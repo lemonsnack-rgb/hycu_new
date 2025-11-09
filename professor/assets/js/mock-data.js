@@ -875,8 +875,11 @@ const DataService = {
     }
 };
 
-// 전역으로 export
+// 🔧 Critical Fix #1: 전역 변수 네임스페이스 분리 (시연용 프로토타입)
+// 교수용과 학생용 DataService가 충돌하지 않도록 별도 네임스페이스 사용
 window.MOCK_DATA = MOCK_DATA;
+window.ProfessorDataService = DataService;
+// 하위 호환성을 위해 DataService도 유지 (교수 화면에서만 사용)
 window.DataService = DataService;
 
 // ========== 학술지 심사 데이터 ==========

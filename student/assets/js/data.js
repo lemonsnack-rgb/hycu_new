@@ -408,6 +408,13 @@ const DataService = {
     getReviews: () => StudentData.reviews,
     
     getTitleChanges: () => StudentData.titleChanges,
-    
+
     getCurrentTitle: () => StudentData.currentTitle
 };
+
+// 🔧 Critical Fix #1: 전역 변수 네임스페이스 분리 (시연용 프로토타입)
+// 학생용 DataService를 별도 네임스페이스로 export
+window.StudentDataService = DataService;
+// 학생 화면에서만 사용하므로 DataService도 export (하위 호환성)
+window.DataService = DataService;
+window.StudentData = StudentData;

@@ -265,4 +265,70 @@ function addStudentInfoIcon(studentName, studentId) {
     `;
 }
 
-console.log('✅ 공통 유틸리티 로드 완료');
+// ==================== 🔧 Critical Fix #2: localStorage 기반 데이터 저장/동기화 (시연용 프로토타입) ====================
+/**
+ * 시연용 프로토타입을 위한 간단한 localStorage 헬퍼
+ * - 교수/학생/관리자 화면 간 데이터 동기화
+ * - 브라우저 새로고침 시 데이터 유지
+ */
+const ProtoStorage = {
+    // 데이터 저장
+    save(key, data) {
+        try {
+            localStorage.setItem(key, JSON.stringify(data));
+            console.log(`💾 [ProtoStorage] 저장: ${key}`);
+            return true;
+        } catch (e) {
+            console.error(`❌ [ProtoStorage] 저장 실패: ${key}`, e);
+            return false;
+        }
+    },
+
+    // 데이터 로드
+    load(key, defaultValue = null) {
+        try {
+            const data = localStorage.getItem(key);
+            if (data === null) return defaultValue;
+            const parsed = JSON.parse(data);
+            console.log(`📂 [ProtoStorage] 로드: ${key}`);
+            return parsed;
+        } catch (e) {
+            console.error(`❌ [ProtoStorage] 로드 실패: ${key}`, e);
+            return defaultValue;
+        }
+    },
+
+    // 데이터 삭제
+    remove(key) {
+        try {
+            localStorage.removeItem(key);
+            console.log(`🗑️ [ProtoStorage] 삭제: ${key}`);
+            return true;
+        } catch (e) {
+            console.error(`❌ [ProtoStorage] 삭제 실패: ${key}`, e);
+            return false;
+        }
+    },
+
+    // 전체 삭제 (시연 초기화용)
+    clear() {
+        try {
+            localStorage.clear();
+            console.log(`🗑️ [ProtoStorage] 전체 삭제`);
+            return true;
+        } catch (e) {
+            console.error(`❌ [ProtoStorage] 전체 삭제 실패`, e);
+            return false;
+        }
+    },
+
+    // 키 목록 조회
+    keys() {
+        return Object.keys(localStorage);
+    }
+};
+
+// 전역으로 export
+window.ProtoStorage = ProtoStorage;
+
+console.log('✅ 공통 유틸리티 로드 완료 (localStorage 헬퍼 포함)');
