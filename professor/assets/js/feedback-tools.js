@@ -511,24 +511,30 @@ eraserRect.set({
                 return;
             }
 
-            // 페이지 경계 체크 (수정: viewport 크기 사용 + tolerance 추가)
+            // 페이지 경계 체크 (수정: viewport 크기 사용 + 동적 tolerance)
             // currentViewport가 없으면 fabricCanvas 크기 사용 (fallback)
             const canvasWidth = currentViewport ? currentViewport.width : fabricCanvas.width;
             const canvasHeight = currentViewport ? currentViewport.height : fabricCanvas.height;
             const rectRight = tempRect.left + tempRect.width;
             const rectBottom = tempRect.top + tempRect.height;
 
-            // 🔧 tolerance를 10px로 증가하여 경계 체크를 더 관대하게 (부동소수점 오차 + 확대/축소 오차 허용)
-            const tolerance = 10;
+            // 🔧 동적 tolerance: currentScale에 비례 + 최소 30px
+            // zoom이 클수록 좌표 오차가 커지므로 tolerance도 증가
+            const baseTolerance = 30;
+            const tolerance = Math.max(baseTolerance, baseTolerance * currentScale);
 
             console.log('🔍 경계 체크 디버그:', {
                 currentViewport: currentViewport,
+                currentScale: currentScale,
                 canvasWidth: canvasWidth,
                 canvasHeight: canvasHeight,
                 'tempRect.left': tempRect.left,
                 'tempRect.top': tempRect.top,
+                'tempRect.width': tempRect.width,
+                'tempRect.height': tempRect.height,
                 rectRight: rectRight,
                 rectBottom: rectBottom,
+                baseTolerance: baseTolerance,
                 tolerance: tolerance,
                 '왼쪽체크': tempRect.left < -tolerance,
                 '위체크': tempRect.top < -tolerance,
@@ -544,8 +550,8 @@ eraserRect.set({
                     rect: { left: tempRect.left, top: tempRect.top, right: rectRight, bottom: rectBottom },
                     canvas: { width: canvasWidth, height: canvasHeight },
                     초과량: {
-                        left: tempRect.left < -tolerance ? tempRect.left + tolerance : 0,
-                        top: tempRect.top < -tolerance ? tempRect.top + tolerance : 0,
+                        left: tempRect.left < -tolerance ? Math.abs(tempRect.left + tolerance) : 0,
+                        top: tempRect.top < -tolerance ? Math.abs(tempRect.top + tolerance) : 0,
                         right: rectRight > canvasWidth + tolerance ? rectRight - (canvasWidth + tolerance) : 0,
                         bottom: rectBottom > canvasHeight + tolerance ? rectBottom - (canvasHeight + tolerance) : 0
                     }
