@@ -511,19 +511,21 @@ eraserRect.set({
                 return;
             }
 
-            // 페이지 경계 체크 (수정: viewport 크기 사용 + 동적 tolerance)
-            // currentViewport가 없으면 fabricCanvas 크기 사용 (fallback)
+            // 🔧 페이지 경계 체크: 중심점 기반으로 변경
+            // 사용자 요구: "영역이 겹치더라도 영역 추가되어야 함"
+            // 중심점이 페이지 안에 있으면 허용 (일부가 벗어나도 OK)
             const canvasWidth = currentViewport ? currentViewport.width : fabricCanvas.width;
             const canvasHeight = currentViewport ? currentViewport.height : fabricCanvas.height;
-            const rectRight = tempRect.left + tempRect.width;
-            const rectBottom = tempRect.top + tempRect.height;
 
-            // 🔧 동적 tolerance: currentScale에 비례 + 최소 30px
-            // zoom이 클수록 좌표 오차가 커지므로 tolerance도 증가
-            const baseTolerance = 30;
-            const tolerance = Math.max(baseTolerance, baseTolerance * currentScale);
+            const rectCenterX = tempRect.left + tempRect.width / 2;
+            const rectCenterY = tempRect.top + tempRect.height / 2;
 
-            console.log('🔍 경계 체크 디버그:', {
+            const isInsidePage = (
+                rectCenterX >= 0 && rectCenterX <= canvasWidth &&
+                rectCenterY >= 0 && rectCenterY <= canvasHeight
+            );
+
+            console.log('🔍 경계 체크 (중심점 기반):', {
                 currentViewport: currentViewport,
                 currentScale: currentScale,
                 canvasWidth: canvasWidth,
@@ -532,32 +534,25 @@ eraserRect.set({
                 'tempRect.top': tempRect.top,
                 'tempRect.width': tempRect.width,
                 'tempRect.height': tempRect.height,
-                rectRight: rectRight,
-                rectBottom: rectBottom,
-                baseTolerance: baseTolerance,
-                tolerance: tolerance,
-                '왼쪽체크': tempRect.left < -tolerance,
-                '위체크': tempRect.top < -tolerance,
-                '오른쪽체크': rectRight > canvasWidth + tolerance,
-                '아래체크': rectBottom > canvasHeight + tolerance
+                rectCenterX: rectCenterX,
+                rectCenterY: rectCenterY,
+                isInsidePage: isInsidePage
             });
 
-            if (tempRect.left < -tolerance || tempRect.top < -tolerance ||
-                rectRight > canvasWidth + tolerance || rectBottom > canvasHeight + tolerance) {
-                fabricCanvas.remove(tempRect);
-                showToast('영역이 페이지 밖으로 벗어났습니다.', 'error');
-                console.error('❌ 영역 지정: 페이지 경계 초과', {
-                    rect: { left: tempRect.left, top: tempRect.top, right: rectRight, bottom: rectBottom },
-                    canvas: { width: canvasWidth, height: canvasHeight },
-                    초과량: {
-                        left: tempRect.left < -tolerance ? Math.abs(tempRect.left + tolerance) : 0,
-                        top: tempRect.top < -tolerance ? Math.abs(tempRect.top + tolerance) : 0,
-                        right: rectRight > canvasWidth + tolerance ? rectRight - (canvasWidth + tolerance) : 0,
-                        bottom: rectBottom > canvasHeight + tolerance ? rectBottom - (canvasHeight + tolerance) : 0
-                    }
+            if (!isInsidePage) {
+                // 중심점이 완전히 페이지 밖에 있을 때만 차단
+                console.error('❌ 영역 지정: 중심점이 페이지 밖', {
+                    rect: { left: tempRect.left, top: tempRect.top, width: tempRect.width, height: tempRect.height },
+                    center: { x: rectCenterX, y: rectCenterY },
+                    canvas: { width: canvasWidth, height: canvasHeight }
                 });
+                fabricCanvas.remove(tempRect);
+                tempRect = null;  // 🔧 tempRect 초기화하여 중복 방지
+                showToast('영역의 중심이 페이지 밖에 있습니다.', 'error');
                 return;
             }
+
+            console.log('✅ 영역 지정 허용 (중심점 검사 통과)');
             
             // ✅ 수정: 영역 겹침 허용 (중복 체크 비활성화)
             // 중복 체크를 원하시면 아래 주석을 해제하세요
@@ -1367,25 +1362,31 @@ function highlightComment(commentId) {
 // ==================== 코멘트 회신 추가 ====================
 function addCommentReply(commentId) {
     console.log('🔵 [addCommentReply] 시작:', commentId);
-    
+    console.log('🔵 [addCommentReply] 찾을 ID:', `reply-${commentId}`);
+
     const textarea = document.getElementById(`reply-${commentId}`);
     console.log('🔵 [addCommentReply] textarea:', textarea);
-    
+    console.log('🔵 [addCommentReply] textarea가 보이는가?:', textarea ? (textarea.offsetParent !== null) : 'textarea 없음');
+    console.log('🔵 [addCommentReply] 페이지의 모든 textarea ID:', Array.from(document.querySelectorAll('textarea')).map(t => t.id));
+
     if (!textarea) {
         console.error('❌ [addCommentReply] textarea를 찾을 수 없음!');
-        alert('입력창을 찾을 수 없습니다.');
+        console.error('   찾으려고 한 ID:', `reply-${commentId}`);
+        alert('입력창을 찾을 수 없습니다.\n\n문제가 지속되면 페이지를 새로고침해주세요.');
         return;
     }
-    
+
     const text = textarea.value.trim();
-    
+
     console.log('🔵 [addCommentReply] textarea.value (원본):', JSON.stringify(textarea.value));
+    console.log('🔵 [addCommentReply] textarea.value.length:', textarea.value.length);
     console.log('🔵 [addCommentReply] text (trim 후):', JSON.stringify(text));
     console.log('🔵 [addCommentReply] text.length:', text.length);
-    
+
     if (!text || text.length === 0) {
         console.error('❌ [addCommentReply] text가 비어있음!');
         alert('댓글을 입력하세요.');
+        textarea.focus();  // 입력창에 포커스
         return;
     }
     
