@@ -518,15 +518,37 @@ eraserRect.set({
             const rectRight = tempRect.left + tempRect.width;
             const rectBottom = tempRect.top + tempRect.height;
 
-            // 2px tolerance를 추가하여 경계 체크를 완화 (부동소수점 오차 허용)
-            const tolerance = 2;
+            // 🔧 tolerance를 10px로 증가하여 경계 체크를 더 관대하게 (부동소수점 오차 + 확대/축소 오차 허용)
+            const tolerance = 10;
+
+            console.log('🔍 경계 체크 디버그:', {
+                currentViewport: currentViewport,
+                canvasWidth: canvasWidth,
+                canvasHeight: canvasHeight,
+                'tempRect.left': tempRect.left,
+                'tempRect.top': tempRect.top,
+                rectRight: rectRight,
+                rectBottom: rectBottom,
+                tolerance: tolerance,
+                '왼쪽체크': tempRect.left < -tolerance,
+                '위체크': tempRect.top < -tolerance,
+                '오른쪽체크': rectRight > canvasWidth + tolerance,
+                '아래체크': rectBottom > canvasHeight + tolerance
+            });
+
             if (tempRect.left < -tolerance || tempRect.top < -tolerance ||
                 rectRight > canvasWidth + tolerance || rectBottom > canvasHeight + tolerance) {
                 fabricCanvas.remove(tempRect);
                 showToast('영역이 페이지 밖으로 벗어났습니다.', 'error');
-                console.log('영역 지정: 페이지 경계 초과', {
+                console.error('❌ 영역 지정: 페이지 경계 초과', {
                     rect: { left: tempRect.left, top: tempRect.top, right: rectRight, bottom: rectBottom },
-                    canvas: { width: canvasWidth, height: canvasHeight }
+                    canvas: { width: canvasWidth, height: canvasHeight },
+                    초과량: {
+                        left: tempRect.left < -tolerance ? tempRect.left + tolerance : 0,
+                        top: tempRect.top < -tolerance ? tempRect.top + tolerance : 0,
+                        right: rectRight > canvasWidth + tolerance ? rectRight - (canvasWidth + tolerance) : 0,
+                        bottom: rectBottom > canvasHeight + tolerance ? rectBottom - (canvasHeight + tolerance) : 0
+                    }
                 });
                 return;
             }
@@ -2169,7 +2191,11 @@ function executeDeleteMainComment(annotationId) {
         console.log('🔴 [executeDeleteMainComment] FeedbackDataService.deleteComment 결과:', success);
     }
 
-    // 4단계: 캔버스에서 영역 삭제 ⭐ 중요!
+    // 4단계: FEEDBACK_DATA에서 annotation 완전 삭제 (먼저 실행)
+    console.log('🔴 [executeDeleteMainComment] FEEDBACK_DATA에서 annotation 삭제...');
+    FeedbackDataService.deleteAnnotation(currentFeedbackId, targetPage, annotationId);
+
+    // 5단계: 캔버스에서 영역 삭제 ⭐ 중요!
     console.log('🔴 [executeDeleteMainComment] 캔버스에서 영역 삭제 시작...');
     if (fabricCanvas) {
         const objects = fabricCanvas.getObjects();
@@ -2187,7 +2213,7 @@ function executeDeleteMainComment(annotationId) {
         console.error('❌ [executeDeleteMainComment] fabricCanvas가 없음!');
     }
 
-    // 5단계: 로컬 annotations에서 삭제
+    // 6단계: 로컬 annotations에서 삭제
     console.log('🔴 [executeDeleteMainComment] 로컬 annotations에서 삭제...');
     if (targetPage && annotations[targetPage]) {
         const index = annotations[targetPage].findIndex(a => a.id === annotationId);
@@ -2203,10 +2229,6 @@ function executeDeleteMainComment(annotationId) {
         }
     }
 
-    // 6단계: FEEDBACK_DATA에서도 annotation 완전 삭제
-    console.log('🔴 [executeDeleteMainComment] FEEDBACK_DATA에서 annotation 삭제...');
-    FeedbackDataService.deleteAnnotation(currentFeedbackId, targetPage, annotationId);
-
     // 7단계: UI 업데이트
     console.log('🔴 [executeDeleteMainComment] UI 업데이트...');
     renderCommentPanel();
@@ -2221,7 +2243,7 @@ function executeDeleteMainComment(annotationId) {
     console.log('🔴 [executeDeleteMainComment] ============ 완료! ============');
     isDeletingComment = false;  // 플래그 해제
     showToast('첨삭과 영역이 삭제되었습니다.', 'success');
-    hideModal();  // 모달 닫기
+    // 🔧 hideModal() 제거: confirm 콜백에서 자동으로 닫힘
 }
 
 function deleteReply(annotationId, replyId) {
@@ -2261,7 +2283,7 @@ function executeDeleteReply(annotationId, replyId) {
 
         console.log('🔴 [executeDeleteReply] ============ 완료! ============');
         showToast('댓글이 삭제되었습니다.', 'success');
-        hideModal();  // 모달 닫기
+        // 🔧 hideModal() 제거: confirm 콜백에서 자동으로 닫힘
     } else {
         alert('댓글 삭제에 실패했습니다.');
     }

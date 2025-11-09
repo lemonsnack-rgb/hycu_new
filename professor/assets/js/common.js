@@ -115,8 +115,11 @@ function hideModal(modalId) {
     }
 }
 
-function createModal(title, content, buttons) {
-    const modalId = 'modal-' + Date.now();
+function createModal(title, content, buttons, modalId = null) {
+    // 🔧 modalId를 인자로 받을 수 있도록 수정
+    if (!modalId) {
+        modalId = 'modal-' + Date.now();
+    }
     const modalHtml = `
         <div id="${modalId}" class="modal-backdrop">
             <div class="modal">
@@ -129,7 +132,7 @@ function createModal(title, content, buttons) {
                 </div>
                 <div class="modal-footer">
                     ${buttons.map(btn => `
-                        <button class="btn ${btn.className || 'btn-secondary'}" 
+                        <button class="btn ${btn.className || 'btn-secondary'}"
                                 onclick="${btn.onclick}; hideModal('${modalId}')">
                             ${btn.text}
                         </button>
@@ -138,20 +141,23 @@ function createModal(title, content, buttons) {
             </div>
         </div>
     `;
-    
+
     const container = document.getElementById('modal-container');
     container.innerHTML = modalHtml;
     showModal(modalId);
-    
+
     // 모달 외부 클릭 시 닫기
     document.getElementById(modalId).addEventListener('click', (e) => {
         if (e.target.classList.contains('modal-backdrop')) {
             hideModal(modalId);
         }
     });
+
+    return modalId;  // 🔧 modalId 반환
 }
 
 function confirm(message, onConfirm) {
+    const modalId = 'modal-' + Date.now();  // 🔧 modalId 미리 생성
     createModal('확인', `<p>${message}</p>`, [
         {
             text: '취소',
@@ -163,13 +169,19 @@ function confirm(message, onConfirm) {
             className: 'btn-primary',
             onclick: typeof onConfirm === 'string' ? onConfirm : ''
         }
-    ]);
-    
+    ], modalId);  // 🔧 modalId 전달
+
     if (typeof onConfirm === 'function') {
-        document.querySelector('.modal-footer .btn-primary').onclick = () => {
-            onConfirm();
-            hideModal('modal-' + Date.now());
-        };
+        // 🔧 정확한 modalId 사용
+        setTimeout(() => {
+            const btn = document.querySelector(`#${modalId} .modal-footer .btn-primary`);
+            if (btn) {
+                btn.onclick = () => {
+                    onConfirm();
+                    hideModal(modalId);  // 🔧 올바른 modalId 전달
+                };
+            }
+        }, 10);
     }
 }
 
