@@ -2107,33 +2107,68 @@ function addMainComment(commentId) {
 }
 
 // ==================== 피드백 완료 (신규) ====================
+// 🔧 Critical Fix #4: completeFeedback() 함수 개선 (ProtoStorage 연동)
 function completeFeedback() {
-    if (!confirm('전체 피드백을 완료하시겠습니까?\n학생에게 알림이 발송됩니다.')) {
+    const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
+
+    if (!feedbackId) {
+        console.error('❌ [completeFeedback] feedbackId가 없음');
+        showToast('피드백 ID를 찾을 수 없습니다.', 'error');
         return;
     }
-    
+
+    console.log('🔵 [completeFeedback] 시작:', feedbackId);
+
+    if (!confirm('전체 피드백을 완료하시겠습니까?\n학생에게 알림이 발송됩니다.')) {
+        console.log('🔴 [completeFeedback] 사용자가 취소함');
+        return;
+    }
+
     // ✅ 수정: 제출물 상태를 '피드백 완료'로 변경
-    const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
     const request = FeedbackDataService.getFeedbackRequestById(feedbackId);
     if (request) {
         request.status = '피드백 완료';
         request.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
         request.lastModifiedBy = CURRENT_USER.id;
+        console.log('✅ [completeFeedback] request 업데이트:', request);
+    } else {
+        console.warn('⚠️ [completeFeedback] request를 찾을 수 없음');
     }
-    
+
     // FEEDBACK_DATA도 업데이트
     const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
     if (feedbackData) {
         feedbackData.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
         feedbackData.lastModifiedBy = CURRENT_USER.id;
+        console.log('✅ [completeFeedback] feedbackData 업데이트:', feedbackData);
+    } else {
+        console.warn('⚠️ [completeFeedback] feedbackData를 찾을 수 없음');
     }
-    
+
+    // 🔧 Critical Fix #4: ProtoStorage에 저장 (시연용 프로토타입)
+    if (window.ProtoStorage) {
+        // 완료된 피드백 ID 목록 저장
+        const completedList = window.ProtoStorage.load('completed_feedbacks', []);
+        if (!completedList.includes(feedbackId)) {
+            completedList.push(feedbackId);
+            window.ProtoStorage.save('completed_feedbacks', completedList);
+            console.log('💾 [completeFeedback] ProtoStorage 저장 완료:', completedList);
+        }
+
+        // 피드백 데이터 전체 저장
+        window.ProtoStorage.save('professor_feedback_data', window.FEEDBACK_DATA || {});
+    } else {
+        console.warn('⚠️ [completeFeedback] ProtoStorage가 없음 (common-utils.js 로드 확인)');
+    }
+
     showToast('피드백이 완료되었습니다. 학생에게 알림이 발송됩니다.', 'success');
-    
+
     // 모달 닫기
     setTimeout(() => {
         closeFeedbackModal();
     }, 1500);
+
+    console.log('✅ [completeFeedback] 완료');
 }
 
 // ==================== 첨삭/댓글 삭제 (신규) ====================
