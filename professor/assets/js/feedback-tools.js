@@ -1988,25 +1988,29 @@ function addMainComment(commentId) {
     console.log('🔵 [addMainComment] commentId:', commentId);
     console.log('🔵 [addMainComment] currentFeedbackId:', currentFeedbackId);
     console.log('🔵 [addMainComment] typeof currentFeedbackId:', typeof currentFeedbackId);
-    
+
     const textarea = document.getElementById(`main-comment-${commentId}`);
     console.log('🔵 [addMainComment] textarea:', textarea);
-    
+    console.log('🔵 [addMainComment] textarea가 보이는가?:', textarea ? (textarea.offsetParent !== null) : 'textarea 없음');
+
     if (!textarea) {
         console.error('❌ [addMainComment] textarea를 찾을 수 없음!');
-        alert('입력창을 찾을 수 없습니다.');
+        console.error('   찾으려고 한 ID:', `main-comment-${commentId}`);
+        console.error('   페이지의 모든 textarea:', Array.from(document.querySelectorAll('textarea')).map(t => t.id));
+        alert('입력창을 찾을 수 없습니다.\n\n이 오류는 다음 경우에 발생할 수 있습니다:\n• 다른 사용자가 작성한 첨삭\n• 페이지가 올바르게 로드되지 않음\n\n페이지를 새로고침하거나, 영역을 다시 지정해주세요.');
         return;
     }
-    
+
     const text = textarea.value.trim();
-    
+
     console.log('🔵 [addMainComment] textarea.value (원본):', JSON.stringify(textarea.value));
     console.log('🔵 [addMainComment] text (trim 후):', JSON.stringify(text));
     console.log('🔵 [addMainComment] text.length:', text.length);
-    
+
     if (!text || text.length === 0) {
         console.log('❌ [addMainComment] text가 비어있음!');
         alert('첨삭 내용을 입력하세요.');
+        textarea.focus();  // 입력창에 포커스
         return;
     }
     
@@ -2110,25 +2114,29 @@ let isDeletingComment = false;
 function deleteMainComment(annotationId) {
     console.log('🔴 [deleteMainComment] ============ 시작 ============');
     console.log('🔴 [deleteMainComment] annotationId:', annotationId);
-    
+
     // 중복 실행 방지
     if (isDeletingComment) {
         console.log('⚠️ [deleteMainComment] 이미 삭제 진행 중, 무시');
         return;
     }
-    
-    if (!confirm('⚠️ 정말로 이 첨삭을 삭제하시겠습니까?\n\n삭제되는 것:\n• 첨삭 내용\n• 모든 댓글\n• PDF 영역 (사각형)\n\n이 작업은 되돌릴 수 없습니다.\n\n삭제하려면 [확인] 버튼을 눌러주세요.')) {
-        console.log('🔴 [deleteMainComment] 사용자가 취소함');
-        return;
-    }
-    
+
+    // 🐛 버그 수정: 커스텀 confirm은 콜백 방식이므로, 콜백으로 변경
+    confirm('⚠️ 정말로 이 첨삭을 삭제하시겠습니까?\n\n삭제되는 것:\n• 첨삭 내용\n• 모든 댓글\n• PDF 영역 (사각형)\n\n이 작업은 되돌릴 수 없습니다.', () => {
+        executeDeleteMainComment(annotationId);
+    });
+}
+
+// 실제 삭제 로직 (분리)
+function executeDeleteMainComment(annotationId) {
+    console.log('🔴 [executeDeleteMainComment] 삭제 진행...');
+
     isDeletingComment = true;  // 플래그 설정
-    console.log('🔴 [deleteMainComment] 삭제 진행...');
-    
+
     // 1단계: 로컬 annotations에서 annotation 찾기
     let targetPage = null;
     let targetAnnotation = null;
-    
+
     for (const page in annotations) {
         const ann = annotations[page].find(a => a.id === annotationId);
         if (ann) {
@@ -2137,101 +2145,105 @@ function deleteMainComment(annotationId) {
             break;
         }
     }
-    
-    console.log('🔴 [deleteMainComment] 로컬에서 찾음 - page:', targetPage, 'annotation:', targetAnnotation);
-    
+
+    console.log('🔴 [executeDeleteMainComment] 로컬에서 찾음 - page:', targetPage, 'annotation:', targetAnnotation);
+
     if (!targetAnnotation) {
-        console.error('❌ [deleteMainComment] annotation을 찾을 수 없음!');
+        console.error('❌ [executeDeleteMainComment] annotation을 찾을 수 없음!');
         isDeletingComment = false;  // 플래그 해제
         alert('삭제할 첨삭을 찾을 수 없습니다.');
         return;
     }
-    
+
     // 2단계: 메인 첨삭 ID 찾기
     let mainCommentId = null;
     if (targetAnnotation.comments && targetAnnotation.comments.length > 0) {
         mainCommentId = targetAnnotation.comments[0].id;
     }
-    
-    console.log('🔴 [deleteMainComment] mainCommentId:', mainCommentId);
-    
+
+    console.log('🔴 [executeDeleteMainComment] mainCommentId:', mainCommentId);
+
     // 3단계: FEEDBACK_DATA에서 삭제 (댓글이 있는 경우)
     if (mainCommentId) {
         const success = FeedbackDataService.deleteComment(currentFeedbackId, annotationId, mainCommentId);
-        console.log('🔴 [deleteMainComment] FeedbackDataService.deleteComment 결과:', success);
+        console.log('🔴 [executeDeleteMainComment] FeedbackDataService.deleteComment 결과:', success);
     }
-    
+
     // 4단계: 캔버스에서 영역 삭제 ⭐ 중요!
-    console.log('🔴 [deleteMainComment] 캔버스에서 영역 삭제 시작...');
+    console.log('🔴 [executeDeleteMainComment] 캔버스에서 영역 삭제 시작...');
     if (fabricCanvas) {
         const objects = fabricCanvas.getObjects();
         for (let i = objects.length - 1; i >= 0; i--) {
             const obj = objects[i];
             if (obj.id === annotationId) {
-                console.log('🔴 [deleteMainComment] 캔버스 객체 찾음:', obj.id);
+                console.log('🔴 [executeDeleteMainComment] 캔버스 객체 찾음:', obj.id);
                 fabricCanvas.remove(obj);
-                console.log('🔴 [deleteMainComment] 캔버스에서 제거 완료');
+                console.log('🔴 [executeDeleteMainComment] 캔버스에서 제거 완료');
                 break;
             }
         }
         fabricCanvas.renderAll();
     } else {
-        console.error('❌ [deleteMainComment] fabricCanvas가 없음!');
+        console.error('❌ [executeDeleteMainComment] fabricCanvas가 없음!');
     }
-    
+
     // 5단계: 로컬 annotations에서 삭제
-    console.log('🔴 [deleteMainComment] 로컬 annotations에서 삭제...');
+    console.log('🔴 [executeDeleteMainComment] 로컬 annotations에서 삭제...');
     if (targetPage && annotations[targetPage]) {
         const index = annotations[targetPage].findIndex(a => a.id === annotationId);
         if (index !== -1) {
             annotations[targetPage].splice(index, 1);
-            console.log('🔴 [deleteMainComment] 로컬에서 제거 완료, index:', index);
-            
+            console.log('🔴 [executeDeleteMainComment] 로컬에서 제거 완료, index:', index);
+
             // 페이지에 annotation이 하나도 없으면 페이지 키 삭제
             if (annotations[targetPage].length === 0) {
                 delete annotations[targetPage];
-                console.log('🔴 [deleteMainComment] 페이지 키 삭제:', targetPage);
+                console.log('🔴 [executeDeleteMainComment] 페이지 키 삭제:', targetPage);
             }
         }
     }
-    
+
     // 6단계: FEEDBACK_DATA에서도 annotation 완전 삭제
-    console.log('🔴 [deleteMainComment] FEEDBACK_DATA에서 annotation 삭제...');
+    console.log('🔴 [executeDeleteMainComment] FEEDBACK_DATA에서 annotation 삭제...');
     FeedbackDataService.deleteAnnotation(currentFeedbackId, targetPage, annotationId);
-    
+
     // 7단계: UI 업데이트
-    console.log('🔴 [deleteMainComment] UI 업데이트...');
+    console.log('🔴 [executeDeleteMainComment] UI 업데이트...');
     renderCommentPanel();
     refreshInlineTabMarker();
-    
+
     // 8단계: 마커 재생성
     if (targetPage) {
-        console.log('🔴 [deleteMainComment] 마커 재생성...');
+        console.log('🔴 [executeDeleteMainComment] 마커 재생성...');
         redrawMarkersForPage(parseInt(targetPage));
     }
-    
-    console.log('🔴 [deleteMainComment] ============ 완료! ============');
+
+    console.log('🔴 [executeDeleteMainComment] ============ 완료! ============');
     isDeletingComment = false;  // 플래그 해제
     showToast('첨삭과 영역이 삭제되었습니다.', 'success');
+    hideModal();  // 모달 닫기
 }
 
 function deleteReply(annotationId, replyId) {
     console.log('🔴 [deleteReply] ============ 시작 ============');
     console.log('🔴 [deleteReply] annotationId:', annotationId);
     console.log('🔴 [deleteReply] replyId:', replyId);
-    
-    if (!confirm('⚠️ 정말로 이 댓글을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.\n\n삭제하려면 [확인] 버튼을 눌러주세요.')) {
-        console.log('🔴 [deleteReply] 사용자가 취소함');
-        return;
-    }
-    
-    console.log('🔴 [deleteReply] 삭제 진행...');
-    
+
+    // 🐛 버그 수정: 커스텀 confirm은 콜백 방식이므로, 콜백으로 변경
+    confirm('⚠️ 정말로 이 댓글을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.', () => {
+        executeDeleteReply(annotationId, replyId);
+    });
+}
+
+// 실제 댓글 삭제 로직 (분리)
+function executeDeleteReply(annotationId, replyId) {
+    console.log('🔴 [executeDeleteReply] 삭제 진행...');
+
     // 삭제 실행
     const success = FeedbackDataService.deleteComment(currentFeedbackId, annotationId, replyId);
-    
-    console.log('🔴 [deleteReply] FeedbackDataService.deleteComment 결과:', success);
-    
+
+    console.log('🔴 [executeDeleteReply] FeedbackDataService.deleteComment 결과:', success);
+
     if (success) {
         // 로컬 annotations 동기화
         const feedbackData = FeedbackDataService.getFeedbackData(currentFeedbackId);
@@ -2239,16 +2251,17 @@ function deleteReply(annotationId, replyId) {
             // 병합 방식
             if (Object.keys(feedbackData.annotations).length > 0) {
                 annotations = feedbackData.annotations;
-                console.log('🔴 [deleteReply] annotations 동기화 완료');
+                console.log('🔴 [executeDeleteReply] annotations 동기화 완료');
             }
         }
-        
+
         // UI 업데이트
         renderCommentPanel();
         refreshInlineTabMarker();
-        
-        console.log('🔴 [deleteReply] ============ 완료! ============');
+
+        console.log('🔴 [executeDeleteReply] ============ 완료! ============');
         showToast('댓글이 삭제되었습니다.', 'success');
+        hideModal();  // 모달 닫기
     } else {
         alert('댓글 삭제에 실패했습니다.');
     }
