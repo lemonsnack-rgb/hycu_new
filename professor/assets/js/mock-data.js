@@ -72,36 +72,36 @@ const MOCK_DATA = {
         }
     ],
 
-    // 지도학생 목록
+    // 지도학생 목록 (🔧 Critical Fix #3: studentId를 2024xxx로 통일)
     students: [
         {
             id: 'S001',
             name: '김철수',
-            studentId: '2023001',
-            department: '경영학과',
-            degree: 'master',
-            stage: 'final',
-            email: 'kim@student.ac.kr',
+            studentId: '2024001',  // 🔧 2023001 → 2024001 (feedback-data와 통일)
+            department: '컴퓨터공학',  // 🔧 경영학과 → 컴퓨터공학 (DEMO_STUDENT와 일치)
+            degree: 'phd',  // 🔧 master → phd (박사과정)
+            stage: 'proposal',
+            email: 'kim@hycu.ac.kr',  // 🔧 DEMO_STUDENT와 일치
             phone: '010-1234-5678',
-            admissionYear: 2023,
+            admissionYear: 2024,  // 🔧 2023 → 2024
             advisor: 'P001'
         },
         {
             id: 'S002',
             name: '이영희',
-            studentId: '2023002',
+            studentId: '2024002',  // 🔧 2023002 → 2024002
             department: '경영학과',
             degree: 'master',
             stage: 'mid',
             email: 'lee@student.ac.kr',
             phone: '010-2345-6789',
-            admissionYear: 2023,
+            admissionYear: 2024,  // 🔧 2023 → 2024
             advisor: 'P001'
         },
         {
             id: 'S003',
             name: '박민수',
-            studentId: '2023003',
+            studentId: '2024003',  // 🔧 2023003 → 2024003
             department: '경영학과',
             degree: 'master',
             stage: 'mid',

@@ -1,16 +1,16 @@
 // ==================== Mock 데이터 ====================
 
 const StudentData = {
-    // 학생 정보
+    // 학생 정보 (🔧 Critical Fix #3: DEMO_STUDENT 상수 사용)
     student: {
-        id: '2023012345',
-        name: '홍길동',
-        program: '석사과정',
-        year: 2,
-        major: '경영학과',
-        advisor: '김교수',
-        email: 'hong@hycu.ac.kr',
-        enrollmentDate: '2023-03-01'
+        id: window.DEMO_STUDENT?.id || '2024001',
+        name: window.DEMO_STUDENT?.name || '김철수',
+        program: window.DEMO_STUDENT?.program || '박사',
+        year: window.DEMO_STUDENT?.year || 1,
+        major: window.DEMO_STUDENT?.major || '컴퓨터공학',
+        advisor: window.DEMO_STUDENT?.advisor || '김교수',
+        email: window.DEMO_STUDENT?.email || 'kim@hycu.ac.kr',
+        enrollmentDate: window.DEMO_STUDENT?.enrollmentDate || '2024-03-01'
     },
     
     // 졸업 요건 체크리스트
