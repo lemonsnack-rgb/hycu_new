@@ -69,7 +69,7 @@ function renderAvailableTab() {
                         <div style="color: #6B7280; font-size: 0.875rem; margin-bottom: 0.75rem;">
                             <p>김교수 • Zoom 온라인</p>
                         </div>
-                        <button onclick="alert('미팅 신청')" style="width: 100%; background: #6A0028; color: white; padding: 0.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
+                        <button onclick="requestMeeting({slotId: 'SLOT001', date: '2025-11-10', time: '10:00', duration: 60})" style="width: 100%; background: #6A0028; color: white; padding: 0.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
                             이 시간에 신청하기
                         </button>
                     </div>
@@ -226,3 +226,77 @@ function hideRecording(recId) {
         playerDiv.style.display = 'none';
     }
 }
+
+// 🔧 Critical Fix #5: 미팅 신청 기능 구현 (ProtoStorage 연동)
+function requestMeeting(slotInfo) {
+    console.log('🔵 [requestMeeting] 시작:', slotInfo);
+
+    // 모달로 미팅 신청 정보 입력받기
+    const topic = prompt('미팅 주제를 입력하세요:', '논문 지도 상담');
+    if (!topic) {
+        console.log('🔴 [requestMeeting] 사용자가 취소함');
+        return;
+    }
+
+    const description = prompt('상담 내용을 간단히 입력하세요:', '');
+
+    // 학생 정보 가져오기 (DEMO_STUDENT 사용)
+    const student = window.DEMO_STUDENT || {
+        id: '2024001',
+        name: '김철수'
+    };
+
+    // 미팅 요청 객체 생성
+    const requestId = 'REQ' + Date.now();
+    const meetingRequest = {
+        id: requestId,
+        slotId: slotInfo?.slotId || 'SLOT_DEMO',
+        studentId: student.id,
+        studentName: student.name,
+        studentNumber: student.id,
+        requestDate: new Date().toISOString().split('T')[0],
+        selectedDate: slotInfo?.date || '2025-11-10',
+        selectedTime: slotInfo?.time || '14:00',
+        duration: slotInfo?.duration || 60,
+        meetingType: 'online',
+        topic: topic,
+        description: description || '',
+        status: 'pending',
+
+        // 승인 정보
+        approvedDate: null,
+        professorComment: null,
+
+        // Zoom 정보
+        zoomMeetingId: null,
+        zoomJoinUrl: null,
+        zoomPassword: null,
+
+        // 거절 정보
+        rejectedDate: null,
+        rejectionReason: null
+    };
+
+    console.log('✅ [requestMeeting] 생성된 요청:', meetingRequest);
+
+    // ProtoStorage에 저장
+    if (window.ProtoStorage) {
+        // 기존 요청 목록 가져오기
+        const allRequests = window.ProtoStorage.load('meeting_requests', []);
+        allRequests.push(meetingRequest);
+        window.ProtoStorage.save('meeting_requests', allRequests);
+
+        console.log('💾 [requestMeeting] ProtoStorage 저장 완료:', allRequests.length, '건');
+
+        alert(`미팅 신청이 완료되었습니다.\n\n주제: ${topic}\n날짜: ${meetingRequest.selectedDate} ${meetingRequest.selectedTime}\n\n교수님 승인 후 확정됩니다.`);
+
+        // 화면 새로고침
+        renderMeeting();
+    } else {
+        console.error('❌ [requestMeeting] ProtoStorage가 없음 (common-utils.js 로드 확인)');
+        alert('미팅 신청 중 오류가 발생했습니다.');
+    }
+}
+
+// 전역 함수로 export
+window.requestMeeting = requestMeeting;

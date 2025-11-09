@@ -234,11 +234,26 @@ if (typeof DataService !== 'undefined') {
         return false;
     };
     
-    // 미팅 신청 관리
+    // 미팅 신청 관리 (🔧 Critical Fix #5: ProtoStorage 연동)
     DataService.getMeetingRequestsV2 = function(status) {
-        return status 
-            ? MEETING_REQUESTS_V2.filter(r => r.status === status)
-            : MEETING_REQUESTS_V2;
+        // 기본 mock 데이터
+        let allRequests = [...MEETING_REQUESTS_V2];
+
+        // 🔧 ProtoStorage에서 학생이 신청한 미팅 가져오기
+        if (window.ProtoStorage) {
+            const storedRequests = window.ProtoStorage.load('meeting_requests', []);
+            if (storedRequests.length > 0) {
+                console.log('📂 [getMeetingRequestsV2] ProtoStorage에서', storedRequests.length, '건 로드');
+                // 중복 제거: storedRequests를 우선하고, 동일 ID가 없는 mock만 추가
+                const storedIds = storedRequests.map(r => r.id);
+                const uniqueMockRequests = MEETING_REQUESTS_V2.filter(r => !storedIds.includes(r.id));
+                allRequests = [...storedRequests, ...uniqueMockRequests];
+            }
+        }
+
+        return status
+            ? allRequests.filter(r => r.status === status)
+            : allRequests;
     };
     
     DataService.getMeetingDetailV2 = function(id) {
@@ -254,22 +269,49 @@ if (typeof DataService !== 'undefined') {
         };
     };
     
-    // 미팅 승인 (Zoom API 시뮬레이션)
+    // 미팅 승인 (Zoom API 시뮬레이션) (🔧 Critical Fix #5: ProtoStorage 연동)
     DataService.approveMeetingV2 = function(id, comment) {
-        const meeting = MEETING_REQUESTS_V2.find(r => r.id === id);
+        console.log('🔵 [approveMeetingV2] 시작:', id, comment);
+
+        // 먼저 MEETING_REQUESTS_V2에서 찾기
+        let meeting = MEETING_REQUESTS_V2.find(r => r.id === id);
+        let isFromStorage = false;
+
+        // 🔧 없으면 ProtoStorage에서 찾기
+        if (!meeting && window.ProtoStorage) {
+            const storedRequests = window.ProtoStorage.load('meeting_requests', []);
+            meeting = storedRequests.find(r => r.id === id);
+            isFromStorage = true;
+            console.log('📂 [approveMeetingV2] ProtoStorage에서 찾음:', meeting);
+        }
+
         if (meeting && meeting.status === 'pending') {
             meeting.status = 'approved';
             meeting.approvedDate = new Date().toISOString().split('T')[0];
             meeting.professorComment = comment;
-            
+
             // Zoom 미팅이면 Zoom API 호출 (시뮬레이션)
             if (meeting.meetingType === 'online') {
                 const zoomInfo = simulateZoomAPI(meeting);
                 Object.assign(meeting, zoomInfo);
             }
-            
+
+            // 🔧 ProtoStorage에 저장된 것이면 업데이트
+            if (isFromStorage && window.ProtoStorage) {
+                const storedRequests = window.ProtoStorage.load('meeting_requests', []);
+                const index = storedRequests.findIndex(r => r.id === id);
+                if (index !== -1) {
+                    storedRequests[index] = meeting;
+                    window.ProtoStorage.save('meeting_requests', storedRequests);
+                    console.log('💾 [approveMeetingV2] ProtoStorage 업데이트 완료');
+                }
+            }
+
+            console.log('✅ [approveMeetingV2] 승인 완료:', meeting);
             return meeting;
         }
+
+        console.warn('⚠️ [approveMeetingV2] 미팅을 찾을 수 없거나 이미 처리됨');
         return null;
     };
     
