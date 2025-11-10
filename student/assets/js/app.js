@@ -35,7 +35,8 @@ function showScreen(screenName) {
         'review': '심사 신청',
         'title-change': '논문제목 변경',
         'board': '자료실',
-        'graduation': '졸업 요건'
+        'graduation': '졸업 요건',
+        'workflow': '논문 진행 단계'
     };
     
     const titleElement = document.getElementById('page-title');
@@ -51,7 +52,8 @@ function showScreen(screenName) {
         'review': renderReview,
         'title-change': renderTitleChange,
         'board': () => initBoard('student'),
-        'graduation': renderGraduation
+        'graduation': renderGraduation,
+        'workflow': renderWorkflow
     };
     
     if (renderFunctions[screenName]) {
