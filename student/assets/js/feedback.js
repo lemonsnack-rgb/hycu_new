@@ -15,7 +15,17 @@ let currentTool = 'select';
 function renderFeedback() {
     const content = document.getElementById('feedback-screen');
     if (!content) return;
-    
+
+    // localStorage에서 제출물 불러오기
+    const localSubmissions = JSON.parse(localStorage.getItem('feedback_submissions') || '[]');
+
+    // DataService에서 기본 제출물 가져오기
+    const defaultSubmissions = DataService.getSubmissions();
+
+    // 두 목록 합치기 (localStorage 우선)
+    const submissions = [... localSubmissions, ...defaultSubmissions]
+        .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+
     content.innerHTML = `
         <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
@@ -27,40 +37,84 @@ function renderFeedback() {
                     <button onclick="showSubmissionHistory()" class="btn btn-secondary">
                         <i class="fas fa-history"></i> 제출 히스토리
                     </button>
-                    <button onclick="alert('문서 업로드')" class="btn-primary">
+                    <button onclick="showSubmissionForm()" class="btn-primary">
                         + 피드백 요청
                     </button>
                 </div>
             </div>
-            
+
             <div class="card-body" style="padding: 0;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                         <tr>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">No</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제목</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">단계</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">문서명</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">피드백상태</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">상태</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">버전</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr onclick="openFeedbackViewer()" style="border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: background 0.2s;" 
-                            onmouseover="this.style.background='#F9FAFB'" 
-                            onmouseout="this.style.background='white'">
-                            <td style="padding: 0.75rem 1rem;">
-                                <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">최종논문</span>
-                            </td>
-                            <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">논문_초안.pdf</td>
-                            <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">2025-11-01</td>
-                            <td style="padding: 0.75rem 1rem;">
-                                <span style="background: #D1FAE5; color: #065F46; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">피드백 완료</span>
-                            </td>
-                        </tr>
+                        ${submissions.length === 0 ? `
+                            <tr>
+                                <td colspan="6" style="padding: 3rem 1rem; text-align: center; color: #9CA3AF;">
+                                    제출된 문서가 없습니다. '+ 피드백 요청' 버튼을 클릭하여 문서를 제출하세요.
+                                </td>
+                            </tr>
+                        ` : submissions.map((sub, index) => `
+                            <tr onclick="openFeedbackViewer(${sub.id})" style="border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: background 0.2s;"
+                                onmouseover="this.style.background='#F9FAFB'"
+                                onmouseout="this.style.background='white'">
+                                <td style="padding: 0.75rem 1rem; color: #6B7280;">${index + 1}</td>
+                                <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${sub.title}</td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    ${getStageBadge(sub.stage)}
+                                </td>
+                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${formatDate(sub.uploadDate)}</td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    ${getStatusBadge(sub.status)}
+                                </td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; background: #F3F4F6; color: #6B7280; border-radius: 0.375rem; font-weight: 600;">${sub.version}</span>
+                                </td>
+                            </tr>
+                        `).join('')}
                     </tbody>
                 </table>
             </div>
         </div>
     `;
+}
+
+// Helper functions
+function getStageBadge(stage) {
+    const stageColors = {
+        '연구계획서 심사': 'background: #DBEAFE; color: #1E40AF;',
+        '중간논문': 'background: #FEF3C7; color: #92400E;',
+        '최종논문': 'background: #F3E8FF; color: #6B21A8;',
+        '최종논문 준비': 'background: #F3E8FF; color: #6B21A8;'
+    };
+    const style = stageColors[stage] || 'background: #F3F4F6; color: #6B7280;';
+    return `<span style="${style} padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${stage}</span>`;
+}
+
+function getStatusBadge(status) {
+    const statusColors = {
+        '피드백 완료': 'background: #D1FAE5; color: #065F46;',
+        '검토중': 'background: #FEF3C7; color: #92400E;',
+        '대기': 'background: #F3F4F6; color: #6B7280;'
+    };
+    const style = statusColors[status] || 'background: #F3F4F6; color: #6B7280;';
+    return `<span style="${style} padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${status}</span>`;
+}
+
+function formatDate(dateStr) {
+    const date = new Date(dateStr);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
 }
 
 // PDF 뷰어 모달 열기 (교수용과 동일한 레이아웃, 편집 기능은 비활성화)
@@ -665,7 +719,343 @@ function closeHistoryModal() {
     document.getElementById('modal-container').innerHTML = '';
 }
 
+// ==================== 피드백 요청 제출 폼 ====================
+
+let selectedFile = null;
+
+function showSubmissionForm() {
+    const currentStep = DataService.getCurrentWorkflowStep();
+
+    const modalContent = `
+        <div class="modal">
+            <div class="modal-content" style="max-width: 700px;">
+                <div class="modal-header">
+                    <h3>📤 피드백 요청 제출</h3>
+                    <button onclick="closeSubmissionForm()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
+                </div>
+                <div class="modal-body">
+                    <!-- 제목 -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            제목 <span style="color: #EF4444;">*</span>
+                        </label>
+                        <input type="text" id="submission-title"
+                               placeholder="문서 제목을 입력하세요 (예: 3장 연구방법론 초안)"
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                    </div>
+
+                    <!-- 워크플로우 단계 선택 -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            워크플로우 단계 <span style="color: #EF4444;">*</span>
+                        </label>
+                        <select id="workflow-step" style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <option value="">단계를 선택하세요</option>
+                            <option value="STEP_1" ${currentStep === 'STEP_1' ? 'selected' : ''}>STEP 1 - 연구계획서 작성</option>
+                            <option value="STEP_2" ${currentStep === 'STEP_2' ? '' : 'disabled'}>STEP 2 - 연구계획서 심사</option>
+                            <option value="STEP_3" ${currentStep === 'STEP_3' ? 'selected' : currentStep > 'STEP_3' ? '' : 'disabled'}>STEP 3 - 논문 작성</option>
+                            <option value="STEP_4" ${currentStep === 'STEP_4' ? '' : 'disabled'}>STEP 4 - 중간논문 심사</option>
+                            <option value="STEP_5" ${currentStep === 'STEP_5' ? 'selected' : ''}>STEP 5 - 최종논문 작성</option>
+                        </select>
+                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.5rem;">현재 진행 단계: ${getStepName(currentStep)}</p>
+                    </div>
+
+                    <!-- 메모 (선택사항) -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            메모 (선택사항)
+                        </label>
+                        <textarea id="submission-memo"
+                                  placeholder="교수님께 전달할 메시지가 있다면 작성하세요"
+                                  style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: vertical;"
+                                  rows="3"></textarea>
+                    </div>
+
+                    <!-- 파일 업로드 -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                            파일 업로드 <span style="color: #EF4444;">*</span>
+                        </label>
+
+                        <!-- 드래그 앤 드롭 영역 -->
+                        <div id="drop-zone"
+                             ondrop="handleDrop(event)"
+                             ondragover="handleDragOver(event)"
+                             ondragleave="handleDragLeave(event)"
+                             onclick="document.getElementById('file-input').click()"
+                             style="border: 2px dashed #D1D5DB; border-radius: 0.5rem; padding: 2rem; text-align: center; background: #F9FAFB; cursor: pointer; transition: all 0.2s;">
+                            <svg style="width: 3rem; height: 3rem; margin: 0 auto 1rem; color: #9CA3AF;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            <p style="font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem; font-weight: 500;">파일을 드래그하거나 클릭하여 업로드</p>
+                            <p style="font-size: 0.75rem; color: #6B7280;">PDF, DOCX, HWP, JPG, PNG (최대 10MB)</p>
+                        </div>
+
+                        <!-- 숨겨진 파일 input -->
+                        <input type="file" id="file-input" accept=".pdf,.docx,.hwp,.jpg,.jpeg,.png" style="display: none;" onchange="handleFileSelect(event)">
+
+                        <!-- 선택된 파일 미리보기 -->
+                        <div id="file-preview" style="display: none; margin-top: 1rem; padding: 1rem; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem;">
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div id="file-icon" style="width: 2.5rem; height: 2.5rem; background: #EFF6FF; border-radius: 0.375rem; display: flex; align-items: center; justify-content: center;">
+                                        <svg style="width: 1.5rem; height: 1.5rem; color: #3B82F6;" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
+                                        </svg>
+                                    </div>
+                                    <div>
+                                        <p id="file-name" style="font-size: 0.875rem; font-weight: 500; color: #1F2937; margin: 0;"></p>
+                                        <p id="file-size" style="font-size: 0.75rem; color: #6B7280; margin: 0;"></p>
+                                    </div>
+                                </div>
+                                <button onclick="removeSelectedFile()" style="padding: 0.25rem; color: #9CA3AF; background: none; border: none; cursor: pointer;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 알림 -->
+                    <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 1rem; border-radius: 0.375rem;">
+                        <p style="font-size: 0.75rem; color: #1E40AF; margin: 0;">
+                            💡 제출한 문서는 교수님께 전달되며, 피드백을 받을 수 있습니다.
+                        </p>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeSubmissionForm()" class="btn btn-secondary">취소</button>
+                    <button onclick="submitFeedbackRequest()" class="btn-primary">제출하기</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('modal-container').innerHTML = modalContent;
+}
+
+function getStepName(step) {
+    const stepNames = {
+        'STEP_1': 'STEP 1 - 연구계획서 작성',
+        'STEP_2': 'STEP 2 - 연구계획서 심사',
+        'STEP_3': 'STEP 3 - 논문 작성',
+        'STEP_4': 'STEP 4 - 중간논문 심사',
+        'STEP_5': 'STEP 5 - 최종논문 작성'
+    };
+    return stepNames[step] || step;
+}
+
+function handleDragOver(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.style.borderColor = '#3B82F6';
+    dropZone.style.background = '#EFF6FF';
+}
+
+function handleDragLeave(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.style.borderColor = '#D1D5DB';
+    dropZone.style.background = '#F9FAFB';
+}
+
+function handleDrop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.style.borderColor = '#D1D5DB';
+    dropZone.style.background = '#F9FAFB';
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleFileSelection(files[0]);
+    }
+}
+
+function handleFileSelect(e) {
+    const file = e.target.files[0];
+    if (file) {
+        handleFileSelection(file);
+    }
+}
+
+function handleFileSelection(file) {
+    // 파일 크기 체크 (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        alert('파일 크기는 10MB 이하여야 합니다.');
+        return;
+    }
+
+    // 파일 확장자 체크
+    const allowedExtensions = ['.pdf', '.docx', '.hwp', '.jpg', '.jpeg', '.png'];
+    const fileName = file.name.toLowerCase();
+    const isAllowed = allowedExtensions.some(ext => fileName.endsWith(ext));
+
+    if (!isAllowed) {
+        alert('허용된 파일 형식: PDF, DOCX, HWP, JPG, PNG');
+        return;
+    }
+
+    // 파일 저장
+    selectedFile = file;
+
+    // 파일 미리보기 표시
+    const filePreview = document.getElementById('file-preview');
+    const fileNameElement = document.getElementById('file-name');
+    const fileSizeElement = document.getElementById('file-size');
+
+    filePreview.style.display = 'block';
+    fileNameElement.textContent = file.name;
+    fileSizeElement.textContent = formatFileSize(file.size);
+}
+
+function removeSelectedFile() {
+    selectedFile = null;
+    document.getElementById('file-preview').style.display = 'none';
+    document.getElementById('file-input').value = '';
+}
+
+function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+}
+
+function submitFeedbackRequest() {
+    // 필드 검증
+    const title = document.getElementById('submission-title').value.trim();
+    const workflowStep = document.getElementById('workflow-step').value;
+    const memo = document.getElementById('submission-memo').value.trim();
+
+    if (!title) {
+        alert('제목을 입력해주세요.');
+        document.getElementById('submission-title').focus();
+        return;
+    }
+
+    if (!workflowStep) {
+        alert('워크플로우 단계를 선택해주세요.');
+        return;
+    }
+
+    if (!selectedFile) {
+        alert('파일을 업로드해주세요.');
+        return;
+    }
+
+    // 파일을 base64로 인코딩 (데모용 - 실제로는 서버에 업로드)
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const fileData = {
+            name: selectedFile.name,
+            size: selectedFile.size,
+            type: selectedFile.type,
+            base64: e.target.result
+        };
+
+        // localStorage에 저장
+        saveFeedbackSubmission({
+            title,
+            workflowStep,
+            memo,
+            file: fileData
+        });
+
+        // 모달 닫기
+        closeSubmissionForm();
+
+        // 성공 메시지
+        alert('✅ 피드백 요청이 제출되었습니다!');
+
+        // 제출 이력 화면으로 이동
+        renderFeedback();
+    };
+
+    reader.readAsDataURL(selectedFile);
+}
+
+function saveFeedbackSubmission(data) {
+    // 기존 제출 목록 가져오기
+    const submissions = JSON.parse(localStorage.getItem('feedback_submissions') || '[]');
+
+    // 같은 workflowStep의 최신 버전 찾기
+    const sameStepSubmissions = submissions.filter(s => s.workflowStep === data.workflowStep);
+    const latestVersion = sameStepSubmissions.length > 0
+        ? Math.max(...sameStepSubmissions.map(s => parseInt(s.version.replace('v', ''))))
+        : 0;
+    const newVersion = latestVersion + 1;
+
+    // 새로운 제출 데이터
+    const newSubmission = {
+        id: 'FB_' + Date.now(),
+        studentId: DataService.getStudent().id,
+        professorId: DataService.getStudent().advisor,
+        title: data.title,
+        workflowStep: data.workflowStep,
+        stage: getStageFromStep(data.workflowStep),
+        file: data.file,
+        memo: data.memo,
+        status: '대기',
+        submittedAt: new Date().toISOString(),
+        uploadDate: new Date().toISOString(),
+        version: 'v' + newVersion,
+        isLatest: true,
+        fileSize: formatFileSize(data.file.size),
+        pageCount: 0, // PDF 파싱 없이 0으로 설정
+        feedbackCount: 0,
+        unreadCount: 0,
+        comments: [],
+        versions: [{ version: 'v' + newVersion, date: new Date().toISOString(), description: '초안' }]
+    };
+
+    // 같은 단계의 이전 제출들은 isLatest를 false로 변경
+    submissions.forEach(s => {
+        if (s.workflowStep === data.workflowStep) {
+            s.isLatest = false;
+        }
+    });
+
+    // 새 제출 추가
+    submissions.push(newSubmission);
+
+    // localStorage에 저장
+    localStorage.setItem('feedback_submissions', JSON.stringify(submissions));
+
+    // StudentData에도 추가 (현재 세션 중에만 유효)
+    if (window.StudentData && window.StudentData.feedbacks) {
+        window.StudentData.feedbacks.push(newSubmission);
+    }
+}
+
+function getStageFromStep(step) {
+    const stageMap = {
+        'STEP_1': '연구계획서 심사',
+        'STEP_2': '연구계획서 심사',
+        'STEP_3': '중간논문',
+        'STEP_4': '중간논문',
+        'STEP_5': '최종논문'
+    };
+    return stageMap[step] || '기타';
+}
+
+function closeSubmissionForm() {
+    selectedFile = null;
+    document.getElementById('modal-container').innerHTML = '';
+}
+
 // Export functions
+window.showSubmissionForm = showSubmissionForm;
+window.closeSubmissionForm = closeSubmissionForm;
+window.handleDragOver = handleDragOver;
+window.handleDragLeave = handleDragLeave;
+window.handleDrop = handleDrop;
+window.handleFileSelect = handleFileSelect;
+window.removeSelectedFile = removeSelectedFile;
+window.submitFeedbackRequest = submitFeedbackRequest;
 window.showSubmissionHistory = showSubmissionHistory;
 window.downloadSubmission = downloadSubmission;
 window.closeHistoryModal = closeHistoryModal;

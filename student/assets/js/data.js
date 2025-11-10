@@ -406,10 +406,25 @@ const DataService = {
     },
     
     getReviews: () => StudentData.reviews,
-    
+
     getTitleChanges: () => StudentData.titleChanges,
 
-    getCurrentTitle: () => StudentData.currentTitle
+    getCurrentTitle: () => StudentData.currentTitle,
+
+    getSubmissions: () => StudentData.feedbacks,
+
+    // Get current workflow step based on graduation requirements
+    getCurrentWorkflowStep: () => {
+        const reqs = StudentData.graduationRequirements;
+        const proposalReview = reqs.find(r => r.name === '연구계획서 심사');
+        const midtermReview = reqs.find(r => r.name === '중간논문 심사');
+        const finalReview = reqs.find(r => r.name === '최종논문 심사');
+
+        if (!proposalReview.completed) return 'STEP_1';
+        if (!midtermReview.completed) return 'STEP_3';
+        if (!finalReview.completed) return 'STEP_5';
+        return 'STEP_5';
+    }
 };
 
 // 🔧 Critical Fix #1: 전역 변수 네임스페이스 분리 (시연용 프로토타입)
