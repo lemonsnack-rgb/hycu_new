@@ -99,7 +99,17 @@
                     </svg>
                     <span class="ml-4">자료실</span>
                 </a>
-            
+
+                <!-- ID 58: 졸업 요건 충족 현황 -->
+                <a href="#" onclick="showScreen('graduation'); return false;" data-screen="graduation"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                    <span class="ml-4">졸업 요건</span>
+                </a>
+
 <a href="journal.html">학술지 실적 제출</a>
 </nav>
         </aside>
@@ -170,6 +180,7 @@
             <div id="board-screen" class="content-screen">
                 <div id="boardContainer"></div>
             </div>
+            <div id="graduation-screen" class="content-screen"></div>
         </main>
     </div>
     
@@ -186,6 +197,7 @@
     <script src="assets/js/review.js"></script>
     <script src="assets/js/title-change.js"></script>
     <script src="assets/js/board.js"></script>
+    <script src="assets/js/graduation.js"></script>
     <script src="assets/js/app.js"></script>
     
     <!-- 공통 유틸리티 -->

@@ -34,7 +34,8 @@ function showScreen(screenName) {
         'feedback': '온라인 피드백',
         'review': '심사 신청',
         'title-change': '논문제목 변경',
-        'board': '자료실'
+        'board': '자료실',
+        'graduation': '졸업 요건'
     };
     
     const titleElement = document.getElementById('page-title');
@@ -49,7 +50,8 @@ function showScreen(screenName) {
         'feedback': renderFeedback,
         'review': renderReview,
         'title-change': renderTitleChange,
-        'board': () => initBoard('student')
+        'board': () => initBoard('student'),
+        'graduation': renderGraduation
     };
     
     if (renderFunctions[screenName]) {
