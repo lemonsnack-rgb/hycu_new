@@ -169,7 +169,7 @@ function viewBoardPost(postId) {
     modal.id = 'boardPostModal';
     modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 48rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content" style="width: 90%; max-width: 56rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
@@ -275,14 +275,14 @@ function openBoardWriteModal() {
     modal.id = 'boardWriteModal';
     modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 48rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content" style="width: 90%; max-width: 56rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-gray-800">글쓰기</h3>
                     <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>
-            
+
             <div class="p-6">
                 <div class="space-y-4">
                     <!-- 제목 -->
@@ -290,40 +290,50 @@ function openBoardWriteModal() {
                         <label class="block text-sm font-medium text-gray-700 mb-2">제목</label>
                         <input type="text" id="postTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                     </div>
-                    
+
                     <!-- 내용 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">내용</label>
                         <textarea id="postContent" rows="8" class="w-full px-3 py-2 border border-gray-300 rounded-lg"></textarea>
                     </div>
-                    
+
                     <!-- 읽기 제한 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">읽기 제한</label>
-                        <select id="postRestriction" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        <select id="postRestriction" onchange="toggleStudentSelector('write')" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                             <option value="전체">전체</option>
                             <option value="석사과정만">석사과정만</option>
                             <option value="박사과정만">박사과정만</option>
                             <option value="개별학생">개별 학생 선택</option>
                         </select>
                     </div>
-                    
+
+                    <!-- 개별 학생 선택 영역 -->
+                    <div id="studentSelectorWrite" style="display: none;">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">학생 선택</label>
+                        <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto bg-gray-50">
+                            <div id="studentCheckboxesWrite" class="space-y-2">
+                                <!-- 동적으로 생성 -->
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- 파일 첨부 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">파일 첨부</label>
-                        <input type="file" multiple class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        <input type="file" multiple id="postFiles" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                     </div>
-                    
+
                     <!-- 버튼 -->
                     <div class="flex gap-2 justify-end pt-4">
-                        <button onclick="closeBoardModal()" class="btn-cancel">취소</button>
+                        <button onclick="closeBoardModal()" class="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300">취소</button>
                         <button onclick="submitBoardPost()" class="btn-primary">등록</button>
                     </div>
                 </div>
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
 }
 
@@ -332,12 +342,22 @@ function submitBoardPost() {
     const title = document.getElementById('postTitle').value.trim();
     const content = document.getElementById('postContent').value.trim();
     const restriction = document.getElementById('postRestriction').value;
-    
+
     if (!title || !content) {
         alert('제목과 내용을 입력해주세요.');
         return;
     }
-    
+
+    // 개별학생 선택 시 학생 선택 확인
+    let selectedStudents = [];
+    if (restriction === '개별학생') {
+        selectedStudents = getSelectedStudents('write');
+        if (selectedStudents.length === 0) {
+            alert('개별 학생을 선택해주세요.');
+            return;
+        }
+    }
+
     boardData.posts.unshift({
         id: boardData.posts.length + 1,
         title: title,
@@ -347,10 +367,11 @@ function submitBoardPost() {
         date: new Date().toISOString().split('T')[0],
         files: [],
         readRestriction: restriction,
+        selectedStudents: selectedStudents,
         views: 0,
         comments: []
     });
-    
+
     closeBoardModal();
     renderBoardList('professor');
     alert('게시글이 등록되었습니다.');
@@ -368,7 +389,7 @@ function openBoardEditModal(postId) {
     modal.id = 'boardEditModal';
     modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 48rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
+        <div class="modal-content" style="width: 90%; max-width: 56rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-gray-800">글 수정</h3>
@@ -393,12 +414,43 @@ function openBoardEditModal(postId) {
                     <!-- 읽기 제한 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">읽기 제한</label>
-                        <select id="editPostRestriction" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        <select id="editPostRestriction" onchange="toggleStudentSelector('edit')" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                             <option value="전체" ${post.readRestriction === '전체' ? 'selected' : ''}>전체</option>
                             <option value="석사과정만" ${post.readRestriction === '석사과정만' ? 'selected' : ''}>석사과정만</option>
                             <option value="박사과정만" ${post.readRestriction === '박사과정만' ? 'selected' : ''}>박사과정만</option>
                             <option value="개별학생" ${post.readRestriction === '개별학생' ? 'selected' : ''}>개별 학생 선택</option>
                         </select>
+                    </div>
+
+                    <!-- 개별 학생 선택 영역 -->
+                    <div id="studentSelectorEdit" style="display: ${post.readRestriction === '개별학생' ? 'block' : 'none'};">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">학생 선택</label>
+                        <div class="border border-gray-300 rounded-lg p-3 max-h-48 overflow-y-auto bg-gray-50">
+                            <div id="studentCheckboxesEdit" class="space-y-2">
+                                <!-- 동적으로 생성 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 기존 첨부파일 -->
+                    ${post.files && post.files.length > 0 ? `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">기존 첨부파일</label>
+                        <div class="space-y-2">
+                            ${post.files.map(file => `
+                                <div class="flex items-center justify-between bg-gray-50 p-2 rounded">
+                                    <span class="text-sm text-gray-700">${file.name} (${file.size})</span>
+                                    <button onclick="removeFile(${post.id}, '${file.name}')" class="text-red-600 hover:text-red-800 text-sm">삭제</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    <!-- 파일 첨부 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">파일 첨부 추가</label>
+                        <input type="file" multiple id="editPostFiles" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                     </div>
 
                     <!-- 버튼 -->
@@ -412,6 +464,11 @@ function openBoardEditModal(postId) {
     `;
 
     document.body.appendChild(modal);
+
+    // 개별학생 선택이 선택된 경우 학생 목록 렌더링
+    if (post.readRestriction === '개별학생') {
+        renderStudentCheckboxes('edit', post.selectedStudents || []);
+    }
 }
 
 // 게시글 수정 저장
@@ -425,11 +482,22 @@ function updateBoardPost(postId) {
         return;
     }
 
+    // 개별학생 선택 시 학생 선택 확인
+    let selectedStudents = [];
+    if (restriction === '개별학생') {
+        selectedStudents = getSelectedStudents('edit');
+        if (selectedStudents.length === 0) {
+            alert('개별 학생을 선택해주세요.');
+            return;
+        }
+    }
+
     const post = boardData.posts.find(p => p.id === postId);
     if (post) {
         post.title = title;
         post.content = content;
         post.readRestriction = restriction;
+        post.selectedStudents = selectedStudents;
 
         closeBoardModal();
         renderBoardList('professor');
@@ -452,6 +520,77 @@ function deleteBoardPost(postId) {
     }
 }
 
+// 파일 삭제
+function removeFile(postId, fileName) {
+    const post = boardData.posts.find(p => p.id === postId);
+    if (post && post.files) {
+        post.files = post.files.filter(f => f.name !== fileName);
+        openBoardEditModal(postId); // 모달 다시 렌더링
+    }
+}
+
+// 학생 선택 토글
+function toggleStudentSelector(mode) {
+    const select = document.getElementById(mode === 'write' ? 'postRestriction' : 'editPostRestriction');
+    const selectorDiv = document.getElementById(`studentSelector${mode === 'write' ? 'Write' : 'Edit'}`);
+
+    if (select.value === '개별학생') {
+        selectorDiv.style.display = 'block';
+        renderStudentCheckboxes(mode);
+    } else {
+        selectorDiv.style.display = 'none';
+    }
+}
+
+// 학생 체크박스 렌더링
+function renderStudentCheckboxes(mode, selectedStudents = []) {
+    const container = document.getElementById(`studentCheckboxes${mode === 'write' ? 'Write' : 'Edit'}`);
+    if (!container) return;
+
+    // DataService에서 학생 목록 가져오기
+    const students = typeof DataService !== 'undefined' && DataService.getStudents ?
+                     DataService.getStudents() : [];
+
+    if (students.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500">지도학생이 없습니다.</p>';
+        return;
+    }
+
+    const html = students.map(student => {
+        const isChecked = selectedStudents.includes(student.id);
+        return `
+            <label class="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded">
+                <input type="checkbox"
+                       value="${student.id}"
+                       ${isChecked ? 'checked' : ''}
+                       class="student-checkbox"
+                       style="width: 16px; height: 16px;">
+                <span class="text-sm text-gray-700">
+                    ${student.name} (${student.studentId}) - ${student.department} ${getDegreeText(student.degree)}
+                </span>
+            </label>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+// 학위과정 텍스트 변환
+function getDegreeText(degree) {
+    const degreeMap = {
+        'master': '석사',
+        'phd': '박사',
+        'doctor': '박사'
+    };
+    return degreeMap[degree] || degree;
+}
+
+// 선택된 학생 ID 가져오기
+function getSelectedStudents(mode) {
+    const checkboxes = document.querySelectorAll(`#studentCheckboxes${mode === 'write' ? 'Write' : 'Edit'} .student-checkbox:checked`);
+    return Array.from(checkboxes).map(cb => cb.value);
+}
+
 // 모달 닫기
 function closeBoardModal() {
     const modals = document.querySelectorAll('#boardPostModal, #boardWriteModal, #boardEditModal');
@@ -469,5 +608,10 @@ window.openBoardEditModal = openBoardEditModal;
 window.updateBoardPost = updateBoardPost;
 window.deleteBoardPost = deleteBoardPost;
 window.closeBoardModal = closeBoardModal;
+window.removeFile = removeFile;
+window.toggleStudentSelector = toggleStudentSelector;
+window.renderStudentCheckboxes = renderStudentCheckboxes;
+window.getDegreeText = getDegreeText;
+window.getSelectedStudents = getSelectedStudents;
 
 console.log('✅ 게시판 모듈 로드 완료');
