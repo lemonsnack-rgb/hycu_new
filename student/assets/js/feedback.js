@@ -63,15 +63,15 @@ function renderFeedback() {
     `;
 }
 
-// PDF 뷰어 모달 열기 (교수용과 동일한 레이아웃)
+// PDF 뷰어 모달 열기 (교수용과 동일한 레이아웃, 편집 기능은 비활성화)
 function openFeedbackViewer() {
     const modal = document.createElement('div');
     modal.id = 'feedback-modal';
     modal.style.cssText = 'position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.8);';
-    
+
     modal.innerHTML = `
         <div style="background: white; width: 1400px; height: 95vh; max-width: 95vw; margin: 2.5vh auto; border-radius: 0.5rem; display: flex; flex-direction: column; overflow: hidden;">
-            
+
             <!-- 헤더 (교수용과 동일) -->
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem; border-bottom: 1px solid #E5E7EB; background: white;">
                 <div style="display: flex; align-items: center; gap: 1rem;">
@@ -84,28 +84,42 @@ function openFeedbackViewer() {
                     </svg>
                 </button>
             </div>
-            
+
             <!-- 3분할 레이아웃 (교수용과 동일: 250px - 1fr - 350px) -->
             <div style="display: grid; grid-template-columns: 250px 1fr 350px; flex: 1; overflow: hidden;">
-                
+
                 <!-- 왼쪽: 제출 이력 (교수용과 동일) -->
                 <div style="background: #F9FAFB; border-right: 1px solid #E5E7EB; padding: 1rem; overflow-y: auto;">
                     <h4 style="font-size: 0.875rem; font-weight: 700; color: #374151; margin-bottom: 0.75rem;">제출 이력</h4>
-                    <div style="background: white; padding: 0.75rem; border-radius: 0.5rem; border-left: 4px solid #3B82F6;">
+                    <div style="background: white; padding: 0.75rem; border-radius: 0.5rem; border-left: 4px solid #3B82F6; margin-bottom: 0.5rem;">
                         <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
                             <span style="width: 0.5rem; height: 0.5rem; background: #3B82F6; border-radius: 9999px;"></span>
                             <span style="font-size: 0.75rem; font-weight: 700; color: #374151;">v3 (현재)</span>
                         </div>
-                        <p style="font-size: 0.75rem; color: #6B7280;">2025-11-01</p>
+                        <p style="font-size: 0.75rem; color: #6B7280;">2025-11-01 15:30</p>
+                    </div>
+                    <div style="background: white; padding: 0.75rem; border-radius: 0.5rem; border-left: 4px solid #E5E7EB; margin-bottom: 0.5rem; cursor: pointer;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <span style="width: 0.5rem; height: 0.5rem; background: #9CA3AF; border-radius: 9999px;"></span>
+                            <span style="font-size: 0.75rem; font-weight: 600; color: #6B7280;">v2</span>
+                        </div>
+                        <p style="font-size: 0.75rem; color: #9CA3AF;">2025-10-28 10:15</p>
+                    </div>
+                    <div style="background: white; padding: 0.75rem; border-radius: 0.5rem; border-left: 4px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB'" onmouseout="this.style.background='white'">
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <span style="width: 0.5rem; height: 0.5rem; background: #9CA3AF; border-radius: 9999px;"></span>
+                            <span style="font-size: 0.75rem; font-weight: 600; color: #6B7280;">v1</span>
+                        </div>
+                        <p style="font-size: 0.75rem; color: #9CA3AF;">2025-10-21 14:00</p>
                     </div>
                 </div>
-                
-                <!-- 중앙: PDF 뷰어 (교수용과 동일) -->
+
+                <!-- 중앙: PDF 뷰어 (교수용과 동일 UI, 편집 도구는 비활성화) -->
                 <div style="background: #F3F4F6; display: flex; flex-direction: column;">
-                    
-                    <!-- 툴바 (판서 도구만 제거) -->
+
+                    <!-- 툴바 (교수용과 동일, 편집 도구는 비활성화) -->
                     <div style="display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1rem; background: white; border-bottom: 1px solid #E5E7EB;">
-                        
+
                         <!-- 페이지 네비게이션 -->
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <button id="prev-page" onclick="onPrevPage()" style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280;">
@@ -122,21 +136,46 @@ function openFeedbackViewer() {
                                 </svg>
                             </button>
                         </div>
-                        
+
                         <div style="width: 1px; height: 1.5rem; background: #D1D5DB;"></div>
-                        
-                        <!-- 선택 도구만 유지 (판서 도구 제거됨) -->
+
+                        <!-- 도구 (교수용과 동일하나 편집 도구는 비활성화) -->
                         <div style="display: flex; align-items: center; gap: 0.25rem;">
-                            <button id="select-tool" onclick="changeTool('select')" 
+                            <button id="select-tool" onclick="changeTool('select')" title="선택 및 텍스트 드래그"
                                     style="padding: 0.5rem; background: #EFF6FF; border: none; border-radius: 0.25rem; cursor: pointer; color: #1E40AF;">
                                 <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 16 16" fill="currentColor">
                                     <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
                                 </svg>
                             </button>
+                            <button id="comment-tool" onclick="showStudentMessage()" title="첨삭 영역 추가 (학생은 사용 불가)" disabled
+                                    style="padding: 0.5rem; background: #F3F4F6; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB;">
+                                <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM9 9a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <button id="drawing-tool" onclick="showStudentMessage()" title="판서 (학생은 사용 불가)" disabled
+                                    style="padding: 0.5rem; background: #F3F4F6; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB;">
+                                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
+                                </svg>
+                            </button>
+                            <button id="highlight-tool" onclick="showStudentMessage()" title="하이라이트 (학생은 사용 불가)" disabled
+                                    style="padding: 0.5rem; background: #F3F4F6; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB;">
+                                <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                    <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <button id="eraser-tool" onclick="showStudentMessage()" title="지우개 (학생은 사용 불가)" disabled
+                                    style="padding: 0.5rem; background: #F3F4F6; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB;">
+                                <svg style="width: 1.25rem; height: 1.25rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 002.828 0L21 9.656a2 2 0 000-2.828L15.172 1a2 2 0 00-2.828 0L3 12z" />
+                                </svg>
+                            </button>
                         </div>
-                        
+
                         <div style="width: 1px; height: 1.5rem; background: #D1D5DB;"></div>
-                        
+
                         <!-- 확대/축소 -->
                         <div style="display: flex; align-items: center; gap: 0.5rem;">
                             <button id="zoom-out-btn" onclick="zoomOut()" style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280;">
@@ -155,7 +194,7 @@ function openFeedbackViewer() {
                             </button>
                         </div>
                     </div>
-                    
+
                     <!-- PDF 렌더링 영역 (교수용과 동일) -->
                     <div id="pdf-render-wrapper" style="flex: 1; overflow: auto; display: flex; justify-content: center; padding: 1rem;">
                         <div id="pdf-render-area" style="position: relative; background: white; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
@@ -328,9 +367,24 @@ function fitPage() {
     renderPage(pageNum);
 }
 
-// 도구 변경 (선택 도구만 있음)
+// 도구 변경 (선택 도구만 활성화)
 function changeTool(tool) {
     currentTool = tool;
+    // 버튼 활성화 상태 업데이트
+    document.querySelectorAll('[id$="-tool"]').forEach(btn => {
+        if (btn.id === `${tool}-tool`) {
+            btn.style.background = '#EFF6FF';
+            btn.style.color = '#1E40AF';
+        } else if (!btn.disabled) {
+            btn.style.background = 'none';
+            btn.style.color = '#6B7280';
+        }
+    });
+}
+
+// 학생에게 편집 불가 메시지 표시
+function showStudentMessage() {
+    alert('학생은 PDF 편집 도구를 사용할 수 없습니다.\n\n오른쪽 패널의 댓글 기능만 사용 가능합니다.');
 }
 
 // 학생 댓글 추가
@@ -453,5 +507,10 @@ function closeHistoryModal() {
 window.showSubmissionHistory = showSubmissionHistory;
 window.downloadSubmission = downloadSubmission;
 window.closeHistoryModal = closeHistoryModal;
+window.showStudentMessage = showStudentMessage;
+window.openFeedbackViewer = openFeedbackViewer;
+window.closeFeedbackViewer = closeFeedbackViewer;
+window.addStudentReply = addStudentReply;
+window.changeTool = changeTool;
 
-console.log('✅ 논문 제출 히스토리 기능 로드 완료');
+console.log('✅ 논문 제출 히스토리 및 피드백 뷰어 기능 로드 완료');
