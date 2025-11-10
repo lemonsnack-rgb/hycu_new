@@ -246,7 +246,7 @@ function loadStudentInfo(studentId) {
 
 // 🔧 수정: 학생정보 모달 닫기 (통합 closeModal 사용)
 function closeStudentInfoModal() {
-    closeModal('student-info-modal');
+    closeModal('student-info-modal', true);  // true = 모달 제거 (숨김이 아닌 완전 삭제)
 }
 
 // ==================== ID 4: 레이블 규칙 통일 ====================
