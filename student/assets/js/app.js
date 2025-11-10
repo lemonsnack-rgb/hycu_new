@@ -35,7 +35,7 @@ function showScreen(screenName) {
         'review': '심사 신청',
         'title-change': '논문제목 변경',
         'board': '자료실',
-        'graduation': '졸업 요건',
+        'graduation': '논문 제출 요건',
         'workflow': '논문 진행 단계'
     };
     
