@@ -764,17 +764,6 @@ function showSubmissionForm() {
                         <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.5rem;">현재 진행 단계: ${getStepName(currentStep)}</p>
                     </div>
 
-                    <!-- 메모 (선택사항) -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
-                            메모 (선택사항)
-                        </label>
-                        <textarea id="submission-memo"
-                                  placeholder="교수님께 전달할 메시지가 있다면 작성하세요"
-                                  style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: vertical;"
-                                  rows="3"></textarea>
-                    </div>
-
                     <!-- 파일 업로드 -->
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
@@ -947,7 +936,6 @@ function submitFeedbackRequest() {
     // 필드 검증
     const title = document.getElementById('submission-title').value.trim();
     const workflowStep = document.getElementById('workflow-step').value;
-    const memo = document.getElementById('submission-memo').value.trim();
 
     if (!title) {
         alert('제목을 입력해주세요.');
@@ -979,7 +967,6 @@ function submitFeedbackRequest() {
         saveFeedbackSubmission({
             title,
             workflowStep,
-            memo,
             file: fileData
         });
 
@@ -1016,7 +1003,6 @@ function saveFeedbackSubmission(data) {
         workflowStep: data.workflowStep,
         stage: getStageFromStep(data.workflowStep),
         file: data.file,
-        memo: data.memo,
         status: '대기',
         submittedAt: new Date().toISOString(),
         uploadDate: new Date().toISOString(),
