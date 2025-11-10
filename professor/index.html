@@ -357,38 +357,65 @@ document.addEventListener('DOMContentLoaded', function(){
                         
                         <!-- 검색 영역 (표준화) -->
                         <div class="search-container">
-                            <div class="search-grid">
-                                <select id="filter-type" class="search-select">
-                                    <option value="">단계 전체</option>
-                                    <option value="연구계획서">연구계획서</option>
-                                    <option value="중간논문">중간논문</option>
-                                    <option value="최종논문">최종논문</option>
+                            <div class="search-grid" style="grid-template-columns: repeat(4, 1fr);">
+                                <select id="filter-year" class="search-select">
+                                    <option value="">학년도 전체</option>
+                                    <option value="2024" selected>2024</option>
+                                    <option value="2023">2023</option>
+                                    <option value="2022">2022</option>
                                 </select>
-                                <select id="filter-role" class="search-select">
-                                    <option value="">역할 전체</option>
-                                    <option value="chair">심사위원장</option>
-                                    <option value="member">심사위원</option>
+                                <select id="filter-semester" class="search-select">
+                                    <option value="">학기 전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
                                 </select>
-                                <select id="filter-status" class="search-select">
-                                    <option value="">상태 전체</option>
-                                    <option value="진행중">진행중</option>
-                                    <option value="심사승인완료">심사승인완료</option>
-                                    <option value="승인">승인</option>
-                                    <option value="보류">보류</option>
-                                    <option value="반려">반려</option>
+                                <select id="filter-semester-order" class="search-select">
+                                    <option value="">학기차 전체</option>
+                                    <option value="1">1학기차</option>
+                                    <option value="2">2학기차</option>
+                                    <option value="3">3학기차</option>
+                                    <option value="4">4학기차</option>
                                 </select>
-                                <input type="text" 
-                                       id="filter-keyword" 
-                                       placeholder="학번/성명/논문제목 검색"
+                                <select id="filter-student-status" class="search-select">
+                                    <option value="">학적상태 전체</option>
+                                    <option value="재학">재학</option>
+                                    <option value="휴학">휴학</option>
+                                    <option value="수료">수료</option>
+                                </select>
+                            </div>
+                            <div class="search-grid mt-3" style="grid-template-columns: 2fr 1.5fr 1.5fr 2fr;">
+                                <select id="filter-major" class="search-select">
+                                    <option value="">학과/전공 전체</option>
+                                    <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                    <option value="인공지능학과">인공지능학과</option>
+                                    <option value="데이터사이언스학과">데이터사이언스학과</option>
+                                    <option value="소프트웨어학과">소프트웨어학과</option>
+                                    <option value="경영학과">경영학과</option>
+                                    <option value="디자인학과">디자인학과</option>
+                                </select>
+                                <select id="filter-degree" class="search-select">
+                                    <option value="">학위과정 전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                    <option value="석박사통합">석박사통합</option>
+                                </select>
+                                <input type="text"
+                                       id="filter-student-keyword"
+                                       placeholder="학번/성명"
+                                       class="search-input"
+                                       onkeypress="if(event.key==='Enter') searchReviews()">
+                                <input type="text"
+                                       id="filter-thesis-title"
+                                       placeholder="논문명"
                                        class="search-input"
                                        onkeypress="if(event.key==='Enter') searchReviews()">
                             </div>
-                            <div class="search-buttons">
+                            <div class="search-buttons mt-3">
                                 <button onclick="searchReviews()" class="search-btn search-btn-primary">
-                                    <i class="fas fa-search"></i>검색
+                                    <i class="fas fa-search"></i> 검색
                                 </button>
                                 <button onclick="resetReviewSearch()" class="search-btn search-btn-secondary">
-                                    <i class="fas fa-redo"></i>초기화
+                                    <i class="fas fa-redo"></i> 초기화
                                 </button>
                             </div>
                         </div>

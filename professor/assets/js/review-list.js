@@ -108,43 +108,79 @@ function renderReviewList() {
 // ==================== 필터링 ====================
 function getCurrentFilters() {
     return {
-        submissionType: document.getElementById('filter-type')?.value || '',
-        role: document.getElementById('filter-role')?.value || '',
-        status: document.getElementById('filter-status')?.value || '',
-        search: document.getElementById('filter-keyword')?.value || ''
+        year: document.getElementById('filter-year')?.value || '',
+        semester: document.getElementById('filter-semester')?.value || '',
+        semesterOrder: document.getElementById('filter-semester-order')?.value || '',
+        studentStatus: document.getElementById('filter-student-status')?.value || '',
+        major: document.getElementById('filter-major')?.value || '',
+        degree: document.getElementById('filter-degree')?.value || '',
+        studentKeyword: document.getElementById('filter-student-keyword')?.value || '',
+        thesisTitle: document.getElementById('filter-thesis-title')?.value || ''
     };
 }
 
 function filterAssignments(assignments, filters) {
     return assignments.filter(assignment => {
-        // 단계 필터
-        if (filters.submissionType && assignment.submissionType !== filters.submissionType) {
-            return false;
-        }
-        
-        // 역할 필터
-        if (filters.role) {
-            if (filters.role === 'chair' && assignment.myRole !== 'chair') return false;
-            if (filters.role === 'member' && assignment.myRole !== 'member') return false;
-        }
-        
-        // 상태 필터
-        if (filters.status && assignment.status !== filters.status) {
-            return false;
-        }
-        
-        // 검색
-        if (filters.search) {
-            const searchLower = filters.search.toLowerCase();
-            const matchStudent = assignment.studentName.toLowerCase().includes(searchLower);
-            const matchNumber = assignment.studentNumber.includes(searchLower);
-            const matchTitle = assignment.thesisTitle.toLowerCase().includes(searchLower);
-            
-            if (!matchStudent && !matchNumber && !matchTitle) {
+        // 학년도 필터 (submissionDate에서 추출)
+        if (filters.year && assignment.submissionDate) {
+            const assignmentYear = new Date(assignment.submissionDate).getFullYear().toString();
+            if (assignmentYear !== filters.year) {
                 return false;
             }
         }
-        
+
+        // 학기 필터 (데이터에 semester 필드가 있다면 사용)
+        if (filters.semester && assignment.semester) {
+            if (assignment.semester !== filters.semester) {
+                return false;
+            }
+        }
+
+        // 학기차 필터 (데이터에 semesterOrder 필드가 있다면 사용)
+        if (filters.semesterOrder && assignment.semesterOrder) {
+            if (assignment.semesterOrder !== filters.semesterOrder) {
+                return false;
+            }
+        }
+
+        // 학적상태 필터 (데이터에 studentStatus 필드가 있다면 사용)
+        if (filters.studentStatus && assignment.studentStatus) {
+            if (assignment.studentStatus !== filters.studentStatus) {
+                return false;
+            }
+        }
+
+        // 학과/전공 필터
+        if (filters.major && assignment.major !== filters.major) {
+            return false;
+        }
+
+        // 학위과정 필터
+        if (filters.degree && assignment.degree !== filters.degree) {
+            return false;
+        }
+
+        // 학번/성명 검색
+        if (filters.studentKeyword) {
+            const keyword = filters.studentKeyword.toLowerCase();
+            const matchStudent = assignment.studentName.toLowerCase().includes(keyword);
+            const matchNumber = assignment.studentNumber.includes(keyword);
+
+            if (!matchStudent && !matchNumber) {
+                return false;
+            }
+        }
+
+        // 논문명 검색
+        if (filters.thesisTitle) {
+            const titleKeyword = filters.thesisTitle.toLowerCase();
+            const matchTitle = assignment.thesisTitle.toLowerCase().includes(titleKeyword);
+
+            if (!matchTitle) {
+                return false;
+            }
+        }
+
         return true;
     });
 }
@@ -154,10 +190,14 @@ function searchReviews() {
 }
 
 function resetReviewSearch() {
-    document.getElementById('filter-type').value = '';
-    document.getElementById('filter-role').value = '';
-    document.getElementById('filter-status').value = '';
-    document.getElementById('filter-keyword').value = '';
+    document.getElementById('filter-year').value = '2024';
+    document.getElementById('filter-semester').value = '';
+    document.getElementById('filter-semester-order').value = '';
+    document.getElementById('filter-student-status').value = '';
+    document.getElementById('filter-major').value = '';
+    document.getElementById('filter-degree').value = '';
+    document.getElementById('filter-student-keyword').value = '';
+    document.getElementById('filter-thesis-title').value = '';
     renderReviewList();
 }
 

@@ -212,10 +212,13 @@ const REVIEW_ASSIGNMENTS = [
         studentNumber: '2024001',
         major: '컴퓨터공학과',
         degree: '석사',
-        
+        semester: '2',
+        semesterOrder: '1',
+        studentStatus: '재학',
+
         submissionId: 'SUB001',
         submissionType: '연구계획서',
-        submissionDate: '2025-11-01',
+        submissionDate: '2024-11-01',
         
         advisorId: 'P001',
         advisorName: '박교수',
@@ -263,12 +266,15 @@ const REVIEW_ASSIGNMENTS = [
         studentNumber: '2023005',
         major: '데이터사이언스학과',
         degree: '석사',
-        
+        semester: '1',
+        semesterOrder: '3',
+        studentStatus: '재학',
+
         submissionId: 'SUB002',
         submissionType: '중간논문',
         copyKiller: 8,
         gptKiller: 12,
-        submissionDate: '2025-11-03',
+        submissionDate: '2024-11-03',
         
         advisorId: 'P005',
         advisorName: '최교수',
@@ -316,12 +322,15 @@ const REVIEW_ASSIGNMENTS = [
         studentNumber: '2022010',
         major: '컴퓨터공학과',
         degree: '박사',
-        
+        semester: '2',
+        semesterOrder: '4',
+        studentStatus: '수료',
+
         submissionId: 'SUB003',
         submissionType: '최종논문',
         copyKiller: 5,
         gptKiller: 8,
-        submissionDate: '2025-10-28',
+        submissionDate: '2024-10-28',
         
         advisorId: 'P001',
         advisorName: '박교수',
@@ -377,10 +386,13 @@ const REVIEW_ASSIGNMENTS = [
         studentNumber: '2024010',
         major: '인공지능학과',
         degree: '석사',
+        semester: '1',
+        semesterOrder: '2',
+        studentStatus: '휴학',
         
         submissionId: 'SUB004',
         submissionType: '연구계획서',
-        submissionDate: '2025-11-08',
+        submissionDate: '2024-11-08',
         
         advisorId: 'P007',
         advisorName: '윤교수',
