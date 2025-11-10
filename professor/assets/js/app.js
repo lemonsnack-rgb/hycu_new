@@ -45,9 +45,9 @@ function showScreen(screenId) {
                 initBoard('professor');
             }
         } else if (screenId === 'journal-review') {
-            // 학술지 심사 초기화 (ID 54-56)
-            if (typeof renderJournalReview === 'function') {
-                renderJournalReview();
+            // 학술지 대체 심사 초기화 (ID 54-56)
+            if (typeof initJournalReplacementReview === 'function') {
+                initJournalReplacementReview();
             }
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];

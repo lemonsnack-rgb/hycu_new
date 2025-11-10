@@ -246,4 +246,234 @@ window.renderJournalReview = renderJournalReview;
 window.viewJournalReviewDetail = viewJournalReviewDetail;
 window.startJournalReview = startJournalReview;
 
+// ==================== 학술지 대체 심사 관리 (ID 54, 55) ====================
+
+// 샘플 데이터
+const JOURNAL_REPLACEMENT_DATA = [
+    {
+        id: 'JR001',
+        year: '2024',
+        semester: '2',
+        graduateSchool: '일반대학원',
+        major: '컴퓨터공학과',
+        degree: '석사',
+        studentNumber: '2024001',
+        studentName: '홍길동',
+        semesterOrder: '3',
+        studentStatus: '재학',
+        journalTitle: 'Artificial Intelligence in Healthcare: A Systematic Review',
+        journalName: 'International Journal of Medical Informatics',
+        submissionDate: '2024-11-01',
+        passStatus: '합격',
+        evaluationDate: '2024-11-08'
+    },
+    {
+        id: 'JR002',
+        year: '2024',
+        semester: '2',
+        graduateSchool: '일반대학원',
+        major: '경영학과',
+        degree: '석사',
+        studentNumber: '2024002',
+        studentName: '김영희',
+        semesterOrder: '4',
+        studentStatus: '재학',
+        journalTitle: 'Consumer Behavior Analysis in E-commerce: A Big Data Approach',
+        journalName: 'Journal of Business Research',
+        submissionDate: '2024-10-28',
+        passStatus: '심사중',
+        evaluationDate: null
+    },
+    {
+        id: 'JR003',
+        year: '2024',
+        semester: '1',
+        graduateSchool: '일반대학원',
+        major: '인공지능학과',
+        degree: '박사',
+        studentNumber: '2023015',
+        studentName: '박민수',
+        semesterOrder: '4',
+        studentStatus: '수료',
+        journalTitle: 'Deep Learning for Natural Language Processing: Recent Advances',
+        journalName: 'IEEE Transactions on Neural Networks',
+        submissionDate: '2024-05-15',
+        passStatus: '합격',
+        evaluationDate: '2024-06-20'
+    }
+];
+
+// 목록 렌더링
+function renderJournalReplacementList() {
+    const listContainer = document.getElementById('journal-review-list');
+    const countEl = document.getElementById('journal-count');
+
+    if (!listContainer) return;
+
+    // 필터링
+    const filters = getJournalFilters();
+    const filteredData = filterJournalData(JOURNAL_REPLACEMENT_DATA, filters);
+
+    // 카운트 업데이트
+    if (countEl) {
+        countEl.textContent = `총 ${filteredData.length}건`;
+    }
+
+    if (filteredData.length === 0) {
+        listContainer.innerHTML = `
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📋</div>
+                <h3 class="text-lg font-semibold text-gray-600 mb-2">검색 결과가 없습니다</h3>
+                <p class="text-gray-500">다른 조건으로 검색해보세요.</p>
+            </div>
+        `;
+        return;
+    }
+
+    const html = `
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                            <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+                        </th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학년도</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학위과정</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기차</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학적상태</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일자</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">합격여부</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">평가일자</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+                    ${filteredData.map((item, index) => `
+                        <tr class="hover:bg-gray-50 cursor-pointer" onclick="showJournalDetail('${item.id}')">
+                            <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                <input type="checkbox" class="journal-checkbox" value="${item.id}">
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${item.year}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${item.semester}학기</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${item.graduateSchool}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${item.degree}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${item.studentNumber}</td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${item.semesterOrder}학기차</td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStudentStatusClass(item.studentStatus)}">
+                                    ${item.studentStatus}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 400px;">
+                                <div class="truncate" title="${item.journalTitle}">
+                                    ${item.journalTitle}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${item.submissionDate}</td>
+                            <td class="py-3 px-4 text-center">
+                                ${getPassStatusBadge(item.passStatus)}
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${item.evaluationDate || '-'}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    listContainer.innerHTML = html;
+}
+
+// 필터 가져오기
+function getJournalFilters() {
+    return {
+        year: document.getElementById('journal-filter-year')?.value || '',
+        semester: document.getElementById('journal-filter-semester')?.value || '',
+        degree: document.getElementById('journal-filter-degree')?.value || '',
+        keyword: document.getElementById('journal-filter-keyword')?.value || ''
+    };
+}
+
+// 데이터 필터링
+function filterJournalData(data, filters) {
+    return data.filter(item => {
+        if (filters.year && item.year !== filters.year) return false;
+        if (filters.semester && item.semester !== filters.semester) return false;
+        if (filters.degree && item.degree !== filters.degree) return false;
+
+        if (filters.keyword) {
+            const keyword = filters.keyword.toLowerCase();
+            const matchStudent = item.studentName.toLowerCase().includes(keyword);
+            const matchNumber = item.studentNumber.includes(keyword);
+            if (!matchStudent && !matchNumber) return false;
+        }
+
+        return true;
+    });
+}
+
+// 합격여부 배지
+function getPassStatusBadge(status) {
+    const statusMap = {
+        '합격': 'bg-green-100 text-green-800',
+        '불합격': 'bg-red-100 text-red-800',
+        '심사중': 'bg-yellow-100 text-yellow-800',
+        '보류': 'bg-orange-100 text-orange-800'
+    };
+
+    const badgeClass = statusMap[status] || 'bg-gray-100 text-gray-800';
+
+    return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${badgeClass}">${status}</span>`;
+}
+
+// 학적상태 색상 (기존 함수와 동일하지만 재정의)
+function getStudentStatusClass(status) {
+    const statusMap = {
+        '재학': 'bg-green-100 text-green-800',
+        '휴학': 'bg-orange-100 text-orange-800',
+        '수료': 'bg-blue-100 text-blue-800'
+    };
+    return statusMap[status] || 'bg-gray-100 text-gray-800';
+}
+
+// 전체 선택/해제
+function toggleSelectAll(checkbox) {
+    const checkboxes = document.querySelectorAll('.journal-checkbox');
+    checkboxes.forEach(cb => cb.checked = checkbox.checked);
+}
+
+// 검색
+function searchJournalReviews() {
+    renderJournalReplacementList();
+}
+
+// 상세 보기
+function showJournalDetail(journalId) {
+    console.log('학술지 대체 심사 상세 보기:', journalId);
+    // TODO: P3-T20에서 상세 모달 구현
+    alert('학술지 대체 심사 상세 화면은 다음 작업에서 구현될 예정입니다.');
+}
+
+// 초기화
+function initJournalReplacementReview() {
+    renderJournalReplacementList();
+}
+
+// Export
+window.renderJournalReplacementList = renderJournalReplacementList;
+window.searchJournalReviews = searchJournalReviews;
+window.showJournalDetail = showJournalDetail;
+window.initJournalReplacementReview = initJournalReplacementReview;
+window.toggleSelectAll = toggleSelectAll;
+
 console.log('✅ 학술지 심사 모듈 로드 완료');
