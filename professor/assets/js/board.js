@@ -167,8 +167,9 @@ function viewBoardPost(postId) {
     const modal = document.createElement('div');
     modal.className = 'modal-backdrop';
     modal.id = 'boardPostModal';
+    modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 48rem;">
+        <div class="modal-content" style="max-width: 48rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
@@ -186,11 +187,11 @@ function viewBoardPost(postId) {
                     </div>
                 </div>
             </div>
-            
+
             <div class="p-6">
                 <!-- 본문 -->
-                <div class="prose max-w-none mb-6">
-                    ${post.content}
+                <div class="prose max-w-none mb-6" style="white-space: pre-wrap; word-wrap: break-word;">
+                    ${post.content.replace(/\n/g, '<br>')}
                 </div>
                 
                 <!-- 첨부파일 -->
@@ -272,8 +273,9 @@ function openBoardWriteModal() {
     const modal = document.createElement('div');
     modal.className = 'modal-backdrop';
     modal.id = 'boardWriteModal';
+    modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 48rem;">
+        <div class="modal-content" style="max-width: 48rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-gray-800">글쓰기</h3>
@@ -364,8 +366,9 @@ function openBoardEditModal(postId) {
     const modal = document.createElement('div');
     modal.className = 'modal-backdrop';
     modal.id = 'boardEditModal';
+    modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 48rem;">
+        <div class="modal-content" style="max-width: 48rem; background: white; border-radius: 0.75rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); max-height: 90vh; overflow-y: auto;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-gray-800">글 수정</h3>
