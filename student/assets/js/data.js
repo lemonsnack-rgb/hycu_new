@@ -420,9 +420,9 @@ const DataService = {
         const midtermReview = reqs.find(r => r.name === '중간논문 심사');
         const finalReview = reqs.find(r => r.name === '최종논문 심사');
 
-        if (!proposalReview.completed) return 'STEP_1';
-        if (!midtermReview.completed) return 'STEP_3';
-        if (!finalReview.completed) return 'STEP_5';
+        if (!proposalReview || !proposalReview.completed) return 'STEP_1';
+        if (!midtermReview || !midtermReview.completed) return 'STEP_3';
+        if (!finalReview || !finalReview.completed) return 'STEP_5';
         return 'STEP_5';
     }
 };

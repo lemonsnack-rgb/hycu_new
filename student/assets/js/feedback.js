@@ -724,9 +724,13 @@ function closeHistoryModal() {
 let selectedFile = null;
 
 function showSubmissionForm() {
-    const currentStep = DataService.getCurrentWorkflowStep();
+    console.log('showSubmissionForm called');
 
-    const modalContent = `
+    try {
+        const currentStep = DataService.getCurrentWorkflowStep();
+        console.log('Current workflow step:', currentStep);
+
+        const modalContent = `
         <div class="modal">
             <div class="modal-content" style="max-width: 700px;">
                 <div class="modal-header">
@@ -832,7 +836,21 @@ function showSubmissionForm() {
         </div>
     `;
 
-    document.getElementById('modal-container').innerHTML = modalContent;
+        const container = document.getElementById('modal-container');
+        console.log('Modal container found:', container);
+
+        if (!container) {
+            console.error('modal-container element not found!');
+            alert('모달 컨테이너를 찾을 수 없습니다.');
+            return;
+        }
+
+        container.innerHTML = modalContent;
+        console.log('Modal content set successfully');
+    } catch (error) {
+        console.error('Error in showSubmissionForm:', error);
+        alert('피드백 요청 폼을 여는 중 오류가 발생했습니다: ' + error.message);
+    }
 }
 
 function getStepName(step) {
