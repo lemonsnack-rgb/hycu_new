@@ -28,8 +28,45 @@ function logout() {
     }
 }
 
-// ==================== ID 3: 학생 정보조회 ====================
-function showStudentInfo(studentId, studentName) {
+// ==================== ID 3: 학생 정보조회 (개선) ====================
+
+/**
+ * 🔧 개선: 학생 정보 모달 표시
+ * - data 속성에서 정보 우선 조회
+ * - 없으면 API 호출로 fallback
+ *
+ * @param {string} studentId - 학생 ID
+ * @param {string} studentName - 학생 이름 (선택)
+ * @param {object} studentInfo - 학생 정보 객체 {phone, email, major, degree} (선택)
+ */
+function showStudentInfo(studentId, studentName, studentInfo) {
+    console.log('🔵 [showStudentInfo] 시작:', { studentId, studentName, studentInfo });
+
+    // 🔧 개선: studentInfo가 없으면 DOM에서 data 속성 찾기
+    if (!studentInfo) {
+        const icon = document.querySelector(`[data-student-id="${studentId}"]`);
+        if (icon) {
+            studentInfo = {
+                phone: icon.getAttribute('data-phone') || '',
+                email: icon.getAttribute('data-email') || '',
+                major: icon.getAttribute('data-major') || '',
+                degree: icon.getAttribute('data-degree') || ''
+            };
+            if (!studentName) {
+                const nameWrapper = icon.closest('.student-name-wrapper');
+                if (nameWrapper) {
+                    const nameElement = nameWrapper.querySelector('.student-name');
+                    studentName = nameElement ? nameElement.textContent : studentId;
+                }
+            }
+            console.log('📂 [showStudentInfo] DOM에서 정보 추출:', studentInfo);
+        }
+    }
+
+    // 기본값 설정
+    studentName = studentName || studentId;
+    const hasInfo = studentInfo && (studentInfo.phone || studentInfo.email);
+
     // 모달 생성
     const modal = document.createElement('div');
     modal.id = 'student-info-modal';
@@ -38,7 +75,7 @@ function showStudentInfo(studentId, studentName) {
         <div class="modal-content" style="max-width: 32rem; padding: 0;">
             <div style="padding: 1.5rem; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="font-size: 1.25rem; font-weight: 700; color: #1F2937;">학생 정보</h3>
-                <button onclick="closeStudentInfoModal()" style="color: #9CA3AF; cursor: pointer; background: none; border: none; font-size: 1.5rem;">&times;</button>
+                <button onclick="closeStudentInfoModal()" class="modal-close" style="color: #9CA3AF; cursor: pointer; background: none; border: none; font-size: 1.5rem;">&times;</button>
             </div>
             <div style="padding: 1.5rem;">
                 <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #E5E7EB;">
@@ -54,27 +91,92 @@ function showStudentInfo(studentId, studentName) {
                         </div>
                     </div>
                 </div>
-                
-                <div id="student-info-loading" style="text-align: center; padding: 2rem; color: #6B7280;">
-                    정보를 불러오는 중...
-                </div>
-                
-                <div id="student-info-content" class="hidden">
-                    <!-- 여기에 학생 정보가 로드됨 -->
-                </div>
+
+                ${hasInfo ? `
+                    <div id="student-info-content">
+                        ${renderStudentInfoContent(studentInfo)}
+                    </div>
+                ` : `
+                    <div id="student-info-loading" style="text-align: center; padding: 2rem; color: #6B7280;">
+                        정보를 불러오는 중...
+                    </div>
+                    <div id="student-info-content" class="hidden">
+                        <!-- 여기에 학생 정보가 로드됨 -->
+                    </div>
+                `}
             </div>
         </div>
     `;
-    
+
     document.body.appendChild(modal);
-    
-    // 학생 정보 로드 (실제 API 호출)
-    loadStudentInfo(studentId);
+
+    // 🔧 개선: 정보가 없을 때만 API 호출
+    if (!hasInfo) {
+        loadStudentInfo(studentId);
+    } else {
+        console.log('✅ [showStudentInfo] data 속성에서 정보 표시');
+    }
 }
 
+/**
+ * 🆕 신규: 학생 정보 HTML 렌더링
+ * @param {object} studentInfo - 학생 정보 객체
+ * @returns {string} HTML 문자열
+ */
+function renderStudentInfoContent(studentInfo) {
+    return `
+        <div style="display: flex; flex-direction: column; gap: 1rem;">
+            <div class="info-row">
+                <span class="info-label">
+                    <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                    </svg>
+                    전화번호
+                </span>
+                <span class="info-value">${studentInfo.phone || '정보 없음'}</span>
+            </div>
+
+            <div class="info-row">
+                <span class="info-label">
+                    <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                    </svg>
+                    이메일
+                </span>
+                <span class="info-value">${studentInfo.email || '정보 없음'}</span>
+            </div>
+
+            ${studentInfo.major || studentInfo.degree ? `
+                <div class="info-row">
+                    <span class="info-label">
+                        <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                        전공 / 과정
+                    </span>
+                    <span class="info-value">${studentInfo.major || ''} ${studentInfo.degree ? '/ ' + studentInfo.degree : ''}</span>
+                </div>
+            ` : ''}
+        </div>
+
+        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
+            ${studentInfo.phone ? `<a href="tel:${studentInfo.phone}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none;">전화하기</a>` : ''}
+            ${studentInfo.email ? `<a href="mailto:${studentInfo.email}" class="btn-secondary" style="flex: 1; text-align: center; text-decoration: none;">이메일</a>` : ''}
+        </div>
+    `;
+}
+
+/**
+ * 🔧 개선: 학생 정보 로드 (API 호출)
+ * - renderStudentInfoContent() 재사용
+ *
+ * @param {string} studentId - 학생 ID
+ */
 function loadStudentInfo(studentId) {
+    console.log('🔵 [loadStudentInfo] API 호출 시작:', studentId);
+
     // TODO: 실제 API 호출
-    // 임시 데이터
+    // 임시 데이터로 시뮬레이션
     setTimeout(() => {
         const studentInfo = {
             phone: '010-1234-5678',
@@ -82,51 +184,18 @@ function loadStudentInfo(studentId) {
             major: '컴퓨터공학',
             degree: '박사과정'
         };
-        
+
         const content = document.getElementById('student-info-content');
         const loading = document.getElementById('student-info-loading');
-        
+
         if (content && loading) {
             loading.classList.add('hidden');
             content.classList.remove('hidden');
-            content.innerHTML = `
-                <div style="display: flex; flex-direction: column; gap: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <svg style="width: 1.25rem; height: 1.25rem; color: #6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                        </svg>
-                        <div>
-                            <p style="font-size: 0.75rem; color: #6B7280;">전화번호</p>
-                            <p style="font-size: 0.875rem; font-weight: 500; color: #1F2937;">${studentInfo.phone}</p>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <svg style="width: 1.25rem; height: 1.25rem; color: #6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                        </svg>
-                        <div>
-                            <p style="font-size: 0.75rem; color: #6B7280;">이메일</p>
-                            <p style="font-size: 0.875rem; font-weight: 500; color: #1F2937;">${studentInfo.email}</p>
-                        </div>
-                    </div>
-                    
-                    <div style="display: flex; align-items: center; gap: 0.75rem;">
-                        <svg style="width: 1.25rem; height: 1.25rem; color: #6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-                        </svg>
-                        <div>
-                            <p style="font-size: 0.75rem; color: #6B7280;">전공 / 과정</p>
-                            <p style="font-size: 0.875rem; font-weight: 500; color: #1F2937;">${studentInfo.major} / ${studentInfo.degree}</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
-                    <a href="tel:${studentInfo.phone}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none;">전화하기</a>
-                    <a href="mailto:${studentInfo.email}" class="btn-secondary" style="flex: 1; text-align: center; text-decoration: none;">이메일</a>
-                </div>
-            `;
+
+            // 🔧 개선: renderStudentInfoContent() 재사용
+            content.innerHTML = renderStudentInfoContent(studentInfo);
+
+            console.log('✅ [loadStudentInfo] API 호출 완료');
         }
     }, 500);
 }
@@ -384,7 +453,67 @@ function createHeaderUtils(userName, userRole) {
     `;
 }
 
-// ==================== 학생명에 정보 아이콘 추가 ====================
+// ==================== 학생명에 정보 아이콘 추가 (개선) ====================
+
+/**
+ * 🆕 신규: 학생 이름에 정보 아이콘을 추가하는 함수 (data 속성 포함)
+ * - data 속성에 학생 정보 저장
+ * - Font Awesome / SVG 아이콘 선택 가능
+ *
+ * @param {string} studentName - 학생 이름
+ * @param {string} studentId - 학생 ID
+ * @param {object} studentInfo - 학생 정보 객체 {phone, email, major, degree}
+ * @param {string} iconType - 아이콘 타입: 'fontawesome' | 'svg' (기본: 'svg')
+ * @returns {string} HTML 문자열
+ *
+ * @example
+ * // 기본 사용 (SVG 아이콘)
+ * createStudentNameWithInfo('김철수', '2024001', {phone: '010-1234-5678', email: 'kim@hycu.ac.kr'})
+ *
+ * // Font Awesome 사용
+ * createStudentNameWithInfo('김철수', '2024001', {phone: '010-1234-5678', email: 'kim@hycu.ac.kr'}, 'fontawesome')
+ */
+function createStudentNameWithInfo(studentName, studentId, studentInfo = {}, iconType = 'svg') {
+    const { phone = '', email = '', major = '', degree = '' } = studentInfo;
+
+    // Font Awesome 아이콘
+    const faIcon = '<i class="fas fa-info-circle"></i>';
+
+    // SVG 아이콘
+    const svgIcon = `
+        <svg style="width: 1rem; height: 1rem; display: inline-block; vertical-align: middle;" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+        </svg>
+    `;
+
+    const icon = iconType === 'fontawesome' ? faIcon : svgIcon;
+
+    return `
+        <span class="student-name-wrapper">
+            <span class="student-name">${studentName}</span>
+            <span class="student-info-icon"
+                  onclick="showStudentInfo('${studentId}')"
+                  data-student-id="${studentId}"
+                  data-phone="${phone}"
+                  data-email="${email}"
+                  data-major="${major}"
+                  data-degree="${degree}"
+                  title="학생 정보 보기">
+                ${icon}
+            </span>
+        </span>
+    `;
+}
+
+/**
+ * 🔧 개선: 학생 이름에 정보 아이콘 추가 (기존 함수, 하위 호환성 유지)
+ * - 기존 코드와 호환성을 위해 유지
+ * - 새로운 코드는 createStudentNameWithInfo() 사용 권장
+ *
+ * @param {string} studentName - 학생 이름
+ * @param {string} studentId - 학생 ID
+ * @returns {string} HTML 문자열
+ */
 function addStudentInfoIcon(studentName, studentId) {
     return `
         <span>${studentName}</span>
@@ -469,4 +598,11 @@ window.handleCancel = handleCancel;
 window.handleClose = handleClose;
 window.closeStudentInfoModal = closeStudentInfoModal;
 
-console.log('✅ 공통 유틸리티 로드 완료 (localStorage 헬퍼 + 통합 모달 관리 시스템)');
+// 학생 정보 조회 함수
+window.showStudentInfo = showStudentInfo;
+window.renderStudentInfoContent = renderStudentInfoContent;
+window.loadStudentInfo = loadStudentInfo;
+window.createStudentNameWithInfo = createStudentNameWithInfo;
+window.addStudentInfoIcon = addStudentInfoIcon;
+
+console.log('✅ 공통 유틸리티 로드 완료 (localStorage 헬퍼 + 통합 모달 관리 시스템 + 학생 정보 조회)');

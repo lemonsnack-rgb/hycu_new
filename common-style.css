@@ -91,12 +91,11 @@ textarea:focus {
     color: #991B1B;
 }
 
-/* 정보 표시 행 */
+/* 정보 표시 행 (개선) */
 .info-row {
-    display: grid;
-    grid-template-columns: 140px 1fr;
-    gap: 1rem;
-    padding: 0.75rem 0;
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
     border-bottom: 1px solid #E5E7EB;
 }
 
@@ -105,12 +104,18 @@ textarea:focus {
 }
 
 .info-label {
+    min-width: 120px;
+    width: 120px;
     font-weight: 600;
     color: #6B7280;
+    display: flex;
+    align-items: center;
 }
 
 .info-value {
+    flex: 1;
     color: #1F2937;
+    word-break: break-word;
 }
 
 /* 헤더 유틸리티 (영문버전, 로그아웃 등) */
@@ -132,16 +137,38 @@ textarea:focus {
     background-color: #F3F4F6;
 }
 
-/* 학생 정보 아이콘 */
+/* 학생 정보 아이콘 (개선) */
+.student-name-wrapper {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.student-name {
+    display: inline;
+}
+
 .student-info-icon {
     cursor: pointer;
-    color: #3B82F6;
-    margin-left: 0.25rem;
-    font-size: 0.875rem;
+    color: #4A90E2;
+    font-size: 14px;
+    transition: color 0.2s, transform 0.2s;
+    display: inline-flex;
+    align-items: center;
 }
 
 .student-info-icon:hover {
-    color: #2563EB;
+    color: #2E5C8A;
+    transform: scale(1.1);
+}
+
+.student-info-icon svg {
+    vertical-align: middle;
+}
+
+/* Font Awesome 아이콘 지원 */
+.student-info-icon i.fas {
+    font-size: 14px;
 }
 
 /* 모달 공통 스타일 */
