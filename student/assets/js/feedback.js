@@ -731,8 +731,8 @@ function showSubmissionForm() {
         console.log('Current workflow step:', currentStep);
 
         const modalContent = `
-        <div class="modal">
-            <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-backdrop active" style="position: fixed; inset: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
+            <div class="modal" style="max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto;">
                 <div class="modal-header">
                     <h3>📤 피드백 요청 제출</h3>
                     <button onclick="closeSubmissionForm()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
