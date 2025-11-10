@@ -261,6 +261,124 @@ function renderWorkflowSteps(requirements) {
 
 window.renderWorkflowSteps = renderWorkflowSteps;
 
+// ID 59: 워크플로우 전체 화면 렌더링
+function renderWorkflow() {
+    const requirements = DataService.getGraduationRequirements();
+    const content = document.getElementById('workflow-screen');
+    if (!content) return;
+
+    content.innerHTML = `
+        <div class="card">
+            <div class="card-header">
+                <h3 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">
+                    🎯 논문 작성 진행 단계
+                </h3>
+                <p style="font-size: 1rem; color: #6B7280; margin-top: 0.5rem;">
+                    논문 작성의 전체 과정을 한눈에 확인하고, 각 단계별 진행 상황을 추적하세요
+                </p>
+            </div>
+            <div class="card-body" style="padding: 2.5rem;">
+                ${renderWorkflowSteps(requirements)}
+
+                <!-- 단계별 상세 정보 -->
+                <div style="margin-top: 3rem; display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem;">
+                    ${['연구계획서 심사', '중간논문 심사', '최종논문 심사'].map((reqName, index) => {
+                        const req = requirements.find(r => r.name === reqName);
+                        const icons = ['📄', '📝', '📘'];
+                        const titles = ['연구계획서', '중간논문', '최종논문'];
+
+                        return `
+                            <div style="border: 2px solid ${req?.completed ? '#10B981' : req?.status === '심사중' || req?.status === '진행중' ? '#3B82F6' : '#E5E7EB'}; border-radius: 0.75rem; padding: 1.5rem; background: white;">
+                                <div style="display: flex; align-items: center; margin-bottom: 1rem;">
+                                    <span style="font-size: 2rem; margin-right: 0.75rem;">${icons[index]}</span>
+                                    <div>
+                                        <h4 style="font-weight: 600; font-size: 1.125rem; color: #1F2937; margin: 0;">
+                                            ${titles[index]}
+                                        </h4>
+                                        <span style="
+                                            display: inline-block;
+                                            margin-top: 0.25rem;
+                                            padding: 0.25rem 0.75rem;
+                                            border-radius: 9999px;
+                                            font-size: 0.75rem;
+                                            font-weight: 600;
+                                            ${req?.completed ? 'background: #D1FAE5; color: #065F46;' :
+                                              req?.status === '심사중' || req?.status === '진행중' ? 'background: #DBEAFE; color: #1E40AF;' :
+                                              'background: #F3F4F6; color: #6B7280;'}
+                                        ">
+                                            ${req?.completed ? '완료' : req?.status === '심사중' || req?.status === '진행중' ? '진행중' : '대기'}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div style="font-size: 0.875rem; color: #6B7280; line-height: 1.6;">
+                                    ${req?.completed ? `
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <strong style="color: #1F2937;">✓ 승인 완료</strong>
+                                        </div>
+                                        <div>신청일: ${req.applicationDate || '-'}</div>
+                                        <div>승인일: ${req.approvalDate || '-'}</div>
+                                        ${req.score ? `<div>점수: ${req.score}점</div>` : ''}
+                                    ` : req?.status === '심사중' || req?.status === '진행중' ? `
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <strong style="color: #1F2937;">⚡ 심사 진행 중</strong>
+                                        </div>
+                                        <div>진행률: ${req.progress || 0}%</div>
+                                        <div>예상 완료: ${req.expectedDate || '-'}</div>
+                                    ` : `
+                                        <div style="margin-bottom: 0.5rem;">
+                                            <strong style="color: #1F2937;">⏳ 대기 중</strong>
+                                        </div>
+                                        <div>이전 단계 완료 후 진행 가능</div>
+                                        <div>예정일: ${req?.expectedDate || '미정'}</div>
+                                    `}
+                                </div>
+
+                                ${req?.completed || req?.status === '심사중' || req?.status === '진행중' ? `
+                                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #E5E7EB;">
+                                        <button onclick="showScreen('review')" class="btn btn-sm btn-outline" style="width: 100%; padding: 0.5rem; font-size: 0.875rem;">
+                                            ${req?.completed ? '📋 심사 결과 보기' : '📝 심사 진행 확인'}
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+
+                <!-- 전체 진행 현황 -->
+                <div style="margin-top: 2.5rem; padding: 2rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 0.75rem; color: white; text-align: center;">
+                    <div style="font-size: 0.875rem; margin-bottom: 0.5rem; opacity: 0.9;">전체 진행률</div>
+                    <div style="font-size: 3rem; font-weight: 700; margin-bottom: 0.5rem;">
+                        ${Math.round((requirements.filter(r => ['연구계획서 심사', '중간논문 심사', '최종논문 심사'].includes(r.name) && r.completed).length / 3) * 100)}%
+                    </div>
+                    <div style="font-size: 0.875rem; opacity: 0.9;">
+                        ${requirements.filter(r => ['연구계획서 심사', '중간논문 심사', '최종논문 심사'].includes(r.name) && r.completed).length} / 3 단계 완료
+                    </div>
+                    <div style="margin-top: 1.5rem; background: rgba(255,255,255,0.2); height: 8px; border-radius: 9999px; overflow: hidden;">
+                        <div style="background: white; height: 100%; width: ${Math.round((requirements.filter(r => ['연구계획서 심사', '중간논문 심사', '최종논문 심사'].includes(r.name) && r.completed).length / 3) * 100)}%; transition: width 0.3s ease;"></div>
+                    </div>
+                </div>
+
+                <!-- 도움말 -->
+                <div style="margin-top: 2rem; padding: 1.5rem; background: #EFF6FF; border-left: 4px solid #3B82F6; border-radius: 0.5rem;">
+                    <h4 style="font-weight: 600; color: #1E40AF; margin: 0 0 0.75rem 0; font-size: 1rem;">
+                        💡 논문 진행 가이드
+                    </h4>
+                    <ul style="margin: 0; padding-left: 1.5rem; color: #1E40AF; font-size: 0.875rem; line-height: 1.8;">
+                        <li>각 단계는 순차적으로 진행되며, 이전 단계 승인 후 다음 단계를 시작할 수 있습니다</li>
+                        <li>심사 신청은 '심사 신청' 메뉴에서 진행할 수 있습니다</li>
+                        <li>각 단계별 피드백은 '온라인 피드백' 메뉴에서 확인할 수 있습니다</li>
+                        <li>문의사항이 있으시면 지도교수님께 미팅을 요청하세요</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+window.renderWorkflow = renderWorkflow;
+
 // ========== 학적 변동 이력 ==========
 
 function showAcademicHistory() {

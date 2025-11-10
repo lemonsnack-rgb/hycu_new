@@ -326,12 +326,19 @@ function openReviewDetailInternal(modal, assignmentId) {
         // 상세 정보 렌더링
         renderReviewDetail(assignmentId);
 
-        // 모달 열기 - 강제로 display와 클래스 모두 설정
-        modal.style.display = 'block';
+        // 모달 열기 - !important로 강제 적용
+        modal.style.setProperty('display', 'block', 'important');
+        modal.style.setProperty('position', 'fixed', 'important');
+        modal.style.setProperty('z-index', '99999', 'important');
+        modal.style.setProperty('visibility', 'visible', 'important');
+        modal.style.setProperty('opacity', '1', 'important');
         modal.classList.add('active');
         document.body.style.overflow = 'hidden';
 
         console.log('모달 열기 완료');
+        console.log('모달 display:', window.getComputedStyle(modal).display);
+        console.log('모달 z-index:', window.getComputedStyle(modal).zIndex);
+        console.log('모달 visibility:', window.getComputedStyle(modal).visibility);
     } catch (error) {
         console.error('모달 열기 중 오류:', error);
         alert('심사 상세를 불러오는 중 오류가 발생했습니다.');
