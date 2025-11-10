@@ -131,26 +131,10 @@ function loadStudentInfo(studentId) {
     }, 500);
 }
 
+// 🔧 수정: 학생정보 모달 닫기 (통합 closeModal 사용)
 function closeStudentInfoModal() {
-    const modal = document.getElementById('student-info-modal');
-    if (modal) {
-        modal.remove();
-    }
+    closeModal('student-info-modal');
 }
-
-// 모달 외부 클릭 시 닫기
-document.addEventListener('click', function(e) {
-    if (e.target.id === 'student-info-modal') {
-        closeStudentInfoModal();
-    }
-});
-
-// ESC 키로 모달 닫기
-document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') {
-        closeStudentInfoModal();
-    }
-});
 
 // ==================== ID 4: 레이블 규칙 통일 ====================
 const COMMON_LABELS = {
@@ -185,37 +169,184 @@ const COMMON_LABELS = {
     }
 };
 
-// ==================== ID 5: 취소/닫기 버튼 핸들러 ====================
-function handleCancel(modalId) {
+// ==================== ID 5: 통합 모달 관리 시스템 (개선) ====================
+
+/**
+ * 🔧 수정: 통합 모달 닫기 함수
+ * - 모달 ID로 특정 모달 닫기
+ * - hidden 클래스 추가 또는 remove() 실행
+ * - 배경 스크롤 복원
+ *
+ * @param {string} modalId - 닫을 모달의 ID
+ * @param {boolean} removeElement - true이면 모달 제거, false면 숨김 (기본: false)
+ */
+function closeModal(modalId, removeElement = false) {
+    console.log('🔵 [closeModal] 모달 닫기:', modalId);
+
     const modal = document.getElementById(modalId);
-    if (modal) {
-        modal.classList.add('hidden');
-        // 또는 modal.remove();
+    if (!modal) {
+        console.warn('⚠️ [closeModal] 모달을 찾을 수 없음:', modalId);
+        return false;
     }
-    return false; // 기본 동작 방지
+
+    // 🔧 수정: 모달 숨김 또는 제거
+    if (removeElement) {
+        modal.remove();
+        console.log('✅ [closeModal] 모달 제거됨:', modalId);
+    } else {
+        modal.style.display = 'none';
+        modal.classList.add('hidden');
+        console.log('✅ [closeModal] 모달 숨김:', modalId);
+    }
+
+    // 🔧 수정: 배경 스크롤 복원
+    // 다른 열린 모달이 없으면 스크롤 복원
+    const openModals = document.querySelectorAll('.modal-backdrop:not(.hidden), [role="dialog"]:not(.hidden)');
+    const visibleModals = Array.from(openModals).filter(m => {
+        const style = window.getComputedStyle(m);
+        return style.display !== 'none';
+    });
+
+    if (visibleModals.length === 0) {
+        document.body.style.overflow = 'auto';
+        console.log('✅ [closeModal] 배경 스크롤 복원');
+    }
+
+    return true;
 }
 
-function handleClose(modalId) {
-    return handleCancel(modalId);
+/**
+ * 🔧 수정: 취소 버튼 핸들러
+ * - 이전: 전체 플로우 종료
+ * - 수정: 모달만 닫기, 이전 화면 유지
+ */
+function handleCancel(modalId) {
+    return closeModal(modalId, false);
 }
 
-// 모달창 취소 버튼에 적용
+/**
+ * 🔧 수정: 닫기 버튼 핸들러 (X 버튼)
+ * - 학생정보 모달 등은 remove, 일반 모달은 숨김
+ */
+function handleClose(modalId, shouldRemove = false) {
+    return closeModal(modalId, shouldRemove);
+}
+
+// 🔧 수정: 모달 외부 클릭 시 닫기 (모든 모달 지원)
+document.addEventListener('click', function(e) {
+    // 모달 배경(backdrop)을 클릭한 경우
+    if (e.target.classList.contains('modal-backdrop') || e.target.id?.includes('modal')) {
+        const modalId = e.target.id;
+        if (modalId) {
+            console.log('🔵 [모달 외부 클릭] 모달 닫기:', modalId);
+
+            // student-info-modal은 제거, 나머지는 숨김
+            const shouldRemove = modalId === 'student-info-modal';
+            closeModal(modalId, shouldRemove);
+        }
+    }
+});
+
+// 🔧 수정: ESC 키로 모든 열린 모달 닫기
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        console.log('🔵 [ESC 키] 열린 모달 찾기...');
+
+        // 모든 모달 중 표시 중인 것 찾기
+        const allModals = document.querySelectorAll('.modal-backdrop, [role="dialog"], [id*="modal"]');
+
+        let closedAny = false;
+        allModals.forEach(modal => {
+            const style = window.getComputedStyle(modal);
+            const isVisible = style.display !== 'none' && !modal.classList.contains('hidden');
+
+            if (isVisible && modal.id) {
+                console.log('🔵 [ESC 키] 모달 닫기:', modal.id);
+
+                // student-info-modal은 제거, 나머지는 숨김
+                const shouldRemove = modal.id === 'student-info-modal';
+                closeModal(modal.id, shouldRemove);
+                closedAny = true;
+            }
+        });
+
+        if (closedAny) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+    }
+});
+
+// 🔧 수정: 모달창 취소/닫기 버튼에 이벤트 자동 연결
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔵 [DOMContentLoaded] 모달 버튼 이벤트 리스너 등록');
+
     // 모든 취소/닫기 버튼에 이벤트 리스너 추가
-    document.querySelectorAll('[data-action="cancel"], [data-action="close"]').forEach(btn => {
+    document.querySelectorAll('[data-action="cancel"], [data-action="close"], .modal-cancel, .modal-close').forEach(btn => {
         btn.addEventListener('click', function(e) {
             e.preventDefault();
             e.stopPropagation();
-            
+
+            console.log('🔵 [취소/닫기 버튼] 클릭됨');
+
             // 가장 가까운 모달 찾기
-            const modal = this.closest('.modal-backdrop') || this.closest('[role="dialog"]');
-            if (modal) {
-                modal.classList.add('hidden');
-                // 또는 modal.remove();
+            const modal = this.closest('.modal-backdrop') || this.closest('[role="dialog"]') || this.closest('[id*="modal"]');
+
+            if (modal && modal.id) {
+                console.log('🔵 [취소/닫기 버튼] 모달 닫기:', modal.id);
+
+                // X 버튼(.modal-close)이거나 student-info-modal이면 제거
+                const isCloseBtn = this.classList.contains('modal-close') || this.dataset.action === 'close';
+                const shouldRemove = isCloseBtn && modal.id === 'student-info-modal';
+
+                closeModal(modal.id, shouldRemove);
+            } else {
+                console.warn('⚠️ [취소/닫기 버튼] 모달을 찾을 수 없음');
             }
         });
     });
 });
+
+// 🔧 수정: 동적 모달에도 이벤트 적용 (MutationObserver)
+// 페이지 로드 후 생성되는 모달에도 자동으로 이벤트 연결
+const modalObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(mutation) {
+        mutation.addedNodes.forEach(function(node) {
+            if (node.nodeType === 1) { // Element 노드만
+                // 새로 추가된 노드가 모달이거나, 모달을 포함하는 경우
+                const modals = node.matches?.('[id*="modal"]') ? [node] : node.querySelectorAll?.('[id*="modal"]') || [];
+
+                modals.forEach(modal => {
+                    // 모달 내부의 취소/닫기 버튼 찾기
+                    const buttons = modal.querySelectorAll('[data-action="cancel"], [data-action="close"], .modal-cancel, .modal-close');
+
+                    buttons.forEach(btn => {
+                        // 이미 이벤트가 등록되어 있는지 확인
+                        if (!btn.dataset.eventAttached) {
+                            btn.addEventListener('click', function(e) {
+                                e.preventDefault();
+                                e.stopPropagation();
+
+                                const modal = this.closest('.modal-backdrop') || this.closest('[role="dialog"]') || this.closest('[id*="modal"]');
+
+                                if (modal && modal.id) {
+                                    const isCloseBtn = this.classList.contains('modal-close') || this.dataset.action === 'close';
+                                    const shouldRemove = isCloseBtn && modal.id === 'student-info-modal';
+                                    closeModal(modal.id, shouldRemove);
+                                }
+                            });
+
+                            btn.dataset.eventAttached = 'true';
+                        }
+                    });
+                });
+            }
+        });
+    });
+});
+
+// body의 자식 변경 감지 시작
+modalObserver.observe(document.body, { childList: true, subtree: true });
 
 // ==================== 헤더 유틸리티 HTML 생성 ====================
 function createHeaderUtils(userName, userRole) {
@@ -328,7 +459,14 @@ const ProtoStorage = {
     }
 };
 
-// 전역으로 export
+// ==================== 전역 함수 Export ====================
+// ProtoStorage
 window.ProtoStorage = ProtoStorage;
 
-console.log('✅ 공통 유틸리티 로드 완료 (localStorage 헬퍼 포함)');
+// 모달 관리 함수
+window.closeModal = closeModal;
+window.handleCancel = handleCancel;
+window.handleClose = handleClose;
+window.closeStudentInfoModal = closeStudentInfoModal;
+
+console.log('✅ 공통 유틸리티 로드 완료 (localStorage 헬퍼 + 통합 모달 관리 시스템)');
