@@ -317,21 +317,32 @@ function openReviewDetail(assignmentId) {
 
 // 내부 함수: 실제 모달 열기 로직
 function openReviewDetailInternal(modal, assignmentId) {
-    // 모달 데이터 설정
-    modal.dataset.assignmentId = assignmentId;
+    try {
+        console.log('모달 열기 시작:', assignmentId);
 
-    // 상세 정보 렌더링
-    renderReviewDetail(assignmentId);
+        // 모달 데이터 설정
+        modal.dataset.assignmentId = assignmentId;
 
-    // 모달 열기
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+        // 상세 정보 렌더링
+        renderReviewDetail(assignmentId);
+
+        // 모달 열기 - 강제로 display와 클래스 모두 설정
+        modal.style.display = 'block';
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        console.log('모달 열기 완료');
+    } catch (error) {
+        console.error('모달 열기 중 오류:', error);
+        alert('심사 상세를 불러오는 중 오류가 발생했습니다.');
+    }
 }
 
 function closeReviewDetail() {
     const modal = document.getElementById('review-detail-modal');
     if (modal) {
         modal.classList.remove('active');
+        modal.style.display = 'none';
         document.body.style.overflow = '';
 
         // 모달 내용 초기화 (메모리 누수 방지 및 다음 열기 준비)

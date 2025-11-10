@@ -2,152 +2,23 @@
 
 function renderDashboard() {
     const requirements = DataService.getGraduationRequirements();
-    const upcomingMeetings = DataService.getUpcomingMeetings();
-    const latestFeedbacks = DataService.getLatestFeedbacks();
-    const notifications = DataService.getNotifications();
-    
+
     const content = document.getElementById('dashboard-screen');
     if (!content) return;
-    
-    // ID 58: 졸업요건 충족률 계산
-    const completedCount = requirements.filter(r => r.completed).length;
-    const totalCount = requirements.length;
-    const completionRate = Math.round((completedCount / totalCount) * 100);
-    
+
     content.innerHTML = `
-        <!-- ID 58: 졸업 요건 충족 현황 -->
+        <!-- 논문 작성 진행 단계 -->
         <div class="card mb-6">
             <div class="card-header">
                 <h3 style="font-size: 1.125rem; font-weight: 600; color: #1F2937;">
-                    졸업 요건 충족 현황
+                    🎯 논문 작성 진행 단계
                 </h3>
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="font-size: 0.875rem; color: #6B7280;">
-                        <span style="font-weight: 700; color: #2563EB; font-size: 1.25rem;">${completionRate}%</span>
-                        <span style="margin-left: 0.25rem;">완료</span>
-                    </div>
-                    <button onclick="showRequirementsModal()" class="btn btn-sm btn-secondary">
-                        <i class="fas fa-list"></i> 상세보기
-                    </button>
-                </div>
-            </div>
-            <div class="card-body" style="padding: 1rem;">
-                <!-- 전체 진행률 바 -->
-                <div style="margin-bottom: 1.5rem; padding: 1rem; background: #F0F9FF; border-radius: 0.5rem; border: 1px solid #BFDBFE;">
-                    <div style="display: flex; justify-content: between; align-items: center; margin-bottom: 0.5rem;">
-                        <span style="font-size: 0.875rem; font-weight: 600; color: #1E40AF;">전체 진행도</span>
-                        <span style="font-size: 0.875rem; font-weight: 700; color: #2563EB;">${completedCount}/${totalCount} 완료</span>
-                    </div>
-                    <div style="width: 100%; height: 20px; background: #E0F2FE; border-radius: 10px; overflow: hidden;">
-                        <div style="width: ${completionRate}%; height: 100%; background: linear-gradient(90deg, #3B82F6, #2563EB); transition: width 0.3s;"></div>
-                    </div>
-                </div>
-                
-                <!-- 체크리스트 항목 -->
-                ${requirements.map(req => `
-                    <div class="checklist-item ${req.completed ? 'completed' : req.status === '진행중' || req.status === '심사중' ? 'in-progress' : ''}">
-                        <div class="checklist-icon">${req.icon}</div>
-                        <div class="checklist-content">
-                            <div class="checklist-title">${req.name}</div>
-                            <div class="checklist-details">${req.details}</div>
-                        </div>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-        
-        <!-- ID 59: 워크플로우 진행단계 -->
-        <div class="card mb-6">
-            <div class="card-header">
-                <h3 style="font-size: 1.125rem; font-weight: 600; color: #1F2937;">
-                    🎯 논문 진행 단계
-                </h3>
+                <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">
+                    현재 진행 중인 논문 작성 단계를 확인하세요
+                </p>
             </div>
             <div class="card-body" style="padding: 1.5rem;">
                 ${renderWorkflowSteps(requirements)}
-            </div>
-        </div>
-        
-        <!-- 그리드 레이아웃 -->
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 1.5rem;">
-            
-            <!-- 다가오는 미팅 -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: #1F2937;">
-                        다가오는 미팅
-                    </h3>
-                </div>
-                <div class="card-body">
-                    ${upcomingMeetings.length > 0 ? upcomingMeetings.map(meeting => `
-                        <div style="padding: 0.75rem; border-left: 3px solid #6A0028; background: #F9FAFB; border-radius: 0.375rem; margin-bottom: 0.75rem;">
-                            <div style="font-weight: 600; color: #1F2937; margin-bottom: 0.25rem;">
-                                ${meeting.title}
-                            </div>
-                            <div style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.5rem;">
-                                ${formatDateTime(meeting.date)}
-                            </div>
-                            <button onclick="joinMeeting('${meeting.zoomLink}')" class="btn btn-sm btn-primary">
-                                <i class="fas fa-video"></i> 참여하기
-                            </button>
-                        </div>
-                    `).join('') : `
-                        <div style="text-align: center; padding: 2rem; color: #9CA3AF;">
-                            예정된 미팅이 없습니다
-                        </div>
-                    `}
-                </div>
-            </div>
-            
-            <!-- 최근 피드백 -->
-            <div class="card">
-                <div class="card-header">
-                    <h3 style="font-size: 1rem; font-weight: 600; color: #1F2937;">
-                        📝 최근 피드백
-                    </h3>
-                </div>
-                <div class="card-body">
-                    ${latestFeedbacks.map(feedback => `
-                        <div style="padding: 0.75rem; background: #F9FAFB; border-radius: 0.375rem; margin-bottom: 0.75rem; cursor: pointer;"
-                             onclick="showScreen('feedback')">
-                            <div style="font-weight: 600; color: #1F2937; margin-bottom: 0.25rem;">
-                                ${feedback.title} ${feedback.version}
-                            </div>
-                            <div style="font-size: 0.875rem; color: #6B7280;">
-                                💬 ${feedback.feedbackCount}개 ${feedback.unreadCount > 0 ? `• 🆕 ${feedback.unreadCount}개 읽지 않음` : ''}
-                            </div>
-                            <div style="margin-top: 0.5rem;">
-                                <span class="badge ${feedback.status === '피드백 완료' ? 'badge-success' : 'badge-info'}">
-                                    ${feedback.status}
-                                </span>
-                            </div>
-                        </div>
-                    `).join('')}
-                </div>
-            </div>
-        </div>
-        
-        <!-- 알림 및 공지사항 -->
-        <div class="card">
-            <div class="card-header">
-                <h3 style="font-size: 1rem; font-weight: 600; color: #1F2937;">
-                    🔔 알림 및 공지사항
-                </h3>
-            </div>
-            <div class="card-body">
-                ${notifications.map(notif => `
-                    <div style="padding: 0.75rem; border-bottom: 1px solid #F3F4F6;">
-                        <div style="font-weight: 600; color: #1F2937; margin-bottom: 0.25rem;">
-                            ${notif.title}
-                        </div>
-                        <div style="font-size: 0.875rem; color: #6B7280;">
-                            ${notif.message}
-                        </div>
-                        <div style="font-size: 0.75rem; color: #9CA3AF; margin-top: 0.25rem;">
-                            ${formatTime(notif.createdAt)}
-                        </div>
-                    </div>
-                `).join('')}
             </div>
         </div>
     `;
