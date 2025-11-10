@@ -2,11 +2,12 @@
 // 대시보드 화면 로직
 // ===================================
 
-// 대시보드 초기화 (ID 30: 간소화 - 카드와 처리대기만)
+// 대시보드 초기화 (ID 30: 간소화 - 처리대기만)
 function initDashboard() {
     console.log('대시보드 초기화');
-    
-    renderSummaryCards();
+
+    // ID 30: 통계 카드 삭제로 인해 주석 처리
+    // renderSummaryCards();
     renderTodoList();
     // ID 30: 최근활동, 학생단계별 현황 삭제
     // renderActivityTimeline();
