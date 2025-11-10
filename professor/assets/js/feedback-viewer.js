@@ -319,6 +319,18 @@ function closeFeedbackModal() {
     if (modal) {
         modal.remove();
     }
+
+    // 제출 이력 사이드바 제거
+    const submissionHistory = document.getElementById('submission-history');
+    if (submissionHistory) {
+        submissionHistory.remove();
+    }
+
+    // 자주 쓰는 코멘트 팝오버 제거
+    const quickmarkPopover = document.getElementById('quickmark-popover');
+    if (quickmarkPopover) {
+        quickmarkPopover.remove();
+    }
 }
 
 // ==================== 제출 이력 렌더링 ====================
