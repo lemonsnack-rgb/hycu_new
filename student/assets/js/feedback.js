@@ -206,15 +206,27 @@ function openFeedbackViewer() {
                 <!-- 오른쪽: 코멘트 패널 (350px, 학생용 수정) -->
                 <div style="background: white; border-left: 1px solid #E5E7EB; display: flex; flex-direction: column; overflow: hidden;">
                     <div style="padding: 1rem; border-bottom: 1px solid #E5E7EB; background: #F9FAFB;">
-                        <h4 style="font-size: 0.875rem; font-weight: 700; color: #374151;">피드백</h4>
+                        <h4 style="font-size: 0.875rem; font-weight: 700; color: #374151; margin-bottom: 0.75rem;">피드백</h4>
+
+                        <!-- 탭 UI (교수용과 동일) -->
+                        <div style="display: flex; gap: 0.25rem; border-bottom: 1px solid #E5E7EB;">
+                            <button id="tab-general" onclick="switchFeedbackTab('general')"
+                                    style="flex: 1; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: #3B82F6; border: none; border-bottom: 2px solid #3B82F6; background: white; cursor: pointer;">
+                                전체 평가
+                            </button>
+                            <button id="tab-inline" onclick="switchFeedbackTab('inline')"
+                                    style="flex: 1; padding: 0.5rem 1rem; font-size: 0.875rem; font-weight: 600; color: #6B7280; border: none; border-bottom: 2px solid transparent; background: white; cursor: pointer;">
+                                첨삭 <span id="tab-inline-badge" style="display: inline-block; background: #EF4444; color: white; font-size: 0.625rem; padding: 0.125rem 0.375rem; border-radius: 9999px; margin-left: 0.25rem;">2</span>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div style="flex: 1; overflow-y: auto; padding: 1rem;">
-                        
-                        <!-- 총평 -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">💬 총평</h5>
-                            
+
+                    <div style="flex: 1; overflow-y: auto; padding: 1rem;" id="comment-panel-content">
+
+                        <!-- 전체 평가 탭 -->
+                        <div id="general-feedback-tab">
+                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">💬 전체 평가</h5>
+
                             <!-- 교수 피드백 (읽기 전용) -->
                             <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
                                 <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
@@ -225,25 +237,38 @@ function openFeedbackViewer() {
                                 </div>
                                 <p style="font-size: 0.875rem; color: #374151;">전반적으로 잘 작성되었습니다. 연구 방법론 부분에서 표본 크기 산정 근거를 더 명확히 제시해주세요.</p>
                             </div>
-                            
+
                             <!-- 학생 댓글 입력 -->
                             <div style="margin-top: 0.75rem;">
-                                <textarea id="student-reply-input" 
+                                <textarea id="student-general-reply-input"
                                           style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: none;"
                                           rows="2"
                                           placeholder="교수님께 질문이나 의견을 작성하세요..."></textarea>
-                                <button onclick="addStudentReply()" 
-                                        style="margin-top: 0.5rem; font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer;">
-                                    댓글 달기
-                                </button>
+                                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                    <button onclick="addStudentReply('general')"
+                                            style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                        <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                        </svg>
+                                        <span>등록</span>
+                                    </button>
+                                    <button onclick="uploadAttachment('general')"
+                                            style="font-size: 0.75rem; background: #F3F4F6; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                        <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                        </svg>
+                                        <span>첨부</span>
+                                    </button>
+                                </div>
                             </div>
                         </div>
-                        
-                        <div style="border-top: 1px solid #E5E7EB; padding-top: 1rem;">
-                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">📝 페이지 코멘트</h5>
-                            
-                            <!-- 페이지별 코멘트 -->
-                            <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem;">
+
+                        <!-- 첨삭 탭 -->
+                        <div id="inline-feedback-tab" style="display: none;">
+                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">📍 첨삭</h5>
+
+                            <!-- 첨삭 1 -->
+                            <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem; border-left: 3px solid #3B82F6;">
                                 <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
                                     <div style="flex: 1;">
                                         <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</p>
@@ -251,7 +276,67 @@ function openFeedbackViewer() {
                                     </div>
                                     <span style="font-size: 0.75rem; background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem;">p.3</span>
                                 </div>
-                                <p style="font-size: 0.875rem; color: #374151;">표본 크기 산정 근거를 추가해주세요.</p>
+                                <p style="font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem;">표본 크기 산정 근거를 추가해주세요.</p>
+
+                                <!-- 학생 댓글 입력 -->
+                                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #E5E7EB;">
+                                    <textarea id="student-inline-reply-input-1"
+                                              style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: none;"
+                                              rows="2"
+                                              placeholder="답변을 작성하세요..."></textarea>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                        <button onclick="addStudentReply('inline', 1)"
+                                                style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                            <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                            </svg>
+                                            <span>등록</span>
+                                        </button>
+                                        <button onclick="uploadAttachment('inline', 1)"
+                                                style="font-size: 0.75rem; background: #F3F4F6; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                            <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                            </svg>
+                                            <span>첨부</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 첨삭 2 -->
+                            <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; border-left: 3px solid #3B82F6;">
+                                <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                    <div style="flex: 1;">
+                                        <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</p>
+                                        <p style="font-size: 0.75rem; color: #6B7280;">2025-11-02 10:15</p>
+                                    </div>
+                                    <span style="font-size: 0.75rem; background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem;">p.5</span>
+                                </div>
+                                <p style="font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem;">이 부분은 선행 연구와의 차이점을 더 명확히 기술해야 합니다.</p>
+
+                                <!-- 학생 댓글 입력 -->
+                                <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #E5E7EB;">
+                                    <textarea id="student-inline-reply-input-2"
+                                              style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: none;"
+                                              rows="2"
+                                              placeholder="답변을 작성하세요..."></textarea>
+                                    <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                        <button onclick="addStudentReply('inline', 2)"
+                                                style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                            <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                            </svg>
+                                            <span>등록</span>
+                                        </button>
+                                        <button onclick="uploadAttachment('inline', 2)"
+                                                style="font-size: 0.75rem; background: #F3F4F6; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                            <svg style="width: 0.875rem; height: 0.875rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                            </svg>
+                                            <span>첨부</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -387,13 +472,90 @@ function showStudentMessage() {
     alert('학생은 PDF 편집 도구를 사용할 수 없습니다.\n\n오른쪽 패널의 댓글 기능만 사용 가능합니다.');
 }
 
+// 탭 전환 기능
+function switchFeedbackTab(tab) {
+    // 탭 버튼 스타일 업데이트
+    const generalTab = document.getElementById('tab-general');
+    const inlineTab = document.getElementById('tab-inline');
+
+    if (tab === 'general') {
+        generalTab.style.color = '#3B82F6';
+        generalTab.style.borderBottom = '2px solid #3B82F6';
+        inlineTab.style.color = '#6B7280';
+        inlineTab.style.borderBottom = '2px solid transparent';
+
+        // 탭 콘텐츠 표시/숨김
+        document.getElementById('general-feedback-tab').style.display = 'block';
+        document.getElementById('inline-feedback-tab').style.display = 'none';
+    } else {
+        inlineTab.style.color = '#3B82F6';
+        inlineTab.style.borderBottom = '2px solid #3B82F6';
+        generalTab.style.color = '#6B7280';
+        generalTab.style.borderBottom = '2px solid transparent';
+
+        // 탭 콘텐츠 표시/숨김
+        document.getElementById('general-feedback-tab').style.display = 'none';
+        document.getElementById('inline-feedback-tab').style.display = 'block';
+    }
+}
+
 // 학생 댓글 추가
-function addStudentReply() {
-    const input = document.getElementById('student-reply-input');
+function addStudentReply(type, commentId) {
+    let inputId;
+
+    if (type === 'general') {
+        inputId = 'student-general-reply-input';
+    } else {
+        inputId = `student-inline-reply-input-${commentId}`;
+    }
+
+    const input = document.getElementById(inputId);
     if (input && input.value.trim()) {
         alert('댓글이 등록되었습니다: ' + input.value);
         input.value = '';
+    } else {
+        alert('댓글 내용을 입력해주세요.');
     }
+}
+
+// 파일 첨부 기능
+function uploadAttachment(type, commentId) {
+    // 파일 선택 input 동적 생성
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = '.pdf,.doc,.docx,.ppt,.pptx,.jpg,.jpeg,.png';
+    fileInput.style.display = 'none';
+
+    fileInput.onchange = function(e) {
+        const file = e.target.files[0];
+        if (file) {
+            // 파일 크기 체크 (10MB 제한)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('파일 크기는 10MB 이하여야 합니다.');
+                return;
+            }
+
+            alert(`파일이 첨부되었습니다: ${file.name}\n\n실제 업로드는 댓글 등록 시 함께 처리됩니다.`);
+
+            // 파일 정보를 댓글 입력 영역에 표시
+            let inputId;
+            if (type === 'general') {
+                inputId = 'student-general-reply-input';
+            } else {
+                inputId = `student-inline-reply-input-${commentId}`;
+            }
+
+            const input = document.getElementById(inputId);
+            if (input) {
+                const currentValue = input.value;
+                input.value = currentValue + (currentValue ? '\n\n' : '') + `📎 ${file.name}`;
+            }
+        }
+        document.body.removeChild(fileInput);
+    };
+
+    document.body.appendChild(fileInput);
+    fileInput.click();
 }
 
 // 모달 닫기
@@ -512,5 +674,7 @@ window.openFeedbackViewer = openFeedbackViewer;
 window.closeFeedbackViewer = closeFeedbackViewer;
 window.addStudentReply = addStudentReply;
 window.changeTool = changeTool;
+window.switchFeedbackTab = switchFeedbackTab;
+window.uploadAttachment = uploadAttachment;
 
 console.log('✅ 논문 제출 히스토리 및 피드백 뷰어 기능 로드 완료');
