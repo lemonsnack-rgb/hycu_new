@@ -50,25 +50,30 @@ function renderReviewList() {
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학위과정</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학적상태</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">내 역할</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">평가진행</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사단계</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사대상</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사위원장</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">진행상태</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    ${filteredAssignments.map((assignment, index) => `
+                    ${filteredAssignments.map((assignment, index) => {
+                        const isMember = assignment.myRole === 'member';
+                        const isChair = assignment.myRole === 'chair';
+                        return `
                         <tr class="hover:bg-gray-50">
                             <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                            <td class="py-3 px-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadgeClass(assignment.submissionType)}">
-                                    ${assignment.submissionType}
-                                </span>
-                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduateSchool || '-'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.major}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600 text-center">${assignment.degree}</td>
                             <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
                             <td class="py-3 px-4 text-sm font-medium text-gray-800">
                                 ${createStudentNameWithInfo(assignment.studentName, assignment.studentNumber, {
@@ -76,27 +81,43 @@ function renderReviewList() {
                                     email: assignment.email || ''
                                 })}
                             </td>
-                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
+                            <td class="py-3 px-4 text-center">
+                                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${getStudentStatusClass(assignment.studentStatus)}">
+                                    ${assignment.studentStatus || '-'}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 300px;">
                                 <div class="truncate" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}
                                 </div>
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(assignment.myRole)}">
-                                    ${assignment.myRole === 'chair' ? '위원장' : '위원'}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadgeClass(assignment.submissionType)}">
+                                    ${assignment.submissionType}
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <span class="text-sm font-semibold ${getProgressColorClass(assignment.evaluationProgress)}">${assignment.evaluationProgress}</span>
+                                ${isMember ? `
+                                    <button onclick="openReviewModal('${assignment.id}')"
+                                            class="px-3 py-1.5 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors">
+                                        <i class="fas fa-clipboard-check mr-1"></i> 심사하기
+                                    </button>
+                                ` : '-'}
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <button onclick="openReviewDetail('${assignment.id}')" 
-                                        class="text-blue-600 hover:underline text-sm font-medium">
-                                    상세보기
-                                </button>
+                                ${isChair ? `
+                                    <button onclick="openChairEvaluation('${assignment.id}')"
+                                            class="px-3 py-1.5 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors">
+                                        <i class="fas fa-star mr-1"></i> 종합평가
+                                    </button>
+                                ` : '-'}
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                ${getProgressBadge(assignment.evaluationProgress)}
                             </td>
                         </tr>
-                    `).join('')}
+                    `;
+                    }).join('')}
                 </tbody>
             </table>
         </div>
@@ -321,4 +342,47 @@ function getProgressColorClass(progress) {
     return 'text-blue-600';
 }
 
+// ID 50: 학적상태 색상 클래스
+function getStudentStatusClass(status) {
+    const statusMap = {
+        '재학': 'bg-green-100 text-green-800',
+        '휴학': 'bg-orange-100 text-orange-800',
+        '수료': 'bg-blue-100 text-blue-800'
+    };
+    return statusMap[status] || 'bg-gray-100 text-gray-800';
+}
+
+// ID 50: 진행상태 배지
+function getProgressBadge(progress) {
+    if (!progress) return '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">대기 (0/0)</span>';
+
+    const [completed, total] = progress.split('/').map(s => parseInt(s.trim()));
+
+    if (completed === 0) {
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">대기 (${progress})</span>`;
+    } else if (completed < total) {
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">진행중 (${progress})</span>`;
+    } else {
+        return `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">완료 (${progress})</span>`;
+    }
+}
+
+// ID 50: 심사하기 버튼 클릭 (심사위원용)
+function openReviewModal(assignmentId) {
+    console.log('심사 모달 열기:', assignmentId);
+    // 기존 상세보기 모달 재사용
+    openReviewDetail(assignmentId);
+}
+
+// ID 50: 종합평가 버튼 클릭 (심사위원장용)
+function openChairEvaluation(assignmentId) {
+    console.log('종합평가 모달 열기:', assignmentId);
+    // TODO: 종합평가 모달 구현 (P3-T17)
+    alert('종합평가 기능은 곧 구현될 예정입니다.');
+}
+
 window.getProgressColorClass = getProgressColorClass;
+window.getStudentStatusClass = getStudentStatusClass;
+window.getProgressBadge = getProgressBadge;
+window.openReviewModal = openReviewModal;
+window.openChairEvaluation = openChairEvaluation;
