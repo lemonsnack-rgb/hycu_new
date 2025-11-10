@@ -31,7 +31,12 @@ function renderApprovedCard(req) {
             <div class="flex justify-between items-start mb-3">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold text-lg">${req.studentName}</span>
+                        <span class="font-semibold text-lg">
+                            ${createStudentNameWithInfo(req.studentName, req.studentNumber, {
+                                phone: req.phone || '',
+                                email: req.email || ''
+                            })}
+                        </span>
                         <span class="text-sm text-gray-500">(${req.studentNumber})</span>
                         <span class="badge-purple">${typeText}</span>
                     </div>
@@ -110,7 +115,10 @@ function completeMeetingV2(reqId) {
     const content = `
         <form id="complete-meeting-form" class="space-y-4">
             <div class="bg-gray-50 p-4 rounded">
-                <p><span class="font-medium">학생:</span> ${req.studentName}</p>
+                <p><span class="font-medium">학생:</span> ${createStudentNameWithInfo(req.studentName, req.studentNumber, {
+                    phone: req.phone || '',
+                    email: req.email || ''
+                })}</p>
                 <p><span class="font-medium">주제:</span> ${req.topic}</p>
                 <p><span class="font-medium">예정:</span> ${req.selectedDate} ${req.selectedTime} (${req.duration}분)</p>
             </div>
@@ -184,7 +192,12 @@ function renderCompletedCard(req) {
             <div class="flex justify-between items-start mb-3">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold text-lg">${req.studentName}</span>
+                        <span class="font-semibold text-lg">
+                            ${createStudentNameWithInfo(req.studentName, req.studentNumber, {
+                                phone: req.phone || '',
+                                email: req.email || ''
+                            })}
+                        </span>
                         <span class="text-sm text-gray-500">(${req.studentNumber})</span>
                         <span class="badge-purple">${typeText}</span>
                         ${hasRecording ? '<span class="badge-red">📹 녹화본</span>' : ''}

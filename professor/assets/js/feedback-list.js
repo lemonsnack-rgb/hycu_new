@@ -128,7 +128,12 @@ function renderFeedbackRow(request, idx) {
             <td class="py-3 px-4 text-gray-600 text-sm">${request.program}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.studentNumber}</td>
             <td class="py-3 px-4 font-medium text-gray-800">
-                ${addStudentInfoIcon(request.studentName, request.studentNumber)}
+                ${createStudentNameWithInfo(request.studentName, request.studentNumber, {
+                    phone: request.phone || '',
+                    email: request.email || '',
+                    major: request.major || '',
+                    degree: request.program || ''
+                })}
             </td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.semester || '-'}학기</td>
             <td class="py-3 px-4 text-gray-700 text-sm">${request.thesisTitle || request.file}</td>
@@ -193,24 +198,9 @@ window.initFeedbackList = initFeedbackList;
 window.renderFeedbackList = renderFeedbackList;
 window.showPlagiarismReport = showPlagiarismReport;
 
-// ==================== ID 38: 학생 정보 아이콘 추가 ====================
-function addStudentInfoIcon(studentName, studentNumber) {
-    return `
-        ${studentName}
-        <button onclick="showStudentInfo('${studentNumber}'); event.stopPropagation();" 
-                class="ml-1 text-blue-600 hover:text-blue-800" 
-                title="학생 정보 보기">
-            <i class="fas fa-info-circle text-xs"></i>
-        </button>
-    `;
-}
-
-function showStudentInfo(studentNumber) {
-    alert(`학생 정보\n학번: ${studentNumber}\n(실제 구현 시 상세 모달 표시)`);
-}
-
-window.addStudentInfoIcon = addStudentInfoIcon;
-window.showStudentInfo = showStudentInfo;
+// ==================== ID 38: 학생 정보 아이콘 추가 (제거 - common-utils.js 사용) ====================
+// 🔧 개선: common-utils.js의 createStudentNameWithInfo() 및 showStudentInfo() 사용
+// 로컬 함수 제거됨
 
 // ==================== 검색 기능 ====================
 function getCurrentFeedbackFilters() {

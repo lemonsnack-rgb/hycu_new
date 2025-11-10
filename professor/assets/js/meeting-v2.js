@@ -450,7 +450,12 @@ function renderRequestCard(req) {
             <div class="flex justify-between items-start mb-3">
                 <div>
                     <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold text-lg">${req.studentName}</span>
+                        <span class="font-semibold text-lg">
+                            ${createStudentNameWithInfo(req.studentName, req.studentNumber, {
+                                phone: req.phone || '',
+                                email: req.email || ''
+                            })}
+                        </span>
                         <span class="text-sm text-gray-500">(${req.studentNumber})</span>
                         <span class="badge-purple">${typeText}</span>
                     </div>
@@ -492,7 +497,10 @@ function approveRequestV2(reqId) {
     const content = `
         <form id="approve-req-form" class="space-y-4">
             <div class="bg-gray-50 p-4 rounded">
-                <p><span class="font-medium">학생:</span> ${req.studentName}</p>
+                <p><span class="font-medium">학생:</span> ${createStudentNameWithInfo(req.studentName, req.studentNumber, {
+                    phone: req.phone || '',
+                    email: req.email || ''
+                })}</p>
                 <p><span class="font-medium">주제:</span> ${req.topic}</p>
                 <p><span class="font-medium">일시:</span> ${req.selectedDate} ${req.selectedTime} (${req.duration}분)</p>
                 <p><span class="font-medium">유형:</span> ${req.meetingType === 'online' ? '온라인' : '대면'}</p>
@@ -534,7 +542,10 @@ function rejectRequestV2(reqId) {
     const content = `
         <form id="reject-req-form" class="space-y-4">
             <div class="bg-gray-50 p-4 rounded">
-                <p><span class="font-medium">학생:</span> ${req.studentName}</p>
+                <p><span class="font-medium">학생:</span> ${createStudentNameWithInfo(req.studentName, req.studentNumber, {
+                    phone: req.phone || '',
+                    email: req.email || ''
+                })}</p>
                 <p><span class="font-medium">주제:</span> ${req.topic}</p>
             </div>
             

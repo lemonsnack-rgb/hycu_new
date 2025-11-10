@@ -70,7 +70,12 @@ function renderReviewList() {
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
-                            <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                ${createStudentNameWithInfo(assignment.studentName, assignment.studentNumber, {
+                                    phone: assignment.phone || '',
+                                    email: assignment.email || ''
+                                })}
+                            </td>
                             <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
                                 <div class="truncate" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}

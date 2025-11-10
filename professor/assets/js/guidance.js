@@ -91,7 +91,14 @@ function showStudentList() {
                             return `
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${student.name}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${createStudentNameWithInfo(student.name, student.studentId, {
+                                            phone: student.phone,
+                                            email: student.email,
+                                            major: student.department,
+                                            degree: getDegreeText(student.degree)
+                                        })}
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${student.studentId}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${getDegreeText(student.degree)}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${getStageText(student.stage)}</td>
