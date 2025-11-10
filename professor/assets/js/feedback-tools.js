@@ -44,7 +44,7 @@ let currentViewport = null;  // 현재 viewport 크기 저장 (경계 체크용)
 function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
     currentFeedbackId = feedbackId;
     annotations = feedbackData && feedbackData.annotations ? {...feedbackData.annotations} : {};
-    
+
     elements = {
         canvas: document.getElementById('pdf-canvas'),
         textLayer: document.getElementById('text-layer'),
@@ -56,14 +56,20 @@ function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
         pageCountEl: document.getElementById('page-count'),
         zoomLevelEl: document.getElementById('zoom-level')
     };
-    
+
+    // DOM 요소 존재 확인
+    if (!elements.pdfRenderWrapper || !elements.canvas || !elements.interactionCanvas) {
+        console.error('PDF 뷰어 초기화 실패: 필수 DOM 요소를 찾을 수 없습니다.');
+        return;
+    }
+
     // Fabric.js 캔버스 초기화
     fabricCanvas = new fabric.Canvas(elements.interactionCanvas, {
         isDrawingMode: false,
         perPixelTargetFind: true,
         selection: false
     });
-    
+
     fabricCanvas.freeDrawingBrush = new fabric.PencilBrush(fabricCanvas);
     
     // 페이지 렌더링 함수
