@@ -115,7 +115,7 @@ const FEEDBACK_REQUESTS = [
     {
         id: 'fb-001',
         documentId: 'doc-001',
-        version: 1,
+        version: 3,
         studentName: '김철수',
         studentNumber: '2024001',
         program: '박사',
@@ -123,8 +123,24 @@ const FEEDBACK_REQUESTS = [
         graduate: '일반대학원',
         semester: 3,
         thesisTitle: 'AI 기반 학습자 맞춤형 교육 시스템 개발',
-        file: '연구계획서_v1.pdf',
+        file: '연구계획서_v3.pdf',
         fileUrl: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf',
+        previousVersions: [
+            {
+                version: 2,
+                file: '연구계획서_v2.pdf',
+                fileUrl: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf',
+                uploadDate: '2025-11-18',
+                feedbackDate: '2025-11-19 14:00'
+            },
+            {
+                version: 1,
+                file: '연구계획서_v1.pdf',
+                fileUrl: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf',
+                uploadDate: '2025-11-15',
+                feedbackDate: '2025-11-16 10:00'
+            }
+        ],
         stage: '연구계획서',
         copykillerScore: '12%',
         gptkillerScore: '5%',

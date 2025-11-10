@@ -141,19 +141,8 @@ function createFeedbackModal(request, feedbackData) {
                 <!-- 왼쪽: 제출 이력 -->
                 <div class="history-panel">
                     <h4 class="text-sm font-bold text-gray-700 mb-3">제출 이력</h4>
-                    <div class="space-y-2">
-                        <div class="bg-white p-3 rounded border-l-4 border-blue-500">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
-                                <span class="text-xs font-bold text-gray-700">v${feedbackData ? feedbackData.version : 1} (현재)</span>
-                            </div>
-                            <p class="text-xs text-gray-600">${request.date}</p>
-                            ${feedbackData && feedbackData.lastModifiedBy ? `
-                                <p class="text-xs text-gray-500 mt-1">
-                                    수정: ${FeedbackDataService.getUserById(feedbackData.lastModifiedBy)?.name}
-                                </p>
-                            ` : ''}
-                        </div>
+                    <div class="submission-history-list space-y-2">
+                        ${renderSubmissionHistory(request, feedbackData)}
                     </div>
                 </div>
                 
@@ -332,6 +321,101 @@ function closeFeedbackModal() {
     }
 }
 
+// ==================== 제출 이력 렌더링 ====================
+function renderSubmissionHistory(request, feedbackData) {
+    const currentVersion = feedbackData ? feedbackData.version : 1;
+    const previousVersions = request.previousVersions || [];
+
+    // 모든 버전을 배열로 만들기 (최신순)
+    const allVersions = [
+        {
+            version: currentVersion,
+            label: `v${currentVersion} - 최신`,
+            file: request.file,
+            fileUrl: request.fileUrl,
+            uploadDate: request.uploadDate || request.date,
+            description: feedbackData && feedbackData.lastModifiedBy
+                ? `수정: ${FeedbackDataService.getUserById(feedbackData.lastModifiedBy)?.name}`
+                : '현재 버전',
+            isLatest: true
+        },
+        ...previousVersions.map(pv => ({
+            version: pv.version,
+            label: `v${pv.version}`,
+            file: pv.file,
+            fileUrl: pv.fileUrl,
+            uploadDate: pv.uploadDate,
+            description: pv.feedbackDate ? `피드백 완료: ${pv.feedbackDate}` : '이전 버전',
+            isLatest: false
+        }))
+    ];
+
+    return allVersions.map((ver, index) => {
+        const isActive = index === 0; // 첫 번째(최신) 버전이 기본 선택
+        return `
+            <div class="history-item ${isActive ? 'active' : ''}"
+                 data-pdf-url="${ver.fileUrl}"
+                 data-version="${ver.version}"
+                 onclick="loadVersionPDF('${ver.fileUrl}', ${ver.version})">
+                <div class="flex items-start gap-3 w-full">
+                    <!-- 버전 배지 -->
+                    <div class="version-badge ${ver.isLatest ? 'badge-success' : 'badge-secondary'}">
+                        ${ver.isLatest ? '최신' : `v${ver.version}`}
+                    </div>
+
+                    <!-- 버전 정보 -->
+                    <div class="version-info flex-1">
+                        <div class="version-title text-sm font-bold text-gray-800 mb-1">
+                            ${ver.label}
+                        </div>
+                        <div class="version-date text-xs text-gray-600 mb-1">
+                            ${ver.uploadDate}
+                        </div>
+                        <div class="version-desc text-xs text-gray-500">
+                            ${ver.description}
+                        </div>
+                    </div>
+
+                    <!-- 보기 아이콘 -->
+                    <div class="version-icon flex-shrink-0">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// ==================== PDF 버전 전환 ====================
+function loadVersionPDF(pdfUrl, version) {
+    console.log(`PDF 버전 전환: v${version}`, pdfUrl);
+
+    // 모든 항목 비활성화
+    document.querySelectorAll('.history-item').forEach(item => {
+        item.classList.remove('active');
+    });
+
+    // 클릭한 항목 활성화
+    const clickedItem = document.querySelector(`[data-version="${version}"]`);
+    if (clickedItem) {
+        clickedItem.classList.add('active');
+    }
+
+    // 실제 PDF 로딩은 PDF.js 초기화 후 처리
+    // 현재는 URL만 업데이트
+    console.log('TODO: PDF.js로 버전 전환 구현 필요');
+
+    // 임시: 상단 툴바의 파일명 업데이트
+    const fileNameElement = document.querySelector('.pdf-toolbar .text-sm.font-medium');
+    if (fileNameElement) {
+        const versionLabel = clickedItem ? clickedItem.querySelector('.version-title').textContent : `v${version}`;
+        fileNameElement.textContent = versionLabel;
+    }
+}
+
 // ==================== 자주 쓰는 코멘트 팝오버 추가 ====================
 function createQuickMarkPopover() {
     const popover = document.createElement('div');
@@ -383,6 +467,7 @@ function createQuickMarkPopover() {
 window.openFeedbackViewer = openFeedbackViewer;
 window.closeFeedbackModal = closeFeedbackModal;
 window.createQuickMarkPopover = createQuickMarkPopover;
+window.loadVersionPDF = loadVersionPDF;
 
 // ==================== ID 40: 탭 전환 함수 ====================
 function switchFeedbackTab(tab) {

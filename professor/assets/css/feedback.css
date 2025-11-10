@@ -719,3 +719,88 @@ canvas.upper-canvas {
 .submission-history .sh-list li.active{ background:#eff6ff; color:#1d4ed8; }
 /* disable text select on pdf text layer (defensive) */
 #text-layer { user-select:none !important; pointer-events:none !important; }
+
+/* ==================== 버전별 제출 이력 (#45) ==================== */
+.submission-history-list .history-item {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.submission-history-list .history-item:hover {
+    background-color: #F9FAFB;
+    border-color: #3B82F6;
+    transform: translateX(2px);
+}
+
+.submission-history-list .history-item.active {
+    background-color: #EFF6FF;
+    border-color: #3B82F6;
+    border-width: 2px;
+    padding: 11px; /* 보정: border-width 2px로 인한 크기 변화 방지 */
+}
+
+.version-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 48px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+}
+
+.version-badge.badge-success {
+    background-color: #DEF7EC;
+    color: #03543F;
+    border: 1px solid #84E1BC;
+}
+
+.version-badge.badge-secondary {
+    background-color: #E5E7EB;
+    color: #6B7280;
+    border: 1px solid #D1D5DB;
+}
+
+.version-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.version-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1F2937;
+    margin-bottom: 4px;
+}
+
+.version-date {
+    font-size: 11px;
+    color: #6B7280;
+    margin-bottom: 2px;
+}
+
+.version-desc {
+    font-size: 11px;
+    color: #9CA3AF;
+}
+
+.version-icon {
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+}
+
+.history-item:hover .version-icon {
+    opacity: 1;
+}
+
+.history-item.active .version-icon {
+    opacity: 1;
+}
