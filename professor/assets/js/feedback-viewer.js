@@ -838,6 +838,33 @@ function switchPdfVersion(ver){
 }
 
 
+// ==================== 피드백 완료 ====================
+function completeFeedback() {
+    // 첨삭, 댓글, 판서 내용 저장
+    console.log('[completeFeedback] 피드백 저장 중...');
+
+    // TODO: 실제 저장 로직 구현
+    // - 첨삭 내용 수집
+    // - 댓글 내용 수집
+    // - 판서 내용 수집
+    // - 서버에 저장
+
+    // 저장 완료 메시지
+    alert('피드백이 완료되었습니다.\n\n첨삭, 댓글, 판서 내용이 저장되었습니다.');
+
+    // 모달 닫기
+    closeFeedbackModal();
+
+    // 목록 새로고침
+    if (typeof initFeedbackList === 'function') {
+        initFeedbackList();
+    }
+}
+
+// Export
+window.completeFeedback = completeFeedback;
+
+
 // injected: autosave on input
 (function attachAutosave(){
   let t; const save = ()=>{ console.log('[autosave] saved'); };

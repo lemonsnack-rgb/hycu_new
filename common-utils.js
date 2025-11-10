@@ -80,6 +80,7 @@ function showStudentInfo(studentId, studentName, studentInfo) {
     const modal = document.createElement('div');
     modal.id = 'student-info-modal';
     modal.className = 'modal-backdrop';
+    modal.style.cssText = 'position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 90vw; width: 28rem; padding: 0; max-height: 90vh; overflow-y: auto;">
             <div style="padding: 1.5rem; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10;">
