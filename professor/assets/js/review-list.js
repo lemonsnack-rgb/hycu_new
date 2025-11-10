@@ -302,13 +302,27 @@ function openReviewDetail(assignmentId) {
         console.error('심사 상세 모달을 찾을 수 없습니다');
         return;
     }
-    
+
+    // 이미 열려있는 경우 먼저 닫기
+    if (modal.classList.contains('active')) {
+        modal.classList.remove('active');
+        // 짧은 지연 후 다시 열기 (DOM 정리를 위해)
+        setTimeout(() => {
+            openReviewDetailInternal(modal, assignmentId);
+        }, 50);
+    } else {
+        openReviewDetailInternal(modal, assignmentId);
+    }
+}
+
+// 내부 함수: 실제 모달 열기 로직
+function openReviewDetailInternal(modal, assignmentId) {
     // 모달 데이터 설정
     modal.dataset.assignmentId = assignmentId;
-    
+
     // 상세 정보 렌더링
     renderReviewDetail(assignmentId);
-    
+
     // 모달 열기
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
@@ -319,6 +333,15 @@ function closeReviewDetail() {
     if (modal) {
         modal.classList.remove('active');
         document.body.style.overflow = '';
+
+        // 모달 내용 초기화 (메모리 누수 방지 및 다음 열기 준비)
+        const content = document.getElementById('review-detail-content');
+        if (content) {
+            // 짧은 지연 후 내용 정리 (애니메이션을 위해)
+            setTimeout(() => {
+                content.innerHTML = '';
+            }, 300);
+        }
     }
 }
 
