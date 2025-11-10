@@ -42,6 +42,13 @@ function logout() {
 function showStudentInfo(studentId, studentName, studentInfo) {
     console.log('🔵 [showStudentInfo] 시작:', { studentId, studentName, studentInfo });
 
+    // 🔧 수정: 기존 모달이 있으면 먼저 제거
+    const existingModal = document.getElementById('student-info-modal');
+    if (existingModal) {
+        console.log('⚠️ [showStudentInfo] 기존 모달 제거');
+        existingModal.remove();
+    }
+
     // 🔧 개선: studentInfo가 없으면 DOM에서 data 속성 찾기
     if (!studentInfo) {
         const icon = document.querySelector(`[data-student-id="${studentId}"]`);
@@ -67,26 +74,28 @@ function showStudentInfo(studentId, studentName, studentInfo) {
     studentName = studentName || studentId;
     const hasInfo = studentInfo && (studentInfo.phone || studentInfo.email);
 
-    // 모달 생성
+    console.log('🔵 [showStudentInfo] hasInfo:', hasInfo, 'studentInfo:', studentInfo);
+
+    // 🔧 수정: 모달 생성 (크기를 내용에 맞춰 조절)
     const modal = document.createElement('div');
     modal.id = 'student-info-modal';
     modal.className = 'modal-backdrop';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 32rem; padding: 0;">
-            <div style="padding: 1.5rem; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center;">
+        <div class="modal-content" style="max-width: 90vw; width: 28rem; padding: 0; max-height: 90vh; overflow-y: auto;">
+            <div style="padding: 1.5rem; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; background: white; z-index: 10;">
                 <h3 style="font-size: 1.25rem; font-weight: 700; color: #1F2937;">학생 정보</h3>
-                <button onclick="closeStudentInfoModal()" class="modal-close" style="color: #9CA3AF; cursor: pointer; background: none; border: none; font-size: 1.5rem;">&times;</button>
+                <button onclick="closeStudentInfoModal()" class="modal-close" style="color: #9CA3AF; cursor: pointer; background: none; border: none; font-size: 1.5rem; line-height: 1;">&times;</button>
             </div>
             <div style="padding: 1.5rem;">
                 <div style="margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #E5E7EB;">
                     <div style="display: flex; align-items: center; gap: 1rem;">
-                        <div style="width: 4rem; height: 4rem; background-color: #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                        <div style="width: 4rem; height: 4rem; background-color: #E5E7EB; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
                             <svg style="width: 2.5rem; height: 2.5rem; color: #6B7280;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                             </svg>
                         </div>
-                        <div>
-                            <p style="font-size: 1.125rem; font-weight: 700; color: #1F2937;">${studentName}</p>
+                        <div style="min-width: 0; flex: 1;">
+                            <p style="font-size: 1.125rem; font-weight: 700; color: #1F2937; word-break: break-word;">${studentName}</p>
                             <p style="font-size: 0.875rem; color: #6B7280;">${studentId}</p>
                         </div>
                     </div>
@@ -109,12 +118,14 @@ function showStudentInfo(studentId, studentName, studentInfo) {
     `;
 
     document.body.appendChild(modal);
+    console.log('✅ [showStudentInfo] 모달 DOM에 추가됨');
 
     // 🔧 개선: 정보가 없을 때만 API 호출
     if (!hasInfo) {
+        console.log('🔵 [showStudentInfo] API 호출 시작');
         loadStudentInfo(studentId);
     } else {
-        console.log('✅ [showStudentInfo] data 속성에서 정보 표시');
+        console.log('✅ [showStudentInfo] data 속성에서 정보 표시 완료');
     }
 }
 
@@ -124,45 +135,78 @@ function showStudentInfo(studentId, studentName, studentInfo) {
  * @returns {string} HTML 문자열
  */
 function renderStudentInfoContent(studentInfo) {
-    return `
-        <div style="display: flex; flex-direction: column; gap: 1rem;">
-            <div class="info-row">
-                <span class="info-label">
-                    <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
-                    </svg>
-                    전화번호
-                </span>
-                <span class="info-value">${studentInfo.phone || '정보 없음'}</span>
-            </div>
+    console.log('🔵 [renderStudentInfoContent] 렌더링:', studentInfo);
 
-            <div class="info-row">
-                <span class="info-label">
-                    <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
-                    </svg>
-                    이메일
-                </span>
-                <span class="info-value">${studentInfo.email || '정보 없음'}</span>
+    // 🔧 수정: 정보가 없는 경우 처리
+    const hasAnyInfo = studentInfo && (studentInfo.phone || studentInfo.email || studentInfo.major || studentInfo.degree);
+
+    if (!hasAnyInfo) {
+        return `
+            <div style="text-align: center; padding: 2rem; color: #9CA3AF;">
+                <p>등록된 정보가 없습니다.</p>
             </div>
+        `;
+    }
+
+    return `
+        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+            ${studentInfo.phone ? `
+                <div class="info-row">
+                    <span class="info-label">
+                        <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"></path>
+                        </svg>
+                        전화번호
+                    </span>
+                    <span class="info-value" style="word-break: break-all;">${studentInfo.phone}</span>
+                </div>
+            ` : ''}
+
+            ${studentInfo.email ? `
+                <div class="info-row">
+                    <span class="info-label">
+                        <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+                        </svg>
+                        이메일
+                    </span>
+                    <span class="info-value" style="word-break: break-all;">${studentInfo.email}</span>
+                </div>
+            ` : ''}
 
             ${studentInfo.major || studentInfo.degree ? `
                 <div class="info-row">
                     <span class="info-label">
-                        <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg style="width: 1.25rem; height: 1.25rem; display: inline-block; vertical-align: middle; margin-right: 0.5rem; flex-shrink: 0;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                         </svg>
                         전공 / 과정
                     </span>
-                    <span class="info-value">${studentInfo.major || ''} ${studentInfo.degree ? '/ ' + studentInfo.degree : ''}</span>
+                    <span class="info-value" style="word-break: break-word;">
+                        ${studentInfo.major || ''} ${studentInfo.degree ? '/ ' + studentInfo.degree : ''}
+                    </span>
                 </div>
             ` : ''}
         </div>
 
-        <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem;">
-            ${studentInfo.phone ? `<a href="tel:${studentInfo.phone}" class="btn-primary" style="flex: 1; text-align: center; text-decoration: none;">전화하기</a>` : ''}
-            ${studentInfo.email ? `<a href="mailto:${studentInfo.email}" class="btn-secondary" style="flex: 1; text-align: center; text-decoration: none;">이메일</a>` : ''}
-        </div>
+        ${studentInfo.phone || studentInfo.email ? `
+            <div style="display: flex; gap: 0.5rem; margin-top: 1.5rem; flex-wrap: wrap;">
+                ${studentInfo.phone ? `
+                    <a href="tel:${studentInfo.phone}"
+                       class="btn-primary"
+                       style="flex: 1; min-width: 120px; text-align: center; text-decoration: none; padding: 0.625rem 1.25rem; border-radius: 0.375rem; font-weight: 600; display: inline-block;">
+                        전화하기
+                    </a>
+                ` : ''}
+                ${studentInfo.email ? `
+                    <a href="mailto:${studentInfo.email}"
+                       class="btn-secondary"
+                       style="flex: 1; min-width: 120px; text-align: center; text-decoration: none; padding: 0.625rem 1.25rem; border-radius: 0.375rem; font-weight: 600; display: inline-block;">
+                        이메일
+                    </a>
+                ` : ''}
+            </div>
+        ` : ''}
     `;
 }
 
