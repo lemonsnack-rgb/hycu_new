@@ -84,8 +84,7 @@ function renderTodoList() {
             <div class="todo-content">
                 <div class="todo-title">${notif.message}</div>
                 <div class="todo-meta">
-                    <span class="badge ${getPriorityBadgeClass(notif.priority)}">${getPriorityText(notif.priority)}</span>
-                    <span style="margin-left: 8px;">${getRelativeTime(notif.timestamp)}</span>
+                    <span>${getRelativeTime(notif.timestamp)}</span>
                 </div>
             </div>
         </div>
