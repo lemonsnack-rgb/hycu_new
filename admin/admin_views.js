@@ -78,15 +78,21 @@ const views = {
         </div>
     `,
 
-    // ========== 연구계획서 제출 현황 ==========
+    // ========== 연구계획서 관리 ==========
     researchProposal: () => {
         // 필터링된 데이터 또는 원본 데이터 사용
         const data = appData.submissions.researchProposal;
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">연구계획서 제출 현황</h3>
-                    
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">연구계획서 관리</h3>
+                        <button onclick="openResearchProposalRegisterModal()"
+                                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors text-sm">
+                            <i class="fas fa-plus mr-2"></i>연구계획서 등록
+                        </button>
+                    </div>
+
                     <!-- 검색 메뉴 (표준화) -->
                     <div class="search-container">
                         <div class="search-grid">
@@ -115,19 +121,7 @@ const views = {
                                 </select>
                             </div>
 
-                            <!-- 3. 승인여부 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    승인여부
-                                </label>
-                                <select id="search-approval" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="승인대기">승인대기</option>
-                                    <option value="승인완료">승인완료</option>
-                                </select>
-                            </div>
-
-                            <!-- 4. 학번 -->
+                            <!-- 3. 학번 -->
                             <div class="search-field">
                                 <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                                     학번
@@ -136,7 +130,7 @@ const views = {
                                        class="search-input">
                             </div>
 
-                            <!-- 5. 성명 -->
+                            <!-- 4. 성명 -->
                             <div class="search-field">
                                 <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                                     성명
@@ -145,7 +139,7 @@ const views = {
                                        class="search-input">
                             </div>
 
-                            <!-- 6. 학과/전공 -->
+                            <!-- 5. 학과/전공 -->
                             <div class="search-field">
                                 <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                                     학과/전공
@@ -159,7 +153,7 @@ const views = {
                                 </select>
                             </div>
 
-                            <!-- 7. 학위과정 -->
+                            <!-- 6. 학위과정 -->
                             <div class="search-field">
                                 <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                                     학위과정
@@ -171,15 +165,15 @@ const views = {
                                 </select>
                             </div>
                         </div>
-                        
+
                         <!-- 검색/초기화 버튼 -->
                         <div class="search-buttons">
-                            <button onclick="searchSubmissions('researchProposal')" 
+                            <button onclick="searchSubmissions('researchProposal')"
                                     class="search-btn search-btn-primary">
                                 <i class="fas fa-search"></i>검색
                             </button>
-                            
-                            <button onclick="resetSearch('researchProposal')" 
+
+                            <button onclick="resetSearch('researchProposal')"
                                     class="search-btn search-btn-secondary">
                                 <i class="fas fa-redo"></i>초기화
                             </button>
@@ -190,30 +184,25 @@ const views = {
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">
-                                    <input type="checkbox" onclick="toggleAllCheckboxes(this)">
-                                </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기차</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">휴대전화</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이메일</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">상태</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">연구계획서 제목</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록일</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.map((item, idx) => `
+                            ${data.length > 0 ? data.map((item, idx) => `
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4">
-                                        <input type="checkbox" value="${item.id}">
-                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">${item.year || '2025'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">${item.semester || '1'}학기</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.degree}</td>
@@ -221,20 +210,24 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-800">
                                         ${addStudentInfoIcon(item.studentName, item.studentId)}
                                     </td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.semesterCount || '-'}학기</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.phone || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.email || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.studentStatus || '재학'}</td>
-                                    <td class="py-3 px-4">
-                                        <span class="status-badge status-${item.status}">
-                                            ${item.status}
-                                        </span>
+                                    <td class="py-3 px-4 text-sm text-gray-800 max-w-xs truncate" title="${item.thesisTitle || '-'}">
+                                        ${item.thesisTitle || '-'}
                                     </td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">${item.submitDate || '-'}</td>
                                     <td class="py-3 px-4">
-                                        <button onclick="viewSubmissionDetail(${item.id}, 'researchProposal')" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
+                                        <button onclick="viewResearchProposalDetail(${item.id})"
+                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded">
+                                            상세보기
+                                        </button>
                                     </td>
                                 </tr>
-                            `).join('')}
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="11" class="py-8 text-center text-gray-500">
+                                        등록된 연구계획서가 없습니다.
+                                    </td>
+                                </tr>
+                            `}
                         </tbody>
                     </table>
                 </div>
@@ -1714,47 +1707,34 @@ const views = {
 
                 <!-- 목록 테이블 -->
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-100">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left">교수명</th>
-                                <th class="py-3 px-4 text-left">학생명</th>
-                                <th class="py-3 px-4 text-left">학번</th>
-                                <th class="py-3 px-4 text-left">학기</th>
-                                <th class="py-3 px-4 text-left">진행률</th>
-                                <th class="py-3 px-4 text-center">관리</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
-                        <tbody id="guidancePairsTableBody">
-                            ${data.guidancePairs.map(pair => `
-                                <tr class="border-t hover:bg-gray-50">
-                                    <td class="py-3 px-4">
-                                        <div>
-                                            <p class="font-medium">${pair.professor.name}</p>
-                                            <p class="text-xs text-gray-500">${pair.professor.department}</p>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 px-4">
-                                        <div>
-                                            <p class="font-medium">${pair.student.name}</p>
-                                            <p class="text-xs text-gray-500">${pair.student.major}</p>
-                                        </div>
-                                    </td>
-                                    <td class="py-3 px-4">${pair.student.studentId}</td>
-                                    <td class="py-3 px-4">${pair.semester}</td>
-                                    <td class="py-3 px-4">
-                                        <div class="flex items-center">
-                                            <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                                                <div class="bg-blue-600 h-2 rounded-full"
-                                                     style="width: ${(pair.completedWeeks/pair.totalWeeks*100)}%"></div>
-                                            </div>
-                                            <span class="text-sm">${pair.completedWeeks}/${pair.totalWeeks}주차</span>
-                                        </div>
-                                        <p class="text-xs text-gray-500 mt-1">최종 업데이트: ${pair.lastUpdateDate}</p>
-                                    </td>
+                        <tbody id="guidancePairsTableBody" class="divide-y divide-gray-200">
+                            ${data.guidancePairs.map((pair, index) => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.student.major || '-'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.student.degree || '석사'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.student.studentId}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${pair.student.name}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.professor.name}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.semester}</td>
                                     <td class="py-3 px-4 text-center">
                                         <button onclick="viewWeeklyGuidanceDetail(${pair.id})"
-                                                class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
                                             상세보기
                                         </button>
                                     </td>

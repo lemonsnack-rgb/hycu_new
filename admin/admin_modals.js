@@ -3438,6 +3438,216 @@ function renderAdminJournalRows(journals) {
     `;
 }
 
+// ==================== 연구계획서 관리 ====================
+
+function openResearchProposalRegisterModal() {
+    const content = `
+        <div class="space-y-6">
+            <!-- 학생 검색 -->
+            <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">학생 정보 검색</h4>
+                <div class="flex gap-2">
+                    <select id="rpSearchType" class="px-3 py-2 border rounded w-32">
+                        <option value="studentId">학번</option>
+                        <option value="name">성명</option>
+                    </select>
+                    <input type="text" id="rpSearchKeyword"
+                           placeholder="검색어 입력"
+                           class="flex-1 px-3 py-2 border rounded"
+                           onkeypress="if(event.key==='Enter') searchStudentForRP()">
+                    <button onclick="searchStudentForRP()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        검색
+                    </button>
+                </div>
+                <div id="rpStudentSearchResults" class="mt-3"></div>
+            </div>
+
+            <!-- 학생 정보 (자동 입력) -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">학번</label>
+                        <input type="text" id="rpStudentId" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">성명</label>
+                        <input type="text" id="rpStudentName" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">학과/전공</label>
+                        <input type="text" id="rpMajor" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">학위과정</label>
+                        <input type="text" id="rpDegree" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 연구계획서 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">연구계획서 정보</h4>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">학년도 *</label>
+                            <select id="rpYear" required class="w-full px-3 py-2 border rounded">
+                                <option value="">선택</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">학기 *</label>
+                            <select id="rpSemester" required class="w-full px-3 py-2 border rounded">
+                                <option value="">선택</option>
+                                <option value="1">1학기</option>
+                                <option value="2">2학기</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">연구계획서 제목 *</label>
+                        <input type="text" id="rpTitle" required
+                               placeholder="연구계획서 제목 입력"
+                               class="w-full px-3 py-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">연구 개요</label>
+                        <textarea id="rpSummary" rows="4"
+                                  placeholder="연구 개요 입력"
+                                  class="w-full px-3 py-2 border rounded"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">연구계획서 파일</label>
+                        <input type="file" id="rpFile" accept=".pdf,.docx"
+                               class="w-full px-3 py-2 border rounded">
+                        <p class="text-xs text-gray-500 mt-1">PDF 또는 Word 파일 (최대 50MB)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('연구계획서 등록', content, '등록', submitResearchProposal, true);
+}
+
+function searchStudentForRP() {
+    const searchType = document.getElementById('rpSearchType').value;
+    const keyword = document.getElementById('rpSearchKeyword').value.trim();
+
+    if (!keyword) {
+        alert('검색어를 입력하세요.');
+        return;
+    }
+
+    // mock 데이터에서 학생 검색 (실제로는 API 호출)
+    const students = appData.submissions.researchProposal;
+    const results = students.filter(s => {
+        if (searchType === 'studentId') {
+            return s.studentId.includes(keyword);
+        } else {
+            return s.studentName.includes(keyword);
+        }
+    });
+
+    const resultsContainer = document.getElementById('rpStudentSearchResults');
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-sm text-gray-500">검색 결과가 없습니다.</p>';
+        return;
+    }
+
+    resultsContainer.innerHTML = `
+        <div class="border rounded max-h-48 overflow-y-auto">
+            ${results.map(s => `
+                <div class="p-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                     onclick="selectStudentForRP('${s.studentId}', '${s.studentName}', '${s.major}', '${s.degree}')">
+                    <p class="text-sm font-medium">${s.studentName} (${s.studentId})</p>
+                    <p class="text-xs text-gray-600">${s.major} - ${s.degree}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function selectStudentForRP(studentId, studentName, major, degree) {
+    document.getElementById('rpStudentId').value = studentId;
+    document.getElementById('rpStudentName').value = studentName;
+    document.getElementById('rpMajor').value = major;
+    document.getElementById('rpDegree').value = degree;
+    document.getElementById('rpStudentSearchResults').innerHTML = '<p class="text-sm text-green-600">✓ 학생이 선택되었습니다.</p>';
+}
+
+function submitResearchProposal() {
+    const studentId = document.getElementById('rpStudentId').value;
+    const year = document.getElementById('rpYear').value;
+    const semester = document.getElementById('rpSemester').value;
+    const title = document.getElementById('rpTitle').value;
+
+    if (!studentId) {
+        alert('학생을 검색하여 선택해주세요.');
+        return;
+    }
+
+    if (!year || !semester || !title) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+    }
+
+    alert('연구계획서가 등록되었습니다.');
+    closeModal();
+    loadView('researchProposal');
+}
+
+function viewResearchProposalDetail(id) {
+    const proposal = appData.submissions.researchProposal.find(p => p.id === id);
+    if (!proposal) return;
+
+    const content = `
+        <div class="space-y-4">
+            <!-- 학생 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div><span class="text-gray-600">학번:</span> <span class="font-medium">${proposal.studentId}</span></div>
+                    <div><span class="text-gray-600">성명:</span> <span class="font-medium">${proposal.studentName}</span></div>
+                    <div><span class="text-gray-600">학과/전공:</span> <span class="font-medium">${proposal.major}</span></div>
+                    <div><span class="text-gray-600">학위과정:</span> <span class="font-medium">${proposal.degree}</span></div>
+                </div>
+            </div>
+
+            <!-- 연구계획서 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">연구계획서 정보</h4>
+                <div class="space-y-2 text-sm">
+                    <div><span class="text-gray-600">학년도/학기:</span> <span class="font-medium">${proposal.year || '2025'}학년도 ${proposal.semester || '1'}학기</span></div>
+                    <div><span class="text-gray-600">제목:</span> <span class="font-medium">${proposal.thesisTitle || '-'}</span></div>
+                    <div><span class="text-gray-600">등록일:</span> <span class="font-medium">${proposal.submitDate || '-'}</span></div>
+                </div>
+            </div>
+
+            <!-- 첨부파일 -->
+            ${proposal.fileUrl ? `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-bold mb-3">첨부파일</h4>
+                    <a href="${proposal.fileUrl}" target="_blank"
+                       class="text-blue-600 hover:underline text-sm">
+                        <i class="fas fa-file-pdf"></i> 연구계획서 다운로드
+                    </a>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    openModal('연구계획서 상세', content, '닫기', closeModal, true);
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
@@ -3452,3 +3662,8 @@ window.viewAdminJournalDetail = viewAdminJournalDetail;
 window.searchJournalReview = searchJournalReview;
 window.resetJournalSearch = resetJournalSearch;
 window.renderAdminJournalRows = renderAdminJournalRows;
+window.openResearchProposalRegisterModal = openResearchProposalRegisterModal;
+window.searchStudentForRP = searchStudentForRP;
+window.selectStudentForRP = selectStudentForRP;
+window.submitResearchProposal = submitResearchProposal;
+window.viewResearchProposalDetail = viewResearchProposalDetail;
