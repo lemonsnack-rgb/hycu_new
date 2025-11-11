@@ -46,8 +46,8 @@ function showScreen(screenId) {
             }
         } else if (screenId === 'journal-review') {
             // 학술지 심사 초기화 (ID 54-56)
-            if (typeof renderJournalReview === 'function') {
-                renderJournalReview();
+            if (typeof initJournalReview === 'function') {
+                initJournalReview();
             }
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];

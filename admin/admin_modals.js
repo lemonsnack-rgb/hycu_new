@@ -213,25 +213,121 @@ function viewSubmissionDetail(id, type) {
                 <div class="bg-purple-50 rounded-lg p-4">
                     <h4 class="font-bold text-purple-800 mb-4">심사위원 정보</h4>
                     <div class="space-y-2">
-                        ${item.reviewers.map(reviewer => `
-                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
-                                <div>
-                                    <p class="font-medium">${reviewer.name}</p>
-                                    <p class="text-sm text-gray-600">${reviewer.role}</p>
+                        ${item.reviewers.map((reviewer, index) => `
+                            <div class="p-3 bg-white rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">${reviewer.name}</p>
+                                        <p class="text-sm text-gray-600">${reviewer.role}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        ${type === 'finalThesis' && reviewer.score !== undefined && reviewer.score !== null ? `
+                                            <p class="font-bold text-lg text-[#6A0028]">${reviewer.score}점</p>
+                                            ${reviewer.comment ? `<p class="text-sm text-gray-600 line-clamp-1">${reviewer.comment}</p>` : ''}
+                                        ` : `
+                                            <span class="status-badge ${reviewer.status === '완료' ? 'status-complete' : reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">${reviewer.status}</span>
+                                        `}
+                                    </div>
                                 </div>
-                                <div class="text-right">
-                                    ${type === 'finalThesis' && reviewer.score ? `
-                                        <p class="font-bold text-lg text-[#6A0028]">${reviewer.score}점</p>
-                                        <p class="text-sm text-gray-600">${reviewer.comment}</p>
-                                    ` : `
-                                        <span class="status-badge ${reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">${reviewer.status}</span>
-                                    `}
-                                </div>
+                                ${type === 'finalThesis' && reviewer.score !== undefined && reviewer.score !== null ? `
+                                    <button onclick="viewIndividualEvaluation(${item.id}, ${index}, '${type}')"
+                                            class="mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors flex items-center gap-1">
+                                        상세 보기 →
+                                    </button>
+                                ` : ''}
                             </div>
                         `).join('')}
                     </div>
                 </div>
-                
+
+                ${type === 'finalThesis' ? (() => {
+                    // 평가표 정보 가져오기 (실제로는 item.evaluationCriteriaId로 찾아야 함)
+                    const evaluationCriteria = appData.evaluationCriteria ? appData.evaluationCriteria[0] : null;
+                    const criteria = evaluationCriteria?.passingCriteria || {};
+
+                    // 점수 계산
+                    const result = calculateScoresAndCriteria(item.reviewers, criteria);
+
+                    // 심사위원장 판정 (실제로는 item에서 가져와야 함)
+                    const chairDecision = item.chairDecision || 'pending'; // 'pass' | 'fail' | 'pending'
+                    const chairDecisionDate = item.chairDecisionDate || null;
+                    const chairNote = item.chairNote || '';
+
+                    return `
+                        <!-- 심사위원장 최종 판정 -->
+                        <div class="bg-gradient-to-r ${chairDecision === 'pass' ? 'from-green-50 to-green-100 border-green-300' : chairDecision === 'fail' ? 'from-red-50 to-red-100 border-red-300' : 'from-yellow-50 to-yellow-100 border-yellow-300'} border-2 rounded-lg p-5 mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h4 class="font-bold text-lg mb-2 ${chairDecision === 'pass' ? 'text-green-900' : chairDecision === 'fail' ? 'text-red-900' : 'text-yellow-900'}">
+                                        심사위원장 최종 판정
+                                    </h4>
+                                    <span class="text-3xl font-bold ${chairDecision === 'pass' ? 'text-green-700' : chairDecision === 'fail' ? 'text-red-700' : 'text-yellow-700'}">
+                                        ${chairDecision === 'pass' ? '✅ 통과' : chairDecision === 'fail' ? '❌ 불통과' : '⏳ 판정 대기'}
+                                    </span>
+                                </div>
+                            </div>
+                            ${chairDecisionDate ? `
+                                <div class="mt-3 text-sm ${chairDecision === 'pass' ? 'text-green-800' : chairDecision === 'fail' ? 'text-red-800' : 'text-yellow-800'}">
+                                    <p><strong>판정일:</strong> ${chairDecisionDate}</p>
+                                    ${chairNote ? `<p class="mt-2"><strong>의견:</strong> ${chairNote}</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${result.hasScores ? `
+                            <!-- 점수 계산 결과 (참고용) -->
+                            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-5 mb-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="font-bold text-blue-900 text-lg">점수 계산 결과 (참고용)</h4>
+                                    <span class="text-xs text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                                        * 최종 판정은 심사위원장이 결정
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="bg-white rounded-lg p-4 border ${result.meets.meetsMinimum ? 'border-green-300' : 'border-red-300'}">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-600">최저 점수</span>
+                                            <span class="text-2xl">${result.meets.meetsMinimum ? '✓' : '✗'}</span>
+                                        </div>
+                                        <div class="text-3xl font-bold ${result.meets.meetsMinimum ? 'text-green-700' : 'text-red-700'}">
+                                            ${result.scores.minScore}점
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-2">
+                                            기준: ${result.criteria.minRule?.value || 'N/A'}점 이상
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border ${result.meets.meetsAverage ? 'border-green-300' : 'border-red-300'}">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-600">평균 점수</span>
+                                            <span class="text-2xl">${result.meets.meetsAverage ? '✓' : '✗'}</span>
+                                        </div>
+                                        <div class="text-3xl font-bold ${result.meets.meetsAverage ? 'text-green-700' : 'text-red-700'}">
+                                            ${result.scores.avgScore.toFixed(1)}점
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-2">
+                                            기준: ${result.criteria.avgRule?.value || 'N/A'}점 이상
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border ${result.meets.meetsTotal ? 'border-green-300' : 'border-red-300'}">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-600">총점</span>
+                                            <span class="text-2xl">${result.meets.meetsTotal ? '✓' : '✗'}</span>
+                                        </div>
+                                        <div class="text-3xl font-bold ${result.meets.meetsTotal ? 'text-green-700' : 'text-red-700'}">
+                                            ${result.scores.totalScore}점
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-2">
+                                            기준: ${result.criteria.totalRule?.value || 'N/A'}점 이상
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                })() : ''}
+
                 ${type === 'finalThesis' && item.result ? `
                 <div class="bg-green-50 rounded-lg p-4">
                     <h4 class="font-bold text-green-800 mb-4">최종 심사 결과</h4>
@@ -2855,11 +2951,132 @@ function viewSingleEvaluation(committeeMemberId) {
         showAlert('평가 정보를 찾을 수 없습니다.');
         return;
     }
-    
+
     // 여기서는 간단한 알림만 표시 (실제로는 상세 평가 모달을 표시)
     showAlert('개별 평가 상세 화면은 구현 예정입니다.');
 }
 
-// Export PDF viewer functions
+/**
+ * 점수 계산 및 통과 기준 확인
+ * @param {Array} evaluations - 심사위원 평가 배열
+ * @param {Object} criteria - 통과 기준 (passingCriteria)
+ * @returns {Object} - 계산 결과
+ */
+function calculateScoresAndCriteria(evaluations, criteria) {
+    if (!evaluations || evaluations.length === 0) {
+        return {
+            hasScores: false,
+            reason: '평가 없음'
+        };
+    }
+
+    // 점수가 있는 평가만 필터링
+    const scoredEvaluations = evaluations.filter(e => e.score !== undefined && e.score !== null);
+    if (scoredEvaluations.length === 0) {
+        return {
+            hasScores: false,
+            reason: '평가 점수 없음'
+        };
+    }
+
+    const scores = scoredEvaluations.map(e => e.score);
+    const minScore = Math.min(...scores);
+    const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const totalScore = scores.reduce((a, b) => a + b, 0);
+
+    const rules = criteria?.rules || [];
+    const minRule = rules.find(r => r.type === 'minimum');
+    const avgRule = rules.find(r => r.type === 'average');
+    const totalRule = rules.find(r => r.type === 'total');
+
+    const meetsMinimum = !minRule || minScore >= minRule.value;
+    const meetsAverage = !avgRule || avgScore >= avgRule.value;
+    const meetsTotal = !totalRule || totalScore >= totalRule.value;
+
+    return {
+        hasScores: true,
+        scores: { minScore, avgScore, totalScore },
+        meets: { meetsMinimum, meetsAverage, meetsTotal },
+        criteria: { minRule, avgRule, totalRule }
+    };
+}
+
+/**
+ * 개별 심사위원 평가 상세 보기
+ * @param {number} submissionId - 제출물 ID
+ * @param {number} reviewerIndex - 심사위원 인덱스
+ * @param {string} type - 제출물 타입
+ */
+function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
+    // 제출물 찾기
+    const submissions = appData.submissions[type];
+    const submission = submissions.find(s => s.id === submissionId);
+
+    if (!submission || !submission.reviewers || !submission.reviewers[reviewerIndex]) {
+        alert('평가 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const reviewer = submission.reviewers[reviewerIndex];
+
+    // 역할 표시 (주심/부심)
+    const roleDisplay = reviewer.role === '주심'
+        ? '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-medium">위원장</span>'
+        : '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded font-medium">위원</span>';
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 평가자 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가자 정보</h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">성명:</span>
+                        <span class="font-medium">${reviewer.name}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">역할:</span>
+                        ${roleDisplay}
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">평가 상태:</span>
+                        <span class="status-badge ${reviewer.status === '완료' ? 'status-complete' : reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">
+                            ${reviewer.status}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            ${reviewer.score !== undefined && reviewer.score !== null ? `
+                <!-- 평가 점수 -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 text-center border-2 border-blue-200">
+                    <p class="text-sm text-gray-600 mb-2">평가 점수</p>
+                    <div class="text-6xl font-bold text-blue-600 mb-2">${reviewer.score}<span class="text-3xl">점</span></div>
+                    <div class="flex items-center justify-center gap-2 mt-3">
+                        <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden max-w-xs">
+                            <div class="h-full bg-blue-600 rounded-full" style="width: ${reviewer.score}%"></div>
+                        </div>
+                    </div>
+                </div>
+            ` : `
+                <div class="bg-yellow-50 rounded-lg p-6 text-center border-2 border-yellow-200">
+                    <p class="text-yellow-800 font-medium">아직 평가가 완료되지 않았습니다.</p>
+                </div>
+            `}
+
+            ${reviewer.comment ? `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-bold text-gray-800 mb-3">평가 의견</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed">${reviewer.comment}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    openModal('심사위원 평가 상세', content, '닫기', closeModal, true);
+}
+
+// Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
+window.viewIndividualEvaluation = viewIndividualEvaluation;

@@ -1,249 +1,218 @@
-// ==================== 학술지 심사 ====================
+/**
+ * 학술지 대체심사 목록 관리
+ */
 
-function renderJournalReview() {
-    const content = document.getElementById('main-content');
-    if (!content) return;
-    
-    const reviews = [
-        {
-            id: 1,
-            journal: '교육공학연구',
-            title: 'AI 기반 학습분석 시스템의 교육적 효과성 연구',
-            author: '홍길동',
-            affiliation: 'OO대학교',
-            submissionDate: '2025-10-15',
-            deadline: '2025-12-15',
-            status: '심사 대기',
-            priority: 'high'
-        },
-        {
-            id: 2,
-            journal: '한국교육학연구',
-            title: '메타버스 기반 교육환경이 학습몰입도에 미치는 영향',
-            author: '김철수',
-            affiliation: 'XX대학교',
-            submissionDate: '2025-10-20',
-            deadline: '2025-12-20',
-            status: '심사중',
-            priority: 'medium'
-        },
-        {
-            id: 3,
-            journal: '교육방법연구',
-            title: '플립러닝 수업설계 모형 개발 연구',
-            author: '이영희',
-            affiliation: '△△대학교',
-            submissionDate: '2025-09-25',
-            deadline: '2025-11-25',
-            status: '심사 완료',
-            priority: 'low'
-        }
-    ];
-    
-    content.innerHTML = `
-        <div class="container mx-auto p-6">
-            <!-- 헤더 -->
-            <div class="bg-white rounded-lg shadow-md mb-6">
-                <div class="p-6 border-b">
-                    <h2 class="text-2xl font-bold text-gray-800">학술지 심사</h2>
-                    <p class="text-sm text-gray-600 mt-2">
-                        학술지로부터 의뢰받은 논문 심사를 진행합니다
-                    </p>
-                </div>
-                
-                <!-- 통계 -->
-                <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div class="bg-red-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-red-600">1</div>
-                        <div class="text-sm text-gray-600 mt-1">심사 대기</div>
+function initJournalReview() {
+    renderJournalReviewList();
+}
+
+function renderJournalReviewList() {
+    const journals = getJournalReviews();
+
+    const contentHtml = `
+        <div class="mb-6">
+            <h2 class="text-2xl font-bold text-gray-800">학술지 대체심사</h2>
+            <p class="text-sm text-gray-600 mt-2">학생들의 학술지 논문 게재를 심사합니다.</p>
+        </div>
+
+        <!-- 검색 영역 -->
+        <div class="search-container">
+            <div class="search-grid">
+                <select class="search-select" id="journalStatusFilter">
+                    <option value="">전체 상태</option>
+                    <option value="심사대기">심사대기</option>
+                    <option value="심사중">심사중</option>
+                    <option value="심사완료">심사완료</option>
+                </select>
+                <input type="text"
+                       class="search-input"
+                       id="journalSearchInput"
+                       placeholder="학생명, 논문 제목 검색...">
+            </div>
+            <div class="search-buttons">
+                <button class="search-btn search-btn-primary" onclick="searchJournalReviews()">
+                    <i class="fas fa-search"></i> 검색
+                </button>
+                <button class="search-btn search-btn-secondary" onclick="resetJournalSearch()">
+                    <i class="fas fa-redo"></i> 초기화
+                </button>
+            </div>
+        </div>
+
+        <!-- 통계 카드 -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-yellow-800">심사대기</p>
+                        <p class="text-2xl font-bold text-yellow-900">${journals.filter(j => j.status === '심사대기').length}</p>
                     </div>
-                    <div class="bg-blue-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-blue-600">1</div>
-                        <div class="text-sm text-gray-600 mt-1">심사중</div>
-                    </div>
-                    <div class="bg-green-50 rounded-lg p-4 text-center">
-                        <div class="text-3xl font-bold text-green-600">1</div>
-                        <div class="text-sm text-gray-600 mt-1">심사 완료</div>
-                    </div>
+                    <i class="fas fa-clock text-3xl text-yellow-400"></i>
                 </div>
             </div>
-            
-            <!-- 심사 목록 -->
-            <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">심사 요청 목록</h3>
-                    
-                    <div class="space-y-4">
-                        ${reviews.map(review => `
-                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
-                                 onclick="viewJournalReviewDetail(${review.id})">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span class="text-xs px-2 py-1 rounded ${
-                                                review.priority === 'high' ? 'bg-red-100 text-red-700' :
-                                                review.priority === 'medium' ? 'bg-yellow-100 text-yellow-700' :
-                                                'bg-green-100 text-green-700'
-                                            }">
-                                                ${review.priority === 'high' ? '긴급' : review.priority === 'medium' ? '보통' : '낮음'}
-                                            </span>
-                                            <span class="text-xs px-2 py-1 rounded ${
-                                                review.status === '심사 대기' ? 'bg-red-100 text-red-700' :
-                                                review.status === '심사중' ? 'bg-blue-100 text-blue-700' :
-                                                'bg-green-100 text-green-700'
-                                            }">
-                                                ${review.status}
-                                            </span>
-                                        </div>
-                                        <h4 class="font-semibold text-gray-800 mb-2">${review.title}</h4>
-                                        <div class="flex items-center gap-4 text-sm text-gray-600">
-                                            <span><i class="fas fa-book"></i> ${review.journal}</span>
-                                            <span><i class="fas fa-user"></i> ${review.author} (${review.affiliation})</span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between text-sm">
-                                    <div class="text-gray-600">
-                                        <span>접수일: ${review.submissionDate}</span>
-                                    </div>
-                                    <div class="text-red-600 font-semibold">
-                                        <i class="fas fa-clock"></i> 마감: ${review.deadline}
-                                    </div>
-                                </div>
-                            </div>
-                        `).join('')}
+            <div class="bg-blue-50 border-l-4 border-blue-400 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-blue-800">심사중</p>
+                        <p class="text-2xl font-bold text-blue-900">${journals.filter(j => j.status === '심사중').length}</p>
                     </div>
+                    <i class="fas fa-file-alt text-3xl text-blue-400"></i>
+                </div>
+            </div>
+            <div class="bg-green-50 border-l-4 border-green-400 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm text-green-800">심사완료</p>
+                        <p class="text-2xl font-bold text-green-900">${journals.filter(j => j.status === '심사완료').length}</p>
+                    </div>
+                    <i class="fas fa-check-circle text-3xl text-green-400"></i>
                 </div>
             </div>
         </div>
+
+        <!-- 학술지 목록 -->
+        <div class="bg-white rounded-lg shadow-sm">
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b border-gray-200">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학생정보</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">논문정보</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">기한</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">진행상태</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200" id="journalReviewTableBody">
+                        ${renderJournalReviewRows(journals)}
+                    </tbody>
+                </table>
+            </div>
+        </div>
     `;
+
+    document.getElementById('main-content').innerHTML = contentHtml;
 }
 
-// 학술지 심사 상세
-function viewJournalReviewDetail(reviewId) {
-    const reviews = [
-        {
-            id: 1,
-            journal: '교육공학연구',
-            title: 'AI 기반 학습분석 시스템의 교육적 효과성 연구',
-            author: '홍길동',
-            affiliation: 'OO대학교',
-            submissionDate: '2025-10-15',
-            deadline: '2025-12-15',
-            status: '심사 대기',
-            abstract: '본 연구는 인공지능 기반 학습분석 시스템이 학습자의 학습 성과에 미치는 영향을 실증적으로 분석하고자 하였다. 대학생 120명을 대상으로 12주간 실험을 진행한 결과, AI 기반 시스템을 활용한 집단이 전통적 방식의 집단에 비해 학습성취도가 유의미하게 높게 나타났다.',
-            keywords: ['인공지능', '학습분석', '교육공학', '학습성과'],
-            pages: 25
-        }
-    ];
-    
-    const review = reviews.find(r => r.id === reviewId) || reviews[0];
-    
-    const modalContent = `
-        <div class="modal">
-            <div class="modal-content" style="max-width: 900px;">
-                <div class="modal-header">
-                    <h3>학술지 심사 상세</h3>
-                    <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
-                </div>
-                <div class="modal-body">
-                    <!-- 기본 정보 -->
-                    <div style="background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">기본 정보</h4>
-                        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-                            <div>
-                                <div style="font-size: 0.75rem; color: #6B7280;">학술지</div>
-                                <div style="font-weight: 600; color: #1F2937;">${review.journal}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.75rem; color: #6B7280;">저자</div>
-                                <div style="font-weight: 600; color: #1F2937;">${review.author} (${review.affiliation})</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.75rem; color: #6B7280;">접수일</div>
-                                <div style="font-weight: 600; color: #1F2937;">${review.submissionDate}</div>
-                            </div>
-                            <div>
-                                <div style="font-size: 0.75rem; color: #6B7280;">심사 마감일</div>
-                                <div style="font-weight: 600; color: #EF4444;">${review.deadline}</div>
-                            </div>
-                        </div>
+function renderJournalReviewRows(journals) {
+    if (journals.length === 0) {
+        return `
+            <tr>
+                <td colspan="5" class="px-6 py-12 text-center text-gray-500">
+                    <i class="fas fa-inbox text-4xl mb-3"></i>
+                    <p>심사할 학술지 논문이 없습니다.</p>
+                </td>
+            </tr>
+        `;
+    }
+
+    return journals.map(journal => {
+        const statusClass = {
+            '심사대기': 'status-pending',
+            '심사중': 'status-reviewing',
+            '심사완료': 'status-complete'
+        }[journal.status] || 'status-pending';
+
+        const daysLeft = Math.ceil((new Date(journal.dueDate) - new Date()) / (1000 * 60 * 60 * 24));
+        const isUrgent = daysLeft <= 7 && journal.status !== '심사완료';
+
+        return `
+            <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-6 py-4">
+                    <div>
+                        <p class="font-medium text-gray-900">${journal.studentName}</p>
+                        <p class="text-sm text-gray-600">${journal.studentId}</p>
+                        <p class="text-xs text-gray-500">${journal.major} (${journal.degree})</p>
                     </div>
-                    
-                    <!-- 논문 정보 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">논문 제목</h4>
-                        <div style="font-size: 1.125rem; font-weight: 600; color: #1F2937; padding: 1rem; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem;">
-                            ${review.title}
-                        </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="max-w-xs">
+                        <p class="font-medium text-gray-900 line-clamp-2">${journal.paperTitle}</p>
+                        <p class="text-sm text-gray-600 mt-1">${journal.journalName}</p>
+                        <p class="text-xs text-gray-500 mt-1">제출일: ${journal.submissionDate}</p>
                     </div>
-                    
-                    <!-- 초록 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">초록</h4>
-                        <div style="padding: 1rem; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem;">
-                            <p style="font-size: 0.875rem; color: #4B5563; line-height: 1.6;">
-                                ${review.abstract}
+                </td>
+                <td class="px-6 py-4">
+                    <div>
+                        <p class="text-sm font-medium text-gray-900">${journal.dueDate}</p>
+                        ${journal.status !== '심사완료' ? `
+                            <p class="text-xs ${isUrgent ? 'text-red-600 font-medium' : 'text-gray-600'} mt-1">
+                                ${isUrgent ? '⚠️ ' : ''}${daysLeft}일 남음
                             </p>
-                        </div>
+                        ` : ''}
                     </div>
-                    
-                    <!-- 키워드 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">키워드</h4>
-                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                            ${review.keywords.map(keyword => `
-                                <span style="padding: 0.5rem 1rem; background: #DBEAFE; color: #1E40AF; border-radius: 9999px; font-size: 0.875rem;">
-                                    ${keyword}
-                                </span>
-                            `).join('')}
+                </td>
+                <td class="px-6 py-4">
+                    <span class="status-badge ${statusClass}">${journal.status}</span>
+                    <div class="mt-2">
+                        <div class="w-full bg-gray-200 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${journal.progress}%"></div>
                         </div>
+                        <p class="text-xs text-gray-600 mt-1">${journal.progress}%</p>
                     </div>
-                    
-                    <!-- 파일 정보 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">첨부 파일</h4>
-                        <div style="padding: 1rem; background: white; border: 1px solid #E5E7EB; border-radius: 0.5rem;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
-                                <div>
-                                    <i class="fas fa-file-pdf" style="color: #EF4444; margin-right: 0.5rem;"></i>
-                                    <span style="font-weight: 500;">${review.title}.pdf</span>
-                                    <span style="font-size: 0.875rem; color: #6B7280; margin-left: 0.5rem;">(${review.pages} 페이지)</span>
-                                </div>
-                                <button onclick="alert('논문 다운로드')" class="btn btn-sm btn-secondary">
-                                    <i class="fas fa-download"></i> 다운로드
-                                </button>
-                            </div>
-                        </div>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="flex gap-2">
+                        ${journal.status === '심사완료' ? `
+                            <button onclick="viewJournalReviewDetail(${journal.id})"
+                                    class="px-3 py-1 text-sm bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors">
+                                <i class="fas fa-eye"></i> 보기
+                            </button>
+                        ` : `
+                            <button onclick="viewJournalReviewDetail(${journal.id})"
+                                    class="px-3 py-1 text-sm bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                                <i class="fas fa-edit"></i> 심사하기
+                            </button>
+                        `}
+                        <button onclick="downloadJournalPdf(${journal.id})"
+                                class="px-3 py-1 text-sm bg-[#6A0028] text-white rounded hover:bg-[#550020] transition-colors">
+                            <i class="fas fa-download"></i> 논문
+                        </button>
                     </div>
-                </div>
-                <div class="modal-footer">
-                    <button onclick="startJournalReview(${review.id})" class="btn btn-primary">
-                        <i class="fas fa-edit"></i> 심사 시작
-                    </button>
-                    <button onclick="closeModal()" class="btn btn-secondary">닫기</button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('modal-container').innerHTML = modalContent;
+                </td>
+            </tr>
+        `;
+    }).join('');
 }
 
-// 심사 시작
-function startJournalReview(reviewId) {
-    alert('학술지 심사 작성 화면으로 이동 (추후 구현)');
-    closeModal();
+function searchJournalReviews() {
+    const status = document.getElementById('journalStatusFilter').value;
+    const searchText = document.getElementById('journalSearchInput').value.toLowerCase();
+
+    let journals = getJournalReviews();
+
+    if (status) {
+        journals = journals.filter(j => j.status === status);
+    }
+
+    if (searchText) {
+        journals = journals.filter(j =>
+            j.studentName.toLowerCase().includes(searchText) ||
+            j.paperTitle.toLowerCase().includes(searchText) ||
+            j.journalName.toLowerCase().includes(searchText)
+        );
+    }
+
+    document.getElementById('journalReviewTableBody').innerHTML = renderJournalReviewRows(journals);
 }
 
-// 모달 닫기
-function closeModal() {
-    document.getElementById('modal-container').innerHTML = '';
+function resetJournalSearch() {
+    document.getElementById('journalStatusFilter').value = '';
+    document.getElementById('journalSearchInput').value = '';
+    renderJournalReviewList();
 }
 
-// Export
-window.renderJournalReview = renderJournalReview;
-window.viewJournalReviewDetail = viewJournalReviewDetail;
-window.startJournalReview = startJournalReview;
+function downloadJournalPdf(journalId) {
+    const journal = getJournalReviews().find(j => j.id === journalId);
+    if (journal) {
+        alert(`논문 다운로드: ${journal.paperTitle}\n파일: ${journal.pdfUrl}`);
+    }
+}
 
-console.log('✅ 학술지 심사 모듈 로드 완료');
+// 전역 export
+window.initJournalReview = initJournalReview;
+window.searchJournalReviews = searchJournalReviews;
+window.resetJournalSearch = resetJournalSearch;
+window.downloadJournalPdf = downloadJournalPdf;
+
+console.log('✅ 학술지 심사 목록 모듈 로드 완료');
