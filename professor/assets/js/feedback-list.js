@@ -17,7 +17,7 @@ function renderFeedbackList() {
     const filters = getCurrentFeedbackFilters();
     const filteredRequests = filterFeedbackRequests(requests, filters);
     
-    // ID 38: 테이블 컬럼 순서 변경
+    // ID 38: 테이블 컬럼 순서 변경 (제출일 추가)
     contentArea.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
@@ -31,7 +31,7 @@ function renderFeedbackList() {
                         ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
                     </div>
                 </div>
-                
+
                 <!-- 검색 영역 (표준화) -->
                 <div class="search-container">
                     <div class="search-grid">
@@ -52,8 +52,8 @@ function renderFeedbackList() {
                             <option value="진행중">진행중</option>
                             <option value="완료">완료</option>
                         </select>
-                        <input type="text" 
-                               id="feedback-filter-keyword" 
+                        <input type="text"
+                               id="feedback-filter-keyword"
                                placeholder="학번/성명/논문명 검색"
                                class="search-input"
                                onkeypress="if(event.key==='Enter') searchFeedback()">
@@ -68,7 +68,7 @@ function renderFeedbackList() {
                     </div>
                 </div>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b">
@@ -82,13 +82,14 @@ function renderFeedbackList() {
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">피드백상태</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제출일</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">관리</th>
                         </tr>
                     </thead>
                     <tbody id="feedback-list-body">
-                        ${filteredRequests.length > 0 
+                        ${filteredRequests.length > 0
                             ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                            : '<tr><td colspan="10" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                            : '<tr><td colspan="11" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
                         }
                     </tbody>
                 </table>
@@ -107,7 +108,7 @@ function renderFeedbackRow(request, idx) {
     // 완료: 명시적으로 완료 버튼 클릭
     const commentCount = request.commentCount || 0;
     let feedbackStatus, statusClass;
-    
+
     if (request.isCompleted) {
         feedbackStatus = '완료';
         statusClass = 'bg-green-100 text-green-700';
@@ -118,9 +119,9 @@ function renderFeedbackRow(request, idx) {
         feedbackStatus = '대기';
         statusClass = 'bg-gray-100 text-gray-700';
     }
-    
+
     return `
-        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors" 
+        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors"
             data-feedback-id="${request.id}">
             <td class="py-3 px-4 text-gray-800">${idx}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.graduate || '일반대학원'}</td>
@@ -137,8 +138,9 @@ function renderFeedbackRow(request, idx) {
                     ${feedbackStatus}
                 </span>
             </td>
+            <td class="py-3 px-4 text-gray-600 text-sm">${request.uploadDate || '-'}</td>
             <td class="py-3 px-4">
-                <button onclick="openFeedbackViewer('${request.id}'); event.stopPropagation();" 
+                <button onclick="openFeedbackViewer('${request.id}'); event.stopPropagation();"
                         class="text-[#6A0028] hover:underline text-sm">
                     상세보기
                 </button>

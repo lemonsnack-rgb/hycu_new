@@ -45,18 +45,22 @@ function renderReviewList() {
         return;
     }
     
+    // ID 49-50: 테이블 컬럼 변경
     const html = `
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">내 역할</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">평가진행</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사일</th>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
                         <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                     </tr>
                 </thead>
@@ -64,30 +68,27 @@ function renderReviewList() {
                     ${filteredAssignments.map((assignment, index) => `
                         <tr class="hover:bg-gray-50">
                             <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                            <td class="py-3 px-4">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadgeClass(assignment.submissionType)}">
-                                    ${assignment.submissionType}
-                                </span>
-                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.degree || '석사'}</td>
                             <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
                             <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
                             <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
                                 <div class="truncate" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}
                                 </div>
                             </td>
+                            <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
                             <td class="py-3 px-4 text-center">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getRoleBadgeClass(assignment.myRole)}">
-                                    ${assignment.myRole === 'chair' ? '위원장' : '위원'}
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
+                                    ${assignment.evaluationProgress}
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <span class="text-sm font-semibold ${getProgressColorClass(assignment.evaluationProgress)}">${assignment.evaluationProgress}</span>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <button onclick="openReviewDetail('${assignment.id}')" 
-                                        class="text-blue-600 hover:underline text-sm font-medium">
-                                    상세보기
+                                <button onclick="openReviewDetail('${assignment.id}')"
+                                        class="text-blue-600 hover:underline text-sm font-medium ${assignment.myRole === 'chair' ? 'font-bold' : ''}">
+                                    ${assignment.myRole === 'chair' ? '위원장 평가' : '위원 평가'}
                                 </button>
                             </td>
                         </tr>
@@ -100,46 +101,51 @@ function renderReviewList() {
     listContainer.innerHTML = html;
 }
 
-// ==================== 필터링 ====================
+// ==================== 필터링 (ID 49-50) ====================
 function getCurrentFilters() {
     return {
-        submissionType: document.getElementById('filter-type')?.value || '',
-        role: document.getElementById('filter-role')?.value || '',
-        status: document.getElementById('filter-status')?.value || '',
+        year: document.getElementById('filter-year')?.value || '',
+        semester: document.getElementById('filter-semester')?.value || '',
+        semesterCount: document.getElementById('filter-semester-count')?.value || '',
+        reviewType: document.getElementById('filter-review-type')?.value || '',
         search: document.getElementById('filter-keyword')?.value || ''
     };
 }
 
 function filterAssignments(assignments, filters) {
     return assignments.filter(assignment => {
-        // 단계 필터
-        if (filters.submissionType && assignment.submissionType !== filters.submissionType) {
+        // 학년도 필터
+        if (filters.year && (assignment.year || '2025') !== filters.year) {
             return false;
         }
-        
-        // 역할 필터
-        if (filters.role) {
-            if (filters.role === 'chair' && assignment.myRole !== 'chair') return false;
-            if (filters.role === 'member' && assignment.myRole !== 'member') return false;
-        }
-        
-        // 상태 필터
-        if (filters.status && assignment.status !== filters.status) {
+
+        // 학기 필터
+        if (filters.semester && (assignment.semester || '1') !== filters.semester) {
             return false;
         }
-        
+
+        // 학기차 필터
+        if (filters.semesterCount && String(assignment.semesterCount) !== filters.semesterCount) {
+            return false;
+        }
+
+        // 심사구분 필터
+        if (filters.reviewType && assignment.submissionType !== filters.reviewType) {
+            return false;
+        }
+
         // 검색
         if (filters.search) {
             const searchLower = filters.search.toLowerCase();
             const matchStudent = assignment.studentName.toLowerCase().includes(searchLower);
             const matchNumber = assignment.studentNumber.includes(searchLower);
             const matchTitle = assignment.thesisTitle.toLowerCase().includes(searchLower);
-            
+
             if (!matchStudent && !matchNumber && !matchTitle) {
                 return false;
             }
         }
-        
+
         return true;
     });
 }
@@ -149,9 +155,10 @@ function searchReviews() {
 }
 
 function resetReviewSearch() {
-    document.getElementById('filter-type').value = '';
-    document.getElementById('filter-role').value = '';
-    document.getElementById('filter-status').value = '';
+    document.getElementById('filter-year').value = '';
+    document.getElementById('filter-semester').value = '';
+    document.getElementById('filter-semester-count').value = '';
+    document.getElementById('filter-review-type').value = '';
     document.getElementById('filter-keyword').value = '';
     renderReviewList();
 }
@@ -276,4 +283,19 @@ function getProgressColorClass(progress) {
     return 'text-blue-600';
 }
 
+// ID 49-50: 심사진행상태 배지 클래스
+function getProgressBadgeClass(progress) {
+    if (progress === '완료' || progress === '3/3' || progress === '심사완료') {
+        return 'bg-green-100 text-green-700';
+    }
+    if (progress === '진행중' || (progress && progress.includes('/'))) {
+        return 'bg-blue-100 text-blue-700';
+    }
+    if (progress === '대기' || progress === '0/3') {
+        return 'bg-gray-100 text-gray-700';
+    }
+    return 'bg-gray-100 text-gray-700';
+}
+
 window.getProgressColorClass = getProgressColorClass;
+window.getProgressBadgeClass = getProgressBadgeClass;
