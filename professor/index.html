@@ -380,33 +380,57 @@ document.addEventListener('DOMContentLoaded', function(){
                         <!-- 검색 영역 (ID 49-50: 학년도, 학기, 학기차, 심사구분) -->
                         <div class="search-container">
                             <div class="search-grid">
-                                <select id="filter-year" class="search-select">
-                                    <option value="">학년도 전체</option>
-                                    <option value="2025">2025학년도</option>
-                                    <option value="2024">2024학년도</option>
-                                    <option value="2023">2023학년도</option>
-                                </select>
-                                <select id="filter-semester" class="search-select">
-                                    <option value="">학기 전체</option>
-                                    <option value="1">1학기</option>
-                                    <option value="2">2학기</option>
-                                </select>
-                                <select id="filter-semester-count" class="search-select">
-                                    <option value="">학기차 전체</option>
-                                    <option value="1">1학기차</option>
-                                    <option value="2">2학기차</option>
-                                    <option value="3">3학기차</option>
-                                    <option value="4">4학기차</option>
-                                    <option value="5">5학기차</option>
-                                    <option value="6">6학기차</option>
-                                </select>
-                                <select id="filter-review-type" class="search-select">
-                                    <option value="">심사구분 전체</option>
-                                    <option value="연구계획서">연구계획서</option>
-                                    <option value="중간논문">중간논문</option>
-                                    <option value="최종논문">최종논문</option>
-                                </select>
-                                <input type="text"
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학년도
+                                    </label>
+                                    <select id="filter-year" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="2025">2025학년도</option>
+                                        <option value="2024">2024학년도</option>
+                                        <option value="2023">2023학년도</option>
+                                    </select>
+                                </div>
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학기
+                                    </label>
+                                    <select id="filter-semester" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="1">1학기</option>
+                                        <option value="2">2학기</option>
+                                    </select>
+                                </div>
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학기차
+                                    </label>
+                                    <select id="filter-semester-count" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="1">1학기차</option>
+                                        <option value="2">2학기차</option>
+                                        <option value="3">3학기차</option>
+                                        <option value="4">4학기차</option>
+                                        <option value="5">5학기차</option>
+                                        <option value="6">6학기차</option>
+                                    </select>
+                                </div>
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        심사구분
+                                    </label>
+                                    <select id="filter-review-type" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="연구계획서">연구계획서</option>
+                                        <option value="중간논문">중간논문</option>
+                                        <option value="최종논문">최종논문</option>
+                                    </select>
+                                </div>
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        키워드
+                                    </label>
+                                    <input type="text"
                                        id="filter-keyword"
                                        placeholder="학번/성명/논문제목 검색"
                                        class="search-input"

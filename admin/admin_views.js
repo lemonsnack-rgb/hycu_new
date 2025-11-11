@@ -91,50 +91,85 @@ const views = {
                     <div class="search-container">
                         <div class="search-grid">
                             <!-- 1. 학년도 -->
-                            <select id="search-year" class="search-select">
-                                <option value="">학년도</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
-                            
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학년도
+                                </label>
+                                <select id="search-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+
                             <!-- 2. 학기 -->
-                            <select id="search-semester" class="search-select">
-                                <option value="">학기</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
-                            
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기
+                                </label>
+                                <select id="search-semester" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+
                             <!-- 3. 승인여부 -->
-                            <select id="search-approval" class="search-select">
-                                <option value="">승인여부</option>
-                                <option value="승인대기">승인대기</option>
-                                <option value="승인완료">승인완료</option>
-                            </select>
-                            
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    승인여부
+                                </label>
+                                <select id="search-approval" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="승인대기">승인대기</option>
+                                    <option value="승인완료">승인완료</option>
+                                </select>
+                            </div>
+
                             <!-- 4. 학번 -->
-                            <input type="text" id="search-student-id" placeholder="학번" 
-                                   class="search-input">
-                            
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학번
+                                </label>
+                                <input type="text" id="search-student-id" placeholder="학번 입력"
+                                       class="search-input">
+                            </div>
+
                             <!-- 5. 성명 -->
-                            <input type="text" id="search-student-name" placeholder="성명" 
-                                   class="search-input">
-                            
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    성명
+                                </label>
+                                <input type="text" id="search-student-name" placeholder="성명 입력"
+                                       class="search-input">
+                            </div>
+
                             <!-- 6. 학과/전공 -->
-                            <select id="search-major" class="search-select">
-                                <option value="">학과/전공</option>
-                                <option value="교육공학">교육공학</option>
-                                <option value="경영학">경영학</option>
-                                <option value="컴퓨터공학">컴퓨터공학</option>
-                                <option value="심리학">심리학</option>
-                            </select>
-                            
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학과/전공
+                                </label>
+                                <select id="search-major" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="교육공학">교육공학</option>
+                                    <option value="경영학">경영학</option>
+                                    <option value="컴퓨터공학">컴퓨터공학</option>
+                                    <option value="심리학">심리학</option>
+                                </select>
+                            </div>
+
                             <!-- 7. 학위과정 -->
-                            <select id="search-degree" class="search-select">
-                                <option value="">학위과정</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학위과정
+                                </label>
+                                <select id="search-degree" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                </select>
+                            </div>
                         </div>
                         
                         <!-- 검색/초기화 버튼 -->
@@ -229,39 +264,69 @@ const views = {
                     <div class="search-container">
                         <div class="search-grid">
                             <!-- 1. 학년도 -->
-                            <select id="thesis-search-year" class="search-select">
-                                <option value="">학년도</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학년도
+                                </label>
+                                <select id="thesis-search-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
 
                             <!-- 2. 학기 -->
-                            <select id="thesis-search-semester" class="search-select">
-                                <option value="">학기</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기
+                                </label>
+                                <select id="thesis-search-semester" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
 
                             <!-- 3. 학기차 (입력란) -->
-                            <input type="text" id="thesis-search-semester-count" placeholder="학기차"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기차
+                                </label>
+                                <input type="text" id="thesis-search-semester-count" placeholder="학기차 입력"
+                                       class="search-input">
+                            </div>
 
                             <!-- 4. 심사구분 -->
-                            <select id="thesis-search-type" class="search-select">
-                                <option value="">심사구분</option>
-                                <option value="plan">논문작성계획서</option>
-                                <option value="mid">중간논문</option>
-                                <option value="final">최종논문</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    심사구분
+                                </label>
+                                <select id="thesis-search-type" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="plan">논문작성계획서</option>
+                                    <option value="mid">중간논문</option>
+                                    <option value="final">최종논문</option>
+                                </select>
+                            </div>
 
                             <!-- 5. 학번 -->
-                            <input type="text" id="thesis-search-student-id" placeholder="학번"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학번
+                                </label>
+                                <input type="text" id="thesis-search-student-id" placeholder="학번 입력"
+                                       class="search-input">
+                            </div>
 
                             <!-- 6. 성명 -->
-                            <input type="text" id="thesis-search-student-name" placeholder="성명"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    성명
+                                </label>
+                                <input type="text" id="thesis-search-student-name" placeholder="성명 입력"
+                                       class="search-input">
+                            </div>
                         </div>
 
                         <!-- 검색/초기화 버튼 -->
@@ -684,31 +749,56 @@ const views = {
                     <div class="search-container">
                         <div class="search-grid">
                             <!-- 1. 학년도 -->
-                            <select id="journal-search-year" class="search-select">
-                                <option value="">학년도</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학년도
+                                </label>
+                                <select id="journal-search-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
 
                             <!-- 2. 학기 -->
-                            <select id="journal-search-semester" class="search-select">
-                                <option value="">학기</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기
+                                </label>
+                                <select id="journal-search-semester" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
 
                             <!-- 3. 학기차 -->
-                            <input type="text" id="journal-search-semester-count" placeholder="학기차"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기차
+                                </label>
+                                <input type="text" id="journal-search-semester-count" placeholder="학기차 입력"
+                                       class="search-input">
+                            </div>
 
                             <!-- 4. 학번 -->
-                            <input type="text" id="journal-search-student-id" placeholder="학번"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학번
+                                </label>
+                                <input type="text" id="journal-search-student-id" placeholder="학번 입력"
+                                       class="search-input">
+                            </div>
 
                             <!-- 5. 성명 -->
-                            <input type="text" id="journal-search-student-name" placeholder="성명"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    성명
+                                </label>
+                                <input type="text" id="journal-search-student-name" placeholder="성명 입력"
+                                       class="search-input">
+                            </div>
                         </div>
 
                         <!-- 검색/초기화 버튼 -->
@@ -914,40 +1004,65 @@ const views = {
                     <div class="search-container">
                         <div class="search-grid">
                             <!-- 1. 학년도 -->
-                            <select id="weekly-search-year" class="search-select">
-                                <option value="">학년도</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학년도
+                                </label>
+                                <select id="weekly-search-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
 
                             <!-- 2. 학기 -->
-                            <select id="weekly-search-semester" class="search-select">
-                                <option value="">학기</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기
+                                </label>
+                                <select id="weekly-search-semester" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
 
                             <!-- 3. 지도교수 -->
-                            <select id="weekly-search-advisor" class="search-select">
-                                <option value="">지도교수</option>
-                                <option value="홍길동">홍길동</option>
-                                <option value="박교수">박교수</option>
-                                <option value="최교수">최교수</option>
-                                <option value="김교수">김교수</option>
-                            </select>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    지도교수
+                                </label>
+                                <select id="weekly-search-advisor" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="홍길동">홍길동</option>
+                                    <option value="박교수">박교수</option>
+                                    <option value="최교수">최교수</option>
+                                    <option value="김교수">김교수</option>
+                                </select>
+                            </div>
 
                             <!-- 4. 학번 -->
-                            <input type="text"
-                                   id="weekly-search-student-id"
-                                   placeholder="학번"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학번
+                                </label>
+                                <input type="text"
+                                       id="weekly-search-student-id"
+                                       placeholder="학번 입력"
+                                       class="search-input">
+                            </div>
 
                             <!-- 5. 성명 -->
-                            <input type="text"
-                                   id="weekly-search-student-name"
-                                   placeholder="성명"
-                                   class="search-input">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    성명
+                                </label>
+                                <input type="text"
+                                       id="weekly-search-student-name"
+                                       placeholder="성명 입력"
+                                       class="search-input">
+                            </div>
                         </div>
 
                         <div class="search-buttons">
@@ -1032,56 +1147,96 @@ const views = {
                     <!-- 검색 영역: 대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명 -->
                     <div class="search-container">
                         <div class="search-grid">
-                            <select id="progress-search-graduate" class="search-select">
-                                <option value="">대학원 전체</option>
-                                <option value="일반대학원">일반대학원</option>
-                                <option value="특수대학원">특수대학원</option>
-                                <option value="전문대학원">전문대학원</option>
-                            </select>
-                            <select id="progress-search-major" class="search-select">
-                                <option value="">전공 전체</option>
-                                <option value="교육공학">교육공학</option>
-                                <option value="경영학">경영학</option>
-                                <option value="컴퓨터공학">컴퓨터공학</option>
-                            </select>
-                            <select id="progress-search-degree" class="search-select">
-                                <option value="">학위과정 전체</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                                <option value="석박통합">석박통합</option>
-                            </select>
-                            <select id="progress-search-advisor" class="search-select">
-                                <option value="">지도교수 전체</option>
-                                <option value="홍길동">홍길동</option>
-                                <option value="박교수">박교수</option>
-                                <option value="김교수">김교수</option>
-                                <option value="이지도">이지도</option>
-                            </select>
-                            <select id="progress-search-semester-count" class="search-select">
-                                <option value="">학기차 전체</option>
-                                <option value="1">1학기차</option>
-                                <option value="2">2학기차</option>
-                                <option value="3">3학기차</option>
-                                <option value="4">4학기차</option>
-                                <option value="5">5학기차</option>
-                                <option value="6">6학기차</option>
-                            </select>
-                            <select id="progress-search-status" class="search-select">
-                                <option value="">피드백상태 전체</option>
-                                <option value="대기">대기</option>
-                                <option value="진행 중">진행 중</option>
-                                <option value="완료">완료</option>
-                            </select>
-                            <input type="text"
-                                   id="progress-search-student-id"
-                                   placeholder="학번"
-                                   class="search-input"
-                                   onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
-                            <input type="text"
-                                   id="progress-search-student-name"
-                                   placeholder="성명"
-                                   class="search-input"
-                                   onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    대학원
+                                </label>
+                                <select id="progress-search-graduate" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="일반대학원">일반대학원</option>
+                                    <option value="특수대학원">특수대학원</option>
+                                    <option value="전문대학원">전문대학원</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    전공
+                                </label>
+                                <select id="progress-search-major" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="교육공학">교육공학</option>
+                                    <option value="경영학">경영학</option>
+                                    <option value="컴퓨터공학">컴퓨터공학</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학위과정
+                                </label>
+                                <select id="progress-search-degree" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                    <option value="석박통합">석박통합</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    지도교수
+                                </label>
+                                <select id="progress-search-advisor" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="홍길동">홍길동</option>
+                                    <option value="박교수">박교수</option>
+                                    <option value="김교수">김교수</option>
+                                    <option value="이지도">이지도</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기차
+                                </label>
+                                <select id="progress-search-semester-count" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기차</option>
+                                    <option value="2">2학기차</option>
+                                    <option value="3">3학기차</option>
+                                    <option value="4">4학기차</option>
+                                    <option value="5">5학기차</option>
+                                    <option value="6">6학기차</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    피드백상태
+                                </label>
+                                <select id="progress-search-status" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="대기">대기</option>
+                                    <option value="진행 중">진행 중</option>
+                                    <option value="완료">완료</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학번
+                                </label>
+                                <input type="text"
+                                       id="progress-search-student-id"
+                                       placeholder="학번 입력"
+                                       class="search-input"
+                                       onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    성명
+                                </label>
+                                <input type="text"
+                                       id="progress-search-student-name"
+                                       placeholder="성명 입력"
+                                       class="search-input"
+                                       onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
+                            </div>
                         </div>
                         <div class="search-buttons">
                             <button onclick="searchGuidanceProgress()"

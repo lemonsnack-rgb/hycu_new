@@ -35,28 +35,48 @@ function renderFeedbackList() {
                 <!-- 검색 영역 (표준화) -->
                 <div class="search-container">
                     <div class="search-grid">
-                        <select id="feedback-filter-graduate" class="search-select" onchange="searchFeedback()">
-                            <option value="">대학원 전체</option>
-                            <option value="일반대학원">일반대학원</option>
-                            <option value="교육대학원">교육대학원</option>
-                            <option value="산업대학원">산업대학원</option>
-                        </select>
-                        <select id="feedback-filter-program" class="search-select" onchange="searchFeedback()">
-                            <option value="">과정 전체</option>
-                            <option value="석사">석사</option>
-                            <option value="박사">박사</option>
-                        </select>
-                        <select id="feedback-filter-status" class="search-select" onchange="searchFeedback()">
-                            <option value="">상태 전체</option>
-                            <option value="대기">대기</option>
-                            <option value="진행중">진행중</option>
-                            <option value="완료">완료</option>
-                        </select>
-                        <input type="text"
-                               id="feedback-filter-keyword"
-                               placeholder="학번/성명/논문명 검색"
-                               class="search-input"
-                               onkeypress="if(event.key==='Enter') searchFeedback()">
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                대학원
+                            </label>
+                            <select id="feedback-filter-graduate" class="search-select" onchange="searchFeedback()">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="교육대학원">교육대학원</option>
+                                <option value="산업대학원">산업대학원</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학위과정
+                            </label>
+                            <select id="feedback-filter-program" class="search-select" onchange="searchFeedback()">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                상태
+                            </label>
+                            <select id="feedback-filter-status" class="search-select" onchange="searchFeedback()">
+                                <option value="">전체</option>
+                                <option value="대기">대기</option>
+                                <option value="진행중">진행중</option>
+                                <option value="완료">완료</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                키워드
+                            </label>
+                            <input type="text"
+                                   id="feedback-filter-keyword"
+                                   placeholder="학번/성명/논문명 검색"
+                                   class="search-input"
+                                   onkeypress="if(event.key==='Enter') searchFeedback()">
+                        </div>
                     </div>
                     <div class="search-buttons">
                         <button onclick="searchFeedback()" class="search-btn search-btn-primary">

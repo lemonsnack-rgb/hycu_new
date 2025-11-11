@@ -597,6 +597,27 @@ const appData = {
             itemCount: 5,
             totalScore: 100,
             createdDate: '2025-01-10',
+            passingCriteria: {
+                type: 'complex',
+                description: "평균 70점 이상, 최저 60점 이상",
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: "각 항목 최소 60점"
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: "전체 평균 70점 이상"
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        description: "총점 70점 이상"
+                    }
+                ]
+            },
             items: [
                 {
                     id: 1,
@@ -637,6 +658,27 @@ const appData = {
             itemCount: 6,
             totalScore: 100,
             createdDate: '2025-01-15',
+            passingCriteria: {
+                type: 'complex',
+                description: "평균 70점 이상, 최저 60점 이상",
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: "각 항목 최소 60점"
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: "전체 평균 70점 이상"
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        description: "총점 70점 이상"
+                    }
+                ]
+            },
             items: [
                 {
                     id: 1,
@@ -683,6 +725,27 @@ const appData = {
             itemCount: 10,
             totalScore: 100,
             createdDate: '2025-01-20',
+            passingCriteria: {
+                type: 'complex',
+                description: "평균 70점 이상, 최저 60점 이상",
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: "각 항목 최소 60점"
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: "전체 평균 70점 이상"
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        description: "총점 70점 이상"
+                    }
+                ]
+            },
             items: [
                 {
                     id: 1,
