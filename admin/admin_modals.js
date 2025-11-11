@@ -2312,7 +2312,7 @@ function viewEvaluationDetail(id) {
         showAlert('평가표를 찾을 수 없습니다.');
         return;
     }
-    
+
     const content = `
         <div class="space-y-4">
             <div class="bg-gray-50 rounded-lg p-4">
@@ -2331,11 +2331,36 @@ function viewEvaluationDetail(id) {
                     </div>
                 </div>
             </div>
-            
+
+            <!-- ⭐ 통과 기준 추가 -->
+            <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                <h4 class="font-bold text-yellow-900 mb-3">통과 기준</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            ${criteria.type === 'passfail' || criteria.type === 'grade' ? '통과 기준' : '통과 점수'}
+                        </label>
+                        <input type="text"
+                               id="passing-score"
+                               value="${criteria.passingScore !== null && criteria.passingScore !== undefined ? criteria.passingScore : ''}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                               ${criteria.type === 'passfail' || criteria.type === 'grade' ? 'readonly' : ''}>
+                    </div>
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+                        <input type="text"
+                               id="passing-criteria"
+                               value="${criteria.passingCriteria || ''}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                               placeholder="예: 총점 70점 이상">
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <div class="flex justify-between items-center mb-3">
                     <h4 class="font-bold text-gray-800">평가 항목 (총 ${criteria.itemCount}개)</h4>
-                    <button onclick="addEvaluationItem(${id})" 
+                    <button onclick="addEvaluationItem(${id})"
                             class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
                         + 항목 추가
                     </button>
@@ -2352,13 +2377,13 @@ function viewEvaluationDetail(id) {
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-lg font-bold text-[#6A0028]">${item.score}점</span>
+                                    <span class="text-lg font-bold text-[#6A0028]">${item.score !== null && item.score !== undefined ? item.score + '점' : 'N/A'}</span>
                                     <div class="flex gap-1">
-                                        <button onclick="editEvaluationItem(${id}, ${item.id})" 
+                                        <button onclick="editEvaluationItem(${id}, ${item.id})"
                                                 class="text-xs text-blue-600 hover:underline">
                                             수정
                                         </button>
-                                        <button onclick="deleteEvaluationItem(${id}, ${item.id})" 
+                                        <button onclick="deleteEvaluationItem(${id}, ${item.id})"
                                                 class="text-xs text-red-600 hover:underline">
                                             삭제
                                         </button>
@@ -2368,16 +2393,18 @@ function viewEvaluationDetail(id) {
                         </div>
                     `).join('')}
                 </div>
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-gray-700">총점</span>
-                        <span class="text-2xl font-bold text-[#6A0028]">${criteria.totalScore}점</span>
+                ${criteria.totalScore !== null && criteria.totalScore !== undefined ? `
+                    <div class="mt-4 pt-4 border-t border-gray-200">
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-gray-700">총점</span>
+                            <span class="text-2xl font-bold text-[#6A0028]">${criteria.totalScore}점</span>
+                        </div>
                     </div>
-                </div>
+                ` : ''}
             </div>
         </div>
     `;
-    
+
     openModal(`${criteria.name} - 상세`, content, '닫기', closeModal, true);
 }
 
