@@ -1070,22 +1070,78 @@ const journalReviews = [
         id: 1,
         journalName: '한국교육공학회지',
         paperTitle: '인공지능 기반 맞춤형 학습 시스템의 효과성 연구',
-        author: '김연구',
+        studentName: '김연구',
+        studentId: '2023001',
+        major: '교육공학과',
+        degree: '박사',
         submissionDate: '2025-10-15',
         dueDate: '2025-11-30',
         status: '심사중',
-        progress: 50
+        progress: 50,
+        pdfUrl: '/uploads/papers/ai-learning-system.pdf',
+        rubric: {
+            items: [
+                { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
+                { id: 2, name: '연구 방법의 적절성', maxScore: 20 },
+                { id: 3, name: '연구 결과의 타당성', maxScore: 20 },
+                { id: 4, name: '논문 구성의 체계성', maxScore: 20 },
+                { id: 5, name: '학문적 기여도', maxScore: 20 }
+            ]
+        },
+        evaluation: null
     },
     {
         id: 2,
         journalName: '교육정보미디어연구',
         paperTitle: '메타버스 환경에서의 협력학습 효과 분석',
-        author: '이논문',
+        studentName: '이논문',
+        studentId: '2023002',
+        major: '교육공학과',
+        degree: '석사',
         submissionDate: '2025-09-20',
         dueDate: '2025-11-15',
         status: '심사완료',
         progress: 100,
-        decision: '수정후게재'
+        decision: '수정후게재',
+        pdfUrl: '/uploads/papers/metaverse-learning.pdf',
+        rubric: {
+            items: [
+                { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
+                { id: 2, name: '연구 방법의 적절성', maxScore: 20 },
+                { id: 3, name: '연구 결과의 타당성', maxScore: 20 },
+                { id: 4, name: '논문 구성의 체계성', maxScore: 20 },
+                { id: 5, name: '학문적 기여도', maxScore: 20 }
+            ]
+        },
+        evaluation: {
+            scores: { 1: 18, 2: 17, 3: 18, 4: 19, 5: 17 },
+            comment: '메타버스 환경에서의 협력학습 효과를 실증적으로 분석한 의미 있는 연구입니다. 다만 표본 크기가 다소 제한적이어서 일반화에 주의가 필요합니다.',
+            submittedAt: '2025-10-05'
+        }
+    },
+    {
+        id: 3,
+        journalName: 'Computers & Education',
+        paperTitle: 'Adaptive Learning Systems Using Machine Learning Algorithms',
+        studentName: '박연구',
+        studentId: '2022005',
+        major: '컴퓨터공학과',
+        degree: '박사',
+        submissionDate: '2025-10-01',
+        dueDate: '2025-12-15',
+        status: '심사대기',
+        progress: 0,
+        pdfUrl: '/uploads/papers/adaptive-learning-ml.pdf',
+        rubric: {
+            items: [
+                { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
+                { id: 2, name: '연구 방법의 적절성', maxScore: 20 },
+                { id: 3, name: '연구 결과의 타당성', maxScore: 20 },
+                { id: 4, name: '논문 구성의 체계성', maxScore: 20 },
+                { id: 5, name: '학문적 기여도', maxScore: 20 }
+            ]
+        },
+        evaluation: null
     }
 ];
 
@@ -1093,6 +1149,22 @@ function getJournalReviews() {
     return journalReviews;
 }
 
+function updateJournalEvaluation(journalId, scores, comment) {
+    const journal = journalReviews.find(j => j.id === journalId);
+    if (journal) {
+        journal.evaluation = {
+            scores: scores,
+            comment: comment,
+            submittedAt: new Date().toISOString().split('T')[0]
+        };
+        journal.status = '심사완료';
+        journal.progress = 100;
+        return true;
+    }
+    return false;
+}
+
 window.getJournalReviews = getJournalReviews;
+window.updateJournalEvaluation = updateJournalEvaluation;
 
 console.log('✅ 학술지 심사 데이터 로드 완료');
