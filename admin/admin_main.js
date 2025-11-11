@@ -402,64 +402,58 @@ function cancelApprovalResearchProposal(id) {
 // ========== 주차별 논문지도 검색 ==========
 
 function searchWeeklyGuidance() {
+    // Task 1-4: 간소화된 검색 필드 (학년도, 학기, 지도교수, 학번, 성명)
     const filters = {
         year: document.getElementById('weekly-search-year')?.value || '',
         semester: document.getElementById('weekly-search-semester')?.value || '',
-        major: document.getElementById('weekly-search-major')?.value || '',
-        degree: document.getElementById('weekly-search-degree')?.value || '',
         advisor: document.getElementById('weekly-search-advisor')?.value || '',
-        count: document.getElementById('weekly-search-count')?.value || '',
-        keyword: document.getElementById('weekly-search-keyword')?.value.toLowerCase().trim() || ''
+        studentId: document.getElementById('weekly-search-student-id')?.value.toLowerCase().trim() || '',
+        studentName: document.getElementById('weekly-search-student-name')?.value.toLowerCase().trim() || ''
     };
-    
+
     // 원본 데이터 백업
     if (!appData.originalWeeklyGuidanceStudents) {
         appData.originalWeeklyGuidanceStudents = [...appData.weeklyGuidanceStudents];
     }
-    
+
     // 필터링
     let filtered = [...appData.originalWeeklyGuidanceStudents];
-    
-    // 학과
-    if (filters.major) {
-        filtered = filtered.filter(item => item.major === filters.major);
+
+    // 학년도
+    if (filters.year) {
+        filtered = filtered.filter(item => (item.year || '2025') === filters.year);
     }
-    
-    // 학위과정
-    if (filters.degree) {
-        filtered = filtered.filter(item => item.degree === filters.degree);
+
+    // 학기
+    if (filters.semester) {
+        filtered = filtered.filter(item => (item.semester || '1') === filters.semester);
     }
-    
+
     // 지도교수 (복수 지도교수 고려)
     if (filters.advisor) {
-        filtered = filtered.filter(item => item.advisors.includes(filters.advisor));
-    }
-    
-    // 지도횟수
-    if (filters.count) {
-        const count = parseInt(filters.count);
-        if (count === 0) {
-            // 지도계획 없음
-            filtered = filtered.filter(item => item.guidanceCount === 0);
-        } else {
-            // N회 이상
-            filtered = filtered.filter(item => item.guidanceCount >= count);
-        }
-    }
-    
-    // 학번/성명 키워드
-    if (filters.keyword) {
         filtered = filtered.filter(item => {
-            return item.studentName.toLowerCase().includes(filters.keyword) ||
-                   item.studentId.toLowerCase().includes(filters.keyword);
+            if (item.advisors && Array.isArray(item.advisors)) {
+                return item.advisors.includes(filters.advisor);
+            }
+            return item.advisor === filters.advisor;
         });
     }
-    
+
+    // 학번
+    if (filters.studentId) {
+        filtered = filtered.filter(item => item.studentId.toLowerCase().includes(filters.studentId));
+    }
+
+    // 성명
+    if (filters.studentName) {
+        filtered = filtered.filter(item => item.studentName.toLowerCase().includes(filters.studentName));
+    }
+
     appData.weeklyGuidanceStudents = filtered;
-    
+
     // 화면 새로고침
     switchView('weeklyGuidance');
-    
+
     showAlert(`검색 결과: ${filtered.length}건`);
 }
 
@@ -468,18 +462,16 @@ function resetWeeklyGuidanceSearch() {
     if (appData.originalWeeklyGuidanceStudents) {
         appData.weeklyGuidanceStudents = [...appData.originalWeeklyGuidanceStudents];
     }
-    
-    // 검색 필드 초기화
+
+    // 검색 필드 초기화 (Task 1-4: 간소화된 필드만)
     const searchFields = [
         'weekly-search-year',
         'weekly-search-semester',
-        'weekly-search-major',
-        'weekly-search-degree',
         'weekly-search-advisor',
-        'weekly-search-count',
-        'weekly-search-keyword'
+        'weekly-search-student-id',
+        'weekly-search-student-name'
     ];
-    
+
     searchFields.forEach(id => {
         const field = document.getElementById(id);
         if (field) {
@@ -504,58 +496,77 @@ function resetGuidanceSearch() {
 
 // ========== 논문지도 진행 현황 검색 ==========
 
+// Task 1-5: 온라인 피드백 현황 검색 (대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명)
 function searchGuidanceProgress() {
     const filters = {
-        year: document.getElementById('progress-search-year')?.value || '',
-        semester: document.getElementById('progress-search-semester')?.value || '',
+        graduate: document.getElementById('progress-search-graduate')?.value || '',
         major: document.getElementById('progress-search-major')?.value || '',
         degree: document.getElementById('progress-search-degree')?.value || '',
-        stage: document.getElementById('progress-search-stage')?.value || '',
+        advisor: document.getElementById('progress-search-advisor')?.value || '',
+        semesterCount: document.getElementById('progress-search-semester-count')?.value || '',
         status: document.getElementById('progress-search-status')?.value || '',
-        keyword: document.getElementById('progress-search-keyword')?.value.toLowerCase().trim() || ''
+        studentId: document.getElementById('progress-search-student-id')?.value.toLowerCase().trim() || '',
+        studentName: document.getElementById('progress-search-student-name')?.value.toLowerCase().trim() || ''
     };
-    
+
     // 원본 데이터 백업
     if (!appData.originalGuidanceProgress) {
         appData.originalGuidanceProgress = [...appData.guidanceProgress];
     }
-    
+
     // 필터링
     let filtered = [...appData.originalGuidanceProgress];
-    
-    // 학과
+
+    // 대학원
+    if (filters.graduate) {
+        filtered = filtered.filter(item => (item.graduate || '일반대학원') === filters.graduate);
+    }
+
+    // 전공
     if (filters.major) {
         filtered = filtered.filter(item => item.major === filters.major);
     }
-    
+
     // 학위과정
     if (filters.degree) {
         filtered = filtered.filter(item => item.degree === filters.degree);
     }
-    
-    // 단계
-    if (filters.stage) {
-        filtered = filtered.filter(item => item.stage === filters.stage);
+
+    // 지도교수
+    if (filters.advisor) {
+        filtered = filtered.filter(item => item.advisor === filters.advisor);
     }
-    
-    // 피드백 상태
+
+    // 학기차
+    if (filters.semesterCount) {
+        filtered = filtered.filter(item => String(item.semesterCount) === filters.semesterCount);
+    }
+
+    // 피드백상태 (답변 대기중 → 대기, 피드백 완료 → 완료 변환 고려)
     if (filters.status) {
-        filtered = filtered.filter(item => item.feedbackStatus === filters.status);
-    }
-    
-    // 학번/성명 키워드
-    if (filters.keyword) {
         filtered = filtered.filter(item => {
-            return item.studentName.toLowerCase().includes(filters.keyword) ||
-                   item.studentId.toLowerCase().includes(filters.keyword);
+            let itemStatus = item.feedbackStatus || '대기';
+            if (itemStatus === '답변 대기중') itemStatus = '대기';
+            if (itemStatus === '피드백 완료') itemStatus = '완료';
+            return itemStatus === filters.status;
         });
     }
-    
+
+    // 학번
+    if (filters.studentId) {
+        filtered = filtered.filter(item => item.studentId.toLowerCase().includes(filters.studentId));
+    }
+
+    // 성명
+    if (filters.studentName) {
+        filtered = filtered.filter(item => item.studentName.toLowerCase().includes(filters.studentName));
+    }
+
     appData.guidanceProgress = filtered;
-    
+
     // 화면 새로고침
     switchView('guidanceProgress');
-    
+
     showAlert(`검색 결과: ${filtered.length}건`);
 }
 
@@ -564,28 +575,29 @@ function resetGuidanceProgressSearch() {
     if (appData.originalGuidanceProgress) {
         appData.guidanceProgress = [...appData.originalGuidanceProgress];
     }
-    
-    // 검색 필드 초기화
+
+    // Task 1-5: 검색 필드 초기화 (대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명)
     const searchFields = [
-        'progress-search-year',
-        'progress-search-semester',
+        'progress-search-graduate',
         'progress-search-major',
         'progress-search-degree',
-        'progress-search-stage',
+        'progress-search-advisor',
+        'progress-search-semester-count',
         'progress-search-status',
-        'progress-search-keyword'
+        'progress-search-student-id',
+        'progress-search-student-name'
     ];
-    
+
     searchFields.forEach(id => {
         const field = document.getElementById(id);
         if (field) {
             field.value = '';
         }
     });
-    
+
     // 화면 새로고침
     switchView('guidanceProgress');
-    
+
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
@@ -596,8 +608,35 @@ function switchThesisTab(tab) {
 }
 
 function searchThesisReview() {
-    // TODO: 실제 검색 로직
-    showAlert('검색 기능은 백엔드 연동 후 동작합니다.');
+    // 검색 조건 수집
+    const year = document.getElementById('thesis-search-year')?.value || '';
+    const semester = document.getElementById('thesis-search-semester')?.value || '';
+    const semesterCount = document.getElementById('thesis-search-semester-count')?.value || '';
+    const type = document.getElementById('thesis-search-type')?.value || '';
+    const studentId = document.getElementById('thesis-search-student-id')?.value || '';
+    const studentName = document.getElementById('thesis-search-student-name')?.value || '';
+
+    // 통합된 원본 데이터
+    const combinedData = [
+        ...appData.submissions.thesisPlan.map(item => ({...item, submissionType: 'plan', submissionTypeName: '논문작성계획서 심사'})),
+        ...appData.submissions.midThesis.map(item => ({...item, submissionType: 'mid', submissionTypeName: '중간논문 심사'})),
+        ...appData.submissions.finalThesis.map(item => ({...item, submissionType: 'final', submissionTypeName: '최종논문 심사'}))
+    ];
+
+    // 필터링
+    window.filteredThesisData = combinedData.filter(item => {
+        if (year && (item.year || '2025') !== year) return false;
+        if (semester && (item.semester || '1') !== semester) return false;
+        if (semesterCount && (item.semesterCount || '') !== semesterCount) return false;
+        if (type && item.submissionType !== type) return false;
+        if (studentId && !item.studentId.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        return true;
+    });
+
+    // 뷰 재렌더링
+    switchView('thesisReview');
+    showAlert(`검색 결과: ${window.filteredThesisData.length}건`);
 }
 
 function resetThesisSearch() {
@@ -609,6 +648,56 @@ function resetThesisSearch() {
             field.value = '';
         }
     });
+
+    // 필터링된 데이터 초기화
+    window.filteredThesisData = null;
+
+    // 뷰 재렌더링
+    switchView('thesisReview');
+    showAlert('검색 조건이 초기화되었습니다.');
+}
+
+// ========== 학술지 심사 검색/초기화 ==========
+function searchJournalReview() {
+    // 검색 조건 수집
+    const year = document.getElementById('journal-search-year')?.value || '';
+    const semester = document.getElementById('journal-search-semester')?.value || '';
+    const semesterCount = document.getElementById('journal-search-semester-count')?.value || '';
+    const studentId = document.getElementById('journal-search-student-id')?.value || '';
+    const studentName = document.getElementById('journal-search-student-name')?.value || '';
+
+    const data = appData.submissions.journalSubmission || [];
+
+    // 필터링
+    window.filteredJournalData = data.filter(item => {
+        if (year && (item.year || '2025') !== year) return false;
+        if (semester && (item.semester || '1') !== semester) return false;
+        if (semesterCount && (item.semesterCount || '') !== semesterCount) return false;
+        if (studentId && !item.studentId.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        return true;
+    });
+
+    // 뷰 재렌더링
+    switchView('journalReview');
+    showAlert(`검색 결과: ${window.filteredJournalData.length}건`);
+}
+
+function resetJournalSearch() {
+    // 검색 필드 초기화
+    document.querySelectorAll('input[id^="journal-search"], select[id^="journal-search"]').forEach(field => {
+        if (field.tagName === 'SELECT') {
+            field.selectedIndex = 0;
+        } else if (field.type !== 'checkbox') {
+            field.value = '';
+        }
+    });
+
+    // 필터링된 데이터 초기화
+    window.filteredJournalData = null;
+
+    // 뷰 재렌더링
+    switchView('journalReview');
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
@@ -620,10 +709,210 @@ function toggleAllCheckboxes(source) {
     });
 }
 
-// ========== 학술지 상세보기 ==========
-function viewJournalDetail(id) {
-    showAlert(`학술지 심사 상세 (ID: ${id})`);
-    // TODO: 모달 열기
+// ========== 학술지 상세보기 (학위논문과 동일한 프로세스) ==========
+function viewJournalDetail(itemId, viewType) {
+    console.log('viewJournalDetail called:', { itemId, viewType });
+
+    const dataSource = appData.submissions.journalSubmission || [];
+    const item = dataSource.find(d => String(d.id) === String(itemId));
+
+    if (!item) {
+        console.error('Item not found for id:', itemId);
+        alert('심사 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const isChair = viewType === 'chair';
+    const modalTitle = (item.thesisTitle || '논문제목 미정') + ' - ' + (isChair ? '심사위원장' : '심사위원') + ' 평가 (읽기 전용)';
+
+    // 학술지 심사는 학위논문 심사와 동일한 프로세스이므로 viewThesisReviewDetail 호출
+    // 실제로는 journalSubmission 타입으로 처리하지만, 평가 UI는 동일
+    const reviewers = item.reviewers || [
+        { name: item.advisor || '홍길동', role: '주심', status: '완료', score: 88, comment: '연구 설계가 잘 되어 있습니다.' },
+        { name: '이교수', role: '부심', status: '완료', score: 85, comment: '이론적 배경이 충실합니다.' },
+        { name: '박교수', role: '부심', status: '대기', score: null, comment: null }
+    ];
+
+    let content = '<div class="space-y-6">';
+
+    // 논문 정보
+    content += '<div class="bg-gray-50 rounded-lg p-4">';
+    content += '<h4 class="font-bold text-gray-800 mb-3">📄 논문 정보</h4>';
+    content += '<div class="space-y-2 text-sm">';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">대학원</div><div class="flex-1">' + (item.graduate || '일반대학원') + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">전공/학과</div><div class="flex-1">' + item.major + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학위과정</div><div class="flex-1">' + item.degree + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학번</div><div class="flex-1">' + item.studentId + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학생명</div><div class="flex-1 font-medium">' + item.studentName + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">논문제목</div><div class="flex-1 font-medium">' + (item.thesisTitle || '미정') + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학술지명</div><div class="flex-1">' + (item.journalName || '-') + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">지도교수</div><div class="flex-1">' + item.advisor + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">제출일</div><div class="flex-1">' + (item.submitDate || '-') + '</div></div>';
+    content += '</div></div>';
+
+    // 평가 내용 (학위논문과 동일)
+    if (!isChair) {
+        // 위원 뷰
+        const template = {
+            name: '학술지 심사 평가표',
+            passingScore: 75,
+            categories: [
+                { id: 'cat1', name: '연구의 독창성', description: '연구 주제의 참신성과 기여도', weight: 25, maxScore: 10 },
+                { id: 'cat2', name: '연구방법의 타당성', description: '연구 방법론의 적절성과 신뢰성', weight: 25, maxScore: 10 },
+                { id: 'cat3', name: '결과의 명확성', description: '연구 결과의 명확성과 논리성', weight: 20, maxScore: 10 },
+                { id: 'cat4', name: '논리적 구성', description: '논문의 전체적인 논리적 구성', weight: 15, maxScore: 10 },
+                { id: 'cat5', name: '학술적 기여도', description: '학문 분야에 대한 기여 정도', weight: 15, maxScore: 10 }
+            ]
+        };
+
+        const evaluation = {
+            evaluationType: 'score',
+            submittedAt: item.submitDate || new Date().toISOString(),
+            totalScore: reviewers[0]?.score || 88,
+            scores: [
+                { categoryId: 'cat1', score: 9, comment: '연구 주제가 참신하고 학술적 가치가 높습니다.' },
+                { categoryId: 'cat2', score: 8.5, comment: '연구 방법론이 체계적이고 적절합니다.' },
+                { categoryId: 'cat3', score: 9, comment: '연구 결과가 명확하게 제시되었습니다.' },
+                { categoryId: 'cat4', score: 8.5, comment: '논문의 구성이 논리적입니다.' },
+                { categoryId: 'cat5', score: 9, comment: '학문 분야에 유의미한 기여를 합니다.' }
+            ],
+            overallComment: { combined: reviewers[0]?.comment || '전반적으로 우수한 연구이며, 학술지 게재 기준을 충족합니다.' }
+        };
+
+        content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6">';
+        content += '<div class="flex items-center justify-between mb-4">';
+        content += '<h3 class="text-lg font-bold text-gray-800">' + template.name + '</h3>';
+        content += '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">';
+        content += '제출 완료 (' + formatDateTime(evaluation.submittedAt) + ')';
+        content += '</span></div>';
+
+        content += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">';
+        content += '<p class="text-sm text-blue-800">';
+        content += '<strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요. ';
+        content += '가중치가 적용되어 최종 점수가 계산됩니다.';
+        content += '</p></div>';
+
+        content += '<div id="evaluation-categories" class="space-y-4">';
+        template.categories.forEach((category, index) => {
+            const scoreData = evaluation.scores.find(s => s.categoryId === category.id);
+            const currentScore = scoreData?.score || 0;
+            const currentComment = scoreData?.comment || '';
+
+            content += '<div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">';
+            content += '<div class="grid grid-cols-[1fr_80px] gap-4 mb-4">';
+            content += '<div>';
+            content += '<h4 class="font-bold text-gray-800 mb-1">' + (index + 1) + '. ' + category.name + '</h4>';
+            content += '<p class="text-sm text-gray-600">' + category.description + '</p>';
+            content += '</div>';
+            content += '<div class="text-right">';
+            content += '<div class="text-xs text-gray-500">가중치</div>';
+            content += '<div class="text-lg font-bold text-blue-600">' + category.weight + '%</div>';
+            content += '</div></div>';
+
+            content += '<div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">';
+            content += '<label class="text-sm font-medium text-gray-700">점수:</label>';
+            content += '<input type="number" class="score-input w-full bg-gray-50" min="0" max="' + category.maxScore + '" step="0.5" value="' + currentScore + '" disabled>';
+            content += '<span class="text-sm text-gray-600">/ ' + category.maxScore + '점</span>';
+            content += '<span></span>';
+            content += '</div>';
+
+            content += '<div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">';
+            content += '<span></span>';
+            content += '<div class="text-sm text-gray-500">';
+            content += '→ 가중 점수: ';
+            content += '<span class="weighted-score text-base font-bold text-blue-600">';
+            content += calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1) + '점';
+            content += '</span>';
+            content += '<span class="text-xs text-gray-400">(' + category.weight + '% 적용)</span>';
+            content += '</div></div>';
+
+            content += '<div>';
+            content += '<label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>';
+            content += '<textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>' + currentComment + '</textarea>';
+            content += '</div>';
+
+            content += '</div>';
+        });
+        content += '</div>';
+
+        content += '<div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">';
+        content += '<div class="flex items-center justify-between">';
+        content += '<h4 class="text-lg font-bold text-gray-800">총점</h4>';
+        content += '<div class="text-3xl font-bold text-blue-600">' + evaluation.totalScore + '점</div>';
+        content += '</div>';
+        content += '<div class="text-sm text-gray-600 mt-1 text-right">100점 만점 (합격 기준: ' + template.passingScore + '점)</div>';
+        content += '</div>';
+
+        content += '<div class="mt-6">';
+        content += '<h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>';
+        content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>' + (evaluation.overallComment.combined || evaluation.overallComment.conclusion || '') + '</textarea>';
+        content += '</div>';
+        content += '</div>';
+    }
+
+    if (isChair) {
+        // 위원장 뷰 (간략화)
+        const template = {
+            name: '학술지 심사 평가표',
+            passingScore: 75
+        };
+
+        content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6">';
+        content += '<h3 class="text-lg font-bold text-gray-800 mb-4">심사위원장 종합 평가</h3>';
+
+        const completedReviewers = reviewers.filter(r => r.score);
+        const avgScore = completedReviewers.length > 0 ? completedReviewers.reduce((sum, r) => sum + r.score, 0) / completedReviewers.length : 0;
+        const threshold = 75;
+        const systemDecision = avgScore >= threshold ? '합격' : '불합격';
+
+        content += '<div class="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">';
+        content += '<div class="grid grid-cols-3 gap-6 text-center">';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">평균 점수</div>';
+        content += '<div class="text-3xl font-bold text-blue-600">' + avgScore.toFixed(1) + '점</div>';
+        content += '</div>';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">합격 기준</div>';
+        content += '<div class="text-3xl font-bold text-gray-800">' + threshold + '점</div>';
+        content += '</div>';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">시스템 판정</div>';
+        content += '<div class="text-2xl font-bold ' + (systemDecision === '합격' ? 'text-green-600' : 'text-red-600') + '">' + systemDecision + '</div>';
+        content += '</div>';
+        content += '</div></div>';
+
+        content += '<div class="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-6">';
+        content += '<h4 class="font-bold text-gray-800 mb-3">최종 결정 (읽기 전용)</h4>';
+        content += '<div class="space-y-3">';
+        content += '<div class="flex items-center gap-3">';
+
+        const currentDecision = item.result || '승인';
+        const decisions = ['승인', '보류', '반려'];
+        decisions.forEach(decision => {
+            const isSelected = decision === currentDecision;
+            const borderColor = decision === '승인' ? 'border-green-400' : decision === '보류' ? 'border-yellow-400' : 'border-red-400';
+            content += '<label class="flex items-center gap-2 p-3 bg-white rounded-lg flex-1 border-2 ' + (isSelected ? borderColor : 'border-gray-300') + '">';
+            content += '<input type="radio" name="chairDecision" value="' + decision + '" ' + (isSelected ? 'checked' : '') + ' disabled class="w-4 h-4">';
+            content += '<span class="font-medium">' + decision + '</span>';
+            content += '</label>';
+        });
+
+        content += '</div>';
+        content += '<div>';
+        content += '<label class="text-sm font-medium text-gray-700 mb-1 block">결정 사유:</label>';
+        content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>전반적으로 연구의 질이 우수하며 학술지 게재 요건을 충족합니다. 승인합니다.</textarea>';
+        content += '</div>';
+        content += '</div></div>';
+
+        content += '</div>';
+    }
+
+    content += '<div class="bg-yellow-50 border border-yellow-200 rounded p-3"><div class="flex items-start">';
+    content += '<svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>';
+    content += '<div class="flex-1"><p class="text-sm font-medium text-yellow-800">읽기 전용 모드</p>';
+    content += '<p class="text-xs text-yellow-700 mt-1">이 화면은 교수의 평가 내용을 조회하기 위한 읽기 전용 화면입니다.</p></div></div></div></div>';
+
+    openModal(modalTitle, content, '닫기', () => { closeModal(); }, true);
 }
 
 // ========== 연구계획서 상세보기 ==========
@@ -749,91 +1038,163 @@ function viewWeeklyGuidanceDetail(studentId) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-// ID 19: 지도일지 상세 보기
+// ID 19-20: 지도일지 상세 보기 (계획/실적 구분, 교수입력 읽기전용)
 function viewGuidanceRecordDetail(recordId) {
     const record = appData.guidanceRecords.find(r => r.id == recordId);
-    
+
     if (!record) {
         showNotification('지도 내역을 찾을 수 없습니다.', 'error');
         return;
     }
-    
+
     const student = appData.weeklyGuidanceStudents.find(s => s.studentId === record.studentId);
-    
+
+    // ID 19: 교수가 입력한 실적인지 관리자가 등록한 계획인지 구분
+    const isProfessorRecord = record.type === 'actual' || !record.type; // type이 없으면 교수 입력으로 간주
+    const isAdminPlan = record.type === 'plan';
+
+    // ID 19: 교수 입력 실적은 읽기 전용 (회색 배경, disabled)
+    const readOnlyClass = isProfessorRecord ? 'bg-gray-100' : 'bg-white';
+    const disabledAttr = isProfessorRecord ? 'disabled' : '';
+    const recordTypeLabel = isProfessorRecord ? '교수 입력 실적 (읽기 전용)' : '관리자 등록 계획';
+    const recordTypeBadge = isProfessorRecord ?
+        '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">교수 입력</span>' :
+        '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">관리자 계획</span>';
+
+    // ID 20: 실제 지도내용 필드 (교수가 입력한 실적인 경우에만 표시)
+    const actualGuidanceSection = isProfessorRecord && (record.actualDate || record.actualMethod || record.actualContent) ? `
+        <div class="mb-6 border-t pt-6">
+            <h5 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                실제 지도내용
+            </h5>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-600 font-medium">실제 실행일</label>
+                    <div class="mt-1 px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800">
+                        ${record.actualDate || record.date}
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 font-medium">실제 지도 방식</label>
+                    <div class="mt-1 px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg">
+                        <span class="inline-block px-3 py-1 text-sm rounded-full ${getMethodBadgeClass(record.actualMethod || record.method)}">
+                            ${record.actualMethod || record.method}
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 font-medium">실제 지도 내용</label>
+                    <div class="mt-1 px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-700 whitespace-pre-wrap">
+                        ${record.actualContent || record.content}
+                    </div>
+                </div>
+            </div>
+        </div>
+    ` : '';
+
     const detailHtml = `
         <div id="guidance-record-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
              onclick="if(event.target.id==='guidance-record-detail-modal') closeGuidanceRecordDetailModal()">
             <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden"
                  onclick="event.stopPropagation()">
-                
+
                 <!-- 헤더 -->
                 <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
-                    <h3 class="text-lg font-bold">지도일지 상세</h3>
-                    <button onclick="closeGuidanceRecordDetailModal()" 
+                    <h3 class="text-lg font-bold flex items-center">
+                        지도일지 상세
+                        ${recordTypeBadge}
+                    </h3>
+                    <button onclick="closeGuidanceRecordDetailModal()"
                             class="text-white hover:text-gray-200 text-2xl leading-none">
                         ×
                     </button>
                 </div>
-                
+
                 <div class="overflow-y-auto p-6" style="max-height: calc(90vh - 80px);">
+                    ${isProfessorRecord ? `
+                    <!-- ID 19: 읽기 전용 안내 -->
+                    <div class="mb-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-sm text-blue-800 font-medium">교수가 입력한 지도 실적은 수정할 수 없습니다 (읽기 전용)</span>
+                        </div>
+                    </div>
+                    ` : ''}
+
                     <!-- 기본 정보 -->
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="${readOnlyClass} rounded-lg p-4 mb-6 border border-gray-300">
                         <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
-                                <span class="text-xs text-gray-500">Week</span>
-                                <div class="font-semibold text-lg text-gray-800">Week ${record.week}</div>
+                                <label class="text-xs text-gray-500 font-medium">Week</label>
+                                <input type="number" value="${record.week}" ${disabledAttr}
+                                       class="mt-1 w-full px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800 font-semibold">
                             </div>
                             <div>
-                                <span class="text-xs text-gray-500">지도일자</span>
-                                <div class="font-semibold text-gray-800">${record.date}</div>
+                                <label class="text-xs text-gray-500 font-medium">지도일자 (계획)</label>
+                                <input type="date" value="${record.date}" ${disabledAttr}
+                                       class="mt-1 w-full px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <span class="text-xs text-gray-500">학생</span>
-                                <div class="font-semibold text-gray-800">${student ? student.studentName : '-'} (${record.studentId})</div>
+                                <label class="text-xs text-gray-500 font-medium">학생</label>
+                                <input type="text" value="${student ? student.studentName : '-'} (${record.studentId})" disabled
+                                       class="mt-1 w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800">
                             </div>
                             <div>
-                                <span class="text-xs text-gray-500">지도교수</span>
-                                <div class="font-semibold text-gray-800">${record.advisor}</div>
+                                <label class="text-xs text-gray-500 font-medium">지도교수</label>
+                                <input type="text" value="${record.advisor}" disabled
+                                       class="mt-1 w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800">
                             </div>
                         </div>
                         <div class="mt-3">
-                            <span class="text-xs text-gray-500">지도방법</span>
-                            <div>
-                                <span class="inline-block mt-1 px-3 py-1 text-sm rounded-full ${getMethodBadgeClass(record.method)}">
-                                    ${record.method}
-                                </span>
-                            </div>
+                            <label class="text-xs text-gray-500 font-medium">지도방법 (계획)</label>
+                            <select ${disabledAttr} class="mt-1 w-full px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg">
+                                <option ${record.method === '대면' ? 'selected' : ''}>대면</option>
+                                <option ${record.method === '비대면' ? 'selected' : ''}>비대면</option>
+                                <option ${record.method === '이메일' ? 'selected' : ''}>이메일</option>
+                            </select>
                         </div>
                     </div>
-                    
-                    <!-- 지도 내용 -->
+
+                    <!-- 지도 내용 (계획) -->
                     <div class="mb-6">
-                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 주제</h5>
-                        <div class="bg-blue-50 rounded-lg p-4">
-                            <div class="text-gray-800 font-medium">${record.topic}</div>
-                        </div>
+                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 주제 (계획)</h5>
+                        <input type="text" value="${record.topic}" ${disabledAttr}
+                               class="w-full px-4 py-3 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800 font-medium">
                     </div>
-                    
+
                     <div class="mb-6">
-                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 내용</h5>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="text-gray-700 whitespace-pre-wrap">${record.content}</div>
-                        </div>
+                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 내용 (계획)</h5>
+                        <textarea ${disabledAttr} rows="4"
+                                  class="w-full px-4 py-3 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-700">${record.content}</textarea>
                     </div>
-                    
+
+                    ${isProfessorRecord ? `
                     <div>
                         <h5 class="text-sm font-bold text-gray-800 mb-2">교수 의견</h5>
-                        <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
-                            <div class="text-gray-700">${record.professorComment}</div>
-                        </div>
+                        <textarea disabled rows="3"
+                                  class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">${record.professorComment || ''}</textarea>
                     </div>
+                    ` : ''}
+
+                    ${actualGuidanceSection}
                 </div>
-                
+
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
-                    <button onclick="closeGuidanceRecordDetailModal()" 
+                    ${isAdminPlan ? `
+                    <button onclick="saveGuidancePlan('${record.id}')"
+                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8B0037]">
+                        저장
+                    </button>
+                    ` : ''}
+                    <button onclick="closeGuidanceRecordDetailModal()"
                             class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
                         닫기
                     </button>
@@ -841,8 +1202,14 @@ function viewGuidanceRecordDetail(recordId) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', detailHtml);
+}
+
+// ID 19: 관리자 계획 저장 (교수 실적은 저장 불가)
+function saveGuidancePlan(recordId) {
+    showNotification('지도 계획이 저장되었습니다.', 'success');
+    closeGuidanceRecordDetailModal();
 }
 
 // 모달 닫기
@@ -879,6 +1246,7 @@ function getMethodBadgeClass(method) {
 // Export
 window.viewWeeklyGuidanceDetail = viewWeeklyGuidanceDetail;
 window.viewGuidanceRecordDetail = viewGuidanceRecordDetail;
+window.saveGuidancePlan = saveGuidancePlan;
 window.closeGuidanceDetailModal = closeGuidanceDetailModal;
 window.closeGuidanceRecordDetailModal = closeGuidanceRecordDetailModal;
 
@@ -915,8 +1283,8 @@ function viewGuidanceProgressDetail(studentId) {
             <div class="flex items-center gap-4 text-sm text-gray-600">
                 <span>${record.submitDate}</span>
                 <span>피드백 ${record.feedbackCount}회</span>
-                <span>카피킬러 ${record.copyKiller}%</span>
-                <span>GPT킬러 ${record.gptKiller}%</span>
+                <span>CopyKiller ${record.copyKiller}%</span>
+                <span>GPT Killer ${record.gptKiller}%</span>
             </div>
             <div class="text-sm text-gray-500 mt-1">${record.fileName}</div>
         </div>
@@ -991,11 +1359,11 @@ function viewGuidanceProgressDetail(studentId) {
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div class="bg-white rounded-lg p-4 text-center">
                                 <div class="text-lg font-bold text-red-600">${stats.avgCopyKiller.toFixed(1)}%</div>
-                                <div class="text-xs text-gray-600 mt-1">평균 카피킬러</div>
+                                <div class="text-xs text-gray-600 mt-1">평균 CopyKiller</div>
                             </div>
                             <div class="bg-white rounded-lg p-4 text-center">
                                 <div class="text-lg font-bold text-red-600">${stats.avgGptKiller.toFixed(1)}%</div>
-                                <div class="text-xs text-gray-600 mt-1">평균 GPT킬러</div>
+                                <div class="text-xs text-gray-600 mt-1">평균 GPT Killer</div>
                             </div>
                         </div>
                     </div>
@@ -1096,7 +1464,7 @@ function viewFeedbackRecordDetail(recordId) {
                         <h5 class="text-sm font-bold text-gray-800 mb-2">표절 검증 결과</h5>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-500">
-                                <div class="text-xs text-gray-600 mb-1">카피킬러</div>
+                                <div class="text-xs text-gray-600 mb-1">CopyKiller</div>
                                 <div class="text-2xl font-bold ${record.copyKiller > 10 ? 'text-red-600' : 'text-green-600'}">
                                     ${record.copyKiller}%
                                 </div>
@@ -1105,7 +1473,7 @@ function viewFeedbackRecordDetail(recordId) {
                                 </div>
                             </div>
                             <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-500">
-                                <div class="text-xs text-gray-600 mb-1">GPT킬러</div>
+                                <div class="text-xs text-gray-600 mb-1">GPT Killer</div>
                                 <div class="text-2xl font-bold ${record.gptKiller > 5 ? 'text-red-600' : 'text-green-600'}">
                                     ${record.gptKiller}%
                                 </div>
@@ -2036,7 +2404,7 @@ function viewStudentDetail(studentId) {
                             </div>
                             <div class="bg-white border rounded-lg p-4 text-center">
                                 <div class="text-lg font-bold text-red-600">${feedbackStats.avgCopyKiller}%</div>
-                                <div class="text-xs text-gray-600 mt-1">평균 카피킬러</div>
+                                <div class="text-xs text-gray-600 mt-1">평균 CopyKiller</div>
                             </div>
                         </div>
                     </div>
@@ -2273,3 +2641,358 @@ window.exportStatistics = exportStatistics;
 window.closeStatisticsModal = closeStatisticsModal;
 
 console.log('✅ 관리자 - 통계 대시보드 기능 로드 완료');
+
+// ========== 학위논문 심사 상세 보기 (위원/위원장 뷰) ==========
+
+// Helper functions for evaluation display
+function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleString('ko-KR');
+}
+
+function calculateWeightedScore(score, maxScore, weight) {
+    return (score / maxScore) * weight;
+}
+
+function viewThesisReviewDetail(itemId, viewType, thesisType) {
+    console.log('viewThesisReviewDetail called:', { itemId, viewType, thesisType });
+    console.log('itemId type:', typeof itemId, 'value:', itemId);
+
+    const dataSource = thesisType === 'plan' ? appData.submissions.thesisPlan :
+                       thesisType === 'mid' ? appData.submissions.midThesis :
+                       appData.submissions.finalThesis;
+
+    console.log('dataSource length:', dataSource ? dataSource.length : 'null');
+
+    if (dataSource && dataSource.length > 0) {
+        console.log('First item in dataSource:', dataSource[0]);
+        console.log('First item id type:', typeof dataSource[0].id, 'value:', dataSource[0].id);
+        console.log('All IDs in dataSource:', dataSource.map(d => ({ id: d.id, type: typeof d.id })));
+    }
+
+    // ID 비교 시 타입을 동일하게 맞춤 (문자열로 통일)
+    const item = dataSource.find(d => String(d.id) === String(itemId));
+
+    console.log('item found:', item ? 'yes' : 'no');
+
+    if (!item) {
+        console.error('Item not found for id:', itemId);
+        console.error('Available items:', dataSource.map(d => ({ id: d.id, studentName: d.studentName, thesisTitle: d.thesisTitle })));
+        alert('심사 정보를 찾을 수 없습니다.\n\n사용 가능한 ID: ' + dataSource.map(d => d.id).join(', '));
+        return;
+    }
+
+    const isChair = viewType === 'chair';
+    const modalTitle = (item.thesisTitle || '논문제목 미정') + ' - ' + (isChair ? '심사위원장' : '심사위원') + ' 평가 (읽기 전용)';
+
+    const reviewers = item.reviewers || [
+        { name: item.advisor || '홍길동', role: '주심', status: '완료', score: 88, comment: '연구 설계가 잘 되어 있습니다.' },
+        { name: '이교수', role: '부심', status: '완료', score: 85, comment: '이론적 배경이 충실합니다.' },
+        { name: '박교수', role: '부심', status: '대기', score: null, comment: null }
+    ];
+
+    let content = '<div class="space-y-6">';
+
+    // 논문 정보 (professor 화면과 동일한 구조)
+    content += '<div class="bg-gray-50 rounded-lg p-4">';
+    content += '<h4 class="font-bold text-gray-800 mb-3">📄 논문 정보</h4>';
+    content += '<div class="space-y-2 text-sm">';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">대학원</div><div class="flex-1">' + (item.graduate || '일반대학원') + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">전공/학과</div><div class="flex-1">' + item.major + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학위과정</div><div class="flex-1">' + item.degree + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학번</div><div class="flex-1">' + item.studentId + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학생명</div><div class="flex-1 font-medium">' + item.studentName + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">논문제목</div><div class="flex-1 font-medium">' + (item.thesisTitle || '미정') + '</div></div>';
+    if (item.copyKiller || item.gptKiller) {
+        const copyKiller = item.copyKiller || 0;
+        const gptKiller = item.gptKiller || 0;
+        content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">표절/AI 검사</div><div class="flex-1">CopyKiller: ' + copyKiller + '% / GPT Killer: ' + gptKiller + '%</div></div>';
+    }
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">지도교수</div><div class="flex-1">' + item.advisor + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">제출일</div><div class="flex-1">' + (item.submitDate || '-') + '</div></div>';
+    content += '</div></div>';
+
+    if (!isChair) {
+        // 심사위원 평가 - 교수 화면과 동일한 UI (점수형 평가)
+        const template = {
+            name: '학위논문 심사 평가표',
+            submissionType: item.submissionType || '최종논문',
+            passingScore: 75,
+            categories: [
+                { id: 'cat1', name: '연구의 독창성', description: '연구 주제의 참신성과 기여도', weight: 25, maxScore: 10 },
+                { id: 'cat2', name: '연구방법의 타당성', description: '연구 방법론의 적절성과 신뢰성', weight: 25, maxScore: 10 },
+                { id: 'cat3', name: '결과의 명확성', description: '연구 결과의 명확성과 논리성', weight: 20, maxScore: 10 },
+                { id: 'cat4', name: '논리적 구성', description: '논문의 전체적인 논리적 구성', weight: 15, maxScore: 10 },
+                { id: 'cat5', name: '학술적 기여도', description: '학문 분야에 대한 기여 정도', weight: 15, maxScore: 10 }
+            ]
+        };
+
+        const evaluation = {
+            evaluationType: 'score',
+            submittedAt: item.submitDate || new Date().toISOString(),
+            totalScore: reviewers[0]?.score || 88,
+            scores: [
+                { categoryId: 'cat1', score: 9, comment: '연구 주제가 참신하고 학술적 가치가 높습니다.' },
+                { categoryId: 'cat2', score: 8.5, comment: '연구 방법론이 체계적이고 적절합니다.' },
+                { categoryId: 'cat3', score: 9, comment: '연구 결과가 명확하게 제시되었습니다.' },
+                { categoryId: 'cat4', score: 8.5, comment: '논문의 구성이 논리적입니다.' },
+                { categoryId: 'cat5', score: 9, comment: '학문 분야에 유의미한 기여를 합니다.' }
+            ],
+            overallComment: { combined: reviewers[0]?.comment || '전반적으로 우수한 연구이며, 학위논문으로서의 요건을 충족합니다.' }
+        };
+
+        // 교수 UI와 동일한 구조로 렌더링
+        content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6">';
+        content += '<div class="flex items-center justify-between mb-4">';
+        content += '<h3 class="text-lg font-bold text-gray-800">' + template.name + '</h3>';
+        content += '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">';
+        content += '제출 완료 (' + formatDateTime(evaluation.submittedAt) + ')';
+        content += '</span></div>';
+
+        content += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">';
+        content += '<p class="text-sm text-blue-800">';
+        content += '<strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요. ';
+        content += '가중치가 적용되어 최종 점수가 계산됩니다.';
+        content += '</p></div>';
+
+        content += '<div id="evaluation-categories" class="space-y-4">';
+        template.categories.forEach((category, index) => {
+            const scoreData = evaluation.scores.find(s => s.categoryId === category.id);
+            const currentScore = scoreData?.score || 0;
+            const currentComment = scoreData?.comment || '';
+
+            content += '<div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">';
+
+            // Grid: 제목 영역 | 가중치
+            content += '<div class="grid grid-cols-[1fr_80px] gap-4 mb-4">';
+            content += '<div>';
+            content += '<h4 class="font-bold text-gray-800 mb-1">' + (index + 1) + '. ' + category.name + '</h4>';
+            content += '<p class="text-sm text-gray-600">' + category.description + '</p>';
+            content += '</div>';
+            content += '<div class="text-right">';
+            content += '<div class="text-xs text-gray-500">가중치</div>';
+            content += '<div class="text-lg font-bold text-blue-600">' + category.weight + '%</div>';
+            content += '</div></div>';
+
+            // Grid: 점수 입력 (읽기 모드)
+            content += '<div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">';
+            content += '<label class="text-sm font-medium text-gray-700">점수:</label>';
+            content += '<input type="number" class="score-input w-full bg-gray-50" min="0" max="' + category.maxScore + '" step="0.5" value="' + currentScore + '" disabled>';
+            content += '<span class="text-sm text-gray-600">/ ' + category.maxScore + '점</span>';
+            content += '<span></span>';
+            content += '</div>';
+
+            // Grid: 가중 점수 표시
+            content += '<div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">';
+            content += '<span></span>';
+            content += '<div class="text-sm text-gray-500">';
+            content += '→ 가중 점수: ';
+            content += '<span class="weighted-score text-base font-bold text-blue-600">';
+            content += calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1) + '점';
+            content += '</span>';
+            content += '<span class="text-xs text-gray-400">(' + category.weight + '% 적용)</span>';
+            content += '</div></div>';
+
+            // 평가 의견 (읽기 모드)
+            content += '<div>';
+            content += '<label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>';
+            content += '<textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>' + currentComment + '</textarea>';
+            content += '</div>';
+
+            content += '</div>';
+        });
+        content += '</div>';
+
+        // 총점
+        content += '<div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">';
+        content += '<div class="flex items-center justify-between">';
+        content += '<h4 class="text-lg font-bold text-gray-800">총점</h4>';
+        content += '<div class="text-3xl font-bold text-blue-600">' + evaluation.totalScore + '점</div>';
+        content += '</div>';
+        content += '<div class="text-sm text-gray-600 mt-1 text-right">100점 만점 (합격 기준: ' + template.passingScore + '점)</div>';
+        content += '</div>';
+
+        // 종합 의견 (읽기 모드)
+        content += '<div class="mt-6">';
+        content += '<h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>';
+        content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>' + (evaluation.overallComment.combined || evaluation.overallComment.conclusion || '') + '</textarea>';
+        content += '</div>';
+        content += '</div>';
+    }
+
+    if (isChair) {
+        // 심사위원장 평가 - 교수 화면과 동일한 UI (각 심사위원의 평가 + 종합 평가)
+        const template = {
+            name: '학위논문 심사 평가표',
+            submissionType: item.submissionType || '최종논문',
+            passingScore: 75,
+            categories: [
+                { id: 'cat1', name: '연구의 독창성', description: '연구 주제의 참신성과 기여도', weight: 25, maxScore: 10 },
+                { id: 'cat2', name: '연구방법의 타당성', description: '연구 방법론의 적절성과 신뢰성', weight: 25, maxScore: 10 },
+                { id: 'cat3', name: '결과의 명확성', description: '연구 결과의 명확성과 논리성', weight: 20, maxScore: 10 },
+                { id: 'cat4', name: '논리적 구성', description: '논문의 전체적인 논리적 구성', weight: 15, maxScore: 10 },
+                { id: 'cat5', name: '학술적 기여도', description: '학문 분야에 대한 기여 정도', weight: 15, maxScore: 10 }
+            ]
+        };
+
+        // 각 심사위원의 평가 표시
+        reviewers.forEach((reviewer, memberIndex) => {
+            if (reviewer.status !== '완료') return;
+
+            const evaluation = {
+                professorName: reviewer.name,
+                role: reviewer.role === '주심' ? 'chair' : 'member',
+                evaluationType: 'score',
+                submittedAt: item.submitDate || new Date().toISOString(),
+                totalScore: reviewer.score || 88,
+                scores: [
+                    { categoryId: 'cat1', score: 9, comment: '연구 주제가 참신하고 학술적 가치가 높습니다.' },
+                    { categoryId: 'cat2', score: 8.5, comment: '연구 방법론이 체계적이고 적절합니다.' },
+                    { categoryId: 'cat3', score: 9, comment: '연구 결과가 명확하게 제시되었습니다.' },
+                    { categoryId: 'cat4', score: 8.5, comment: '논문의 구성이 논리적입니다.' },
+                    { categoryId: 'cat5', score: 9, comment: '학문 분야에 유의미한 기여를 합니다.' }
+                ],
+                overallComment: reviewer.comment || '전반적으로 우수한 연구이며, 학위논문으로서의 요건을 충족합니다.'
+            };
+
+            // 교수 UI의 renderCommitteeMemberEvaluation과 동일한 구조
+            content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-blue-500">';
+            content += '<div class="flex items-center justify-between mb-4">';
+            content += '<div>';
+            content += '<h3 class="text-lg font-bold text-gray-800">' + evaluation.professorName + ' (' + (evaluation.role === 'chair' ? '심사위원장' : '심사위원') + ')</h3>';
+            content += '<p class="text-sm text-gray-600">' + template.name + '</p>';
+            content += '</div>';
+            content += '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">';
+            content += '제출 완료 (' + formatDateTime(evaluation.submittedAt) + ')';
+            content += '</span></div>';
+
+            content += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">';
+            content += '<p class="text-sm text-blue-800">';
+            content += '<strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요. ';
+            content += '가중치가 적용되어 최종 점수가 계산됩니다.';
+            content += '</p></div>';
+
+            content += '<div class="space-y-4">';
+            template.categories.forEach((category, index) => {
+                const scoreData = evaluation.scores.find(s => s.categoryId === category.id);
+                const currentScore = scoreData?.score || 0;
+                const currentComment = scoreData?.comment || '';
+
+                content += '<div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">';
+                content += '<div class="grid grid-cols-[1fr_80px] gap-4 mb-4">';
+                content += '<div>';
+                content += '<h4 class="font-bold text-gray-800 mb-1">' + (index + 1) + '. ' + category.name + '</h4>';
+                content += '<p class="text-sm text-gray-600">' + category.description + '</p>';
+                content += '</div>';
+                content += '<div class="text-right">';
+                content += '<div class="text-xs text-gray-500">가중치</div>';
+                content += '<div class="text-lg font-bold text-blue-600">' + category.weight + '%</div>';
+                content += '</div></div>';
+
+                content += '<div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">';
+                content += '<label class="text-sm font-medium text-gray-700">점수:</label>';
+                content += '<input type="number" class="w-full bg-gray-50" min="0" max="' + category.maxScore + '" step="0.5" value="' + currentScore + '" disabled>';
+                content += '<span class="text-sm text-gray-600">/ ' + category.maxScore + '점</span>';
+                content += '<span></span>';
+                content += '</div>';
+
+                content += '<div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">';
+                content += '<span></span>';
+                content += '<div class="text-sm text-gray-500">';
+                content += '→ 가중 점수: ';
+                content += '<span class="text-base font-bold text-blue-600">' + calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1) + '점</span>';
+                content += '<span class="text-xs text-gray-400">(' + category.weight + '% 적용)</span>';
+                content += '</div></div>';
+
+                content += '<div>';
+                content += '<label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>';
+                content += '<textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>' + currentComment + '</textarea>';
+                content += '</div>';
+
+                content += '</div>';
+            });
+            content += '</div>';
+
+            content += '<div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">';
+            content += '<div class="flex items-center justify-between">';
+            content += '<h4 class="text-lg font-bold text-gray-800">총점</h4>';
+            content += '<div class="text-3xl font-bold text-blue-600">' + evaluation.totalScore + '점</div>';
+            content += '</div>';
+            content += '<div class="text-sm text-gray-600 mt-1 text-right">100점 만점 (합격 기준: ' + template.passingScore + '점)</div>';
+            content += '</div>';
+
+            content += '<div class="mt-6">';
+            content += '<h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>';
+            content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="3" disabled>' + evaluation.overallComment + '</textarea>';
+            content += '</div>';
+
+            content += '</div>';
+        });
+
+        // 종합 평가 섹션 (교수 UI의 renderChairSummary와 동일)
+        const completedReviewers = reviewers.filter(r => r.score);
+        const avgScore = completedReviewers.length > 0 ? completedReviewers.reduce((sum, r) => sum + r.score, 0) / completedReviewers.length : 0;
+        const threshold = (item.submissionType || template.submissionType) === '최종논문' ? 80 : 75;
+        const systemDecision = avgScore >= threshold ? '합격' : '불합격';
+
+        content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6">';
+        content += '<h3 class="text-lg font-bold text-gray-800 mb-4">심사위원장 종합 평가</h3>';
+
+        content += '<div class="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">';
+        content += '<div class="grid grid-cols-3 gap-6 text-center">';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">평균 점수</div>';
+        content += '<div class="text-3xl font-bold text-blue-600">' + avgScore.toFixed(1) + '점</div>';
+        content += '</div>';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">합격 기준</div>';
+        content += '<div class="text-3xl font-bold text-gray-800">' + threshold + '점</div>';
+        content += '</div>';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">시스템 판정</div>';
+        content += '<div class="text-2xl font-bold ' + (systemDecision === '합격' ? 'text-green-600' : 'text-red-600') + '">' + systemDecision + '</div>';
+        content += '</div>';
+        content += '</div></div>';
+
+        content += '<div class="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-6">';
+        content += '<h4 class="font-bold text-gray-800 mb-3">최종 결정 (읽기 전용)</h4>';
+        content += '<div class="space-y-3">';
+        content += '<div class="flex items-center gap-3">';
+
+        const currentDecision = item.result || '승인';
+        const decisions = ['승인', '보류', '반려'];
+        decisions.forEach(decision => {
+            const isSelected = decision === currentDecision;
+            const borderColor = decision === '승인' ? 'border-green-400' : decision === '보류' ? 'border-yellow-400' : 'border-red-400';
+            content += '<label class="flex items-center gap-2 p-3 bg-white rounded-lg flex-1 border-2 ' + (isSelected ? borderColor : 'border-gray-300') + '">';
+            content += '<input type="radio" name="chairDecision" value="' + decision + '" ' + (isSelected ? 'checked' : '') + ' disabled class="w-4 h-4">';
+            content += '<span class="font-medium">' + decision + '</span>';
+            content += '</label>';
+        });
+
+        content += '</div>';
+        content += '<div>';
+        content += '<label class="text-sm font-medium text-gray-700 mb-1 block">결정 사유:</label>';
+        content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>전반적으로 연구의 질이 우수하며 학위 논문으로서의 요건을 충족합니다. 승인합니다.</textarea>';
+        content += '</div>';
+        content += '</div></div>';
+
+        content += '</div>';
+    }
+
+    content += '<div class="bg-yellow-50 border border-yellow-200 rounded p-3"><div class="flex items-start">';
+    content += '<svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>';
+    content += '<div class="flex-1"><p class="text-sm font-medium text-yellow-800">읽기 전용 모드</p>';
+    content += '<p class="text-xs text-yellow-700 mt-1">이 화면은 교수의 평가 내용을 조회하기 위한 읽기 전용 화면입니다. 수정이 필요한 경우 교수 계정으로 로그인하여 진행해주세요.</p></div></div></div></div>';
+
+    console.log('About to call openModal with title:', modalTitle);
+    console.log('openModal function exists:', typeof openModal);
+    console.log('closeModal function exists:', typeof closeModal);
+
+    openModal(modalTitle, content, '닫기', () => { closeModal(); }, true);
+
+    console.log('openModal called successfully');
+}
+
+window.viewThesisReviewDetail = viewThesisReviewDetail;
+console.log('✅ 학위논문 심사 상세 보기 기능 로드 완료');

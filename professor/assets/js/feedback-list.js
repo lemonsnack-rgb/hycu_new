@@ -17,7 +17,7 @@ function renderFeedbackList() {
     const filters = getCurrentFeedbackFilters();
     const filteredRequests = filterFeedbackRequests(requests, filters);
     
-    // ID 38: 테이블 컬럼 순서 변경
+    // ID 38: 테이블 컬럼 순서 변경 (제출일 추가)
     contentArea.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
@@ -31,32 +31,52 @@ function renderFeedbackList() {
                         ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
                     </div>
                 </div>
-                
+
                 <!-- 검색 영역 (표준화) -->
                 <div class="search-container">
                     <div class="search-grid">
-                        <select id="feedback-filter-graduate" class="search-select" onchange="searchFeedback()">
-                            <option value="">대학원 전체</option>
-                            <option value="일반대학원">일반대학원</option>
-                            <option value="교육대학원">교육대학원</option>
-                            <option value="산업대학원">산업대학원</option>
-                        </select>
-                        <select id="feedback-filter-program" class="search-select" onchange="searchFeedback()">
-                            <option value="">과정 전체</option>
-                            <option value="석사">석사</option>
-                            <option value="박사">박사</option>
-                        </select>
-                        <select id="feedback-filter-status" class="search-select" onchange="searchFeedback()">
-                            <option value="">상태 전체</option>
-                            <option value="대기">대기</option>
-                            <option value="진행중">진행중</option>
-                            <option value="완료">완료</option>
-                        </select>
-                        <input type="text" 
-                               id="feedback-filter-keyword" 
-                               placeholder="학번/성명/논문명 검색"
-                               class="search-input"
-                               onkeypress="if(event.key==='Enter') searchFeedback()">
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                대학원
+                            </label>
+                            <select id="feedback-filter-graduate" class="search-select" onchange="searchFeedback()">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="교육대학원">교육대학원</option>
+                                <option value="산업대학원">산업대학원</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학위과정
+                            </label>
+                            <select id="feedback-filter-program" class="search-select" onchange="searchFeedback()">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                상태
+                            </label>
+                            <select id="feedback-filter-status" class="search-select" onchange="searchFeedback()">
+                                <option value="">전체</option>
+                                <option value="대기">대기</option>
+                                <option value="진행중">진행중</option>
+                                <option value="완료">완료</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                키워드
+                            </label>
+                            <input type="text"
+                                   id="feedback-filter-keyword"
+                                   placeholder="학번/성명/논문명 검색"
+                                   class="search-input"
+                                   onkeypress="if(event.key==='Enter') searchFeedback()">
+                        </div>
                     </div>
                     <div class="search-buttons">
                         <button onclick="searchFeedback()" class="search-btn search-btn-primary">
@@ -68,7 +88,7 @@ function renderFeedbackList() {
                     </div>
                 </div>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b">
@@ -82,13 +102,14 @@ function renderFeedbackList() {
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">피드백상태</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제출일</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">관리</th>
                         </tr>
                     </thead>
                     <tbody id="feedback-list-body">
-                        ${filteredRequests.length > 0 
+                        ${filteredRequests.length > 0
                             ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                            : '<tr><td colspan="10" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                            : '<tr><td colspan="11" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
                         }
                     </tbody>
                 </table>
@@ -107,7 +128,7 @@ function renderFeedbackRow(request, idx) {
     // 완료: 명시적으로 완료 버튼 클릭
     const commentCount = request.commentCount || 0;
     let feedbackStatus, statusClass;
-    
+
     if (request.isCompleted) {
         feedbackStatus = '완료';
         statusClass = 'bg-green-100 text-green-700';
@@ -118,9 +139,9 @@ function renderFeedbackRow(request, idx) {
         feedbackStatus = '대기';
         statusClass = 'bg-gray-100 text-gray-700';
     }
-    
+
     return `
-        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors" 
+        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors"
             data-feedback-id="${request.id}">
             <td class="py-3 px-4 text-gray-800">${idx}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.graduate || '일반대학원'}</td>
@@ -137,8 +158,9 @@ function renderFeedbackRow(request, idx) {
                     ${feedbackStatus}
                 </span>
             </td>
+            <td class="py-3 px-4 text-gray-600 text-sm">${request.uploadDate || '-'}</td>
             <td class="py-3 px-4">
-                <button onclick="openFeedbackViewer('${request.id}'); event.stopPropagation();" 
+                <button onclick="openFeedbackViewer('${request.id}'); event.stopPropagation();"
                         class="text-[#6A0028] hover:underline text-sm">
                     상세보기
                 </button>
@@ -158,9 +180,9 @@ function renderPlagiarismScore(copyScore, gptScore) {
     return `
         <div class="text-xs">
             <div>
-                <span class="${copyColor} font-semibold">카피킬러: ${copyScore}</span>
+                <span class="${copyColor} font-semibold">CopyKiller: ${copyScore}</span>
                 <span class="text-gray-400 mx-1">/</span>
-                <span class="${gptColor} font-semibold">GPT킬러: ${gptScore}</span>
+                <span class="${gptColor} font-semibold">GPT Killer: ${gptScore}</span>
             </div>
             <a href="#" onclick="showPlagiarismReport('통합', event)" class="text-blue-600 hover:underline text-xs">
                 결과보고서 보기 <i class="fas fa-external-link-alt"></i>
@@ -184,7 +206,7 @@ function getGptScoreColor(score) {
 // ==================== 표절 리포트 보기 ====================
 function showPlagiarismReport(type, event) {
     event.preventDefault();
-    const reportType = type === 'copykiller' ? '카피킬러' : 'GPT킬러';
+    const reportType = type === 'copykiller' ? 'CopyKiller' : 'GPT Killer';
     alert(`${reportType} 리포트 보기 기능 (구현 예정)\n\n실제 구현 시:\n- 새 창으로 리포트 페이지 열기\n- 또는 모달로 리포트 표시`);
 }
 

@@ -4,50 +4,51 @@ let currentAssignmentId = null;
 let currentEvaluationData = null;
 
 // ==================== 심사 상세 렌더링 ====================
-function renderReviewDetail(assignmentId) {
+function renderReviewDetail(assignmentId, viewType) {
     currentAssignmentId = assignmentId;
     const detail = ReviewService.getReviewDetail(assignmentId);
-    
+
     if (!detail) {
         showToast('심사 정보를 찾을 수 없습니다', 'error');
         return;
     }
-    
+
     const container = document.getElementById('review-detail-content');
     if (!container) return;
-    
-    const isChair = detail.myRole === 'chair';
+
+    // viewType이 지정되면 해당 역할로, 아니면 내 역할 사용
+    const isChair = viewType ? (viewType === 'chair') : (detail.myRole === 'chair');
     const myEval = detail.myEvaluation;
     const isSubmitted = myEval && myEval.status === '제출완료';
     const allSubmitted = detail.allEvaluations.length === detail.assignment.committee.length &&
                          detail.allEvaluations.every(e => e.status === '제출완료');
-    
+
     let html = '';
-    
+
     // 논문 정보
     html += renderThesisInfo(detail.assignment);
-    
+
     // 심사위원 평가 (내 평가)
     if (!isSubmitted) {
-        html += renderEvaluationForm(detail.template, myEval);
+        html += renderEvaluationForm(detail.template, myEval, isChair);
     } else {
-        html += renderSubmittedEvaluation(detail.template, myEval);
+        html += renderSubmittedEvaluation(detail.template, myEval, isChair);
     }
-    
+
     // 심사위원장 전용: 종합 평가
     if (isChair && allSubmitted) {
         html += renderChairSummary(detail);
     }
-    
+
     container.innerHTML = html;
-    
+
     // 이벤트 바인딩
     bindEvaluationEvents(detail, isSubmitted, isChair, allSubmitted);
 }
 
 // ==================== 논문 정보 (관리자 페이지 스타일) ====================
 function renderThesisInfo(assignment) {
-    // 카피킬러/GPT킬러 점수 (더미 데이터 - 실제로는 assignment에 포함)
+    // CopyKiller/GPT Killer 점수 (더미 데이터 - 실제로는 assignment에 포함)
     const copyKiller = assignment.copyKiller || Math.floor(Math.random() * 15) + 3;
     const gptKiller = assignment.gptKiller || Math.floor(Math.random() * 15) + 2;
 
@@ -109,11 +110,7 @@ function renderThesisInfo(assignment) {
                     ${(assignment.submissionType === '중간논문' || assignment.submissionType === '최종논문') ? `
                     <div class="info-row">
                         <div class="info-label">표절/AI 검사</div>
-                        <div class="info-value">
-                            <span class="${copyKiller <= 10 ? 'text-green-600' : copyKiller <= 20 ? 'text-yellow-600' : 'text-red-600'} font-semibold">
-                                카피킬러: ${copyKiller}% / GPT킬러: ${gptKiller}%
-                            </span>
-                        </div>
+                        <div class="info-value">CopyKiller: ${copyKiller}% / GPT Killer: ${gptKiller}%</div>
                     </div>
                     ` : ''}
                 </div>

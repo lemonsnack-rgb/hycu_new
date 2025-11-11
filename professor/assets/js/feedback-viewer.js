@@ -112,10 +112,10 @@ function createFeedbackModal(request, feedbackData) {
                     <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
                         v${feedbackData ? feedbackData.version : 1}
                     </span>
-                    <!-- ID 47: 카피킬러/GPT킬러 결과보고서 링크 -->
+                    <!-- ID 47: CopyKiller/GPT Killer 결과보고서 링크 -->
                     <div class="text-sm text-gray-600">
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            카피킬러: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT킬러: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-blue-600 hover:underline text-xs">결과보고서(통합)</a>
+                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-blue-600 hover:underline text-xs">결과보고서(통합)</a>
                         </a>
                     </div>
                 </div>
@@ -330,6 +330,27 @@ function closeFeedbackModal() {
     if (modal) {
         modal.remove();
     }
+
+    // PDF 뷰어 관련 정리 (cleanup)
+    // 1. 버전 목록(submission-history) 제거
+    const submissionHistory = document.getElementById('submission-history');
+    if (submissionHistory) {
+        submissionHistory.remove();
+    }
+
+    // 2. 전역 변수 정리
+    if (window._currentVersionLabel) {
+        window._currentVersionLabel = null;
+    }
+    if (window._currentFeedbackCtx) {
+        window._currentFeedbackCtx = null;
+    }
+
+    // 3. QuickMark 팝오버 제거
+    const quickmarkPopover = document.getElementById('quickmark-popover');
+    if (quickmarkPopover) {
+        quickmarkPopover.remove();
+    }
 }
 
 // ==================== 자주 쓰는 코멘트 팝오버 추가 ====================
@@ -415,7 +436,7 @@ function downloadPlagiarismReport(type, requestId) {
         : `/api/reports/gptkiller/${requestId}.pdf`;
     
     // 실제 구현 시 다운로드 처리
-    alert(`${type === 'copykiller' ? '카피킬러' : 'GPT킬러'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
+    alert(`${type === 'copykiller' ? 'CopyKiller' : 'GPT Killer'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
     console.log(`다운로드 URL: ${reportUrl}`);
 }
 
@@ -723,7 +744,7 @@ function downloadPlagiarismReport(type, requestId){
     return;
   }
   const reportUrl = type === 'copykiller' ? `/api/reports/copykiller/${requestId}.pdf` : `/api/reports/gptkiller/${requestId}.pdf`;
-  alert(`${type==='copykiller'?'카피킬러':'GPT킬러'} 결과보고서 다운로드\n(샘플)`);
+  alert(`${type==='copykiller'?'CopyKiller':'GPT Killer'} 결과보고서 다운로드\n(샘플)`);
 }
 
 // helper
@@ -732,6 +753,12 @@ function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<'
 // version switch
 window._pdfVersions = { v3: null, v2: null, v1: null };
 function switchPdfVersion(ver){
+  // PDF 뷰어가 열려있지 않으면 실행하지 않음
+  if (!document.getElementById('feedback-modal')) {
+    console.warn('PDF 뷰어가 닫혀있습니다. 버전 전환을 중단합니다.');
+    return;
+  }
+
   if (window._currentVersionLabel) window._currentVersionLabel(ver);
   document.querySelectorAll('.ver-pill').forEach(b=> b.classList.toggle('active', b.dataset.ver===ver));
   // Reuse same fileUrl for demo; 실제 구현 시 버전별 파일 경로를 바인딩

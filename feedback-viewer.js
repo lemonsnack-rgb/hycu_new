@@ -97,10 +97,10 @@ function createFeedbackModal(request, feedbackData) {
                     <span class="text-xs px-2 py-1 rounded-full bg-blue-100 text-blue-700 font-semibold">
                         v${feedbackData ? feedbackData.version : '1'}
                     </span>
-                    <!-- Task 1-1: 카피킬러/GPT킬러 결과보고서 링크 -->
+                    <!-- Task 1-1: CopyKiller/GPT Killer 결과보고서 링크 -->
                     <div class="text-sm text-gray-600">
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            카피킬러: ${request.copykillerScore}
+                            CopyKiller: ${request.copykillerScore}
                         </span>
                         <a href="#" onclick="downloadPlagiarismReport('copykiller', '${request.id}'); event.preventDefault();" 
                            class="ml-1 text-blue-600 hover:underline text-xs">
@@ -108,7 +108,7 @@ function createFeedbackModal(request, feedbackData) {
                         </a>
                         <span class="text-gray-400 mx-1">/</span>
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            GPT킬러: ${request.gptkillerScore}
+                            GPT Killer: ${request.gptkillerScore}
                         </span>
                         <a href="#" onclick="downloadPlagiarismReport('gptkiller', '${request.id}'); event.preventDefault();" 
                            class="ml-1 text-blue-600 hover:underline text-xs">
@@ -598,7 +598,7 @@ function downloadPlagiarismReport(type, requestId) {
         : `/api/reports/gptkiller/${requestId}.pdf`;
     
     // 실제 구현 시 다운로드 처리
-    alert(`${type === 'copykiller' ? '카피킬러' : 'GPT킬러'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
+    alert(`${type === 'copykiller' ? 'CopyKiller' : 'GPT Killer'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
     console.log(`다운로드 URL: ${reportUrl}`);
 }
 

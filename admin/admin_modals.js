@@ -196,7 +196,7 @@ function viewSubmissionDetail(id, type) {
                         <div class="text-2xl font-bold text-gray-800">
                             <span class="${item.copyKiller <= 10 ? 'text-green-600' : item.copyKiller <= 20 ? 'text-yellow-600' : 'text-red-600'}">CopyKiller ${item.copyKiller}%</span>
                             <span class="text-gray-400 mx-3">/</span>
-                            <span class="${item.gptKiller <= 10 ? 'text-green-600' : item.gptKiller <= 20 ? 'text-yellow-600' : 'text-red-600'}">GPT킬러 ${item.gptKiller}%</span>
+                            <span class="${item.gptKiller <= 10 ? 'text-green-600' : item.gptKiller <= 20 ? 'text-yellow-600' : 'text-red-600'}">GPT Killer ${item.gptKiller}%</span>
                         </div>
                     </div>
                     <div class="mt-4">
@@ -756,14 +756,111 @@ function editGuidanceRecord(recordId) {
 
 // ========== PDF 피드백 관련 함수 (뷰어는 별도 구현) ==========
 
-function viewPdfFeedback(id) {
+// Task 1-5 ID 25: PDF 뷰어 (관리자는 읽기 전용)
+function viewPdfFeedback(id, readOnly = false) {
     const item = appData.guidanceProgress.find(doc => doc.id === id);
     if (!item) {
         showAlert('문서를 찾을 수 없습니다.');
         return;
     }
-    
-    showAlert(`PDF 뷰어 오픈: ${item.fileName}\n\n※ PDF 뷰어는 별도로 구현됩니다.`);
+
+    // ID 25: 관리자는 읽기 전용으로 교수용 PDF 뷰어 호출
+    const mode = readOnly ? '읽기 전용 (관리자)' : '편집 가능 (교수)';
+    const modeClass = readOnly ? 'bg-blue-600' : 'bg-[#6A0028]';
+    const readOnlyBadge = readOnly ? '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">읽기 전용</span>' : '';
+
+    // 피드백 상태값 변환
+    let statusText = item.feedbackStatus || '대기';
+    if (statusText === '답변 대기중') statusText = '대기';
+    if (statusText === '피드백 완료') statusText = '완료';
+
+    const statusClass =
+        statusText === '대기' ? 'bg-yellow-100 text-yellow-700' :
+        statusText === '진행 중' ? 'bg-blue-100 text-blue-700' :
+        'bg-green-100 text-green-700';
+
+    // 교수용 PDF 뷰어를 읽기 전용 모드로 표시
+    const pdfViewerHtml = `
+        <div id="pdf-viewer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]"
+             onclick="if(event.target.id==='pdf-viewer-modal') closePdfViewer()">
+            <div class="bg-white rounded-lg shadow-xl w-full h-full mx-4 my-4 flex flex-col"
+                 onclick="event.stopPropagation()">
+
+                <!-- 헤더 -->
+                <div class="${modeClass} text-white px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold flex items-center">
+                            PDF 뷰어 - ${item.documentTitle}
+                            ${readOnlyBadge}
+                        </h3>
+                        <div class="text-sm text-white text-opacity-90 mt-1">
+                            ${item.fileName} | 학생: ${item.studentName} (${item.studentId})
+                        </div>
+                    </div>
+                    <button onclick="closePdfViewer()"
+                            class="text-white hover:text-gray-200 text-2xl leading-none">
+                        ×
+                    </button>
+                </div>
+
+                ${readOnly ? `
+                <!-- 읽기 전용 안내 -->
+                <div class="px-6 py-3 bg-blue-50 border-b border-blue-200">
+                    <div class="flex items-center text-sm text-blue-800">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-medium">관리자 모드:</span>
+                        <span class="ml-1">교수의 첨삭 내역만 조회할 수 있습니다. 편집 및 댓글 기능은 비활성화됩니다.</span>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- PDF 뷰어 영역 -->
+                <div class="flex-1 overflow-hidden p-4 bg-gray-100">
+                    <div class="h-full bg-white rounded shadow-lg flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="text-gray-600 text-lg mb-2">PDF 뷰어 영역</p>
+                            <p class="text-sm text-gray-500">파일: ${item.fileName}</p>
+                            <p class="text-xs text-gray-400 mt-4">
+                                ${readOnly ? '교수의 첨삭 내역이 표시됩니다 (읽기 전용)' : '첨삭 및 피드백 작성이 가능합니다'}
+                            </p>
+                            <div class="mt-6 inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                실제 PDF 렌더링은 별도 라이브러리로 구현 예정
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 푸터 -->
+                <div class="border-t px-6 py-4 bg-gray-50 flex justify-between items-center">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">상태:</span>
+                        <span class="ml-2 px-2 py-1 rounded text-xs font-medium ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <button onclick="closePdfViewer()"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', pdfViewerHtml);
+}
+
+function closePdfViewer() {
+    const modal = document.getElementById('pdf-viewer-modal');
+    if (modal) modal.remove();
 }
 
 function writeFeedback(id) {
@@ -2566,3 +2663,176 @@ function toggleEvaluationSelect() {
     }
 }
 
+
+// ========== 심사위원별 평가 조회 (관리자용) ==========
+function viewCommitteeEvaluations(submissionId) {
+    // 해당 제출물의 심사 배정 및 평가 정보 가져오기
+    const assignment = getReviewAssignmentBySubmissionId(submissionId);
+    
+    if (!assignment) {
+        showAlert('심사 배정 정보를 찾을 수 없습니다.');
+        return;
+    }
+    
+    // 모달 타이틀
+    const title = `심사 상세 조회 - ` + assignment.studentName + ` (` + assignment.thesisTitle + `)`;
+    
+    // 논문 정보 섹션
+    let content = `
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h4 class="font-bold text-gray-800 mb-3">논문 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-600">대학원:</span> <span class="font-medium">` + (assignment.graduate || '일반대학원') + `</span></div>
+                <div><span class="text-gray-600">전공/학과:</span> <span class="font-medium">` + assignment.major + `</span></div>
+                <div><span class="text-gray-600">학위과정:</span> <span class="font-medium">` + assignment.degree + `</span></div>
+                <div><span class="text-gray-600">학번:</span> <span class="font-medium">` + assignment.studentId + `</span></div>
+                <div><span class="text-gray-600">학생명:</span> <span class="font-medium">` + assignment.studentName + `</span></div>
+                <div><span class="text-gray-600">지도교수:</span> <span class="font-medium">` + assignment.advisor + `</span></div>
+            </div>
+            <div class="mt-3">
+                <div><span class="text-gray-600">논문제목:</span> <span class="font-medium">` + (assignment.thesisTitle || '미정') + `</span></div>
+            </div>
+        </div>
+    `;
+    
+    // 심사위원회 정보
+    if (assignment.committee && assignment.committee.length > 0) {
+        content += `
+            <div class="mb-6">
+                <h4 class="font-bold text-gray-800 mb-3">심사위원회</h4>
+                <div class="space-y-2">
+        `;
+        
+        assignment.committee.forEach(member => {
+            const evaluation = getEvaluationByCommitteeMemberId(member.id);
+            const statusBadge = evaluation && evaluation.status === '제출완료' 
+                ? '<span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">평가 완료</span>'
+                : '<span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded">평가 대기</span>';
+            
+            const evalButton = (evaluation && evaluation.status === '제출완료') 
+                ? `<button onclick="viewSingleEvaluation('` + member.id + `')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm">평가 보기</button>`
+                : '';
+            
+            content += `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                    <div>
+                        <div class="font-medium">` + member.professorName + `</div>
+                        <div class="text-sm text-gray-600">` + member.department + ` / ` + (member.role === 'chair' ? '심사위원장' : '심사위원') + `</div>
+                    </div>
+                    <div class="text-right">
+                        ` + statusBadge + `
+                        ` + evalButton + `
+                    </div>
+                </div>
+            `;
+        });
+        
+        content += `
+                </div>
+            </div>
+        `;
+    }
+    
+    // 평가 결과 요약 (모든 심사위원이 평가를 완료한 경우)
+    const allEvaluations = assignment.committee
+        .map(member => getEvaluationByCommitteeMemberId(member.id))
+        .filter(eval => eval && eval.status === '제출완료');
+    
+    if (allEvaluations.length > 0 && allEvaluations.length === assignment.committee.length) {
+        const avgScore = allEvaluations.reduce((sum, e) => sum + (e.totalScore || 0), 0) / allEvaluations.length;
+        const threshold = 75; // 합격 기준 점수
+        const passed = avgScore >= threshold;
+        
+        content += `
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 class="font-bold text-gray-800 mb-3">평가 결과 요약</h4>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-sm text-gray-600">평균 점수</div>
+                        <div class="text-2xl font-bold text-blue-600">` + avgScore.toFixed(1) + `점</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">합격 기준</div>
+                        <div class="text-2xl font-bold text-gray-800">` + threshold + `점</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">판정</div>
+                        <div class="text-2xl font-bold ` + (passed ? 'text-green-600' : 'text-red-600') + `">
+                            ` + (passed ? '합격' : '불합격') + `
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    openModal(title, content, '닫기', () => closeModal(), true);
+}
+
+// 심사 배정 정보 가져오기 (제출물 ID로)
+function getReviewAssignmentBySubmissionId(submissionId) {
+    // admin_data.js의 데이터에서 찾기
+    // 여기서는 더미 데이터 반환 (실제로는 appData에서 찾아야 함)
+    return {
+        id: submissionId,
+        studentId: '2024001',
+        studentName: '김철수',
+        studentNumber: '2024001',
+        major: '컴퓨터공학과',
+        degree: '석사',
+        graduate: '일반대학원',
+        advisor: '박교수',
+        thesisTitle: '딥러닝 기반 자연어 처리 모델의 성능 개선 연구',
+        committee: [
+            {
+                id: 'C001',
+                professorName: '이교수',
+                department: '컴퓨터공학과',
+                role: 'chair'
+            },
+            {
+                id: 'C002',
+                professorName: '김교수',
+                department: '인공지능학과',
+                role: 'member'
+            },
+            {
+                id: 'C003',
+                professorName: '정교수',
+                department: '소프트웨어학과',
+                role: 'member'
+            }
+        ]
+    };
+}
+
+// 심사위원의 평가 정보 가져오기
+function getEvaluationByCommitteeMemberId(committeeMemberId) {
+    // 더미 데이터 반환 (실제로는 appData에서 찾아야 함)
+    if (committeeMemberId === 'C001' || committeeMemberId === 'C002') {
+        return {
+            id: 'EVAL_' + committeeMemberId,
+            committeeId: committeeMemberId,
+            status: '제출완료',
+            totalScore: 85.5,
+            submittedAt: '2025-11-15 14:30:00'
+        };
+    }
+    return null;
+}
+
+// 개별 심사위원의 평가 상세 보기
+function viewSingleEvaluation(committeeMemberId) {
+    const evaluation = getEvaluationByCommitteeMemberId(committeeMemberId);
+    if (!evaluation) {
+        showAlert('평가 정보를 찾을 수 없습니다.');
+        return;
+    }
+    
+    // 여기서는 간단한 알림만 표시 (실제로는 상세 평가 모달을 표시)
+    showAlert('개별 평가 상세 화면은 구현 예정입니다.');
+}
+
+// Export PDF viewer functions
+window.viewPdfFeedback = viewPdfFeedback;
+window.closePdfViewer = closePdfViewer;

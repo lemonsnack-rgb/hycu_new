@@ -238,14 +238,22 @@ const appData = {
             }
         ],
         thesisPlan: [
-            { 
-                id: 1, 
-                studentName: '박민수', 
-                studentId: '2023005', 
-                major: '교육공학', 
-                degree: '석사', 
-                advisor: '홍길동', 
+            {
+                id: 1,
+                studentName: '박민수',
+                studentId: '2023005',
+                major: '교육공학',
+                degree: '석사',
+                advisor: '홍길동',
+                phone: '010-1234-5678',
+                email: 'minsu.park@example.com',
+                semesterCount: '2',
+                studentStatus: '재학',
+                year: '2025',
+                semester: '1',
+                graduate: '일반대학원',
                 submitDate: '2025-04-05',
+                evalDate: '2025-04-12',
                 thesisTitle: '메타버스 기반 협력학습이 문제해결력에 미치는 영향',
                 chapter1: '연구의 필요성 및 목적',
                 chapter2: '이론적 배경 (메타버스 교육, 협력학습, 문제해결력)',
@@ -253,61 +261,79 @@ const appData = {
                 chapter4: '연구 결과 예상',
                 chapter5: '결론 및 제언',
                 schedule: '1학기: 1-2장 작성, 여름방학: 3장 작성 및 데이터 수집, 2학기: 4-5장 작성',
-                status: '검토중', 
+                status: '검토중',
+                result: '승인',
                 fileUrl: '#',
                 fileName: '2023005_박민수_논문작성계획서.pdf'
             }
         ],
         midThesis: [
-            { 
-                id: 1, 
-                studentName: '최지연', 
-                studentId: '2023010', 
-                major: '경영학', 
-                degree: '석사', 
-                advisor: '박교수', 
+            {
+                id: 1,
+                studentName: '최지연',
+                studentId: '2023010',
+                major: '경영학',
+                degree: '석사',
+                advisor: '박교수',
+                phone: '010-2345-6789',
+                email: 'jiyeon.choi@example.com',
+                semesterCount: '3',
+                studentStatus: '재학',
+                year: '2025',
+                semester: '1',
+                graduate: '일반대학원',
                 submitDate: '2025-05-15',
+                evalDate: '2025-05-22',
                 thesisTitle: '소셜미디어 마케팅이 브랜드 충성도에 미치는 영향',
                 totalPages: 85,
-                copyKiller: 92,
+                copyKiller: 8,
+                gptKiller: 12,
                 copyKillerDetail: '전체 유사도 8%, 인용 처리 적절',
-                gptKiller: 88,
                 gptKillerDetail: 'AI 생성 의심 구간 12%, 추가 검토 필요',
-                status: '심사중', 
+                status: '심사중',
+                result: '대기',
                 fileUrl: '#',
                 fileName: '2023010_최지연_중간논문.pdf',
                 reviewers: [
-                    { name: '박교수', role: '지도교수', status: '검토중' },
-                    { name: '김교수', role: '심사위원', status: '대기' },
-                    { name: '이교수', role: '심사위원', status: '대기' }
+                    { name: '박교수', role: '주심', status: '완료', score: 88, comment: '연구 설계가 잘 되어 있습니다.' },
+                    { name: '김교수', role: '부심', status: '완료', score: 85, comment: '이론적 배경이 충실합니다.' },
+                    { name: '이교수', role: '부심', status: '대기' }
                 ]
             }
         ],
         finalThesis: [
-            { 
-                id: 1, 
-                studentName: '정태훈', 
-                studentId: '2022008', 
-                major: '교육공학', 
-                degree: '박사', 
-                advisor: '홍길동', 
+            {
+                id: 1,
+                studentName: '정태훈',
+                studentId: '2022008',
+                major: '교육공학',
+                degree: '박사',
+                advisor: '홍길동',
+                phone: '010-3456-7890',
+                email: 'taehoon.jung@example.com',
+                semesterCount: '4',
+                studentStatus: '재학',
+                year: '2025',
+                semester: '1',
+                graduate: '일반대학원',
                 submitDate: '2025-06-10',
+                evalDate: '2025-06-20',
                 thesisTitle: '학습분석학을 활용한 적응형 학습 시스템 설계 및 효과성 검증',
                 totalPages: 248,
-                copyKiller: 95,
+                copyKiller: 5,
+                gptKiller: 0,
                 copyKillerDetail: '전체 유사도 5%, 모든 인용 적절',
-                gptKiller: 90,
                 gptKillerDetail: 'AI 생성 의심 구간 없음',
                 status: '심사완료',
-                result: '합격',
+                result: '승인',
                 finalScore: 92,
                 defenseDate: '2025-06-20',
                 fileUrl: '#',
                 fileName: '2022008_정태훈_최종논문.pdf',
                 reviewers: [
-                    { name: '홍길동', role: '지도교수', score: 94, comment: '학문적 기여도가 높은 우수한 연구입니다.' },
-                    { name: '최교수', role: '심사위원', score: 91, comment: '연구 방법론이 탁월합니다.' },
-                    { name: '강교수', role: '심사위원', score: 90, comment: '실용적 시사점이 명확합니다.' }
+                    { name: '홍길동', role: '주심', status: '완료', score: 94, comment: '학문적 기여도가 높은 우수한 연구입니다.' },
+                    { name: '최교수', role: '부심', status: '완료', score: 91, comment: '연구 방법론이 탁월합니다.' },
+                    { name: '강교수', role: '부심', status: '완료', score: 90, comment: '실용적 시사점이 명확합니다.' }
                 ]
             }
         ],
@@ -571,6 +597,27 @@ const appData = {
             itemCount: 5,
             totalScore: 100,
             createdDate: '2025-01-10',
+            passingCriteria: {
+                type: 'complex',
+                description: "평균 70점 이상, 최저 60점 이상",
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: "각 항목 최소 60점"
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: "전체 평균 70점 이상"
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        description: "총점 70점 이상"
+                    }
+                ]
+            },
             items: [
                 {
                     id: 1,
@@ -611,6 +658,27 @@ const appData = {
             itemCount: 6,
             totalScore: 100,
             createdDate: '2025-01-15',
+            passingCriteria: {
+                type: 'complex',
+                description: "평균 70점 이상, 최저 60점 이상",
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: "각 항목 최소 60점"
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: "전체 평균 70점 이상"
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        description: "총점 70점 이상"
+                    }
+                ]
+            },
             items: [
                 {
                     id: 1,
@@ -657,6 +725,27 @@ const appData = {
             itemCount: 10,
             totalScore: 100,
             createdDate: '2025-01-20',
+            passingCriteria: {
+                type: 'complex',
+                description: "평균 70점 이상, 최저 60점 이상",
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: "각 항목 최소 60점"
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: "전체 평균 70점 이상"
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        description: "총점 70점 이상"
+                    }
+                ]
+            },
             items: [
                 {
                     id: 1,
