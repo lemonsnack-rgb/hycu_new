@@ -2278,6 +2278,7 @@ console.log('✅ 관리자 - 통계 대시보드 기능 로드 완료');
 
 function viewThesisReviewDetail(itemId, viewType, thesisType) {
     console.log('viewThesisReviewDetail called:', { itemId, viewType, thesisType });
+    console.log('itemId type:', typeof itemId, 'value:', itemId);
 
     const dataSource = thesisType === 'plan' ? appData.submissions.thesisPlan :
                        thesisType === 'mid' ? appData.submissions.midThesis :
@@ -2285,13 +2286,21 @@ function viewThesisReviewDetail(itemId, viewType, thesisType) {
 
     console.log('dataSource length:', dataSource ? dataSource.length : 'null');
 
-    const item = dataSource.find(d => d.id === itemId);
+    if (dataSource && dataSource.length > 0) {
+        console.log('First item in dataSource:', dataSource[0]);
+        console.log('First item id type:', typeof dataSource[0].id, 'value:', dataSource[0].id);
+        console.log('All IDs in dataSource:', dataSource.map(d => ({ id: d.id, type: typeof d.id })));
+    }
+
+    // ID 비교 시 타입을 동일하게 맞춤 (문자열로 통일)
+    const item = dataSource.find(d => String(d.id) === String(itemId));
 
     console.log('item found:', item ? 'yes' : 'no');
 
     if (!item) {
         console.error('Item not found for id:', itemId);
-        alert('심사 정보를 찾을 수 없습니다.');
+        console.error('Available items:', dataSource.map(d => ({ id: d.id, studentName: d.studentName, thesisTitle: d.thesisTitle })));
+        alert('심사 정보를 찾을 수 없습니다.\n\n사용 가능한 ID: ' + dataSource.map(d => d.id).join(', '));
         return;
     }
 
