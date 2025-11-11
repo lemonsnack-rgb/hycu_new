@@ -40,9 +40,11 @@ function showScreen(screenId) {
                 initReviewList();
             }
         } else if (screenId === 'board') {
-            // 게시판 초기화 (ID 32)
-            if (typeof initBoard === 'function') {
-                initBoard('professor');
+            // 게시판 초기화 (Enhanced Version)
+            if (typeof initBoardEnhanced === 'function') {
+                // 현재 로그인한 교수 정보 (실제로는 세션에서 가져옴)
+                const currentProf = DataService.getCurrentProfessor();
+                initBoardEnhanced(currentProf.id, 'professor', currentProf.name);
             }
         } else if (screenId === 'journal-review') {
             // 학술지 심사 초기화 (ID 54-56)

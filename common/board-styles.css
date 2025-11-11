@@ -1,0 +1,511 @@
+/**
+ * 자료실 게시판 스타일
+ */
+
+/* ========================================
+   Quill Editor 커스터마이징
+   ======================================== */
+.ql-container {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+}
+
+.ql-editor {
+    min-height: 300px;
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.ql-editor.ql-blank::before {
+    color: #9ca3af;
+    font-style: normal;
+}
+
+/* ========================================
+   게시판 테이블
+   ======================================== */
+.board-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.board-table thead th {
+    background-color: #f9fafb;
+    padding: 12px 16px;
+    text-align: left;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #6b7280;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.board-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+}
+
+.board-table tbody tr:hover {
+    background-color: #f9fafb;
+}
+
+.board-table tbody td {
+    padding: 12px 16px;
+    font-size: 0.875rem;
+}
+
+/* ========================================
+   게시글 상세보기
+   ======================================== */
+.post-content {
+    line-height: 1.8;
+    color: #374151;
+}
+
+.post-content h1 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.post-content h2 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-top: 1.25rem;
+    margin-bottom: 0.75rem;
+}
+
+.post-content h3 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-top: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.post-content p {
+    margin-bottom: 1rem;
+}
+
+.post-content ul,
+.post-content ol {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.post-content li {
+    margin-bottom: 0.5rem;
+}
+
+.post-content a {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+.post-content a:hover {
+    color: #2563eb;
+}
+
+.post-content img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 1rem 0;
+}
+
+.post-content blockquote {
+    border-left: 4px solid #e5e7eb;
+    padding-left: 1rem;
+    margin: 1rem 0;
+    color: #6b7280;
+    font-style: italic;
+}
+
+.post-content code {
+    background-color: #f3f4f6;
+    padding: 0.125rem 0.25rem;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.875em;
+}
+
+.post-content pre {
+    background-color: #1f2937;
+    color: #f9fafb;
+    padding: 1rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.post-content pre code {
+    background-color: transparent;
+    padding: 0;
+    color: inherit;
+}
+
+/* ========================================
+   첨부파일
+   ======================================== */
+.attachment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem 1rem;
+    background-color: #f9fafb;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.attachment-item:hover {
+    background-color: #f3f4f6;
+}
+
+.attachment-info {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.attachment-icon {
+    width: 1.25rem;
+    height: 1.25rem;
+    color: #6b7280;
+}
+
+.attachment-details {
+    display: flex;
+    flex-direction: column;
+}
+
+.attachment-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.attachment-size {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.attachment-download {
+    color: #3b82f6;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.attachment-download:hover {
+    color: #2563eb;
+}
+
+/* ========================================
+   댓글
+   ======================================== */
+.comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.comment-item {
+    background-color: #f9fafb;
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+}
+
+.comment-header {
+    display: flex;
+    justify-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.comment-author-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.comment-author {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #111827;
+}
+
+.comment-date {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.comment-delete {
+    color: #ef4444;
+    font-size: 0.75rem;
+    transition: color 0.2s;
+}
+
+.comment-delete:hover {
+    color: #dc2626;
+}
+
+.comment-content {
+    font-size: 0.875rem;
+    color: #374151;
+    line-height: 1.6;
+}
+
+.comment-input-area {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.comment-input {
+    flex: 1;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s;
+}
+
+.comment-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+/* ========================================
+   파일 미리보기
+   ======================================== */
+.file-preview-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.file-preview-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem;
+    background-color: #f9fafb;
+    border-radius: 6px;
+}
+
+.file-preview-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+}
+
+.file-preview-name {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+.file-preview-size {
+    font-size: 0.75rem;
+    color: #6b7280;
+}
+
+.file-preview-remove {
+    color: #ef4444;
+    font-size: 0.75rem;
+    transition: color 0.2s;
+}
+
+.file-preview-remove:hover {
+    color: #dc2626;
+}
+
+/* ========================================
+   학생 선택기
+   ======================================== */
+.student-selector-area {
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    padding: 0.75rem;
+    max-height: 240px;
+    overflow-y: auto;
+}
+
+.student-selector-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.student-selector-item:hover {
+    background-color: #f9fafb;
+}
+
+.student-selector-checkbox {
+    width: 1rem;
+    height: 1rem;
+    cursor: pointer;
+    accent-color: #3b82f6;
+}
+
+.student-selector-name {
+    font-size: 0.875rem;
+    color: #374151;
+}
+
+/* ========================================
+   접근 권한 배지
+   ======================================== */
+.access-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.access-badge-all {
+    background-color: #dbeafe;
+    color: #1e40af;
+}
+
+.access-badge-master {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.access-badge-phd {
+    background-color: #e9d5ff;
+    color: #6b21a8;
+}
+
+.access-badge-selected {
+    background-color: #fef3c7;
+    color: #92400e;
+}
+
+/* ========================================
+   빈 상태
+   ======================================== */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+}
+
+.empty-state-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+}
+
+.empty-state-description {
+    font-size: 0.875rem;
+    color: #6b7280;
+    margin-bottom: 1rem;
+}
+
+/* ========================================
+   반응형
+   ======================================== */
+@media (max-width: 768px) {
+    .board-table {
+        font-size: 0.75rem;
+    }
+
+    .board-table thead th,
+    .board-table tbody td {
+        padding: 8px 12px;
+    }
+
+    .ql-editor {
+        min-height: 200px;
+    }
+
+    .attachment-item,
+    .comment-item {
+        padding: 0.5rem 0.75rem;
+    }
+
+    .file-preview-list {
+        gap: 0.375rem;
+    }
+}
+
+/* ========================================
+   다크모드 지원 (선택적)
+   ======================================== */
+@media (prefers-color-scheme: dark) {
+    .ql-container {
+        background-color: #1f2937;
+        color: #f9fafb;
+    }
+
+    .ql-toolbar {
+        background-color: #374151;
+        border-color: #4b5563;
+    }
+
+    .ql-stroke {
+        stroke: #f9fafb;
+    }
+
+    .ql-fill {
+        fill: #f9fafb;
+    }
+
+    .board-table thead th {
+        background-color: #374151;
+        color: #e5e7eb;
+        border-bottom-color: #4b5563;
+    }
+
+    .board-table tbody tr {
+        border-bottom-color: #4b5563;
+    }
+
+    .board-table tbody tr:hover {
+        background-color: #374151;
+    }
+
+    .attachment-item,
+    .comment-item,
+    .file-preview-item {
+        background-color: #374151;
+    }
+
+    .attachment-item:hover {
+        background-color: #4b5563;
+    }
+
+    .post-content {
+        color: #e5e7eb;
+    }
+
+    .post-content code {
+        background-color: #374151;
+        color: #f9fafb;
+    }
+
+    .comment-input {
+        background-color: #374151;
+        border-color: #4b5563;
+        color: #f9fafb;
+    }
+}

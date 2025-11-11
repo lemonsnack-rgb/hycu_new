@@ -21,12 +21,18 @@
     
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
+
+    <!-- Quill Editor -->
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/guidance.css">
     <link rel="stylesheet" href="assets/css/meeting-v2.css">
     <link rel="stylesheet" href="assets/css/feedback.css">
     <link rel="stylesheet" href="assets/css/review.css">
+
+    <!-- 자료실 스타일 -->
+    <link rel="stylesheet" href="../common/board-styles.css">
     
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
@@ -39,6 +45,9 @@
     
     <!-- Fabric.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+
+    <!-- Quill Editor -->
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 </head>
 <body class="bg-gray-100">
     
@@ -507,9 +516,13 @@ document.addEventListener('DOMContentLoaded', function(){
     <script src="assets/js/feedback-tools.js"></script>
     <script src="assets/js/review-list.js"></script>
     <script src="assets/js/review-detail.js"></script>
-    <script src="assets/js/board.js"></script>
+
+    <!-- 자료실 게시판 -->
+    <script src="../common/board-service.js"></script>
+    <script src="assets/js/board-enhanced.js"></script>
+
     <script src="assets/js/journal-review.js"></script>
-    
+
     <!-- 공통 유틸리티 -->
     <script src="../common-utils.js"></script>
 
