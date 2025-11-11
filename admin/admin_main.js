@@ -1018,91 +1018,163 @@ function viewWeeklyGuidanceDetail(studentId) {
     document.body.insertAdjacentHTML('beforeend', modalHtml);
 }
 
-// ID 19: 지도일지 상세 보기
+// ID 19-20: 지도일지 상세 보기 (계획/실적 구분, 교수입력 읽기전용)
 function viewGuidanceRecordDetail(recordId) {
     const record = appData.guidanceRecords.find(r => r.id == recordId);
-    
+
     if (!record) {
         showNotification('지도 내역을 찾을 수 없습니다.', 'error');
         return;
     }
-    
+
     const student = appData.weeklyGuidanceStudents.find(s => s.studentId === record.studentId);
-    
+
+    // ID 19: 교수가 입력한 실적인지 관리자가 등록한 계획인지 구분
+    const isProfessorRecord = record.type === 'actual' || !record.type; // type이 없으면 교수 입력으로 간주
+    const isAdminPlan = record.type === 'plan';
+
+    // ID 19: 교수 입력 실적은 읽기 전용 (회색 배경, disabled)
+    const readOnlyClass = isProfessorRecord ? 'bg-gray-100' : 'bg-white';
+    const disabledAttr = isProfessorRecord ? 'disabled' : '';
+    const recordTypeLabel = isProfessorRecord ? '교수 입력 실적 (읽기 전용)' : '관리자 등록 계획';
+    const recordTypeBadge = isProfessorRecord ?
+        '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">교수 입력</span>' :
+        '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-green-100 text-green-700">관리자 계획</span>';
+
+    // ID 20: 실제 지도내용 필드 (교수가 입력한 실적인 경우에만 표시)
+    const actualGuidanceSection = isProfessorRecord && (record.actualDate || record.actualMethod || record.actualContent) ? `
+        <div class="mb-6 border-t pt-6">
+            <h5 class="text-sm font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                실제 지도내용
+            </h5>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-600 font-medium">실제 실행일</label>
+                    <div class="mt-1 px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800">
+                        ${record.actualDate || record.date}
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 font-medium">실제 지도 방식</label>
+                    <div class="mt-1 px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg">
+                        <span class="inline-block px-3 py-1 text-sm rounded-full ${getMethodBadgeClass(record.actualMethod || record.method)}">
+                            ${record.actualMethod || record.method}
+                        </span>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-600 font-medium">실제 지도 내용</label>
+                    <div class="mt-1 px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-700 whitespace-pre-wrap">
+                        ${record.actualContent || record.content}
+                    </div>
+                </div>
+            </div>
+        </div>
+    ` : '';
+
     const detailHtml = `
         <div id="guidance-record-detail-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[60]"
              onclick="if(event.target.id==='guidance-record-detail-modal') closeGuidanceRecordDetailModal()">
             <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[90vh] overflow-hidden"
                  onclick="event.stopPropagation()">
-                
+
                 <!-- 헤더 -->
                 <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
-                    <h3 class="text-lg font-bold">지도일지 상세</h3>
-                    <button onclick="closeGuidanceRecordDetailModal()" 
+                    <h3 class="text-lg font-bold flex items-center">
+                        지도일지 상세
+                        ${recordTypeBadge}
+                    </h3>
+                    <button onclick="closeGuidanceRecordDetailModal()"
                             class="text-white hover:text-gray-200 text-2xl leading-none">
                         ×
                     </button>
                 </div>
-                
+
                 <div class="overflow-y-auto p-6" style="max-height: calc(90vh - 80px);">
+                    ${isProfessorRecord ? `
+                    <!-- ID 19: 읽기 전용 안내 -->
+                    <div class="mb-4 p-3 bg-blue-50 border-l-4 border-blue-500 rounded">
+                        <div class="flex items-center">
+                            <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="text-sm text-blue-800 font-medium">교수가 입력한 지도 실적은 수정할 수 없습니다 (읽기 전용)</span>
+                        </div>
+                    </div>
+                    ` : ''}
+
                     <!-- 기본 정보 -->
-                    <div class="bg-gray-50 rounded-lg p-4 mb-6">
+                    <div class="${readOnlyClass} rounded-lg p-4 mb-6 border border-gray-300">
                         <div class="grid grid-cols-2 gap-4 mb-3">
                             <div>
-                                <span class="text-xs text-gray-500">Week</span>
-                                <div class="font-semibold text-lg text-gray-800">Week ${record.week}</div>
+                                <label class="text-xs text-gray-500 font-medium">Week</label>
+                                <input type="number" value="${record.week}" ${disabledAttr}
+                                       class="mt-1 w-full px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800 font-semibold">
                             </div>
                             <div>
-                                <span class="text-xs text-gray-500">지도일자</span>
-                                <div class="font-semibold text-gray-800">${record.date}</div>
+                                <label class="text-xs text-gray-500 font-medium">지도일자 (계획)</label>
+                                <input type="date" value="${record.date}" ${disabledAttr}
+                                       class="mt-1 w-full px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800">
                             </div>
                         </div>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
-                                <span class="text-xs text-gray-500">학생</span>
-                                <div class="font-semibold text-gray-800">${student ? student.studentName : '-'} (${record.studentId})</div>
+                                <label class="text-xs text-gray-500 font-medium">학생</label>
+                                <input type="text" value="${student ? student.studentName : '-'} (${record.studentId})" disabled
+                                       class="mt-1 w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800">
                             </div>
                             <div>
-                                <span class="text-xs text-gray-500">지도교수</span>
-                                <div class="font-semibold text-gray-800">${record.advisor}</div>
+                                <label class="text-xs text-gray-500 font-medium">지도교수</label>
+                                <input type="text" value="${record.advisor}" disabled
+                                       class="mt-1 w-full px-3 py-2 bg-gray-100 border border-gray-300 rounded-lg text-gray-800">
                             </div>
                         </div>
                         <div class="mt-3">
-                            <span class="text-xs text-gray-500">지도방법</span>
-                            <div>
-                                <span class="inline-block mt-1 px-3 py-1 text-sm rounded-full ${getMethodBadgeClass(record.method)}">
-                                    ${record.method}
-                                </span>
-                            </div>
+                            <label class="text-xs text-gray-500 font-medium">지도방법 (계획)</label>
+                            <select ${disabledAttr} class="mt-1 w-full px-3 py-2 ${readOnlyClass} border border-gray-300 rounded-lg">
+                                <option ${record.method === '대면' ? 'selected' : ''}>대면</option>
+                                <option ${record.method === '비대면' ? 'selected' : ''}>비대면</option>
+                                <option ${record.method === '이메일' ? 'selected' : ''}>이메일</option>
+                            </select>
                         </div>
                     </div>
-                    
-                    <!-- 지도 내용 -->
+
+                    <!-- 지도 내용 (계획) -->
                     <div class="mb-6">
-                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 주제</h5>
-                        <div class="bg-blue-50 rounded-lg p-4">
-                            <div class="text-gray-800 font-medium">${record.topic}</div>
-                        </div>
+                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 주제 (계획)</h5>
+                        <input type="text" value="${record.topic}" ${disabledAttr}
+                               class="w-full px-4 py-3 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-800 font-medium">
                     </div>
-                    
+
                     <div class="mb-6">
-                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 내용</h5>
-                        <div class="bg-gray-50 rounded-lg p-4">
-                            <div class="text-gray-700 whitespace-pre-wrap">${record.content}</div>
-                        </div>
+                        <h5 class="text-sm font-bold text-gray-800 mb-2">지도 내용 (계획)</h5>
+                        <textarea ${disabledAttr} rows="4"
+                                  class="w-full px-4 py-3 ${readOnlyClass} border border-gray-300 rounded-lg text-gray-700">${record.content}</textarea>
                     </div>
-                    
+
+                    ${isProfessorRecord ? `
                     <div>
                         <h5 class="text-sm font-bold text-gray-800 mb-2">교수 의견</h5>
-                        <div class="bg-green-50 rounded-lg p-4 border-l-4 border-green-500">
-                            <div class="text-gray-700">${record.professorComment}</div>
-                        </div>
+                        <textarea disabled rows="3"
+                                  class="w-full px-4 py-3 bg-gray-100 border border-gray-300 rounded-lg text-gray-700">${record.professorComment || ''}</textarea>
                     </div>
+                    ` : ''}
+
+                    ${actualGuidanceSection}
                 </div>
-                
+
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
-                    <button onclick="closeGuidanceRecordDetailModal()" 
+                    ${isAdminPlan ? `
+                    <button onclick="saveGuidancePlan('${record.id}')"
+                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8B0037]">
+                        저장
+                    </button>
+                    ` : ''}
+                    <button onclick="closeGuidanceRecordDetailModal()"
                             class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
                         닫기
                     </button>
@@ -1110,8 +1182,14 @@ function viewGuidanceRecordDetail(recordId) {
             </div>
         </div>
     `;
-    
+
     document.body.insertAdjacentHTML('beforeend', detailHtml);
+}
+
+// ID 19: 관리자 계획 저장 (교수 실적은 저장 불가)
+function saveGuidancePlan(recordId) {
+    showNotification('지도 계획이 저장되었습니다.', 'success');
+    closeGuidanceRecordDetailModal();
 }
 
 // 모달 닫기
@@ -1148,6 +1226,7 @@ function getMethodBadgeClass(method) {
 // Export
 window.viewWeeklyGuidanceDetail = viewWeeklyGuidanceDetail;
 window.viewGuidanceRecordDetail = viewGuidanceRecordDetail;
+window.saveGuidancePlan = saveGuidancePlan;
 window.closeGuidanceDetailModal = closeGuidanceDetailModal;
 window.closeGuidanceRecordDetailModal = closeGuidanceRecordDetailModal;
 
