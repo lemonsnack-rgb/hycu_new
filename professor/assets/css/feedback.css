@@ -1,0 +1,721 @@
+/* Phase 4: 온라인피드백 관리 - CSS */
+
+/* ==================== 제출물 목록 ==================== */
+.feedback-row {
+    transition: all 0.2s ease;
+}
+
+.feedback-row:hover {
+    background-color: #F9FAFB;
+    transform: translateX(2px);
+}
+
+/* ==================== 피드백 뷰어 모달 ==================== */
+.feedback-modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    padding: 1rem;
+}
+
+.feedback-modal-content {
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 95vw;
+    height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* ==================== 3단 레이아웃 ==================== */
+.feedback-layout {
+    display: flex;
+    gap: 1rem;
+    flex: 1;
+    overflow: hidden;
+    padding: 1rem;
+}
+
+/* 왼쪽: 제출 이력 (소폭 확대) */
+.history-panel {
+    width: 250px;
+    min-width: 220px;
+    max-width: 280px;
+    flex-shrink: 0;
+    background: #F9FAFB;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+/* 중앙: PDF 뷰어 */
+.pdf-panel {
+    flex: 1;
+    min-width: 450px;
+    display: flex;
+    flex-direction: column;
+    background: #F9FAFB;
+    border-radius: 0.5rem;
+    overflow: hidden;
+}
+
+/* 오른쪽: 코멘트 패널 (대폭 확대) */
+.comment-panel {
+    width: 450px;
+    min-width: 400px;
+    max-width: 500px;
+    flex-shrink: 0;
+    background: white;
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 코멘트 패널 스크롤 영역 */
+#comment-panel-content {
+    max-height: calc(100vh - 120px);  /* 250px → 120px로 확대 */
+    overflow-y: auto;
+}
+
+#inline-feedback {
+    max-height: calc(100vh - 200px);  /* 600px → 동적으로 변경 */
+    overflow-y: auto;
+}
+
+/* 텍스트 입력창 크기 확대 */
+#general-feedback-input,
+.comment-card textarea {
+    min-height: 80px;
+}
+
+
+/* ==================== PDF 뷰어 ==================== */
+#pdf-render-wrapper {
+    flex: 1;
+    overflow: auto;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 1rem;
+    background: #E5E7EB;
+}
+
+#pdf-render-area {
+    position: relative;
+    margin: auto;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+#pdf-canvas {
+    display: block;
+    background: white;
+}
+
+/* ==================== 텍스트 레이어 ==================== */
+#text-layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    opacity: 0.2;
+    line-height: 1.0;
+    z-index: 20;
+    pointer-events: none;
+}
+
+#text-layer.active {
+    pointer-events: auto;
+}
+
+#text-layer > div,
+#text-layer > span {
+    color: transparent;
+    position: absolute;
+    white-space: pre;
+    cursor: text;
+    transform-origin: 0% 0%;
+}
+
+#text-layer ::selection {
+    background: rgba(106, 0, 40, 0.3);
+}
+
+/* ==================== Fabric.js 캔버스 ==================== */
+.canvas-container {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.canvas-container.interaction-active {
+    pointer-events: auto;
+}
+
+/* ==================== 마커 컨테이너 ==================== */
+#marker-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 30;
+}
+
+/* ==================== 코멘트 마커 ==================== */
+.comment-marker {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    background-color: rgba(106, 0, 40, 0.9);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    z-index: 35;
+    pointer-events: auto;
+}
+
+.comment-marker:hover,
+.comment-marker.highlight {
+    transform: scale(1.3);
+    background-color: #C9BC9C;
+    color: #6A0028;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* ==================== PDF 툴바 ==================== */
+.pdf-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    background: white;
+    border-bottom: 1px solid #E5E7EB;
+    flex-wrap: wrap;
+}
+
+.pdf-toolbar-btn {
+    padding: 0.5rem;
+    border-radius: 0.375rem;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    color: #374151;
+}
+
+.pdf-toolbar-btn:hover {
+    background: #F3F4F6;
+}
+
+.pdf-toolbar-btn.active {
+    background: #F5F1E9;
+    color: #6A0028;
+}
+
+.pdf-toolbar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ==================== 코멘트 카드 ==================== */
+.comment-wrapper {
+    position: relative;
+    margin-bottom: 1.5rem;
+}
+
+.comment-card {
+    background: white;
+    border: 2px solid #E5E7EB;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.comment-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.comment-card.highlight {
+    background-color: #FEF3C7;
+    border-color: #FBBF24;
+}
+
+.comment-card.linking-mode {
+    background-color: #DBEAFE;
+    border: 3px solid #3B82F6;
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    animation: pulse-border 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse-border {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+    }
+}
+
+.comment-card.linkable {
+    cursor: pointer;
+    border-color: #93C5FD;
+    background-color: #F0F9FF;
+}
+
+.comment-card.linkable:hover {
+    border-color: #60A5FA;
+    background-color: #E0F2FE;
+    transform: translateX(4px);
+}
+
+/* 연결 버튼 활성화 상태 */
+button.active-linking {
+    background-color: #3B82F6 !important;
+    color: white !important;
+    font-weight: 600;
+}
+
+/* 텍스트 블록 외곽선 색상 조절 */
+.canvas-container canvas {
+    opacity: 0.5;
+}
+
+.fabric-rect[data-type="comment"] {
+    opacity: 0.2 !important;
+}
+
+/* Fabric 객체 기본 투명도 */
+canvas.upper-canvas {
+    opacity: 0.6;
+}
+
+/* ==================== 페이지 마커 카드 ==================== */
+.page-marker-card {
+    background: #EFF6FF;
+    border-left: 4px solid #3B82F6;
+    padding: 0.75rem;
+    margin: 0.5rem 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-radius: 0.25rem;
+}
+
+.page-marker-card:hover {
+    background: #DBEAFE;
+    transform: translateX(4px);
+}
+
+.page-marker-card.highlight {
+    background: #FEF3C7;
+    border-left-color: #FBBF24;
+}
+
+/* ==================== 코멘트 스레드 ==================== */
+.comment-thread {
+    max-height: 500px;
+    overflow-y: auto;
+    padding-right: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.comment-bubble {
+    padding: 0.75rem 1rem;
+    border-radius: 1rem;
+    margin-bottom: 0.5rem;
+    max-width: 100%;
+    width: 100%;
+    word-wrap: break-word;
+    box-sizing: border-box;
+}
+
+.comment-bubble p {
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+.comment-bubble .author {
+    font-weight: 600;
+    font-size: 0.8125rem;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.comment-bubble .timestamp {
+    font-size: 0.6875rem;
+    color: #6B7280;
+    margin-top: 0.25rem;
+}
+
+/* 주지도교수 */
+.professor-main {
+    background-color: #F5F1E9;
+    border-left: 3px solid #6A0028;
+    align-self: flex-end;
+}
+
+/* 공동지도교수 */
+.professor-co {
+    background-color: #E0F2FE;
+    border-left: 3px solid #0369A1;
+    align-self: flex-end;
+}
+
+/* 학생 */
+.student-comment {
+    background-color: #F3F4F6;
+    border-left: 3px solid #6B7280;
+    align-self: flex-start;
+}
+
+/* ==================== 음성 녹음 ==================== */
+.record-btn {
+    position: relative;
+}
+
+.record-btn.recording {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+.record-btn.recording .fa-microphone {
+    display: none;
+}
+
+.record-btn.recording .fa-stop {
+    display: inline-block;
+    color: #DC2626;
+}
+
+.record-btn:not(.recording) .fa-microphone {
+    display: inline-block;
+}
+
+.record-btn:not(.recording) .fa-stop {
+    display: none;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.record-timer {
+    position: absolute;
+    top: -20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #DC2626;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+/* ==================== 자주 쓰는 코멘트 ==================== */
+.quickmark-btn {
+    font-size: 0.75rem;
+    background: #F3F4F6;
+    color: #374151;
+    padding: 0.375rem 0.75rem;
+    border-radius: 9999px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.quickmark-btn:hover {
+    background: #E5E7EB;
+    transform: translateY(-1px);
+}
+
+#quickmark-popover {
+    z-index: 150;
+}
+
+.quickmark-item {
+    transition: background-color 0.2s;
+}
+
+.quickmark-item:hover {
+    background-color: #F3F4F6;
+}
+
+.quickmark-item button {
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.quickmark-item:hover button {
+    opacity: 1;
+}
+
+
+/* ==================== 반응형 ==================== */
+@media (max-width: 1280px) {
+    .feedback-layout {
+        flex-direction: column;
+    }
+    
+    .history-panel,
+    .pdf-panel,
+    .comment-panel {
+        width: 100%;
+        max-width: 100%;
+        min-width: 100%;
+    }
+    
+    .pdf-panel {
+        min-height: 500px;
+    }
+}
+
+/* ==================== 스크롤바 커스터마이징 ==================== */
+.comment-thread::-webkit-scrollbar,
+.history-panel::-webkit-scrollbar,
+.comment-panel::-webkit-scrollbar {
+    width: 6px;
+}
+
+.comment-thread::-webkit-scrollbar-track,
+.history-panel::-webkit-scrollbar-track,
+.comment-panel::-webkit-scrollbar-track {
+    background: #F3F4F6;
+    border-radius: 3px;
+}
+
+.comment-thread::-webkit-scrollbar-thumb,
+.history-panel::-webkit-scrollbar-thumb,
+.comment-panel::-webkit-scrollbar-thumb {
+    background: #9CA3AF;
+    border-radius: 3px;
+}
+
+.comment-thread::-webkit-scrollbar-thumb:hover,
+.history-panel::-webkit-scrollbar-thumb:hover,
+.comment-panel::-webkit-scrollbar-thumb:hover {
+    background: #6B7280;
+}
+
+/* ==================== 첨부파일 ==================== */
+.attachment-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem 0.5rem;
+    background: #F3F4F6;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    color: #374151;
+    text-decoration: none;
+    transition: all 0.2s;
+}
+
+.attachment-item:hover {
+    background: #E5E7EB;
+    color: #6A0028;
+}
+
+/* ==================== 동시 편집 경고 ==================== */
+.conflict-warning {
+    background: #FEF3C7;
+    border: 2px solid #FBBF24;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.conflict-warning-icon {
+    color: #F59E0B;
+    font-size: 1.5rem;
+}
+
+/* ==================== 로딩 ==================== */
+.loading-spinner {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #F3F4F6;
+    border-top-color: #6A0028;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+
+/* === injected: pdf viewer tweaks === */
+#text-layer { user-select: none !important; pointer-events: none !important; }
+
+/* ==================== 개선된 탭 스타일 ==================== */
+.tabs { 
+    display: flex; 
+    gap: 4px; 
+    border-bottom: 2px solid #E5E7EB;
+    margin-bottom: 0;
+}
+
+.tab { 
+    padding: 10px 16px; 
+    font-size: 13px; 
+    font-weight: 500;
+    color: #6B7280; 
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer; 
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.tab:hover { 
+    color: #374151; 
+    background: #F9FAFB;
+}
+
+.tab.active { 
+    color: #2563EB; 
+    border-bottom-color: #2563EB; 
+    font-weight: 600;
+    background: transparent;
+}
+
+.tab-badge { 
+    display: inline-block;
+    font-size: 10px; 
+    font-weight: 600;
+    color: white;
+    background: #EF4444; 
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 6px;
+    min-width: 18px;
+    text-align: center;
+}
+
+/* ==================== 첨삭/댓글 섹션 구분 ==================== */
+.comment-main-section {
+    padding: 0.75rem;
+    background: #F9FAFB;
+    border-radius: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.comment-main-section h6 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+/* ==================== 댓글 영역 (완전 분리) ==================== */
+.comment-replies-container {
+    position: relative;
+    margin-left: 1.5rem;
+    margin-top: 0.75rem;
+    padding-left: 1.5rem;
+    border-left: 2px solid #E5E7EB;  /* 전체 영역 왼쪽 선 */
+}
+
+/* 기존 복잡한 연결선 제거 */
+.reply-connector {
+    display: none;
+}
+
+.reply-connector::before {
+    display: none;
+}
+
+.comment-replies {
+    background: white;
+    border: 1px solid #E5E7EB;
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+
+.comment-replies h6 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.comment-replies-section {
+    padding: 0.75rem;
+    background: #FFFFFF;
+    border-radius: 0.5rem;
+}
+
+.comment-replies-section h6 {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+}
+
+.ver-pill { padding:2px 8px; border:1px solid #d1d5db; border-radius:9999px; margin-right:4px; font-size:12px; }
+.ver-pill.active { background:#1f2937; color:#fff; border-color:#1f2937; }
+
+
+/* === injected: left submission history sidebar === */
+.viewer-wrap { display:flex; gap:16px; }
+.submission-history{ width:220px; border-right:1px solid #e5e7eb; padding:8px 8px 8px 0; }
+.submission-history .sh-header{ font-weight:600; margin:4px 0 8px 8px; color:#111827; }
+.submission-history .sh-list{ list-style:none; margin:0; padding:0 8px; }
+.submission-history .sh-list li{ padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
+.submission-history .sh-list li .sh-meta{ font-size:11px; color:#6b7280; margin-left:10px; }
+.submission-history .sh-list li.active{ background:#eff6ff; color:#1d4ed8; }
+/* disable text select on pdf text layer (defensive) */
+#text-layer { user-select:none !important; pointer-events:none !important; }
