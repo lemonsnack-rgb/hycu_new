@@ -231,7 +231,95 @@ function viewSubmissionDetail(id, type) {
                         `).join('')}
                     </div>
                 </div>
-                
+
+                ${type === 'finalThesis' ? (() => {
+                    // 평가표 정보 가져오기 (실제로는 item.evaluationCriteriaId로 찾아야 함)
+                    const evaluationCriteria = appData.evaluationCriteria ? appData.evaluationCriteria[0] : null;
+                    const criteria = evaluationCriteria?.passingCriteria || {};
+
+                    // 점수 계산
+                    const result = calculateScoresAndCriteria(item.reviewers, criteria);
+
+                    // 심사위원장 판정 (실제로는 item에서 가져와야 함)
+                    const chairDecision = item.chairDecision || 'pending'; // 'pass' | 'fail' | 'pending'
+                    const chairDecisionDate = item.chairDecisionDate || null;
+                    const chairNote = item.chairNote || '';
+
+                    return `
+                        <!-- 심사위원장 최종 판정 -->
+                        <div class="bg-gradient-to-r ${chairDecision === 'pass' ? 'from-green-50 to-green-100 border-green-300' : chairDecision === 'fail' ? 'from-red-50 to-red-100 border-red-300' : 'from-yellow-50 to-yellow-100 border-yellow-300'} border-2 rounded-lg p-5 mb-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div>
+                                    <h4 class="font-bold text-lg mb-2 ${chairDecision === 'pass' ? 'text-green-900' : chairDecision === 'fail' ? 'text-red-900' : 'text-yellow-900'}">
+                                        심사위원장 최종 판정
+                                    </h4>
+                                    <span class="text-3xl font-bold ${chairDecision === 'pass' ? 'text-green-700' : chairDecision === 'fail' ? 'text-red-700' : 'text-yellow-700'}">
+                                        ${chairDecision === 'pass' ? '✅ 통과' : chairDecision === 'fail' ? '❌ 불통과' : '⏳ 판정 대기'}
+                                    </span>
+                                </div>
+                            </div>
+                            ${chairDecisionDate ? `
+                                <div class="mt-3 text-sm ${chairDecision === 'pass' ? 'text-green-800' : chairDecision === 'fail' ? 'text-red-800' : 'text-yellow-800'}">
+                                    <p><strong>판정일:</strong> ${chairDecisionDate}</p>
+                                    ${chairNote ? `<p class="mt-2"><strong>의견:</strong> ${chairNote}</p>` : ''}
+                                </div>
+                            ` : ''}
+                        </div>
+
+                        ${result.hasScores ? `
+                            <!-- 점수 계산 결과 (참고용) -->
+                            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-5 mb-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="font-bold text-blue-900 text-lg">점수 계산 결과 (참고용)</h4>
+                                    <span class="text-xs text-blue-700 bg-blue-100 px-3 py-1 rounded-full">
+                                        * 최종 판정은 심사위원장이 결정
+                                    </span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4">
+                                    <div class="bg-white rounded-lg p-4 border ${result.meets.meetsMinimum ? 'border-green-300' : 'border-red-300'}">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-600">최저 점수</span>
+                                            <span class="text-2xl">${result.meets.meetsMinimum ? '✓' : '✗'}</span>
+                                        </div>
+                                        <div class="text-3xl font-bold ${result.meets.meetsMinimum ? 'text-green-700' : 'text-red-700'}">
+                                            ${result.scores.minScore}점
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-2">
+                                            기준: ${result.criteria.minRule?.value || 'N/A'}점 이상
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border ${result.meets.meetsAverage ? 'border-green-300' : 'border-red-300'}">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-600">평균 점수</span>
+                                            <span class="text-2xl">${result.meets.meetsAverage ? '✓' : '✗'}</span>
+                                        </div>
+                                        <div class="text-3xl font-bold ${result.meets.meetsAverage ? 'text-green-700' : 'text-red-700'}">
+                                            ${result.scores.avgScore.toFixed(1)}점
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-2">
+                                            기준: ${result.criteria.avgRule?.value || 'N/A'}점 이상
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-white rounded-lg p-4 border ${result.meets.meetsTotal ? 'border-green-300' : 'border-red-300'}">
+                                        <div class="flex items-center justify-between mb-2">
+                                            <span class="text-sm text-gray-600">총점</span>
+                                            <span class="text-2xl">${result.meets.meetsTotal ? '✓' : '✗'}</span>
+                                        </div>
+                                        <div class="text-3xl font-bold ${result.meets.meetsTotal ? 'text-green-700' : 'text-red-700'}">
+                                            ${result.scores.totalScore}점
+                                        </div>
+                                        <div class="text-xs text-gray-500 mt-2">
+                                            기준: ${result.criteria.totalRule?.value || 'N/A'}점 이상
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        ` : ''}
+                    `;
+                })() : ''}
+
                 ${type === 'finalThesis' && item.result ? `
                 <div class="bg-green-50 rounded-lg p-4">
                     <h4 class="font-bold text-green-800 mb-4">최종 심사 결과</h4>
@@ -2855,9 +2943,54 @@ function viewSingleEvaluation(committeeMemberId) {
         showAlert('평가 정보를 찾을 수 없습니다.');
         return;
     }
-    
+
     // 여기서는 간단한 알림만 표시 (실제로는 상세 평가 모달을 표시)
     showAlert('개별 평가 상세 화면은 구현 예정입니다.');
+}
+
+/**
+ * 점수 계산 및 통과 기준 확인
+ * @param {Array} evaluations - 심사위원 평가 배열
+ * @param {Object} criteria - 통과 기준 (passingCriteria)
+ * @returns {Object} - 계산 결과
+ */
+function calculateScoresAndCriteria(evaluations, criteria) {
+    if (!evaluations || evaluations.length === 0) {
+        return {
+            hasScores: false,
+            reason: '평가 없음'
+        };
+    }
+
+    // 점수가 있는 평가만 필터링
+    const scoredEvaluations = evaluations.filter(e => e.score !== undefined && e.score !== null);
+    if (scoredEvaluations.length === 0) {
+        return {
+            hasScores: false,
+            reason: '평가 점수 없음'
+        };
+    }
+
+    const scores = scoredEvaluations.map(e => e.score);
+    const minScore = Math.min(...scores);
+    const avgScore = scores.reduce((a, b) => a + b, 0) / scores.length;
+    const totalScore = scores.reduce((a, b) => a + b, 0);
+
+    const rules = criteria?.rules || [];
+    const minRule = rules.find(r => r.type === 'minimum');
+    const avgRule = rules.find(r => r.type === 'average');
+    const totalRule = rules.find(r => r.type === 'total');
+
+    const meetsMinimum = !minRule || minScore >= minRule.value;
+    const meetsAverage = !avgRule || avgScore >= avgRule.value;
+    const meetsTotal = !totalRule || totalScore >= totalRule.value;
+
+    return {
+        hasScores: true,
+        scores: { minScore, avgScore, totalScore },
+        meets: { meetsMinimum, meetsAverage, meetsTotal },
+        criteria: { minRule, avgRule, totalRule }
+    };
 }
 
 // Export PDF viewer functions
