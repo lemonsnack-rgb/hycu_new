@@ -2273,3 +2273,107 @@ window.exportStatistics = exportStatistics;
 window.closeStatisticsModal = closeStatisticsModal;
 
 console.log('✅ 관리자 - 통계 대시보드 기능 로드 완료');
+
+// ========== 학위논문 심사 상세 보기 (읽기 전용) ==========
+
+function viewThesisReviewDetail(itemId, viewType, thesisType) {
+    const dataSource = thesisType === 'plan' ? appData.submissions.thesisPlan :
+                       thesisType === 'mid' ? appData.submissions.midThesis :
+                       appData.submissions.finalThesis;
+
+    const item = dataSource.find(d => d.id === itemId);
+
+    if (!item) {
+        showAlert('심사 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const isChair = viewType === 'chair';
+    const modalTitle = (item.thesisTitle || '논문제목 미정') + ' - ' + (isChair ? '심사위원장' : '심사위원') + ' 평가 (읽기 전용)';
+
+    const reviewers = item.reviewers || [
+        { name: item.advisor || '홍길동', role: '주심', status: '완료', score: 88, comment: '연구 설계가 잘 되어 있습니다.' },
+        { name: '이교수', role: '부심', status: '완료', score: 85, comment: '이론적 배경이 충실합니다.' },
+        { name: '박교수', role: '부심', status: '대기', score: null, comment: null }
+    ];
+
+    let content = '<div class="space-y-6">';
+    content += '<div class="bg-gray-50 rounded-lg p-4"><h4 class="font-bold text-gray-800 mb-3">📄 논문 정보</h4><div class="space-y-2 text-sm">';
+    content += '<div class="flex"><div class="w-32 text-gray-600">학생명</div><div class="flex-1 font-medium">' + item.studentName + ' (' + item.studentId + ')</div></div>';
+    content += '<div class="flex"><div class="w-32 text-gray-600">전공 / 학위과정</div><div class="flex-1">' + item.major + ' / ' + item.degree + '</div></div>';
+    content += '<div class="flex"><div class="w-32 text-gray-600">지도교수</div><div class="flex-1">' + item.advisor + '</div></div>';
+    content += '<div class="flex"><div class="w-32 text-gray-600">제출일</div><div class="flex-1">' + (item.submitDate || '-') + '</div></div>';
+    content += '<div class="flex"><div class="w-32 text-gray-600">논문제목</div><div class="flex-1 font-medium">' + (item.thesisTitle || '미정') + '</div></div>';
+    if (item.totalPages) content += '<div class="flex"><div class="w-32 text-gray-600">총 페이지</div><div class="flex-1">' + item.totalPages + '페이지</div></div>';
+    if (item.copyKiller) {
+        const copyColor = item.copyKiller >= 90 ? 'green' : item.copyKiller >= 70 ? 'orange' : 'red';
+        content += '<div class="flex"><div class="w-32 text-gray-600">카피킬러</div><div class="flex-1"><span class="text-' + copyColor + '-600 font-bold">' + item.copyKiller + '점</span><span class="text-xs text-gray-500 ml-2">' + (item.copyKillerDetail || '') + '</span></div></div>';
+    }
+    if (item.gptKiller) {
+        const gptColor = item.gptKiller >= 90 ? 'green' : item.gptKiller >= 70 ? 'orange' : 'red';
+        content += '<div class="flex"><div class="w-32 text-gray-600">GPT킬러</div><div class="flex-1"><span class="text-' + gptColor + '-600 font-bold">' + item.gptKiller + '점</span><span class="text-xs text-gray-500 ml-2">' + (item.gptKillerDetail || '') + '</span></div></div>';
+    }
+    content += '</div></div>';
+
+    if (!isChair) {
+        content += '<div class="bg-white border border-gray-200 rounded-lg p-4"><h4 class="font-bold text-gray-800 mb-4">📝 심사위원 평가</h4><div class="space-y-4">';
+        const criteria = [
+            { name: '연구의 독창성', score: 4 }, { name: '방법론의 타당성', score: 5 }, { name: '결과의 명확성', score: 4 },
+            { name: '논리적 구성', score: 4 }, { name: '참고문헌의 적절성', score: 5 }
+        ];
+        criteria.forEach(criterion => {
+            content += '<div><label class="block text-sm font-medium text-gray-700 mb-2">' + criterion.name + ' (5점 만점)</label><div class="flex gap-2">';
+            for (let i = 1; i <= 5; i++) {
+                content += '<span class="px-3 py-1 rounded ' + (i === criterion.score ? 'bg-blue-100 text-blue-700 font-bold' : 'bg-gray-100 text-gray-500') + '">' + i + '점</span>';
+            }
+            content += '</div></div>';
+        });
+        content += '</div><div class="mt-6"><label class="block text-sm font-medium text-gray-700 mb-2">종합 의견</label>';
+        content += '<div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700">' + (reviewers[0]?.comment || '연구 방법론이 적절하며 결과 해석이 명확합니다.') + '</div></div>';
+        content += '<div class="mt-6 bg-blue-50 border border-blue-200 rounded p-4"><div class="flex justify-between items-center"><span class="font-bold text-gray-800">총점</span>';
+        content += '<span class="text-2xl font-bold text-blue-600">' + (reviewers[0]?.score || 88) + '점 / 100점</span></div></div></div>';
+    }
+
+    if (isChair) {
+        content += '<div class="bg-white border border-gray-200 rounded-lg p-4"><h4 class="font-bold text-gray-800 mb-4">👥 심사위원 평가 현황</h4><div class="space-y-3">';
+        reviewers.forEach(reviewer => {
+            const statusBg = reviewer.status === '완료' ? 'bg-green-50' : 'bg-gray-50';
+            const statusBadge = reviewer.status === '완료' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600';
+            content += '<div class="border border-gray-200 rounded p-3 ' + statusBg + '"><div class="flex justify-between items-center mb-2">';
+            content += '<div><span class="font-medium">' + reviewer.name + '</span><span class="text-sm text-gray-600 ml-2">(' + reviewer.role + ')</span></div>';
+            content += '<span class="px-2 py-1 rounded text-xs ' + statusBadge + '">' + reviewer.status + '</span></div>';
+            if (reviewer.status === '완료') {
+                content += '<div class="text-sm"><div class="flex justify-between mb-1"><span class="text-gray-600">평가 점수</span>';
+                content += '<span class="font-bold text-blue-600">' + reviewer.score + '점</span></div>';
+                content += '<div class="text-gray-700 bg-white rounded p-2 mt-2 text-xs">' + reviewer.comment + '</div></div>';
+            } else {
+                content += '<div class="text-sm text-gray-500">평가 대기 중</div>';
+            }
+            content += '</div>';
+        });
+        const completedReviewers = reviewers.filter(r => r.score);
+        const avgScore = completedReviewers.length > 0 ? Math.round(completedReviewers.reduce((sum, r) => sum + r.score, 0) / completedReviewers.length) : 0;
+        content += '</div><div class="mt-4 bg-blue-50 border border-blue-200 rounded p-4"><div class="flex justify-between items-center">';
+        content += '<span class="font-bold text-gray-800">평균 점수</span><span class="text-2xl font-bold text-blue-600">' + avgScore + '점</span></div></div>';
+        content += '<div class="mt-6 border-t pt-4"><h5 class="font-bold text-gray-800 mb-3">최종 심사 결정</h5><div class="space-y-3">';
+        content += '<div><label class="block text-sm font-medium text-gray-700 mb-2">심사 결과</label><div class="flex gap-2">';
+        const results = ['승인', '조건부승인', '보류', '불합격'];
+        const currentResult = item.result || '승인';
+        results.forEach(result => {
+            const className = result === currentResult ? 'bg-green-100 text-green-700 font-bold border border-green-300' : 'bg-gray-100 text-gray-500';
+            content += '<span class="px-3 py-1.5 rounded text-sm ' + className + '">' + result + '</span>';
+        });
+        content += '</div></div><div><label class="block text-sm font-medium text-gray-700 mb-2">최종 의견</label>';
+        content += '<div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700">전반적으로 연구의 질이 우수하며 학위 논문으로서의 요건을 충족합니다. 승인합니다.</div></div></div></div></div>';
+    }
+
+    content += '<div class="bg-yellow-50 border border-yellow-200 rounded p-3"><div class="flex items-start">';
+    content += '<svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" /></svg>';
+    content += '<div class="flex-1"><p class="text-sm font-medium text-yellow-800">읽기 전용 모드</p>';
+    content += '<p class="text-xs text-yellow-700 mt-1">이 화면은 교수의 평가 내용을 조회하기 위한 읽기 전용 화면입니다. 수정이 필요한 경우 교수 계정으로 로그인하여 진행해주세요.</p></div></div></div></div>';
+
+    openModal(modalTitle, content, '닫기', () => { closeModal(); }, true);
+}
+
+window.viewThesisReviewDetail = viewThesisReviewDetail;
+console.log('✅ 학위논문 심사 상세 보기 기능 로드 완료');
