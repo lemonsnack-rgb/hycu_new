@@ -2277,14 +2277,21 @@ console.log('✅ 관리자 - 통계 대시보드 기능 로드 완료');
 // ========== 학위논문 심사 상세 보기 (위원/위원장 뷰) ==========
 
 function viewThesisReviewDetail(itemId, viewType, thesisType) {
+    console.log('viewThesisReviewDetail called:', { itemId, viewType, thesisType });
+
     const dataSource = thesisType === 'plan' ? appData.submissions.thesisPlan :
                        thesisType === 'mid' ? appData.submissions.midThesis :
                        appData.submissions.finalThesis;
 
+    console.log('dataSource length:', dataSource ? dataSource.length : 'null');
+
     const item = dataSource.find(d => d.id === itemId);
 
+    console.log('item found:', item ? 'yes' : 'no');
+
     if (!item) {
-        showAlert('심사 정보를 찾을 수 없습니다.');
+        console.error('Item not found for id:', itemId);
+        alert('심사 정보를 찾을 수 없습니다.');
         return;
     }
 
@@ -2368,7 +2375,13 @@ function viewThesisReviewDetail(itemId, viewType, thesisType) {
     content += '<div class="flex-1"><p class="text-sm font-medium text-yellow-800">읽기 전용 모드</p>';
     content += '<p class="text-xs text-yellow-700 mt-1">이 화면은 교수의 평가 내용을 조회하기 위한 읽기 전용 화면입니다. 수정이 필요한 경우 교수 계정으로 로그인하여 진행해주세요.</p></div></div></div></div>';
 
+    console.log('About to call openModal with title:', modalTitle);
+    console.log('openModal function exists:', typeof openModal);
+    console.log('closeModal function exists:', typeof closeModal);
+
     openModal(modalTitle, content, '닫기', () => { closeModal(); }, true);
+
+    console.log('openModal called successfully');
 }
 
 window.viewThesisReviewDetail = viewThesisReviewDetail;
