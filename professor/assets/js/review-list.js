@@ -86,10 +86,16 @@ function renderReviewList() {
                                 </span>
                             </td>
                             <td class="py-3 px-4 text-center">
-                                <button onclick="openReviewDetail('${assignment.id}')"
-                                        class="text-blue-600 hover:underline text-sm font-medium ${assignment.myRole === 'chair' ? 'font-bold' : ''}">
-                                    ${assignment.myRole === 'chair' ? '위원장 평가' : '위원 평가'}
-                                </button>
+                                <div class="flex gap-2 justify-center">
+                                    <button onclick="openReviewDetail('${assignment.id}', 'member')"
+                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded ${assignment.myRole === 'member' ? 'font-bold bg-blue-50' : ''}">
+                                        위원
+                                    </button>
+                                    <button onclick="openReviewDetail('${assignment.id}', 'chair')"
+                                            class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded ${assignment.myRole === 'chair' ? 'font-bold bg-green-50' : ''}">
+                                        위원장
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                     `).join('')}
@@ -237,19 +243,20 @@ function formatDate(dateStr) {
 }
 
 // ==================== 심사 상세 열기 ====================
-function openReviewDetail(assignmentId) {
+function openReviewDetail(assignmentId, viewType) {
     const modal = document.getElementById('review-detail-modal');
     if (!modal) {
         console.error('심사 상세 모달을 찾을 수 없습니다');
         return;
     }
-    
+
     // 모달 데이터 설정
     modal.dataset.assignmentId = assignmentId;
-    
+    modal.dataset.viewType = viewType || 'member';
+
     // 상세 정보 렌더링
-    renderReviewDetail(assignmentId);
-    
+    renderReviewDetail(assignmentId, viewType);
+
     // 모달 열기
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
