@@ -48,7 +48,7 @@ function renderReviewDetail(assignmentId, viewType) {
 
 // ==================== 논문 정보 (관리자 페이지 스타일) ====================
 function renderThesisInfo(assignment) {
-    // 카피킬러/GPT킬러 점수 (더미 데이터 - 실제로는 assignment에 포함)
+    // CopyKiller/GPT Killer 점수 (더미 데이터 - 실제로는 assignment에 포함)
     const copyKiller = assignment.copyKiller || Math.floor(Math.random() * 15) + 3;
     const gptKiller = assignment.gptKiller || Math.floor(Math.random() * 15) + 2;
 
@@ -110,7 +110,7 @@ function renderThesisInfo(assignment) {
                     ${(assignment.submissionType === '중간논문' || assignment.submissionType === '최종논문') ? `
                     <div class="info-row">
                         <div class="info-label">표절/AI 검사</div>
-                        <div class="info-value">카피킬러: ${copyKiller}% / GPT킬러: ${gptKiller}%</div>
+                        <div class="info-value">CopyKiller: ${copyKiller}% / GPT Killer: ${gptKiller}%</div>
                     </div>
                     ` : ''}
                 </div>

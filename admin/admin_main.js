@@ -1283,8 +1283,8 @@ function viewGuidanceProgressDetail(studentId) {
             <div class="flex items-center gap-4 text-sm text-gray-600">
                 <span>${record.submitDate}</span>
                 <span>피드백 ${record.feedbackCount}회</span>
-                <span>카피킬러 ${record.copyKiller}%</span>
-                <span>GPT킬러 ${record.gptKiller}%</span>
+                <span>CopyKiller ${record.copyKiller}%</span>
+                <span>GPT Killer ${record.gptKiller}%</span>
             </div>
             <div class="text-sm text-gray-500 mt-1">${record.fileName}</div>
         </div>
@@ -1359,11 +1359,11 @@ function viewGuidanceProgressDetail(studentId) {
                         <div class="grid grid-cols-2 gap-4 mt-4">
                             <div class="bg-white rounded-lg p-4 text-center">
                                 <div class="text-lg font-bold text-red-600">${stats.avgCopyKiller.toFixed(1)}%</div>
-                                <div class="text-xs text-gray-600 mt-1">평균 카피킬러</div>
+                                <div class="text-xs text-gray-600 mt-1">평균 CopyKiller</div>
                             </div>
                             <div class="bg-white rounded-lg p-4 text-center">
                                 <div class="text-lg font-bold text-red-600">${stats.avgGptKiller.toFixed(1)}%</div>
-                                <div class="text-xs text-gray-600 mt-1">평균 GPT킬러</div>
+                                <div class="text-xs text-gray-600 mt-1">평균 GPT Killer</div>
                             </div>
                         </div>
                     </div>
@@ -1464,7 +1464,7 @@ function viewFeedbackRecordDetail(recordId) {
                         <h5 class="text-sm font-bold text-gray-800 mb-2">표절 검증 결과</h5>
                         <div class="grid grid-cols-2 gap-4">
                             <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-500">
-                                <div class="text-xs text-gray-600 mb-1">카피킬러</div>
+                                <div class="text-xs text-gray-600 mb-1">CopyKiller</div>
                                 <div class="text-2xl font-bold ${record.copyKiller > 10 ? 'text-red-600' : 'text-green-600'}">
                                     ${record.copyKiller}%
                                 </div>
@@ -1473,7 +1473,7 @@ function viewFeedbackRecordDetail(recordId) {
                                 </div>
                             </div>
                             <div class="bg-red-50 rounded-lg p-4 border-l-4 border-red-500">
-                                <div class="text-xs text-gray-600 mb-1">GPT킬러</div>
+                                <div class="text-xs text-gray-600 mb-1">GPT Killer</div>
                                 <div class="text-2xl font-bold ${record.gptKiller > 5 ? 'text-red-600' : 'text-green-600'}">
                                     ${record.gptKiller}%
                                 </div>
@@ -2404,7 +2404,7 @@ function viewStudentDetail(studentId) {
                             </div>
                             <div class="bg-white border rounded-lg p-4 text-center">
                                 <div class="text-lg font-bold text-red-600">${feedbackStats.avgCopyKiller}%</div>
-                                <div class="text-xs text-gray-600 mt-1">평균 카피킬러</div>
+                                <div class="text-xs text-gray-600 mt-1">평균 CopyKiller</div>
                             </div>
                         </div>
                     </div>
@@ -2706,7 +2706,7 @@ function viewThesisReviewDetail(itemId, viewType, thesisType) {
     if (item.copyKiller || item.gptKiller) {
         const copyKiller = item.copyKiller || 0;
         const gptKiller = item.gptKiller || 0;
-        content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">표절/AI 검사</div><div class="flex-1">카피킬러: ' + copyKiller + '% / GPT킬러: ' + gptKiller + '%</div></div>';
+        content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">표절/AI 검사</div><div class="flex-1">CopyKiller: ' + copyKiller + '% / GPT Killer: ' + gptKiller + '%</div></div>';
     }
     content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">지도교수</div><div class="flex-1">' + item.advisor + '</div></div>';
     content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">제출일</div><div class="flex-1">' + (item.submitDate || '-') + '</div></div>';

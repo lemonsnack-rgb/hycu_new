@@ -180,9 +180,9 @@ function renderPlagiarismScore(copyScore, gptScore) {
     return `
         <div class="text-xs">
             <div>
-                <span class="${copyColor} font-semibold">카피킬러: ${copyScore}</span>
+                <span class="${copyColor} font-semibold">CopyKiller: ${copyScore}</span>
                 <span class="text-gray-400 mx-1">/</span>
-                <span class="${gptColor} font-semibold">GPT킬러: ${gptScore}</span>
+                <span class="${gptColor} font-semibold">GPT Killer: ${gptScore}</span>
             </div>
             <a href="#" onclick="showPlagiarismReport('통합', event)" class="text-blue-600 hover:underline text-xs">
                 결과보고서 보기 <i class="fas fa-external-link-alt"></i>
@@ -206,7 +206,7 @@ function getGptScoreColor(score) {
 // ==================== 표절 리포트 보기 ====================
 function showPlagiarismReport(type, event) {
     event.preventDefault();
-    const reportType = type === 'copykiller' ? '카피킬러' : 'GPT킬러';
+    const reportType = type === 'copykiller' ? 'CopyKiller' : 'GPT Killer';
     alert(`${reportType} 리포트 보기 기능 (구현 예정)\n\n실제 구현 시:\n- 새 창으로 리포트 페이지 열기\n- 또는 모달로 리포트 표시`);
 }
 

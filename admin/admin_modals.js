@@ -196,7 +196,7 @@ function viewSubmissionDetail(id, type) {
                         <div class="text-2xl font-bold text-gray-800">
                             <span class="${item.copyKiller <= 10 ? 'text-green-600' : item.copyKiller <= 20 ? 'text-yellow-600' : 'text-red-600'}">CopyKiller ${item.copyKiller}%</span>
                             <span class="text-gray-400 mx-3">/</span>
-                            <span class="${item.gptKiller <= 10 ? 'text-green-600' : item.gptKiller <= 20 ? 'text-yellow-600' : 'text-red-600'}">GPT킬러 ${item.gptKiller}%</span>
+                            <span class="${item.gptKiller <= 10 ? 'text-green-600' : item.gptKiller <= 20 ? 'text-yellow-600' : 'text-red-600'}">GPT Killer ${item.gptKiller}%</span>
                         </div>
                     </div>
                     <div class="mt-4">

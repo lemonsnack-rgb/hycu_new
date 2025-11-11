@@ -112,10 +112,10 @@ function createFeedbackModal(request, feedbackData) {
                     <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
                         v${feedbackData ? feedbackData.version : 1}
                     </span>
-                    <!-- ID 47: 카피킬러/GPT킬러 결과보고서 링크 -->
+                    <!-- ID 47: CopyKiller/GPT Killer 결과보고서 링크 -->
                     <div class="text-sm text-gray-600">
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            카피킬러: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT킬러: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-blue-600 hover:underline text-xs">결과보고서(통합)</a>
+                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-blue-600 hover:underline text-xs">결과보고서(통합)</a>
                         </a>
                     </div>
                 </div>
@@ -436,7 +436,7 @@ function downloadPlagiarismReport(type, requestId) {
         : `/api/reports/gptkiller/${requestId}.pdf`;
     
     // 실제 구현 시 다운로드 처리
-    alert(`${type === 'copykiller' ? '카피킬러' : 'GPT킬러'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
+    alert(`${type === 'copykiller' ? 'CopyKiller' : 'GPT Killer'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
     console.log(`다운로드 URL: ${reportUrl}`);
 }
 
@@ -744,7 +744,7 @@ function downloadPlagiarismReport(type, requestId){
     return;
   }
   const reportUrl = type === 'copykiller' ? `/api/reports/copykiller/${requestId}.pdf` : `/api/reports/gptkiller/${requestId}.pdf`;
-  alert(`${type==='copykiller'?'카피킬러':'GPT킬러'} 결과보고서 다운로드\n(샘플)`);
+  alert(`${type==='copykiller'?'CopyKiller':'GPT Killer'} 결과보고서 다운로드\n(샘플)`);
 }
 
 // helper
