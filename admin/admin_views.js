@@ -186,12 +186,22 @@ const views = {
                         </div>
                     </div>
                 </div>
+
+                <!-- 학생 선택 영역 (알림 발송) -->
+                ${typeof StudentSelection !== 'undefined' ? StudentSelection.createSelectionUI() : ''}
+
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table id="research-proposal-table" class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">
-                                    <input type="checkbox" onclick="toggleAllCheckboxes(this)">
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">
+                                    <input
+                                        type="checkbox"
+                                        id="select-all-students"
+                                        class="checkbox-input"
+                                        onchange="if(typeof StudentSelection !== 'undefined') StudentSelection.toggleSelectAll()"
+                                        title="전체 선택"
+                                    >
                                 </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
@@ -208,27 +218,44 @@ const views = {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.map((item, idx) => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4">
-                                        <input type="checkbox" value="${item.id}">
-                                    </td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.graduate || '일반대학원'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.major}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">
-                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
-                                    </td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.semesterCount || '-'}학기</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.phone || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.email || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.studentStatus || '재학'}</td>
-                                    <td class="py-3 px-4">
-                                        <span class="status-badge status-${item.status}">
-                                            ${item.status}
-                                        </span>
+                            ${data.map((item, idx) => {
+                                // 알림 발송용 학생 데이터
+                                const studentData = {
+                                    studentId: item.studentId,
+                                    studentName: item.studentName,
+                                    phone: item.phone || '-',
+                                    email: item.email || '-',
+                                    major: item.major,
+                                    degree: item.degree
+                                };
+
+                                return `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="py-3 px-4 text-center">
+                                            <input
+                                                type="checkbox"
+                                                class="student-checkbox checkbox-input"
+                                                data-student-id="${item.studentId}"
+                                                data-student-data='${JSON.stringify(studentData)}'
+                                                onchange="if(typeof StudentSelection !== 'undefined') StudentSelection.toggleStudent(this)"
+                                            >
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${idx + 1}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.graduate || '일반대학원'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.major}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.degree}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.studentId}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">
+                                            ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.semesterCount || '-'}학기</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.phone || '-'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.email || '-'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${item.studentStatus || '재학'}</td>
+                                        <td class="py-3 px-4">
+                                            <span class="status-badge status-${item.status}">
+                                                ${item.status}
+                                            </span>
                                     </td>
                                     <td class="py-3 px-4">
                                         <button onclick="viewSubmissionDetail(${item.id}, 'researchProposal')" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
