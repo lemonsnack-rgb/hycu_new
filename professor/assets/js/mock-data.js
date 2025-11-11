@@ -601,6 +601,80 @@ const MOCK_DATA = {
         '오타를 수정해주세요.',
         '이 부분은 잘 작성되었습니다.',
         '앞의 내용과 중복되는 부분입니다.'
+    ],
+
+    // 자료실 게시판 데이터
+    resourceBoards: [
+        {
+            id: 1,
+            title: '논문 작성 가이드라인',
+            content: '<p>논문 작성시 다음 사항을 참고하시기 바랍니다.</p><ul><li>서론에서 연구 배경과 목적을 명확히 기술</li><li>선행연구 검토를 충실히 수행</li><li>연구 방법론을 구체적으로 설명</li></ul>',
+            authorId: 'P001',
+            authorName: '김교수',
+            authorRole: 'professor',
+            createdAt: '2025-11-05T10:30:00',
+            updatedAt: '2025-11-05T10:30:00',
+            files: [
+                { id: 'F001', name: '논문작성가이드.docx', size: 856000, url: '#' },
+                { id: 'F002', name: '참고논문.pdf', size: 3400000, url: '#' }
+            ],
+            viewerType: 'masters', // 'all', 'masters', 'phd', 'specific'
+            viewers: [], // Array of student IDs (only used when viewerType is 'specific')
+            views: 28,
+            comments: [
+                {
+                    id: 'C001',
+                    authorId: 'S001',
+                    authorName: '김철수',
+                    authorRole: 'student',
+                    content: '감사합니다! 많은 도움이 되었습니다.',
+                    createdAt: '2025-11-06T14:20:00'
+                }
+            ]
+        },
+        {
+            id: 2,
+            title: '이번 주 미팅 일정 안내',
+            content: '<p>11월 8일 (금) 오후 2시에 줌 미팅을 진행합니다.</p><p>각자 진행상황을 5분 내외로 발표 준비 부탁드립니다.</p>',
+            authorId: 'P001',
+            authorName: '김교수',
+            authorRole: 'professor',
+            createdAt: '2025-11-03T09:15:00',
+            updatedAt: '2025-11-03T09:15:00',
+            files: [
+                { id: 'F003', name: '미팅자료.pdf', size: 1200000, url: '#' }
+            ],
+            viewerType: 'all',
+            viewers: [],
+            views: 15,
+            comments: []
+        },
+        {
+            id: 3,
+            title: '중간 보고서 진행 상황',
+            content: '<p>중간 보고서 작성을 완료하였습니다.</p><p>검토 부탁드립니다.</p>',
+            authorId: 'S001',
+            authorName: '김철수',
+            authorRole: 'student',
+            createdAt: '2025-11-07T16:45:00',
+            updatedAt: '2025-11-07T16:45:00',
+            files: [
+                { id: 'F004', name: '중간보고서_김철수.docx', size: 2100000, url: '#' }
+            ],
+            viewerType: 'specific',
+            viewers: ['P001'],
+            views: 3,
+            comments: [
+                {
+                    id: 'C002',
+                    authorId: 'P001',
+                    authorName: '김교수',
+                    authorRole: 'professor',
+                    content: '전체적으로 잘 작성하셨습니다. 3장 연구방법론 부분을 좀 더 보완해주세요.',
+                    createdAt: '2025-11-08T10:30:00'
+                }
+            ]
+        }
     ]
 };
 
@@ -872,6 +946,117 @@ const DataService = {
     // 퀵마크
     getQuickMarks() {
         return localData.quickMarks;
+    },
+
+    // 자료실 게시판
+    getResourceBoards(userRole, userId) {
+        // 권한에 따라 필터링
+        return localData.resourceBoards.filter(post => {
+            // 작성자 본인이면 항상 볼 수 있음
+            if (post.authorId === userId) return true;
+
+            // 교수인 경우: 자신의 학생들이 작성한 글도 볼 수 있음
+            if (userRole === 'professor') {
+                const student = localData.students.find(s => s.id === post.authorId);
+                if (student && student.advisor === userId) return true;
+
+                // 자신이 작성한 글의 열람권한 확인
+                if (post.authorRole === 'professor' && post.authorId === userId) return true;
+            }
+
+            // 학생인 경우: 지도교수가 작성한 글 중 자신이 볼 수 있는 것만
+            if (userRole === 'student') {
+                const student = localData.students.find(s => s.id === userId);
+                if (!student) return false;
+
+                // 지도교수가 작성한 글인지 확인
+                if (post.authorRole === 'professor' && post.authorId === student.advisor) {
+                    // 열람 권한 체크
+                    if (post.viewerType === 'all') return true;
+                    if (post.viewerType === 'masters' && student.degree === 'master') return true;
+                    if (post.viewerType === 'phd' && student.degree === 'phd') return true;
+                    if (post.viewerType === 'specific' && post.viewers.includes(userId)) return true;
+                }
+
+                // 같은 지도교수의 다른 학생이 작성한 글도 볼 수 있음
+                const postAuthorStudent = localData.students.find(s => s.id === post.authorId);
+                if (postAuthorStudent && postAuthorStudent.advisor === student.advisor) {
+                    // 해당 학생 글의 열람 권한 확인 (교수 또는 특정 사용자)
+                    if (post.viewerType === 'specific' && post.viewers.includes(student.advisor)) return true;
+                }
+            }
+
+            return false;
+        });
+    },
+
+    getResourceBoard(postId) {
+        return localData.resourceBoards.find(p => p.id === postId);
+    },
+
+    createResourceBoard(postData) {
+        const newPost = {
+            id: localData.resourceBoards.length + 1,
+            ...postData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            views: 0,
+            comments: []
+        };
+        localData.resourceBoards.unshift(newPost);
+        return newPost;
+    },
+
+    updateResourceBoard(postId, postData) {
+        const post = localData.resourceBoards.find(p => p.id === postId);
+        if (post) {
+            Object.assign(post, postData, {
+                updatedAt: new Date().toISOString()
+            });
+        }
+        return post;
+    },
+
+    deleteResourceBoard(postId) {
+        const index = localData.resourceBoards.findIndex(p => p.id === postId);
+        if (index !== -1) {
+            localData.resourceBoards.splice(index, 1);
+            return true;
+        }
+        return false;
+    },
+
+    addResourceBoardComment(postId, commentData) {
+        const post = localData.resourceBoards.find(p => p.id === postId);
+        if (post) {
+            const newComment = {
+                id: `C${Date.now()}`,
+                ...commentData,
+                createdAt: new Date().toISOString()
+            };
+            post.comments.push(newComment);
+            return newComment;
+        }
+        return null;
+    },
+
+    deleteResourceBoardComment(postId, commentId) {
+        const post = localData.resourceBoards.find(p => p.id === postId);
+        if (post) {
+            const index = post.comments.findIndex(c => c.id === commentId);
+            if (index !== -1) {
+                post.comments.splice(index, 1);
+                return true;
+            }
+        }
+        return false;
+    },
+
+    incrementResourceBoardViews(postId) {
+        const post = localData.resourceBoards.find(p => p.id === postId);
+        if (post) {
+            post.views++;
+        }
     }
 };
 

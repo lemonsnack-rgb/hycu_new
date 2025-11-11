@@ -163,15 +163,40 @@ function renderEvaluationForm(template, existingEvaluation) {
     }
     
     // 점수형 방식 (기존)
+    // 통과 기준 정보 추출
+    const criteria = template.passingCriteria || {};
+    const rules = criteria.rules || [];
+    const minRule = rules.find(r => r.type === 'minimum') || { value: 60 };
+    const avgRule = rules.find(r => r.type === 'average') || { value: 70 };
+    const totalRule = rules.find(r => r.type === 'total') || { value: 70, maxValue: 100 };
+
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
-            
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p class="text-sm text-blue-800">
-                    <strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요. 
-                    가중치가 적용되어 최종 점수가 계산됩니다.
-                </p>
+
+            <!-- 평가 기준 안내 -->
+            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    평가 기준 안내
+                </h4>
+                <div class="space-y-2 text-sm text-blue-900">
+                    <p class="flex items-center">
+                        <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                        <span>각 항목 최소 <strong class="font-bold">${minRule.value}점 이상</strong> (과락)</span>
+                    </p>
+                    <p class="flex items-center">
+                        <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                        <span>전체 평균 <strong class="font-bold">${avgRule.value}점 이상</strong></span>
+                    </p>
+                    <p class="flex items-center">
+                        <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                        <span>총점 <strong class="font-bold">${totalRule.value}점 이상</strong> (${totalRule.maxValue}점 만점)</span>
+                    </p>
+                </div>
             </div>
             
             <div id="evaluation-categories" class="space-y-4">

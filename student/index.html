@@ -36,12 +36,26 @@
         <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex-shrink-0 p-4 z-30 transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0">
             <!-- 로고 영역 -->
             <div class="mb-8">
-                <img src="https://i.ibb.co/271kh4Tt/HYCU-GS-SIGNATURE.png" 
-                     alt="한양사이버대학교 대학원 로고" 
+                <img src="https://i.ibb.co/271kh4Tt/HYCU-GS-SIGNATURE.png"
+                     alt="한양사이버대학교 대학원 로고"
                      class="w-full mb-2"
                      onerror="this.style.display='none';">
                 <h1 class="text-xl font-bold text-gray-800 pl-4">논문 지도 시스템</h1>
-                <p class="text-sm text-gray-600 pl-4">학생</p>
+
+                <!-- 역할 표시 -->
+                <div class="mt-2 pl-4">
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 14l9-5-9-5-9 5 9 5z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path>
+                        </svg>
+                        대학원생
+                    </span>
+                </div>
             </div>
             
             <nav>
@@ -177,6 +191,8 @@
     <div id="modal-container"></div>
     
     <!-- 스크립트 -->
+    <!-- 공유 데이터 서비스 (교수-학생 공통) -->
+    <script src="../professor/assets/js/mock-data.js"></script>
     <script src="assets/js/data.js"></script>
     <script src="assets/js/dashboard.js"></script>
     <script src="assets/js/meeting.js"></script>
