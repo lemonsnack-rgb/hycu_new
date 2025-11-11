@@ -596,8 +596,35 @@ function switchThesisTab(tab) {
 }
 
 function searchThesisReview() {
-    // TODO: 실제 검색 로직
-    showAlert('검색 기능은 백엔드 연동 후 동작합니다.');
+    // 검색 조건 수집
+    const year = document.getElementById('thesis-search-year')?.value || '';
+    const semester = document.getElementById('thesis-search-semester')?.value || '';
+    const semesterCount = document.getElementById('thesis-search-semester-count')?.value || '';
+    const type = document.getElementById('thesis-search-type')?.value || '';
+    const studentId = document.getElementById('thesis-search-student-id')?.value || '';
+    const studentName = document.getElementById('thesis-search-student-name')?.value || '';
+
+    // 통합된 원본 데이터
+    const combinedData = [
+        ...appData.submissions.thesisPlan.map(item => ({...item, submissionType: 'plan', submissionTypeName: '논문작성계획서 심사'})),
+        ...appData.submissions.midThesis.map(item => ({...item, submissionType: 'mid', submissionTypeName: '중간논문 심사'})),
+        ...appData.submissions.finalThesis.map(item => ({...item, submissionType: 'final', submissionTypeName: '최종논문 심사'}))
+    ];
+
+    // 필터링
+    window.filteredThesisData = combinedData.filter(item => {
+        if (year && (item.year || '2025') !== year) return false;
+        if (semester && (item.semester || '1') !== semester) return false;
+        if (semesterCount && (item.semesterCount || '') !== semesterCount) return false;
+        if (type && item.submissionType !== type) return false;
+        if (studentId && !item.studentId.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        return true;
+    });
+
+    // 뷰 재렌더링
+    switchView('thesisReview');
+    showAlert(`검색 결과: ${window.filteredThesisData.length}건`);
 }
 
 function resetThesisSearch() {
@@ -609,6 +636,12 @@ function resetThesisSearch() {
             field.value = '';
         }
     });
+
+    // 필터링된 데이터 초기화
+    window.filteredThesisData = null;
+
+    // 뷰 재렌더링
+    switchView('thesisReview');
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
