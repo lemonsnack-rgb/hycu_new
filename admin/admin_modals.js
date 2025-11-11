@@ -756,14 +756,25 @@ function editGuidanceRecord(recordId) {
 
 // ========== PDF 피드백 관련 함수 (뷰어는 별도 구현) ==========
 
-function viewPdfFeedback(id) {
+// Task 1-5 ID 25: PDF 뷰어 (관리자는 읽기 전용)
+function viewPdfFeedback(id, readOnly = false) {
     const item = appData.guidanceProgress.find(doc => doc.id === id);
     if (!item) {
         showAlert('문서를 찾을 수 없습니다.');
         return;
     }
-    
-    showAlert(`PDF 뷰어 오픈: ${item.fileName}\n\n※ PDF 뷰어는 별도로 구현됩니다.`);
+
+    // ID 25: 관리자는 읽기 전용으로 PDF 뷰어 열기
+    const mode = readOnly ? '읽기 전용 (관리자)' : '편집 가능 (교수)';
+    const description = readOnly ?
+        '관리자는 교수의 첨삭 내역만 조회할 수 있습니다.\n편집 및 댓글 기능은 비활성화됩니다.' :
+        '교수로서 PDF에 첨삭과 피드백을 작성할 수 있습니다.';
+
+    showAlert(`PDF 뷰어 오픈: ${item.fileName}\n모드: ${mode}\n\n${description}\n\n※ PDF 뷰어는 별도로 구현됩니다.`);
+
+    // TODO: 실제 PDF 뷰어 구현 시 readOnly 파라미터를 전달하여
+    // 편집 도구, 댓글 기능 등을 비활성화해야 함
+    // 예: openPdfViewer(item.fileName, { readOnly: readOnly });
 }
 
 function writeFeedback(id) {
