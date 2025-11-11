@@ -109,11 +109,7 @@ function renderThesisInfo(assignment) {
                     ${(assignment.submissionType === '중간논문' || assignment.submissionType === '최종논문') ? `
                     <div class="info-row">
                         <div class="info-label">표절/AI 검사</div>
-                        <div class="info-value">
-                            <span class="${copyKiller <= 10 ? 'text-green-600' : copyKiller <= 20 ? 'text-yellow-600' : 'text-red-600'} font-semibold">
-                                카피킬러: ${copyKiller}% / GPT킬러: ${gptKiller}%
-                            </span>
-                        </div>
+                        <div class="info-value">카피킬러: ${copyKiller}% / GPT킬러: ${gptKiller}%</div>
                     </div>
                     ` : ''}
                 </div>
