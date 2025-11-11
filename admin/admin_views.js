@@ -345,6 +345,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출일자</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">합격여부</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가일자</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -372,6 +373,12 @@ const views = {
                                         </span>
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.evalDate || '-'}</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button onclick="viewCommitteeEvaluations('${item.id}')"
+                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
+                                            상세조회
+                                        </button>
+                                    </td>
                                 </tr>
                             `).join('')}
                         </tbody>

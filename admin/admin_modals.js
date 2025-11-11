@@ -2566,3 +2566,172 @@ function toggleEvaluationSelect() {
     }
 }
 
+
+// ========== 심사위원별 평가 조회 (관리자용) ==========
+function viewCommitteeEvaluations(submissionId) {
+    // 해당 제출물의 심사 배정 및 평가 정보 가져오기
+    const assignment = getReviewAssignmentBySubmissionId(submissionId);
+    
+    if (!assignment) {
+        showAlert('심사 배정 정보를 찾을 수 없습니다.');
+        return;
+    }
+    
+    // 모달 타이틀
+    const title = `심사 상세 조회 - ` + assignment.studentName + ` (` + assignment.thesisTitle + `)`;
+    
+    // 논문 정보 섹션
+    let content = `
+        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+            <h4 class="font-bold text-gray-800 mb-3">논문 정보</h4>
+            <div class="grid grid-cols-2 gap-3 text-sm">
+                <div><span class="text-gray-600">대학원:</span> <span class="font-medium">` + (assignment.graduate || '일반대학원') + `</span></div>
+                <div><span class="text-gray-600">전공/학과:</span> <span class="font-medium">` + assignment.major + `</span></div>
+                <div><span class="text-gray-600">학위과정:</span> <span class="font-medium">` + assignment.degree + `</span></div>
+                <div><span class="text-gray-600">학번:</span> <span class="font-medium">` + assignment.studentId + `</span></div>
+                <div><span class="text-gray-600">학생명:</span> <span class="font-medium">` + assignment.studentName + `</span></div>
+                <div><span class="text-gray-600">지도교수:</span> <span class="font-medium">` + assignment.advisor + `</span></div>
+            </div>
+            <div class="mt-3">
+                <div><span class="text-gray-600">논문제목:</span> <span class="font-medium">` + (assignment.thesisTitle || '미정') + `</span></div>
+            </div>
+        </div>
+    `;
+    
+    // 심사위원회 정보
+    if (assignment.committee && assignment.committee.length > 0) {
+        content += `
+            <div class="mb-6">
+                <h4 class="font-bold text-gray-800 mb-3">심사위원회</h4>
+                <div class="space-y-2">
+        `;
+        
+        assignment.committee.forEach(member => {
+            const evaluation = getEvaluationByCommitteeMemberId(member.id);
+            const statusBadge = evaluation && evaluation.status === '제출완료' 
+                ? '<span class="text-xs px-2 py-1 bg-green-100 text-green-700 rounded">평가 완료</span>'
+                : '<span class="text-xs px-2 py-1 bg-yellow-100 text-yellow-700 rounded">평가 대기</span>';
+            
+            const evalButton = (evaluation && evaluation.status === '제출완료') 
+                ? `<button onclick="viewSingleEvaluation('` + member.id + `')" class="ml-2 text-blue-600 hover:text-blue-800 text-sm">평가 보기</button>`
+                : '';
+            
+            content += `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded border">
+                    <div>
+                        <div class="font-medium">` + member.professorName + `</div>
+                        <div class="text-sm text-gray-600">` + member.department + ` / ` + (member.role === 'chair' ? '심사위원장' : '심사위원') + `</div>
+                    </div>
+                    <div class="text-right">
+                        ` + statusBadge + `
+                        ` + evalButton + `
+                    </div>
+                </div>
+            `;
+        });
+        
+        content += `
+                </div>
+            </div>
+        `;
+    }
+    
+    // 평가 결과 요약 (모든 심사위원이 평가를 완료한 경우)
+    const allEvaluations = assignment.committee
+        .map(member => getEvaluationByCommitteeMemberId(member.id))
+        .filter(eval => eval && eval.status === '제출완료');
+    
+    if (allEvaluations.length > 0 && allEvaluations.length === assignment.committee.length) {
+        const avgScore = allEvaluations.reduce((sum, e) => sum + (e.totalScore || 0), 0) / allEvaluations.length;
+        const threshold = 75; // 합격 기준 점수
+        const passed = avgScore >= threshold;
+        
+        content += `
+            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <h4 class="font-bold text-gray-800 mb-3">평가 결과 요약</h4>
+                <div class="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                        <div class="text-sm text-gray-600">평균 점수</div>
+                        <div class="text-2xl font-bold text-blue-600">` + avgScore.toFixed(1) + `점</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">합격 기준</div>
+                        <div class="text-2xl font-bold text-gray-800">` + threshold + `점</div>
+                    </div>
+                    <div>
+                        <div class="text-sm text-gray-600">판정</div>
+                        <div class="text-2xl font-bold ` + (passed ? 'text-green-600' : 'text-red-600') + `">
+                            ` + (passed ? '합격' : '불합격') + `
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    openModal(title, content, '닫기', () => closeModal(), true);
+}
+
+// 심사 배정 정보 가져오기 (제출물 ID로)
+function getReviewAssignmentBySubmissionId(submissionId) {
+    // admin_data.js의 데이터에서 찾기
+    // 여기서는 더미 데이터 반환 (실제로는 appData에서 찾아야 함)
+    return {
+        id: submissionId,
+        studentId: '2024001',
+        studentName: '김철수',
+        studentNumber: '2024001',
+        major: '컴퓨터공학과',
+        degree: '석사',
+        graduate: '일반대학원',
+        advisor: '박교수',
+        thesisTitle: '딥러닝 기반 자연어 처리 모델의 성능 개선 연구',
+        committee: [
+            {
+                id: 'C001',
+                professorName: '이교수',
+                department: '컴퓨터공학과',
+                role: 'chair'
+            },
+            {
+                id: 'C002',
+                professorName: '김교수',
+                department: '인공지능학과',
+                role: 'member'
+            },
+            {
+                id: 'C003',
+                professorName: '정교수',
+                department: '소프트웨어학과',
+                role: 'member'
+            }
+        ]
+    };
+}
+
+// 심사위원의 평가 정보 가져오기
+function getEvaluationByCommitteeMemberId(committeeMemberId) {
+    // 더미 데이터 반환 (실제로는 appData에서 찾아야 함)
+    if (committeeMemberId === 'C001' || committeeMemberId === 'C002') {
+        return {
+            id: 'EVAL_' + committeeMemberId,
+            committeeId: committeeMemberId,
+            status: '제출완료',
+            totalScore: 85.5,
+            submittedAt: '2025-11-15 14:30:00'
+        };
+    }
+    return null;
+}
+
+// 개별 심사위원의 평가 상세 보기
+function viewSingleEvaluation(committeeMemberId) {
+    const evaluation = getEvaluationByCommitteeMemberId(committeeMemberId);
+    if (!evaluation) {
+        showAlert('평가 정보를 찾을 수 없습니다.');
+        return;
+    }
+    
+    // 여기서는 간단한 알림만 표시 (실제로는 상세 평가 모달을 표시)
+    showAlert('개별 평가 상세 화면은 구현 예정입니다.');
+}
