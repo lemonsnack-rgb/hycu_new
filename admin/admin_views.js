@@ -909,106 +909,110 @@ const views = {
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">주차별 논문지도 현황</h3>
-                    
-                    <!-- 검색 영역 (표준화) -->
+
+                    <!-- 검색 영역 (Task 1-4: ID 18 기준 간소화) -->
                     <div class="search-container">
                         <div class="search-grid">
-                            <select id="weekly-search-year" class="search-select" onchange="searchWeeklyGuidance()">
-                                <option value="">학년도 전체</option>
-                                <option value="2025">2025학년도</option>
-                                <option value="2024">2024학년도</option>
-                                <option value="2023">2023학년도</option>
+                            <!-- 1. 학년도 -->
+                            <select id="weekly-search-year" class="search-select">
+                                <option value="">학년도</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
                             </select>
-                            <select id="weekly-search-semester" class="search-select" onchange="searchWeeklyGuidance()">
-                                <option value="">학기 전체</option>
+
+                            <!-- 2. 학기 -->
+                            <select id="weekly-search-semester" class="search-select">
+                                <option value="">학기</option>
                                 <option value="1">1학기</option>
                                 <option value="2">2학기</option>
                             </select>
-                            <select id="weekly-search-major" class="search-select" onchange="searchWeeklyGuidance()">
-                                <option value="">학과 전체</option>
-                                <option value="교육공학">교육공학</option>
-                                <option value="경영학">경영학</option>
-                                <option value="컴퓨터공학">컴퓨터공학</option>
-                            </select>
-                            <select id="weekly-search-degree" class="search-select" onchange="searchWeeklyGuidance()">
-                                <option value="">학위 전체</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                            </select>
-                            <select id="weekly-search-advisor" class="search-select" onchange="searchWeeklyGuidance()">
-                                <option value="">지도교수 전체</option>
+
+                            <!-- 3. 지도교수 -->
+                            <select id="weekly-search-advisor" class="search-select">
+                                <option value="">지도교수</option>
                                 <option value="홍길동">홍길동</option>
                                 <option value="박교수">박교수</option>
                                 <option value="최교수">최교수</option>
                                 <option value="김교수">김교수</option>
                             </select>
-                            <select id="weekly-search-count" class="search-select" onchange="searchWeeklyGuidance()">
-                                <option value="">지도횟수 전체</option>
-                                <option value="1">1회 이상</option>
-                                <option value="3">3회 이상</option>
-                                <option value="5">5회 이상</option>
-                                <option value="0">지도계획 없음</option>
-                            </select>
-                            <input type="text" 
-                                   id="weekly-search-keyword" 
-                                   placeholder="학번/성명 검색"
-                                   class="search-input"
-                                   onkeypress="if(event.key==='Enter') searchWeeklyGuidance()">
+
+                            <!-- 4. 학번 -->
+                            <input type="text"
+                                   id="weekly-search-student-id"
+                                   placeholder="학번"
+                                   class="search-input">
+
+                            <!-- 5. 성명 -->
+                            <input type="text"
+                                   id="weekly-search-student-name"
+                                   placeholder="성명"
+                                   class="search-input">
                         </div>
+
                         <div class="search-buttons">
-                            <button onclick="searchWeeklyGuidance()" 
+                            <button onclick="searchWeeklyGuidance()"
                                     class="search-btn search-btn-primary">
                                 <i class="fas fa-search"></i>검색
                             </button>
-                            <button onclick="resetWeeklyGuidanceSearch()" 
+                            <button onclick="resetWeeklyGuidanceSearch()"
                                     class="search-btn search-btn-secondary">
                                 <i class="fas fa-redo"></i>초기화
                             </button>
                         </div>
                     </div>
                 </div>
-                
+
+                <!-- 테이블 (Task 1-4: ID 18 기준) -->
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문지도교수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도횟수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">최근지도일</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">액션</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기차</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">지도계획 수립여부</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">지도실적 입력여부</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.map((item, idx) => `
-                                <tr class="hover:bg-gray-50">
+                            ${data.map((item, idx) => {
+                                const hasPlan = item.guidanceCount > 0 || (item.planEstablished === true);
+                                const hasRecord = item.guidanceCount > 0;
+
+                                return `
+                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewWeeklyGuidanceDetail('${item.studentId}')">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.year || '2025'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.semester || '1'}학기</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.advisors ? item.advisors.join(', ') : (item.advisor || '-')}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.advisors.join(', ')}</td>
-                                    <td class="py-3 px-4 text-sm text-center">
-                                        ${item.guidanceCount > 0 ? 
-                                            `<span class="font-semibold text-blue-600">${item.guidanceCount}회</span>` : 
-                                            `<span class="text-gray-400">지도계획 없음</span>`
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.semesterCount || '-'}학기</td>
+                                    <td class="py-3 px-4 text-center">
+                                        ${hasPlan ?
+                                            '<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-green-100 text-green-700">수립</span>' :
+                                            '<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">미수립</span>'
                                         }
                                     </td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">
-                                        ${item.lastGuidanceDate || '-'}
-                                    </td>
-                                    <td class="py-3 px-4">
-                                        <button onclick="viewWeeklyGuidanceDetail('${item.studentId}')" 
-                                                class="text-[#6A0028] hover:underline text-sm">
-                                            상세보기
-                                        </button>
+                                    <td class="py-3 px-4 text-center">
+                                        ${hasRecord ?
+                                            '<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">입력완료 (' + item.guidanceCount + '회)</span>' :
+                                            '<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-gray-100 text-gray-600">미입력</span>'
+                                        }
                                     </td>
                                 </tr>
-                            `).join('')}
+                            `;}).join('')}
                         </tbody>
                     </table>
                 </div>

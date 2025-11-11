@@ -402,64 +402,58 @@ function cancelApprovalResearchProposal(id) {
 // ========== 주차별 논문지도 검색 ==========
 
 function searchWeeklyGuidance() {
+    // Task 1-4: 간소화된 검색 필드 (학년도, 학기, 지도교수, 학번, 성명)
     const filters = {
         year: document.getElementById('weekly-search-year')?.value || '',
         semester: document.getElementById('weekly-search-semester')?.value || '',
-        major: document.getElementById('weekly-search-major')?.value || '',
-        degree: document.getElementById('weekly-search-degree')?.value || '',
         advisor: document.getElementById('weekly-search-advisor')?.value || '',
-        count: document.getElementById('weekly-search-count')?.value || '',
-        keyword: document.getElementById('weekly-search-keyword')?.value.toLowerCase().trim() || ''
+        studentId: document.getElementById('weekly-search-student-id')?.value.toLowerCase().trim() || '',
+        studentName: document.getElementById('weekly-search-student-name')?.value.toLowerCase().trim() || ''
     };
-    
+
     // 원본 데이터 백업
     if (!appData.originalWeeklyGuidanceStudents) {
         appData.originalWeeklyGuidanceStudents = [...appData.weeklyGuidanceStudents];
     }
-    
+
     // 필터링
     let filtered = [...appData.originalWeeklyGuidanceStudents];
-    
-    // 학과
-    if (filters.major) {
-        filtered = filtered.filter(item => item.major === filters.major);
+
+    // 학년도
+    if (filters.year) {
+        filtered = filtered.filter(item => (item.year || '2025') === filters.year);
     }
-    
-    // 학위과정
-    if (filters.degree) {
-        filtered = filtered.filter(item => item.degree === filters.degree);
+
+    // 학기
+    if (filters.semester) {
+        filtered = filtered.filter(item => (item.semester || '1') === filters.semester);
     }
-    
+
     // 지도교수 (복수 지도교수 고려)
     if (filters.advisor) {
-        filtered = filtered.filter(item => item.advisors.includes(filters.advisor));
-    }
-    
-    // 지도횟수
-    if (filters.count) {
-        const count = parseInt(filters.count);
-        if (count === 0) {
-            // 지도계획 없음
-            filtered = filtered.filter(item => item.guidanceCount === 0);
-        } else {
-            // N회 이상
-            filtered = filtered.filter(item => item.guidanceCount >= count);
-        }
-    }
-    
-    // 학번/성명 키워드
-    if (filters.keyword) {
         filtered = filtered.filter(item => {
-            return item.studentName.toLowerCase().includes(filters.keyword) ||
-                   item.studentId.toLowerCase().includes(filters.keyword);
+            if (item.advisors && Array.isArray(item.advisors)) {
+                return item.advisors.includes(filters.advisor);
+            }
+            return item.advisor === filters.advisor;
         });
     }
-    
+
+    // 학번
+    if (filters.studentId) {
+        filtered = filtered.filter(item => item.studentId.toLowerCase().includes(filters.studentId));
+    }
+
+    // 성명
+    if (filters.studentName) {
+        filtered = filtered.filter(item => item.studentName.toLowerCase().includes(filters.studentName));
+    }
+
     appData.weeklyGuidanceStudents = filtered;
-    
+
     // 화면 새로고침
     switchView('weeklyGuidance');
-    
+
     showAlert(`검색 결과: ${filtered.length}건`);
 }
 
@@ -468,18 +462,16 @@ function resetWeeklyGuidanceSearch() {
     if (appData.originalWeeklyGuidanceStudents) {
         appData.weeklyGuidanceStudents = [...appData.originalWeeklyGuidanceStudents];
     }
-    
-    // 검색 필드 초기화
+
+    // 검색 필드 초기화 (Task 1-4: 간소화된 필드만)
     const searchFields = [
         'weekly-search-year',
         'weekly-search-semester',
-        'weekly-search-major',
-        'weekly-search-degree',
         'weekly-search-advisor',
-        'weekly-search-count',
-        'weekly-search-keyword'
+        'weekly-search-student-id',
+        'weekly-search-student-name'
     ];
-    
+
     searchFields.forEach(id => {
         const field = document.getElementById(id);
         if (field) {
