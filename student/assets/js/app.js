@@ -34,14 +34,15 @@ function showScreen(screenName) {
         'feedback': '온라인 피드백',
         'review': '심사 신청',
         'title-change': '논문제목 변경',
-        'board': '자료실'
+        'board': '자료실',
+        'journal-submission': '학술지 실적 제출'
     };
-    
+
     const titleElement = document.getElementById('page-title');
     if (titleElement) {
         titleElement.textContent = titles[screenName] || screenName;
     }
-    
+
     // 해당 화면 렌더링 함수 호출
     const renderFunctions = {
         'dashboard': renderDashboard,
@@ -49,9 +50,10 @@ function showScreen(screenName) {
         'feedback': renderFeedback,
         'review': renderReview,
         'title-change': renderTitleChange,
-        'board': () => initBoard('student')
+        'board': () => initBoard('student'),
+        'journal-submission': initJournalSubmission
     };
-    
+
     if (renderFunctions[screenName]) {
         renderFunctions[screenName]();
     }
