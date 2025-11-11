@@ -1,0 +1,435 @@
+// ==================== Mock 데이터 ====================
+
+const StudentData = {
+    // 학생 정보 (🔧 Critical Fix #3: DEMO_STUDENT 상수 사용)
+    student: {
+        id: window.DEMO_STUDENT?.id || '2024001',
+        name: window.DEMO_STUDENT?.name || '김철수',
+        program: window.DEMO_STUDENT?.program || '박사',
+        year: window.DEMO_STUDENT?.year || 1,
+        major: window.DEMO_STUDENT?.major || '컴퓨터공학',
+        advisor: window.DEMO_STUDENT?.advisor || '김교수',
+        email: window.DEMO_STUDENT?.email || 'kim@hycu.ac.kr',
+        enrollmentDate: window.DEMO_STUDENT?.enrollmentDate || '2024-03-01'
+    },
+    
+    // 졸업 요건 체크리스트
+    graduationRequirements: [
+        {
+            id: 1,
+            name: '학점 이수',
+            type: 'credits',
+            required: 36,
+            current: 30,
+            completed: false,
+            status: '진행중',
+            details: '30/36 학점 (83% 완료)',
+            icon: '🔄'
+        },
+        {
+            id: 2,
+            name: '연구계획서 심사',
+            type: 'review',
+            completed: true,
+            status: '완료',
+            score: 85,
+            approvalDate: '2025-09-28',
+            details: '승인 (85점)',
+            icon: '✓'
+        },
+        {
+            id: 3,
+            name: '중간논문 심사',
+            type: 'review',
+            completed: false,
+            status: '심사중',
+            progress: 66,
+            details: '심사 진행중 (66%)',
+            icon: '🔄'
+        },
+        {
+            id: 4,
+            name: '최종논문 심사',
+            type: 'review',
+            completed: false,
+            status: '미진행',
+            details: '미진행',
+            icon: '☐'
+        },
+        {
+            id: 5,
+            name: '학술활동',
+            type: 'activity',
+            required: 2,
+            current: 1,
+            completed: false,
+            status: '진행중',
+            details: '1/2 완료',
+            icon: '🔄'
+        },
+        {
+            id: 6,
+            name: '논문 투고',
+            type: 'publication',
+            completed: false,
+            status: '미완료',
+            details: '미완료',
+            icon: '☐'
+        }
+    ],
+    
+    // 알림
+    notifications: [
+        {
+            id: 1,
+            title: '중간논문 심사 진행중',
+            message: '심사위원 2/3 완료. 박교수님 심사 대기중입니다.',
+            createdAt: '2025-11-03T09:00:00',
+            read: false,
+            type: 'review'
+        },
+        {
+            id: 2,
+            title: '논문제목 변경 승인',
+            message: '11/15 신청한 논문제목 변경이 승인되었습니다.',
+            createdAt: '2025-11-02T14:30:00',
+            read: false,
+            type: 'title'
+        },
+        {
+            id: 3,
+            title: '미팅 일정 알림',
+            message: '11/07 10:00 연구방법론 논의 미팅이 예정되어 있습니다.',
+            createdAt: '2025-11-01T16:00:00',
+            read: false,
+            type: 'meeting'
+        }
+    ],
+    
+    // 미팅 일정
+    meetings: [
+        {
+            id: 1,
+            title: '연구방법론 논의',
+            date: '2025-11-07T10:00:00',
+            endDate: '2025-11-07T11:00:00',
+            advisor: '김교수',
+            location: 'Zoom',
+            zoomLink: 'https://zoom.us/j/123456789',
+            status: '승인됨',
+            agenda: '• 연구방법론 선택 논의\n• 설문지 설계 검토\n• 데이터 수집 계획 수립',
+            notes: '설문지 초안을 준비해 가겠습니다',
+            attachments: ['survey_draft_v1.pdf'],
+            applicationDate: '2025-11-01',
+            approvalDate: '2025-11-02'
+        },
+        {
+            id: 2,
+            title: '중간발표 준비',
+            date: '2025-11-10T14:00:00',
+            endDate: '2025-11-10T15:30:00',
+            advisor: '김교수',
+            location: 'Zoom',
+            zoomLink: 'https://zoom.us/j/987654321',
+            status: '승인됨',
+            agenda: '• 발표 자료 검토\n• 발표 연습\n• 질의응답 준비',
+            applicationDate: '2025-11-02',
+            approvalDate: '2025-11-03'
+        },
+        {
+            id: 3,
+            title: '데이터 분석 논의',
+            date: '2025-11-15T16:00:00',
+            endDate: '2025-11-15T17:00:00',
+            advisor: '김교수',
+            location: 'Zoom',
+            zoomLink: 'https://zoom.us/j/456789123',
+            status: '대기중',
+            agenda: '• 데이터 분석 방법 논의\n• 통계 결과 해석',
+            applicationDate: '2025-11-03'
+        }
+    ],
+    
+    // 피드백 문서
+    feedbacks: [
+        {
+            id: 1,
+            title: '논문 초안',
+            stage: '최종논문 준비',
+            version: 'v3',
+            isLatest: true,
+            uploadDate: '2025-11-01T14:30:00',
+            file: 'thesis_draft_v3.pdf',
+            fileSize: '2.5 MB',
+            pageCount: 45,
+            feedbackCount: 5,
+            unreadCount: 2,
+            status: '피드백 완료',
+            description: '3장 연구방법 추가 및 전체 구조 수정',
+            comments: [
+                {
+                    id: 1,
+                    page: 3,
+                    author: '김교수',
+                    authorRole: 'professor',
+                    content: '연구 방법론 부분에서 표본 크기 산정 근거를 더 명확히 제시해주세요.',
+                    createdAt: '2025-11-02T09:30:00',
+                    read: false,
+                    replies: [
+                        {
+                            id: 11,
+                            author: '홍길동',
+                            authorRole: 'student',
+                            content: '네, 교수님. G*Power로 표본 크기를 재계산하여 추가하겠습니다.',
+                            createdAt: '2025-11-02T14:20:00'
+                        }
+                    ]
+                },
+                {
+                    id: 2,
+                    page: 12,
+                    author: '김교수',
+                    authorRole: 'professor',
+                    content: '이론적 배경이 잘 정리되었습니다. 선행연구 간 비교 분석이 명확합니다.',
+                    createdAt: '2025-11-02T10:15:00',
+                    read: true
+                }
+            ],
+            versions: [
+                { version: 'v3', date: '2025-11-01T14:30:00', description: '3장 추가 및 전체 수정' },
+                { version: 'v2', date: '2025-10-25T16:20:00', description: '2장 이론적 배경 보강' },
+                { version: 'v1', date: '2025-10-15T10:00:00', description: '초안 작성' }
+            ]
+        },
+        {
+            id: 2,
+            title: '2장: 이론적 배경',
+            stage: '최종논문 준비',
+            version: 'v2',
+            isLatest: true,
+            uploadDate: '2025-10-28T16:20:00',
+            file: 'chapter2_v2.pdf',
+            fileSize: '1.2 MB',
+            pageCount: 18,
+            feedbackCount: 3,
+            unreadCount: 0,
+            status: '검토중',
+            description: '선행연구 추가 및 이론 체계 재구성',
+            comments: [],
+            versions: [
+                { version: 'v2', date: '2025-10-28T16:20:00' },
+                { version: 'v1', date: '2025-10-20T11:00:00' }
+            ]
+        },
+        {
+            id: 3,
+            title: '연구계획서',
+            stage: '연구계획서 심사',
+            version: 'v1',
+            isLatest: true,
+            uploadDate: '2025-09-10T09:30:00',
+            file: 'proposal_v1.pdf',
+            fileSize: '1.8 MB',
+            pageCount: 25,
+            feedbackCount: 8,
+            unreadCount: 0,
+            status: '피드백 완료',
+            comments: [],
+            versions: [
+                { version: 'v1', date: '2025-09-10T09:30:00' }
+            ]
+        }
+    ],
+    
+    // 심사 현황
+    reviews: [
+        {
+            id: 1,
+            type: '중간논문 심사',
+            applicationDate: '2025-10-28',
+            status: '심사 진행중',
+            statusDetail: '심사위원 2/3 완료',
+            progress: 66,
+            expectedDate: '2025-11-15',
+            result: null,
+            score: null,
+            file: 'midterm_thesis.pdf',
+            plagiarismRate: 8,
+            plagiarismStatus: '통과',
+            reviewers: [
+                {
+                    name: '김교수',
+                    role: '주심',
+                    status: '완료',
+                    score: 88,
+                    reviewDate: '2025-11-02',
+                    comment: '연구 설계가 잘 되어 있습니다. 데이터 분석 부분을 더 보강하세요.',
+                    revisionRequests: [
+                        '3장의 데이터 분석 방법을 더 구체적으로 기술',
+                        '통계 분석 결과에 대한 해석을 추가',
+                        '그래프와 표의 일관성 확인'
+                    ]
+                },
+                {
+                    name: '이교수',
+                    role: '부심',
+                    status: '완료',
+                    score: 85,
+                    reviewDate: '2025-11-03',
+                    comment: '이론적 배경이 충실합니다. 결과 해석을 더 깊이 있게 다루면 좋겠습니다.',
+                    revisionRequests: [
+                        '4장 결과 부분의 논의를 더 깊이있게 작성',
+                        '선행연구와의 비교 분석 추가',
+                        '연구의 한계점 보완'
+                    ]
+                },
+                {
+                    name: '박교수',
+                    role: '부심',
+                    status: '대기중',
+                    score: null,
+                    reviewDate: null,
+                    comment: null
+                }
+            ]
+        },
+        {
+            id: 2,
+            type: '연구계획서 심사',
+            applicationDate: '2025-09-15',
+            status: '심사 완료',
+            statusDetail: null,
+            progress: 100,
+            result: '합격',
+            score: 85,
+            file: 'research_proposal.pdf',
+            plagiarismRate: 12,
+            plagiarismStatus: '통과',
+            reviewers: [
+                {
+                    name: '김교수',
+                    role: '주심',
+                    status: '완료',
+                    score: 90,
+                    reviewDate: '2025-09-20',
+                    comment: '연구 주제가 명확하고 연구 방법이 적절합니다.'
+                },
+                {
+                    name: '이교수',
+                    role: '부심',
+                    status: '완료',
+                    score: 80,
+                    reviewDate: '2025-09-22',
+                    comment: '선행연구 검토가 잘 되어있습니다.'
+                }
+            ]
+        }
+    ],
+    
+    // 논문제목 변경 이력
+    titleChanges: [
+        {
+            id: 1,
+            applicationDate: '2025-10-10T14:30:00',
+            approvalDate: '2025-10-15T09:20:00',
+            status: '승인',
+            oldTitle: {
+                korean: '고객 이탈 예측을 위한 머신러닝 모델 개발',
+                english: 'Development of Machine Learning Model for Customer Churn Prediction'
+            },
+            newTitle: {
+                korean: '인공지능 기반 고객 이탈 예측 모델 개발에 관한 연구',
+                english: 'Development of AI-based Customer Churn Prediction Model'
+            },
+            reason: '연구 범위를 명확히 하고, 학술적 표현을 강화하기 위해 제목을 수정합니다.',
+            professorComment: '변경된 제목이 연구 내용을 더 잘 반영합니다. 승인합니다.',
+            attachments: []
+        },
+        {
+            id: 2,
+            applicationDate: '2025-09-05T10:00:00',
+            approvalDate: '2025-09-08T16:30:00',
+            status: '승인',
+            oldTitle: {
+                korean: '고객 이탈 예측 모델 연구',
+                english: 'Study on Customer Churn Prediction Model'
+            },
+            newTitle: {
+                korean: '고객 이탈 예측을 위한 머신러닝 모델 개발',
+                english: 'Development of Machine Learning Model for Customer Churn Prediction'
+            },
+            reason: '연구 방법을 제목에 명확히 반영하기 위함',
+            professorComment: '연구 방법이 제목에 잘 반영되었습니다.',
+            attachments: []
+        }
+    ],
+    
+    // 현재 논문 제목
+    currentTitle: {
+        korean: '인공지능 기반 고객 이탈 예측 모델 개발에 관한 연구',
+        english: 'Development of AI-based Customer Churn Prediction Model',
+        registrationDate: '2025-09-01',
+        lastModifiedDate: '2025-10-15'
+    }
+};
+
+// 데이터 접근 함수
+const DataService = {
+    getStudent: () => StudentData.student,
+    
+    getGraduationRequirements: () => StudentData.graduationRequirements,
+    
+    calculateProgress: () => {
+        const reqs = StudentData.graduationRequirements;
+        const completed = reqs.filter(r => r.completed).length;
+        return Math.round((completed / reqs.length) * 100);
+    },
+    
+    getNotifications: () => StudentData.notifications,
+    
+    getMeetings: () => StudentData.meetings,
+    
+    getUpcomingMeetings: () => {
+        const now = new Date();
+        return StudentData.meetings
+            .filter(m => m.status === '승인됨' && new Date(m.date) >= now)
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 3);
+    },
+    
+    getFeedbacks: () => StudentData.feedbacks,
+    
+    getLatestFeedbacks: (count = 3) => {
+        return StudentData.feedbacks
+            .sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate))
+            .slice(0, count);
+    },
+    
+    getReviews: () => StudentData.reviews,
+
+    getTitleChanges: () => StudentData.titleChanges,
+
+    getCurrentTitle: () => StudentData.currentTitle,
+
+    getSubmissions: () => StudentData.feedbacks,
+
+    // Get current workflow step based on graduation requirements
+    getCurrentWorkflowStep: () => {
+        const reqs = StudentData.graduationRequirements;
+        const proposalReview = reqs.find(r => r.name === '연구계획서 심사');
+        const midtermReview = reqs.find(r => r.name === '중간논문 심사');
+        const finalReview = reqs.find(r => r.name === '최종논문 심사');
+
+        if (!proposalReview || !proposalReview.completed) return 'STEP_1';
+        if (!midtermReview || !midtermReview.completed) return 'STEP_3';
+        if (!finalReview || !finalReview.completed) return 'STEP_5';
+        return 'STEP_5';
+    }
+};
+
+// 🔧 Critical Fix #1: 전역 변수 네임스페이스 분리 (시연용 프로토타입)
+// 학생용 DataService를 별도 네임스페이스로 export
+window.StudentDataService = DataService;
+// 학생 화면에서만 사용하므로 DataService도 export (하위 호환성)
+window.DataService = DataService;
+window.StudentData = StudentData;

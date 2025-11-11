@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>학생용 논문 지도 시스템</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <!-- FullCalendar -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+    
+    <!-- Video.js -->
+    <link href="https://vjs.zencdn.net/7.20.3/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/7.20.3/video.min.js"></script>
+    
+    <!-- 커스텀 스타일 -->
+    <link rel="stylesheet" href="../common-style.css">
+    <link rel="stylesheet" href="../common-search.css">
+    <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="bg-gray-100">
+    <div class="relative flex min-h-screen">
+        <!-- 좌측 사이드바 -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex-shrink-0 p-4 z-30 transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0">
+            <!-- 로고 영역 -->
+            <div class="mb-8">
+                <img src="https://i.ibb.co/271kh4Tt/HYCU-GS-SIGNATURE.png" 
+                     alt="한양사이버대학교 대학원 로고" 
+                     class="w-full mb-2"
+                     onerror="this.style.display='none';">
+                <h1 class="text-xl font-bold text-gray-800 pl-4">논문 지도 시스템</h1>
+                <p class="text-sm text-gray-600 pl-4">학생</p>
+            </div>
+            
+            <nav>
+                <a href="#" onclick="showScreen('dashboard'); return false;" data-screen="dashboard"
+                   class="sidebar-link active flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="ml-4">대시보드</span>
+                </a>
+                
+                <a href="#" onclick="showScreen('meeting'); return false;" data-screen="meeting"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                              d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <span class="ml-4">미팅관리</span>
+                </a>
+                
+                <a href="#" onclick="showScreen('feedback'); return false;" data-screen="feedback"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    <span class="ml-4">온라인 피드백</span>
+                </a>
+
+                <a href="#" onclick="showScreen('workflow'); return false;" data-screen="workflow"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                    <span class="ml-4">논문 작성 진행 단계</span>
+                </a>
+
+                <a href="#" onclick="showScreen('review'); return false;" data-screen="review"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                    </svg>
+                    <span class="ml-4">심사 신청</span>
+                </a>
+
+                <!-- 학술지 실적 제출 -->
+                <a href="journal.html" class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                    </svg>
+                    <span class="ml-4">학술지 실적 제출</span>
+                </a>
+
+                <a href="#" onclick="showScreen('title-change'); return false;" data-screen="title-change"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                    </svg>
+                    <span class="ml-4">논문제목 변경</span>
+                </a>
+
+                <!-- ID 58: 졸업 요건 충족 현황 -->
+                <a href="#" onclick="showScreen('graduation'); return false;" data-screen="graduation"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                    </svg>
+                    <span class="ml-4">논문 제출 요건</span>
+                </a>
+
+                <!-- ID 57: 자료실 게시판 (마지막으로 이동) -->
+                <a href="#" onclick="showScreen('board'); return false;" data-screen="board"
+                   class="sidebar-link flex items-center p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                    </svg>
+                    <span class="ml-4">자료실</span>
+                </a>
+</nav>
+        </aside>
+        
+        <!-- 메인 콘텐츠 영역 -->
+        <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto" style="background-color: #F9F9F9;">
+            
+            <!-- 상단 헤더 -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h2 id="page-title" class="text-3xl font-bold text-gray-800">대시보드</h2>
+                    <p id="page-subtitle" class="text-sm text-gray-600 mt-1"></p>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <!-- 알림 버튼 -->
+                    <button onclick="toggleNotifications()" class="relative p-2 text-gray-600 hover:text-gray-800 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                        </svg>
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full bg-red-500"></span>
+                    </button>
+                    
+                    <!-- 사용자 프로필 -->
+                    <div class="flex items-center space-x-3 cursor-pointer" onclick="toggleUserMenu()">
+                        <div class="text-right">
+                            <p class="text-sm font-semibold text-gray-800">홍길동</p>
+                            <p class="text-xs text-gray-600">학생</p>
+                        </div>
+                        <div class="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center">
+                            <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 알림 드롭다운 -->
+            <div id="notification-dropdown" class="hidden absolute right-8 top-20 w-80 bg-white rounded-lg shadow-xl z-50">
+                <div class="p-4 border-b">
+                    <h3 class="text-lg font-semibold">알림</h3>
+                </div>
+                <div class="max-h-96 overflow-y-auto">
+                    <div class="p-4 border-b hover:bg-gray-50">
+                        <p class="text-sm">새로운 피드백이 도착했습니다.</p>
+                        <p class="text-xs text-gray-500 mt-1">5분 전</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 사용자 메뉴 드롭다운 -->
+            <div id="user-menu-dropdown" class="hidden absolute right-8 top-20 w-48 bg-white rounded-lg shadow-xl z-50">
+                <button onclick="logout()" class="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                    </svg>
+                    로그아웃
+                </button>
+            </div>
+            
+            <!-- 콘텐츠 영역 -->
+            <div id="dashboard-screen" class="content-screen active"></div>
+            <div id="meeting-screen" class="content-screen"></div>
+            <div id="feedback-screen" class="content-screen"></div>
+            <div id="review-screen" class="content-screen"></div>
+            <div id="title-change-screen" class="content-screen"></div>
+            <div id="board-screen" class="content-screen">
+                <div id="boardContainer"></div>
+            </div>
+            <div id="graduation-screen" class="content-screen"></div>
+            <div id="workflow-screen" class="content-screen"></div>
+        </main>
+    </div>
+    
+    <!-- 모달 컨테이너 -->
+    <div id="modal-container"></div>
+    
+    <!-- 스크립트 -->
+    <!-- 🔧 Critical Fix #3: 통합 상수 먼저 로드 -->
+    <script src="../demo-constants.js"></script>
+    <script src="assets/js/data.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/meeting.js"></script>
+    <script src="assets/js/feedback.js"></script>
+    <script src="assets/js/review.js"></script>
+    <script src="assets/js/title-change.js"></script>
+    <script src="assets/js/board.js"></script>
+    <script src="assets/js/graduation.js"></script>
+    <script src="assets/js/workflow.js"></script>
+    <script src="assets/js/app.js"></script>
+    
+    <!-- 공통 유틸리티 -->
+    <script src="../common-utils.js"></script>
+
+<!-- injected: i18n minimal handler -->
+<script data-i18n-ready>
+(function(){
+  function getParam(n){ return new URLSearchParams(location.search).get(n); }
+  var lang = getParam('lang') || 'ko';
+  document.documentElement.setAttribute('lang', lang);
+  // Placeholder for future dictionary binding.
+})();
+</script>
+
+
+<!-- injected: similarity badge placeholder -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var cards = document.querySelectorAll('.submission-card, .paper-card, .review-item');
+  cards.forEach(function(card){
+    if (card.querySelector('[data-similarity-badge]')) return;
+    var badge = document.createElement('span');
+    badge.setAttribute('data-similarity-badge','');
+    badge.className = 'badge';
+    badge.style.marginLeft = '8px';
+    badge.textContent = '유사도: —';
+    var header = card.querySelector('.title, h3, h4') || card;
+    header.appendChild(badge);
+  });
+});
+</script>
+
+</body>
+</html>
