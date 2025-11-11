@@ -3076,7 +3076,239 @@ function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
     openModal('심사위원 평가 상세', content, '닫기', closeModal, true);
 }
 
+// ========== 주차별 지도 관리 ==========
+
+/**
+ * 주차별 지도 상세 보기
+ */
+function viewWeeklyGuidanceDetail(pairId) {
+    const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === pairId);
+    const plans = appData.weeklyGuidance.weeklyPlans[pairId];
+
+    if (!pair || !plans) {
+        alert('데이터를 찾을 수 없습니다.');
+        return;
+    }
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 지도 관계 정보 -->
+            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-5 border-2 border-blue-300">
+                <h4 class="font-bold text-blue-900 mb-3">지도 관계 정보</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-white rounded-lg p-3">
+                        <p class="text-xs text-gray-600">지도교수</p>
+                        <p class="font-bold">${pair.professor.name}</p>
+                        <p class="text-xs text-gray-500">${pair.professor.department}</p>
+                    </div>
+                    <div class="bg-white rounded-lg p-3">
+                        <p class="text-xs text-gray-600">지도학생</p>
+                        <p class="font-bold">${pair.student.name} (${pair.student.studentId})</p>
+                        <p class="text-xs text-gray-500">${pair.student.major} ${pair.student.degree}</p>
+                    </div>
+                </div>
+                <div class="mt-3 bg-white rounded-lg p-3">
+                    <div class="flex items-center justify-between">
+                        <p class="text-xs text-gray-600">학기: ${pair.semester}</p>
+                        <p class="text-xs text-gray-600">진행률: ${pair.completedWeeks}/${pair.totalWeeks}주차</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 주차별 계획 (아코디언) -->
+            <div class="space-y-3">
+                <h4 class="font-bold text-lg">주차별 지도 내역</h4>
+
+                ${plans.weeks.map(weekPlan => `
+                    <div class="border-2 rounded-lg overflow-hidden">
+                        <!-- 아코디언 헤더 -->
+                        <button onclick="toggleWeekAccordion('week-${pairId}-${weekPlan.week}')"
+                                class="w-full px-5 py-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center">
+                            <span class="font-bold">${weekPlan.week}주차: ${weekPlan.professorPlan.goal}</span>
+                            <svg class="w-5 h-5 transition-transform" id="week-${pairId}-${weekPlan.week}-icon"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+
+                        <!-- 아코디언 내용 -->
+                        <div id="week-${pairId}-${weekPlan.week}-content" class="hidden p-5 space-y-4">
+                            <!-- 교수 계획 -->
+                            <div class="bg-blue-50 rounded-lg p-4">
+                                <h5 class="font-bold text-blue-900 mb-3">교수 계획</h5>
+                                <div class="text-sm space-y-2">
+                                    <div><span class="text-gray-600 font-medium">목표:</span> ${weekPlan.professorPlan.goal}</div>
+                                    <div><span class="text-gray-600 font-medium">내용:</span> ${weekPlan.professorPlan.content}</div>
+                                    ${weekPlan.professorPlan.materials && weekPlan.professorPlan.materials.length > 0 ? `
+                                        <div>
+                                            <span class="text-gray-600 font-medium">자료:</span>
+                                            ${weekPlan.professorPlan.materials.join(', ')}
+                                        </div>
+                                    ` : ''}
+                                    <div class="text-xs text-gray-500">등록일: ${weekPlan.professorPlan.createdAt}</div>
+                                </div>
+                            </div>
+
+                            <!-- 학생 실적 -->
+                            ${weekPlan.studentReport ? `
+                                <div class="bg-green-50 rounded-lg p-4">
+                                    <h5 class="font-bold text-green-900 mb-3">학생 실적</h5>
+                                    <div class="text-sm space-y-2">
+                                        <div><span class="text-gray-600 font-medium">달성:</span> ${weekPlan.studentReport.achievement}</div>
+                                        <div><span class="text-gray-600 font-medium">다음 계획:</span> ${weekPlan.studentReport.nextPlan}</div>
+                                        <div><span class="text-gray-600 font-medium">어려움:</span> ${weekPlan.studentReport.difficulties}</div>
+                                        <div class="text-xs text-gray-500">제출일: ${weekPlan.studentReport.submittedAt}</div>
+                                    </div>
+                                </div>
+                            ` : '<div class="text-center py-4 text-red-700 bg-red-50 rounded-lg">학생 실적 미제출</div>'}
+
+                            <!-- 관리자 메모 -->
+                            <div class="bg-yellow-50 rounded-lg p-4">
+                                <h5 class="font-bold text-yellow-900 mb-2">관리자 메모</h5>
+                                <textarea id="adminNote-${pairId}-${weekPlan.week}" rows="2"
+                                          class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
+                                          placeholder="관리자 메모를 입력하세요...">${weekPlan.adminNote || ''}</textarea>
+                                <button onclick="saveWeekAdminNote(${pairId}, ${weekPlan.week})"
+                                        class="mt-2 bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700">
+                                    저장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    openModal('주차별 지도 상세', content, '닫기', closeModal, true);
+}
+
+/**
+ * 주차 아코디언 토글
+ */
+function toggleWeekAccordion(weekId) {
+    const content = document.getElementById(`${weekId}-content`);
+    const icon = document.getElementById(`${weekId}-icon`);
+
+    if (!content || !icon) return;
+
+    if (content.classList.contains('hidden')) {
+        content.classList.remove('hidden');
+        icon.style.transform = 'rotate(180deg)';
+    } else {
+        content.classList.add('hidden');
+        icon.style.transform = 'rotate(0deg)';
+    }
+}
+
+/**
+ * 관리자 메모 저장
+ */
+function saveWeekAdminNote(pairId, week) {
+    const note = document.getElementById(`adminNote-${pairId}-${week}`).value;
+
+    // 실제로는 서버에 저장해야 함
+    const plans = appData.weeklyGuidance.weeklyPlans[pairId];
+    if (plans) {
+        const weekPlan = plans.weeks.find(w => w.week === week);
+        if (weekPlan) {
+            weekPlan.adminNote = note;
+            alert('메모가 저장되었습니다.');
+        }
+    }
+}
+
+/**
+ * 지도 쌍 필터링
+ */
+function filterGuidancePairs() {
+    const semester = document.getElementById('semesterFilter').value;
+    const status = document.getElementById('statusFilter').value;
+    const professorSearch = document.getElementById('professorSearch').value.toLowerCase();
+    const studentSearch = document.getElementById('studentSearch').value.toLowerCase();
+
+    let pairs = appData.weeklyGuidance.guidancePairs;
+
+    // 필터링
+    if (semester) {
+        pairs = pairs.filter(p => p.semester === semester);
+    }
+    if (status) {
+        pairs = pairs.filter(p => p.status === status);
+    }
+    if (professorSearch) {
+        pairs = pairs.filter(p => p.professor.name.toLowerCase().includes(professorSearch));
+    }
+    if (studentSearch) {
+        pairs = pairs.filter(p => p.student.name.toLowerCase().includes(studentSearch));
+    }
+
+    // 테이블 업데이트
+    renderGuidancePairsTable(pairs);
+}
+
+/**
+ * 필터 초기화
+ */
+function resetGuidancePairsFilter() {
+    document.getElementById('semesterFilter').value = '';
+    document.getElementById('statusFilter').value = '';
+    document.getElementById('professorSearch').value = '';
+    document.getElementById('studentSearch').value = '';
+
+    renderGuidancePairsTable(appData.weeklyGuidance.guidancePairs);
+}
+
+/**
+ * 지도 쌍 테이블 렌더링
+ */
+function renderGuidancePairsTable(pairs) {
+    const tbody = document.getElementById('guidancePairsTableBody');
+    if (!tbody) return;
+
+    tbody.innerHTML = pairs.map(pair => `
+        <tr class="border-t hover:bg-gray-50">
+            <td class="py-3 px-4">
+                <div>
+                    <p class="font-medium">${pair.professor.name}</p>
+                    <p class="text-xs text-gray-500">${pair.professor.department}</p>
+                </div>
+            </td>
+            <td class="py-3 px-4">
+                <div>
+                    <p class="font-medium">${pair.student.name}</p>
+                    <p class="text-xs text-gray-500">${pair.student.major}</p>
+                </div>
+            </td>
+            <td class="py-3 px-4">${pair.student.studentId}</td>
+            <td class="py-3 px-4">${pair.semester}</td>
+            <td class="py-3 px-4">
+                <div class="flex items-center">
+                    <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                        <div class="bg-blue-600 h-2 rounded-full"
+                             style="width: ${(pair.completedWeeks/pair.totalWeeks*100)}%"></div>
+                    </div>
+                    <span class="text-sm">${pair.completedWeeks}/${pair.totalWeeks}주차</span>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">최종 업데이트: ${pair.lastUpdateDate}</p>
+            </td>
+            <td class="py-3 px-4 text-center">
+                <button onclick="viewWeeklyGuidanceDetail(${pair.id})"
+                        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                    상세보기
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
 window.viewIndividualEvaluation = viewIndividualEvaluation;
+window.viewWeeklyGuidanceDetail = viewWeeklyGuidanceDetail;
+window.toggleWeekAccordion = toggleWeekAccordion;
+window.saveWeekAdminNote = saveWeekAdminNote;
+window.filterGuidancePairs = filterGuidancePairs;
+window.resetGuidancePairsFilter = resetGuidancePairsFilter;
