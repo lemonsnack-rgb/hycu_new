@@ -764,17 +764,103 @@ function viewPdfFeedback(id, readOnly = false) {
         return;
     }
 
-    // ID 25: 관리자는 읽기 전용으로 PDF 뷰어 열기
+    // ID 25: 관리자는 읽기 전용으로 교수용 PDF 뷰어 호출
     const mode = readOnly ? '읽기 전용 (관리자)' : '편집 가능 (교수)';
-    const description = readOnly ?
-        '관리자는 교수의 첨삭 내역만 조회할 수 있습니다.\n편집 및 댓글 기능은 비활성화됩니다.' :
-        '교수로서 PDF에 첨삭과 피드백을 작성할 수 있습니다.';
+    const modeClass = readOnly ? 'bg-blue-600' : 'bg-[#6A0028]';
+    const readOnlyBadge = readOnly ? '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">읽기 전용</span>' : '';
 
-    showAlert(`PDF 뷰어 오픈: ${item.fileName}\n모드: ${mode}\n\n${description}\n\n※ PDF 뷰어는 별도로 구현됩니다.`);
+    // 피드백 상태값 변환
+    let statusText = item.feedbackStatus || '대기';
+    if (statusText === '답변 대기중') statusText = '대기';
+    if (statusText === '피드백 완료') statusText = '완료';
 
-    // TODO: 실제 PDF 뷰어 구현 시 readOnly 파라미터를 전달하여
-    // 편집 도구, 댓글 기능 등을 비활성화해야 함
-    // 예: openPdfViewer(item.fileName, { readOnly: readOnly });
+    const statusClass =
+        statusText === '대기' ? 'bg-yellow-100 text-yellow-700' :
+        statusText === '진행 중' ? 'bg-blue-100 text-blue-700' :
+        'bg-green-100 text-green-700';
+
+    // 교수용 PDF 뷰어를 읽기 전용 모드로 표시
+    const pdfViewerHtml = `
+        <div id="pdf-viewer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]"
+             onclick="if(event.target.id==='pdf-viewer-modal') closePdfViewer()">
+            <div class="bg-white rounded-lg shadow-xl w-full h-full mx-4 my-4 flex flex-col"
+                 onclick="event.stopPropagation()">
+
+                <!-- 헤더 -->
+                <div class="${modeClass} text-white px-6 py-4 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold flex items-center">
+                            PDF 뷰어 - ${item.documentTitle}
+                            ${readOnlyBadge}
+                        </h3>
+                        <div class="text-sm text-white text-opacity-90 mt-1">
+                            ${item.fileName} | 학생: ${item.studentName} (${item.studentId})
+                        </div>
+                    </div>
+                    <button onclick="closePdfViewer()"
+                            class="text-white hover:text-gray-200 text-2xl leading-none">
+                        ×
+                    </button>
+                </div>
+
+                ${readOnly ? `
+                <!-- 읽기 전용 안내 -->
+                <div class="px-6 py-3 bg-blue-50 border-b border-blue-200">
+                    <div class="flex items-center text-sm text-blue-800">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span class="font-medium">관리자 모드:</span>
+                        <span class="ml-1">교수의 첨삭 내역만 조회할 수 있습니다. 편집 및 댓글 기능은 비활성화됩니다.</span>
+                    </div>
+                </div>
+                ` : ''}
+
+                <!-- PDF 뷰어 영역 -->
+                <div class="flex-1 overflow-hidden p-4 bg-gray-100">
+                    <div class="h-full bg-white rounded shadow-lg flex items-center justify-center">
+                        <div class="text-center">
+                            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                            </svg>
+                            <p class="text-gray-600 text-lg mb-2">PDF 뷰어 영역</p>
+                            <p class="text-sm text-gray-500">파일: ${item.fileName}</p>
+                            <p class="text-xs text-gray-400 mt-4">
+                                ${readOnly ? '교수의 첨삭 내역이 표시됩니다 (읽기 전용)' : '첨삭 및 피드백 작성이 가능합니다'}
+                            </p>
+                            <div class="mt-6 inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                실제 PDF 렌더링은 별도 라이브러리로 구현 예정
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 푸터 -->
+                <div class="border-t px-6 py-4 bg-gray-50 flex justify-between items-center">
+                    <div class="text-sm text-gray-600">
+                        <span class="font-medium">상태:</span>
+                        <span class="ml-2 px-2 py-1 rounded text-xs font-medium ${statusClass}">
+                            ${statusText}
+                        </span>
+                    </div>
+                    <button onclick="closePdfViewer()"
+                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
+                        닫기
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', pdfViewerHtml);
+}
+
+function closePdfViewer() {
+    const modal = document.getElementById('pdf-viewer-modal');
+    if (modal) modal.remove();
 }
 
 function writeFeedback(id) {
@@ -2746,3 +2832,7 @@ function viewSingleEvaluation(committeeMemberId) {
     // 여기서는 간단한 알림만 표시 (실제로는 상세 평가 모달을 표시)
     showAlert('개별 평가 상세 화면은 구현 예정입니다.');
 }
+
+// Export PDF viewer functions
+window.viewPdfFeedback = viewPdfFeedback;
+window.closePdfViewer = closePdfViewer;

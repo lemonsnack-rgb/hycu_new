@@ -496,12 +496,15 @@ function resetGuidanceSearch() {
 
 // ========== 논문지도 진행 현황 검색 ==========
 
-// Task 1-5: 온라인 피드백 현황 검색 (학년도, 학기, 지도교수, 학번, 성명)
+// Task 1-5: 온라인 피드백 현황 검색 (대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명)
 function searchGuidanceProgress() {
     const filters = {
-        year: document.getElementById('progress-search-year')?.value || '',
-        semester: document.getElementById('progress-search-semester')?.value || '',
+        graduate: document.getElementById('progress-search-graduate')?.value || '',
+        major: document.getElementById('progress-search-major')?.value || '',
+        degree: document.getElementById('progress-search-degree')?.value || '',
         advisor: document.getElementById('progress-search-advisor')?.value || '',
+        semesterCount: document.getElementById('progress-search-semester-count')?.value || '',
+        status: document.getElementById('progress-search-status')?.value || '',
         studentId: document.getElementById('progress-search-student-id')?.value.toLowerCase().trim() || '',
         studentName: document.getElementById('progress-search-student-name')?.value.toLowerCase().trim() || ''
     };
@@ -514,19 +517,39 @@ function searchGuidanceProgress() {
     // 필터링
     let filtered = [...appData.originalGuidanceProgress];
 
-    // 학년도
-    if (filters.year) {
-        filtered = filtered.filter(item => (item.year || '2025') === filters.year);
+    // 대학원
+    if (filters.graduate) {
+        filtered = filtered.filter(item => (item.graduate || '일반대학원') === filters.graduate);
     }
 
-    // 학기
-    if (filters.semester) {
-        filtered = filtered.filter(item => (item.semester || '1') === filters.semester);
+    // 전공
+    if (filters.major) {
+        filtered = filtered.filter(item => item.major === filters.major);
+    }
+
+    // 학위과정
+    if (filters.degree) {
+        filtered = filtered.filter(item => item.degree === filters.degree);
     }
 
     // 지도교수
     if (filters.advisor) {
         filtered = filtered.filter(item => item.advisor === filters.advisor);
+    }
+
+    // 학기차
+    if (filters.semesterCount) {
+        filtered = filtered.filter(item => String(item.semesterCount) === filters.semesterCount);
+    }
+
+    // 피드백상태 (답변 대기중 → 대기, 피드백 완료 → 완료 변환 고려)
+    if (filters.status) {
+        filtered = filtered.filter(item => {
+            let itemStatus = item.feedbackStatus || '대기';
+            if (itemStatus === '답변 대기중') itemStatus = '대기';
+            if (itemStatus === '피드백 완료') itemStatus = '완료';
+            return itemStatus === filters.status;
+        });
     }
 
     // 학번
@@ -553,11 +576,14 @@ function resetGuidanceProgressSearch() {
         appData.guidanceProgress = [...appData.originalGuidanceProgress];
     }
 
-    // Task 1-5: 검색 필드 초기화 (학년도, 학기, 지도교수, 학번, 성명)
+    // Task 1-5: 검색 필드 초기화 (대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명)
     const searchFields = [
-        'progress-search-year',
-        'progress-search-semester',
+        'progress-search-graduate',
+        'progress-search-major',
+        'progress-search-degree',
         'progress-search-advisor',
+        'progress-search-semester-count',
+        'progress-search-status',
         'progress-search-student-id',
         'progress-search-student-name'
     ];

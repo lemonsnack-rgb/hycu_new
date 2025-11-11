@@ -1029,19 +1029,26 @@ const views = {
                 <div class="p-6 border-b">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">온라인 피드백 현황</h3>
 
-                    <!-- Task 1-5: 검색 영역 간소화 (학년도, 학기, 지도교수, 학번, 성명) -->
+                    <!-- 검색 영역: 대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명 -->
                     <div class="search-container">
                         <div class="search-grid">
-                            <select id="progress-search-year" class="search-select">
-                                <option value="">학년도 전체</option>
-                                <option value="2025">2025학년도</option>
-                                <option value="2024">2024학년도</option>
-                                <option value="2023">2023학년도</option>
+                            <select id="progress-search-graduate" class="search-select">
+                                <option value="">대학원 전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="특수대학원">특수대학원</option>
+                                <option value="전문대학원">전문대학원</option>
                             </select>
-                            <select id="progress-search-semester" class="search-select">
-                                <option value="">학기 전체</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
+                            <select id="progress-search-major" class="search-select">
+                                <option value="">전공 전체</option>
+                                <option value="교육공학">교육공학</option>
+                                <option value="경영학">경영학</option>
+                                <option value="컴퓨터공학">컴퓨터공학</option>
+                            </select>
+                            <select id="progress-search-degree" class="search-select">
+                                <option value="">학위과정 전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                                <option value="석박통합">석박통합</option>
                             </select>
                             <select id="progress-search-advisor" class="search-select">
                                 <option value="">지도교수 전체</option>
@@ -1049,6 +1056,21 @@ const views = {
                                 <option value="박교수">박교수</option>
                                 <option value="김교수">김교수</option>
                                 <option value="이지도">이지도</option>
+                            </select>
+                            <select id="progress-search-semester-count" class="search-select">
+                                <option value="">학기차 전체</option>
+                                <option value="1">1학기차</option>
+                                <option value="2">2학기차</option>
+                                <option value="3">3학기차</option>
+                                <option value="4">4학기차</option>
+                                <option value="5">5학기차</option>
+                                <option value="6">6학기차</option>
+                            </select>
+                            <select id="progress-search-status" class="search-select">
+                                <option value="">피드백상태 전체</option>
+                                <option value="대기">대기</option>
+                                <option value="진행 중">진행 중</option>
+                                <option value="완료">완료</option>
                             </select>
                             <input type="text"
                                    id="progress-search-student-id"
@@ -1088,12 +1110,23 @@ const views = {
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기차</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일시</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">피드백상태</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">상태</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.length > 0 ? data.map((item, idx) => `
+                            ${data.length > 0 ? data.map((item, idx) => {
+                                // 피드백 상태값 변환: 답변 대기중 → 대기, 피드백 완료 → 완료
+                                let statusText = item.feedbackStatus || '대기';
+                                if (statusText === '답변 대기중') statusText = '대기';
+                                if (statusText === '피드백 완료') statusText = '완료';
+
+                                const statusClass =
+                                    statusText === '대기' ? 'bg-yellow-100 text-yellow-700' :
+                                    statusText === '진행 중' ? 'bg-blue-100 text-blue-700' :
+                                    'bg-green-100 text-green-700';
+
+                                return `
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
@@ -1104,24 +1137,16 @@ const views = {
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.semesterCount || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-700">
-                                        <div class="max-w-xs truncate" title="${item.documentTitle}">
+                                        <div class="max-w-xs truncate font-medium" title="${item.documentTitle}">
                                             ${item.documentTitle}
                                         </div>
                                         <div class="text-xs text-gray-500 mt-1">${item.fileName}</div>
                                     </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.submitDate}</td>
                                     <td class="py-3 px-4 text-center">
-                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                                            item.feedbackStatus === '답변 대기중' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-green-100 text-green-700'
-                                        }">
-                                            ${item.feedbackStatus}
+                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium ${statusClass}">
+                                            ${statusText}
                                         </span>
-                                        ${item.feedbackCount > 0 ? `
-                                            <div class="text-xs text-gray-500 mt-1">
-                                                피드백 ${item.feedbackCount}회
-                                            </div>
-                                        ` : ''}
                                     </td>
                                     <td class="py-3 px-4 text-center">
                                         <button onclick="viewPdfFeedback(${item.id}, true)"
@@ -1130,7 +1155,7 @@ const views = {
                                         </button>
                                     </td>
                                 </tr>
-                            `).join('') : `
+                            `}).join('') : `
                                 <tr>
                                     <td colspan="12" class="py-8 text-center text-gray-500">
                                         데이터가 없습니다.
