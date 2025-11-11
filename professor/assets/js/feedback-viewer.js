@@ -431,13 +431,25 @@ function switchFeedbackTab(tab) {
 
 // ==================== ID 47: 표절 검사 결과보고서 다운로드 ====================
 function downloadPlagiarismReport(type, requestId) {
-    const reportUrl = type === 'copykiller' 
-        ? `/api/reports/copykiller/${requestId}.pdf`
-        : `/api/reports/gptkiller/${requestId}.pdf`;
-    
-    // 실제 구현 시 다운로드 처리
-    alert(`${type === 'copykiller' ? 'CopyKiller' : 'GPT Killer'} 결과보고서 다운로드\n(실제 구현 시 파일 다운로드)`);
-    console.log(`다운로드 URL: ${reportUrl}`);
+    // 제출물 데이터 조회
+    const request = FeedbackDataService.getFeedbackRequest(requestId);
+    if (!request) {
+        alert('제출물을 찾을 수 없습니다.');
+        return;
+    }
+
+    let reportUrl;
+    if (type === 'combined') {
+        // 통합 리포트는 CopyKiller URL 사용
+        reportUrl = request.copyKillerReportUrl || `https://copykiller.hanyang.ac.kr/report/${requestId}`;
+    } else if (type === 'copykiller') {
+        reportUrl = request.copyKillerReportUrl || `https://copykiller.hanyang.ac.kr/report/${requestId}`;
+    } else if (type === 'gptkiller') {
+        reportUrl = request.gptKillerReportUrl || `https://gptkiller.hanyang.ac.kr/report/${requestId}`;
+    }
+
+    // 새 창으로 외부 리포트 열기
+    window.open(reportUrl, '_blank', 'width=1200,height=800,noopener,noreferrer');
 }
 
 // 전역 함수 등록
@@ -739,12 +751,25 @@ function refreshInlineTabMarker(){
 }
 
 function downloadPlagiarismReport(type, requestId){
-  if (type==='combined'){
-    alert('통합 결과보고서 다운로드 (샘플)');
+  // 제출물 데이터 조회
+  const request = FeedbackDataService.getFeedbackRequest(requestId);
+  if (!request) {
+    alert('제출물을 찾을 수 없습니다.');
     return;
   }
-  const reportUrl = type === 'copykiller' ? `/api/reports/copykiller/${requestId}.pdf` : `/api/reports/gptkiller/${requestId}.pdf`;
-  alert(`${type==='copykiller'?'CopyKiller':'GPT Killer'} 결과보고서 다운로드\n(샘플)`);
+
+  let reportUrl;
+  if (type === 'combined') {
+    // 통합 리포트는 CopyKiller URL 사용
+    reportUrl = request.copyKillerReportUrl || `https://copykiller.hanyang.ac.kr/report/${requestId}`;
+  } else if (type === 'copykiller') {
+    reportUrl = request.copyKillerReportUrl || `https://copykiller.hanyang.ac.kr/report/${requestId}`;
+  } else if (type === 'gptkiller') {
+    reportUrl = request.gptKillerReportUrl || `https://gptkiller.hanyang.ac.kr/report/${requestId}`;
+  }
+
+  // 새 창으로 외부 리포트 열기
+  window.open(reportUrl, '_blank', 'width=1200,height=800,noopener,noreferrer');
 }
 
 // helper
