@@ -1150,5 +1150,144 @@ const appData = {
             ]
         }
     ],
+
+    // ========== 주차별 지도 관리 데이터 ==========
+    weeklyGuidance: {
+        guidancePairs: [
+            {
+                id: 1,
+                professor: {
+                    id: 'prof001',
+                    name: '김교수',
+                    department: '컴퓨터공학과'
+                },
+                student: {
+                    id: 'S001',
+                    name: '김철수',
+                    studentId: '2024001',
+                    major: '컴퓨터공학',
+                    degree: '석사'
+                },
+                semester: '2024-2학기',
+                status: 'active',
+                totalWeeks: 16,
+                completedWeeks: 8,
+                lastUpdateDate: '2024-11-10'
+            },
+            {
+                id: 2,
+                professor: {
+                    id: 'prof002',
+                    name: '이교수',
+                    department: '경영학과'
+                },
+                student: {
+                    id: 'S002',
+                    name: '박영희',
+                    studentId: '2024002',
+                    major: '경영학',
+                    degree: '박사'
+                },
+                semester: '2024-2학기',
+                status: 'active',
+                totalWeeks: 16,
+                completedWeeks: 12,
+                lastUpdateDate: '2024-11-08'
+            },
+            {
+                id: 3,
+                professor: {
+                    id: 'prof001',
+                    name: '김교수',
+                    department: '컴퓨터공학과'
+                },
+                student: {
+                    id: 'S003',
+                    name: '홍길동',
+                    studentId: '2024003',
+                    major: '컴퓨터공학',
+                    degree: '석사'
+                },
+                semester: '2024-2학기',
+                status: 'active',
+                totalWeeks: 16,
+                completedWeeks: 5,
+                lastUpdateDate: '2024-11-05'
+            }
+        ],
+        weeklyPlans: {
+            1: { // guidancePair id
+                weeks: [
+                    {
+                        week: 1,
+                        professorPlan: {
+                            goal: '연구 주제 선정',
+                            content: '관심 분야 논의 및 주제 탐색',
+                            materials: ['AI 관련 논문 목록'],
+                            createdAt: '2024-09-01'
+                        },
+                        studentReport: {
+                            achievement: '5편의 선행 연구 검토 완료',
+                            nextPlan: '연구 문제 정의',
+                            difficulties: '없음',
+                            submittedAt: '2024-09-07'
+                        },
+                        adminNote: '진행 양호'
+                    },
+                    {
+                        week: 2,
+                        professorPlan: {
+                            goal: '연구 문제 정의',
+                            content: '연구 문제 및 가설 설정',
+                            materials: ['연구 방법론 교재'],
+                            createdAt: '2024-09-08'
+                        },
+                        studentReport: {
+                            achievement: '연구 문제 초안 작성',
+                            nextPlan: '선행 연구 분석',
+                            difficulties: '가설 설정에 어려움',
+                            submittedAt: '2024-09-14'
+                        },
+                        adminNote: ''
+                    }
+                ]
+            },
+            2: {
+                weeks: [
+                    {
+                        week: 1,
+                        professorPlan: {
+                            goal: '논문 주제 확정',
+                            content: '경영 전략 분야 주제 선정',
+                            materials: ['경영학 저널 논문'],
+                            createdAt: '2024-09-01'
+                        },
+                        studentReport: {
+                            achievement: '주제 확정 완료',
+                            nextPlan: '연구 설계',
+                            difficulties: '없음',
+                            submittedAt: '2024-09-06'
+                        },
+                        adminNote: '우수'
+                    }
+                ]
+            },
+            3: {
+                weeks: [
+                    {
+                        week: 1,
+                        professorPlan: {
+                            goal: '기초 개념 학습',
+                            content: '머신러닝 기초 이론 학습',
+                            materials: ['머신러닝 교재'],
+                            createdAt: '2024-09-01'
+                        },
+                        studentReport: null,
+                        adminNote: '학생 실적 제출 독려 필요'
+                    }
+                ]
+            }
+        }
+    }
 };
 
