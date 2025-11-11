@@ -213,20 +213,28 @@ function viewSubmissionDetail(id, type) {
                 <div class="bg-purple-50 rounded-lg p-4">
                     <h4 class="font-bold text-purple-800 mb-4">심사위원 정보</h4>
                     <div class="space-y-2">
-                        ${item.reviewers.map(reviewer => `
-                            <div class="flex items-center justify-between p-3 bg-white rounded-lg">
-                                <div>
-                                    <p class="font-medium">${reviewer.name}</p>
-                                    <p class="text-sm text-gray-600">${reviewer.role}</p>
+                        ${item.reviewers.map((reviewer, index) => `
+                            <div class="p-3 bg-white rounded-lg">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-medium">${reviewer.name}</p>
+                                        <p class="text-sm text-gray-600">${reviewer.role}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        ${type === 'finalThesis' && reviewer.score !== undefined && reviewer.score !== null ? `
+                                            <p class="font-bold text-lg text-[#6A0028]">${reviewer.score}점</p>
+                                            ${reviewer.comment ? `<p class="text-sm text-gray-600 line-clamp-1">${reviewer.comment}</p>` : ''}
+                                        ` : `
+                                            <span class="status-badge ${reviewer.status === '완료' ? 'status-complete' : reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">${reviewer.status}</span>
+                                        `}
+                                    </div>
                                 </div>
-                                <div class="text-right">
-                                    ${type === 'finalThesis' && reviewer.score ? `
-                                        <p class="font-bold text-lg text-[#6A0028]">${reviewer.score}점</p>
-                                        <p class="text-sm text-gray-600">${reviewer.comment}</p>
-                                    ` : `
-                                        <span class="status-badge ${reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">${reviewer.status}</span>
-                                    `}
-                                </div>
+                                ${type === 'finalThesis' && reviewer.score !== undefined && reviewer.score !== null ? `
+                                    <button onclick="viewIndividualEvaluation(${item.id}, ${index}, '${type}')"
+                                            class="mt-2 text-sm text-blue-600 hover:text-blue-800 hover:underline transition-colors flex items-center gap-1">
+                                        상세 보기 →
+                                    </button>
+                                ` : ''}
                             </div>
                         `).join('')}
                     </div>
@@ -2993,6 +3001,82 @@ function calculateScoresAndCriteria(evaluations, criteria) {
     };
 }
 
-// Export PDF viewer functions
+/**
+ * 개별 심사위원 평가 상세 보기
+ * @param {number} submissionId - 제출물 ID
+ * @param {number} reviewerIndex - 심사위원 인덱스
+ * @param {string} type - 제출물 타입
+ */
+function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
+    // 제출물 찾기
+    const submissions = appData.submissions[type];
+    const submission = submissions.find(s => s.id === submissionId);
+
+    if (!submission || !submission.reviewers || !submission.reviewers[reviewerIndex]) {
+        alert('평가 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const reviewer = submission.reviewers[reviewerIndex];
+
+    // 역할 표시 (주심/부심)
+    const roleDisplay = reviewer.role === '주심'
+        ? '<span class="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded font-medium">위원장</span>'
+        : '<span class="px-2 py-1 bg-gray-100 text-gray-800 text-xs rounded font-medium">위원</span>';
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 평가자 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가자 정보</h4>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">성명:</span>
+                        <span class="font-medium">${reviewer.name}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">역할:</span>
+                        ${roleDisplay}
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">평가 상태:</span>
+                        <span class="status-badge ${reviewer.status === '완료' ? 'status-complete' : reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">
+                            ${reviewer.status}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            ${reviewer.score !== undefined && reviewer.score !== null ? `
+                <!-- 평가 점수 -->
+                <div class="bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg p-6 text-center border-2 border-blue-200">
+                    <p class="text-sm text-gray-600 mb-2">평가 점수</p>
+                    <div class="text-6xl font-bold text-blue-600 mb-2">${reviewer.score}<span class="text-3xl">점</span></div>
+                    <div class="flex items-center justify-center gap-2 mt-3">
+                        <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden max-w-xs">
+                            <div class="h-full bg-blue-600 rounded-full" style="width: ${reviewer.score}%"></div>
+                        </div>
+                    </div>
+                </div>
+            ` : `
+                <div class="bg-yellow-50 rounded-lg p-6 text-center border-2 border-yellow-200">
+                    <p class="text-yellow-800 font-medium">아직 평가가 완료되지 않았습니다.</p>
+                </div>
+            `}
+
+            ${reviewer.comment ? `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-bold text-gray-800 mb-3">평가 의견</h4>
+                    <p class="text-sm text-gray-700 leading-relaxed">${reviewer.comment}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    openModal('심사위원 평가 상세', content, '닫기', closeModal, true);
+}
+
+// Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
+window.viewIndividualEvaluation = viewIndividualEvaluation;
