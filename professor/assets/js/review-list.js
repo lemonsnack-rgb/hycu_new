@@ -47,10 +47,22 @@ function renderReviewList() {
     
     // ID 49-50: 테이블 컬럼 변경
     const html = `
+        <!-- 학생 선택 영역 (알림 발송) -->
+        ${StudentSelection.createSelectionUI()}
+
         <div class="overflow-x-auto">
-            <table class="min-w-full">
+            <table id="review-table" class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">
+                            <input
+                                type="checkbox"
+                                id="select-all-students"
+                                class="checkbox-input"
+                                onchange="StudentSelection.toggleSelectAll()"
+                                title="전체 선택"
+                            >
+                        </th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
@@ -65,46 +77,78 @@ function renderReviewList() {
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
-                    ${filteredAssignments.map((assignment, index) => `
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.degree || '석사'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
-                            <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
-                                <div class="truncate" title="${assignment.thesisTitle}">
-                                    ${assignment.thesisTitle}
-                                </div>
-                            </td>
-                            <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
-                            <td class="py-3 px-4 text-center">
-                                <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
-                                    ${assignment.evaluationProgress}
-                                </span>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <div class="flex gap-2 justify-center">
-                                    <button onclick="openReviewDetail('${assignment.id}', 'member')"
-                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded ${assignment.myRole === 'member' ? 'font-bold bg-blue-50' : ''}">
-                                        위원
-                                    </button>
-                                    <button onclick="openReviewDetail('${assignment.id}', 'chair')"
-                                            class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded ${assignment.myRole === 'chair' ? 'font-bold bg-green-50' : ''}">
-                                        위원장
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    `).join('')}
+                    ${filteredAssignments.map((assignment, index) => {
+                        // 알림 발송용 학생 데이터
+                        const studentData = {
+                            studentId: assignment.studentNumber,
+                            studentName: assignment.studentName,
+                            phone: assignment.phone || '-',
+                            email: assignment.email || '-',
+                            major: assignment.major || '-',
+                            degree: assignment.degree || '석사'
+                        };
+
+                        return `
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-center">
+                                    <input
+                                        type="checkbox"
+                                        class="student-checkbox checkbox-input"
+                                        data-student-id="${assignment.studentNumber}"
+                                        data-student-data='${JSON.stringify(studentData)}'
+                                        onchange="StudentSelection.toggleStudent(this)"
+                                    >
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.degree || '석사'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
+                                <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
+                                    <div class="truncate" title="${assignment.thesisTitle}">
+                                        ${assignment.thesisTitle}
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
+                                        ${assignment.evaluationProgress}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <div class="flex gap-2 justify-center">
+                                        <button onclick="openReviewDetail('${assignment.id}', 'member')"
+                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded ${assignment.myRole === 'member' ? 'font-bold bg-blue-50' : ''}">
+                                            위원
+                                        </button>
+                                        <button onclick="openReviewDetail('${assignment.id}', 'chair')"
+                                                class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded ${assignment.myRole === 'chair' ? 'font-bold bg-green-50' : ''}">
+                                            위원장
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    }).join('')}
                 </tbody>
             </table>
         </div>
     `;
-    
+
     listContainer.innerHTML = html;
+
+    // StudentSelection 초기화
+    const studentsForSelection = filteredAssignments.map(assignment => ({
+        studentId: assignment.studentNumber,
+        studentName: assignment.studentName,
+        phone: assignment.phone || '-',
+        email: assignment.email || '-',
+        major: assignment.major || '-',
+        degree: assignment.degree || '석사'
+    }));
+    StudentSelection.init(studentsForSelection);
 }
 
 // ==================== 필터링 (ID 49-50) ====================

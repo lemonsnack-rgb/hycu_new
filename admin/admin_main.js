@@ -28,9 +28,55 @@ function switchView(viewName) {
     };
     
     document.getElementById('view-title').textContent = viewTitles[viewName] || '대시보드';
-    
+
     // 컨텐츠 렌더링
     document.getElementById('content-area').innerHTML = views[viewName]();
+
+    // StudentSelection 초기화 (알림 발송 기능)
+    setTimeout(() => {
+        if (typeof StudentSelection !== 'undefined') {
+            let students = [];
+
+            // 뷰에 따라 적절한 학생 데이터 가져오기
+            if (viewName === 'researchProposal') {
+                students = appData.submissions.researchProposal.map(item => ({
+                    studentId: item.studentId,
+                    studentName: item.studentName,
+                    phone: item.phone || '-',
+                    email: item.email || '-',
+                    major: item.major,
+                    degree: item.degree
+                }));
+            } else if (viewName === 'thesisReview') {
+                // 통합된 논문 심사 데이터
+                students = [
+                    ...appData.submissions.thesisPlan,
+                    ...appData.submissions.midThesis,
+                    ...appData.submissions.finalThesis
+                ].map(item => ({
+                    studentId: item.studentId,
+                    studentName: item.studentName,
+                    phone: item.phone || '-',
+                    email: item.email || '-',
+                    major: item.major,
+                    degree: item.degree
+                }));
+            } else if (viewName === 'journalReview') {
+                students = appData.submissions.journalSubmission.map(item => ({
+                    studentId: item.studentId,
+                    studentName: item.studentName,
+                    phone: item.phone || '-',
+                    email: item.email || '-',
+                    major: item.major,
+                    degree: item.degree
+                }));
+            }
+
+            if (students.length > 0) {
+                StudentSelection.init(students);
+            }
+        }
+    }, 100);
 }
 
 // ========== 이벤트 리스너 초기화 ==========

@@ -17,13 +17,13 @@ function initGuidance() {
 function showStudentList() {
     currentView = 'list';
     currentStudentId = null;
-    
+
     const students = DataService.getMyStudents();
     const currentProf = DataService.getCurrentProfessor();
-    
+
     const contentArea = document.getElementById('guidance-content-area');
     if (!contentArea) return;
-    
+
     contentArea.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
@@ -33,7 +33,7 @@ function showStudentList() {
                         총 <span class="font-semibold text-blue-600">${students.length}명</span>
                     </div>
                 </div>
-                
+
                 <!-- 검색 영역 -->
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -49,16 +49,16 @@ function showStudentList() {
                             <option value="mid_thesis">중간논문</option>
                             <option value="final_thesis">최종논문</option>
                         </select>
-                        <input type="text" 
-                               id="filter-keyword" 
+                        <input type="text"
+                               id="filter-keyword"
                                placeholder="학번/성명 검색"
                                class="border border-gray-300 rounded px-3 py-2 text-sm">
                         <div class="flex gap-2">
-                            <button onclick="searchStudents()" 
+                            <button onclick="searchStudents()"
                                     class="flex-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
                                 검색
                             </button>
-                            <button onclick="resetStudentSearch()" 
+                            <button onclick="resetStudentSearch()"
                                     class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-300">
                                 초기화
                             </button>
@@ -66,11 +66,23 @@ function showStudentList() {
                     </div>
                 </div>
             </div>
-            
+
+            <!-- 학생 선택 영역 (알림 발송) -->
+            ${StudentSelection.createSelectionUI()}
+
             <div class="overflow-x-auto">
-                <table class="min-w-full">
+                <table id="students-table" class="min-w-full">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">
+                                <input
+                                    type="checkbox"
+                                    id="select-all-students"
+                                    class="checkbox-input"
+                                    onchange="StudentSelection.toggleSelectAll()"
+                                    title="전체 선택"
+                                >
+                            </th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
@@ -87,9 +99,28 @@ function showStudentList() {
                         ${students.map((student, idx) => {
                             const myRole = student.advisors.find(a => a.id === currentProf.id)?.role;
                             const myStats = student.guidanceStats[currentProf.id] || { count: 0, lastDate: '-' };
-                            
+
+                            // 알림 발송용 학생 데이터
+                            const studentData = {
+                                studentId: student.studentId,
+                                studentName: student.name,
+                                phone: student.phone,
+                                email: student.email,
+                                major: student.major,
+                                degree: getDegreeText(student.degree)
+                            };
+
                             return `
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-center">
+                                        <input
+                                            type="checkbox"
+                                            class="student-checkbox checkbox-input"
+                                            data-student-id="${student.studentId}"
+                                            data-student-data='${JSON.stringify(studentData)}'
+                                            onchange="StudentSelection.toggleStudent(this)"
+                                        >
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${student.name}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${student.studentId}</td>
@@ -99,8 +130,8 @@ function showStudentList() {
                                         <div class="flex flex-col gap-1">
                                             ${student.advisors.map(advisor => `
                                                 <span class="text-xs ${
-                                                    advisor.id === currentProf.id 
-                                                        ? 'font-semibold text-blue-600' 
+                                                    advisor.id === currentProf.id
+                                                        ? 'font-semibold text-blue-600'
                                                         : 'text-gray-500'
                                                 }">
                                                     ${advisor.name} ${advisor.role === 'primary' ? '(주)' : '(부)'}
@@ -114,7 +145,7 @@ function showStudentList() {
                                     <td class="py-3 px-4 text-center text-gray-600">${student.totalGuidanceCount}회</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${myStats.lastDate || '-'}</td>
                                     <td class="py-3 px-4 text-center">
-                                        <button onclick="showStudentDetail('${student.studentId}')" 
+                                        <button onclick="showStudentDetail('${student.studentId}')"
                                                 class="text-blue-600 hover:underline text-sm font-medium">
                                             상세보기
                                         </button>
@@ -127,6 +158,9 @@ function showStudentList() {
             </div>
         </div>
     `;
+
+    // StudentSelection 초기화
+    StudentSelection.init(students);
 }
 
 // 학생 상세 화면
