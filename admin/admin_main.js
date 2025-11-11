@@ -596,8 +596,80 @@ function switchThesisTab(tab) {
 }
 
 function searchThesisReview() {
-    // TODO: 실제 검색 로직
-    showAlert('검색 기능은 백엔드 연동 후 동작합니다.');
+    // 검색 조건 수집
+    const filters = {
+        year: document.getElementById('thesis-search-year')?.value || '',
+        semester: document.getElementById('thesis-search-semester')?.value || '',
+        semesterCount: document.getElementById('thesis-search-semester-count')?.value || '',
+        reviewType: document.getElementById('thesis-search-review-type')?.value || '',
+        studentId: document.getElementById('thesis-search-student-id')?.value.trim() || '',
+        studentName: document.getElementById('thesis-search-student-name')?.value.trim() || ''
+    };
+
+    // 모든 심사 데이터 통합
+    const allTheses = [
+        ...appData.submissions.thesisPlan.map(item => ({...item, reviewType: '논문작성계획서'})),
+        ...appData.submissions.midThesis.map(item => ({...item, reviewType: '중간논문'})),
+        ...appData.submissions.finalThesis.map(item => ({...item, reviewType: '최종논문'}))
+    ];
+
+    // 필터링
+    let filtered = allTheses;
+
+    // 학년도 필터
+    if (filters.year) {
+        filtered = filtered.filter(item => {
+            const submitYear = (item.submitDate || item.submittedAt || '').substring(0, 4);
+            return submitYear === filters.year;
+        });
+    }
+
+    // 학기 필터
+    if (filters.semester) {
+        filtered = filtered.filter(item => {
+            const submitMonth = parseInt((item.submitDate || item.submittedAt || '').substring(5, 7));
+            if (filters.semester === '1') {
+                return submitMonth >= 3 && submitMonth <= 8;
+            } else {
+                return submitMonth >= 9 || submitMonth <= 2;
+            }
+        });
+    }
+
+    // 학기차 필터
+    if (filters.semesterCount) {
+        filtered = filtered.filter(item => {
+            return String(item.semesterCount) === filters.semesterCount;
+        });
+    }
+
+    // 심사구분 필터
+    if (filters.reviewType) {
+        filtered = filtered.filter(item => item.reviewType === filters.reviewType);
+    }
+
+    // 학번 필터
+    if (filters.studentId) {
+        filtered = filtered.filter(item =>
+            item.studentId?.toLowerCase().includes(filters.studentId.toLowerCase())
+        );
+    }
+
+    // 성명 필터
+    if (filters.studentName) {
+        filtered = filtered.filter(item =>
+            item.studentName?.toLowerCase().includes(filters.studentName.toLowerCase())
+        );
+    }
+
+    // 필터링된 데이터 저장
+    appData.filteredTheses = filtered;
+
+    // 화면 새로고침
+    switchView('thesisReview');
+
+    // 결과 알림
+    showAlert(`검색 결과: ${filtered.length}건`);
 }
 
 function resetThesisSearch() {
@@ -609,6 +681,13 @@ function resetThesisSearch() {
             field.value = '';
         }
     });
+
+    // 필터 제거
+    delete appData.filteredTheses;
+
+    // 화면 새로고침
+    switchView('thesisReview');
+
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
