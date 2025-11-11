@@ -168,12 +168,20 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">휴대전화</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이메일</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">상태</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출일시</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">승인여부</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.map((item, idx) => `
+                            ${data.map((item, idx) => {
+                                // Normalize status: 검토중 -> 승인대기
+                                const normalizedStatus = item.status === '검토중' ? '승인대기' :
+                                                        item.status === '승인완료' ? '승인완료' : '승인대기';
+                                const statusClass = normalizedStatus === '승인완료' ? 'status-approved' : 'status-pending';
+
+                                return `
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-3 px-4">
                                         <input type="checkbox" value="${item.id}">
@@ -190,16 +198,18 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.phone || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.email || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.studentStatus || '재학'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">${item.advisor || '-'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">${item.submittedAt || '-'}</td>
                                     <td class="py-3 px-4">
-                                        <span class="status-badge status-${item.status}">
-                                            ${item.status}
+                                        <span class="status-badge ${statusClass}">
+                                            ${normalizedStatus}
                                         </span>
                                     </td>
                                     <td class="py-3 px-4">
                                         <button onclick="viewSubmissionDetail(${item.id}, 'researchProposal')" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
                                     </td>
                                 </tr>
-                            `).join('')}
+                            `}).join('')}
                         </tbody>
                     </table>
                 </div>
