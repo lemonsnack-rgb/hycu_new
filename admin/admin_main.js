@@ -2276,6 +2276,16 @@ console.log('✅ 관리자 - 통계 대시보드 기능 로드 완료');
 
 // ========== 학위논문 심사 상세 보기 (위원/위원장 뷰) ==========
 
+// Helper functions for evaluation display
+function formatDateTime(dateStr) {
+    const date = new Date(dateStr);
+    return date.toLocaleString('ko-KR');
+}
+
+function calculateWeightedScore(score, maxScore, weight) {
+    return (score / maxScore) * weight;
+}
+
 function viewThesisReviewDetail(itemId, viewType, thesisType) {
     console.log('viewThesisReviewDetail called:', { itemId, viewType, thesisType });
     console.log('itemId type:', typeof itemId, 'value:', itemId);
@@ -2314,69 +2324,292 @@ function viewThesisReviewDetail(itemId, viewType, thesisType) {
     ];
 
     let content = '<div class="space-y-6">';
-    content += '<div class="bg-gray-50 rounded-lg p-4"><h4 class="font-bold text-gray-800 mb-3">📄 논문 정보</h4><div class="space-y-2 text-sm">';
-    content += '<div class="flex"><div class="w-32 text-gray-600">학생명</div><div class="flex-1 font-medium">' + item.studentName + ' (' + item.studentId + ')</div></div>';
-    content += '<div class="flex"><div class="w-32 text-gray-600">전공 / 학위과정</div><div class="flex-1">' + item.major + ' / ' + item.degree + '</div></div>';
-    content += '<div class="flex"><div class="w-32 text-gray-600">지도교수</div><div class="flex-1">' + item.advisor + '</div></div>';
-    content += '<div class="flex"><div class="w-32 text-gray-600">제출일</div><div class="flex-1">' + (item.submitDate || '-') + '</div></div>';
-    content += '<div class="flex"><div class="w-32 text-gray-600">논문제목</div><div class="flex-1 font-medium">' + (item.thesisTitle || '미정') + '</div></div>';
+
+    // 논문 정보 (professor 화면과 동일한 구조)
+    content += '<div class="bg-gray-50 rounded-lg p-4">';
+    content += '<h4 class="font-bold text-gray-800 mb-3">📄 논문 정보</h4>';
+    content += '<div class="space-y-2 text-sm">';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">대학원</div><div class="flex-1">' + (item.graduate || '일반대학원') + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">전공/학과</div><div class="flex-1">' + item.major + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학위과정</div><div class="flex-1">' + item.degree + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학번</div><div class="flex-1">' + item.studentId + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">학생명</div><div class="flex-1 font-medium">' + item.studentName + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">논문제목</div><div class="flex-1 font-medium">' + (item.thesisTitle || '미정') + '</div></div>';
     if (item.copyKiller || item.gptKiller) {
         const copyKiller = item.copyKiller || 0;
         const gptKiller = item.gptKiller || 0;
-        content += '<div class="flex"><div class="w-32 text-gray-600">표절/AI 검사</div><div class="flex-1">카피킬러: ' + copyKiller + '% / GPT킬러: ' + gptKiller + '%</div></div>';
+        content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">표절/AI 검사</div><div class="flex-1">카피킬러: ' + copyKiller + '% / GPT킬러: ' + gptKiller + '%</div></div>';
     }
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">지도교수</div><div class="flex-1">' + item.advisor + '</div></div>';
+    content += '<div class="flex border-b border-gray-200 pb-2"><div class="w-32 text-gray-600 font-semibold">제출일</div><div class="flex-1">' + (item.submitDate || '-') + '</div></div>';
     content += '</div></div>';
 
     if (!isChair) {
-        content += '<div class="bg-white border border-gray-200 rounded-lg p-4"><h4 class="font-bold text-gray-800 mb-4">📝 심사위원 평가</h4><div class="space-y-4">';
-        const criteria = [
-            { name: '연구의 독창성', score: 4 }, { name: '방법론의 타당성', score: 5 }, { name: '결과의 명확성', score: 4 },
-            { name: '논리적 구성', score: 4 }, { name: '참고문헌의 적절성', score: 5 }
-        ];
-        criteria.forEach(criterion => {
-            content += '<div><label class="block text-sm font-medium text-gray-700 mb-2">' + criterion.name + ' (5점 만점)</label><div class="flex gap-2">';
-            for (let i = 1; i <= 5; i++) {
-                content += '<span class="px-3 py-1 rounded ' + (i === criterion.score ? 'bg-blue-100 text-blue-700 font-bold' : 'bg-gray-100 text-gray-500') + '">' + i + '점</span>';
-            }
+        // 심사위원 평가 - 교수 화면과 동일한 UI (점수형 평가)
+        const template = {
+            name: '학위논문 심사 평가표',
+            submissionType: item.submissionType || '최종논문',
+            passingScore: 75,
+            categories: [
+                { id: 'cat1', name: '연구의 독창성', description: '연구 주제의 참신성과 기여도', weight: 25, maxScore: 10 },
+                { id: 'cat2', name: '연구방법의 타당성', description: '연구 방법론의 적절성과 신뢰성', weight: 25, maxScore: 10 },
+                { id: 'cat3', name: '결과의 명확성', description: '연구 결과의 명확성과 논리성', weight: 20, maxScore: 10 },
+                { id: 'cat4', name: '논리적 구성', description: '논문의 전체적인 논리적 구성', weight: 15, maxScore: 10 },
+                { id: 'cat5', name: '학술적 기여도', description: '학문 분야에 대한 기여 정도', weight: 15, maxScore: 10 }
+            ]
+        };
+
+        const evaluation = {
+            evaluationType: 'score',
+            submittedAt: item.submitDate || new Date().toISOString(),
+            totalScore: reviewers[0]?.score || 88,
+            scores: [
+                { categoryId: 'cat1', score: 9, comment: '연구 주제가 참신하고 학술적 가치가 높습니다.' },
+                { categoryId: 'cat2', score: 8.5, comment: '연구 방법론이 체계적이고 적절합니다.' },
+                { categoryId: 'cat3', score: 9, comment: '연구 결과가 명확하게 제시되었습니다.' },
+                { categoryId: 'cat4', score: 8.5, comment: '논문의 구성이 논리적입니다.' },
+                { categoryId: 'cat5', score: 9, comment: '학문 분야에 유의미한 기여를 합니다.' }
+            ],
+            overallComment: { combined: reviewers[0]?.comment || '전반적으로 우수한 연구이며, 학위논문으로서의 요건을 충족합니다.' }
+        };
+
+        // 교수 UI와 동일한 구조로 렌더링
+        content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6">';
+        content += '<div class="flex items-center justify-between mb-4">';
+        content += '<h3 class="text-lg font-bold text-gray-800">' + template.name + '</h3>';
+        content += '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">';
+        content += '제출 완료 (' + formatDateTime(evaluation.submittedAt) + ')';
+        content += '</span></div>';
+
+        content += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">';
+        content += '<p class="text-sm text-blue-800">';
+        content += '<strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요. ';
+        content += '가중치가 적용되어 최종 점수가 계산됩니다.';
+        content += '</p></div>';
+
+        content += '<div id="evaluation-categories" class="space-y-4">';
+        template.categories.forEach((category, index) => {
+            const scoreData = evaluation.scores.find(s => s.categoryId === category.id);
+            const currentScore = scoreData?.score || 0;
+            const currentComment = scoreData?.comment || '';
+
+            content += '<div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">';
+
+            // Grid: 제목 영역 | 가중치
+            content += '<div class="grid grid-cols-[1fr_80px] gap-4 mb-4">';
+            content += '<div>';
+            content += '<h4 class="font-bold text-gray-800 mb-1">' + (index + 1) + '. ' + category.name + '</h4>';
+            content += '<p class="text-sm text-gray-600">' + category.description + '</p>';
+            content += '</div>';
+            content += '<div class="text-right">';
+            content += '<div class="text-xs text-gray-500">가중치</div>';
+            content += '<div class="text-lg font-bold text-blue-600">' + category.weight + '%</div>';
             content += '</div></div>';
+
+            // Grid: 점수 입력 (읽기 모드)
+            content += '<div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">';
+            content += '<label class="text-sm font-medium text-gray-700">점수:</label>';
+            content += '<input type="number" class="score-input w-full bg-gray-50" min="0" max="' + category.maxScore + '" step="0.5" value="' + currentScore + '" disabled>';
+            content += '<span class="text-sm text-gray-600">/ ' + category.maxScore + '점</span>';
+            content += '<span></span>';
+            content += '</div>';
+
+            // Grid: 가중 점수 표시
+            content += '<div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">';
+            content += '<span></span>';
+            content += '<div class="text-sm text-gray-500">';
+            content += '→ 가중 점수: ';
+            content += '<span class="weighted-score text-base font-bold text-blue-600">';
+            content += calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1) + '점';
+            content += '</span>';
+            content += '<span class="text-xs text-gray-400">(' + category.weight + '% 적용)</span>';
+            content += '</div></div>';
+
+            // 평가 의견 (읽기 모드)
+            content += '<div>';
+            content += '<label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>';
+            content += '<textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>' + currentComment + '</textarea>';
+            content += '</div>';
+
+            content += '</div>';
         });
-        content += '</div><div class="mt-6"><label class="block text-sm font-medium text-gray-700 mb-2">종합 의견</label>';
-        content += '<div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700">' + (reviewers[0]?.comment || '연구 방법론이 적절하며 결과 해석이 명확합니다.') + '</div></div>';
-        content += '<div class="mt-6 bg-blue-50 border border-blue-200 rounded p-4"><div class="flex justify-between items-center"><span class="font-bold text-gray-800">총점</span>';
-        content += '<span class="text-2xl font-bold text-blue-600">' + (reviewers[0]?.score || 88) + '점 / 100점</span></div></div></div>';
+        content += '</div>';
+
+        // 총점
+        content += '<div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">';
+        content += '<div class="flex items-center justify-between">';
+        content += '<h4 class="text-lg font-bold text-gray-800">총점</h4>';
+        content += '<div class="text-3xl font-bold text-blue-600">' + evaluation.totalScore + '점</div>';
+        content += '</div>';
+        content += '<div class="text-sm text-gray-600 mt-1 text-right">100점 만점 (합격 기준: ' + template.passingScore + '점)</div>';
+        content += '</div>';
+
+        // 종합 의견 (읽기 모드)
+        content += '<div class="mt-6">';
+        content += '<h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>';
+        content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>' + (evaluation.overallComment.combined || evaluation.overallComment.conclusion || '') + '</textarea>';
+        content += '</div>';
+        content += '</div>';
     }
 
     if (isChair) {
-        content += '<div class="bg-white border border-gray-200 rounded-lg p-4"><h4 class="font-bold text-gray-800 mb-4">👥 심사위원 평가 현황</h4><div class="space-y-3">';
-        reviewers.forEach(reviewer => {
-            const statusBg = reviewer.status === '완료' ? 'bg-green-50' : 'bg-gray-50';
-            const statusBadge = reviewer.status === '완료' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600';
-            content += '<div class="border border-gray-200 rounded p-3 ' + statusBg + '"><div class="flex justify-between items-center mb-2">';
-            content += '<div><span class="font-medium">' + reviewer.name + '</span><span class="text-sm text-gray-600 ml-2">(' + reviewer.role + ')</span></div>';
-            content += '<span class="px-2 py-1 rounded text-xs ' + statusBadge + '">' + reviewer.status + '</span></div>';
-            if (reviewer.status === '완료') {
-                content += '<div class="text-sm"><div class="flex justify-between mb-1"><span class="text-gray-600">평가 점수</span>';
-                content += '<span class="font-bold text-blue-600">' + reviewer.score + '점</span></div>';
-                content += '<div class="text-gray-700 bg-white rounded p-2 mt-2 text-xs">' + reviewer.comment + '</div></div>';
-            } else {
-                content += '<div class="text-sm text-gray-500">평가 대기 중</div>';
-            }
+        // 심사위원장 평가 - 교수 화면과 동일한 UI (각 심사위원의 평가 + 종합 평가)
+        const template = {
+            name: '학위논문 심사 평가표',
+            submissionType: item.submissionType || '최종논문',
+            passingScore: 75,
+            categories: [
+                { id: 'cat1', name: '연구의 독창성', description: '연구 주제의 참신성과 기여도', weight: 25, maxScore: 10 },
+                { id: 'cat2', name: '연구방법의 타당성', description: '연구 방법론의 적절성과 신뢰성', weight: 25, maxScore: 10 },
+                { id: 'cat3', name: '결과의 명확성', description: '연구 결과의 명확성과 논리성', weight: 20, maxScore: 10 },
+                { id: 'cat4', name: '논리적 구성', description: '논문의 전체적인 논리적 구성', weight: 15, maxScore: 10 },
+                { id: 'cat5', name: '학술적 기여도', description: '학문 분야에 대한 기여 정도', weight: 15, maxScore: 10 }
+            ]
+        };
+
+        // 각 심사위원의 평가 표시
+        reviewers.forEach((reviewer, memberIndex) => {
+            if (reviewer.status !== '완료') return;
+
+            const evaluation = {
+                professorName: reviewer.name,
+                role: reviewer.role === '주심' ? 'chair' : 'member',
+                evaluationType: 'score',
+                submittedAt: item.submitDate || new Date().toISOString(),
+                totalScore: reviewer.score || 88,
+                scores: [
+                    { categoryId: 'cat1', score: 9, comment: '연구 주제가 참신하고 학술적 가치가 높습니다.' },
+                    { categoryId: 'cat2', score: 8.5, comment: '연구 방법론이 체계적이고 적절합니다.' },
+                    { categoryId: 'cat3', score: 9, comment: '연구 결과가 명확하게 제시되었습니다.' },
+                    { categoryId: 'cat4', score: 8.5, comment: '논문의 구성이 논리적입니다.' },
+                    { categoryId: 'cat5', score: 9, comment: '학문 분야에 유의미한 기여를 합니다.' }
+                ],
+                overallComment: reviewer.comment || '전반적으로 우수한 연구이며, 학위논문으로서의 요건을 충족합니다.'
+            };
+
+            // 교수 UI의 renderCommitteeMemberEvaluation과 동일한 구조
+            content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-blue-500">';
+            content += '<div class="flex items-center justify-between mb-4">';
+            content += '<div>';
+            content += '<h3 class="text-lg font-bold text-gray-800">' + evaluation.professorName + ' (' + (evaluation.role === 'chair' ? '심사위원장' : '심사위원') + ')</h3>';
+            content += '<p class="text-sm text-gray-600">' + template.name + '</p>';
+            content += '</div>';
+            content += '<span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">';
+            content += '제출 완료 (' + formatDateTime(evaluation.submittedAt) + ')';
+            content += '</span></div>';
+
+            content += '<div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">';
+            content += '<p class="text-sm text-blue-800">';
+            content += '<strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요. ';
+            content += '가중치가 적용되어 최종 점수가 계산됩니다.';
+            content += '</p></div>';
+
+            content += '<div class="space-y-4">';
+            template.categories.forEach((category, index) => {
+                const scoreData = evaluation.scores.find(s => s.categoryId === category.id);
+                const currentScore = scoreData?.score || 0;
+                const currentComment = scoreData?.comment || '';
+
+                content += '<div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">';
+                content += '<div class="grid grid-cols-[1fr_80px] gap-4 mb-4">';
+                content += '<div>';
+                content += '<h4 class="font-bold text-gray-800 mb-1">' + (index + 1) + '. ' + category.name + '</h4>';
+                content += '<p class="text-sm text-gray-600">' + category.description + '</p>';
+                content += '</div>';
+                content += '<div class="text-right">';
+                content += '<div class="text-xs text-gray-500">가중치</div>';
+                content += '<div class="text-lg font-bold text-blue-600">' + category.weight + '%</div>';
+                content += '</div></div>';
+
+                content += '<div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">';
+                content += '<label class="text-sm font-medium text-gray-700">점수:</label>';
+                content += '<input type="number" class="w-full bg-gray-50" min="0" max="' + category.maxScore + '" step="0.5" value="' + currentScore + '" disabled>';
+                content += '<span class="text-sm text-gray-600">/ ' + category.maxScore + '점</span>';
+                content += '<span></span>';
+                content += '</div>';
+
+                content += '<div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">';
+                content += '<span></span>';
+                content += '<div class="text-sm text-gray-500">';
+                content += '→ 가중 점수: ';
+                content += '<span class="text-base font-bold text-blue-600">' + calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1) + '점</span>';
+                content += '<span class="text-xs text-gray-400">(' + category.weight + '% 적용)</span>';
+                content += '</div></div>';
+
+                content += '<div>';
+                content += '<label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>';
+                content += '<textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>' + currentComment + '</textarea>';
+                content += '</div>';
+
+                content += '</div>';
+            });
+            content += '</div>';
+
+            content += '<div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">';
+            content += '<div class="flex items-center justify-between">';
+            content += '<h4 class="text-lg font-bold text-gray-800">총점</h4>';
+            content += '<div class="text-3xl font-bold text-blue-600">' + evaluation.totalScore + '점</div>';
+            content += '</div>';
+            content += '<div class="text-sm text-gray-600 mt-1 text-right">100점 만점 (합격 기준: ' + template.passingScore + '점)</div>';
+            content += '</div>';
+
+            content += '<div class="mt-6">';
+            content += '<h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>';
+            content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="3" disabled>' + evaluation.overallComment + '</textarea>';
+            content += '</div>';
+
             content += '</div>';
         });
+
+        // 종합 평가 섹션 (교수 UI의 renderChairSummary와 동일)
         const completedReviewers = reviewers.filter(r => r.score);
-        const avgScore = completedReviewers.length > 0 ? Math.round(completedReviewers.reduce((sum, r) => sum + r.score, 0) / completedReviewers.length) : 0;
-        content += '</div><div class="mt-4 bg-blue-50 border border-blue-200 rounded p-4"><div class="flex justify-between items-center">';
-        content += '<span class="font-bold text-gray-800">평균 점수</span><span class="text-2xl font-bold text-blue-600">' + avgScore + '점</span></div></div>';
-        content += '<div class="mt-6 border-t pt-4"><h5 class="font-bold text-gray-800 mb-3">최종 심사 결정</h5><div class="space-y-3">';
-        content += '<div><label class="block text-sm font-medium text-gray-700 mb-2">심사 결과</label><div class="flex gap-2">';
-        const results = ['승인', '조건부승인', '보류', '불합격'];
-        const currentResult = item.result || '승인';
-        results.forEach(result => {
-            const className = result === currentResult ? 'bg-green-100 text-green-700 font-bold border border-green-300' : 'bg-gray-100 text-gray-500';
-            content += '<span class="px-3 py-1.5 rounded text-sm ' + className + '">' + result + '</span>';
+        const avgScore = completedReviewers.length > 0 ? completedReviewers.reduce((sum, r) => sum + r.score, 0) / completedReviewers.length : 0;
+        const threshold = (item.submissionType || template.submissionType) === '최종논문' ? 80 : 75;
+        const systemDecision = avgScore >= threshold ? '합격' : '불합격';
+
+        content += '<div class="bg-white rounded-lg shadow-md p-6 mb-6">';
+        content += '<h3 class="text-lg font-bold text-gray-800 mb-4">심사위원장 종합 평가</h3>';
+
+        content += '<div class="bg-blue-50 rounded-lg p-6 border-2 border-blue-200 mb-6">';
+        content += '<div class="grid grid-cols-3 gap-6 text-center">';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">평균 점수</div>';
+        content += '<div class="text-3xl font-bold text-blue-600">' + avgScore.toFixed(1) + '점</div>';
+        content += '</div>';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">합격 기준</div>';
+        content += '<div class="text-3xl font-bold text-gray-800">' + threshold + '점</div>';
+        content += '</div>';
+        content += '<div>';
+        content += '<div class="text-sm text-gray-600 mb-1">시스템 판정</div>';
+        content += '<div class="text-2xl font-bold ' + (systemDecision === '합격' ? 'text-green-600' : 'text-red-600') + '">' + systemDecision + '</div>';
+        content += '</div>';
+        content += '</div></div>';
+
+        content += '<div class="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-6">';
+        content += '<h4 class="font-bold text-gray-800 mb-3">최종 결정 (읽기 전용)</h4>';
+        content += '<div class="space-y-3">';
+        content += '<div class="flex items-center gap-3">';
+
+        const currentDecision = item.result || '승인';
+        const decisions = ['승인', '보류', '반려'];
+        decisions.forEach(decision => {
+            const isSelected = decision === currentDecision;
+            const borderColor = decision === '승인' ? 'border-green-400' : decision === '보류' ? 'border-yellow-400' : 'border-red-400';
+            content += '<label class="flex items-center gap-2 p-3 bg-white rounded-lg flex-1 border-2 ' + (isSelected ? borderColor : 'border-gray-300') + '">';
+            content += '<input type="radio" name="chairDecision" value="' + decision + '" ' + (isSelected ? 'checked' : '') + ' disabled class="w-4 h-4">';
+            content += '<span class="font-medium">' + decision + '</span>';
+            content += '</label>';
         });
-        content += '</div></div><div><label class="block text-sm font-medium text-gray-700 mb-2">최종 의견</label>';
-        content += '<div class="bg-gray-50 border border-gray-200 rounded p-3 text-sm text-gray-700">전반적으로 연구의 질이 우수하며 학위 논문으로서의 요건을 충족합니다. 승인합니다.</div></div></div></div></div>';
+
+        content += '</div>';
+        content += '<div>';
+        content += '<label class="text-sm font-medium text-gray-700 mb-1 block">결정 사유:</label>';
+        content += '<textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>전반적으로 연구의 질이 우수하며 학위 논문으로서의 요건을 충족합니다. 승인합니다.</textarea>';
+        content += '</div>';
+        content += '</div></div>';
+
+        content += '</div>';
     }
 
     content += '<div class="bg-yellow-50 border border-yellow-200 rounded p-3"><div class="flex items-start">';
