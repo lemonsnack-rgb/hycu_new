@@ -43,7 +43,7 @@ let elements = null;  // DOM 요소 참조
 function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
     currentFeedbackId = feedbackId;
     annotations = feedbackData && feedbackData.annotations ? {...feedbackData.annotations} : {};
-    
+
     elements = {
         canvas: document.getElementById('pdf-canvas'),
         textLayer: document.getElementById('text-layer'),
@@ -55,7 +55,13 @@ function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
         pageCountEl: document.getElementById('page-count'),
         zoomLevelEl: document.getElementById('zoom-level')
     };
-    
+
+    // PDF 뷰어 DOM 요소가 없으면 초기화하지 않음 (뷰어가 닫힌 상태)
+    if (!elements.canvas || !elements.interactionCanvas || !elements.pdfRenderWrapper) {
+        console.warn('PDF 뷰어 DOM 요소가 없습니다. 초기화를 중단합니다.');
+        return;
+    }
+
     // Fabric.js 캔버스 초기화
     fabricCanvas = new fabric.Canvas(elements.interactionCanvas, {
         isDrawingMode: false,

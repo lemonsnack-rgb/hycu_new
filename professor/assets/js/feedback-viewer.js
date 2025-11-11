@@ -330,6 +330,27 @@ function closeFeedbackModal() {
     if (modal) {
         modal.remove();
     }
+
+    // PDF 뷰어 관련 정리 (cleanup)
+    // 1. 버전 목록(submission-history) 제거
+    const submissionHistory = document.getElementById('submission-history');
+    if (submissionHistory) {
+        submissionHistory.remove();
+    }
+
+    // 2. 전역 변수 정리
+    if (window._currentVersionLabel) {
+        window._currentVersionLabel = null;
+    }
+    if (window._currentFeedbackCtx) {
+        window._currentFeedbackCtx = null;
+    }
+
+    // 3. QuickMark 팝오버 제거
+    const quickmarkPopover = document.getElementById('quickmark-popover');
+    if (quickmarkPopover) {
+        quickmarkPopover.remove();
+    }
 }
 
 // ==================== 자주 쓰는 코멘트 팝오버 추가 ====================
@@ -732,6 +753,12 @@ function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<'
 // version switch
 window._pdfVersions = { v3: null, v2: null, v1: null };
 function switchPdfVersion(ver){
+  // PDF 뷰어가 열려있지 않으면 실행하지 않음
+  if (!document.getElementById('feedback-modal')) {
+    console.warn('PDF 뷰어가 닫혀있습니다. 버전 전환을 중단합니다.');
+    return;
+  }
+
   if (window._currentVersionLabel) window._currentVersionLabel(ver);
   document.querySelectorAll('.ver-pill').forEach(b=> b.classList.toggle('active', b.dataset.ver===ver));
   // Reuse same fileUrl for demo; 실제 구현 시 버전별 파일 경로를 바인딩
