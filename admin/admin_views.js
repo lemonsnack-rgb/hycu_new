@@ -374,10 +374,16 @@ const views = {
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.evalDate || '-'}</td>
                                     <td class="py-3 px-4 text-center">
-                                        <button onclick="viewCommitteeEvaluations('${item.id}')"
-                                                class="text-blue-600 hover:text-blue-800 text-sm font-medium">
-                                            상세조회
-                                        </button>
+                                        <div class="flex gap-2 justify-center">
+                                            <button onclick="viewThesisReviewDetail('${item.id}', 'member', '${currentTab}')"
+                                                    class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded">
+                                                위원
+                                            </button>
+                                            <button onclick="viewThesisReviewDetail('${item.id}', 'chair', '${currentTab}')"
+                                                    class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded">
+                                                위원장
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             `).join('')}
