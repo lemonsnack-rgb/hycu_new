@@ -10,11 +10,6 @@ function renderJournalReviewList() {
     const journals = getJournalReviews();
 
     const contentHtml = `
-        <div class="mb-6">
-            <h2 class="text-2xl font-bold text-gray-800">학술지 대체심사</h2>
-            <p class="text-sm text-gray-600 mt-2">학생들의 학술지 논문 게재를 심사합니다.</p>
-        </div>
-
         <!-- 검색 영역 -->
         <div class="search-container">
             <div class="search-grid">
@@ -91,7 +86,10 @@ function renderJournalReviewList() {
         </div>
     `;
 
-    document.getElementById('main-content').innerHTML = contentHtml;
+    const container = document.getElementById('journal-review-content');
+    if (container) {
+        container.innerHTML = contentHtml;
+    }
 }
 
 function renderJournalReviewRows(journals) {
