@@ -3303,6 +3303,351 @@ function renderGuidancePairsTable(pairs) {
     `).join('');
 }
 
+// ==================== 학술지 심사 관리 ====================
+
+function getAdminJournalStatusClass(status) {
+    const classes = {
+        '심사대기': 'bg-yellow-100 text-yellow-800',
+        '심사중': 'bg-blue-100 text-blue-800',
+        '심사완료': 'bg-green-100 text-green-800'
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800';
+}
+
+function viewAdminJournalDetail(journalId) {
+    // professor의 viewJournalReviewDetail 함수 재사용
+    if (typeof viewJournalReviewDetail === 'function') {
+        viewJournalReviewDetail(journalId);
+    } else {
+        alert('학술지 상세보기 기능을 로드할 수 없습니다.');
+    }
+}
+
+function searchJournalReview() {
+    const year = document.getElementById('journal-search-year')?.value || '';
+    const semester = document.getElementById('journal-search-semester')?.value || '';
+    const status = document.getElementById('journal-search-status')?.value || '';
+    const keyword = document.getElementById('journal-search-keyword')?.value.toLowerCase() || '';
+
+    let journals = typeof getJournalReviews === 'function' ? getJournalReviews() : [];
+
+    // 필터링
+    if (year) {
+        journals = journals.filter(j => (j.year || '2025') === year);
+    }
+    if (semester) {
+        journals = journals.filter(j => (j.semester || '1') === semester);
+    }
+    if (status) {
+        journals = journals.filter(j => j.status === status);
+    }
+    if (keyword) {
+        journals = journals.filter(j =>
+            j.studentId.toLowerCase().includes(keyword) ||
+            j.studentName.toLowerCase().includes(keyword) ||
+            j.paperTitle.toLowerCase().includes(keyword) ||
+            j.journalName.toLowerCase().includes(keyword)
+        );
+    }
+
+    // 테이블 업데이트
+    const listContainer = document.getElementById('admin-journal-review-list');
+    if (listContainer) {
+        listContainer.innerHTML = renderAdminJournalRows(journals);
+    }
+}
+
+function resetJournalSearch() {
+    document.getElementById('journal-search-year').value = '';
+    document.getElementById('journal-search-semester').value = '';
+    document.getElementById('journal-search-status').value = '';
+    document.getElementById('journal-search-keyword').value = '';
+
+    const journals = typeof getJournalReviews === 'function' ? getJournalReviews() : [];
+    const listContainer = document.getElementById('admin-journal-review-list');
+    if (listContainer) {
+        listContainer.innerHTML = renderAdminJournalRows(journals);
+    }
+}
+
+function renderAdminJournalRows(journals) {
+    if (journals.length === 0) {
+        return `
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📋</div>
+                <h3 class="text-lg font-semibold text-gray-600 mb-2">학술지 심사 내역이 없습니다</h3>
+            </div>
+        `;
+    }
+
+    return `
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
+                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일</th>
+                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
+                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                ${journals.map((journal, idx) => {
+                    const statusClass = getAdminJournalStatusClass(journal.status);
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${journal.major || '-'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${journal.degree || '석사'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${journal.studentId}</td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-800">${journal.studentName}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
+                                <div class="truncate" title="${journal.paperTitle}">
+                                    ${journal.paperTitle}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 200px;">
+                                <div class="truncate" title="${journal.journalName}">
+                                    ${journal.journalName}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center text-sm text-gray-600">${journal.submissionDate || '-'}</td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
+                                    ${journal.status}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button onclick="viewAdminJournalDetail(${journal.id})"
+                                        class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                    조회
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
+// ==================== 연구계획서 관리 ====================
+
+function openResearchProposalRegisterModal() {
+    const content = `
+        <div class="space-y-6">
+            <!-- 학생 검색 -->
+            <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">학생 정보 검색</h4>
+                <div class="flex gap-2">
+                    <select id="rpSearchType" class="px-3 py-2 border rounded w-32">
+                        <option value="studentId">학번</option>
+                        <option value="name">성명</option>
+                    </select>
+                    <input type="text" id="rpSearchKeyword"
+                           placeholder="검색어 입력"
+                           class="flex-1 px-3 py-2 border rounded"
+                           onkeypress="if(event.key==='Enter') searchStudentForRP()">
+                    <button onclick="searchStudentForRP()"
+                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        검색
+                    </button>
+                </div>
+                <div id="rpStudentSearchResults" class="mt-3"></div>
+            </div>
+
+            <!-- 학생 정보 (자동 입력) -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">학번</label>
+                        <input type="text" id="rpStudentId" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">성명</label>
+                        <input type="text" id="rpStudentName" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">학과/전공</label>
+                        <input type="text" id="rpMajor" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">학위과정</label>
+                        <input type="text" id="rpDegree" readonly
+                               class="w-full px-3 py-2 border rounded bg-gray-100">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 연구계획서 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">연구계획서 정보</h4>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">학년도 *</label>
+                            <select id="rpYear" required class="w-full px-3 py-2 border rounded">
+                                <option value="">선택</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">학기 *</label>
+                            <select id="rpSemester" required class="w-full px-3 py-2 border rounded">
+                                <option value="">선택</option>
+                                <option value="1">1학기</option>
+                                <option value="2">2학기</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">연구계획서 제목 *</label>
+                        <input type="text" id="rpTitle" required
+                               placeholder="연구계획서 제목 입력"
+                               class="w-full px-3 py-2 border rounded">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">연구 개요</label>
+                        <textarea id="rpSummary" rows="4"
+                                  placeholder="연구 개요 입력"
+                                  class="w-full px-3 py-2 border rounded"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">연구계획서 파일</label>
+                        <input type="file" id="rpFile" accept=".pdf,.docx"
+                               class="w-full px-3 py-2 border rounded">
+                        <p class="text-xs text-gray-500 mt-1">PDF 또는 Word 파일 (최대 50MB)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('연구계획서 등록', content, '등록', submitResearchProposal, true);
+}
+
+function searchStudentForRP() {
+    const searchType = document.getElementById('rpSearchType').value;
+    const keyword = document.getElementById('rpSearchKeyword').value.trim();
+
+    if (!keyword) {
+        alert('검색어를 입력하세요.');
+        return;
+    }
+
+    // mock 데이터에서 학생 검색 (실제로는 API 호출)
+    const students = appData.submissions.researchProposal;
+    const results = students.filter(s => {
+        if (searchType === 'studentId') {
+            return s.studentId.includes(keyword);
+        } else {
+            return s.studentName.includes(keyword);
+        }
+    });
+
+    const resultsContainer = document.getElementById('rpStudentSearchResults');
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<p class="text-sm text-gray-500">검색 결과가 없습니다.</p>';
+        return;
+    }
+
+    resultsContainer.innerHTML = `
+        <div class="border rounded max-h-48 overflow-y-auto">
+            ${results.map(s => `
+                <div class="p-2 hover:bg-gray-100 cursor-pointer border-b last:border-b-0"
+                     onclick="selectStudentForRP('${s.studentId}', '${s.studentName}', '${s.major}', '${s.degree}')">
+                    <p class="text-sm font-medium">${s.studentName} (${s.studentId})</p>
+                    <p class="text-xs text-gray-600">${s.major} - ${s.degree}</p>
+                </div>
+            `).join('')}
+        </div>
+    `;
+}
+
+function selectStudentForRP(studentId, studentName, major, degree) {
+    document.getElementById('rpStudentId').value = studentId;
+    document.getElementById('rpStudentName').value = studentName;
+    document.getElementById('rpMajor').value = major;
+    document.getElementById('rpDegree').value = degree;
+    document.getElementById('rpStudentSearchResults').innerHTML = '<p class="text-sm text-green-600">✓ 학생이 선택되었습니다.</p>';
+}
+
+function submitResearchProposal() {
+    const studentId = document.getElementById('rpStudentId').value;
+    const year = document.getElementById('rpYear').value;
+    const semester = document.getElementById('rpSemester').value;
+    const title = document.getElementById('rpTitle').value;
+
+    if (!studentId) {
+        alert('학생을 검색하여 선택해주세요.');
+        return;
+    }
+
+    if (!year || !semester || !title) {
+        alert('필수 항목을 모두 입력해주세요.');
+        return;
+    }
+
+    alert('연구계획서가 등록되었습니다.');
+    closeModal();
+    loadView('researchProposal');
+}
+
+function viewResearchProposalDetail(id) {
+    const proposal = appData.submissions.researchProposal.find(p => p.id === id);
+    if (!proposal) return;
+
+    const content = `
+        <div class="space-y-4">
+            <!-- 학생 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <div><span class="text-gray-600">학번:</span> <span class="font-medium">${proposal.studentId}</span></div>
+                    <div><span class="text-gray-600">성명:</span> <span class="font-medium">${proposal.studentName}</span></div>
+                    <div><span class="text-gray-600">학과/전공:</span> <span class="font-medium">${proposal.major}</span></div>
+                    <div><span class="text-gray-600">학위과정:</span> <span class="font-medium">${proposal.degree}</span></div>
+                </div>
+            </div>
+
+            <!-- 연구계획서 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">연구계획서 정보</h4>
+                <div class="space-y-2 text-sm">
+                    <div><span class="text-gray-600">학년도/학기:</span> <span class="font-medium">${proposal.year || '2025'}학년도 ${proposal.semester || '1'}학기</span></div>
+                    <div><span class="text-gray-600">제목:</span> <span class="font-medium">${proposal.thesisTitle || '-'}</span></div>
+                    <div><span class="text-gray-600">등록일:</span> <span class="font-medium">${proposal.submitDate || '-'}</span></div>
+                </div>
+            </div>
+
+            <!-- 첨부파일 -->
+            ${proposal.fileUrl ? `
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <h4 class="font-bold mb-3">첨부파일</h4>
+                    <a href="${proposal.fileUrl}" target="_blank"
+                       class="text-blue-600 hover:underline text-sm">
+                        <i class="fas fa-file-pdf"></i> 연구계획서 다운로드
+                    </a>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    openModal('연구계획서 상세', content, '닫기', closeModal, true);
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
@@ -3312,3 +3657,13 @@ window.toggleWeekAccordion = toggleWeekAccordion;
 window.saveWeekAdminNote = saveWeekAdminNote;
 window.filterGuidancePairs = filterGuidancePairs;
 window.resetGuidancePairsFilter = resetGuidancePairsFilter;
+window.getAdminJournalStatusClass = getAdminJournalStatusClass;
+window.viewAdminJournalDetail = viewAdminJournalDetail;
+window.searchJournalReview = searchJournalReview;
+window.resetJournalSearch = resetJournalSearch;
+window.renderAdminJournalRows = renderAdminJournalRows;
+window.openResearchProposalRegisterModal = openResearchProposalRegisterModal;
+window.searchStudentForRP = searchStudentForRP;
+window.selectStudentForRP = selectStudentForRP;
+window.submitResearchProposal = submitResearchProposal;
+window.viewResearchProposalDetail = viewResearchProposalDetail;
