@@ -3303,6 +3303,141 @@ function renderGuidancePairsTable(pairs) {
     `).join('');
 }
 
+// ==================== 학술지 심사 관리 ====================
+
+function getAdminJournalStatusClass(status) {
+    const classes = {
+        '심사대기': 'bg-yellow-100 text-yellow-800',
+        '심사중': 'bg-blue-100 text-blue-800',
+        '심사완료': 'bg-green-100 text-green-800'
+    };
+    return classes[status] || 'bg-gray-100 text-gray-800';
+}
+
+function viewAdminJournalDetail(journalId) {
+    // professor의 viewJournalReviewDetail 함수 재사용
+    if (typeof viewJournalReviewDetail === 'function') {
+        viewJournalReviewDetail(journalId);
+    } else {
+        alert('학술지 상세보기 기능을 로드할 수 없습니다.');
+    }
+}
+
+function searchJournalReview() {
+    const year = document.getElementById('journal-search-year')?.value || '';
+    const semester = document.getElementById('journal-search-semester')?.value || '';
+    const status = document.getElementById('journal-search-status')?.value || '';
+    const keyword = document.getElementById('journal-search-keyword')?.value.toLowerCase() || '';
+
+    let journals = typeof getJournalReviews === 'function' ? getJournalReviews() : [];
+
+    // 필터링
+    if (year) {
+        journals = journals.filter(j => (j.year || '2025') === year);
+    }
+    if (semester) {
+        journals = journals.filter(j => (j.semester || '1') === semester);
+    }
+    if (status) {
+        journals = journals.filter(j => j.status === status);
+    }
+    if (keyword) {
+        journals = journals.filter(j =>
+            j.studentId.toLowerCase().includes(keyword) ||
+            j.studentName.toLowerCase().includes(keyword) ||
+            j.paperTitle.toLowerCase().includes(keyword) ||
+            j.journalName.toLowerCase().includes(keyword)
+        );
+    }
+
+    // 테이블 업데이트
+    const listContainer = document.getElementById('admin-journal-review-list');
+    if (listContainer) {
+        listContainer.innerHTML = renderAdminJournalRows(journals);
+    }
+}
+
+function resetJournalSearch() {
+    document.getElementById('journal-search-year').value = '';
+    document.getElementById('journal-search-semester').value = '';
+    document.getElementById('journal-search-status').value = '';
+    document.getElementById('journal-search-keyword').value = '';
+
+    const journals = typeof getJournalReviews === 'function' ? getJournalReviews() : [];
+    const listContainer = document.getElementById('admin-journal-review-list');
+    if (listContainer) {
+        listContainer.innerHTML = renderAdminJournalRows(journals);
+    }
+}
+
+function renderAdminJournalRows(journals) {
+    if (journals.length === 0) {
+        return `
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4">📋</div>
+                <h3 class="text-lg font-semibold text-gray-600 mb-2">학술지 심사 내역이 없습니다</h3>
+            </div>
+        `;
+    }
+
+    return `
+        <table class="min-w-full">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
+                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일</th>
+                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
+                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                ${journals.map((journal, idx) => {
+                    const statusClass = getAdminJournalStatusClass(journal.status);
+                    return `
+                        <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${journal.major || '-'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${journal.degree || '석사'}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600">${journal.studentId}</td>
+                            <td class="py-3 px-4 text-sm font-medium text-gray-800">${journal.studentName}</td>
+                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
+                                <div class="truncate" title="${journal.paperTitle}">
+                                    ${journal.paperTitle}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 200px;">
+                                <div class="truncate" title="${journal.journalName}">
+                                    ${journal.journalName}
+                                </div>
+                            </td>
+                            <td class="py-3 px-4 text-center text-sm text-gray-600">${journal.submissionDate || '-'}</td>
+                            <td class="py-3 px-4 text-center">
+                                <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
+                                    ${journal.status}
+                                </span>
+                            </td>
+                            <td class="py-3 px-4 text-center">
+                                <button onclick="viewAdminJournalDetail(${journal.id})"
+                                        class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                    조회
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('')}
+            </tbody>
+        </table>
+    `;
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
@@ -3312,3 +3447,8 @@ window.toggleWeekAccordion = toggleWeekAccordion;
 window.saveWeekAdminNote = saveWeekAdminNote;
 window.filterGuidancePairs = filterGuidancePairs;
 window.resetGuidancePairsFilter = resetGuidancePairsFilter;
+window.getAdminJournalStatusClass = getAdminJournalStatusClass;
+window.viewAdminJournalDetail = viewAdminJournalDetail;
+window.searchJournalReview = searchJournalReview;
+window.resetJournalSearch = resetJournalSearch;
+window.renderAdminJournalRows = renderAdminJournalRows;

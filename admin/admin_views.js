@@ -737,13 +737,17 @@ const views = {
 
     // ========== 학술지 심사 신청 현황 ==========
     // ========== 학술지 심사 관리 ==========
-    // ID 13-15: 검색/테이블 학위논문과 동일, 제목 변경
+    // ID 13-15: 학술지 대체심사 관리 (교수용 데이터 공유)
     journalReview: () => {
-        const data = appData.submissions.journalSubmission || [];
+        // professor/mock-data.js의 journalReviews 데이터 사용
+        const data = typeof getJournalReviews === 'function' ? getJournalReviews() : [];
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <h3 class="text-lg font-bold text-gray-800 mb-4">학술지 심사 관리</h3>
+                    <div class="text-sm text-gray-600 mb-4">
+                        <span class="font-semibold text-blue-600">총 ${data.length}건</span>
+                    </div>
 
                     <!-- 검색 메뉴 (표준화) -->
                     <div class="search-container">
@@ -773,31 +777,26 @@ const views = {
                                 </select>
                             </div>
 
-                            <!-- 3. 학기차 -->
+                            <!-- 3. 심사상태 -->
                             <div class="search-field">
                                 <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학기차
+                                    심사상태
                                 </label>
-                                <input type="text" id="journal-search-semester-count" placeholder="학기차 입력"
-                                       class="search-input">
+                                <select id="journal-search-status" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="심사대기">심사대기</option>
+                                    <option value="심사중">심사중</option>
+                                    <option value="심사완료">심사완료</option>
+                                </select>
                             </div>
 
-                            <!-- 4. 학번 -->
+                            <!-- 4. 키워드 -->
                             <div class="search-field">
                                 <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학번
+                                    키워드
                                 </label>
-                                <input type="text" id="journal-search-student-id" placeholder="학번 입력"
-                                       class="search-input">
-                            </div>
-
-                            <!-- 5. 성명 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    성명
-                                </label>
-                                <input type="text" id="journal-search-student-name" placeholder="성명 입력"
-                                       class="search-input">
+                                <input type="text" id="journal-search-keyword" placeholder="학번/성명/논문제목 검색"
+                                       class="search-input" onkeypress="if(event.key==='Enter') searchJournalReview()">
                             </div>
                         </div>
 
@@ -813,72 +812,63 @@ const views = {
                     </div>
                 </div>
 
-                <!-- 테이블 (Task 1-3: 학위논문과 동일한 프로세스) -->
-                <div class="overflow-x-auto">
+                <!-- 학술지 심사 목록 -->
+                <div id="admin-journal-review-list" class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">
-                                    <input type="checkbox" onclick="toggleAllCheckboxes(this)">
-                                </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기차</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">신청일</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사상태</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.length > 0 ? data.map((item, idx) => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4"><input type="checkbox" value="${item.id}"></td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.year || '2025'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.semester || '1'}학기</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.graduate || '일반대학원'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.major}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">
-                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
-                                    </td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.semesterCount || '-'}학기</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.studentStatus || '재학'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.advisor || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800 max-w-xs truncate" title="${item.thesisTitle || '-'}">${item.thesisTitle || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-800">${item.submitDate || '-'}</td>
-                                    <td class="py-3 px-4">
-                                        <span class="status-badge status-${item.result || '대기'}">
-                                            ${item.result || '대기'}
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-4 text-center">
-                                        <div class="flex gap-2 justify-center">
-                                            <button onclick="viewJournalDetail('${item.id}', 'member')"
-                                                    class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded">
-                                                위원
+                            ${data.length > 0 ? data.map((journal, idx) => {
+                                const statusClass = getAdminJournalStatusClass(journal.status);
+                                return `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${journal.major || '-'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${journal.degree || '석사'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${journal.studentId}</td>
+                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">${journal.studentName}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
+                                            <div class="truncate" title="${journal.paperTitle}">
+                                                ${journal.paperTitle}
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 200px;">
+                                            <div class="truncate" title="${journal.journalName}">
+                                                ${journal.journalName}
+                                            </div>
+                                        </td>
+                                        <td class="py-3 px-4 text-center text-sm text-gray-600">${journal.submissionDate || '-'}</td>
+                                        <td class="py-3 px-4 text-center">
+                                            <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
+                                                ${journal.status}
+                                            </span>
+                                        </td>
+                                        <td class="py-3 px-4 text-center">
+                                            <button onclick="viewAdminJournalDetail(${journal.id})"
+                                                    class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                                조회
                                             </button>
-                                            <button onclick="viewJournalDetail('${item.id}', 'chair')"
-                                                    class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded">
-                                                위원장
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `).join('') : `
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('') : `
                                 <tr>
-                                    <td colspan="16" class="py-8 text-center text-gray-500">
-                                        학술지 심사 신청 내역이 없습니다.
+                                    <td colspan="11" class="py-8 text-center text-gray-500">
+                                        학술지 심사 내역이 없습니다.
                                     </td>
                                 </tr>
                             `}
