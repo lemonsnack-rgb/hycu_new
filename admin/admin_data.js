@@ -598,7 +598,28 @@ const appData = {
             itemCount: 5,
             totalScore: 100,
             passingScore: 70,
-            passingCriteria: '총점 70점 이상',
+            passingCriteria: {
+                type: 'complex',
+                description: '평균 70점 이상, 최저 60점 이상',
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: '각 항목 최소 60점 이상 (과락)'
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: '전체 평균 70점 이상'
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        maxValue: 100,
+                        description: '총점 70점 이상 (100점 만점)'
+                    }
+                ]
+            },
             createdDate: '2025-01-10',
             items: [
                 {
@@ -641,7 +662,28 @@ const appData = {
             itemCount: 6,
             totalScore: 100,
             passingScore: 75,
-            passingCriteria: '총점 75점 이상',
+            passingCriteria: {
+                type: 'complex',
+                description: '평균 75점 이상, 최저 65점 이상',
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 65,
+                        description: '각 항목 최소 65점 이상 (과락)'
+                    },
+                    {
+                        type: 'average',
+                        value: 75,
+                        description: '전체 평균 75점 이상'
+                    },
+                    {
+                        type: 'total',
+                        value: 75,
+                        maxValue: 100,
+                        description: '총점 75점 이상 (100점 만점)'
+                    }
+                ]
+            },
             createdDate: '2025-01-15',
             items: [
                 {
@@ -690,7 +732,28 @@ const appData = {
             itemCount: 5,
             totalScore: 100,
             passingScore: 70,
-            passingCriteria: '총점 70점 이상',
+            passingCriteria: {
+                type: 'complex',
+                description: '평균 70점 이상, 최저 60점 이상',
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: '각 항목 최소 60점 이상 (과락)'
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: '전체 평균 70점 이상'
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        maxValue: 100,
+                        description: '총점 70점 이상 (100점 만점)'
+                    }
+                ]
+            },
             createdDate: '2025-01-20',
             items: [
                 {
