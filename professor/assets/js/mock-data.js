@@ -1074,11 +1074,42 @@ const journalReviews = [
         studentId: '2023001',
         major: '교육공학과',
         degree: '박사',
+        advisor: '홍길동',
         submissionDate: '2025-10-15',
         dueDate: '2025-11-30',
         status: '심사중',
         progress: 50,
         pdfUrl: '/uploads/papers/ai-learning-system.pdf',
+        myRole: 'chair', // 'chair' 또는 'member'
+        reviewers: [
+            {
+                professorId: 'PROF001',
+                professorName: '김교수',
+                department: '교육공학과',
+                role: '주심',
+                status: '완료',
+                score: 85,
+                comment: '연구 주제가 독창적이며 방법론이 탄탄합니다.'
+            },
+            {
+                professorId: 'PROF002',
+                professorName: '이교수',
+                department: '컴퓨터공학과',
+                role: '부심',
+                status: '진행중',
+                score: null,
+                comment: null
+            },
+            {
+                professorId: 'PROF003',
+                professorName: '박교수',
+                department: '교육학과',
+                role: '부심',
+                status: '완료',
+                score: 82,
+                comment: '실증적 분석이 우수하나 일반화에 주의가 필요합니다.'
+            }
+        ],
         rubric: {
             items: [
                 { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
@@ -1098,12 +1129,34 @@ const journalReviews = [
         studentId: '2023002',
         major: '교육공학과',
         degree: '석사',
+        advisor: '최교수',
         submissionDate: '2025-09-20',
         dueDate: '2025-11-15',
         status: '심사완료',
         progress: 100,
         decision: '수정후게재',
         pdfUrl: '/uploads/papers/metaverse-learning.pdf',
+        myRole: 'member',
+        reviewers: [
+            {
+                professorId: 'PROF004',
+                professorName: '정교수',
+                department: '교육공학과',
+                role: '주심',
+                status: '완료',
+                score: 88,
+                comment: '메타버스 환경에서의 협력학습을 잘 분석한 연구입니다.'
+            },
+            {
+                professorId: 'PROF005',
+                professorName: '강교수',
+                department: '교육학과',
+                role: '부심',
+                status: '완료',
+                score: 90,
+                comment: '교육적 시사점이 명확하게 제시되어 있습니다.'
+            }
+        ],
         rubric: {
             items: [
                 { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
@@ -1127,11 +1180,33 @@ const journalReviews = [
         studentId: '2022005',
         major: '컴퓨터공학과',
         degree: '박사',
+        advisor: '송교수',
         submissionDate: '2025-10-01',
         dueDate: '2025-12-15',
         status: '심사대기',
         progress: 0,
         pdfUrl: '/uploads/papers/adaptive-learning-ml.pdf',
+        myRole: 'member',
+        reviewers: [
+            {
+                professorId: 'PROF006',
+                professorName: '윤교수',
+                department: '컴퓨터공학과',
+                role: '주심',
+                status: '대기',
+                score: null,
+                comment: null
+            },
+            {
+                professorId: 'PROF007',
+                professorName: '서교수',
+                department: '인공지능학과',
+                role: '부심',
+                status: '대기',
+                score: null,
+                comment: null
+            }
+        ],
         rubric: {
             items: [
                 { id: 1, name: '연구 주제의 독창성', maxScore: 20 },

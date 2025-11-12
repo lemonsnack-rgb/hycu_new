@@ -1,9 +1,15 @@
 /**
- * 학술지 대체심사 상세보기
+ * 학술지 대체심사 상세보기 - 위원/위원장 화면 분리
+ * 관리자 화면(admin_thesis_review.js) 참고하여 구현
  */
 
-function viewJournalReviewDetail(journalId) {
-    console.log('viewJournalReviewDetail called with journalId:', journalId);
+/**
+ * 학술지 심사 상세 화면
+ * @param {number} journalId - 학술지 ID
+ * @param {string} viewType - 'member' 또는 'chair'
+ */
+function viewJournalReviewDetail(journalId, viewType) {
+    console.log('viewJournalReviewDetail called with journalId:', journalId, 'viewType:', viewType);
 
     // getJournalReviews가 정의되어 있는지 확인
     if (typeof getJournalReviews !== 'function') {
@@ -13,155 +19,326 @@ function viewJournalReviewDetail(journalId) {
     }
 
     const allJournals = getJournalReviews();
-    console.log('All journals:', allJournals);
-
     const journal = allJournals.find(j => j.id === journalId);
-    console.log('Found journal:', journal);
 
     if (!journal) {
         alert('학술지 정보를 찾을 수 없습니다. (ID: ' + journalId + ')');
         return;
     }
 
-    // rubric 확인
-    if (!journal.rubric || !journal.rubric.items) {
-        alert('평가 기준 정보가 없습니다.');
-        return;
-    }
+    const roleText = viewType === 'chair' ? '위원장' : '위원';
 
-    // 평가 완료 여부 확인
-    if (journal.evaluation) {
-        showCompletedEvaluation(journal);
-        return;
-    }
-
-    // 평가 폼 표시
-    showEvaluationForm(journal);
-}
-
-function showEvaluationForm(journal) {
-    const content = `
+    // 논문 정보 섹션 (관리자 화면과 동일)
+    let content = `
         <div class="space-y-6">
-            <!-- 학생 정보 -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
-                <div class="space-y-2">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">학생명:</span>
-                        <span class="font-medium">${journal.studentName} (${journal.studentId})</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">전공:</span>
-                        <span class="font-medium">${journal.major} (${journal.degree})</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">논문 제목:</span>
-                        <span class="font-medium">${journal.paperTitle}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">학술지명:</span>
-                        <span class="font-medium">${journal.journalName}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">제출일:</span>
-                        <span class="font-medium">${journal.submissionDate}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">심사기한:</span>
-                        <span class="font-medium">${journal.dueDate}</span>
+            <!-- 논문 정보 -->
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">📄 논문 정보</h3>
+
+                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                    <h4 class="font-bold text-gray-800 mb-3">기본 정보</h4>
+                    <div class="space-y-3">
+                        <div class="info-row">
+                            <div class="info-label">학생명</div>
+                            <div class="info-value">${journal.studentName} (${journal.studentId})</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">전공 / 학위과정</div>
+                            <div class="info-value">${journal.major} / ${journal.degree}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">지도교수</div>
+                            <div class="info-value">${journal.advisor || '-'}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">제출일</div>
+                            <div class="info-value">${journal.submissionDate}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">논문제목</div>
+                            <div class="info-value font-medium">${journal.paperTitle}</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">학술지명</div>
+                            <div class="info-value font-medium">${journal.journalName}</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- 평가 기준 -->
-            <div class="bg-white rounded-lg border border-gray-200 p-4">
-                <h4 class="font-bold text-gray-800 mb-3">평가 기준</h4>
-                <div class="space-y-3" id="evaluation-items">
-                    ${journal.rubric.items.map(item => `
-                        <div class="flex items-center justify-between border-b border-gray-100 pb-2">
-                            <label class="text-sm font-medium text-gray-700">
-                                ${item.name} (${item.maxScore}점)
-                            </label>
-                            <input type="number"
-                                   id="score-${item.id}"
-                                   min="0"
-                                   max="${item.maxScore}"
-                                   class="w-20 border border-gray-300 rounded px-3 py-1 text-sm text-center"
-                                   placeholder="0">
+                ${journal.reviewers && journal.reviewers.length > 0 ? `
+                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-300">
+                        <h4 class="font-bold text-gray-800 mb-3">심사위원회</h4>
+                        <div class="space-y-2">
+                            ${journal.reviewers.map(reviewer => `
+                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-300">
+                                    <div>
+                                        <p class="font-medium">${reviewer.professorName}</p>
+                                        <p class="text-sm text-gray-600">${reviewer.department || '-'} / ${reviewer.role === '주심' ? '심사위원장' : '심사위원'}</p>
+                                    </div>
+                                    <div>
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${reviewer.status === '완료' ? 'bg-green-100 text-green-800' : reviewer.status === '진행중' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
+                                            ${reviewer.status || '평가 대기'}
+                                        </span>
+                                        ${reviewer.score !== null && reviewer.score !== undefined ? `
+                                            <span class="ml-2 text-sm font-semibold text-gray-700">${reviewer.score}점</span>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+    `;
+
+    // 위원/위원장 화면 분리
+    if (viewType === 'member') {
+        // 위원 화면: 평가표 입력
+        content += `
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">평가표</h3>
+
+                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+                    <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        평가 기준 안내
+                    </h4>
+                    <div class="space-y-2 text-sm text-blue-900">
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                            <span>각 항목 최소 <strong class="font-bold">60점 이상</strong> (과락)</span>
+                        </p>
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                            <span>전체 평균 <strong class="font-bold">70점 이상</strong></span>
+                        </p>
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-blue-600 rounded-full mr-2"></span>
+                            <span>총점 <strong class="font-bold">70점 이상</strong> (100점 만점)</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-4" id="evaluation-categories">
+                    ${journal.rubric.items.map((item, index) => `
+                        <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
+                            <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
+                                <div>
+                                    <h4 class="font-bold text-gray-800 mb-1">${index + 1}. ${item.name}</h4>
+                                    <p class="text-sm text-gray-600">${getItemDescription(item.name)}</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xs text-gray-500">가중치</div>
+                                    <div class="text-lg font-bold text-blue-600">20%</div>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
+                                <label class="text-sm font-medium text-gray-700">점수:</label>
+                                <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                       min="0" max="${item.maxScore}" step="0.5" value="0"
+                                       data-item-id="${item.id}"
+                                       onchange="updateJournalTotalScore()">
+                                <span class="text-sm text-gray-600">/ ${item.maxScore}점</span>
+                                <span></span>
+                            </div>
+                            <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
+                                <span></span>
+                                <div class="text-sm text-gray-500">
+                                    → 가중 점수: <span class="weighted-score-${item.id} text-base font-bold text-blue-600">0.0점</span>
+                                </div>
+                            </div>
                         </div>
                     `).join('')}
                 </div>
 
                 <!-- 총점 표시 -->
-                <div class="mt-4 pt-4 border-t-2 border-gray-300">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 my-6 border-2 border-blue-300">
                     <div class="flex justify-between items-center">
-                        <span class="font-bold text-lg">총점:</span>
-                        <span class="font-bold text-2xl text-blue-600" id="total-score">0</span>
-                        <span class="text-gray-600">/ 100</span>
+                        <span class="text-lg font-bold text-gray-800">총점</span>
+                        <span class="text-3xl font-bold text-blue-600" id="journal-total-score">0.0점</span>
                     </div>
                 </div>
-            </div>
 
-            <!-- 종합 의견 -->
-            <div class="bg-white rounded-lg border border-gray-200 p-4">
-                <h4 class="font-bold text-gray-800 mb-3">종합 의견</h4>
-                <textarea id="evaluation-comment"
-                          rows="6"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                          placeholder="학술지 대체심사에 대한 종합 의견을 작성해주세요."></textarea>
-            </div>
-
-            <!-- PDF 파일 -->
-            ${journal.pdfUrl ? `
-                <div class="bg-blue-50 rounded-lg p-4">
-                    <h4 class="font-bold text-blue-800 mb-2">첨부 파일</h4>
-                    <a href="${journal.pdfUrl}" target="_blank"
-                       class="text-blue-600 hover:underline flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        논문 PDF 다운로드
-                    </a>
+                <!-- 종합 의견 -->
+                <div class="mb-6">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">종합 의견 *</label>
+                    <textarea id="journal-evaluation-comment" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" rows="5"
+                              placeholder="평가에 대한 종합 의견을 입력하세요"></textarea>
                 </div>
-            ` : ''}
-        </div>
-    `;
+
+                <!-- PDF 다운로드 -->
+                ${journal.pdfUrl ? `
+                    <div class="bg-blue-50 border border-blue-300 rounded-lg p-4 mb-6">
+                        <h4 class="font-bold text-blue-800 mb-2">첨부 파일</h4>
+                        <a href="${journal.pdfUrl}" target="_blank"
+                           class="text-blue-600 hover:underline flex items-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            논문 PDF 다운로드
+                        </a>
+                    </div>
+                ` : ''}
+
+                <!-- 제출 버튼 -->
+                <div class="flex gap-3">
+                    <button onclick="saveJournalDraft(${journalId})"
+                            class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors">
+                        임시 저장
+                    </button>
+                    <button onclick="submitJournalEvaluation(${journalId})"
+                            class="flex-1 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        평가 제출
+                    </button>
+                </div>
+            </div>
+        `;
+    } else {
+        // 위원장 화면: 승인/보류/반려
+        content += `
+            <div class="bg-white rounded-lg shadow-md p-6">
+                <h3 class="text-lg font-bold text-gray-800 mb-4">📊 심사위원 평가 현황</h3>
+
+                <!-- 모든 위원 평가 요약 -->
+                ${journal.reviewers && journal.reviewers.length > 0 ? `
+                    <div class="space-y-4 mb-6">
+                        ${journal.reviewers.map(reviewer => `
+                            <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                                <div class="flex justify-between items-start mb-2">
+                                    <div>
+                                        <p class="font-semibold text-gray-800">${reviewer.professorName}</p>
+                                        <p class="text-sm text-gray-600">${reviewer.department || '-'} / ${reviewer.role === '주심' ? '심사위원장' : '심사위원'}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        ${reviewer.score !== undefined && reviewer.score !== null ? `
+                                            <p class="text-lg font-bold text-blue-600">${reviewer.score}점</p>
+                                            <p class="text-xs text-gray-500">총점</p>
+                                        ` : `
+                                            <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">평가 대기</span>
+                                        `}
+                                    </div>
+                                </div>
+                                ${reviewer.comment ? `
+                                    <div class="mt-3 p-3 bg-white rounded border border-gray-200">
+                                        <p class="text-xs font-semibold text-gray-600 mb-1">종합 의견:</p>
+                                        <p class="text-sm text-gray-700">${reviewer.comment}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `).join('')}
+                    </div>
+
+                    <!-- 평균 점수 -->
+                    <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold text-blue-900">전체 평균 점수</p>
+                            <p class="text-2xl font-bold text-blue-600">
+                                ${calculateAverageScore(journal.reviewers)}점
+                            </p>
+                        </div>
+                    </div>
+                ` : `
+                    <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+                        <p class="text-yellow-800">심사위원회 정보가 없습니다.</p>
+                    </div>
+                `}
+
+                <!-- 최종 승인 영역 -->
+                <div class="bg-gray-50 border border-gray-300 rounded-lg p-6">
+                    <h4 class="font-bold text-gray-800 mb-4">최종 심사 결정</h4>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">결정 선택 *</label>
+                        <div class="flex gap-3">
+                            <button id="decision-approve"
+                                    onclick="selectJournalDecision('approve')"
+                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors">
+                                <span class="text-lg font-semibold text-gray-700">✓ 승인</span>
+                            </button>
+                            <button id="decision-hold"
+                                    onclick="selectJournalDecision('hold')"
+                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 transition-colors">
+                                <span class="text-lg font-semibold text-gray-700">⊙ 보류</span>
+                            </button>
+                            <button id="decision-reject"
+                                    onclick="selectJournalDecision('reject')"
+                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 transition-colors">
+                                <span class="text-lg font-semibold text-gray-700">✗ 반려</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
+                        <textarea id="journal-chair-comment"
+                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm" rows="4"
+                                  placeholder="최종 심사 의견을 입력하세요"></textarea>
+                    </div>
+
+                    <button onclick="submitJournalChairDecision(${journalId})"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                        최종 결정 제출
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    content += `</div>`;
 
     if (typeof openModal === 'function') {
         openModal(
-            `학술지 대체심사 - ${journal.studentName}`,
+            `${roleText} 평가 - 학술지 대체심사`,
             content,
-            '평가 제출',
-            () => submitEvaluation(journalId),
-            true
+            '닫기',
+            null,
+            true,
+            { size: 'large' }
         );
-
-        // 총점 자동 계산
-        journal.rubric.items.forEach(item => {
-            const input = document.getElementById(`score-${item.id}`);
-            if (input) {
-                input.addEventListener('input', updateTotalScore);
-            }
-        });
     }
 }
 
-function updateTotalScore() {
+// 평가 항목별 설명
+function getItemDescription(itemName) {
+    const descriptions = {
+        '연구 주제의 독창성': '연구 주제의 새로움과 독창성 평가',
+        '연구 방법의 적절성': '연구 방법론의 적절성과 타당성',
+        '연구 결과의 타당성': '연구 결과의 신뢰성과 타당성',
+        '논문 구성의 체계성': '논문의 논리적 구성과 체계성',
+        '학문적 기여도': '해당 분야에 대한 학문적 기여'
+    };
+    return descriptions[itemName] || '';
+}
+
+// 총점 자동 계산
+function updateJournalTotalScore() {
     let total = 0;
-    const inputs = document.querySelectorAll('[id^="score-"]');
+    const inputs = document.querySelectorAll('.score-input');
+
     inputs.forEach(input => {
-        const value = parseInt(input.value) || 0;
+        const value = parseFloat(input.value) || 0;
+        const itemId = input.dataset.itemId;
         total += value;
+
+        // 가중 점수 업데이트 (각 항목이 20점이므로 가중치는 1)
+        const weightedScoreEl = document.querySelector(`.weighted-score-${itemId}`);
+        if (weightedScoreEl) {
+            weightedScoreEl.textContent = value.toFixed(1) + '점';
+        }
     });
 
-    const totalScoreEl = document.getElementById('total-score');
+    const totalScoreEl = document.getElementById('journal-total-score');
     if (totalScoreEl) {
-        totalScoreEl.textContent = total;
+        totalScoreEl.textContent = total.toFixed(1) + '점';
     }
 }
 
-function submitEvaluation(journalId) {
+// 평가 제출 (위원)
+function submitJournalEvaluation(journalId) {
     const journal = getJournalReviews().find(j => j.id === journalId);
     if (!journal) return;
 
@@ -169,8 +346,8 @@ function submitEvaluation(journalId) {
     let hasEmptyScore = false;
 
     journal.rubric.items.forEach(item => {
-        const input = document.getElementById(`score-${item.id}`);
-        const value = parseInt(input.value);
+        const input = document.querySelector(`.score-input[data-item-id="${item.id}"]`);
+        const value = parseFloat(input.value);
 
         if (isNaN(value) || value < 0) {
             hasEmptyScore = true;
@@ -184,7 +361,7 @@ function submitEvaluation(journalId) {
         return;
     }
 
-    const comment = document.getElementById('evaluation-comment').value.trim();
+    const comment = document.getElementById('journal-evaluation-comment').value.trim();
     if (!comment) {
         alert('종합 의견을 작성해주세요.');
         return;
@@ -198,117 +375,106 @@ function submitEvaluation(journalId) {
             closeModal();
         }
 
-        alert('평가가 제출되었습니다.');
+        if (typeof showToast === 'function') {
+            showToast('평가가 제출되었습니다', 'success');
+        } else {
+            alert('평가가 제출되었습니다.');
+        }
 
-        // 목록 새로고침 (함수가 존재하는 경우)
+        // 목록 새로고침
         if (typeof renderJournalReviewList === 'function') {
             renderJournalReviewList();
         }
     }
 }
 
-function showCompletedEvaluation(journal) {
-    const totalScore = Object.values(journal.evaluation.scores).reduce((sum, score) => sum + score, 0);
-
-    const content = `
-        <div class="space-y-6">
-            <!-- 학생 정보 -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
-                <div class="space-y-2">
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">학생명:</span>
-                        <span class="font-medium">${journal.studentName} (${journal.studentId})</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">전공:</span>
-                        <span class="font-medium">${journal.major} (${journal.degree})</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">논문 제목:</span>
-                        <span class="font-medium">${journal.paperTitle}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">학술지명:</span>
-                        <span class="font-medium">${journal.journalName}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">제출일:</span>
-                        <span class="font-medium">${journal.submissionDate}</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-gray-600">평가 완료일:</span>
-                        <span class="font-medium text-green-600">${journal.evaluation.submittedAt}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 평가 결과 -->
-            <div class="bg-white rounded-lg border border-gray-200 p-4">
-                <h4 class="font-bold text-gray-800 mb-3">평가 결과</h4>
-                <div class="space-y-3">
-                    ${journal.rubric.items.map(item => {
-                        const score = journal.evaluation.scores[item.id] || 0;
-                        return `
-                            <div class="flex items-center justify-between border-b border-gray-100 pb-2">
-                                <span class="text-sm font-medium text-gray-700">
-                                    ${item.name}
-                                </span>
-                                <span class="font-bold text-blue-600">
-                                    ${score}/${item.maxScore}점
-                                </span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-
-                <!-- 총점 표시 -->
-                <div class="mt-4 pt-4 border-t-2 border-gray-300">
-                    <div class="flex justify-between items-center">
-                        <span class="font-bold text-lg">총점:</span>
-                        <span class="font-bold text-3xl text-blue-600">${totalScore}</span>
-                        <span class="text-gray-600">/ 100</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 종합 의견 -->
-            <div class="bg-green-50 rounded-lg border border-green-200 p-4">
-                <h4 class="font-bold text-green-800 mb-3">종합 의견</h4>
-                <p class="text-gray-700 leading-relaxed">${journal.evaluation.comment}</p>
-            </div>
-
-            <!-- PDF 파일 -->
-            ${journal.pdfUrl ? `
-                <div class="bg-blue-50 rounded-lg p-4">
-                    <h4 class="font-bold text-blue-800 mb-2">첨부 파일</h4>
-                    <a href="${journal.pdfUrl}" target="_blank"
-                       class="text-blue-600 hover:underline flex items-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        논문 PDF 다운로드
-                    </a>
-                </div>
-            ` : ''}
-        </div>
-    `;
-
-    if (typeof openModal === 'function') {
-        openModal(
-            `학술지 대체심사 결과 - ${journal.studentName}`,
-            content,
-            '닫기',
-            null,
-            true
-        );
+// 임시 저장 (위원)
+function saveJournalDraft(journalId) {
+    if (typeof showToast === 'function') {
+        showToast('임시 저장되었습니다', 'success');
+    } else {
+        alert('임시 저장되었습니다.');
     }
+}
+
+// 최종 결정 선택 (위원장)
+let selectedDecision = null;
+
+function selectJournalDecision(decision) {
+    selectedDecision = decision;
+
+    // 모든 버튼 초기화
+    ['approve', 'hold', 'reject'].forEach(d => {
+        const btn = document.getElementById(`decision-${d}`);
+        if (btn) {
+            btn.className = 'flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors';
+        }
+    });
+
+    // 선택된 버튼 강조
+    const selectedBtn = document.getElementById(`decision-${decision}`);
+    if (selectedBtn) {
+        const colorMap = {
+            'approve': 'border-green-500 bg-green-50',
+            'hold': 'border-yellow-500 bg-yellow-50',
+            'reject': 'border-red-500 bg-red-50'
+        };
+        selectedBtn.className = `flex-1 py-3 rounded-lg border-2 ${colorMap[decision]} transition-colors`;
+    }
+}
+
+// 최종 결정 제출 (위원장)
+function submitJournalChairDecision(journalId) {
+    if (!selectedDecision) {
+        alert('결정을 선택해주세요.');
+        return;
+    }
+
+    const comment = document.getElementById('journal-chair-comment').value.trim();
+
+    const decisionText = {
+        'approve': '승인',
+        'hold': '보류',
+        'reject': '반려'
+    };
+
+    console.log('위원장 최종 결정:', {
+        journalId,
+        decision: decisionText[selectedDecision],
+        comment
+    });
+
+    if (typeof closeModal === 'function') {
+        closeModal();
+    }
+
+    if (typeof showToast === 'function') {
+        showToast(`최종 결정(${decisionText[selectedDecision]})이 제출되었습니다`, 'success');
+    } else {
+        alert(`최종 결정(${decisionText[selectedDecision]})이 제출되었습니다.`);
+    }
+
+    // 목록 새로고침
+    if (typeof renderJournalReviewList === 'function') {
+        renderJournalReviewList();
+    }
+}
+
+// 평균 점수 계산
+function calculateAverageScore(reviewers) {
+    const validScores = reviewers.filter(r => r.score !== null && r.score !== undefined);
+    if (validScores.length === 0) return 0;
+
+    const sum = validScores.reduce((acc, r) => acc + r.score, 0);
+    return (sum / validScores.length).toFixed(1);
 }
 
 // 전역으로 노출
 window.viewJournalReviewDetail = viewJournalReviewDetail;
-window.updateTotalScore = updateTotalScore;
-window.submitEvaluation = submitEvaluation;
+window.updateJournalTotalScore = updateJournalTotalScore;
+window.submitJournalEvaluation = submitJournalEvaluation;
+window.saveJournalDraft = saveJournalDraft;
+window.selectJournalDecision = selectJournalDecision;
+window.submitJournalChairDecision = submitJournalChairDecision;
 
-console.log('✅ 학술지 상세보기 로드 완료');
+console.log('✅ 학술지 상세보기 (위원/위원장 분리) 로드 완료');
