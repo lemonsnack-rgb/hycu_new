@@ -1742,11 +1742,6 @@ function viewEvaluationCriteria(criteriaId) {
     showNotification(`평가표 ID ${criteriaId} 상세보기 (추후 구현)`, 'info');
 }
 
-// 워크플로우 수정 (추후 구현)
-function editStage(stageId) {
-    showNotification(`워크플로우 ID ${stageId} 수정 (추후 구현)`, 'info');
-}
-
 // 모달 닫기
 function closeStageDetailModal() {
     const modal = document.getElementById('stage-detail-modal');
@@ -1756,7 +1751,6 @@ function closeStageDetailModal() {
 // Export
 window.viewStageDetail = viewStageDetail;
 window.viewEvaluationCriteria = viewEvaluationCriteria;
-window.editStage = editStage;
 window.closeStageDetailModal = closeStageDetailModal;
 
 console.log('✅ ID 26-29: 워크플로우 관리 상세 기능 로드 완료');
