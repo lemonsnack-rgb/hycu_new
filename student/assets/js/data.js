@@ -377,19 +377,76 @@ const StudentData = {
         {
             id: 1,
             title: '논문 작성 가이드라인',
-            content: '<p>논문 작성 시 유의사항 및 가이드라인입니다.</p>',
+            content: '<p>논문 작성시 다음 사항을 참고하시기 바랍니다.</p><ul><li>서론에서 연구 배경과 목적을 명확히 기술</li><li>선행연구 검토를 충실히 수행</li><li>연구 방법론을 구체적으로 설명</li></ul>',
             authorId: 'P001',
             authorName: '김교수',
             authorRole: 'professor',
-            createdAt: '2025-11-01T10:00:00',
-            updatedAt: '2025-11-01T10:00:00',
+            createdAt: '2025-11-05T10:30:00',
+            updatedAt: '2025-11-05T10:30:00',
+            views: 28,
+            files: [
+                { id: 'F001', name: '논문작성가이드.docx', size: 856000, url: '#' },
+                { id: 'F002', name: '참고논문.pdf', size: 3400000, url: '#' }
+            ],
+            comments: [
+                {
+                    id: 'C001',
+                    authorId: 'S001',
+                    authorName: '홍길동',
+                    authorRole: 'student',
+                    content: '감사합니다! 많은 도움이 되었습니다.',
+                    createdAt: '2025-11-06T14:20:00',
+                    files: []
+                }
+            ],
+            viewerType: 'specific',
+            viewers: ['S001']
+        },
+        {
+            id: 2,
+            title: '이번 주 미팅 일정 안내',
+            content: '<p>11월 8일 (금) 오후 2시에 줌 미팅을 진행합니다.</p><p>각자 진행상황을 5분 내외로 발표 준비 부탁드립니다.</p>',
+            authorId: 'P001',
+            authorName: '김교수',
+            authorRole: 'professor',
+            createdAt: '2025-11-03T09:15:00',
+            updatedAt: '2025-11-03T09:15:00',
             views: 15,
             files: [
-                { id: 'F1', name: '논문작성가이드.pdf', size: 2048000, url: '#' }
+                { id: 'F003', name: '미팅자료.pdf', size: 1200000, url: '#' }
             ],
             comments: [],
             viewerType: 'specific',
             viewers: ['S001']
+        },
+        {
+            id: 3,
+            title: '중간 보고서 진행 상황',
+            content: '<p>중간 보고서 작성을 완료하였습니다.</p><p>검토 부탁드립니다.</p>',
+            authorId: 'S001',
+            authorName: '홍길동',
+            authorRole: 'student',
+            createdAt: '2025-11-07T16:45:00',
+            updatedAt: '2025-11-07T16:45:00',
+            views: 3,
+            files: [
+                { id: 'F004', name: '중간보고서_홍길동.docx', size: 2100000, url: '#' }
+            ],
+            comments: [
+                {
+                    id: 'C002',
+                    authorId: 'P001',
+                    authorName: '김교수',
+                    authorRole: 'professor',
+                    content: '전체적으로 잘 작성하셨습니다. 3장 연구방법론 부분을 좀 더 보완해주세요.',
+                    createdAt: '2025-11-08T10:30:00',
+                    files: [
+                        { id: 'CF001', name: '참고자료.pdf', size: 1500000, url: '#' }
+                    ]
+                }
+            ],
+            viewerType: 'specific',
+            viewers: ['P001']
         }
     ]
 };
