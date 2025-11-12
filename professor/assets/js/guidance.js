@@ -31,7 +31,7 @@ function showStudentList() {
                     <h3 class="text-lg font-bold text-gray-800">내 지도학생 목록</h3>
                     <div class="flex items-center gap-3">
                         <button onclick="sendNotificationToSelected()"
-                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">
+                                class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
                             선택 학생에게 알림 발송
                         </button>
                         <div class="text-sm text-gray-600">
@@ -61,7 +61,7 @@ function showStudentList() {
                                class="border border-gray-300 rounded px-3 py-2 text-sm">
                         <div class="flex gap-2">
                             <button onclick="searchStudents()"
-                                    class="flex-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                    class="flex-1 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
                                 검색
                             </button>
                             <button onclick="resetStudentSearch()"
@@ -226,7 +226,7 @@ function renderStudentDetail() {
                 <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                 <div class="flex items-center gap-3">
                     <button onclick="openAddPlanModal()"
-                            class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
                         + 주차 추가
                     </button>
                 </div>
@@ -322,7 +322,7 @@ function renderStudentDetail() {
                     </svg>
                     <p class="mt-4 text-sm text-gray-600">등록된 지도 계획이 없습니다</p>
                     <button onclick="openAddPlanModal()" 
-                            class="mt-4 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                            class="mt-4 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
                         첫 지도 계획 추가하기
                     </button>
                 </div>

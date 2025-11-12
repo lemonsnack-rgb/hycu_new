@@ -57,7 +57,7 @@ function openModal(title, content, confirmText = '저장', onConfirm = null, sho
     // 단일 버튼 지원 (하위 호환성)
     else if (options.showExtraButton) {
         const extraBtn = document.createElement('button');
-        extraBtn.className = `modal-extra-btn px-4 py-2 rounded-md text-sm font-medium ${options.extraButtonClass || 'bg-blue-600 hover:bg-blue-700 text-white'}`;
+        extraBtn.className = `modal-extra-btn px-4 py-2 rounded-md text-sm font-medium ${options.extraButtonClass || 'bg-[#6A0028] hover:bg-[#5A0020] text-white'}`;
         extraBtn.textContent = options.extraButtonText || '추가 작업';
         extraBtn.onclick = options.onExtraButtonClick;
         
@@ -160,7 +160,7 @@ function viewSubmissionDetail(id, type) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <a href="${item.fileUrl}" class="text-blue-600 hover:underline">${item.fileName}</a>
-                        <button class="ml-auto bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">다운로드</button>
+                        <button class="ml-auto bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -357,7 +357,7 @@ function viewSubmissionDetail(id, type) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <a href="${item.fileUrl}" class="text-blue-600 hover:underline">${item.fileName}</a>
-                        <button class="ml-auto bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">다운로드</button>
+                        <button class="ml-auto bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -419,7 +419,7 @@ function viewSubmissionDetail(id, type) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <a href="${item.fileUrl}" class="text-blue-600 hover:underline">${item.fileName}</a>
-                        <button class="ml-auto bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">다운로드</button>
+                        <button class="ml-auto bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -441,7 +441,7 @@ function viewSubmissionDetail(id, type) {
                     extraButtons: [
                         {
                             text: '승인',
-                            className: 'bg-green-600 hover:bg-green-700 text-white',
+                            className: 'bg-[#6A0028] hover:bg-[#5A0020] text-white',
                             onClick: () => {
                                 showConfirm(
                                     '이 연구계획서를 승인하시겠습니까?',
@@ -551,7 +551,7 @@ function viewPdfFeedback(id, readOnly = false) {
 
     // ID 25: 관리자는 읽기 전용으로 교수용 PDF 뷰어 호출
     const mode = readOnly ? '읽기 전용 (관리자)' : '편집 가능 (교수)';
-    const modeClass = readOnly ? 'bg-blue-600' : 'bg-[#6A0028]';
+    const modeClass = readOnly ? 'bg-[#6A0028]' : 'bg-[#6A0028]';
     const readOnlyBadge = readOnly ? '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">읽기 전용</span>' : '';
 
     // 피드백 상태값 변환
@@ -758,12 +758,12 @@ function viewJournalDetail(id) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <span class="flex-1">게재 증명서</span>
-                        <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">다운로드</button>
+                        <button class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <span class="flex-1">논문 원문</span>
-                        <button class="bg-blue-600 text-white px-3 py-1 rounded text-sm hover:bg-blue-700">다운로드</button>
+                        <button class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -1361,11 +1361,11 @@ function viewStageDetail(id) {
                     <div class="flex gap-2">
                         ${canEdit ? `
                             <button onclick="editWorkflowStages(${id})"
-                                    class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                    class="text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
                                 <i class="fas fa-edit mr-1"></i> 단계 조립
                             </button>
                             <button onclick="addWorkflowStep(${id})"
-                                    class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                    class="text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
                                 + 단계 추가
                             </button>
                         ` : ''}
@@ -1736,7 +1736,7 @@ function editWorkflowStages(workflowId) {
                             </option>
                         `).join('')}
                     </select>
-                    <button onclick="addStageFromType()" class="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                    <button onclick="addStageFromType()" class="mt-2 text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
                         + 단계 추가
                     </button>
                 </div>
@@ -2503,7 +2503,7 @@ function viewEvaluationDetail(id) {
                 <div class="flex justify-between items-center mb-3">
                     <h4 class="font-bold text-gray-800">평가 항목 (총 ${criteria.itemCount}개)</h4>
                     <button onclick="addEvaluationItem(${id})"
-                            class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                            class="text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
                         + 항목 추가
                     </button>
                 </div>
@@ -3209,7 +3209,7 @@ function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
                     <div class="text-6xl font-bold text-blue-600 mb-2">${reviewer.score}<span class="text-3xl">점</span></div>
                     <div class="flex items-center justify-center gap-2 mt-3">
                         <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden max-w-xs">
-                            <div class="h-full bg-blue-600 rounded-full" style="width: ${reviewer.score}%"></div>
+                            <div class="h-full bg-[#6A0028] rounded-full" style="width: ${reviewer.score}%"></div>
                         </div>
                     </div>
                 </div>
@@ -3295,7 +3295,7 @@ function viewWeeklyGuidanceDetail(pairId) {
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                     <button onclick="addNewWeeklyPlan(${pairId})"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
                         + 주차 추가
                     </button>
                 </div>
@@ -3509,7 +3509,7 @@ function renderGuidancePairsTable(pairs) {
             <td class="py-3 px-4">
                 <div class="flex items-center">
                     <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                        <div class="bg-blue-600 h-2 rounded-full"
+                        <div class="bg-[#6A0028] h-2 rounded-full"
                              style="width: ${(pair.completedWeeks/pair.totalWeeks*100)}%"></div>
                     </div>
                     <span class="text-sm">${pair.completedWeeks}/${pair.totalWeeks}주차</span>
@@ -3518,7 +3518,7 @@ function renderGuidancePairsTable(pairs) {
             </td>
             <td class="py-3 px-4 text-center">
                 <button onclick="viewWeeklyGuidanceDetail(${pair.id})"
-                        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                        class="px-3 py-1 bg-[#6A0028] text-white rounded hover:bg-[#5A0020] text-sm">
                     상세보기
                 </button>
             </td>
@@ -3679,7 +3679,7 @@ function openResearchProposalRegisterModal() {
                            class="flex-1 px-3 py-2 border rounded"
                            onkeypress="if(event.key==='Enter') searchStudentForRP()">
                     <button onclick="searchStudentForRP()"
-                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
                         검색
                     </button>
                 </div>
@@ -3915,7 +3915,7 @@ function viewResearchProposalDetail(id) {
                             ${proposal.fileUrl ? `
                                 <div class="flex items-center gap-2">
                                     <a href="${proposal.fileUrl}" target="_blank"
-                                       class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                       class="inline-flex items-center px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020] text-sm">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>

@@ -321,7 +321,7 @@ function showJournalSubmissionModal() {
                             취소
                         </button>
                         <button type="submit"
-                                class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                                class="px-6 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020] transition-colors">
                             제출하기
                         </button>
                     </div>
