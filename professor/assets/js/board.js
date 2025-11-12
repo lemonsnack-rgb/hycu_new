@@ -50,10 +50,15 @@ function initBoard(userRole, userId = null) {
 
 // 게시판 목록 렌더링
 function renderBoardList() {
+    console.log('📋 게시판 목록 렌더링 시작');
     const container = document.getElementById('boardContainer');
-    if (!container) return;
+    if (!container) {
+        console.error('❌ boardContainer 요소를 찾을 수 없음');
+        return;
+    }
 
     const posts = DataService.getResourceBoards(currentUser.role, currentUser.id);
+    console.log('조회된 게시글 수:', posts.length);
 
     const html = `
         <div class="bg-white rounded-lg shadow p-6">
@@ -249,7 +254,11 @@ function deleteComment(postId, commentId) {
 
 // 게시글 작성 모달
 function openBoardWriteModal() {
+    console.log('📝 글쓰기 모달 열기 시작');
+    console.log('현재 사용자:', currentUser);
+
     const students = DataService.getStudents();
+    console.log('학생 목록:', students);
 
     const modal = document.createElement('div');
     modal.className = 'modal-backdrop';
@@ -353,7 +362,9 @@ function openBoardWriteModal() {
         </div>
     `;
 
+    console.log('모달 DOM 생성 완료, body에 추가 시작');
     document.body.appendChild(modal);
+    console.log('✅ 모달이 body에 추가됨');
 
     // contenteditable placeholder 처리
     const editor = document.getElementById('postContent');
@@ -585,7 +596,8 @@ function submitBoardPost() {
         viewers: viewers
     };
 
-    DataService.createResourceBoard(postData);
+    const createdPost = DataService.createResourceBoard(postData);
+    console.log('✅ 게시글 저장 완료:', createdPost);
 
     closeBoardModal();
     renderBoardList();
@@ -712,9 +724,8 @@ window.deleteBoardPost = deleteBoardPost;
 window.closeBoardModal = closeBoardModal;
 window.formatText = formatText;
 window.toggleStudentSelection = toggleStudentSelection;
-window.addBoardComment = addBoardComment;
-window.updateBoardComment = updateBoardComment;
-window.deleteBoardComment = deleteBoardComment;
+window.addComment = addComment;
+window.deleteComment = deleteComment;
 window.removeExistingFile = removeExistingFile;
 
 console.log('✅ 자료실 게시판 모듈 로드 완료 (Enhanced Version)');
