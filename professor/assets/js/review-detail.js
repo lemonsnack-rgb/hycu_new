@@ -16,8 +16,8 @@ function renderReviewDetail(assignmentId, viewType) {
     const container = document.getElementById('review-detail-content');
     if (!container) return;
 
-    // viewType이 지정되면 해당 역할로, 아니면 내 역할 사용
-    const isChair = viewType ? (viewType === 'chair') : (detail.myRole === 'chair');
+    // viewType에 따라 화면 분리
+    const isChairView = viewType === 'chair';
     const myEval = detail.myEvaluation;
     const isSubmitted = myEval && myEval.status === '제출완료';
     const allSubmitted = detail.allEvaluations.length === detail.assignment.committee.length &&
@@ -28,22 +28,41 @@ function renderReviewDetail(assignmentId, viewType) {
     // 논문 정보
     html += renderThesisInfo(detail.assignment);
 
-    // 심사위원 평가 (내 평가)
-    if (!isSubmitted) {
-        html += renderEvaluationForm(detail.template, myEval, isChair);
+    // 역할에 따라 화면 분리
+    if (isChairView) {
+        // 위원장 화면: 평가 요약 + 승인/보류/반려
+        if (detail.myRole !== 'chair') {
+            html += `<div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
+                <p class="text-red-800">위원장 권한이 없습니다.</p>
+            </div>`;
+        } else {
+            // 위원장이면서 자신의 위원 평가가 완료되지 않은 경우
+            if (!isSubmitted) {
+                html += `<div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
+                    <p class="text-yellow-800 font-semibold">⚠️ 위원장 승인 전에 먼저 위원 역할로 평가를 완료해주세요.</p>
+                    <button onclick="openReviewDetail('${assignmentId}', 'member')"
+                            class="mt-3 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                        위원 평가 화면으로 이동
+                    </button>
+                </div>`;
+            } else {
+                // 위원 평가 완료 후 위원장 화면
+                html += renderChairApprovalScreen(detail, allSubmitted);
+            }
+        }
     } else {
-        html += renderSubmittedEvaluation(detail.template, myEval, isChair);
-    }
-
-    // 심사위원장 전용: 종합 평가
-    if (isChair && allSubmitted) {
-        html += renderChairSummary(detail);
+        // 위원 화면: 평가표 입력만
+        if (!isSubmitted) {
+            html += renderEvaluationForm(detail.template, myEval, false);
+        } else {
+            html += renderSubmittedEvaluation(detail.template, myEval, false);
+        }
     }
 
     container.innerHTML = html;
 
     // 이벤트 바인딩
-    bindEvaluationEvents(detail, isSubmitted, isChair, allSubmitted);
+    bindEvaluationEvents(detail, isSubmitted, isChairView, allSubmitted);
 }
 
 // ==================== 논문 정보 (관리자 페이지 스타일) ====================
@@ -1167,3 +1186,200 @@ function viewThesisOnline(filename) {
     showToast('온라인 뷰어를 엽니다', 'info');
     // 실제 뷰어 로직
 }
+
+// ==================== 위원장 승인 화면 ====================
+function renderChairApprovalScreen(detail, allSubmitted) {
+    const result = detail.result;
+    const isApproved = result && result.finalDecision;
+
+    let html = `
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">📊 심사위원 평가 현황</h3>
+    `;
+
+    // 모든 위원의 평가 요약
+    if (allSubmitted) {
+        html += `<div class="space-y-4 mb-6">`;
+
+        detail.allEvaluations.forEach((evaluation, index) => {
+            const committee = detail.assignment.committee.find(c => c.id === evaluation.committeeId);
+            const totalScore = evaluation.scores ? evaluation.scores.reduce((sum, s) => sum + s.weightedScore, 0) : 0;
+
+            html += `
+                <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <p class="font-semibold text-gray-800">${committee.professorName}</p>
+                            <p class="text-sm text-gray-600">${committee.department} / ${committee.role === 'chair' ? '심사위원장' : '심사위원'}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-lg font-bold text-blue-600">${totalScore.toFixed(1)}점</p>
+                            <p class="text-xs text-gray-500">총점</p>
+                        </div>
+                    </div>
+                    ${evaluation.overallComment ? `
+                        <div class="mt-3 p-3 bg-white rounded border border-gray-200">
+                            <p class="text-xs font-semibold text-gray-600 mb-1">종합 의견:</p>
+                            <p class="text-sm text-gray-700">${evaluation.overallComment}</p>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+
+        // 평균 점수 계산
+        const avgScore = detail.allEvaluations.reduce((sum, e) => {
+            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + sc.weightedScore, 0) : 0;
+            return sum + totalScore;
+        }, 0) / detail.allEvaluations.length;
+
+        html += `
+            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+                <div class="flex justify-between items-center">
+                    <p class="font-bold text-blue-900">전체 평균 점수</p>
+                    <p class="text-2xl font-bold text-blue-600">${avgScore.toFixed(1)}점</p>
+                </div>
+            </div>
+        `;
+
+        // 최종 승인 영역
+        if (!isApproved) {
+            html += `
+                <div class="bg-gray-50 border border-gray-300 rounded-lg p-6">
+                    <h4 class="font-bold text-gray-800 mb-4">최종 심사 결정</h4>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">결정 선택 *</label>
+                        <div class="flex gap-3">
+                            <button onclick="selectDecision('승인')" id="btn-approve"
+                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors">
+                                <span class="text-lg font-semibold text-gray-700">✓ 승인</span>
+                            </button>
+                            <button onclick="selectDecision('보류')" id="btn-hold"
+                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 transition-colors">
+                                <span class="text-lg font-semibold text-gray-700">⊙ 보류</span>
+                            </button>
+                            <button onclick="selectDecision('반려')" id="btn-reject"
+                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 transition-colors">
+                                <span class="text-lg font-semibold text-gray-700">✗ 반려</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
+                        <textarea id="chair-final-comment" rows="4"
+                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                  placeholder="최종 심사 의견을 입력하세요"></textarea>
+                    </div>
+
+                    <button onclick="submitChairDecision()"
+                            class="w-full bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg font-semibold">
+                        최종 결정 제출
+                    </button>
+                </div>
+            `;
+        } else {
+            html += `
+                <div class="bg-green-50 border-2 border-green-300 rounded-lg p-6">
+                    <h4 class="font-bold text-green-800 mb-3">✓ 최종 심사 완료</h4>
+                    <div class="space-y-2 text-sm">
+                        <p><span class="font-semibold">결정:</span>
+                            <span class="inline-block px-3 py-1 rounded-full ${
+                                result.finalDecision === '승인' ? 'bg-green-100 text-green-800' :
+                                result.finalDecision === '보류' ? 'bg-yellow-100 text-yellow-800' :
+                                'bg-red-100 text-red-800'
+                            } font-semibold">${result.finalDecision}</span>
+                        </p>
+                        ${result.chairComment ? `
+                            <p class="mt-2"><span class="font-semibold">의견:</span> ${result.chairComment}</p>
+                        ` : ''}
+                        <p class="text-xs text-gray-600 mt-2">결정일: ${formatDateFull(result.decisionDate)}</p>
+                    </div>
+                </div>
+            `;
+        }
+
+    } else {
+        html += `
+            <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                <p class="text-yellow-800">모든 심사위원의 평가가 완료되면 최종 승인을 진행할 수 있습니다.</p>
+                <p class="text-sm text-yellow-700 mt-2">
+                    현재 진행률: ${detail.allEvaluations.length} / ${detail.assignment.committee.length}
+                </p>
+            </div>
+        `;
+    }
+
+    html += `</div>`;
+
+    return html;
+}
+
+let selectedDecision = null;
+
+function selectDecision(decision) {
+    selectedDecision = decision;
+
+    // 버튼 스타일 업데이트
+    document.querySelectorAll('#btn-approve, #btn-hold, #btn-reject').forEach(btn => {
+        btn.classList.remove('border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50', 'border-red-500', 'bg-red-50');
+        btn.classList.add('border-gray-300');
+    });
+
+    if (decision === '승인') {
+        const btn = document.getElementById('btn-approve');
+        btn.classList.remove('border-gray-300');
+        btn.classList.add('border-green-500', 'bg-green-50');
+    } else if (decision === '보류') {
+        const btn = document.getElementById('btn-hold');
+        btn.classList.remove('border-gray-300');
+        btn.classList.add('border-yellow-500', 'bg-yellow-50');
+    } else if (decision === '반려') {
+        const btn = document.getElementById('btn-reject');
+        btn.classList.remove('border-gray-300');
+        btn.classList.add('border-red-500', 'bg-red-50');
+    }
+}
+
+function submitChairDecision() {
+    if (!selectedDecision) {
+        showToast('결정을 선택해주세요', 'warning');
+        return;
+    }
+
+    const comment = document.getElementById('chair-final-comment').value.trim();
+
+    if (!comment) {
+        showToast('최종 의견을 입력해주세요', 'warning');
+        return;
+    }
+
+    // 서버에 최종 결정 저장 (실제로는 API 호출)
+    const result = {
+        assignmentId: currentAssignmentId,
+        finalDecision: selectedDecision,
+        chairComment: comment,
+        decisionDate: new Date().toISOString().split('T')[0]
+    };
+
+    // REVIEW_RESULTS에 저장 (Mock)
+    const existingIndex = REVIEW_RESULTS.findIndex(r => r.assignmentId === currentAssignmentId);
+    if (existingIndex >= 0) {
+        REVIEW_RESULTS[existingIndex] = result;
+    } else {
+        REVIEW_RESULTS.push(result);
+    }
+
+    showToast('최종 심사 결정이 제출되었습니다', 'success');
+
+    // 화면 새로고침
+    setTimeout(() => {
+        renderReviewDetail(currentAssignmentId, 'chair');
+    }, 1000);
+}
+
+window.selectDecision = selectDecision;
+window.submitChairDecision = submitChairDecision;
