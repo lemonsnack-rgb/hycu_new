@@ -436,6 +436,14 @@
                             </div>
                         </div>
                         
+                        <!-- 알림 발송 버튼 -->
+                        <div class="flex justify-end mb-4">
+                            <button onclick="sendNotificationToSelectedReviews()"
+                                    class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">
+                                선택 학생에게 알림 발송
+                            </button>
+                        </div>
+
                         <!-- 검색 영역 (ID 49-50: 학년도, 학기, 학기차, 심사구분) -->
                         <div class="search-container">
                             <div class="search-grid">
@@ -493,13 +501,14 @@
                                        id="filter-keyword"
                                        placeholder="학번/성명/논문제목 검색"
                                        class="search-input"
+                                       style="height: 38px;"
                                        onkeypress="if(event.key==='Enter') searchReviews()">
                             </div>
                             <div class="search-buttons">
-                                <button onclick="searchReviews()" class="search-btn search-btn-primary">
+                                <button onclick="searchReviews()" class="search-btn search-btn-primary" style="height: 38px;">
                                     <i class="fas fa-search"></i>검색
                                 </button>
-                                <button onclick="resetReviewSearch()" class="search-btn search-btn-secondary">
+                                <button onclick="resetReviewSearch()" class="search-btn search-btn-secondary" style="height: 38px;">
                                     <i class="fas fa-redo"></i>초기화
                                 </button>
                             </div>
