@@ -552,10 +552,10 @@ function submitBoardPost() {
             viewers = Array.from(checkboxes).map(cb => cb.value);
         }
     } else {
-        // 학생이 작성하는 경우, 지도교수에게만 공개
+        // 학생이 작성하는 경우, 모든 지도교수에게 공개 (n:m 관계 지원)
         const student = DataService.getStudent(currentUser.id);
         if (student) {
-            viewers = [student.advisor];
+            viewers = student.advisors || [student.advisor];
         }
     }
 
@@ -699,5 +699,22 @@ function formatFileSize(bytes) {
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
+
+// 전역으로 export
+window.initBoard = initBoard;
+window.renderBoardList = renderBoardList;
+window.openBoardWriteModal = openBoardWriteModal;
+window.openBoardEditModal = openBoardEditModal;
+window.viewBoardPost = viewBoardPost;
+window.submitBoardPost = submitBoardPost;
+window.updateBoardPost = updateBoardPost;
+window.deleteBoardPost = deleteBoardPost;
+window.closeBoardModal = closeBoardModal;
+window.formatText = formatText;
+window.toggleStudentSelection = toggleStudentSelection;
+window.addBoardComment = addBoardComment;
+window.updateBoardComment = updateBoardComment;
+window.deleteBoardComment = deleteBoardComment;
+window.removeExistingFile = removeExistingFile;
 
 console.log('✅ 자료실 게시판 모듈 로드 완료 (Enhanced Version)');

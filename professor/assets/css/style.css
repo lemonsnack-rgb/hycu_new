@@ -525,6 +525,11 @@ tr:hover {
     overflow-y: auto;
 }
 
+.modal-large {
+    max-width: 1200px;
+    width: 95%;
+}
+
 .modal-header {
     padding: var(--spacing-6);
     border-bottom: 1px solid var(--gray-200);

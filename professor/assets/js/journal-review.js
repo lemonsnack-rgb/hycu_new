@@ -186,10 +186,12 @@ function renderJournalReviewRows(journals) {
                                                 class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
                                             위원
                                         </button>
-                                        <button onclick="viewJournalReviewDetail(${journal.id}, 'chair')"
-                                                class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
-                                            위원장
-                                        </button>
+                                        ${journal.myRole === 'chair' ? `
+                                            <button onclick="viewJournalReviewDetail(${journal.id}, 'chair')"
+                                                    class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
+                                                위원장
+                                            </button>
+                                        ` : ''}
                                     </div>
                                 </td>
                             </tr>
