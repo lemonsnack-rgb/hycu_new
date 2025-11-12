@@ -1,120 +1,177 @@
-# 논문 지도 시스템 - 수정 완료 버전
+# 논문 지도 시스템 - 한국사이버대학교
 
-## 📋 수정 내용
+## 📋 프로젝트 개요
 
-### ✅ 공통 수정 (ID 1-5)
-- ✅ 영문버전 전환 기능 추가
-- ✅ 로그아웃 버튼 추가
-- ✅ 학생 정보조회 (i) 아이콘 추가
-- ✅ 레이블 규칙 통일
-- ✅ 취소/닫기 버튼 정상 작동
+한국사이버대학교 대학원 논문지도 관리 시스템입니다. 학생, 교수, 관리자를 위한 통합 플랫폼을 제공합니다.
 
-### ✅ 관리자 화면 (ID 6, 21)
-- ✅ 메뉴 통합: 5개 → 3개 (연구계획서 / 학위논문 심사 관리 / 학술지 심사 관리)
-- ✅ "논문지도 진행 현황" → "온라인 피드백 현황"
+## 🌐 배포
 
-### ✅ 교수 화면 (ID 33)
-- ✅ "랩미팅관리" → "미팅관리"
+### Vercel 배포 방법
+자세한 배포 가이드는 [DEPLOYMENT.md](./DEPLOYMENT.md)를 참조하세요.
 
-### ✅ 학생 화면 (ID 60)
-- ✅ "랩미팅 관리" → "미팅관리"
+```bash
+# Vercel CLI로 배포
+npm install -g vercel
+vercel --prod
+```
 
-### ✅ 디자인 통일
-- ✅ 관리자 UI/UX 기준으로 통일
-- ✅ 공통 스타일 CSS 적용
-- ✅ 상태 배지 통일 (대기/진행중/완료)
+또는 GitHub 저장소를 Vercel에 연결하여 자동 배포 설정 가능합니다.
 
 ## 📁 파일 구조
 
 ```
-thesis-system-final/
-├── common-style.css          ← 공통 스타일 (관리자 기준)
-├── common-utils.js           ← 공통 기능 (로그아웃, 영문버전 등)
+hycu_new/
+├── index.html                              # 루트: 역할 선택 페이지
+├── vercel.json                             # Vercel 배포 설정
+├── DEPLOYMENT.md                           # 배포 가이드
 │
-├── admin/                    ← 관리자 화면
-│   ├── admin_complete.html   (수정됨: 메뉴 통합, 공통 CSS/JS 추가)
-│   ├── admin_data.js
-│   ├── admin_main.js
-│   ├── admin_modals.js
-│   └── admin_views.js
+├── common-style.css                        # 공통 스타일
+├── common-search.css                       # 검색 공통 스타일
+├── common-utils.js                         # 공통 유틸리티
 │
-├── professor/                ← 교수 화면
-│   ├── index.html            (수정됨: 메뉴명 변경, 공통 CSS/JS 추가)
-│   ├── assets/
-│   │   ├── css/              (5개 CSS 파일 - 기존 유지)
-│   │   └── js/               (19개 JS 파일 - 기존 유지)
-│   └── ... (기타 파일들)
+├── student/                                # 학생 영역
+│   ├── index.html                          # 리다이렉트 페이지
+│   ├── student-dashboard.html              # ⭐ 학생 메인 대시보드
+│   └── assets/
+│       ├── css/
+│       └── js/
 │
-└── student/                  ← 학생 화면
-    ├── index.html            (수정됨: 메뉴명 변경, 공통 CSS/JS 추가)
-    ├── assets/
-    │   ├── css/              (기존 유지)
-    │   └── js/               (기존 유지)
-    └── ... (기타 파일들)
+├── professor/                              # 교수 영역
+│   ├── index.html                          # 리다이렉트 페이지
+│   ├── professor-dashboard.html            # ⭐ 교수 메인 대시보드
+│   └── assets/
+│       ├── css/
+│       └── js/
+│
+└── admin/                                  # 관리자 영역
+    ├── index.html                          # 리다이렉트 페이지
+    ├── admin-dashboard.html                # ⭐ 관리자 메인 대시보드
+    ├── admin_data.js
+    ├── admin_main.js
+    ├── admin_modals.js
+    └── admin_views.js
 ```
 
-## 🚀 사용 방법
+## 🎯 파일명 규칙
 
-### 1. 파일 배포
+### 메인 대시보드 파일
+- **학생**: `student/student-dashboard.html`
+- **교수**: `professor/professor-dashboard.html`
+- **관리자**: `admin/admin-dashboard.html`
+
+### 리다이렉트 파일
+각 디렉토리의 `index.html`은 자동으로 해당 대시보드로 리다이렉트합니다.
+
+## 🚀 접근 URL
+
+### 로컬 개발
 ```
-1. 루트에 common-style.css, common-utils.js 배치
-2. admin/, professor/, student/ 폴더를 각각 배포
+http://localhost/                                    # 역할 선택 페이지
+http://localhost/student/student-dashboard.html      # 학생 대시보드
+http://localhost/professor/professor-dashboard.html  # 교수 대시보드
+http://localhost/admin/admin-dashboard.html          # 관리자 대시보드
 ```
 
-### 2. 경로 확인
-각 HTML 파일에서 공통 파일 경로:
-```html
-<link rel="stylesheet" href="../common-style.css">
-<script src="../common-utils.js"></script>
+### 배포 후 (Vercel)
+```
+https://your-project.vercel.app/                     # 역할 선택 페이지
+https://your-project.vercel.app/student/             # 학생 영역
+https://your-project.vercel.app/professor/           # 교수 영역
+https://your-project.vercel.app/admin/               # 관리자 영역
 ```
 
-### 3. 모든 기능 정상 작동
-- ✅ 기존 JavaScript 로직 100% 유지
-- ✅ 데이터 흐름 정상
-- ✅ 모든 버튼/모달/기능 작동
+## 🎨 주요 기능
 
-## 📝 주요 변경점
+### 공통 기능
+- ✅ 영문버전 전환 기능
+- ✅ 로그아웃 기능
+- ✅ 학생 정보조회 (i) 아이콘
+- ✅ 유틸리티 메뉴 일관성
+- ✅ 브랜드 색상 통일 (#6A0028)
+- ✅ 카카오톡/SMS 알림 발송
 
-### common-style.css
-- 관리자 HTML의 inline 스타일 추출
-- 사이드바, 버튼, 테이블, 상태 배지 통일
-- 3개 화면 모두 동일한 디자인 적용
+### 학생 화면
+- 논문지도 계획 조회
+- 제출 관리
+- 미팅관리
+- 피드백 확인
 
-### common-utils.js
-- switchLanguage(): 영문버전 전환
-- logout(): 로그아웃
-- showStudentInfo(): 학생 정보 조회
-- handleCancel(): 취소/닫기 버튼 핸들러
+### 교수 화면
+- 지도학생 관리
+- 주차별 논문지도
+- 온라인 피드백
+- 논문심사 관리
+- 학술지 심사 관리
+- 알림 발송 (카카오톡/SMS 선택)
 
-## ⚠️ 주의사항
+### 관리자 화면
+- 전체 제출 현황 관리
+- 논문작성계획서 관리
+- 중간/최종논문 관리
+- 학술지 심사 관리
+- 학생 알림 발송 (체크박스 선택)
 
-### 기존 코드 유지
-- **모든 기존 JavaScript 로직 유지됨**
-- **데이터 흐름 변경 없음**
-- **기능 정상 작동 보장**
+## 📝 최근 업데이트
 
-### 추가 작업 권장
-다음 수정사항들은 기존 JS 파일을 직접 수정해야 합니다:
-- ID 7-29: 관리자 검색/테이블 상세 수정
-- ID 30-56: 교수 화면 상세 기능 수정
-- ID 57-69: 학생 화면 상세 기능 수정
+### v3.0 (2025-11-12)
+- 📂 **파일명 명확화**: 학생/교수/관리자 구분 명확
+- 🌐 **Vercel 배포 지원**: vercel.json 및 배포 가이드 추가
+- 🎯 **역할 선택 페이지**: 루트에 통합 진입점 추가
+- 📧 **알림 발송 기능**: 관리자 페이지 전체 테이블에 체크박스 및 알림 발송 추가
+- 📱 **카카오톡/SMS 선택**: 알림 발송 시 방법 선택 가능
 
-이 작업들은 admin_views.js, dashboard.js 등 각 파일을 열어서 수정해야 합니다.
+### v2.5 (2025-11-12)
+- ✅ 알림 발송 기능에 카카오톡/SMS 선택 추가
+- ✅ 버튼 색상 통일 (브랜드 색상 #6A0028)
+- ✅ 유틸리티 메뉴에 언어 전환 버튼 추가
 
-## 🎯 완성도
+### v2.0 (2025-11-06)
+- ✅ 공통 스타일 통일
+- ✅ 메뉴 구조 개편
+- ✅ 기능 추가 및 개선
 
-| 항목 | 상태 |
-|------|------|
-| HTML 구조 | ✅ 100% |
-| CSS 디자인 통일 | ✅ 100% |
-| 공통 기능 추가 | ✅ 100% |
-| 메뉴 구조 변경 | ✅ 100% |
-| 기존 로직 유지 | ✅ 100% |
-| 데이터 흐름 | ✅ 정상 |
+## 🛠 기술 스택
 
-## 📞 문의
+- **Frontend**: HTML5, CSS3, Vanilla JavaScript
+- **스타일링**: Tailwind CSS (CDN)
+- **아이콘**: Heroicons
+- **배포**: Vercel (Static Site)
+- **버전관리**: Git
 
-추가 수정이 필요한 경우 이 README를 참고하여 요청해주세요.
+## 📦 배포 전 체크리스트
 
-**작업 완료**: 2025-11-06
-**버전**: 2.0 (실제 작동 버전)
+- [ ] 모든 HTML 파일의 경로 확인
+- [ ] CSS/JS 파일 링크 확인
+- [ ] 이미지 및 리소스 파일 확인
+- [ ] vercel.json 설정 검토
+- [ ] 브라우저 테스트 (Chrome, Firefox, Safari)
+- [ ] 모바일 반응형 테스트
+
+## 🔒 보안 고려사항
+
+- 현재는 프로토타입으로 Mock 데이터 사용
+- 실제 운영 시 다음 구현 필요:
+  - 사용자 인증/인가 시스템
+  - 백엔드 API 연동
+  - 데이터베이스 통합
+  - HTTPS 적용 (Vercel 자동 제공)
+  - 입력 데이터 검증
+
+## 🐛 알려진 이슈
+
+- Mock 데이터 사용으로 실제 서버 연동 필요
+- 일부 기능은 백엔드 API 구현 후 활성화
+
+## 📞 문의 및 지원
+
+추가 수정이 필요하거나 문의사항이 있으면 이슈를 등록해주세요.
+
+## 📜 라이선스
+
+© 2025 한국사이버대학교. All rights reserved.
+
+---
+
+**최종 업데이트**: 2025-11-12
+**버전**: 3.0
+**개발자**: Claude AI Assistant
