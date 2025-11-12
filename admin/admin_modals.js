@@ -1274,7 +1274,20 @@ function openStageModal(id = null) {
 
 
 function editStage(id) {
-    openStageModal(id);
+    const workflow = appData.stages.find(s => s.id === id);
+    if (!workflow) {
+        showAlert('워크플로우를 찾을 수 없습니다.');
+        return;
+    }
+
+    const studentCount = workflow.studentCount || 0;
+    if (studentCount > 0) {
+        showAlert(`이 워크플로우는 ${studentCount}명의 학생에게 적용되어 있어 수정할 수 없습니다.`);
+        return;
+    }
+
+    // 단계 조립 화면으로 이동
+    editWorkflowStages(id);
 }
 
 function deleteStage(id) {
@@ -1292,7 +1305,10 @@ function viewStageDetail(id) {
         showAlert('워크플로우를 찾을 수 없습니다.');
         return;
     }
-    
+
+    const studentCount = workflow.studentCount || 0;
+    const canEdit = studentCount === 0;
+
     const content = `
         <div class="space-y-4">
             <div class="bg-gray-50 rounded-lg p-4">
@@ -1313,19 +1329,57 @@ function viewStageDetail(id) {
                         <label class="text-xs font-medium text-gray-500">학위과정</label>
                         <p class="text-sm text-gray-800 mt-1">${workflow.degree}</p>
                     </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">적용 학생 수</label>
+                        <p class="text-sm text-gray-800 mt-1">
+                            <span class="${studentCount > 0 ? 'text-red-600 font-bold' : 'text-green-600'}">${studentCount}명</span>
+                        </p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">수정 가능 여부</label>
+                        <p class="text-sm mt-1">
+                            ${canEdit ?
+                                '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">수정 가능</span>' :
+                                '<span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">수정 불가</span>'
+                            }
+                        </p>
+                    </div>
                 </div>
+                ${!canEdit ? `
+                    <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                        <p class="text-xs text-yellow-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            이 워크플로우는 ${studentCount}명의 학생에게 적용되어 있어 수정할 수 없습니다.
+                        </p>
+                    </div>
+                ` : ''}
             </div>
-            
+
             <div>
                 <div class="flex justify-between items-center mb-3">
                     <h4 class="font-bold text-gray-800">단계 구성 (총 ${workflow.stageCount}단계)</h4>
-                    <button onclick="addWorkflowStep(${id})" 
-                            class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                        + 단계 추가
-                    </button>
+                    <div class="flex gap-2">
+                        ${canEdit ? `
+                            <button onclick="editWorkflowStages(${id})"
+                                    class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                <i class="fas fa-edit mr-1"></i> 단계 조립
+                            </button>
+                            <button onclick="addWorkflowStep(${id})"
+                                    class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                + 단계 추가
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
                 <div class="space-y-2">
-                    ${workflow.steps.map((step, idx) => `
+                    ${workflow.steps.length === 0 ? `
+                        <div class="text-center py-8 text-gray-500">
+                            <p class="text-sm">등록된 단계가 없습니다.</p>
+                            ${canEdit ? `
+                                <p class="text-xs mt-2">상단의 "단계 조립" 또는 "단계 추가" 버튼을 눌러 단계를 구성하세요.</p>
+                            ` : ''}
+                        </div>
+                    ` : workflow.steps.map((step, idx) => `
                         <div class="bg-white border ${step.hasEvaluation ? 'border-green-300' : 'border-gray-200'} rounded-lg p-4">
                             <div class="flex justify-between items-start">
                                 <div class="flex items-center gap-3 flex-1">
@@ -1333,7 +1387,7 @@ function viewStageDetail(id) {
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <p class="text-sm font-bold text-gray-800">${step.name}</p>
-                                            ${step.hasEvaluation ? 
+                                            ${step.hasEvaluation ?
                                                 '<span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">평가함</span>' :
                                                 '<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">평가안함</span>'
                                             }
@@ -1346,28 +1400,30 @@ function viewStageDetail(id) {
                                         ` : ''}
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button onclick="editWorkflowStep(${id}, ${step.id})" 
-                                            class="text-xs text-blue-600 hover:underline">
-                                        수정
-                                    </button>
-                                    <button onclick="deleteWorkflowStep(${id}, ${step.id})" 
-                                            class="text-xs text-red-600 hover:underline">
-                                        삭제
-                                    </button>
-                                    ${idx > 0 ? `
-                                        <button onclick="moveStepUp(${id}, ${step.id})" 
-                                                class="text-xs text-gray-600 hover:underline">
-                                            ↑
+                                ${canEdit ? `
+                                    <div class="flex gap-2">
+                                        <button onclick="editWorkflowStep(${id}, ${step.id})"
+                                                class="text-xs text-blue-600 hover:underline">
+                                            수정
                                         </button>
-                                    ` : ''}
-                                    ${idx < workflow.steps.length - 1 ? `
-                                        <button onclick="moveStepDown(${id}, ${step.id})" 
-                                                class="text-xs text-gray-600 hover:underline">
-                                            ↓
+                                        <button onclick="deleteWorkflowStep(${id}, ${step.id})"
+                                                class="text-xs text-red-600 hover:underline">
+                                            삭제
                                         </button>
-                                    ` : ''}
-                                </div>
+                                        ${idx > 0 ? `
+                                            <button onclick="moveStepUp(${id}, ${step.id})"
+                                                    class="text-xs text-gray-600 hover:underline">
+                                                ↑
+                                            </button>
+                                        ` : ''}
+                                        ${idx < workflow.steps.length - 1 ? `
+                                            <button onclick="moveStepDown(${id}, ${step.id})"
+                                                    class="text-xs text-gray-600 hover:underline">
+                                                ↓
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     `).join('')}
@@ -1636,11 +1692,254 @@ function copyStage(id) {
         };
         
         appData.stages.push(newWorkflow);
-        
+
         closeModal();
         showAlert('워크플로우가 복사되었습니다.');
         switchView('stageManagement');
     });
+}
+
+// 워크플로우 단계 조립 (지도 단계 유형에서 선택)
+function editWorkflowStages(workflowId) {
+    const workflow = appData.stages.find(s => s.id === workflowId);
+    if (!workflow) {
+        showAlert('워크플로우를 찾을 수 없습니다.');
+        return;
+    }
+
+    // Store current workflow ID globally for helper functions
+    window._currentWorkflowId = workflowId;
+
+    const availableTypes = appData.types || [];
+    const availableCriteria = appData.evaluationCriteria || [];
+
+    // Initialize temporary stages array if not exists
+    window._tempWorkflowStages = workflow.steps.length > 0 ? JSON.parse(JSON.stringify(workflow.steps)) : [];
+
+    const renderStageAssembly = () => {
+        return `
+            <div class="space-y-4">
+                <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        지도 단계 유형을 선택하여 워크플로우를 구성합니다. 각 단계에 이름을 부여하고 평가가 필요한 단계에는 평가표를 매핑하세요.
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2">단계 유형 선택</h5>
+                    <select id="stage-type-select" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        <option value="">단계 유형을 선택하세요</option>
+                        ${availableTypes.map(t => `
+                            <option value="${t.id}">
+                                ${t.name} ${t.document ? '[문서]' : ''} ${t.presentation ? '[발표]' : ''}
+                            </option>
+                        `).join('')}
+                    </select>
+                    <button onclick="addStageFromType()" class="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                        + 단계 추가
+                    </button>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2">구성된 단계 (${window._tempWorkflowStages.length}개)</h5>
+                    <div id="stage-assembly-list" class="space-y-2">
+                        ${window._tempWorkflowStages.length === 0 ? `
+                            <p class="text-sm text-gray-500 text-center py-4">단계를 추가해주세요</p>
+                        ` : window._tempWorkflowStages.map((stage, idx) => `
+                            <div class="bg-white border border-gray-200 rounded p-3">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-sm font-bold text-gray-400">${idx + 1}.</span>
+                                    <div class="flex-1 space-y-2">
+                                        <input type="text"
+                                               id="stage-name-${idx}"
+                                               value="${stage.name}"
+                                               placeholder="단계명 입력"
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                                               onchange="updateTempStageName(${idx}, this.value)">
+                                        <div class="flex items-center gap-2">
+                                            <label class="flex items-center text-sm">
+                                                <input type="checkbox"
+                                                       id="stage-eval-${idx}"
+                                                       ${stage.hasEvaluation ? 'checked' : ''}
+                                                       onchange="toggleTempStageEvaluation(${idx})"
+                                                       class="mr-1">
+                                                평가 필요
+                                            </label>
+                                            ${stage.hasEvaluation ? `
+                                                <select id="stage-criteria-${idx}"
+                                                        onchange="updateTempStageCriteria(${idx}, this.value)"
+                                                        class="text-xs border border-gray-300 rounded px-2 py-1">
+                                                    <option value="">평가표 선택</option>
+                                                    ${availableCriteria.map(c => `
+                                                        <option value="${c.id}" ${stage.evaluationCriteriaId === c.id ? 'selected' : ''}>
+                                                            ${c.name}
+                                                        </option>
+                                                    `).join('')}
+                                                </select>
+                                            ` : ''}
+                                        </div>
+                                        ${stage.stageTypeId ? `
+                                            <p class="text-xs text-gray-500">
+                                                유형: ${availableTypes.find(t => t.id === stage.stageTypeId)?.name || ''}
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                    <div class="flex gap-1">
+                                        ${idx > 0 ? `
+                                            <button onclick="moveTempStageUp(${idx})" class="text-xs text-gray-600 hover:underline">↑</button>
+                                        ` : ''}
+                                        ${idx < window._tempWorkflowStages.length - 1 ? `
+                                            <button onclick="moveTempStageDown(${idx})" class="text-xs text-gray-600 hover:underline">↓</button>
+                                        ` : ''}
+                                        <button onclick="removeTempStage(${idx})" class="text-xs text-red-600 hover:underline">삭제</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    const content = renderStageAssembly();
+
+    openModal('워크플로우 단계 조립', content, '저장', () => {
+        // Validate all stages have names
+        for (let i = 0; i < window._tempWorkflowStages.length; i++) {
+            const name = document.getElementById(`stage-name-${i}`)?.value.trim();
+            if (!name) {
+                showAlert(`${i + 1}번 단계의 이름을 입력하세요.`);
+                return;
+            }
+            window._tempWorkflowStages[i].name = name;
+
+            // Validate evaluation criteria if needed
+            if (window._tempWorkflowStages[i].hasEvaluation) {
+                const criteriaId = parseInt(document.getElementById(`stage-criteria-${i}`)?.value);
+                if (!criteriaId) {
+                    showAlert(`${i + 1}번 단계의 평가표를 선택하세요.`);
+                    return;
+                }
+            }
+        }
+
+        // Update workflow with new stages
+        workflow.steps = window._tempWorkflowStages.map((stage, idx) => ({
+            ...stage,
+            order: idx + 1
+        }));
+        workflow.stageCount = workflow.steps.length;
+        workflow.evaluationCount = workflow.steps.filter(s => s.hasEvaluation).length;
+
+        closeModal();
+        showAlert('워크플로우 단계가 저장되었습니다.');
+        viewStageDetail(workflowId);
+    }, true);
+}
+
+// Helper functions for stage assembly
+function addStageFromType() {
+    const select = document.getElementById('stage-type-select');
+    const typeId = parseInt(select?.value);
+
+    if (!typeId) {
+        showAlert('단계 유형을 선택하세요.');
+        return;
+    }
+
+    const stageType = appData.types.find(t => t.id === typeId);
+    if (!stageType) return;
+
+    const newStage = {
+        id: Date.now() + Math.random(),
+        name: stageType.name,
+        stageTypeId: typeId,
+        hasEvaluation: false,
+        evaluationCriteriaId: null,
+        evaluationCriteriaName: null
+    };
+
+    window._tempWorkflowStages.push(newStage);
+
+    // Re-render the list
+    const listContainer = document.getElementById('stage-assembly-list');
+    if (listContainer) {
+        const workflow = appData.stages.find(s => s.id);
+        listContainer.outerHTML = document.createElement('div').innerHTML = editWorkflowStages.toString();
+        // Trigger re-render by calling parent function - but this won't work in modal context
+        // Instead, let's use a simpler approach: close and reopen
+    }
+
+    // Refresh modal content
+    showAlert('단계가 추가되었습니다. 이름을 수정하고 필요시 평가표를 선택하세요.');
+    // Close and reopen modal with updated content
+    const currentWorkflowId = window._currentWorkflowId;
+    closeModal();
+    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+}
+
+function updateTempStageName(idx, value) {
+    if (window._tempWorkflowStages[idx]) {
+        window._tempWorkflowStages[idx].name = value;
+    }
+}
+
+function toggleTempStageEvaluation(idx) {
+    const checkbox = document.getElementById(`stage-eval-${idx}`);
+    if (window._tempWorkflowStages[idx]) {
+        window._tempWorkflowStages[idx].hasEvaluation = checkbox.checked;
+    }
+
+    // Refresh modal
+    const currentWorkflowId = window._currentWorkflowId;
+    closeModal();
+    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+}
+
+function updateTempStageCriteria(idx, criteriaId) {
+    const id = parseInt(criteriaId);
+    if (window._tempWorkflowStages[idx]) {
+        const criteria = appData.evaluationCriteria.find(c => c.id === id);
+        window._tempWorkflowStages[idx].evaluationCriteriaId = id || null;
+        window._tempWorkflowStages[idx].evaluationCriteriaName = criteria ? criteria.name : null;
+    }
+}
+
+function removeTempStage(idx) {
+    window._tempWorkflowStages.splice(idx, 1);
+
+    // Refresh modal
+    const currentWorkflowId = window._currentWorkflowId;
+    closeModal();
+    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+}
+
+function moveTempStageUp(idx) {
+    if (idx > 0 && window._tempWorkflowStages[idx]) {
+        const temp = window._tempWorkflowStages[idx];
+        window._tempWorkflowStages[idx] = window._tempWorkflowStages[idx - 1];
+        window._tempWorkflowStages[idx - 1] = temp;
+
+        // Refresh modal
+        const currentWorkflowId = window._currentWorkflowId;
+        closeModal();
+        setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+    }
+}
+
+function moveTempStageDown(idx) {
+    if (idx < window._tempWorkflowStages.length - 1 && window._tempWorkflowStages[idx]) {
+        const temp = window._tempWorkflowStages[idx];
+        window._tempWorkflowStages[idx] = window._tempWorkflowStages[idx + 1];
+        window._tempWorkflowStages[idx + 1] = temp;
+
+        // Refresh modal
+        const currentWorkflowId = window._currentWorkflowId;
+        closeModal();
+        setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+    }
 }
 
 // 평가표 선택 토글
@@ -2098,6 +2397,11 @@ function viewEvaluationDetail(id) {
         return;
     }
 
+    const evalType = criteria.evaluationType || 'score';
+    const evalTypeLabel = evalType === 'score' ? '점수형' : evalType === 'grade' ? '등급형' : 'Pass/Fail형';
+    const evalTypeColor = evalType === 'score' ? 'bg-blue-100 text-blue-800' :
+                          evalType === 'grade' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800';
+
     const content = `
         <div class="space-y-4">
             <div class="bg-gray-50 rounded-lg p-4">
@@ -2107,8 +2411,18 @@ function viewEvaluationDetail(id) {
                         <p class="text-sm font-bold text-gray-800 mt-1">${criteria.name}</p>
                     </div>
                     <div>
+                        <label class="text-xs font-medium text-gray-500">평가표 유형</label>
+                        <p class="mt-1">
+                            <span class="px-2 py-1 text-xs rounded-full ${evalTypeColor}">${evalTypeLabel}</span>
+                        </p>
+                    </div>
+                    <div>
                         <label class="text-xs font-medium text-gray-500">생성일</label>
                         <p class="text-sm text-gray-800 mt-1">${criteria.createdDate}</p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">평가 항목 수</label>
+                        <p class="text-sm text-gray-800 mt-1">${criteria.itemCount}개</p>
                     </div>
                     <div class="col-span-2">
                         <label class="text-xs font-medium text-gray-500">설명</label>
@@ -2117,28 +2431,71 @@ function viewEvaluationDetail(id) {
                 </div>
             </div>
 
-            <!-- ⭐ 통과 기준 추가 -->
+            <!-- 통과 기준 -->
             <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
                 <h4 class="font-bold text-yellow-900 mb-3">통과 기준</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            ${criteria.type === 'passfail' || criteria.type === 'grade' ? '통과 기준' : '통과 점수'}
-                        </label>
-                        <input type="text"
-                               id="passing-score"
-                               value="${criteria.passingScore !== null && criteria.passingScore !== undefined ? criteria.passingScore : ''}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                               ${criteria.type === 'passfail' || criteria.type === 'grade' ? 'readonly' : ''}>
+                ${evalType === 'score' ? `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">통과 점수</label>
+                            <input type="number"
+                                   id="pass-score-input"
+                                   value="${criteria.passCriteria?.passScore || 70}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                   placeholder="예: 70">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">통과 기준 설명</label>
+                            <input type="text"
+                                   id="pass-description-input"
+                                   value="${criteria.passCriteria?.description || ''}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                   placeholder="예: 총점 70점 이상 합격">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
-                        <input type="text"
-                               id="passing-criteria"
-                               value="${criteria.passingCriteria || ''}"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                               placeholder="예: 총점 70점 이상">
+                ` : evalType === 'grade' ? `
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">최소 합격 등급</label>
+                            <select id="min-grade-input"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                                <option value="A" ${criteria.passCriteria?.minGrade === 'A' ? 'selected' : ''}>A (최우수)</option>
+                                <option value="B" ${criteria.passCriteria?.minGrade === 'B' ? 'selected' : ''}>B (우수)</option>
+                                <option value="C" ${criteria.passCriteria?.minGrade === 'C' ? 'selected' : ''}>C (보통)</option>
+                                <option value="D" ${criteria.passCriteria?.minGrade === 'D' ? 'selected' : ''}>D (미흡)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">통과 기준 설명</label>
+                            <input type="text"
+                                   id="pass-description-input"
+                                   value="${criteria.passCriteria?.description || ''}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                   placeholder="예: C등급 이상 합격">
+                        </div>
                     </div>
+                ` : `
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">통과 요구사항</label>
+                        <div class="flex items-center gap-2">
+                            <input type="checkbox"
+                                   id="pass-required-input"
+                                   ${criteria.passCriteria?.passRequired !== false ? 'checked' : ''}
+                                   class="rounded border-gray-300">
+                            <label for="pass-required-input" class="text-sm text-gray-700">모든 항목 Pass 필요</label>
+                        </div>
+                        <input type="text"
+                               id="pass-description-input"
+                               value="${criteria.passCriteria?.description || ''}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg mt-2"
+                               placeholder="예: 모든 항목에서 Pass를 받아야 합격">
+                    </div>
+                `}
+                <div class="mt-3">
+                    <button onclick="savePassCriteria(${id})"
+                            class="text-sm bg-yellow-600 text-white px-4 py-2 rounded hover:bg-yellow-700">
+                        통과 기준 저장
+                    </button>
                 </div>
             </div>
 
@@ -2158,11 +2515,16 @@ function viewEvaluationDetail(id) {
                                     <span class="text-sm font-bold text-gray-400">${idx + 1}.</span>
                                     <div class="flex-1">
                                         <p class="text-sm font-bold text-gray-800">${item.name}</p>
-                                        <p class="text-xs text-gray-600 mt-1">${item.description}</p>
+                                        <p class="text-xs text-gray-600 mt-1">${item.description || ''}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
-                                    <span class="text-lg font-bold text-[#6A0028]">${item.score !== null && item.score !== undefined ? item.score + '점' : 'N/A'}</span>
+                                    ${evalType === 'score' ?
+                                        `<span class="text-lg font-bold text-[#6A0028]">${item.score || 0}점</span>` :
+                                      evalType === 'grade' ?
+                                        `<span class="text-sm text-gray-600">등급 평가</span>` :
+                                        `<span class="text-sm text-gray-600">Pass/Fail</span>`
+                                    }
                                     <div class="flex gap-1">
                                         <button onclick="editEvaluationItem(${id}, ${item.id})"
                                                 class="text-xs text-blue-600 hover:underline">
@@ -2178,7 +2540,7 @@ function viewEvaluationDetail(id) {
                         </div>
                     `).join('')}
                 </div>
-                ${criteria.totalScore !== null && criteria.totalScore !== undefined ? `
+                ${evalType === 'score' && criteria.totalScore !== null && criteria.totalScore !== undefined ? `
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-gray-700">총점</span>
@@ -2200,15 +2562,29 @@ function addEvaluationCriteria() {
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     평가표명 <span class="text-red-600">*</span>
                 </label>
-                <input type="text" id="criteria-name" 
+                <input type="text" id="criteria-name"
                        placeholder="예: 일반 연구계획서 평가표"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
+                    평가표 유형 <span class="text-red-600">*</span>
+                </label>
+                <select id="criteria-evaluation-type"
+                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <option value="score">점수형 - 점수로 평가 (예: 100점 만점)</option>
+                    <option value="grade">등급형 - 등급으로 평가 (예: A, B, C, D, F)</option>
+                    <option value="passfail">Pass/Fail형 - 합격/불합격으로 평가</option>
+                </select>
+                <p class="text-xs text-gray-500 mt-1">
+                    선택한 유형에 따라 평가 항목의 입력 방식이 달라집니다.
+                </p>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
                     설명 <span class="text-red-600">*</span>
                 </label>
-                <textarea id="criteria-description" 
+                <textarea id="criteria-description"
                           placeholder="이 평가표의 용도와 특징을 설명해주세요"
                           rows="3"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
@@ -2221,33 +2597,38 @@ function addEvaluationCriteria() {
             </div>
         </div>
     `;
-    
+
     openModal('새 평가표 추가', content, '저장', () => {
         const name = document.getElementById('criteria-name')?.value.trim();
         const description = document.getElementById('criteria-description')?.value.trim();
-        
+        const evaluationType = document.getElementById('criteria-evaluation-type')?.value;
+
         if (!name) {
             showAlert('평가표명을 입력하세요.');
             return;
         }
-        
+
         if (!description) {
             showAlert('설명을 입력하세요.');
             return;
         }
-        
+
         const newCriteria = {
             id: Date.now(),
             name: name,
             description: description,
+            evaluationType: evaluationType,
             itemCount: 0,
-            totalScore: 0,
+            totalScore: evaluationType === 'score' ? 0 : null,
             createdDate: new Date().toISOString().split('T')[0],
-            items: []
+            items: [],
+            passCriteria: evaluationType === 'passfail' ? { type: 'simple', passRequired: true } :
+                         evaluationType === 'grade' ? { type: 'grade', minGrade: 'C' } :
+                         { type: 'score', passScore: 70 }
         };
-        
+
         appData.evaluationCriteria.push(newCriteria);
-        
+
         closeModal();
         showAlert('평가표가 추가되었습니다. 이제 평가 항목을 추가하세요.');
         switchView('evaluationCriteria');
@@ -2322,70 +2703,89 @@ function deleteEvaluationCriteria(id) {
 }
 
 function addEvaluationItem(criteriaId) {
+    const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
+    if (!criteria) {
+        showAlert('평가표를 찾을 수 없습니다.');
+        return;
+    }
+
+    const evalType = criteria.evaluationType || 'score';
+
     const content = `
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     평가 항목명 <span class="text-red-600">*</span>
                 </label>
-                <input type="text" id="item-name" 
+                <input type="text" id="item-name"
                        placeholder="예: 연구주제 적절성"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    배점 <span class="text-red-600">*</span>
-                </label>
-                <input type="number" id="item-score" 
-                       placeholder="20"
-                       min="0"
-                       max="100"
-                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-            </div>
+            ${evalType === 'score' ? `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        배점 <span class="text-red-600">*</span>
+                    </label>
+                    <input type="number" id="item-score"
+                           placeholder="20"
+                           min="0"
+                           max="100"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                </div>
+            ` : ''}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     설명
                 </label>
-                <textarea id="item-description" 
-                          placeholder="이 평가 항목에 대한 설명"
+                <textarea id="item-description"
+                          placeholder="이 평가 항목에 대한 설명${evalType === 'grade' ? ' (등급별 평가 기준을 설명해주세요)' : evalType === 'passfail' ? ' (Pass/Fail 판단 기준을 설명해주세요)' : ''}"
                           rows="3"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
             </div>
+            ${evalType === 'grade' || evalType === 'passfail' ? `
+                <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        ${evalType === 'grade' ? '등급형 평가: 교수가 평가 시 A/B/C/D/F 등급으로 평가합니다.' : 'Pass/Fail형 평가: 교수가 평가 시 합격/불합격으로 평가합니다.'}
+                    </p>
+                </div>
+            ` : ''}
         </div>
     `;
-    
+
     openModal('평가 항목 추가', content, '추가', () => {
         const name = document.getElementById('item-name')?.value.trim();
-        const score = parseInt(document.getElementById('item-score')?.value);
         const description = document.getElementById('item-description')?.value.trim();
-        
+
         if (!name) {
             showAlert('평가 항목명을 입력하세요.');
             return;
         }
-        
-        if (!score || score <= 0) {
-            showAlert('배점을 입력하세요.');
-            return;
-        }
-        
-        const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
-        if (!criteria) {
-            showAlert('평가표를 찾을 수 없습니다.');
-            return;
-        }
-        
+
         const newItem = {
             id: Date.now(),
             name: name,
-            score: score,
             description: description || ''
         };
-        
+
+        // Only add score for score-type evaluations
+        if (evalType === 'score') {
+            const score = parseInt(document.getElementById('item-score')?.value);
+            if (!score || score <= 0) {
+                showAlert('배점을 입력하세요.');
+                return;
+            }
+            newItem.score = score;
+        }
+
         criteria.items.push(newItem);
         criteria.itemCount = criteria.items.length;
-        criteria.totalScore = criteria.items.reduce((sum, item) => sum + item.score, 0);
-        
+
+        // Only calculate totalScore for score-type evaluations
+        if (evalType === 'score') {
+            criteria.totalScore = criteria.items.reduce((sum, item) => sum + (item.score || 0), 0);
+        }
+
         closeModal();
         showAlert('평가 항목이 추가되었습니다.');
         viewEvaluationDetail(criteriaId);
@@ -2395,57 +2795,76 @@ function addEvaluationItem(criteriaId) {
 function editEvaluationItem(criteriaId, itemId) {
     const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
     if (!criteria) return;
-    
+
     const item = criteria.items.find(i => i.id === itemId);
     if (!item) return;
-    
+
+    const evalType = criteria.evaluationType || 'score';
+
     const content = `
         <div class="space-y-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     평가 항목명 <span class="text-red-600">*</span>
                 </label>
-                <input type="text" id="item-name" 
+                <input type="text" id="item-name"
                        value="${item.name}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">
-                    배점 <span class="text-red-600">*</span>
-                </label>
-                <input type="number" id="item-score" 
-                       value="${item.score}"
-                       min="0"
-                       max="100"
-                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-            </div>
+            ${evalType === 'score' ? `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        배점 <span class="text-red-600">*</span>
+                    </label>
+                    <input type="number" id="item-score"
+                           value="${item.score || 0}"
+                           min="0"
+                           max="100"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                </div>
+            ` : ''}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
                     설명
                 </label>
-                <textarea id="item-description" 
+                <textarea id="item-description"
                           rows="3"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${item.description}</textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${item.description || ''}</textarea>
             </div>
+            ${evalType === 'grade' || evalType === 'passfail' ? `
+                <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        ${evalType === 'grade' ? '등급형 평가: 교수가 평가 시 A/B/C/D/F 등급으로 평가합니다.' : 'Pass/Fail형 평가: 교수가 평가 시 합격/불합격으로 평가합니다.'}
+                    </p>
+                </div>
+            ` : ''}
         </div>
     `;
-    
+
     openModal('평가 항목 수정', content, '저장', () => {
         const name = document.getElementById('item-name')?.value.trim();
-        const score = parseInt(document.getElementById('item-score')?.value);
         const description = document.getElementById('item-description')?.value.trim();
-        
-        if (!name || !score || score <= 0) {
-            showAlert('모든 필수 항목을 입력하세요.');
+
+        if (!name) {
+            showAlert('평가 항목명을 입력하세요.');
             return;
         }
-        
+
         item.name = name;
-        item.score = score;
         item.description = description;
-        
-        criteria.totalScore = criteria.items.reduce((sum, item) => sum + item.score, 0);
-        
+
+        // Only update score for score-type evaluations
+        if (evalType === 'score') {
+            const score = parseInt(document.getElementById('item-score')?.value);
+            if (!score || score <= 0) {
+                showAlert('배점을 입력하세요.');
+                return;
+            }
+            item.score = score;
+            criteria.totalScore = criteria.items.reduce((sum, item) => sum + (item.score || 0), 0);
+        }
+
         closeModal();
         showAlert('평가 항목이 수정되었습니다.');
         viewEvaluationDetail(criteriaId);
@@ -2456,14 +2875,61 @@ function deleteEvaluationItem(criteriaId, itemId) {
     showConfirm('이 평가 항목을 삭제하시겠습니까?', () => {
         const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
         if (!criteria) return;
-        
+
         criteria.items = criteria.items.filter(i => i.id !== itemId);
         criteria.itemCount = criteria.items.length;
         criteria.totalScore = criteria.items.reduce((sum, item) => sum + item.score, 0);
-        
+
         showAlert('평가 항목이 삭제되었습니다.');
         viewEvaluationDetail(criteriaId);
     });
+}
+
+function savePassCriteria(criteriaId) {
+    const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
+    if (!criteria) {
+        showAlert('평가표를 찾을 수 없습니다.');
+        return;
+    }
+
+    const evalType = criteria.evaluationType || 'score';
+
+    if (evalType === 'score') {
+        const passScore = parseInt(document.getElementById('pass-score-input')?.value);
+        const description = document.getElementById('pass-description-input')?.value.trim();
+
+        if (!passScore || passScore < 0) {
+            showAlert('통과 점수를 입력하세요.');
+            return;
+        }
+
+        criteria.passCriteria = {
+            type: 'score',
+            passScore: passScore,
+            description: description
+        };
+    } else if (evalType === 'grade') {
+        const minGrade = document.getElementById('min-grade-input')?.value;
+        const description = document.getElementById('pass-description-input')?.value.trim();
+
+        criteria.passCriteria = {
+            type: 'grade',
+            minGrade: minGrade,
+            description: description
+        };
+    } else {
+        const passRequired = document.getElementById('pass-required-input')?.checked;
+        const description = document.getElementById('pass-description-input')?.value.trim();
+
+        criteria.passCriteria = {
+            type: 'simple',
+            passRequired: passRequired,
+            description: description
+        };
+    }
+
+    showAlert('통과 기준이 저장되었습니다.');
+    viewEvaluationDetail(criteriaId);
 }
 
 // 평가표 선택 토글 (기존 평가 기준 관리용)

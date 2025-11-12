@@ -1520,15 +1520,19 @@ const views = {
                                     </td>
                                     <td class="py-3 px-4">
                                         <div class="flex gap-2">
-                                            <button onclick="viewStageDetail(${item.id})" 
+                                            <button onclick="viewStageDetail(${item.id})"
                                                     class="text-blue-600 hover:underline text-sm">
                                                 상세보기
                                             </button>
-                                            <button onclick="copyStage(${item.id})" 
+                                            <button onclick="editStage(${item.id})"
+                                                    class="text-purple-600 hover:underline text-sm">
+                                                수정
+                                            </button>
+                                            <button onclick="copyStage(${item.id})"
                                                     class="text-green-600 hover:underline text-sm">
                                                 복사
                                             </button>
-                                            <button onclick="deleteStage(${item.id})" 
+                                            <button onclick="deleteStage(${item.id})"
                                                     class="text-red-600 hover:underline text-sm">
                                                 삭제
                                             </button>
@@ -1635,8 +1639,16 @@ const views = {
                                         <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                         <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">
-                                            <span class="px-2 py-1 text-xs rounded-full ${item.evaluationType === 'score' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">
-                                                ${item.evaluationType === 'score' ? '점수제' : '합격/불합격'}
+                                            <span class="px-2 py-1 text-xs rounded-full ${
+                                                item.evaluationType === 'score' ? 'bg-blue-100 text-blue-800' :
+                                                item.evaluationType === 'grade' ? 'bg-purple-100 text-purple-800' :
+                                                'bg-gray-100 text-gray-800'
+                                            }">
+                                                ${
+                                                    item.evaluationType === 'score' ? '점수형' :
+                                                    item.evaluationType === 'grade' ? '등급형' :
+                                                    'Pass/Fail형'
+                                                }
                                             </span>
                                         </td>
                                         <td class="py-3 px-4 text-sm text-center">
@@ -1653,11 +1665,7 @@ const views = {
                                             <div class="flex gap-2">
                                                 <button onclick="viewEvaluationDetail(${item.id})"
                                                         class="text-blue-600 hover:underline text-sm">
-                                                    상세보기
-                                                </button>
-                                                <button onclick="editPassCriteria(${item.id})"
-                                                        class="text-green-600 hover:underline text-sm">
-                                                    통과기준
+                                                    관리
                                                 </button>
                                                 <button onclick="deleteEvaluationCriteria(${item.id})"
                                                         class="text-red-600 hover:underline text-sm">
