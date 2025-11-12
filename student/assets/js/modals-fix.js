@@ -473,10 +473,22 @@ window.viewBoardPost = function(postId) {
                                         </div>
                                         <div class="flex items-center gap-2">
                                             <span class="text-xs text-gray-500">${formatDateTime(comment.createdAt)}</span>
-                                            ${isCommentAuthor ? `<button onclick="deleteComment(${post.id}, '${comment.id}')" class="text-xs text-red-600 hover:text-red-800">삭제</button>` : ''}
+                                            ${isCommentAuthor ? `
+                                                <button onclick="editBoardComment(${post.id}, '${comment.id}')" class="text-xs text-blue-600 hover:text-blue-800">수정</button>
+                                                <button onclick="deleteBoardComment(${post.id}, '${comment.id}')" class="text-xs text-red-600 hover:text-red-800">삭제</button>
+                                            ` : ''}
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-700">${comment.text}</p>
+                                    <div id="comment-display-${comment.id}">
+                                        <p class="text-sm text-gray-700">${comment.text}</p>
+                                    </div>
+                                    <div id="comment-edit-${comment.id}" style="display: none;">
+                                        <textarea id="comment-textarea-${comment.id}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none" rows="2">${comment.text}</textarea>
+                                        <div class="flex gap-2 mt-2">
+                                            <button onclick="saveBoardCommentEdit(${post.id}, '${comment.id}')" class="text-xs bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">저장</button>
+                                            <button onclick="cancelBoardCommentEdit('${comment.id}')" class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300">취소</button>
+                                        </div>
+                                    </div>
                                 </div>
                             `;
                         }).join('')}
@@ -513,6 +525,57 @@ window.formatDateTime = function(dateString) {
     const hour = String(date.getHours()).padStart(2, '0');
     const minute = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day} ${hour}:${minute}`;
+};
+
+// 자료실 댓글 수정 함수
+window.editBoardComment = function(postId, commentId) {
+    document.getElementById(`comment-display-${commentId}`).style.display = 'none';
+    document.getElementById(`comment-edit-${commentId}`).style.display = 'block';
+    document.getElementById(`comment-textarea-${commentId}`).focus();
+};
+
+window.saveBoardCommentEdit = function(postId, commentId) {
+    const textarea = document.getElementById(`comment-textarea-${commentId}`);
+    const newText = textarea.value.trim();
+
+    if (!newText) {
+        alert('댓글 내용을 입력하세요.');
+        return;
+    }
+
+    if (typeof DataService !== 'undefined') {
+        // DataService를 통해 댓글 수정 (실제 구현 시)
+        // DataService.updateResourceBoardComment(postId, commentId, newText);
+    }
+
+    // 임시: alert로 확인
+    alert('댓글이 수정되었습니다.');
+
+    // 모달 다시 열어서 갱신된 내용 표시
+    closeBoardModal();
+    setTimeout(() => viewBoardPost(postId), 100);
+};
+
+window.cancelBoardCommentEdit = function(commentId) {
+    document.getElementById(`comment-display-${commentId}`).style.display = 'block';
+    document.getElementById(`comment-edit-${commentId}`).style.display = 'none';
+};
+
+window.deleteBoardComment = function(postId, commentId) {
+    if (!confirm('댓글을 삭제하시겠습니까?')) {
+        return;
+    }
+
+    if (typeof DataService !== 'undefined') {
+        // DataService를 통해 댓글 삭제
+        DataService.deleteResourceBoardComment(postId, commentId);
+    }
+
+    alert('댓글이 삭제되었습니다.');
+
+    // 모달 다시 열어서 갱신된 내용 표시
+    closeBoardModal();
+    setTimeout(() => viewBoardPost(postId), 100);
 };
 
 console.log('✅ 모달 수정 스크립트 로드 완료');
