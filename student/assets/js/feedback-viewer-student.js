@@ -7,6 +7,7 @@
 window._studentGeneralReplies = {};
 window._studentInlineReplies = {};
 window._studentAttachments = [];
+window._studentInlineAttachments = {};
 
 // 학생용 피드백 뷰어 UI 재정의 (교수용과 동일한 구조)
 function renderStudentFeedbackViewerUI(feedbackId) {
@@ -126,7 +127,7 @@ function renderStudentFeedbackViewerUI(feedbackId) {
                                             <button onclick="addStudentGeneralReply()"
                                                     style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
                                                 <i class="fas fa-paper-plane"></i>
-                                                <span>답변하기</span>
+                                                <span>댓글</span>
                                             </button>
                                             <button onclick="uploadStudentGeneralAttachment()"
                                                     style="font-size: 0.75rem; background: #E5E7EB; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
@@ -172,13 +173,20 @@ function renderStudentFeedbackViewerUI(feedbackId) {
                                                       style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.75rem; resize: none;"
                                                       rows="2"
                                                       placeholder="이 첨삭에 대한 답변을 작성하세요..."></textarea>
-                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
                                                 <button onclick="addStudentInlineReply(1)"
                                                         style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
                                                     <i class="fas fa-reply"></i>
-                                                    <span>답변하기</span>
+                                                    <span>댓글</span>
+                                                </button>
+                                                <button onclick="uploadStudentInlineAttachment(1)"
+                                                        style="font-size: 0.75rem; background: #E5E7EB; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem;">
+                                                    <i class="fas fa-paperclip"></i>
+                                                    <span>첨부</span>
                                                 </button>
                                             </div>
+                                            <input type="file" id="student-inline-attach-input-1" multiple accept=".png,.jpg,.jpeg,.pdf" style="display: none;">
+                                            <div id="student-inline-attach-display-1" style="margin-top: 0.5rem; font-size: 0.625rem; color: #6B7280;"></div>
                                         </div>
                                     </div>
                                 </div>
@@ -289,11 +297,15 @@ function addStudentInlineReply(annotationId) {
     window._studentInlineReplies[annotationId] = window._studentInlineReplies[annotationId] || [];
     window._studentInlineReplies[annotationId].push({
         text: value,
+        attach: window._studentInlineAttachments[annotationId] || [],
         ts: Date.now()
     });
 
     renderStudentInlineReplies(annotationId);
     textarea.value = '';
+    window._studentInlineAttachments[annotationId] = [];
+    const displayEl = document.getElementById(`student-inline-attach-display-${annotationId}`);
+    if (displayEl) displayEl.innerHTML = '';
 }
 
 // 첨삭 답변 렌더링
@@ -312,18 +324,34 @@ function renderStudentInlineReplies(annotationId) {
     list.innerHTML = replies.map(reply => `
         <div style="padding: 0.5rem; border: 1px solid #E5E7EB; border-radius: 0.375rem; background: #F9FAFB; margin-bottom: 0.5rem;">
             <div style="font-size: 0.75rem; color: #374151; margin-bottom: 0.25rem; white-space: pre-wrap;">${escapeHtml(reply.text)}</div>
+            ${reply.attach && reply.attach.length > 0 ? `
+                <div style="font-size: 0.625rem; color: #3B82F6; margin-bottom: 0.25rem;">
+                    ${reply.attach.map(a => `<a href="#" class="underline mr-2">${a.name}</a>`).join('')}
+                </div>
+            ` : ''}
             <div style="font-size: 0.625rem; color: #9CA3AF;">${new Date(reply.ts).toLocaleString('ko-KR')}</div>
         </div>
     `).join('');
 }
 
-// 첨부파일 업로드
+// 첨부파일 업로드 - 전체 평가
 function uploadStudentGeneralAttachment() {
     const input = document.getElementById('student-general-attach-input');
     input.onchange = function() {
         window._studentAttachments = Array.from(input.files).map(f => ({ name: f.name, size: f.size }));
         document.getElementById('student-general-attach-display').innerHTML =
             window._studentAttachments.map(a => `<span class="text-blue-600">${a.name}</span>`).join(', ');
+    };
+    input.click();
+}
+
+// 첨부파일 업로드 - 첨삭
+function uploadStudentInlineAttachment(annotationId) {
+    const input = document.getElementById(`student-inline-attach-input-${annotationId}`);
+    input.onchange = function() {
+        window._studentInlineAttachments[annotationId] = Array.from(input.files).map(f => ({ name: f.name, size: f.size }));
+        document.getElementById(`student-inline-attach-display-${annotationId}`).innerHTML =
+            window._studentInlineAttachments[annotationId].map(a => `<span class="text-blue-600">${a.name}</span>`).join(', ');
     };
     input.click();
 }
@@ -347,6 +375,7 @@ window.switchStudentFeedbackTab = switchStudentFeedbackTab;
 window.addStudentGeneralReply = addStudentGeneralReply;
 window.addStudentInlineReply = addStudentInlineReply;
 window.uploadStudentGeneralAttachment = uploadStudentGeneralAttachment;
+window.uploadStudentInlineAttachment = uploadStudentInlineAttachment;
 window.renderStudentFeedbackViewerUI = renderStudentFeedbackViewerUI;
 
 console.log('✅ 학생용 피드백 뷰어 로드 완료 (교수 UI 구조)');
