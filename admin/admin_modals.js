@@ -2771,8 +2771,15 @@ function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
  * 주차별 지도 상세 보기 (교수용 화면과 동일한 스타일)
  */
 function viewWeeklyGuidanceDetail(pairId) {
+    console.log('viewWeeklyGuidanceDetail called with pairId:', pairId);
+    console.log('appData:', appData);
+    console.log('guidancePairs:', appData.weeklyGuidance?.guidancePairs);
+
     const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === pairId);
     const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+
+    console.log('Found pair:', pair);
+    console.log('Found plansData:', plansData);
 
     if (!pair || !plansData) {
         alert('데이터를 찾을 수 없습니다.');
@@ -3356,45 +3363,94 @@ function submitResearchProposal() {
 
 function viewResearchProposalDetail(id) {
     const proposal = appData.submissions.researchProposal.find(p => p.id === id);
-    if (!proposal) return;
+    if (!proposal) {
+        alert('연구계획서 정보를 찾을 수 없습니다.');
+        return;
+    }
 
     const content = `
-        <div class="space-y-4">
-            <!-- 학생 정보 -->
+        <div class="space-y-6">
+            <!-- 학생 정보 (등록 화면과 동일한 레이아웃) -->
             <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold mb-3">학생 정보</h4>
-                <div class="grid grid-cols-2 gap-3 text-sm">
-                    <div><span class="text-gray-600">학번:</span> <span class="font-medium">${proposal.studentId}</span></div>
-                    <div><span class="text-gray-600">성명:</span> <span class="font-medium">${proposal.studentName}</span></div>
-                    <div><span class="text-gray-600">학과/전공:</span> <span class="font-medium">${proposal.major}</span></div>
-                    <div><span class="text-gray-600">학위과정:</span> <span class="font-medium">${proposal.degree}</span></div>
+                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학번</label>
+                        <input type="text" value="${proposal.studentId}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
+                        <input type="text" value="${proposal.studentName}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학과/전공</label>
+                        <input type="text" value="${proposal.major}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학위과정</label>
+                        <input type="text" value="${proposal.degree}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
                 </div>
             </div>
 
-            <!-- 연구계획서 정보 -->
+            <!-- 연구계획서 정보 (등록 화면과 동일한 레이아웃) -->
             <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold mb-3">연구계획서 정보</h4>
-                <div class="space-y-2 text-sm">
-                    <div><span class="text-gray-600">학년도/학기:</span> <span class="font-medium">${proposal.year || '2025'}학년도 ${proposal.semester || '1'}학기</span></div>
-                    <div><span class="text-gray-600">제목:</span> <span class="font-medium">${proposal.thesisTitle || '-'}</span></div>
-                    <div><span class="text-gray-600">등록일:</span> <span class="font-medium">${proposal.submitDate || '-'}</span></div>
+                <h4 class="font-bold text-gray-800 mb-3">연구계획서 정보</h4>
+                <div class="space-y-4">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">학년도</label>
+                            <input type="text" value="${proposal.year || '2025'}" readonly
+                                   class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">학기</label>
+                            <input type="text" value="${proposal.semester || '1'}학기" readonly
+                                   class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">연구계획서 제목</label>
+                        <input type="text" value="${proposal.thesisTitle || '-'}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">연구 개요</label>
+                        <textarea rows="4" readonly
+                                  class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">${proposal.summary || '연구 개요 정보가 없습니다.'}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">등록일</label>
+                        <input type="text" value="${proposal.submitDate || '-'}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">연구계획서 파일</label>
+                        ${proposal.fileUrl ? `
+                            <div class="flex items-center gap-2">
+                                <a href="${proposal.fileUrl}" target="_blank"
+                                   class="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    연구계획서 다운로드
+                                </a>
+                            </div>
+                        ` : `
+                            <p class="text-sm text-gray-500 py-2">첨부된 파일이 없습니다.</p>
+                        `}
+                    </div>
                 </div>
             </div>
-
-            <!-- 첨부파일 -->
-            ${proposal.fileUrl ? `
-                <div class="bg-gray-50 rounded-lg p-4">
-                    <h4 class="font-bold mb-3">첨부파일</h4>
-                    <a href="${proposal.fileUrl}" target="_blank"
-                       class="text-blue-600 hover:underline text-sm">
-                        <i class="fas fa-file-pdf"></i> 연구계획서 다운로드
-                    </a>
-                </div>
-            ` : ''}
         </div>
     `;
 
-    openModal('연구계획서 상세', content, '닫기', closeModal, true);
+    openModal('연구계획서 상세보기', content, '닫기', closeModal, true);
 }
 
 // ==================== 평가기준 통과기준 관리 ====================
