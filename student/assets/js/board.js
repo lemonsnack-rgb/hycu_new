@@ -200,19 +200,42 @@ function viewBoardPost(postId) {
                                         </div>
                                     </div>
                                     <p class="text-sm text-gray-700">${comment.content}</p>
+                                    ${comment.files && comment.files.length > 0 ? `
+                                        <div class="mt-2 space-y-1">
+                                            ${comment.files.map(file => `
+                                                <div class="flex items-center gap-2 text-xs text-gray-600 hover:text-blue-600 cursor-pointer">
+                                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                                    </svg>
+                                                    <span>${file.name}</span>
+                                                    <span class="text-gray-500">(${formatFileSize(file.size)})</span>
+                                                </div>
+                                            `).join('')}
+                                        </div>
+                                    ` : ''}
                                 </div>
                             `;
                         }).join('')}
                     </div>
 
                     <!-- 댓글 작성 -->
-                    <div class="flex gap-2">
-                        <input type="text"
-                               id="commentInput"
-                               placeholder="댓글을 입력하세요"
-                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
-                               onkeypress="if(event.key==='Enter') addComment(${post.id})">
-                        <button onclick="addComment(${post.id})" class="btn-primary">등록</button>
+                    <div class="space-y-2">
+                        <div class="flex gap-2">
+                            <input type="text"
+                                   id="commentInput"
+                                   placeholder="댓글을 입력하세요"
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                                   onkeypress="if(event.key==='Enter' && !event.shiftKey) addComment(${post.id})">
+                            <button onclick="addComment(${post.id})" class="btn-primary">등록</button>
+                        </div>
+                        <div>
+                            <input type="file"
+                                   id="commentFiles"
+                                   multiple
+                                   class="text-xs text-gray-600"
+                                   onchange="updateCommentFilePreview()">
+                            <div id="commentFilePreview" class="mt-1 space-y-1"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -228,22 +251,64 @@ function addComment(postId) {
 
     const input = document.getElementById('commentInput');
     const content = input.value.trim();
+    const filesInput = document.getElementById('commentFiles');
 
     if (!content) {
         alert('댓글 내용을 입력해주세요.');
         return;
     }
 
+    // 파일 처리
+    const files = [];
+    if (filesInput && filesInput.files.length > 0) {
+        for (let i = 0; i < filesInput.files.length; i++) {
+            const file = filesInput.files[i];
+            files.push({
+                id: `CF${Date.now()}_${i}`,
+                name: file.name,
+                size: file.size,
+                url: '#' // 실제로는 업로드된 파일의 URL
+            });
+        }
+    }
+
     DataService.addResourceBoardComment(postId, {
         authorId: currentUser.id,
         authorName: currentUser.name,
         authorRole: currentUser.role,
-        content: content
+        content: content,
+        files: files
     });
 
     input.value = '';
+    if (filesInput) filesInput.value = '';
     closeBoardModal();
     viewBoardPost(postId);
+}
+
+// 댓글 파일 미리보기 업데이트
+function updateCommentFilePreview() {
+    const filesInput = document.getElementById('commentFiles');
+    const preview = document.getElementById('commentFilePreview');
+
+    if (!filesInput || !preview) return;
+
+    if (filesInput.files.length === 0) {
+        preview.innerHTML = '';
+        return;
+    }
+
+    const fileList = Array.from(filesInput.files).map(file => `
+        <div class="flex items-center gap-2 text-xs text-gray-600">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+            </svg>
+            <span>${file.name}</span>
+            <span class="text-gray-500">(${formatFileSize(file.size)})</span>
+        </div>
+    `).join('');
+
+    preview.innerHTML = fileList;
 }
 
 // 댓글 삭제
