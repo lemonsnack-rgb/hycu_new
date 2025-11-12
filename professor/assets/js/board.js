@@ -132,7 +132,7 @@ function viewBoardPost(postId) {
     modal.className = 'modal-backdrop active';
     modal.id = 'boardPostModal';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 56rem;">
+        <div class="modal-content" style="max-width: 80rem; width: 95%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-start">
                     <div class="flex-1">
@@ -264,7 +264,7 @@ function openBoardWriteModal() {
     modal.className = 'modal-backdrop active';
     modal.id = 'boardWriteModal';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 56rem;">
+        <div class="modal-content" style="max-width: 80rem; width: 95%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-gray-800">글쓰기</h3>
@@ -391,7 +391,7 @@ function openBoardEditModal(postId) {
     modal.className = 'modal-backdrop active';
     modal.id = 'boardEditModal';
     modal.innerHTML = `
-        <div class="modal-content" style="max-width: 56rem;">
+        <div class="modal-content" style="max-width: 80rem; width: 95%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-gray-800">글 수정</h3>

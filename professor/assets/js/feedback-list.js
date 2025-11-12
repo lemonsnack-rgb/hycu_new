@@ -26,9 +26,16 @@ function renderFeedbackList() {
                         <h2 class="text-2xl font-bold text-gray-800">제출물 목록</h2>
                         <p class="text-sm text-gray-600 mt-1">학생들이 제출한 문서를 확인하고 피드백을 작성하세요</p>
                     </div>
-                    <div class="text-sm text-gray-600">
-                        <span class="font-semibold text-blue-600">${filteredRequests.length}</span>건
-                        ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
+                    <div class="flex items-center gap-4">
+                        <button onclick="sendNotificationToSelected()"
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#500020] text-sm font-semibold flex items-center gap-2">
+                            <i class="fas fa-bell"></i>
+                            선택한 학생에게 알림 발송
+                        </button>
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold text-blue-600">${filteredRequests.length}</span>건
+                            ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
+                        </div>
                     </div>
                 </div>
 
@@ -93,6 +100,12 @@ function renderFeedbackList() {
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b">
                         <tr>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                                <input type="checkbox"
+                                       id="select-all-feedbacks"
+                                       onchange="toggleAllFeedbacks(this)"
+                                       class="rounded">
+                            </th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공</th>
@@ -109,7 +122,7 @@ function renderFeedbackList() {
                     <tbody id="feedback-list-body">
                         ${filteredRequests.length > 0
                             ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                            : '<tr><td colspan="11" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                            : '<tr><td colspan="12" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
                         }
                     </tbody>
                 </table>
@@ -143,6 +156,13 @@ function renderFeedbackRow(request, idx) {
     return `
         <tr class="feedback-row border-b hover:bg-gray-50 transition-colors"
             data-feedback-id="${request.id}">
+            <td class="py-3 px-4 text-center">
+                <input type="checkbox"
+                       class="feedback-checkbox rounded"
+                       data-feedback-id="${request.id}"
+                       data-student-name="${request.studentName}"
+                       data-student-number="${request.studentNumber}">
+            </td>
             <td class="py-3 px-4 text-gray-800">${idx}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.graduate || '일반대학원'}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.major}</td>
@@ -307,3 +327,195 @@ function resetFeedbackSearch() {
 // Export
 window.searchFeedback = searchFeedback;
 window.resetFeedbackSearch = resetFeedbackSearch;
+
+// ==================== 체크박스 전체 선택/해제 ====================
+function toggleAllFeedbacks(checkbox) {
+    const checkboxes = document.querySelectorAll('.feedback-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+}
+
+// ==================== 선택한 학생에게 알림 발송 ====================
+function sendNotificationToSelected() {
+    const checkboxes = document.querySelectorAll('.feedback-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        alert('알림을 받을 학생을 선택해주세요.');
+        return;
+    }
+
+    // 선택된 학생 정보 수집
+    const selectedStudents = Array.from(checkboxes).map(cb => ({
+        id: cb.dataset.feedbackId,
+        name: cb.dataset.studentName,
+        studentNumber: cb.dataset.studentNumber
+    }));
+
+    // 알림 발송 모달 열기
+    openNotificationModal(selectedStudents, () => {
+        // 발송 완료 후 체크박스 초기화
+        checkboxes.forEach(cb => cb.checked = false);
+        const selectAll = document.getElementById('select-all-feedbacks');
+        if (selectAll) selectAll.checked = false;
+    });
+}
+
+// ==================== 알림 발송 모달 (공통) ====================
+function openNotificationModal(students, onSuccess) {
+    // 모달 생성
+    const modal = document.createElement('div');
+    modal.className = 'modal-backdrop active';
+    modal.id = 'notification-modal';
+
+    const studentList = students.map(s => `${s.name} (${s.studentNumber})`).join(', ');
+
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px; width: 90%;">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800">알림 발송</h3>
+                    <button onclick="closeNotificationModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- 발송 대상 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        발송 대상 (${students.length}명)
+                    </label>
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 max-h-32 overflow-y-auto">
+                        <p class="text-sm text-gray-700">${studentList}</p>
+                    </div>
+                </div>
+
+                <!-- 발송 방법 선택 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        발송 방법 *
+                    </label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="notification-type" value="kakao" checked class="rounded-full">
+                            <span class="text-sm text-gray-700">카카오톡</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="notification-type" value="sms" class="rounded-full">
+                            <span class="text-sm text-gray-700">SMS</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 메시지 내용 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        메시지 내용 *
+                    </label>
+                    <textarea id="notification-message"
+                              rows="6"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none"
+                              placeholder="발송할 메시지 내용을 입력하세요.&#10;&#10;예시:&#10;온라인 피드백이 완료되었습니다.&#10;확인 후 수정하여 재제출 바랍니다."></textarea>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <span id="message-length">0</span> / 1000자
+                    </p>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="flex gap-2 justify-end pt-4">
+                    <button onclick="closeNotificationModal()" class="btn-cancel">취소</button>
+                    <button onclick="submitNotification()" class="btn-primary">발송</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 글자 수 카운터
+    const messageInput = document.getElementById('notification-message');
+    const lengthDisplay = document.getElementById('message-length');
+
+    messageInput.addEventListener('input', function() {
+        const length = this.value.length;
+        lengthDisplay.textContent = length;
+
+        if (length > 1000) {
+            lengthDisplay.classList.add('text-red-600');
+        } else {
+            lengthDisplay.classList.remove('text-red-600');
+        }
+    });
+
+    // 전역 변수에 콜백 저장
+    window._notificationCallback = { students, onSuccess };
+}
+
+function closeNotificationModal() {
+    const modal = document.getElementById('notification-modal');
+    if (modal) {
+        modal.remove();
+    }
+    window._notificationCallback = null;
+}
+
+function submitNotification() {
+    const message = document.getElementById('notification-message').value.trim();
+    const notificationType = document.querySelector('input[name="notification-type"]:checked').value;
+
+    if (!message) {
+        alert('메시지 내용을 입력해주세요.');
+        return;
+    }
+
+    if (message.length > 1000) {
+        alert('메시지는 1000자를 초과할 수 없습니다.');
+        return;
+    }
+
+    const { students, onSuccess } = window._notificationCallback;
+
+    // 발송 확인
+    const typeText = notificationType === 'kakao' ? '카카오톡' : 'SMS';
+    if (!confirm(`${students.length}명의 학생에게 ${typeText}으로 알림을 발송하시겠습니까?`)) {
+        return;
+    }
+
+    // 기관계로 전달할 데이터 구성
+    const notificationData = {
+        type: notificationType,
+        message: message,
+        recipients: students.map(s => ({
+            studentId: s.id,
+            studentNumber: s.studentNumber,
+            studentName: s.name
+        })),
+        timestamp: new Date().toISOString(),
+        sender: 'P001' // 실제로는 현재 로그인한 교수 ID
+    };
+
+    // 실제 구현 시에는 기관계 API로 전송
+    // fetch('/api/notifications/send', {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify(notificationData)
+    // })
+
+    console.log('기관계로 전송할 알림 데이터:', notificationData);
+
+    alert(`${students.length}명의 학생에게 ${typeText} 알림을 발송했습니다.`);
+
+    closeNotificationModal();
+
+    // 성공 콜백 실행
+    if (onSuccess) {
+        onSuccess();
+    }
+}
+
+// Export
+window.toggleAllFeedbacks = toggleAllFeedbacks;
+window.sendNotificationToSelected = sendNotificationToSelected;
+window.openNotificationModal = openNotificationModal;
+window.closeNotificationModal = closeNotificationModal;
+window.submitNotification = submitNotification;
