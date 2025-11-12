@@ -45,12 +45,17 @@ function renderReviewList() {
         return;
     }
     
-    // ID 49-50: 테이블 컬럼 변경
+    // ID 49-50: 테이블 컬럼 변경 + 체크박스 추가
     const html = `
         <div class="overflow-x-auto">
             <table class="min-w-full">
                 <thead class="bg-gray-50">
                     <tr>
+                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                            <input type="checkbox" id="select-all-reviews"
+                                   onchange="toggleSelectAllReviews(this.checked)"
+                                   class="rounded border-gray-300">
+                        </th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
                         <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
@@ -67,6 +72,12 @@ function renderReviewList() {
                 <tbody class="divide-y divide-gray-200">
                     ${filteredAssignments.map((assignment, index) => `
                         <tr class="hover:bg-gray-50">
+                            <td class="py-3 px-4 text-center">
+                                <input type="checkbox" class="review-checkbox rounded border-gray-300"
+                                       value="${assignment.id}"
+                                       data-name="${assignment.studentName}"
+                                       data-student-id="${assignment.studentNumber}">
+                            </td>
                             <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
                             <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
                             <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
@@ -88,11 +99,11 @@ function renderReviewList() {
                             <td class="py-3 px-4 text-center">
                                 <div class="flex gap-2 justify-center">
                                     <button onclick="openReviewDetail('${assignment.id}', 'member')"
-                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded ${assignment.myRole === 'member' ? 'font-bold bg-blue-50' : ''}">
+                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50 ${assignment.myRole === 'member' ? 'font-bold bg-blue-50' : ''}">
                                         위원
                                     </button>
                                     <button onclick="openReviewDetail('${assignment.id}', 'chair')"
-                                            class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded ${assignment.myRole === 'chair' ? 'font-bold bg-green-50' : ''}">
+                                            class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50 ${assignment.myRole === 'chair' ? 'font-bold bg-green-50' : ''}">
                                         위원장
                                     </button>
                                 </div>
@@ -306,3 +317,91 @@ function getProgressBadgeClass(progress) {
 
 window.getProgressColorClass = getProgressColorClass;
 window.getProgressBadgeClass = getProgressBadgeClass;
+
+// ==================== 체크박스 관련 기능 ====================
+function toggleSelectAllReviews(checked) {
+    const checkboxes = document.querySelectorAll('.review-checkbox');
+    checkboxes.forEach(cb => cb.checked = checked);
+}
+
+function sendNotificationToSelectedReviews() {
+    const checkboxes = document.querySelectorAll('.review-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        showToast('학생을 선택해주세요', 'warning');
+        return;
+    }
+
+    const selectedStudents = Array.from(checkboxes).map(cb => ({
+        id: cb.dataset.studentId,
+        name: cb.dataset.name
+    }));
+
+    const modalContent = `
+        <div class="space-y-4">
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-sm font-medium text-gray-700 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
+                <div class="flex flex-wrap gap-2">
+                    ${selectedStudents.map(s => `
+                        <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                            ${s.name}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">알림 제목 *</label>
+                <input type="text" id="review-notif-title" placeholder="예: 논문 심사 결과 확인 요청"
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">알림 내용 *</label>
+                <textarea id="review-notif-message" rows="4" placeholder="학생들에게 전달할 메시지를 입력하세요"
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+            </div>
+        </div>
+    `;
+
+    createModal('알림 발송', modalContent, [
+        {
+            text: '취소',
+            className: 'btn-secondary',
+            onclick: 'return;'
+        },
+        {
+            text: '발송',
+            className: 'btn-primary',
+            onclick: 'confirmSendReviewNotification(' + JSON.stringify(selectedStudents) + ')'
+        }
+    ]);
+}
+
+function confirmSendReviewNotification(students) {
+    const title = document.getElementById('review-notif-title')?.value.trim();
+    const message = document.getElementById('review-notif-message')?.value.trim();
+
+    if (!title) {
+        showToast('알림 제목을 입력해주세요', 'warning');
+        return;
+    }
+
+    if (!message) {
+        showToast('알림 내용을 입력해주세요', 'warning');
+        return;
+    }
+
+    console.log('심사 알림 발송:', { students, title, message });
+    showToast(`${students.length}명의 학생에게 알림이 발송되었습니다`, 'success');
+
+    // 체크박스 초기화
+    const checkboxes = document.querySelectorAll('.review-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+    const selectAll = document.getElementById('select-all-reviews');
+    if (selectAll) selectAll.checked = false;
+}
+
+window.toggleSelectAllReviews = toggleSelectAllReviews;
+window.sendNotificationToSelectedReviews = sendNotificationToSelectedReviews;
+window.confirmSendReviewNotification = confirmSendReviewNotification;
