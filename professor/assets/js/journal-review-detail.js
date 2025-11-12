@@ -325,6 +325,14 @@ function viewJournalReviewDetail(journalId, viewType) {
                 }
             ]
         );
+
+        // 모달 크기를 large로 변경
+        setTimeout(() => {
+            const modal = document.querySelector('.modal-backdrop .modal');
+            if (modal) {
+                modal.classList.add('modal-large');
+            }
+        }, 0);
     } else {
         console.error('createModal function not found');
         alert('모달을 열 수 없습니다. 페이지를 새로고침해주세요.');

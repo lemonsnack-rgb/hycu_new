@@ -700,4 +700,21 @@ function formatFileSize(bytes) {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
+// 전역으로 export
+window.initBoard = initBoard;
+window.renderBoardList = renderBoardList;
+window.openBoardWriteModal = openBoardWriteModal;
+window.openBoardEditModal = openBoardEditModal;
+window.viewBoardPost = viewBoardPost;
+window.submitBoardPost = submitBoardPost;
+window.updateBoardPost = updateBoardPost;
+window.deleteBoardPost = deleteBoardPost;
+window.closeBoardModal = closeBoardModal;
+window.formatText = formatText;
+window.toggleStudentSelection = toggleStudentSelection;
+window.addBoardComment = addBoardComment;
+window.updateBoardComment = updateBoardComment;
+window.deleteBoardComment = deleteBoardComment;
+window.removeExistingFile = removeExistingFile;
+
 console.log('✅ 자료실 게시판 모듈 로드 완료 (Enhanced Version)');
