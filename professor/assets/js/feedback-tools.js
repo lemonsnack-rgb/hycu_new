@@ -2069,31 +2069,76 @@ function addMainComment(commentId) {
 
 // ==================== 피드백 완료 (신규) ====================
 function completeFeedback() {
+    // 빈 첨삭 검사
+    const emptyComments = [];
+    let globalCommentIndex = 1;
+
+    // 모든 페이지의 첨삭 검사
+    for (const pageNum in annotations) {
+        const pageAnnotations = annotations[pageNum];
+        if (!pageAnnotations) continue;
+
+        // 각 annotation 검사
+        pageAnnotations.forEach(annot => {
+            // customType이 'comment'인 첨삭 영역만 검사
+            if (annot.customType === 'comment') {
+                // comments 배열이 없거나 비어있으면 빈 첨삭
+                if (!annot.comments || annot.comments.length === 0) {
+                    emptyComments.push(`페이지 ${pageNum} - 첨삭 #${globalCommentIndex}`);
+                } else {
+                    // comments[0].text가 비어있으면 빈 첨삭
+                    const mainText = annot.comments[0]?.text || '';
+                    if (!mainText.trim()) {
+                        emptyComments.push(`페이지 ${pageNum} - 첨삭 #${globalCommentIndex}`);
+                    }
+                }
+                globalCommentIndex++;
+            }
+        });
+    }
+
+    // 빈 첨삭이 있으면 경고
+    if (emptyComments.length > 0) {
+        alert(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n\n${emptyComments.join('\n')}`);
+        return;
+    }
+
     if (!confirm('전체 피드백을 완료하시겠습니까?\n학생에게 알림이 발송됩니다.')) {
         return;
     }
-    
+
     // ✅ 수정: 제출물 상태를 '피드백 완료'로 변경
     const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
-    const request = FeedbackDataService.getFeedbackRequestById(feedbackId);
-    if (request) {
-        request.status = '피드백 완료';
-        request.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
-        request.lastModifiedBy = CURRENT_USER.id;
+
+    // FeedbackDataService의 completeFeedbackRequest 사용
+    const success = FeedbackDataService.completeFeedbackRequest(feedbackId);
+
+    if (!success) {
+        const request = FeedbackDataService.getFeedbackRequestById(feedbackId);
+        if (request) {
+            request.status = '피드백 완료';
+            request.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            request.lastModifiedBy = CURRENT_USER.id;
+        }
     }
-    
+
     // FEEDBACK_DATA도 업데이트
     const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
     if (feedbackData) {
         feedbackData.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
         feedbackData.lastModifiedBy = CURRENT_USER.id;
     }
-    
+
     showToast('피드백이 완료되었습니다. 학생에게 알림이 발송됩니다.', 'success');
-    
+
     // 모달 닫기
     setTimeout(() => {
         closeFeedbackModal();
+
+        // 목록 새로고침
+        if (window.renderFeedbackList) {
+            window.renderFeedbackList();
+        }
     }, 1500);
 }
 
