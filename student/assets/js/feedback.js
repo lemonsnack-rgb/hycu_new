@@ -209,11 +209,20 @@ function closeFeedbackRequestModal() {
 }
 
 // PDF 뷰어 모달 열기 (교수용과 동일한 레이아웃)
-function openFeedbackViewer() {
+function openFeedbackViewer(feedbackId) {
+    // 새로운 학생용 피드백 뷰어 UI 사용 (교수용과 동일 구조)
+    const modalHTML = renderStudentFeedbackViewerUI(feedbackId || 'current');
+
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = modalHTML;
+    const modal = tempDiv.firstElementChild;
+
+    // 기존 코드는 주석 처리
+    /*
     const modal = document.createElement('div');
     modal.id = 'feedback-modal';
     modal.style.cssText = 'position: fixed; inset: 0; z-index: 9999; background: rgba(0, 0, 0, 0.8);';
-    
+
     modal.innerHTML = `
         <div style="background: white; width: 1400px; height: 95vh; max-width: 95vw; margin: 2.5vh auto; border-radius: 0.5rem; display: flex; flex-direction: column; overflow: hidden;">
             
@@ -396,9 +405,11 @@ function openFeedbackViewer() {
             </div>
         </div>
     `;
-    
+    */
+    // 주석 처리된 기존 코드 끝
+
     document.body.appendChild(modal);
-    
+
     // ESC 키로 닫기
     document.addEventListener('keydown', function closeOnEsc(e) {
         if (e.key === 'Escape') {
@@ -406,7 +417,7 @@ function openFeedbackViewer() {
             document.removeEventListener('keydown', closeOnEsc);
         }
     });
-    
+
     // PDF 로드
     setTimeout(() => loadPDF(), 100);
 }
