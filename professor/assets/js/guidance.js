@@ -88,8 +88,8 @@ function showStudentList() {
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">과정</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">내 지도횟수</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">전체 지도횟수</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">전체 지도 계획 수</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">지도 횟수</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">최근지도일</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                         </tr>
@@ -123,10 +123,10 @@ function showStudentList() {
                                             `).join('')}
                                         </div>
                                     </td>
+                                    <td class="py-3 px-4 text-center text-gray-600">${student.totalGuidanceCount}회</td>
                                     <td class="py-3 px-4 text-center">
                                         <span class="font-semibold text-blue-600">${myStats.count}회</span>
                                     </td>
-                                    <td class="py-3 px-4 text-center text-gray-600">${student.totalGuidanceCount}회</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${myStats.lastDate || '-'}</td>
                                     <td class="py-3 px-4 text-center">
                                         <button onclick="showStudentDetail('${student.studentId}')"
@@ -209,8 +209,8 @@ function renderStudentDetail() {
                 <div class="info-row">
                     <div class="info-label">지도 현황</div>
                     <div class="info-value">
-                        <span class="font-semibold text-blue-600">내 지도: ${myStats.count}회</span>
-                        <span class="text-gray-600 ml-3">전체: ${student.totalGuidanceCount}회</span>
+                        <span class="text-gray-600">전체 계획: ${student.totalGuidanceCount}회</span>
+                        <span class="font-semibold text-blue-600 ml-3">지도 횟수: ${myStats.count}회</span>
                     </div>
                 </div>
                 <div class="info-row">
