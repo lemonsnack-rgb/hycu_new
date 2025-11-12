@@ -104,23 +104,29 @@ const appData = {
         { id: 5, name: '최종논문 제출', presentation: true, document: true }
     ],
     evaluationCriteria: [
-        { 
-            id: 1, 
-            name: '석사 논문 평가 기준', 
-            type: '석사', 
+        {
+            id: 1,
+            name: '석사 논문 평가 기준',
+            type: '석사',
             evaluationType: 'score',
             items: [
                 { name: '연구 주제의 적절성', score: 25 },
                 { name: '연구 방법론', score: 25 },
                 { name: '결과 분석', score: 25 },
                 { name: '논문 작성 완성도', score: 25 }
-            ], 
-            totalScore: 100 
+            ],
+            totalScore: 100,
+            passCriteria: {
+                type: 'average',  // 'average' 또는 'total'
+                passScore: 70,    // 통과 점수
+                hasFailThreshold: true,  // 과락 기준 있음
+                failThreshold: 60  // 과락 기준 점수 (항목별)
+            }
         },
-        { 
-            id: 2, 
-            name: '박사 논문 평가 기준', 
-            type: '박사', 
+        {
+            id: 2,
+            name: '박사 논문 평가 기준',
+            type: '박사',
             evaluationType: 'score',
             items: [
                 { name: '연구의 독창성', score: 25 },
@@ -128,8 +134,14 @@ const appData = {
                 { name: '학문적 기여도', score: 25 },
                 { name: '논문 작성 완성도', score: 20 },
                 { name: '발표 능력', score: 10 }
-            ], 
-            totalScore: 100 
+            ],
+            totalScore: 100,
+            passCriteria: {
+                type: 'total',    // 총점 기준
+                passScore: 75,    // 통과 점수
+                hasFailThreshold: false,  // 과락 기준 없음
+                failThreshold: null
+            }
         },
         {
             id: 3,
@@ -137,7 +149,8 @@ const appData = {
             type: '박사',
             evaluationType: 'passfail',
             items: ['연구 윤리 준수', '개인정보 보호 계획', '연구 참여자 동의서', '위험성 평가'],
-            totalScore: null
+            totalScore: null,
+            passCriteria: null  // pass/fail 방식은 통과기준 없음
         }
     ],
     

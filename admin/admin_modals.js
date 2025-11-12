@@ -3648,6 +3648,151 @@ function viewResearchProposalDetail(id) {
     openModal('연구계획서 상세', content, '닫기', closeModal, true);
 }
 
+// ==================== 평가기준 통과기준 관리 ====================
+
+function editPassCriteria(criteriaId) {
+    const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
+    if (!criteria) return;
+
+    if (criteria.evaluationType === 'passfail') {
+        alert('합격/불합격 방식은 통과기준을 설정할 수 없습니다.');
+        return;
+    }
+
+    const currentCriteria = criteria.passCriteria || {
+        type: 'average',
+        passScore: 70,
+        hasFailThreshold: false,
+        failThreshold: 60
+    };
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 평가표 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold mb-2">평가표: ${criteria.name}</h4>
+                <p class="text-sm text-gray-600">총 ${criteria.items.length}개 항목, ${criteria.totalScore}점 만점</p>
+            </div>
+
+            <!-- 통과기준 유형 -->
+            <div class="bg-blue-50 rounded-lg p-4">
+                <h4 class="font-bold mb-3">통과기준 유형</h4>
+                <div class="space-y-2">
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="criteriaType" value="average"
+                               ${currentCriteria.type === 'average' ? 'checked' : ''}
+                               class="mr-2">
+                        <div>
+                            <span class="font-medium">평균 점수 기준</span>
+                            <p class="text-xs text-gray-600">모든 평가 항목의 평균 점수가 기준을 충족해야 합니다</p>
+                        </div>
+                    </label>
+                    <label class="flex items-center cursor-pointer">
+                        <input type="radio" name="criteriaType" value="total"
+                               ${currentCriteria.type === 'total' ? 'checked' : ''}
+                               class="mr-2">
+                        <div>
+                            <span class="font-medium">총점 기준</span>
+                            <p class="text-xs text-gray-600">모든 평가 항목의 합계 점수가 기준을 충족해야 합니다</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 통과 점수 -->
+            <div>
+                <label class="block text-sm font-medium mb-2">통과 점수 *</label>
+                <input type="number" id="passScore" min="0" max="${criteria.totalScore}"
+                       value="${currentCriteria.passScore}"
+                       class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                       placeholder="통과 기준 점수">
+                <p class="text-xs text-gray-500 mt-1">
+                    평균 기준: 각 항목 평균이 이 점수 이상이어야 합니다<br>
+                    총점 기준: 전체 합계가 이 점수 이상이어야 합니다
+                </p>
+            </div>
+
+            <!-- 과락 기준 -->
+            <div>
+                <label class="flex items-center cursor-pointer mb-3">
+                    <input type="checkbox" id="hasFailThreshold"
+                           ${currentCriteria.hasFailThreshold ? 'checked' : ''}
+                           onchange="toggleFailThreshold(this.checked)"
+                           class="mr-2">
+                    <span class="font-medium">과락 기준 사용</span>
+                </label>
+
+                <div id="failThresholdSection" style="display: ${currentCriteria.hasFailThreshold ? 'block' : 'none'}">
+                    <label class="block text-sm font-medium mb-2">과락 기준 점수</label>
+                    <input type="number" id="failThreshold" min="0" max="${criteria.totalScore}"
+                           value="${currentCriteria.failThreshold || 60}"
+                           class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           placeholder="과락 기준 점수">
+                    <p class="text-xs text-red-600 mt-1">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        개별 항목이 이 점수 미만이면 전체 평균/총점과 관계없이 불합격 처리됩니다
+                    </p>
+                </div>
+            </div>
+
+            <!-- 예시 -->
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h5 class="font-bold text-yellow-900 mb-2">설정 예시</h5>
+                <div class="text-sm text-yellow-900 space-y-1">
+                    <p>• 평균 70점, 과락 60점: 모든 항목 평균 70점 이상, 각 항목 60점 이상</p>
+                    <p>• 총점 75점, 과락 없음: 전체 합계 75점 이상이면 합격</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('통과기준 설정 - ' + criteria.name, content, '저장', () => savePassCriteria(criteriaId), true);
+}
+
+function toggleFailThreshold(checked) {
+    const section = document.getElementById('failThresholdSection');
+    if (section) {
+        section.style.display = checked ? 'block' : 'none';
+    }
+}
+
+function savePassCriteria(criteriaId) {
+    const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
+    if (!criteria) return;
+
+    const type = document.querySelector('input[name="criteriaType"]:checked').value;
+    const passScore = parseInt(document.getElementById('passScore').value);
+    const hasFailThreshold = document.getElementById('hasFailThreshold').checked;
+    const failThreshold = hasFailThreshold ? parseInt(document.getElementById('failThreshold').value) : null;
+
+    if (!passScore || passScore <= 0) {
+        alert('통과 점수를 입력해주세요.');
+        return;
+    }
+
+    if (hasFailThreshold && (!failThreshold || failThreshold <= 0)) {
+        alert('과락 기준 점수를 입력해주세요.');
+        return;
+    }
+
+    if (hasFailThreshold && failThreshold >= passScore) {
+        alert('과락 기준은 통과 점수보다 낮아야 합니다.');
+        return;
+    }
+
+    // 데이터 저장
+    criteria.passCriteria = {
+        type: type,
+        passScore: passScore,
+        hasFailThreshold: hasFailThreshold,
+        failThreshold: failThreshold
+    };
+
+    alert('통과기준이 저장되었습니다.');
+    closeModal();
+    loadView('evaluationCriteria');
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
@@ -3667,3 +3812,6 @@ window.searchStudentForRP = searchStudentForRP;
 window.selectStudentForRP = selectStudentForRP;
 window.submitResearchProposal = submitResearchProposal;
 window.viewResearchProposalDetail = viewResearchProposalDetail;
+window.editPassCriteria = editPassCriteria;
+window.toggleFailThreshold = toggleFailThreshold;
+window.savePassCriteria = savePassCriteria;
