@@ -712,9 +712,8 @@ window.deleteBoardPost = deleteBoardPost;
 window.closeBoardModal = closeBoardModal;
 window.formatText = formatText;
 window.toggleStudentSelection = toggleStudentSelection;
-window.addBoardComment = addBoardComment;
-window.updateBoardComment = updateBoardComment;
-window.deleteBoardComment = deleteBoardComment;
+window.addComment = addComment;
+window.deleteComment = deleteComment;
 window.removeExistingFile = removeExistingFile;
 
 console.log('✅ 자료실 게시판 모듈 로드 완료 (Enhanced Version)');
