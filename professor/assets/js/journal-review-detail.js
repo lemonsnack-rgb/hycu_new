@@ -3,6 +3,29 @@
  * 관리자 화면(admin_thesis_review.js) 참고하여 구현
  */
 
+console.log('🔄 journal-review-detail.js 로드 시작...');
+
+// 평가 항목별 설명
+function getItemDescription(itemName) {
+    const descriptions = {
+        '연구 주제의 독창성': '연구 주제의 새로움과 독창성 평가',
+        '연구 방법의 적절성': '연구 방법론의 적절성과 타당성',
+        '연구 결과의 타당성': '연구 결과의 신뢰성과 타당성',
+        '논문 구성의 체계성': '논문의 논리적 구성과 체계성',
+        '학문적 기여도': '해당 분야에 대한 학문적 기여'
+    };
+    return descriptions[itemName] || '';
+}
+
+// 평균 점수 계산
+function calculateAverageScore(reviewers) {
+    const validScores = reviewers.filter(r => r.score !== null && r.score !== undefined);
+    if (validScores.length === 0) return 0;
+
+    const sum = validScores.reduce((acc, r) => acc + r.score, 0);
+    return (sum / validScores.length).toFixed(1);
+}
+
 /**
  * 학술지 심사 상세 화면
  * @param {number} journalId - 학술지 ID
@@ -308,18 +331,6 @@ function viewJournalReviewDetail(journalId, viewType) {
     }
 }
 
-// 평가 항목별 설명
-function getItemDescription(itemName) {
-    const descriptions = {
-        '연구 주제의 독창성': '연구 주제의 새로움과 독창성 평가',
-        '연구 방법의 적절성': '연구 방법론의 적절성과 타당성',
-        '연구 결과의 타당성': '연구 결과의 신뢰성과 타당성',
-        '논문 구성의 체계성': '논문의 논리적 구성과 체계성',
-        '학문적 기여도': '해당 분야에 대한 학문적 기여'
-    };
-    return descriptions[itemName] || '';
-}
-
 // 총점 자동 계산
 function updateJournalTotalScore() {
     let total = 0;
@@ -470,21 +481,19 @@ function submitJournalChairDecision(journalId) {
     }
 }
 
-// 평균 점수 계산
-function calculateAverageScore(reviewers) {
-    const validScores = reviewers.filter(r => r.score !== null && r.score !== undefined);
-    if (validScores.length === 0) return 0;
-
-    const sum = validScores.reduce((acc, r) => acc + r.score, 0);
-    return (sum / validScores.length).toFixed(1);
-}
-
 // 전역으로 노출
-window.viewJournalReviewDetail = viewJournalReviewDetail;
-window.updateJournalTotalScore = updateJournalTotalScore;
-window.submitJournalEvaluation = submitJournalEvaluation;
-window.saveJournalDraft = saveJournalDraft;
-window.selectJournalDecision = selectJournalDecision;
-window.submitJournalChairDecision = submitJournalChairDecision;
+try {
+    window.viewJournalReviewDetail = viewJournalReviewDetail;
+    window.updateJournalTotalScore = updateJournalTotalScore;
+    window.submitJournalEvaluation = submitJournalEvaluation;
+    window.saveJournalDraft = saveJournalDraft;
+    window.selectJournalDecision = selectJournalDecision;
+    window.submitJournalChairDecision = submitJournalChairDecision;
 
-console.log('✅ 학술지 상세보기 (위원/위원장 분리) 로드 완료');
+    console.log('✅ 학술지 상세보기 (위원/위원장 분리) 로드 완료');
+    console.log('   - viewJournalReviewDetail:', typeof window.viewJournalReviewDetail);
+    console.log('   - updateJournalTotalScore:', typeof window.updateJournalTotalScore);
+    console.log('   - submitJournalEvaluation:', typeof window.submitJournalEvaluation);
+} catch (error) {
+    console.error('❌ journal-review-detail.js 로드 중 에러:', error);
+}
