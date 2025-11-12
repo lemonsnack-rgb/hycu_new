@@ -1274,7 +1274,20 @@ function openStageModal(id = null) {
 
 
 function editStage(id) {
-    openStageModal(id);
+    const workflow = appData.stages.find(s => s.id === id);
+    if (!workflow) {
+        showAlert('워크플로우를 찾을 수 없습니다.');
+        return;
+    }
+
+    const studentCount = workflow.studentCount || 0;
+    if (studentCount > 0) {
+        showAlert(`이 워크플로우는 ${studentCount}명의 학생에게 적용되어 있어 수정할 수 없습니다.`);
+        return;
+    }
+
+    // 단계 조립 화면으로 이동
+    editWorkflowStages(id);
 }
 
 function deleteStage(id) {
@@ -1359,7 +1372,14 @@ function viewStageDetail(id) {
                     </div>
                 </div>
                 <div class="space-y-2">
-                    ${workflow.steps.map((step, idx) => `
+                    ${workflow.steps.length === 0 ? `
+                        <div class="text-center py-8 text-gray-500">
+                            <p class="text-sm">등록된 단계가 없습니다.</p>
+                            ${canEdit ? `
+                                <p class="text-xs mt-2">상단의 "단계 조립" 또는 "단계 추가" 버튼을 눌러 단계를 구성하세요.</p>
+                            ` : ''}
+                        </div>
+                    ` : workflow.steps.map((step, idx) => `
                         <div class="bg-white border ${step.hasEvaluation ? 'border-green-300' : 'border-gray-200'} rounded-lg p-4">
                             <div class="flex justify-between items-start">
                                 <div class="flex items-center gap-3 flex-1">
@@ -1367,7 +1387,7 @@ function viewStageDetail(id) {
                                     <div class="flex-1">
                                         <div class="flex items-center gap-2">
                                             <p class="text-sm font-bold text-gray-800">${step.name}</p>
-                                            ${step.hasEvaluation ? 
+                                            ${step.hasEvaluation ?
                                                 '<span class="px-2 py-0.5 rounded text-xs bg-green-100 text-green-700">평가함</span>' :
                                                 '<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">평가안함</span>'
                                             }
@@ -1380,28 +1400,30 @@ function viewStageDetail(id) {
                                         ` : ''}
                                     </div>
                                 </div>
-                                <div class="flex gap-2">
-                                    <button onclick="editWorkflowStep(${id}, ${step.id})" 
-                                            class="text-xs text-blue-600 hover:underline">
-                                        수정
-                                    </button>
-                                    <button onclick="deleteWorkflowStep(${id}, ${step.id})" 
-                                            class="text-xs text-red-600 hover:underline">
-                                        삭제
-                                    </button>
-                                    ${idx > 0 ? `
-                                        <button onclick="moveStepUp(${id}, ${step.id})" 
-                                                class="text-xs text-gray-600 hover:underline">
-                                            ↑
+                                ${canEdit ? `
+                                    <div class="flex gap-2">
+                                        <button onclick="editWorkflowStep(${id}, ${step.id})"
+                                                class="text-xs text-blue-600 hover:underline">
+                                            수정
                                         </button>
-                                    ` : ''}
-                                    ${idx < workflow.steps.length - 1 ? `
-                                        <button onclick="moveStepDown(${id}, ${step.id})" 
-                                                class="text-xs text-gray-600 hover:underline">
-                                            ↓
+                                        <button onclick="deleteWorkflowStep(${id}, ${step.id})"
+                                                class="text-xs text-red-600 hover:underline">
+                                            삭제
                                         </button>
-                                    ` : ''}
-                                </div>
+                                        ${idx > 0 ? `
+                                            <button onclick="moveStepUp(${id}, ${step.id})"
+                                                    class="text-xs text-gray-600 hover:underline">
+                                                ↑
+                                            </button>
+                                        ` : ''}
+                                        ${idx < workflow.steps.length - 1 ? `
+                                            <button onclick="moveStepDown(${id}, ${step.id})"
+                                                    class="text-xs text-gray-600 hover:underline">
+                                                ↓
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                ` : ''}
                             </div>
                         </div>
                     `).join('')}

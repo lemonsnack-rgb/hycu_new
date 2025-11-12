@@ -96,6 +96,34 @@ const appData = {
                     evaluationCriteriaName: '최종논문 평가표 (상세형)'
                 }
             ]
+        },
+        {
+            id: 3,
+            name: '2024-2학기 심리학 석사 계획',
+            major: '심리학',
+            degree: '석사',
+            version: 'v1.0',
+            stageCount: 2,
+            evaluationCount: 2,
+            studentCount: 3,
+            steps: [
+                {
+                    id: 1,
+                    name: '연구계획서',
+                    order: 1,
+                    hasEvaluation: true,
+                    evaluationCriteriaId: 1,
+                    evaluationCriteriaName: '석사 논문 평가 기준'
+                },
+                {
+                    id: 2,
+                    name: '최종논문',
+                    order: 2,
+                    hasEvaluation: true,
+                    evaluationCriteriaId: 1,
+                    evaluationCriteriaName: '석사 논문 평가 기준'
+                }
+            ]
         }
     ],
     types: [
