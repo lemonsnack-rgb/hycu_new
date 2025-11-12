@@ -3079,109 +3079,169 @@ function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
 // ========== 주차별 지도 관리 ==========
 
 /**
- * 주차별 지도 상세 보기
+ * 주차별 지도 상세 보기 (교수용 화면과 동일한 스타일)
  */
 function viewWeeklyGuidanceDetail(pairId) {
     const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === pairId);
-    const plans = appData.weeklyGuidance.weeklyPlans[pairId];
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
 
-    if (!pair || !plans) {
+    if (!pair || !plansData) {
         alert('데이터를 찾을 수 없습니다.');
         return;
     }
 
+    const sortedPlans = plansData.weeks.sort((a, b) => a.week - b.week);
+
     const content = `
         <div class="space-y-6">
-            <!-- 지도 관계 정보 -->
-            <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-5 border-2 border-blue-300">
-                <h4 class="font-bold text-blue-900 mb-3">지도 관계 정보</h4>
+            <!-- 학생 정보 카드 (교수용 스타일) -->
+            <div class="bg-gray-50 rounded-lg p-6">
+                <h4 class="font-bold text-gray-800 mb-4">학생 정보</h4>
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-white rounded-lg p-3">
-                        <p class="text-xs text-gray-600">지도교수</p>
-                        <p class="font-bold">${pair.professor.name}</p>
-                        <p class="text-xs text-gray-500">${pair.professor.department}</p>
+                    <div class="info-row">
+                        <div class="text-xs font-semibold text-gray-500">학생명</div>
+                        <div class="text-sm text-gray-800 mt-1">${pair.student.name} (${pair.student.studentId})</div>
                     </div>
-                    <div class="bg-white rounded-lg p-3">
-                        <p class="text-xs text-gray-600">지도학생</p>
-                        <p class="font-bold">${pair.student.name} (${pair.student.studentId})</p>
-                        <p class="text-xs text-gray-500">${pair.student.major} ${pair.student.degree}</p>
+                    <div class="info-row">
+                        <div class="text-xs font-semibold text-gray-500">전공 / 학위</div>
+                        <div class="text-sm text-gray-800 mt-1">${pair.student.major} / ${getAdminDegreeText(pair.student.degree)}</div>
                     </div>
-                </div>
-                <div class="mt-3 bg-white rounded-lg p-3">
-                    <div class="flex items-center justify-between">
-                        <p class="text-xs text-gray-600">학기: ${pair.semester}</p>
-                        <p class="text-xs text-gray-600">진행률: ${pair.completedWeeks}/${pair.totalWeeks}주차</p>
+                    <div class="info-row">
+                        <div class="text-xs font-semibold text-gray-500">지도교수</div>
+                        <div class="text-sm text-gray-800 mt-1">${pair.professor.name} (${pair.professor.department})</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="text-xs font-semibold text-gray-500">학기</div>
+                        <div class="text-sm text-gray-800 mt-1">${pair.semester}</div>
+                    </div>
+                    <div class="info-row">
+                        <div class="text-xs font-semibold text-gray-500">지도 현황</div>
+                        <div class="text-sm text-gray-800 mt-1">
+                            <span class="font-semibold text-blue-600">완료: ${pair.completedWeeks}주차</span>
+                            <span class="text-gray-600 ml-3">전체: ${pair.totalWeeks}주차</span>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <div class="text-xs font-semibold text-gray-500">최근 업데이트</div>
+                        <div class="text-sm text-gray-800 mt-1">${pair.lastUpdateDate || '-'}</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 주차별 계획 (아코디언) -->
-            <div class="space-y-3">
-                <h4 class="font-bold text-lg">주차별 지도 내역</h4>
+            <!-- 주차별 지도 내역 (교수용 카드 스타일) -->
+            <div>
+                <div class="flex justify-between items-center mb-4">
+                    <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
+                </div>
 
-                ${plans.weeks.map(weekPlan => `
-                    <div class="border-2 rounded-lg overflow-hidden">
-                        <!-- 아코디언 헤더 -->
-                        <button onclick="toggleWeekAccordion('week-${pairId}-${weekPlan.week}')"
-                                class="w-full px-5 py-4 bg-gray-50 hover:bg-gray-100 flex justify-between items-center">
-                            <span class="font-bold">${weekPlan.week}주차: ${weekPlan.professorPlan.goal}</span>
-                            <svg class="w-5 h-5 transition-transform" id="week-${pairId}-${weekPlan.week}-icon"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M19 9l-7 7-7-7"></path>
-                            </svg>
-                        </button>
-
-                        <!-- 아코디언 내용 -->
-                        <div id="week-${pairId}-${weekPlan.week}-content" class="hidden p-5 space-y-4">
-                            <!-- 교수 계획 -->
-                            <div class="bg-blue-50 rounded-lg p-4">
-                                <h5 class="font-bold text-blue-900 mb-3">교수 계획</h5>
-                                <div class="text-sm space-y-2">
-                                    <div><span class="text-gray-600 font-medium">목표:</span> ${weekPlan.professorPlan.goal}</div>
-                                    <div><span class="text-gray-600 font-medium">내용:</span> ${weekPlan.professorPlan.content}</div>
-                                    ${weekPlan.professorPlan.materials && weekPlan.professorPlan.materials.length > 0 ? `
-                                        <div>
-                                            <span class="text-gray-600 font-medium">자료:</span>
-                                            ${weekPlan.professorPlan.materials.join(', ')}
-                                        </div>
-                                    ` : ''}
-                                    <div class="text-xs text-gray-500">등록일: ${weekPlan.professorPlan.createdAt}</div>
-                                </div>
-                            </div>
-
-                            <!-- 학생 실적 -->
-                            ${weekPlan.studentReport ? `
-                                <div class="bg-green-50 rounded-lg p-4">
-                                    <h5 class="font-bold text-green-900 mb-3">학생 실적</h5>
-                                    <div class="text-sm space-y-2">
-                                        <div><span class="text-gray-600 font-medium">달성:</span> ${weekPlan.studentReport.achievement}</div>
-                                        <div><span class="text-gray-600 font-medium">다음 계획:</span> ${weekPlan.studentReport.nextPlan}</div>
-                                        <div><span class="text-gray-600 font-medium">어려움:</span> ${weekPlan.studentReport.difficulties}</div>
-                                        <div class="text-xs text-gray-500">제출일: ${weekPlan.studentReport.submittedAt}</div>
+                ${sortedPlans.length > 0 ? `
+                    <div class="space-y-4">
+                        ${sortedPlans.map(weekPlan => `
+                            <div class="border border-gray-200 bg-white rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <!-- 헤더 -->
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+                                            ${weekPlan.week}주차
+                                        </span>
+                                        ${weekPlan.professorPlan.createdAt ? `
+                                            <span class="ml-2 text-sm text-gray-600">${formatAdminDate(weekPlan.professorPlan.createdAt)}</span>
+                                        ` : ''}
+                                        ${weekPlan.studentReport && weekPlan.studentReport.submittedAt ? `
+                                            <span class="ml-2 text-sm text-green-600 font-medium">
+                                                → ${formatAdminDate(weekPlan.studentReport.submittedAt)} 제출
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    <div class="flex gap-2">
+                                        ${weekPlan.studentReport ? `
+                                            <span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">완료</span>
+                                        ` : `
+                                            <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">진행중</span>
+                                        `}
                                     </div>
                                 </div>
-                            ` : '<div class="text-center py-4 text-red-700 bg-red-50 rounded-lg">학생 실적 미제출</div>'}
 
-                            <!-- 관리자 메모 -->
-                            <div class="bg-yellow-50 rounded-lg p-4">
-                                <h5 class="font-bold text-yellow-900 mb-2">관리자 메모</h5>
-                                <textarea id="adminNote-${pairId}-${weekPlan.week}" rows="2"
-                                          class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-yellow-500"
-                                          placeholder="관리자 메모를 입력하세요...">${weekPlan.adminNote || ''}</textarea>
-                                <button onclick="saveWeekAdminNote(${pairId}, ${weekPlan.week})"
-                                        class="mt-2 bg-yellow-600 text-white px-3 py-1 rounded text-sm hover:bg-yellow-700">
-                                    저장
-                                </button>
+                                <!-- 본문 -->
+                                <div class="space-y-2">
+                                    <div>
+                                        <span class="text-xs font-semibold text-gray-500">담당교수:</span>
+                                        <span class="text-sm text-blue-600 font-semibold ml-2">${pair.professor.name}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-semibold text-gray-500">지도주제:</span>
+                                        <span class="text-sm text-gray-800 ml-2">${weekPlan.professorPlan.goal}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-semibold text-gray-500">계획내용:</span>
+                                        <p class="text-sm text-gray-700 mt-1">${weekPlan.professorPlan.content}</p>
+                                    </div>
+                                    ${weekPlan.professorPlan.materials && weekPlan.professorPlan.materials.length > 0 ? `
+                                        <div>
+                                            <span class="text-xs font-semibold text-gray-500">자료:</span>
+                                            <p class="text-sm text-gray-700 mt-1">${weekPlan.professorPlan.materials.join(', ')}</p>
+                                        </div>
+                                    ` : ''}
+
+                                    ${weekPlan.studentReport ? `
+                                        <div class="bg-green-50 border-l-4 border-green-400 p-3 mt-2">
+                                            <span class="text-xs font-semibold text-green-800">학생 실적:</span>
+                                            <div class="text-sm text-green-900 mt-1 space-y-1">
+                                                <p><strong>달성:</strong> ${weekPlan.studentReport.achievement}</p>
+                                                <p><strong>다음 계획:</strong> ${weekPlan.studentReport.nextPlan}</p>
+                                                ${weekPlan.studentReport.difficulties ? `
+                                                    <p><strong>어려움:</strong> ${weekPlan.studentReport.difficulties}</p>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                    ` : `
+                                        <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 mt-2">
+                                            <span class="text-xs font-semibold text-yellow-800">학생 실적 미제출</span>
+                                        </div>
+                                    `}
+
+                                    ${weekPlan.adminNote ? `
+                                        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-2">
+                                            <span class="text-xs font-semibold text-amber-800">관리자 메모:</span>
+                                            <p class="text-sm text-amber-900 mt-1">${weekPlan.adminNote}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
-                        </div>
+                        `).join('')}
                     </div>
-                `).join('')}
+                ` : `
+                    <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="mt-4 text-sm text-gray-600">등록된 지도 계획이 없습니다</p>
+                    </div>
+                `}
             </div>
         </div>
     `;
 
     openModal('주차별 지도 상세', content, '닫기', closeModal, true);
+}
+
+/**
+ * 관리자용 헬퍼 함수
+ */
+function getAdminDegreeText(degree) {
+    const degrees = {
+        '석사': '석사',
+        '박사': '박사',
+        'master': '석사',
+        'phd': '박사'
+    };
+    return degrees[degree] || degree;
+}
+
+function formatAdminDate(dateStr) {
+    if (!dateStr) return '-';
+    return dateStr;
 }
 
 /**
