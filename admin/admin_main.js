@@ -1722,7 +1722,7 @@ function viewStageDetail(stageId) {
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
                     <button onclick="editStage(${stageId})" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
                         <i class="fas fa-edit"></i> 수정
                     </button>
                     <button onclick="closeStageDetailModal()" 
@@ -1941,7 +1941,7 @@ function viewRequirementDetail(requirementId) {
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
                     <button onclick="editRequirement(${requirement.id}); closeRequirementDetailModal();" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
                         <i class="fas fa-edit"></i> 수정
                     </button>
                     <button onclick="closeRequirementDetailModal()" 
@@ -2143,7 +2143,7 @@ function showStatisticsChart(type) {
                                     <span class="text-sm font-semibold">45명 (30%)</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-4">
-                                    <div class="bg-blue-600 h-4 rounded-full" style="width: 30%"></div>
+                                    <div class="bg-[#6A0028] h-4 rounded-full" style="width: 30%"></div>
                                 </div>
                             </div>
                             <div>
@@ -2207,7 +2207,7 @@ function showStatisticsChart(type) {
                         <div class="flex items-end justify-between h-64 border-b border-l border-gray-300 p-4">
                             ${[120, 145, 130, 150, 165, 180].map((value, idx) => `
                                 <div class="flex flex-col items-center flex-1">
-                                    <div class="bg-blue-500 w-12 rounded-t transition-all hover:bg-blue-600" 
+                                    <div class="bg-blue-500 w-12 rounded-t transition-all hover:bg-[#6A0028]" 
                                          style="height: ${value/2}px"
                                          title="${value}건"></div>
                                     <div class="text-xs text-gray-600 mt-2">${idx+6}월</div>
@@ -2341,7 +2341,7 @@ function viewStudentDetail(studentId) {
                                     ${student.credits} / ${student.requiredCredits}
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                                    <div class="bg-blue-600 h-3 rounded-full" style="width: ${creditProgress}%"></div>
+                                    <div class="bg-[#6A0028] h-3 rounded-full" style="width: ${creditProgress}%"></div>
                                 </div>
                                 <div class="text-sm text-gray-600">${creditProgress}% 완료</div>
                             </div>
@@ -2413,7 +2413,7 @@ function viewStudentDetail(studentId) {
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
                     <button onclick="editStudent('${student.id}')" 
-                            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
                         <i class="fas fa-edit"></i> 수정
                     </button>
                     <button onclick="manageCredits('${student.id}')" 
@@ -2536,7 +2536,7 @@ function showStatisticsDashboard() {
                                                 <span class="text-gray-600 font-semibold">${item.count}명 (${percentage}%)</span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                                <div class="bg-blue-600 h-2 rounded-full" style="width: ${percentage}%"></div>
+                                                <div class="bg-[#6A0028] h-2 rounded-full" style="width: ${percentage}%"></div>
                                             </div>
                                         </div>
                                     `;

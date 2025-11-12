@@ -122,7 +122,7 @@ function createFeedbackModal(request, feedbackData) {
                 <div class="flex items-center gap-2">
                     <!-- 피드백 완료 버튼 추가 -->
                     <button onclick="completeFeedback()" 
-                            class="text-sm bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2 font-semibold transition-colors">
+                            class="text-sm bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#5A0020] flex items-center gap-2 font-semibold transition-colors">
                         <i class="fas fa-check-double"></i>
                         <span>피드백 완료</span>
                     </button>
@@ -273,7 +273,7 @@ function createFeedbackModal(request, feedbackData) {
                                           rows="3"
                                           placeholder="전체 평가를 입력하세요..."></textarea>
                                 <div class="flex gap-2 mt-2 flex-wrap">
-                                    <button onclick="addGeneralFeedback()" class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 flex items-center gap-1">
+                                    <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#5A0020] flex items-center gap-1">
                                         <i class="fas fa-paper-plane"></i>
                                         <span>등록</span>
                                     </button>
@@ -590,7 +590,7 @@ function renderGeneralThread(feedbackId){
         </div>
         <div class="flex gap-2 mt-2">
           <button onclick="saveGeneralMainEdit('${feedbackId}')" 
-                  class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 flex items-center gap-1">
+                  class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#5A0020] flex items-center gap-1">
             <i class="fas fa-save"></i>
             <span>저장</span>
           </button>
@@ -636,7 +636,7 @@ function renderGeneralThread(feedbackId){
                             rows="2">${reply.text}</textarea>
                   <div class="flex gap-2 mt-2">
                     <button onclick="saveGeneralReplyEdit('${feedbackId}', ${idx+1})" 
-                            class="text-xs bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700 flex items-center gap-1">
+                            class="text-xs bg-[#6A0028] text-white px-3 py-1 rounded-md hover:bg-[#5A0020] flex items-center gap-1">
                       <i class="fas fa-save"></i>
                       <span>저장</span>
                     </button>
@@ -661,7 +661,7 @@ function renderGeneralThread(feedbackId){
                   placeholder="댓글을 입력하세요..."></textarea>
         <div class="flex gap-2 mt-2">
           <button onclick="addGeneralReply('${feedbackId}')" 
-                  class="text-xs bg-blue-600 text-white px-3 py-1.5 rounded-md hover:bg-blue-700 flex items-center gap-1">
+                  class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#5A0020] flex items-center gap-1">
             <i class="fas fa-paper-plane"></i>
             <span>댓글 등록</span>
           </button>

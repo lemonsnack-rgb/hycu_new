@@ -484,7 +484,7 @@ window.viewBoardPost = function(postId) {
                                     <div id="comment-edit-${comment.id}" style="display: none;">
                                         <textarea id="comment-textarea-${comment.id}" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none" rows="2">${comment.text}</textarea>
                                         <div class="flex gap-2 mt-2">
-                                            <button onclick="saveBoardCommentEdit(${post.id}, '${comment.id}')" class="text-xs bg-blue-600 text-white px-3 py-1 rounded-md hover:bg-blue-700">저장</button>
+                                            <button onclick="saveBoardCommentEdit(${post.id}, '${comment.id}')" class="text-xs bg-[#6A0028] text-white px-3 py-1 rounded-md hover:bg-[#5A0020]">저장</button>
                                             <button onclick="cancelBoardCommentEdit('${comment.id}')" class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300">취소</button>
                                         </div>
                                     </div>
