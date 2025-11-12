@@ -129,7 +129,7 @@ function viewBoardPost(postId) {
     const canDelete = isAuthor;
 
     const modal = document.createElement('div');
-    modal.className = 'modal-backdrop';
+    modal.className = 'modal-backdrop active';
     modal.id = 'boardPostModal';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 56rem;">
@@ -261,7 +261,7 @@ function openBoardWriteModal() {
     console.log('학생 목록:', students);
 
     const modal = document.createElement('div');
-    modal.className = 'modal-backdrop';
+    modal.className = 'modal-backdrop active';
     modal.id = 'boardWriteModal';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 56rem;">
@@ -388,7 +388,7 @@ function openBoardEditModal(postId) {
     const students = DataService.getStudents();
 
     const modal = document.createElement('div');
-    modal.className = 'modal-backdrop';
+    modal.className = 'modal-backdrop active';
     modal.id = 'boardEditModal';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 56rem;">
