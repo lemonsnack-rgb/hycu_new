@@ -924,7 +924,10 @@ function viewResearchProposalDetail(id) {
 console.log('🚀 모든 JavaScript 모듈 로드 완료!');
 console.log('💡 window.debugInfo()를 실행하여 시스템 상태를 확인하세요.');
 
-// ==================== ID 17-20: 주차별 논문지도 상세 기능 ====================
+// ==================== ID 17-20: 주차별 논문지도 상세 기능 (사용 중지) ====================
+// 이 섹션은 admin_modals.js의 새로운 구현으로 대체되었습니다.
+// admin_modals.js는 weeklyGuidance.guidancePairs 구조를 사용합니다.
+/*
 
 // ID 17: 주차별 논문지도 상세보기
 function viewWeeklyGuidanceDetail(studentId) {
@@ -1251,6 +1254,9 @@ window.closeGuidanceDetailModal = closeGuidanceDetailModal;
 window.closeGuidanceRecordDetailModal = closeGuidanceRecordDetailModal;
 
 console.log('✅ ID 17-20: 주차별 논문지도 상세 기능 로드 완료');
+*/
+
+console.log('ℹ️  ID 17-20: 주차별 논문지도 기능은 admin_modals.js에서 로드됨');
 
 // ==================== ID 22-25: 온라인 피드백 현황 세부 기능 ====================
 
@@ -2996,3 +3002,95 @@ function viewThesisReviewDetail(itemId, viewType, thesisType) {
 
 window.viewThesisReviewDetail = viewThesisReviewDetail;
 console.log('✅ 학위논문 심사 상세 보기 기능 로드 완료');
+
+// ==================== 알림 시스템 ====================
+
+/**
+ * 화면에 알림 메시지를 표시하는 함수
+ * @param {string} message - 표시할 메시지
+ * @param {string} type - 알림 타입 ('success', 'error', 'info', 'warning')
+ */
+function showNotification(message, type = 'info') {
+    // 기존 알림이 있으면 제거
+    const existingNotification = document.getElementById('notification-toast');
+    if (existingNotification) {
+        existingNotification.remove();
+    }
+
+    // 타입별 색상 설정
+    const typeColors = {
+        success: 'bg-green-500',
+        error: 'bg-red-500',
+        info: 'bg-blue-500',
+        warning: 'bg-yellow-500'
+    };
+
+    const typeIcons = {
+        success: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>',
+        error: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>',
+        info: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>',
+        warning: '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>'
+    };
+
+    const bgColor = typeColors[type] || typeColors.info;
+    const icon = typeIcons[type] || typeIcons.info;
+
+    // 알림 HTML 생성
+    const notificationHtml = `
+        <div id="notification-toast"
+             class="fixed top-4 right-4 z-50 ${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in"
+             style="min-width: 300px; max-width: 500px; animation: slideIn 0.3s ease-out;">
+            <div class="flex-shrink-0">
+                ${icon}
+            </div>
+            <div class="flex-1 text-sm font-medium">
+                ${message}
+            </div>
+            <button onclick="document.getElementById('notification-toast').remove()"
+                    class="flex-shrink-0 ml-2 hover:opacity-75">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <style>
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        </style>
+    `;
+
+    // 알림을 body에 추가
+    document.body.insertAdjacentHTML('beforeend', notificationHtml);
+
+    // 3초 후 자동으로 제거
+    setTimeout(() => {
+        const notification = document.getElementById('notification-toast');
+        if (notification) {
+            notification.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(() => notification.remove(), 300);
+        }
+    }, 3000);
+}
+
+// Export
+window.showNotification = showNotification;
+
+console.log('✅ 알림 시스템 로드 완료');
