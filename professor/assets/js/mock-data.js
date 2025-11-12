@@ -84,7 +84,8 @@ const MOCK_DATA = {
             email: 'kim@student.ac.kr',
             phone: '010-1234-5678',
             admissionYear: 2023,
-            advisor: 'P001'
+            advisor: 'P001', // 하위 호환성을 위해 유지
+            advisors: ['P001'] // n:m 관계 지원
         },
         {
             id: 'S002',
@@ -96,7 +97,8 @@ const MOCK_DATA = {
             email: 'lee@student.ac.kr',
             phone: '010-2345-6789',
             admissionYear: 2023,
-            advisor: 'P001'
+            advisor: 'P001',
+            advisors: ['P001']
         },
         {
             id: 'S003',
@@ -108,7 +110,8 @@ const MOCK_DATA = {
             email: 'park@student.ac.kr',
             phone: '010-3456-7890',
             admissionYear: 2023,
-            advisor: 'P001'
+            advisor: 'P001',
+            advisors: ['P001']
         },
         {
             id: 'S004',
@@ -120,7 +123,8 @@ const MOCK_DATA = {
             email: 'jung@student.ac.kr',
             phone: '010-4567-8901',
             admissionYear: 2022,
-            advisor: 'P001'
+            advisor: 'P001',
+            advisors: ['P001']
         },
         {
             id: 'S005',
@@ -958,7 +962,11 @@ const DataService = {
             // 교수인 경우: 자신의 학생들이 작성한 글도 볼 수 있음
             if (userRole === 'professor') {
                 const student = localData.students.find(s => s.id === post.authorId);
-                if (student && student.advisor === userId) return true;
+                if (student) {
+                    // n:m 관계 지원: advisors 배열 확인
+                    const studentAdvisors = student.advisors || [student.advisor];
+                    if (studentAdvisors.includes(userId)) return true;
+                }
 
                 // 자신이 작성한 글의 열람권한 확인
                 if (post.authorRole === 'professor' && post.authorId === userId) return true;
@@ -969,8 +977,10 @@ const DataService = {
                 const student = localData.students.find(s => s.id === userId);
                 if (!student) return false;
 
+                const studentAdvisors = student.advisors || [student.advisor];
+
                 // 지도교수가 작성한 글인지 확인
-                if (post.authorRole === 'professor' && post.authorId === student.advisor) {
+                if (post.authorRole === 'professor' && studentAdvisors.includes(post.authorId)) {
                     // 열람 권한 체크
                     if (post.viewerType === 'all') return true;
                     if (post.viewerType === 'masters' && student.degree === 'master') return true;
@@ -978,11 +988,19 @@ const DataService = {
                     if (post.viewerType === 'specific' && post.viewers.includes(userId)) return true;
                 }
 
-                // 같은 지도교수의 다른 학생이 작성한 글도 볼 수 있음
+                // 같은 지도교수를 공유하는 다른 학생이 작성한 글도 볼 수 있음
                 const postAuthorStudent = localData.students.find(s => s.id === post.authorId);
-                if (postAuthorStudent && postAuthorStudent.advisor === student.advisor) {
-                    // 해당 학생 글의 열람 권한 확인 (교수 또는 특정 사용자)
-                    if (post.viewerType === 'specific' && post.viewers.includes(student.advisor)) return true;
+                if (postAuthorStudent) {
+                    const postAuthorAdvisors = postAuthorStudent.advisors || [postAuthorStudent.advisor];
+                    // 공통 지도교수가 있는지 확인
+                    const hasCommonAdvisor = postAuthorAdvisors.some(advisor => studentAdvisors.includes(advisor));
+                    if (hasCommonAdvisor) {
+                        // 해당 학생 글의 열람 권한 확인 (교수들에게 공개)
+                        const postViewers = post.viewers || [];
+                        if (postAuthorAdvisors.some(advisor => postViewers.includes(advisor))) {
+                            return true;
+                        }
+                    }
                 }
             }
 

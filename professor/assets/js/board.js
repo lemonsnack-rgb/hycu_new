@@ -552,10 +552,10 @@ function submitBoardPost() {
             viewers = Array.from(checkboxes).map(cb => cb.value);
         }
     } else {
-        // 학생이 작성하는 경우, 지도교수에게만 공개
+        // 학생이 작성하는 경우, 모든 지도교수에게 공개 (n:m 관계 지원)
         const student = DataService.getStudent(currentUser.id);
         if (student) {
-            viewers = [student.advisor];
+            viewers = student.advisors || [student.advisor];
         }
     }
 
