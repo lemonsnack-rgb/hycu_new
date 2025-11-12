@@ -56,7 +56,7 @@ function renderFeedback() {
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">파일명</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">피드백 상태</th>
-                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">상세보기</th>
+                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">[관리]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -310,55 +310,86 @@ function openFeedbackViewer() {
                     </div>
                 </div>
                 
-                <!-- 오른쪽: 코멘트 패널 (350px, 학생용 수정) -->
+                <!-- 오른쪽: 코멘트 패널 (350px, 학생용 - 탭 구조) -->
                 <div style="background: white; border-left: 1px solid #E5E7EB; display: flex; flex-direction: column; overflow: hidden;">
+                    <!-- 탭 헤더 -->
                     <div style="padding: 1rem; border-bottom: 1px solid #E5E7EB; background: #F9FAFB;">
-                        <h4 style="font-size: 0.875rem; font-weight: 700; color: #374151;">피드백</h4>
+                        <div style="display: flex; border-bottom: 2px solid #E5E7EB;">
+                            <button id="tab-general" role="tab" aria-selected="true"
+                                    onclick="switchStudentFeedbackTab('general')"
+                                    style="flex: 1; padding: 0.75rem; border: none; background: none; cursor: pointer; border-bottom: 2px solid #3B82F6; color: #3B82F6; font-weight: 600; font-size: 0.875rem; margin-bottom: -2px;">
+                                전체 평가 <span id="tab-general-badge" style="display: inline-block; background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; margin-left: 0.25rem;">1</span>
+                            </button>
+                            <button id="tab-inline" role="tab" aria-selected="false"
+                                    onclick="switchStudentFeedbackTab('inline')"
+                                    style="flex: 1; padding: 0.75rem; border: none; background: none; cursor: pointer; color: #6B7280; font-weight: 500; font-size: 0.875rem;">
+                                첨삭 <span id="tab-inline-badge" style="display: inline-block; background: #E5E7EB; color: #6B7280; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; margin-left: 0.25rem;">1</span>
+                            </button>
+                        </div>
                     </div>
-                    
-                    <div style="flex: 1; overflow-y: auto; padding: 1rem;">
-                        
-                        <!-- 총평 -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">💬 총평</h5>
-                            
+
+                    <!-- 탭 컨텐츠 -->
+                    <div style="flex: 1; overflow-y: auto; padding: 1rem;" id="comment-panel-content">
+                        <!-- 전체 평가 탭 -->
+                        <div id="general-feedback-tab">
+                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.75rem;">💬 전체 평가</h5>
+
                             <!-- 교수 피드백 (읽기 전용) -->
-                            <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
-                                <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <div style="flex: 1;">
-                                        <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</p>
-                                        <p style="font-size: 0.75rem; color: #6B7280;">2025-11-02 09:30</p>
+                            <div id="general-feedback-thread" style="margin-bottom: 1rem;">
+                                <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                                    <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="flex: 1;">
+                                            <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</p>
+                                            <p style="font-size: 0.75rem; color: #6B7280;">2025-11-02 09:30</p>
+                                        </div>
                                     </div>
+                                    <p style="font-size: 0.875rem; color: #374151;">전반적으로 잘 작성되었습니다. 연구 방법론 부분에서 표본 크기 산정 근거를 더 명확히 제시해주세요.</p>
                                 </div>
-                                <p style="font-size: 0.875rem; color: #374151;">전반적으로 잘 작성되었습니다. 연구 방법론 부분에서 표본 크기 산정 근거를 더 명확히 제시해주세요.</p>
                             </div>
-                            
+
                             <!-- 학생 댓글 입력 -->
-                            <div style="margin-top: 0.75rem;">
-                                <textarea id="student-reply-input" 
+                            <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #E5E7EB;">
+                                <label style="display: block; font-size: 0.75rem; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">댓글 작성</label>
+                                <textarea id="general-reply-input"
                                           style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: none;"
-                                          rows="2"
+                                          rows="3"
                                           placeholder="교수님께 질문이나 의견을 작성하세요..."></textarea>
-                                <button onclick="addStudentReply()" 
-                                        style="margin-top: 0.5rem; font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer;">
-                                    댓글 달기
+                                <button onclick="addGeneralReply()"
+                                        style="margin-top: 0.5rem; font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.5rem 1rem; border: none; border-radius: 0.375rem; cursor: pointer; width: 100%;">
+                                    <i class="fas fa-comment"></i> 댓글 달기
                                 </button>
                             </div>
                         </div>
-                        
-                        <div style="border-top: 1px solid #E5E7EB; padding-top: 1rem;">
-                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">📝 페이지 코멘트</h5>
-                            
-                            <!-- 페이지별 코멘트 -->
-                            <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem;">
-                                <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                    <div style="flex: 1;">
-                                        <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</p>
-                                        <p style="font-size: 0.75rem; color: #6B7280;">2025-11-02 09:35</p>
+
+                        <!-- 첨삭 탭 -->
+                        <div id="inline-feedback-tab" style="display: none;">
+                            <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.75rem;">📍 첨삭</h5>
+
+                            <!-- 첨삭 코멘트 목록 -->
+                            <div id="inline-feedback-list">
+                                <!-- 페이지별 첨삭 -->
+                                <div style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem;">
+                                    <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                        <div style="flex: 1;">
+                                            <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</p>
+                                            <p style="font-size: 0.75rem; color: #6B7280;">2025-11-02 09:35</p>
+                                        </div>
+                                        <span style="font-size: 0.75rem; background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem;">p.3</span>
                                     </div>
-                                    <span style="font-size: 0.75rem; background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem;">p.3</span>
+                                    <p style="font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem;">표본 크기 산정 근거를 추가해주세요.</p>
+
+                                    <!-- 첨삭에 대한 댓글 입력 -->
+                                    <div style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #D1D5DB;">
+                                        <textarea id="inline-reply-1"
+                                                  style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.75rem; resize: none;"
+                                                  rows="2"
+                                                  placeholder="이 첨삭에 대한 답변을 작성하세요..."></textarea>
+                                        <button onclick="addInlineReply(1)"
+                                                style="margin-top: 0.5rem; font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer;">
+                                            <i class="fas fa-reply"></i> 답변하기
+                                        </button>
+                                    </div>
                                 </div>
-                                <p style="font-size: 0.875rem; color: #374151;">표본 크기 산정 근거를 추가해주세요.</p>
                             </div>
                         </div>
                     </div>
@@ -479,13 +510,86 @@ function changeTool(tool) {
     currentTool = tool;
 }
 
-// 학생 댓글 추가
-function addStudentReply() {
-    const input = document.getElementById('student-reply-input');
+// 탭 전환 함수
+function switchStudentFeedbackTab(tabName) {
+    // 탭 버튼 스타일 업데이트
+    const generalTab = document.getElementById('tab-general');
+    const inlineTab = document.getElementById('tab-inline');
+    const generalContent = document.getElementById('general-feedback-tab');
+    const inlineContent = document.getElementById('inline-feedback-tab');
+
+    if (tabName === 'general') {
+        // 전체 평가 탭 활성화
+        generalTab.style.borderBottom = '2px solid #3B82F6';
+        generalTab.style.color = '#3B82F6';
+        generalTab.style.fontWeight = '600';
+        generalTab.setAttribute('aria-selected', 'true');
+
+        inlineTab.style.borderBottom = 'none';
+        inlineTab.style.color = '#6B7280';
+        inlineTab.style.fontWeight = '500';
+        inlineTab.setAttribute('aria-selected', 'false');
+
+        generalContent.style.display = 'block';
+        inlineContent.style.display = 'none';
+    } else if (tabName === 'inline') {
+        // 첨삭 탭 활성화
+        inlineTab.style.borderBottom = '2px solid #3B82F6';
+        inlineTab.style.color = '#3B82F6';
+        inlineTab.style.fontWeight = '600';
+        inlineTab.setAttribute('aria-selected', 'true');
+
+        generalTab.style.borderBottom = 'none';
+        generalTab.style.color = '#6B7280';
+        generalTab.style.fontWeight = '500';
+        generalTab.setAttribute('aria-selected', 'false');
+
+        generalContent.style.display = 'none';
+        inlineContent.style.display = 'block';
+    }
+}
+
+// 전체 평가 댓글 추가
+function addGeneralReply() {
+    const input = document.getElementById('general-reply-input');
     if (input && input.value.trim()) {
-        alert('댓글이 등록되었습니다: ' + input.value);
+        const comment = input.value.trim();
+
+        // 댓글을 스레드에 추가
+        const thread = document.getElementById('general-feedback-thread');
+        const replyHTML = `
+            <div style="background: #EFF6FF; padding: 0.75rem; border-radius: 0.5rem; border-left: 3px solid #3B82F6;">
+                <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <div style="flex: 1;">
+                        <p style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">학생 (나)</p>
+                        <p style="font-size: 0.75rem; color: #6B7280;">${new Date().toLocaleString('ko-KR')}</p>
+                    </div>
+                </div>
+                <p style="font-size: 0.875rem; color: #374151;">${comment}</p>
+            </div>
+        `;
+        thread.insertAdjacentHTML('beforeend', replyHTML);
+
+        input.value = '';
+        alert('댓글이 등록되었습니다');
+    }
+}
+
+// 첨삭 댓글 추가
+function addInlineReply(annotationId) {
+    const input = document.getElementById(`inline-reply-${annotationId}`);
+    if (input && input.value.trim()) {
+        const comment = input.value.trim();
+
+        // 해당 첨삭 영역에 댓글 추가 (여기서는 alert로 대체)
+        alert('첨삭에 대한 답변이 등록되었습니다: ' + comment);
         input.value = '';
     }
+}
+
+// 하위 호환성을 위해 유지
+function addStudentReply() {
+    addGeneralReply();
 }
 
 // 모달 닫기
