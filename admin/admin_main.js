@@ -924,7 +924,10 @@ function viewResearchProposalDetail(id) {
 console.log('🚀 모든 JavaScript 모듈 로드 완료!');
 console.log('💡 window.debugInfo()를 실행하여 시스템 상태를 확인하세요.');
 
-// ==================== ID 17-20: 주차별 논문지도 상세 기능 ====================
+// ==================== ID 17-20: 주차별 논문지도 상세 기능 (사용 중지) ====================
+// 이 섹션은 admin_modals.js의 새로운 구현으로 대체되었습니다.
+// admin_modals.js는 weeklyGuidance.guidancePairs 구조를 사용합니다.
+/*
 
 // ID 17: 주차별 논문지도 상세보기
 function viewWeeklyGuidanceDetail(studentId) {
@@ -1251,6 +1254,9 @@ window.closeGuidanceDetailModal = closeGuidanceDetailModal;
 window.closeGuidanceRecordDetailModal = closeGuidanceRecordDetailModal;
 
 console.log('✅ ID 17-20: 주차별 논문지도 상세 기능 로드 완료');
+*/
+
+console.log('ℹ️  ID 17-20: 주차별 논문지도 기능은 admin_modals.js에서 로드됨');
 
 // ==================== ID 22-25: 온라인 피드백 현황 세부 기능 ====================
 
