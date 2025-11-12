@@ -1164,6 +1164,58 @@ const appData = {
         }
     ],
 
+    // ========== 논문 제목 변경 신청 관리 ==========
+    titleChangeRequests: [
+        {
+            id: 1,
+            studentId: '2024001',
+            studentName: '김철수',
+            major: '교육공학',
+            degree: '석사',
+            graduate: '일반대학원',
+            currentTitle: '인공지능 기반 맞춤형 학습 시스템 연구',
+            newTitle: 'AI-driven Personalized Learning System Research',
+            language: '영어',
+            reason: '국제 학술지 투고를 위해 영어 제목으로 변경이 필요합니다.',
+            requestDate: '2025-11-10',
+            status: '대기',
+            approvedDate: null,
+            approvedBy: null
+        },
+        {
+            id: 2,
+            studentId: '2024002',
+            studentName: '이영희',
+            major: '경영학',
+            degree: '박사',
+            graduate: '일반대학원',
+            currentTitle: '디지털 전환 시대의 기업 혁신 전략',
+            newTitle: '디지털 트랜스포메이션 시대의 기업 혁신 전략 연구',
+            language: '한글',
+            reason: '논문 내용을 보다 정확하게 반영하기 위해 제목 수정이 필요합니다.',
+            requestDate: '2025-11-08',
+            status: '승인',
+            approvedDate: '2025-11-09',
+            approvedBy: '관리자'
+        },
+        {
+            id: 3,
+            studentId: '2024003',
+            studentName: '박민수',
+            major: '컴퓨터공학',
+            degree: '석사',
+            graduate: '일반대학원',
+            currentTitle: 'Deep Learning을 활용한 이미지 분류',
+            newTitle: '딥러닝 기반 이미지 분류 시스템 설계 및 구현',
+            language: '한글',
+            reason: '심사위원 의견을 반영하여 논문 제목을 보다 구체적으로 수정합니다.',
+            requestDate: '2025-11-05',
+            status: '대기',
+            approvedDate: null,
+            approvedBy: null
+        }
+    ],
+
     // ========== 주차별 지도 관리 데이터 ==========
     weeklyGuidance: {
         guidancePairs: [
