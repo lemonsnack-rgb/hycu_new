@@ -178,7 +178,6 @@ function showTitleChangeModal() {
                             <textarea id="change-reason" required
                                       style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; min-height: 120px; resize: vertical;"
                                       placeholder="제목 변경이 필요한 구체적인 사유를 작성해주세요"></textarea>
-                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">상세히 작성할수록 승인 가능성이 높아집니다</p>
                         </div>
 
                         <!-- 주의사항 -->
