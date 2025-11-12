@@ -48,6 +48,7 @@
 
 .search-btn {
     padding: 0.625rem 1.25rem;
+    height: 40px;
     border-radius: 0.375rem;
     font-size: 0.875rem;
     font-weight: 500;
@@ -55,15 +56,18 @@
     border: none;
     cursor: pointer;
     white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .search-btn-primary {
-    background: #2563EB;
+    background: #6A0028;
     color: white;
 }
 
 .search-btn-primary:hover {
-    background: #1D4ED8;
+    background: #5A0020;
 }
 
 .search-btn-secondary {
