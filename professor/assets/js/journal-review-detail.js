@@ -290,15 +290,21 @@ function viewJournalReviewDetail(journalId, viewType) {
 
     content += `</div>`;
 
-    if (typeof openModal === 'function') {
-        openModal(
+    if (typeof createModal === 'function') {
+        createModal(
             `${roleText} 평가 - 학술지 대체심사`,
             content,
-            '닫기',
-            null,
-            true,
-            { size: 'large' }
+            [
+                {
+                    text: '닫기',
+                    className: 'btn-secondary',
+                    onclick: 'return;'
+                }
+            ]
         );
+    } else {
+        console.error('createModal function not found');
+        alert('모달을 열 수 없습니다. 페이지를 새로고침해주세요.');
     }
 }
 
@@ -371,8 +377,10 @@ function submitJournalEvaluation(journalId) {
     if (typeof updateJournalEvaluation === 'function') {
         updateJournalEvaluation(journalId, scores, comment);
 
-        if (typeof closeModal === 'function') {
-            closeModal();
+        // 모달 닫기
+        const modalBackdrop = document.querySelector('.modal-backdrop');
+        if (modalBackdrop) {
+            modalBackdrop.remove();
         }
 
         if (typeof showToast === 'function') {
@@ -444,8 +452,10 @@ function submitJournalChairDecision(journalId) {
         comment
     });
 
-    if (typeof closeModal === 'function') {
-        closeModal();
+    // 모달 닫기
+    const modalBackdrop = document.querySelector('.modal-backdrop');
+    if (modalBackdrop) {
+        modalBackdrop.remove();
     }
 
     if (typeof showToast === 'function') {
