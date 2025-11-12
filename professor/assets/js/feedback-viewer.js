@@ -353,6 +353,67 @@ function closeFeedbackModal() {
     }
 }
 
+// ==================== 피드백 완료 ====================
+function completeFeedback() {
+    // 현재 피드백 ID 가져오기
+    const feedbackId = window._currentFeedbackCtx?.id;
+    if (!feedbackId) {
+        alert('피드백 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 빈 첨삭 검사
+    const emptyComments = [];
+
+    // 1. inline-feedback의 모든 textarea 검사
+    const inlineTextareas = document.querySelectorAll('#inline-feedback .inline-comment-input');
+    inlineTextareas.forEach((textarea, index) => {
+        const text = textarea.value.trim();
+        if (!text) {
+            emptyComments.push(`인라인 첨삭 #${index + 1}`);
+        }
+    });
+
+    // 2. 영역이 지정되었지만 내용이 없는 주석 검사
+    const feedbackData = window._currentFeedbackCtx?.data;
+    if (feedbackData && feedbackData.annotations) {
+        Object.keys(feedbackData.annotations).forEach(pageNum => {
+            const annotations = feedbackData.annotations[pageNum];
+            annotations.forEach((annot, index) => {
+                if (annot.type === 'comment' && (!annot.text || !annot.text.trim())) {
+                    emptyComments.push(`페이지 ${pageNum} 주석 #${index + 1}`);
+                }
+            });
+        });
+    }
+
+    // 빈 첨삭이 있으면 경고
+    if (emptyComments.length > 0) {
+        alert(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n- ${emptyComments.join('\n- ')}`);
+        return;
+    }
+
+    // 완료 확인
+    if (!confirm('피드백을 완료 처리하시겠습니까?\n완료 후에는 목록에서 "완료" 상태로 표시됩니다.')) {
+        return;
+    }
+
+    // 피드백 완료 처리
+    const success = FeedbackDataService.completeFeedbackRequest(feedbackId);
+
+    if (success) {
+        alert('피드백이 완료 처리되었습니다.');
+        closeFeedbackModal();
+
+        // 목록 새로고침
+        if (window.renderFeedbackList) {
+            window.renderFeedbackList();
+        }
+    } else {
+        alert('피드백 완료 처리 중 오류가 발생했습니다.');
+    }
+}
+
 // ==================== 자주 쓰는 코멘트 팝오버 추가 ====================
 function createQuickMarkPopover() {
     const popover = document.createElement('div');
@@ -403,6 +464,7 @@ function createQuickMarkPopover() {
 // Export
 window.openFeedbackViewer = openFeedbackViewer;
 window.closeFeedbackModal = closeFeedbackModal;
+window.completeFeedback = completeFeedback;
 window.createQuickMarkPopover = createQuickMarkPopover;
 
 // ==================== ID 40: 탭 전환 함수 ====================

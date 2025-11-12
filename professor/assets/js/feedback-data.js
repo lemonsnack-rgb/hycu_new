@@ -648,6 +648,19 @@ const FeedbackDataService = {
     
     getUserById(userId) {
         return FEEDBACK_USERS[userId] ? {...FEEDBACK_USERS[userId]} : null;
+    },
+
+    // 피드백 완료 처리
+    completeFeedbackRequest(feedbackId) {
+        const request = FEEDBACK_REQUESTS.find(req => req.id === feedbackId);
+        if (request) {
+            request.isCompleted = true;
+            request.status = '피드백 완료';
+            request.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            request.lastModifiedBy = CURRENT_USER.id;
+            return true;
+        }
+        return false;
     }
 };
 

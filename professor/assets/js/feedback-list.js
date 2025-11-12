@@ -26,9 +26,16 @@ function renderFeedbackList() {
                         <h2 class="text-2xl font-bold text-gray-800">제출물 목록</h2>
                         <p class="text-sm text-gray-600 mt-1">학생들이 제출한 문서를 확인하고 피드백을 작성하세요</p>
                     </div>
-                    <div class="text-sm text-gray-600">
-                        <span class="font-semibold text-blue-600">${filteredRequests.length}</span>건
-                        ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
+                    <div class="flex items-center gap-4">
+                        <button onclick="sendNotificationToSelected()"
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#500020] text-sm font-semibold flex items-center gap-2">
+                            <i class="fas fa-bell"></i>
+                            선택한 학생에게 알림 발송
+                        </button>
+                        <div class="text-sm text-gray-600">
+                            <span class="font-semibold text-blue-600">${filteredRequests.length}</span>건
+                            ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
+                        </div>
                     </div>
                 </div>
 
@@ -93,6 +100,12 @@ function renderFeedbackList() {
                 <table class="w-full">
                     <thead class="bg-gray-50 border-b">
                         <tr>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                                <input type="checkbox"
+                                       id="select-all-feedbacks"
+                                       onchange="toggleAllFeedbacks(this)"
+                                       class="rounded">
+                            </th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
                             <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공</th>
@@ -109,7 +122,7 @@ function renderFeedbackList() {
                     <tbody id="feedback-list-body">
                         ${filteredRequests.length > 0
                             ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                            : '<tr><td colspan="11" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                            : '<tr><td colspan="12" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
                         }
                     </tbody>
                 </table>
@@ -143,6 +156,13 @@ function renderFeedbackRow(request, idx) {
     return `
         <tr class="feedback-row border-b hover:bg-gray-50 transition-colors"
             data-feedback-id="${request.id}">
+            <td class="py-3 px-4 text-center">
+                <input type="checkbox"
+                       class="feedback-checkbox rounded"
+                       data-feedback-id="${request.id}"
+                       data-student-name="${request.studentName}"
+                       data-student-number="${request.studentNumber}">
+            </td>
             <td class="py-3 px-4 text-gray-800">${idx}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.graduate || '일반대학원'}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.major}</td>
@@ -307,3 +327,48 @@ function resetFeedbackSearch() {
 // Export
 window.searchFeedback = searchFeedback;
 window.resetFeedbackSearch = resetFeedbackSearch;
+
+// ==================== 체크박스 전체 선택/해제 ====================
+function toggleAllFeedbacks(checkbox) {
+    const checkboxes = document.querySelectorAll('.feedback-checkbox');
+    checkboxes.forEach(cb => {
+        cb.checked = checkbox.checked;
+    });
+}
+
+// ==================== 선택한 학생에게 알림 발송 ====================
+function sendNotificationToSelected() {
+    const checkboxes = document.querySelectorAll('.feedback-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        alert('알림을 받을 학생을 선택해주세요.');
+        return;
+    }
+
+    // 선택된 학생 정보 수집
+    const selectedStudents = Array.from(checkboxes).map(cb => ({
+        id: cb.dataset.feedbackId,
+        name: cb.dataset.studentName,
+        studentNumber: cb.dataset.studentNumber
+    }));
+
+    // 알림 발송 확인
+    const studentList = selectedStudents.map(s => `${s.name} (${s.studentNumber})`).join('\n');
+    if (!confirm(`다음 학생들에게 알림을 발송하시겠습니까?\n\n${studentList}\n\n총 ${selectedStudents.length}명`)) {
+        return;
+    }
+
+    // 실제 구현 시에는 서버로 알림 발송 요청
+    // 여기서는 시뮬레이션
+    console.log('알림 발송 대상:', selectedStudents);
+    alert(`${selectedStudents.length}명의 학생에게 알림을 발송했습니다.`);
+
+    // 체크박스 초기화
+    checkboxes.forEach(cb => cb.checked = false);
+    const selectAll = document.getElementById('select-all-feedbacks');
+    if (selectAll) selectAll.checked = false;
+}
+
+// Export
+window.toggleAllFeedbacks = toggleAllFeedbacks;
+window.sendNotificationToSelected = sendNotificationToSelected;
