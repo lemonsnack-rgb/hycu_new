@@ -35,7 +35,7 @@ function showScreen(screenName) {
         'review': '심사 신청',
         'title-change': '논문제목 변경',
         'board': '자료실',
-        'journal-submission': '학술지 실적 제출'
+        'journal-submission': '학술지 대체 심사 신청'
     };
 
     const titleElement = document.getElementById('page-title');
