@@ -4589,3 +4589,17 @@ window.editWeeklyPlan = editWeeklyPlan;
 window.saveWeeklyPlan = saveWeeklyPlan;
 window.addNewWeeklyPlan = addNewWeeklyPlan;
 window.createNewWeeklyPlan = createNewWeeklyPlan;
+
+// 워크플로우 관리 함수들
+window.editStage = editStage;
+window.deleteStage = deleteStage;
+window.viewStageDetail = viewStageDetail;
+window.addWorkflowStep = addWorkflowStep;
+window.editWorkflowStages = editWorkflowStages;
+window.addStageFromType = addStageFromType;
+window.updateTempStageName = updateTempStageName;
+window.toggleTempStageEvaluation = toggleTempStageEvaluation;
+window.updateTempStageCriteria = updateTempStageCriteria;
+window.removeTempStage = removeTempStage;
+window.moveTempStageUp = moveTempStageUp;
+window.moveTempStageDown = moveTempStageDown;
