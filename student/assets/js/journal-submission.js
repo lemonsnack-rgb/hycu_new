@@ -2,6 +2,9 @@
  * 학생 - 학술지 대체 심사 신청
  */
 
+// 전역 저장소
+let journalSubmissions = [];
+
 function initJournalSubmission() {
     renderJournalSubmissionList();
 }
@@ -19,18 +22,39 @@ function renderJournalSubmissionList() {
             grade: 'SCI',
             submitDate: '2025-10-15',
             status: '승인 대기',
-            editable: false
+            editable: false,
+            paperTitleEn: 'AI-Based Data Analysis Research',
+            firstAuthor: '홍길동',
+            correspondingAuthor: '김교수',
+            coAuthors: '이철수, 박영희',
+            volume: '25',
+            issue: '3',
+            publishYear: '2025',
+            startPage: '123',
+            endPage: '145',
+            doi: '10.1234/example.2025.001',
+            url: 'https://example.com/journal',
+            abstractKo: '이 연구는 인공지능 기반 데이터 분석 방법론에 대한 연구입니다.',
+            abstractEn: 'This study investigates AI-based data analysis methodologies.',
+            keywordsKo: '인공지능, 데이터 분석, 머신러닝',
+            keywordsEn: 'Artificial Intelligence, Data Analysis, Machine Learning'
         }
     ];
+
+    // 전역 변수에 저장 (detail view에서 사용)
+    journalSubmissions = submissions;
+
+    // 제출 건수 체크 (1건 제한)
+    const hasSubmission = submissions.length > 0;
 
     const content = `
         <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학술지 대체 심사 신청</h2>
-                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 게재 실적으로 대체 심사를 신청하세요</p>
+                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 게재 실적으로 대체 심사를 신청하세요 ${hasSubmission ? '(최대 1건)' : ''}</p>
                 </div>
-                <button onclick="showJournalSubmissionModal()" class="btn-primary">
+                <button onclick="showJournalSubmissionModal()" class="btn-primary" ${hasSubmission ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
                     + 학술지 대체 심사 실적 제출
                 </button>
             </div>
@@ -44,6 +68,7 @@ function renderJournalSubmissionList() {
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">등급</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">상태</th>
+                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">[관리]</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,10 +83,15 @@ function renderJournalSubmissionList() {
                                 <td style="padding: 0.75rem 1rem;">
                                     <span style="background: #FEF3C7; color: #92400E; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.status}</span>
                                 </td>
+                                <td style="padding: 0.75rem 1rem; text-align: center;">
+                                    <button onclick="viewJournalDetail(${sub.id})" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;">
+                                        <i class="fas fa-eye"></i> 상세보기
+                                    </button>
+                                </td>
                             </tr>
                         `).join('') : `
                             <tr>
-                                <td colspan="5" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                <td colspan="6" style="padding: 3rem; text-align: center; color: #9CA3AF;">
                                     제출한 학술지 실적이 없습니다
                                 </td>
                             </tr>
@@ -366,10 +396,196 @@ function submitJournal(e) {
     renderJournalSubmissionList();
 }
 
+// 상세 보기 모달
+function viewJournalDetail(submissionId) {
+    const submission = journalSubmissions.find(s => s.id === submissionId);
+    if (!submission) {
+        alert('제출 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'modal-backdrop active';
+    modal.id = 'journal-detail-modal';
+
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>학술지 실적 상세 정보</h3>
+                <button onclick="closeJournalDetailModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
+            </div>
+            <div class="modal-body" style="padding: 1.5rem;">
+
+                <!-- 상태 표시 -->
+                <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <span style="font-size: 0.875rem; color: #6B7280;">제출 상태</span>
+                            <h4 style="font-size: 1.25rem; font-weight: 700; color: #1F2937; margin-top: 0.25rem;">
+                                <span style="background: #FEF3C7; color: #92400E; padding: 0.375rem 0.75rem; border-radius: 9999px; font-size: 1rem;">${submission.status}</span>
+                            </h4>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.875rem; color: #6B7280;">제출일</span>
+                            <p style="font-size: 1rem; font-weight: 600; color: #374151; margin-top: 0.25rem;">${submission.submitDate}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 논문 정보 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; color: #1F2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E5E7EB;">
+                        📄 논문 정보
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.875rem;">
+                        <div style="color: #6B7280; font-weight: 600;">논문 제목 (한글)</div>
+                        <div style="color: #1F2937;">${submission.paperTitle}</div>
+
+                        ${submission.paperTitleEn ? `
+                            <div style="color: #6B7280; font-weight: 600;">논문 제목 (영문)</div>
+                            <div style="color: #1F2937;">${submission.paperTitleEn}</div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- 저자 정보 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; color: #1F2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E5E7EB;">
+                        👤 저자 정보
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.875rem;">
+                        <div style="color: #6B7280; font-weight: 600;">제1저자</div>
+                        <div style="color: #1F2937;">${submission.firstAuthor}</div>
+
+                        <div style="color: #6B7280; font-weight: 600;">교신저자</div>
+                        <div style="color: #1F2937;">${submission.correspondingAuthor}</div>
+
+                        ${submission.coAuthors ? `
+                            <div style="color: #6B7280; font-weight: 600;">공동저자</div>
+                            <div style="color: #1F2937;">${submission.coAuthors}</div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- 학술지 정보 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; color: #1F2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E5E7EB;">
+                        📚 학술지 정보
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.875rem;">
+                        <div style="color: #6B7280; font-weight: 600;">학술지명</div>
+                        <div style="color: #1F2937;">${submission.journalName}</div>
+
+                        <div style="color: #6B7280; font-weight: 600;">등급</div>
+                        <div><span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.75rem; border-radius: 9999px; font-weight: 600;">${submission.grade}</span></div>
+
+                        ${submission.volume ? `
+                            <div style="color: #6B7280; font-weight: 600;">권 (Volume)</div>
+                            <div style="color: #1F2937;">${submission.volume}</div>
+                        ` : ''}
+
+                        ${submission.issue ? `
+                            <div style="color: #6B7280; font-weight: 600;">호 (Issue)</div>
+                            <div style="color: #1F2937;">${submission.issue}</div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- 게재 정보 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <h4 style="font-size: 1rem; font-weight: 700; color: #1F2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E5E7EB;">
+                        🗓️ 게재 정보
+                    </h4>
+                    <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.875rem;">
+                        <div style="color: #6B7280; font-weight: 600;">게재 연도</div>
+                        <div style="color: #1F2937;">${submission.publishYear}</div>
+
+                        ${submission.startPage && submission.endPage ? `
+                            <div style="color: #6B7280; font-weight: 600;">페이지</div>
+                            <div style="color: #1F2937;">${submission.startPage}-${submission.endPage}</div>
+                        ` : ''}
+
+                        ${submission.doi ? `
+                            <div style="color: #6B7280; font-weight: 600;">DOI</div>
+                            <div style="color: #1F2937; font-family: monospace; font-size: 0.75rem;">${submission.doi}</div>
+                        ` : ''}
+
+                        ${submission.url ? `
+                            <div style="color: #6B7280; font-weight: 600;">URL</div>
+                            <div><a href="${submission.url}" target="_blank" style="color: #3B82F6; text-decoration: underline;">${submission.url}</a></div>
+                        ` : ''}
+                    </div>
+                </div>
+
+                <!-- 초록 -->
+                ${submission.abstractKo || submission.abstractEn ? `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 1rem; font-weight: 700; color: #1F2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E5E7EB;">
+                            📝 초록
+                        </h4>
+                        ${submission.abstractKo ? `
+                            <div style="margin-bottom: 1rem;">
+                                <div style="color: #6B7280; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem;">한글 초록</div>
+                                <div style="background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; color: #374151; font-size: 0.875rem; line-height: 1.6;">${submission.abstractKo}</div>
+                            </div>
+                        ` : ''}
+                        ${submission.abstractEn ? `
+                            <div>
+                                <div style="color: #6B7280; font-weight: 600; font-size: 0.875rem; margin-bottom: 0.5rem;">영문 초록</div>
+                                <div style="background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; color: #374151; font-size: 0.875rem; line-height: 1.6;">${submission.abstractEn}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                ` : ''}
+
+                <!-- 키워드 -->
+                ${submission.keywordsKo || submission.keywordsEn ? `
+                    <div style="margin-bottom: 1.5rem;">
+                        <h4 style="font-size: 1rem; font-weight: 700; color: #1F2937; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #E5E7EB;">
+                            🔑 키워드
+                        </h4>
+                        <div style="display: grid; grid-template-columns: 150px 1fr; gap: 0.75rem; font-size: 0.875rem;">
+                            ${submission.keywordsKo ? `
+                                <div style="color: #6B7280; font-weight: 600;">한글 키워드</div>
+                                <div style="color: #1F2937;">${submission.keywordsKo}</div>
+                            ` : ''}
+                            ${submission.keywordsEn ? `
+                                <div style="color: #6B7280; font-weight: 600;">영문 키워드</div>
+                                <div style="color: #1F2937;">${submission.keywordsEn}</div>
+                            ` : ''}
+                        </div>
+                    </div>
+                ` : ''}
+
+                <!-- 안내 -->
+                <div style="background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0.5rem; padding: 1rem; margin-top: 1.5rem;">
+                    <p style="font-size: 0.875rem; color: #1E40AF;">
+                        <i class="fas fa-info-circle"></i> 제출 후에는 내용을 수정할 수 없습니다. 문의사항이 있으시면 관리자에게 연락해주세요.
+                    </p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeJournalDetailModal()" class="btn btn-primary">닫기</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+}
+
+function closeJournalDetailModal() {
+    const modal = document.getElementById('journal-detail-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
 // Export functions
 window.initJournalSubmission = initJournalSubmission;
 window.showJournalSubmissionModal = showJournalSubmissionModal;
 window.closeJournalModal = closeJournalModal;
 window.submitJournal = submitJournal;
+window.viewJournalDetail = viewJournalDetail;
+window.closeJournalDetailModal = closeJournalDetailModal;
 
 console.log('✅ 학술지 대체 심사 신청 모듈 로드 완료');
