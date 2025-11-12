@@ -2828,6 +2828,10 @@ function viewWeeklyGuidanceDetail(pairId) {
             <div>
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
+                    <button onclick="addNewWeeklyPlan(${pairId})"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium">
+                        + 주차 추가
+                    </button>
                 </div>
 
                 ${sortedPlans.length > 0 ? `
@@ -2855,6 +2859,10 @@ function viewWeeklyGuidanceDetail(pairId) {
                                         ` : `
                                             <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">진행중</span>
                                         `}
+                                        <button onclick="editWeeklyPlan(${pairId}, ${weekPlan.week})"
+                                                class="text-xs px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium">
+                                            수정
+                                        </button>
                                     </div>
                                 </div>
 
@@ -2895,13 +2903,6 @@ function viewWeeklyGuidanceDetail(pairId) {
                                             <span class="text-xs font-semibold text-yellow-800">학생 실적 미제출</span>
                                         </div>
                                     `}
-
-                                    ${weekPlan.adminNote ? `
-                                        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-2">
-                                            <span class="text-xs font-semibold text-amber-800">관리자 메모:</span>
-                                            <p class="text-sm text-amber-900 mt-1">${weekPlan.adminNote}</p>
-                                        </div>
-                                    ` : ''}
                                 </div>
                             </div>
                         `).join('')}
@@ -3815,6 +3816,282 @@ function resetTitleChangeSearch() {
     loadView('titleChangeRequests');
 }
 
+/**
+ * 주차별 지도 계획 수정
+ */
+function editWeeklyPlan(pairId, week) {
+    const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === pairId);
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+
+    if (!pair || !plansData) {
+        alert('데이터를 찾을 수 없습니다.');
+        return;
+    }
+
+    const weekPlan = plansData.weeks.find(w => w.week === week);
+    if (!weekPlan) {
+        alert('해당 주차 계획을 찾을 수 없습니다.');
+        return;
+    }
+
+    const materials = weekPlan.professorPlan.materials ? weekPlan.professorPlan.materials.join(', ') : '';
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 학생 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500">학생명:</span>
+                        <span class="text-sm text-gray-800 ml-2">${pair.student.name} (${pair.student.studentId})</span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500">담당교수:</span>
+                        <span class="text-sm text-gray-800 ml-2">${pair.professor.name}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 지도 계획 수정 폼 -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">주차</label>
+                    <input type="number" id="edit-week" value="${weekPlan.week}" readonly
+                           class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-100 text-gray-600">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">지도주제 *</label>
+                    <input type="text" id="edit-goal" value="${weekPlan.professorPlan.goal}"
+                           class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">계획내용 *</label>
+                    <textarea id="edit-content" rows="4"
+                              class="w-full border border-gray-300 rounded px-3 py-2">${weekPlan.professorPlan.content}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">자료 (콤마로 구분)</label>
+                    <input type="text" id="edit-materials" value="${materials}"
+                           class="w-full border border-gray-300 rounded px-3 py-2"
+                           placeholder="예: 교재 3장, 논문 링크">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">등록일</label>
+                    <input type="date" id="edit-created-at" value="${weekPlan.professorPlan.createdAt}"
+                           class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+            </div>
+
+            ${weekPlan.studentReport ? `
+                <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                    <h4 class="font-bold text-green-800 mb-3">학생 실적 (수정 불가)</h4>
+                    <div class="space-y-2 text-sm text-green-900">
+                        <p><strong>달성:</strong> ${weekPlan.studentReport.achievement}</p>
+                        <p><strong>다음 계획:</strong> ${weekPlan.studentReport.nextPlan}</p>
+                        ${weekPlan.studentReport.difficulties ? `
+                            <p><strong>어려움:</strong> ${weekPlan.studentReport.difficulties}</p>
+                        ` : ''}
+                        <p><strong>제출일:</strong> ${weekPlan.studentReport.submittedAt}</p>
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    openModal(
+        `${week}주차 지도 계획 수정`,
+        content,
+        '저장',
+        () => saveWeeklyPlan(pairId, week),
+        true
+    );
+}
+
+/**
+ * 주차별 지도 계획 저장
+ */
+function saveWeeklyPlan(pairId, week) {
+    const goal = document.getElementById('edit-goal').value.trim();
+    const content = document.getElementById('edit-content').value.trim();
+    const materialsStr = document.getElementById('edit-materials').value.trim();
+    const createdAt = document.getElementById('edit-created-at').value;
+
+    if (!goal) {
+        alert('지도주제를 입력해주세요.');
+        return;
+    }
+
+    if (!content) {
+        alert('계획내용을 입력해주세요.');
+        return;
+    }
+
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+    const weekPlan = plansData.weeks.find(w => w.week === week);
+
+    if (!weekPlan) {
+        alert('데이터를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 업데이트
+    weekPlan.professorPlan.goal = goal;
+    weekPlan.professorPlan.content = content;
+    weekPlan.professorPlan.materials = materialsStr ? materialsStr.split(',').map(m => m.trim()) : [];
+    weekPlan.professorPlan.createdAt = createdAt;
+
+    showNotification('지도 계획이 수정되었습니다.', 'success');
+    closeModal();
+
+    // 상세 화면 다시 표시
+    viewWeeklyGuidanceDetail(pairId);
+}
+
+/**
+ * 새로운 주차 추가
+ */
+function addNewWeeklyPlan(pairId) {
+    const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === pairId);
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+
+    if (!pair || !plansData) {
+        alert('데이터를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 다음 주차 번호 계산
+    const maxWeek = plansData.weeks.length > 0
+        ? Math.max(...plansData.weeks.map(w => w.week))
+        : 0;
+    const nextWeek = maxWeek + 1;
+
+    const today = new Date().toISOString().split('T')[0];
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 학생 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500">학생명:</span>
+                        <span class="text-sm text-gray-800 ml-2">${pair.student.name} (${pair.student.studentId})</span>
+                    </div>
+                    <div>
+                        <span class="text-xs font-semibold text-gray-500">담당교수:</span>
+                        <span class="text-sm text-gray-800 ml-2">${pair.professor.name}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 지도 계획 입력 폼 -->
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">주차</label>
+                    <input type="number" id="new-week" value="${nextWeek}"
+                           class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">지도주제 *</label>
+                    <input type="text" id="new-goal" placeholder="예: 연구방법론 검토"
+                           class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">계획내용 *</label>
+                    <textarea id="new-content" rows="4" placeholder="지도 계획 내용을 입력하세요"
+                              class="w-full border border-gray-300 rounded px-3 py-2"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">자료 (콤마로 구분)</label>
+                    <input type="text" id="new-materials" placeholder="예: 교재 3장, 논문 링크"
+                           class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">등록일</label>
+                    <input type="date" id="new-created-at" value="${today}"
+                           class="w-full border border-gray-300 rounded px-3 py-2">
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal(
+        '새 주차 추가',
+        content,
+        '추가',
+        () => createNewWeeklyPlan(pairId),
+        true
+    );
+}
+
+/**
+ * 새로운 주차 계획 생성
+ */
+function createNewWeeklyPlan(pairId) {
+    const week = parseInt(document.getElementById('new-week').value);
+    const goal = document.getElementById('new-goal').value.trim();
+    const content = document.getElementById('new-content').value.trim();
+    const materialsStr = document.getElementById('new-materials').value.trim();
+    const createdAt = document.getElementById('new-created-at').value;
+
+    if (!week || week < 1) {
+        alert('올바른 주차를 입력해주세요.');
+        return;
+    }
+
+    if (!goal) {
+        alert('지도주제를 입력해주세요.');
+        return;
+    }
+
+    if (!content) {
+        alert('계획내용을 입력해주세요.');
+        return;
+    }
+
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+    const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === pairId);
+
+    // 중복 주차 확인
+    const existingWeek = plansData.weeks.find(w => w.week === week);
+    if (existingWeek) {
+        alert(`${week}주차는 이미 존재합니다.`);
+        return;
+    }
+
+    // 새 주차 추가
+    const newWeekPlan = {
+        week: week,
+        professorPlan: {
+            goal: goal,
+            content: content,
+            materials: materialsStr ? materialsStr.split(',').map(m => m.trim()) : [],
+            createdAt: createdAt
+        },
+        studentReport: null
+    };
+
+    plansData.weeks.push(newWeekPlan);
+
+    // 전체 주차 수 업데이트
+    pair.totalWeeks = plansData.weeks.length;
+
+    showNotification('새 주차 계획이 추가되었습니다.', 'success');
+    closeModal();
+
+    // 상세 화면 다시 표시
+    viewWeeklyGuidanceDetail(pairId);
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
@@ -3842,3 +4119,7 @@ window.viewTitleChangeDetail = viewTitleChangeDetail;
 window.approveTitleChange = approveTitleChange;
 window.searchTitleChangeRequests = searchTitleChangeRequests;
 window.resetTitleChangeSearch = resetTitleChangeSearch;
+window.editWeeklyPlan = editWeeklyPlan;
+window.saveWeeklyPlan = saveWeeklyPlan;
+window.addNewWeeklyPlan = addNewWeeklyPlan;
+window.createNewWeeklyPlan = createNewWeeklyPlan;
