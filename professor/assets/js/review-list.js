@@ -99,13 +99,15 @@ function renderReviewList() {
                             <td class="py-3 px-4 text-center">
                                 <div class="flex gap-2 justify-center">
                                     <button onclick="openReviewDetail('${assignment.id}', 'member')"
-                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50 ${assignment.myRole === 'member' ? 'font-bold bg-blue-50' : ''}">
+                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
                                         위원
                                     </button>
-                                    <button onclick="openReviewDetail('${assignment.id}', 'chair')"
-                                            class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50 ${assignment.myRole === 'chair' ? 'font-bold bg-green-50' : ''}">
-                                        위원장
-                                    </button>
+                                    ${assignment.myRole === 'chair' ? `
+                                        <button onclick="openReviewDetail('${assignment.id}', 'chair')"
+                                                class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
+                                            위원장
+                                        </button>
+                                    ` : ''}
                                 </div>
                             </td>
                         </tr>
