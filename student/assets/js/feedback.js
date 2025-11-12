@@ -15,52 +15,194 @@ let currentTool = 'select';
 function renderFeedback() {
     const content = document.getElementById('feedback-screen');
     if (!content) return;
-    
+
+    // Mock data - 실제로는 서버에서 가져옴
+    const feedbackRequests = [
+        {
+            id: 1,
+            title: '딥러닝 기반 이미지 분류 연구',
+            fileName: '논문_최종본.pdf',
+            stage: '최종논문',
+            submitDate: '2025-11-01',
+            status: '피드백 완료'
+        },
+        {
+            id: 2,
+            title: '머신러닝 활용 예측 모델 연구',
+            fileName: '연구계획서.pdf',
+            stage: '연구계획서',
+            submitDate: '2025-10-15',
+            status: '검토중'
+        }
+    ];
+
     content.innerHTML = `
         <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">제출한 문서</h2>
-                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">제출한 문서를 확인하고 교수님의 피드백을 확인하세요</p>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">온라인 피드백</h2>
+                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문을 제출하고 교수님의 피드백을 받으세요</p>
                 </div>
-                <div style="display: flex; gap: 0.5rem;">
-                    <button onclick="showSubmissionHistory()" class="btn btn-secondary">
-                        <i class="fas fa-history"></i> 제출 히스토리
-                    </button>
-                    <button onclick="alert('문서 업로드')" class="btn-primary">
-                        + 피드백 요청
-                    </button>
-                </div>
+                <button onclick="showFeedbackRequestModal()" class="btn-primary">
+                    + 피드백 요청
+                </button>
             </div>
-            
+
             <div class="card-body" style="padding: 0;">
                 <table style="width: 100%; border-collapse: collapse;">
                     <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                         <tr>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">단계</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">문서명</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문명</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">파일명</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">피드백상태</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">피드백 상태</th>
+                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">상세보기</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr onclick="openFeedbackViewer()" style="border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: background 0.2s;" 
-                            onmouseover="this.style.background='#F9FAFB'" 
-                            onmouseout="this.style.background='white'">
-                            <td style="padding: 0.75rem 1rem;">
-                                <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">최종논문</span>
-                            </td>
-                            <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">논문_초안.pdf</td>
-                            <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">2025-11-01</td>
-                            <td style="padding: 0.75rem 1rem;">
-                                <span style="background: #D1FAE5; color: #065F46; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">피드백 완료</span>
-                            </td>
-                        </tr>
+                        ${feedbackRequests.map(req => `
+                            <tr style="border-bottom: 1px solid #E5E7EB;">
+                                <td style="padding: 0.75rem 1rem;">
+                                    <div>
+                                        <div style="font-weight: 500; color: #1F2937;">${req.title}</div>
+                                        <span style="background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-top: 0.25rem;">${req.stage}</span>
+                                    </div>
+                                </td>
+                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">
+                                    <i class="fas fa-file-pdf" style="color: #EF4444;"></i> ${req.fileName}
+                                </td>
+                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${req.submitDate}</td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <span style="background: ${req.status === '피드백 완료' ? '#D1FAE5' : '#FEF3C7'}; color: ${req.status === '피드백 완료' ? '#065F46' : '#92400E'}; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${req.status}</span>
+                                </td>
+                                <td style="padding: 0.75rem 1rem; text-align: center;">
+                                    <button onclick="openFeedbackViewer(${req.id})" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;">
+                                        <i class="fas fa-eye"></i> 보기
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                        ${feedbackRequests.length === 0 ? `
+                            <tr>
+                                <td colspan="5" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                    제출한 피드백 요청이 없습니다
+                                </td>
+                            </tr>
+                        ` : ''}
                     </tbody>
                 </table>
             </div>
         </div>
     `;
+}
+
+// 피드백 요청 모달
+function showFeedbackRequestModal() {
+    const modalContent = `
+        <div class="modal">
+            <div class="modal-content" style="max-width: 600px;">
+                <div class="modal-header">
+                    <h3>피드백 요청</h3>
+                    <button onclick="closeFeedbackRequestModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="feedback-request-form" onsubmit="submitFeedbackRequest(event)">
+                        <!-- 논문 제목 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                논문 제목 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="text" id="feedback-title" required
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;"
+                                   placeholder="논문 제목을 입력하세요">
+                        </div>
+
+                        <!-- 논문 진행 단계 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                논문 진행 단계 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <select id="feedback-stage" required
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                                <option value="">선택하세요</option>
+                                <option value="연구계획서">연구계획서</option>
+                                <option value="중간논문">중간논문</option>
+                                <option value="최종논문">최종논문</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+
+                        <!-- 첨부파일 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                첨부파일 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="file" id="feedback-file" required accept=".pdf"
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                PDF 파일만 업로드 가능 (최대 30MB)
+                            </p>
+                        </div>
+
+                        <!-- 주의사항 -->
+                        <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                            <p style="font-weight: 600; color: #1E40AF; margin-bottom: 0.5rem;">안내사항</p>
+                            <ul style="font-size: 0.75rem; color: #1E40AF; margin-left: 1rem;">
+                                <li>한 번에 하나의 파일만 업로드 가능합니다</li>
+                                <li>PDF 파일만 업로드 가능하며, 최대 용량은 30MB입니다</li>
+                                <li>교수님의 피드백은 영업일 기준 3-5일 소요됩니다</li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button onclick="closeFeedbackRequestModal()" class="btn btn-secondary">취소</button>
+                    <button onclick="document.getElementById('feedback-request-form').requestSubmit()" class="btn btn-primary">
+                        요청하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('modal-container').innerHTML = modalContent;
+}
+
+function submitFeedbackRequest(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('feedback-title').value;
+    const stage = document.getElementById('feedback-stage').value;
+    const file = document.getElementById('feedback-file').files[0];
+
+    if (!file) {
+        alert('파일을 선택해주세요');
+        return;
+    }
+
+    // 파일 크기 검증 (30MB = 30 * 1024 * 1024 bytes)
+    const maxSize = 30 * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert('파일 크기는 30MB를 초과할 수 없습니다');
+        return;
+    }
+
+    // 파일 형식 검증
+    if (file.type !== 'application/pdf') {
+        alert('PDF 파일만 업로드 가능합니다');
+        return;
+    }
+
+    // 실제로는 서버로 전송
+    console.log('피드백 요청:', { title, stage, file: file.name });
+
+    alert('피드백 요청이 완료되었습니다');
+    closeFeedbackRequestModal();
+    renderFeedback();
+}
+
+function closeFeedbackRequestModal() {
+    document.getElementById('modal-container').innerHTML = '';
 }
 
 // PDF 뷰어 모달 열기 (교수용과 동일한 레이아웃)

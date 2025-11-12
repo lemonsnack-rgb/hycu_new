@@ -6,144 +6,77 @@ function renderReview() {
     const reviews = DataService.getReviews();
     const content = document.getElementById('review-screen');
     if (!content) return;
-    
-    // 필터링
-    let filteredReviews = [...reviews];
-    if (currentReviewTab === 'progress') {
-        filteredReviews = reviews.filter(r => r.status === '심사 진행중');
-    } else if (currentReviewTab === 'completed') {
-        filteredReviews = reviews.filter(r => r.status === '심사 완료');
-    }
-    
+
     content.innerHTML = `
-        <!-- 심사 신청 가능 여부 -->
-        <div class="card mb-6">
-            <div class="card-body">
-                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                    <div>
-                        <h3 style="font-size: 1.125rem; font-weight: 600; color: #1F2937; margin-bottom: 0.5rem;">
-                            심사 신청 가능 여부
-                        </h3>
-                        <p style="font-size: 0.875rem; color: #6B7280;">
-                            다음 심사 단계: <strong>최종논문 심사</strong>
-                        </p>
-                    </div>
-                    <button onclick="showReviewApplicationModal()" class="btn btn-primary" disabled>
-                        심사 신청하기
-                    </button>
-                </div>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1rem;">
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 1.5rem; margin-right: 0.5rem; color: #10B981;">✓</span>
-                        <span style="font-size: 0.875rem; color: #065F46;">학점 이수 완료 (36/36)</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 1.5rem; margin-right: 0.5rem; color: #10B981;">✓</span>
-                        <span style="font-size: 0.875rem; color: #065F46;">연구계획서 승인</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 1.5rem; margin-right: 0.5rem; color: #10B981;">✓</span>
-                        <span style="font-size: 0.875rem; color: #065F46;">중간논문 승인</span>
-                    </div>
-                    <div style="display: flex; align-items: center;">
-                        <span style="font-size: 1.5rem; margin-right: 0.5rem; color: #F59E0B;">!</span>
-                        <span style="font-size: 0.875rem; color: #92400E;">학술활동 (1/2) - 1건 부족</span>
-                    </div>
-                </div>
-                
-                <div style="margin-top: 1rem; padding: 0.75rem; background: #FEF3C7; border-left: 4px solid #F59E0B; border-radius: 0.375rem;">
-                    <p style="font-size: 0.875rem; color: #92400E;">
-                        조건 미충족: 학술활동 1건이 더 필요합니다. 신청 가능 기간: 2025-12-01 ~ 2025-12-15
-                    </p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 심사 진행 현황 -->
+        <!-- 심사 신청 -->
         <div class="card">
-            <div class="card-header">
-                <h3 style="font-size: 1.125rem; font-weight: 600; color: #1F2937;">
-                    심사 진행 현황
-                </h3>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">심사 신청</h2>
+                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문 심사를 신청하고 진행 상황을 확인하세요</p>
+                </div>
+                <button onclick="showReviewApplicationModal()" class="btn-primary">
+                    + 심사 신청하기
+                </button>
             </div>
+
             <div class="card-body" style="padding: 0;">
-                <!-- 탭 -->
-                <div style="display: flex; gap: 0.5rem; padding: 1rem 1rem 0 1rem; border-bottom: 2px solid #F3F4F6;">
-                    <button onclick="filterReviews('all')" class="tab-button ${currentReviewTab === 'all' ? 'active' : ''}" data-tab="all">
-                        전체 (${reviews.length})
-                    </button>
-                    <button onclick="filterReviews('progress')" class="tab-button ${currentReviewTab === 'progress' ? 'active' : ''}" data-tab="progress">
-                        진행중 (${reviews.filter(r => r.status === '심사 진행중').length})
-                    </button>
-                    <button onclick="filterReviews('completed')" class="tab-button ${currentReviewTab === 'completed' ? 'active' : ''}" data-tab="completed">
-                        완료 (${reviews.filter(r => r.status === '심사 완료').length})
-                    </button>
-                </div>
-                
                 <!-- 테이블 -->
-                <div style="overflow-x: auto;">
-                    <table class="data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 25%;">심사 종류</th>
-                                <th style="width: 15%;">신청일</th>
-                                <th style="width: 30%;">진행 상태</th>
-                                <th style="width: 15%;">진행률</th>
-                                <th style="width: 15%;">결과</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${filteredReviews.length > 0 ? filteredReviews.map(review => `
-                                <tr onclick="showReviewDetail(${review.id})">
-                                    <td data-label="심사 종류">
-                                        <div style="display: flex; align-items: center;">
-                                            <i class="fas fa-file-alt" style="color: #6A0028; margin-right: 0.5rem;"></i>
-                                            <span style="font-weight: 500;">${review.type}</span>
-                                        </div>
-                                    </td>
-                                    <td data-label="신청일">${review.applicationDate}</td>
-                                    <td data-label="진행 상태">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
+                        <tr>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문명</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">심사 유형</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">진행 상태</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">심사 결과</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${reviews.length > 0 ? reviews.map(review => `
+                            <tr onclick="showReviewDetail(${review.id})" style="border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: background 0.2s;"
+                                onmouseover="this.style.background='#F9FAFB'"
+                                onmouseout="this.style.background='white'">
+                                <td style="padding: 0.75rem 1rem;">
+                                    <div style="font-weight: 500; color: #1F2937;">${review.title || review.type}</div>
+                                </td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${review.type}</span>
+                                </td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span class="badge ${review.status === '심사 진행중' ? 'badge-info' : review.status === '심사 완료' ? 'badge-success' : 'badge-warning'}">
+                                            ${review.status}
+                                        </span>
+                                        ${review.progress !== undefined ? `
+                                            <div style="flex: 1; max-width: 100px;">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: ${review.progress}%;"></div>
+                                                </div>
+                                            </div>
+                                            <span style="font-size: 0.75rem; color: #6B7280;">${review.progress}%</span>
+                                        ` : ''}
+                                    </div>
+                                </td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    ${review.result ? `
                                         <div>
-                                            <span class="badge ${review.status === '심사 진행중' ? 'badge-info' : 'badge-success'}">
-                                                ${review.status}
+                                            <span class="badge ${review.result === '합격' ? 'badge-success' : 'badge-danger'}">
+                                                ${review.result}
                                             </span>
-                                            ${review.statusDetail ? `<br><span style="font-size: 0.75rem; color: #6B7280;">${review.statusDetail}</span>` : ''}
+                                            ${review.score ? `<span style="font-size: 0.875rem; font-weight: 600; color: #6A0028; margin-left: 0.5rem;">${review.score}점</span>` : ''}
                                         </div>
-                                    </td>
-                                    <td data-label="진행률">
-                                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                            <span style="font-weight: 600; color: #6A0028;">${review.progress}%</span>
-                                            <div class="progress-bar">
-                                                <div class="progress-fill" style="width: ${review.progress}%;"></div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td data-label="결과">
-                                        ${review.result ? `
-                                            <div>
-                                                <span class="badge ${review.result === '합격' ? 'badge-success' : 'badge-danger'}">
-                                                    ${review.result}
-                                                </span>
-                                                ${review.score ? `<br><span style="font-size: 0.875rem; font-weight: 600; color: #6A0028;">${review.score}점</span>` : ''}
-                                            </div>
-                                        ` : '<span style="color: #9CA3AF;">-</span>'}
-                                    </td>
-                                </tr>
-                            `).join('') : `
-                                <tr>
-                                    <td colspan="5" style="text-align: center; padding: 3rem; color: #9CA3AF;">
-                                        해당하는 심사가 없습니다
-                                    </td>
-                                </tr>
-                            `}
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div style="padding: 1rem; border-top: 1px solid #F3F4F6; font-size: 0.875rem; color: #6B7280;">
-                    ※ 행을 클릭하면 상세 정보를 확인할 수 있습니다
-                </div>
+                                    ` : '<span style="color: #9CA3AF;">-</span>'}
+                                </td>
+                            </tr>
+                        `).join('') : `
+                            <tr>
+                                <td colspan="4" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                    신청한 심사가 없습니다
+                                </td>
+                            </tr>
+                        `}
+                    </tbody>
+                </table>
             </div>
         </div>
     `;
@@ -460,61 +393,98 @@ function showReviewApplicationModal() {
                     <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
                 </div>
                 <div class="modal-body">
-                    <!-- 신청 불가 안내 -->
-                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #92400E; margin-bottom: 0.5rem;">신청 조건 미충족</h4>
-                        <p style="font-size: 0.875rem; color: #92400E; margin-bottom: 0.5rem;">
-                            다음 조건을 충족해야 심사를 신청할 수 있습니다:
-                        </p>
-                        <ul style="font-size: 0.875rem; color: #92400E; margin-left: 1.5rem;">
-                            <li>학술활동 2건 (현재 1건)</li>
-                            <li>신청 가능 기간: 2025-12-01 ~ 2025-12-15</li>
-                        </ul>
-                    </div>
-                    
-                    <!-- 심사 종류 선택 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #1F2937; margin-bottom: 0.5rem;">
-                            심사 종류
-                        </label>
-                        <select id="review-type" class="form-control" disabled>
-                            <option value="">선택하세요</option>
-                            <option value="proposal">연구계획서 심사</option>
-                            <option value="interim">중간논문 심사</option>
-                            <option value="final" selected>최종논문 심사</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 희망 심사일 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #1F2937; margin-bottom: 0.5rem;">
-                            희망 심사일
-                        </label>
-                        <input type="date" id="review-date" class="form-control" disabled>
-                    </div>
-                    
-                    <!-- 첨부 파일 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #1F2937; margin-bottom: 0.5rem;">
-                            논문 파일
-                        </label>
-                        <input type="file" id="review-file" class="form-control" accept=".pdf" disabled>
-                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
-                            PDF 파일만 첨부 가능합니다.
-                        </p>
-                    </div>
+                    <form id="review-application-form" onsubmit="handleReviewApplication(event)">
+                        <!-- 논문 제목 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                논문 제목 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="text" id="review-title" required
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;"
+                                   placeholder="논문 제목을 입력하세요">
+                        </div>
+
+                        <!-- 심사 유형 선택 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                심사 유형 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <select id="review-type" required
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                                <option value="">선택하세요</option>
+                                <option value="연구계획서 심사">연구계획서 심사</option>
+                                <option value="중간논문 심사">중간논문 심사</option>
+                                <option value="최종논문 심사">최종논문 심사</option>
+                            </select>
+                        </div>
+
+                        <!-- 첨부 파일 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                논문 파일 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="file" id="review-file" required accept=".pdf"
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                PDF 파일만 첨부 가능 (최대 30MB)
+                            </p>
+                        </div>
+
+                        <!-- 주의사항 -->
+                        <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                            <p style="font-weight: 600; color: #92400E; margin-bottom: 0.5rem;">주의사항</p>
+                            <ul style="font-size: 0.75rem; color: #92400E; margin-left: 1rem;">
+                                <li>신청 후 취소는 심사일 7일 전까지 가능합니다</li>
+                                <li>제출한 파일은 수정이 불가하오니 신중히 제출해주세요</li>
+                                <li>심사위원회 구성 후 일정 변경 시 개별 연락드립니다</li>
+                            </ul>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
                     <button onclick="closeModal()" class="btn btn-secondary">취소</button>
-                    <button onclick="submitReviewApplication()" class="btn btn-primary" disabled>
+                    <button onclick="document.getElementById('review-application-form').requestSubmit()" class="btn btn-primary">
                         신청하기
                     </button>
                 </div>
             </div>
         </div>
     `;
-    
+
     document.getElementById('modal-container').innerHTML = modalContent;
+}
+
+function handleReviewApplication(event) {
+    event.preventDefault();
+
+    const title = document.getElementById('review-title').value;
+    const type = document.getElementById('review-type').value;
+    const file = document.getElementById('review-file').files[0];
+
+    if (!file) {
+        alert('파일을 선택해주세요');
+        return;
+    }
+
+    // 파일 크기 검증 (30MB)
+    const maxSize = 30 * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert('파일 크기는 30MB를 초과할 수 없습니다');
+        return;
+    }
+
+    // 파일 형식 검증
+    if (file.type !== 'application/pdf') {
+        alert('PDF 파일만 업로드 가능합니다');
+        return;
+    }
+
+    // 실제로는 서버로 전송
+    console.log('심사 신청:', { title, type, file: file.name });
+
+    alert('심사 신청이 완료되었습니다.\n관리자 승인 후 심사위원이 배정됩니다.');
+    closeModal();
+    renderReview();
 }
 
 // 심사 신청 제출

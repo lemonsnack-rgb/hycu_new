@@ -1,34 +1,104 @@
 /**
- * 학생 - 학술지 논문 제출
+ * 학생 - 학술지 대체 심사 신청
  */
 
 function initJournalSubmission() {
-    renderJournalSubmissionForm();
+    renderJournalSubmissionList();
 }
 
-function renderJournalSubmissionForm() {
+function renderJournalSubmissionList() {
     const container = document.getElementById('journalSubmissionContainer');
     if (!container) return;
 
+    // Mock data - 실제로는 서버에서 가져옴
+    const submissions = [
+        {
+            id: 1,
+            paperTitle: 'AI 기반 데이터 분석 연구',
+            journalName: 'Journal of AI Research',
+            grade: 'SCI',
+            submitDate: '2025-10-15',
+            status: '승인 대기',
+            editable: false
+        }
+    ];
+
     const content = `
-        <div class="max-w-4xl mx-auto">
-            <div class="mb-6">
-                <h2 class="text-2xl font-bold text-gray-800">학술지 논문 제출</h2>
-                <p class="text-sm text-gray-600 mt-2">학술지에 게재된 논문 정보를 등록해주세요.</p>
-            </div>
-
-            <!-- 제출 이력 -->
-            <div class="bg-white rounded-lg shadow-sm p-6 mb-6">
-                <h3 class="text-lg font-bold mb-4">제출 이력</h3>
-                <div class="space-y-3" id="submissionHistory">
-                    <p class="text-sm text-gray-500">제출된 학술지가 없습니다.</p>
+        <div class="card">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학술지 대체 심사 신청</h2>
+                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 게재 실적으로 대체 심사를 신청하세요</p>
                 </div>
+                <button onclick="showJournalSubmissionModal()" class="btn-primary">
+                    + 학술지 대체 심사 실적 제출
+                </button>
             </div>
 
-            <!-- 제출 폼 -->
-            <div class="bg-white rounded-lg shadow-sm p-6">
-                <h3 class="text-lg font-bold mb-6">새 논문 제출</h3>
-                <form id="journalSubmissionForm" class="space-y-6">
+            <div class="card-body" style="padding: 0;">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
+                        <tr>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문 제목</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">학술지명</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">등급</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">상태</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${submissions.length > 0 ? submissions.map(sub => `
+                            <tr style="border-bottom: 1px solid #E5E7EB;">
+                                <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${sub.paperTitle}</td>
+                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.journalName}</td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.grade}</span>
+                                </td>
+                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.submitDate}</td>
+                                <td style="padding: 0.75rem 1rem;">
+                                    <span style="background: #FEF3C7; color: #92400E; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.status}</span>
+                                </td>
+                            </tr>
+                        `).join('') : `
+                            <tr>
+                                <td colspan="5" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                    제출한 학술지 실적이 없습니다
+                                </td>
+                            </tr>
+                        `}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- 안내사항 -->
+        <div style="margin-top: 1.5rem; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0.5rem; padding: 1rem;">
+            <h4 style="font-weight: 600; color: #1E40AF; margin-bottom: 0.75rem;">
+                📌 학술지 대체 심사 안내
+            </h4>
+            <ul style="font-size: 0.875rem; color: #1E40AF; padding-left: 1.25rem; margin: 0;">
+                <li style="margin-bottom: 0.5rem;">SCI, SSCI, SCIE 등급 학술지 게재 시 최종 논문 심사를 대체할 수 있습니다</li>
+                <li style="margin-bottom: 0.5rem;">제출 후에는 수정이 불가하오니 신중히 입력해주세요</li>
+                <li style="margin-bottom: 0.5rem;">관리자 승인 후 지도교수의 최종 확인이 필요합니다</li>
+                <li>자세한 사항은 지도교수 또는 관리자에게 문의하세요</li>
+            </ul>
+        </div>
+    `;
+
+    container.innerHTML = content;
+}
+
+// 학술지 제출 모달
+function showJournalSubmissionModal() {
+    const modalContent = `
+        <div class="modal">
+            <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
+                <div class="modal-header">
+                    <h3>학술지 대체 심사 실적 제출</h3>
+                    <button onclick="closeJournalModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="journalSubmissionForm" onsubmit="submitJournal(event)" class="space-y-6">
 
                     <!-- 논문 정보 -->
                     <div class="bg-gray-50 rounded-lg p-4">
@@ -216,24 +286,36 @@ function renderJournalSubmissionForm() {
 
                     <!-- 제출 버튼 -->
                     <div class="flex justify-end gap-3">
-                        <button type="button" onclick="resetJournalForm()"
+                        <button type="button" onclick="closeJournalModal()"
                                 class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
-                            초기화
+                            취소
                         </button>
                         <button type="submit"
                                 class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
                             제출하기
                         </button>
                     </div>
+
+                    <!-- 안내 -->
+                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.75rem; border-radius: 0.375rem;">
+                        <p style="font-weight: 600; color: #92400E; font-size: 0.875rem; margin-bottom: 0.5rem;">주의사항</p>
+                        <ul style="font-size: 0.75rem; color: #92400E; padding-left: 1rem; margin: 0;">
+                            <li>제출 후에는 수정이 불가합니다</li>
+                            <li>모든 정보를 정확히 입력해주세요</li>
+                            <li>PDF 파일은 최대 50MB까지 업로드 가능합니다</li>
+                        </ul>
+                    </div>
                 </form>
             </div>
         </div>
+    </div>
     `;
 
-    container.innerHTML = content;
+    document.getElementById('modal-container').innerHTML = modalContent;
+}
 
-    // 폼 제출 이벤트
-    document.getElementById('journalSubmissionForm').addEventListener('submit', submitJournal);
+function closeJournalModal() {
+    document.getElementById('modal-container').innerHTML = '';
 }
 
 function submitJournal(e) {
@@ -276,21 +358,18 @@ function submitJournal(e) {
     }
 
     // 실제로는 서버로 전송
-    console.log('학술지 논문 제출:', formData);
+    console.log('학술지 대체 심사 실적 제출:', formData);
 
-    alert('학술지 논문이 제출되었습니다.\n지도교수의 승인 후 심사가 진행됩니다.');
+    alert('학술지 대체 심사 실적이 제출되었습니다.\n관리자의 승인을 기다려주세요.');
 
-    // 폼 초기화
-    resetJournalForm();
-}
-
-function resetJournalForm() {
-    document.getElementById('journalSubmissionForm').reset();
+    closeJournalModal();
+    renderJournalSubmissionList();
 }
 
 // Export functions
 window.initJournalSubmission = initJournalSubmission;
+window.showJournalSubmissionModal = showJournalSubmissionModal;
+window.closeJournalModal = closeJournalModal;
 window.submitJournal = submitJournal;
-window.resetJournalForm = resetJournalForm;
 
-console.log('✅ 학술지 제출 모듈 로드 완료');
+console.log('✅ 학술지 대체 심사 신청 모듈 로드 완료');

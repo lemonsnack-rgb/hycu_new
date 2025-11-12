@@ -122,7 +122,7 @@ function renderTitleChange() {
 
 function showTitleChangeModal() {
     const currentTitle = DataService.getCurrentTitle();
-    
+
     const modalContent = `
         <div class="modal">
             <div class="modal-content" style="max-width: 700px;">
@@ -144,47 +144,50 @@ function showTitleChangeModal() {
                                 <p style="font-size: 0.875rem; color: #4B5563;">${currentTitle.english}</p>
                             </div>
                         </div>
-                        
-                        <!-- 변경할 제목 -->
-                        <div style="border-top: 2px solid #E5E7EB; padding-top: 1.5rem; margin-bottom: 1.5rem;">
-                            <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">🔄 변경할 제목</h4>
-                            
-                            <div class="form-group">
-                                <label class="form-label required">국문 제목</label>
-                                <textarea class="form-textarea" placeholder="변경할 국문 제목을 입력하세요" required></textarea>
-                                <p class="form-hint">권장: 30자 이내</p>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label class="form-label required">영문 제목</label>
-                                <textarea class="form-textarea" placeholder="변경할 영문 제목을 입력하세요" required></textarea>
-                                <p class="form-hint">권장: 15 words 이내</p>
-                            </div>
+
+                        <!-- 변경할 논문명 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                변경할 논문명 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="text" id="new-title" required
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;"
+                                   placeholder="변경할 논문 제목을 입력하세요">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">권장: 50자 이내</p>
                         </div>
-                        
+
+                        <!-- 논문명의 언어 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                논문명의 언어 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <select id="title-language" required
+                                    style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                                <option value="">선택하세요</option>
+                                <option value="한국어">한국어</option>
+                                <option value="영어">영어</option>
+                                <option value="한국어/영어">한국어/영어</option>
+                            </select>
+                        </div>
+
                         <!-- 변경 사유 -->
-                        <div class="form-group">
-                            <label class="form-label required">변경 사유</label>
-                            <textarea class="form-textarea" placeholder="제목 변경이 필요한 구체적인 사유를 작성해주세요" 
-                                      style="min-height: 120px;" required></textarea>
-                            <p class="form-hint">상세히 작성할수록 승인 가능성이 높아집니다</p>
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                변경 사유 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <textarea id="change-reason" required
+                                      style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; min-height: 120px; resize: vertical;"
+                                      placeholder="제목 변경이 필요한 구체적인 사유를 작성해주세요"></textarea>
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">상세히 작성할수록 승인 가능성이 높아집니다</p>
                         </div>
-                        
-                        <!-- 첨부 서류 -->
-                        <div class="form-group">
-                            <label class="form-label">첨부 서류 (선택)</label>
-                            <input type="file" class="form-input">
-                            <p class="form-hint">제목 변경 관련 미팅록, 이메일 등</p>
-                        </div>
-                        
+
                         <!-- 주의사항 -->
                         <div style="background: #FEF3C7; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #F59E0B;">
-                            <p style="font-size: 0.875rem; color: #92400E;">
-                                주의사항
-                            </p>
-                            <ul style="font-size: 0.875rem; color: #92400E; padding-left: 1.25rem; margin-top: 0.5rem;">
-                                <li>제목 변경은 지도교수 승인 후 확정됩니다.</li>
-                                <li>심사 진행 중인 경우 변경이 제한될 수 있습니다.</li>
+                            <p style="font-size: 0.875rem; color: #92400E; font-weight: 600; margin-bottom: 0.5rem;">주의사항</p>
+                            <ul style="font-size: 0.75rem; color: #92400E; padding-left: 1.25rem; margin: 0;">
+                                <li>제목 변경은 지도교수 및 관리자 승인 후 확정됩니다</li>
+                                <li>심사 진행 중인 경우 변경이 제한될 수 있습니다</li>
+                                <li>최종 심사 이후에는 제목 변경이 불가합니다</li>
                             </ul>
                         </div>
                     </form>
@@ -198,14 +201,28 @@ function showTitleChangeModal() {
             </div>
         </div>
     `;
-    
+
     document.getElementById('modal-container').innerHTML = modalContent;
 }
 
 function handleTitleChange(event) {
     event.preventDefault();
-    alert('제목 변경 신청이 완료되었습니다. 교수님의 승인을 기다려주세요.');
+
+    const newTitle = document.getElementById('new-title').value;
+    const language = document.getElementById('title-language').value;
+    const reason = document.getElementById('change-reason').value;
+
+    if (!newTitle || !language || !reason) {
+        alert('모든 필수 항목을 입력해주세요');
+        return;
+    }
+
+    // 실제로는 서버로 전송
+    console.log('제목 변경 신청:', { newTitle, language, reason });
+
+    alert('제목 변경 신청이 완료되었습니다.\n관리자의 승인을 기다려주세요.');
     closeModal();
+    renderTitleChange();
 }
 
 function showTitleChangeDetail(changeId) {
