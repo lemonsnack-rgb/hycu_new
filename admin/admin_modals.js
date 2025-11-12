@@ -3362,7 +3362,12 @@ function submitResearchProposal() {
 }
 
 function viewResearchProposalDetail(id) {
+    console.log('viewResearchProposalDetail called with id:', id);
+    console.log('appData.submissions.researchProposal:', appData.submissions.researchProposal);
+
     const proposal = appData.submissions.researchProposal.find(p => p.id === id);
+    console.log('Found proposal:', proposal);
+
     if (!proposal) {
         alert('연구계획서 정보를 찾을 수 없습니다.');
         return;
@@ -3645,6 +3650,171 @@ function savePassCriteria(criteriaId) {
     loadView('evaluationCriteria');
 }
 
+// ==================== 논문 제목 변경 신청 관리 ====================
+
+function viewTitleChangeDetail(id) {
+    const request = appData.titleChangeRequests.find(r => r.id === id);
+    if (!request) {
+        alert('신청 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const content = `
+        <div class="space-y-6">
+            <!-- 학생 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학번</label>
+                        <input type="text" value="${request.studentId}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
+                        <input type="text" value="${request.studentName}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학과/전공</label>
+                        <input type="text" value="${request.major}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학위과정</label>
+                        <input type="text" value="${request.degree}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 논문 제목 변경 정보 -->
+            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
+                <h4 class="font-bold text-blue-900 mb-3">논문 제목 변경 정보</h4>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">현재 논문 제목</label>
+                        <input type="text" value="${request.currentTitle}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div class="flex items-center justify-center text-blue-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">변경 논문 제목</label>
+                        <input type="text" value="${request.newTitle}" readonly
+                               class="w-full px-3 py-2 border border-blue-300 rounded bg-blue-100 text-gray-900 font-medium">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">논문 언어</label>
+                        <input type="text" value="${request.language}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 변경 사유 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">변경 사유</h4>
+                <textarea rows="4" readonly
+                          class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">${request.reason}</textarea>
+            </div>
+
+            <!-- 신청 정보 -->
+            <div class="bg-gray-50 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">신청 정보</h4>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">신청일</label>
+                        <input type="text" value="${request.requestDate}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
+                        <span class="inline-block px-4 py-2 rounded-full text-sm font-medium ${
+                            request.status === '승인' ? 'bg-green-100 text-green-700' :
+                            request.status === '대기' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-gray-100 text-gray-700'
+                        }">
+                            ${request.status}
+                        </span>
+                    </div>
+                    ${request.status === '승인' ? `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">승인일</label>
+                            <input type="text" value="${request.approvedDate}" readonly
+                                   class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">승인자</label>
+                            <input type="text" value="${request.approvedBy}" readonly
+                                   class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 대기 상태면 승인 버튼 표시, 승인 상태면 닫기 버튼만 표시
+    if (request.status === '대기') {
+        openModal(
+            '논문 제목 변경 신청 상세',
+            content,
+            '승인',
+            () => approveTitleChange(id),
+            true
+        );
+    } else {
+        openModal(
+            '논문 제목 변경 신청 상세',
+            content,
+            '닫기',
+            closeModal,
+            true
+        );
+    }
+}
+
+function approveTitleChange(id) {
+    const request = appData.titleChangeRequests.find(r => r.id === id);
+    if (!request) {
+        alert('신청 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    if (request.status === '승인') {
+        alert('이미 승인된 신청입니다.');
+        return;
+    }
+
+    if (confirm(`${request.studentName}(${request.studentId}) 학생의 논문 제목 변경 신청을 승인하시겠습니까?`)) {
+        request.status = '승인';
+        request.approvedDate = new Date().toISOString().split('T')[0];
+        request.approvedBy = '관리자';
+
+        alert('논문 제목 변경이 승인되었습니다.');
+        closeModal();
+        loadView('titleChangeRequests');
+    }
+}
+
+function searchTitleChangeRequests() {
+    // 검색 기능 구현 (선택사항)
+    alert('검색 기능은 추후 구현 예정입니다.');
+}
+
+function resetTitleChangeSearch() {
+    document.getElementById('title-search-year').value = '';
+    document.getElementById('title-search-semester').value = '';
+    document.getElementById('title-search-student-id').value = '';
+    document.getElementById('title-search-student-name').value = '';
+    document.getElementById('title-search-status').value = '';
+    loadView('titleChangeRequests');
+}
+
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
 window.closePdfViewer = closePdfViewer;
@@ -3664,6 +3834,11 @@ window.searchStudentForRP = searchStudentForRP;
 window.selectStudentForRP = selectStudentForRP;
 window.submitResearchProposal = submitResearchProposal;
 window.viewResearchProposalDetail = viewResearchProposalDetail;
+window.updateResearchProposal = updateResearchProposal;
 window.editPassCriteria = editPassCriteria;
 window.toggleFailThreshold = toggleFailThreshold;
 window.savePassCriteria = savePassCriteria;
+window.viewTitleChangeDetail = viewTitleChangeDetail;
+window.approveTitleChange = approveTitleChange;
+window.searchTitleChangeRequests = searchTitleChangeRequests;
+window.resetTitleChangeSearch = resetTitleChangeSearch;

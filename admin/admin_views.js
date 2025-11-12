@@ -1675,6 +1675,143 @@ const views = {
         `;
     },
 
+    // ========== 논문 제목 변경 신청 관리 ==========
+    titleChangeRequests: () => {
+        const data = appData.titleChangeRequests;
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">논문 제목 변경 신청 관리</h3>
+
+                    <!-- 검색 메뉴 (학위논문 심사관리와 동일하되 심사구분, 심사일, 심사상태 제거) -->
+                    <div class="search-container">
+                        <div class="search-grid">
+                            <!-- 1. 학년도 -->
+                            <div class="search-field">
+                                <label class="search-label">학년도</label>
+                                <select id="title-search-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+
+                            <!-- 2. 학기 -->
+                            <div class="search-field">
+                                <label class="search-label">학기</label>
+                                <select id="title-search-semester" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+
+                            <!-- 3. 학번 -->
+                            <div class="search-field">
+                                <label class="search-label">학번</label>
+                                <input type="text" id="title-search-student-id" placeholder="학번 입력"
+                                       class="search-input">
+                            </div>
+
+                            <!-- 4. 성명 -->
+                            <div class="search-field">
+                                <label class="search-label">성명</label>
+                                <input type="text" id="title-search-student-name" placeholder="성명 입력"
+                                       class="search-input">
+                            </div>
+
+                            <!-- 5. 상태 -->
+                            <div class="search-field">
+                                <label class="search-label">상태</label>
+                                <select id="title-search-status" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="대기">대기</option>
+                                    <option value="승인">승인</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 검색/초기화 버튼 -->
+                        <div class="search-buttons">
+                            <button onclick="searchTitleChangeRequests()" class="search-btn search-btn-primary">
+                                <i class="fas fa-search"></i>검색
+                            </button>
+                            <button onclick="resetTitleChangeSearch()" class="search-btn search-btn-secondary">
+                                <i class="fas fa-redo"></i>초기화
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">현재 논문 제목</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">변경 논문 제목</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">신청일</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">상태</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${data.length > 0 ? data.map((item, idx) => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
+                                        <div class="truncate" title="${item.currentTitle}">
+                                            ${item.currentTitle}
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
+                                        <div class="truncate" title="${item.newTitle}">
+                                            ${item.newTitle}
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.requestDate || '-'}</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="text-xs px-3 py-1.5 rounded-full ${
+                                            item.status === '승인' ? 'bg-green-100 text-green-700' :
+                                            item.status === '대기' ? 'bg-yellow-100 text-yellow-700' :
+                                            'bg-gray-100 text-gray-700'
+                                        }">
+                                            ${item.status}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button onclick="viewTitleChangeDetail(${item.id})"
+                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                            상세보기
+                                        </button>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="11" class="py-8 text-center text-gray-500">
+                                        논문 제목 변경 신청 내역이 없습니다.
+                                    </td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    },
+
     // ========== 주차별 지도 관리 ==========
     weeklyGuidance: () => {
         const data = appData.weeklyGuidance;
