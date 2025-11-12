@@ -478,10 +478,24 @@ const views = {
                         </div>
                     </div>
                 </div>
+
+                <!-- 알림 발송 버튼 -->
+                <div class="flex justify-end mb-4 px-6">
+                    <button onclick="sendNotificationToSelectedStudents('thesisPlan')"
+                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                        선택 학생에게 알림 발송
+                    </button>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                                    <input type="checkbox" id="select-all-thesis-plan"
+                                           onchange="toggleSelectAllAdmin('thesisPlan', this.checked)"
+                                           class="rounded border-gray-300">
+                                </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
@@ -496,6 +510,13 @@ const views = {
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => `
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-center">
+                                        <input type="checkbox" class="admin-student-checkbox thesis-plan-checkbox"
+                                               data-student-id="${item.studentId}"
+                                               data-student-name="${item.studentName}"
+                                               value="${item.id}"
+                                               class="rounded border-gray-300">
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
@@ -583,10 +604,24 @@ const views = {
                         </div>
                     </div>
                 </div>
+
+                <!-- 알림 발송 버튼 -->
+                <div class="flex justify-end mb-4 px-6">
+                    <button onclick="sendNotificationToSelectedStudents('midThesis')"
+                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                        선택 학생에게 알림 발송
+                    </button>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                                    <input type="checkbox" id="select-all-mid-thesis"
+                                           onchange="toggleSelectAllAdmin('midThesis', this.checked)"
+                                           class="rounded border-gray-300">
+                                </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
@@ -601,6 +636,13 @@ const views = {
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => `
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-center">
+                                        <input type="checkbox" class="admin-student-checkbox mid-thesis-checkbox"
+                                               data-student-id="${item.studentId}"
+                                               data-student-name="${item.studentName}"
+                                               value="${item.id}"
+                                               class="rounded border-gray-300">
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
@@ -688,10 +730,24 @@ const views = {
                         </div>
                     </div>
                 </div>
+
+                <!-- 알림 발송 버튼 -->
+                <div class="flex justify-end mb-4 px-6">
+                    <button onclick="sendNotificationToSelectedStudents('finalThesis')"
+                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                        선택 학생에게 알림 발송
+                    </button>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                                    <input type="checkbox" id="select-all-final-thesis"
+                                           onchange="toggleSelectAllAdmin('finalThesis', this.checked)"
+                                           class="rounded border-gray-300">
+                                </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
@@ -706,6 +762,13 @@ const views = {
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => `
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-center">
+                                        <input type="checkbox" class="admin-student-checkbox final-thesis-checkbox"
+                                               data-student-id="${item.studentId}"
+                                               data-student-name="${item.studentName}"
+                                               value="${item.id}"
+                                               class="rounded border-gray-300">
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
@@ -935,10 +998,24 @@ const views = {
                         </div>
                     </div>
                 </div>
+
+                <!-- 알림 발송 버튼 -->
+                <div class="flex justify-end mb-4 px-6">
+                    <button onclick="sendNotificationToSelectedStudents('journalSubmission')"
+                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                        선택 학생에게 알림 발송
+                    </button>
+                </div>
+
                 <div class="overflow-x-auto">
                     <table class="min-w-full">
                         <thead class="bg-gray-50">
                             <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                                    <input type="checkbox" id="select-all-journal-submission"
+                                           onchange="toggleSelectAllAdmin('journalSubmission', this.checked)"
+                                           class="rounded border-gray-300">
+                                </th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
@@ -955,6 +1032,13 @@ const views = {
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => `
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-center">
+                                        <input type="checkbox" class="admin-student-checkbox journal-submission-checkbox"
+                                               data-student-id="${item.studentId}"
+                                               data-student-name="${item.studentName}"
+                                               value="${item.id}"
+                                               class="rounded border-gray-300">
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>

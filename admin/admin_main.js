@@ -3088,3 +3088,226 @@ function showNotification(message, type = 'info') {
 window.showNotification = showNotification;
 
 console.log('✅ 알림 시스템 로드 완료');
+
+// ========== 체크박스 전체 선택/해제 함수 ==========
+function toggleSelectAllAdmin(viewType, checked) {
+    const classMap = {
+        'thesisPlan': '.thesis-plan-checkbox',
+        'midThesis': '.mid-thesis-checkbox',
+        'finalThesis': '.final-thesis-checkbox',
+        'journalSubmission': '.journal-submission-checkbox'
+    };
+
+    const selector = classMap[viewType];
+    if (!selector) return;
+
+    const checkboxes = document.querySelectorAll(selector);
+    checkboxes.forEach(cb => cb.checked = checked);
+}
+
+// ========== 선택한 학생에게 알림 발송 ==========
+function sendNotificationToSelectedStudents(viewType) {
+    const classMap = {
+        'thesisPlan': '.thesis-plan-checkbox',
+        'midThesis': '.mid-thesis-checkbox',
+        'finalThesis': '.final-thesis-checkbox',
+        'journalSubmission': '.journal-submission-checkbox'
+    };
+
+    const selector = classMap[viewType];
+    if (!selector) return;
+
+    const checkboxes = document.querySelectorAll(selector + ':checked');
+
+    if (checkboxes.length === 0) {
+        showNotification('학생을 선택해주세요', 'warning');
+        return;
+    }
+
+    const selectedStudents = Array.from(checkboxes).map(cb => ({
+        id: cb.value,
+        studentId: cb.dataset.studentId,
+        name: cb.dataset.studentName
+    }));
+
+    openAdminNotificationModal(selectedStudents, viewType);
+}
+
+// ========== 알림 발송 모달 열기 ==========
+function openAdminNotificationModal(students, viewType) {
+    const modal = document.createElement('div');
+    modal.className = 'modal-backdrop active';
+    modal.id = 'admin-notification-modal';
+
+    const studentList = students.map(s => `${s.name} (${s.studentId})`).join(', ');
+
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px; width: 90%;">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-gray-800">알림 발송</h3>
+                    <button onclick="closeAdminNotificationModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+                </div>
+            </div>
+
+            <div class="p-6">
+                <!-- 발송 대상 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        발송 대상 (${students.length}명)
+                    </label>
+                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 max-h-32 overflow-y-auto">
+                        <p class="text-sm text-gray-700">${studentList}</p>
+                    </div>
+                </div>
+
+                <!-- 발송 방법 선택 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        발송 방법 *
+                    </label>
+                    <div class="flex gap-4">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="admin-notification-type" value="kakao" checked class="rounded-full">
+                            <span class="text-sm text-gray-700">카카오톡</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="radio" name="admin-notification-type" value="sms" class="rounded-full">
+                            <span class="text-sm text-gray-700">SMS</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 알림 제목 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        알림 제목 *
+                    </label>
+                    <input type="text" id="admin-notification-title"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                           placeholder="예: 논문 제출 안내">
+                </div>
+
+                <!-- 메시지 내용 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        메시지 내용 *
+                    </label>
+                    <textarea id="admin-notification-message"
+                              rows="6"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm resize-none"
+                              placeholder="발송할 메시지 내용을 입력하세요."></textarea>
+                    <p class="text-xs text-gray-500 mt-1">
+                        <span id="admin-message-length">0</span> / 1000자
+                    </p>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="flex gap-2 justify-end pt-4">
+                    <button onclick="closeAdminNotificationModal()" class="btn-cancel">취소</button>
+                    <button onclick="submitAdminNotification()" class="btn-primary">발송</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 글자 수 카운터
+    const messageInput = document.getElementById('admin-notification-message');
+    const lengthDisplay = document.getElementById('admin-message-length');
+
+    messageInput.addEventListener('input', function() {
+        const length = this.value.length;
+        lengthDisplay.textContent = length;
+
+        if (length > 1000) {
+            lengthDisplay.classList.add('text-red-600');
+        } else {
+            lengthDisplay.classList.remove('text-red-600');
+        }
+    });
+
+    // 전역 변수에 콜백 저장
+    window._adminNotificationCallback = { students, viewType };
+}
+
+// ========== 알림 발송 모달 닫기 ==========
+function closeAdminNotificationModal() {
+    const modal = document.getElementById('admin-notification-modal');
+    if (modal) {
+        modal.remove();
+    }
+    window._adminNotificationCallback = null;
+}
+
+// ========== 알림 발송 실행 ==========
+function submitAdminNotification() {
+    const title = document.getElementById('admin-notification-title').value.trim();
+    const message = document.getElementById('admin-notification-message').value.trim();
+    const notificationType = document.querySelector('input[name="admin-notification-type"]:checked').value;
+
+    if (!title) {
+        showNotification('알림 제목을 입력해주세요', 'warning');
+        return;
+    }
+
+    if (!message) {
+        showNotification('메시지 내용을 입력해주세요', 'warning');
+        return;
+    }
+
+    if (message.length > 1000) {
+        showNotification('메시지는 1000자 이내로 입력해주세요', 'warning');
+        return;
+    }
+
+    const { students, viewType } = window._adminNotificationCallback;
+    const notifTypeText = notificationType === 'kakao' ? '카카오톡' : 'SMS';
+
+    // 실제로는 서버에 알림 전송 요청
+    console.log('관리자 알림 발송:', {
+        viewType,
+        students,
+        title,
+        message,
+        type: notificationType
+    });
+
+    showNotification(`${students.length}명의 학생에게 ${notifTypeText} 알림이 발송되었습니다`, 'success');
+
+    // 체크박스 초기화
+    const classMap = {
+        'thesisPlan': '.thesis-plan-checkbox',
+        'midThesis': '.mid-thesis-checkbox',
+        'finalThesis': '.final-thesis-checkbox',
+        'journalSubmission': '.journal-submission-checkbox'
+    };
+
+    const selector = classMap[viewType];
+    if (selector) {
+        const checkboxes = document.querySelectorAll(selector);
+        checkboxes.forEach(cb => cb.checked = false);
+
+        const selectAllIds = {
+            'thesisPlan': 'select-all-thesis-plan',
+            'midThesis': 'select-all-mid-thesis',
+            'finalThesis': 'select-all-final-thesis',
+            'journalSubmission': 'select-all-journal-submission'
+        };
+
+        const selectAll = document.getElementById(selectAllIds[viewType]);
+        if (selectAll) selectAll.checked = false;
+    }
+
+    closeAdminNotificationModal();
+}
+
+// Export
+window.toggleSelectAllAdmin = toggleSelectAllAdmin;
+window.sendNotificationToSelectedStudents = sendNotificationToSelectedStudents;
+window.openAdminNotificationModal = openAdminNotificationModal;
+window.closeAdminNotificationModal = closeAdminNotificationModal;
+window.submitAdminNotification = submitAdminNotification;
+
+console.log('✅ 관리자 알림 발송 기능 로드 완료');
