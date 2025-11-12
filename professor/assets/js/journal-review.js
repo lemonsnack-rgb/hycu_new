@@ -291,6 +291,20 @@ function sendNotificationToSelectedJournals() {
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">발송 방법 *</label>
+                <div class="flex gap-4">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="journal-notif-type" value="kakao" checked class="rounded-full">
+                        <span class="text-sm text-gray-700">카카오톡</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="journal-notif-type" value="sms" class="rounded-full">
+                        <span class="text-sm text-gray-700">SMS</span>
+                    </label>
+                </div>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">알림 제목 *</label>
                 <input type="text" id="journal-notif-title" placeholder="예: 학술지 심사 결과 확인 요청"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
@@ -321,6 +335,7 @@ function sendNotificationToSelectedJournals() {
 function confirmSendJournalNotification(students) {
     const title = document.getElementById('journal-notif-title')?.value.trim();
     const message = document.getElementById('journal-notif-message')?.value.trim();
+    const notifType = document.querySelector('input[name="journal-notif-type"]:checked')?.value;
 
     if (!title) {
         showToast('알림 제목을 입력해주세요', 'warning');
@@ -332,8 +347,9 @@ function confirmSendJournalNotification(students) {
         return;
     }
 
-    console.log('학술지 알림 발송:', { students, title, message });
-    showToast(`${students.length}명의 학생에게 알림이 발송되었습니다`, 'success');
+    const notifTypeText = notifType === 'kakao' ? '카카오톡' : 'SMS';
+    console.log('학술지 알림 발송:', { students, title, message, type: notifType });
+    showToast(`${students.length}명의 학생에게 ${notifTypeText} 알림이 발송되었습니다`, 'success');
 
     // 체크박스 초기화
     const checkboxes = document.querySelectorAll('.journal-checkbox');
