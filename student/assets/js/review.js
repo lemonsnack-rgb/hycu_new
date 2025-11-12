@@ -43,19 +43,9 @@ function renderReview() {
                                     <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${review.type}</span>
                                 </td>
                                 <td style="padding: 0.75rem 1rem;">
-                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                        <span class="badge ${review.status === '심사 진행중' ? 'badge-info' : review.status === '심사 완료' ? 'badge-success' : 'badge-warning'}">
-                                            ${review.status}
-                                        </span>
-                                        ${review.progress !== undefined ? `
-                                            <div style="flex: 1; max-width: 100px;">
-                                                <div class="progress-bar">
-                                                    <div class="progress-fill" style="width: ${review.progress}%;"></div>
-                                                </div>
-                                            </div>
-                                            <span style="font-size: 0.75rem; color: #6B7280;">${review.progress}%</span>
-                                        ` : ''}
-                                    </div>
+                                    <span class="badge ${review.status === '심사 진행중' ? 'badge-info' : review.status === '심사 완료' ? 'badge-success' : 'badge-warning'}">
+                                        ${review.status}
+                                    </span>
                                 </td>
                                 <td style="padding: 0.75rem 1rem;">
                                     ${review.result ? `

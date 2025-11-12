@@ -53,20 +53,19 @@ function renderFeedback() {
                     <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                         <tr>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문명</th>
+                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">단계</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">파일명</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">피드백 상태</th>
-                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">[관리]</th>
+                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">관리</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${feedbackRequests.map(req => `
                             <tr style="border-bottom: 1px solid #E5E7EB;">
+                                <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${req.title}</td>
                                 <td style="padding: 0.75rem 1rem;">
-                                    <div>
-                                        <div style="font-weight: 500; color: #1F2937;">${req.title}</div>
-                                        <span style="background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-top: 0.25rem;">${req.stage}</span>
-                                    </div>
+                                    <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${req.stage}</span>
                                 </td>
                                 <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">
                                     <i class="fas fa-file-pdf" style="color: #EF4444;"></i> ${req.fileName}
@@ -76,15 +75,15 @@ function renderFeedback() {
                                     <span style="background: ${req.status === '피드백 완료' ? '#D1FAE5' : '#FEF3C7'}; color: ${req.status === '피드백 완료' ? '#065F46' : '#92400E'}; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${req.status}</span>
                                 </td>
                                 <td style="padding: 0.75rem 1rem; text-align: center;">
-                                    <button onclick="openFeedbackViewer(${req.id})" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;">
-                                        <i class="fas fa-eye"></i> 보기
-                                    </button>
+                                    <a href="javascript:void(0)" onclick="openFeedbackViewer(${req.id})" style="color: #3B82F6; text-decoration: underline; font-size: 0.875rem;">
+                                        상세보기
+                                    </a>
                                 </td>
                             </tr>
                         `).join('')}
                         ${feedbackRequests.length === 0 ? `
                             <tr>
-                                <td colspan="5" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                <td colspan="6" style="padding: 3rem; text-align: center; color: #9CA3AF;">
                                     제출한 피드백 요청이 없습니다
                                 </td>
                             </tr>

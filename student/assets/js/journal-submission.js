@@ -84,9 +84,9 @@ function renderJournalSubmissionList() {
                                     <span style="background: #FEF3C7; color: #92400E; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.status}</span>
                                 </td>
                                 <td style="padding: 0.75rem 1rem; text-align: center;">
-                                    <button onclick="viewJournalDetail(${sub.id})" class="btn btn-sm btn-primary" style="font-size: 0.75rem; padding: 0.375rem 0.75rem;">
-                                        <i class="fas fa-eye"></i> 상세보기
-                                    </button>
+                                    <a href="javascript:void(0)" onclick="viewJournalDetail(${sub.id})" style="color: #3B82F6; text-decoration: underline; font-size: 0.875rem;">
+                                        상세보기
+                                    </a>
                                 </td>
                             </tr>
                         `).join('') : `
