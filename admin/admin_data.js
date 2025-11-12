@@ -9,14 +9,15 @@ const appData = {
         { id: 2, major: '경영학', degree: '박사', minCredits: 36, thesisRequired: true, journalPapers: 2, conferencePapers: 1 }
     ],
     stages: [
-        { 
-            id: 1, 
-            name: '2025-1학기 교육공학 석사 표준 계획', 
-            major: '교육공학', 
-            degree: '석사', 
+        {
+            id: 1,
+            name: '2025-1학기 교육공학 석사 표준 계획',
+            major: '교육공학',
+            degree: '석사',
             version: 'v1.0',
             stageCount: 3,
             evaluationCount: 3,
+            studentCount: 0,
             steps: [
                 {
                     id: 1,
@@ -44,14 +45,15 @@ const appData = {
                 }
             ]
         },
-        { 
-            id: 2, 
-            name: '2025-1학기 경영학 박사 표준 계획', 
-            major: '경영학', 
-            degree: '박사', 
+        {
+            id: 2,
+            name: '2025-1학기 경영학 박사 표준 계획',
+            major: '경영학',
+            degree: '박사',
             version: 'v1.0',
             stageCount: 5,
             evaluationCount: 3,
+            studentCount: 0,
             steps: [
                 {
                     id: 1,

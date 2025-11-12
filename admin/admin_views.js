@@ -1520,15 +1520,19 @@ const views = {
                                     </td>
                                     <td class="py-3 px-4">
                                         <div class="flex gap-2">
-                                            <button onclick="viewStageDetail(${item.id})" 
+                                            <button onclick="viewStageDetail(${item.id})"
                                                     class="text-blue-600 hover:underline text-sm">
                                                 상세보기
                                             </button>
-                                            <button onclick="copyStage(${item.id})" 
+                                            <button onclick="editStage(${item.id})"
+                                                    class="text-purple-600 hover:underline text-sm">
+                                                수정
+                                            </button>
+                                            <button onclick="copyStage(${item.id})"
                                                     class="text-green-600 hover:underline text-sm">
                                                 복사
                                             </button>
-                                            <button onclick="deleteStage(${item.id})" 
+                                            <button onclick="deleteStage(${item.id})"
                                                     class="text-red-600 hover:underline text-sm">
                                                 삭제
                                             </button>

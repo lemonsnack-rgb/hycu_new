@@ -1292,7 +1292,10 @@ function viewStageDetail(id) {
         showAlert('워크플로우를 찾을 수 없습니다.');
         return;
     }
-    
+
+    const studentCount = workflow.studentCount || 0;
+    const canEdit = studentCount === 0;
+
     const content = `
         <div class="space-y-4">
             <div class="bg-gray-50 rounded-lg p-4">
@@ -1313,16 +1316,47 @@ function viewStageDetail(id) {
                         <label class="text-xs font-medium text-gray-500">학위과정</label>
                         <p class="text-sm text-gray-800 mt-1">${workflow.degree}</p>
                     </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">적용 학생 수</label>
+                        <p class="text-sm text-gray-800 mt-1">
+                            <span class="${studentCount > 0 ? 'text-red-600 font-bold' : 'text-green-600'}">${studentCount}명</span>
+                        </p>
+                    </div>
+                    <div>
+                        <label class="text-xs font-medium text-gray-500">수정 가능 여부</label>
+                        <p class="text-sm mt-1">
+                            ${canEdit ?
+                                '<span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">수정 가능</span>' :
+                                '<span class="px-2 py-1 rounded-full text-xs bg-red-100 text-red-800">수정 불가</span>'
+                            }
+                        </p>
+                    </div>
                 </div>
+                ${!canEdit ? `
+                    <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded">
+                        <p class="text-xs text-yellow-800">
+                            <i class="fas fa-exclamation-triangle mr-1"></i>
+                            이 워크플로우는 ${studentCount}명의 학생에게 적용되어 있어 수정할 수 없습니다.
+                        </p>
+                    </div>
+                ` : ''}
             </div>
-            
+
             <div>
                 <div class="flex justify-between items-center mb-3">
                     <h4 class="font-bold text-gray-800">단계 구성 (총 ${workflow.stageCount}단계)</h4>
-                    <button onclick="addWorkflowStep(${id})" 
-                            class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
-                        + 단계 추가
-                    </button>
+                    <div class="flex gap-2">
+                        ${canEdit ? `
+                            <button onclick="editWorkflowStages(${id})"
+                                    class="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700">
+                                <i class="fas fa-edit mr-1"></i> 단계 조립
+                            </button>
+                            <button onclick="addWorkflowStep(${id})"
+                                    class="text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                                + 단계 추가
+                            </button>
+                        ` : ''}
+                    </div>
                 </div>
                 <div class="space-y-2">
                     ${workflow.steps.map((step, idx) => `
@@ -1636,11 +1670,254 @@ function copyStage(id) {
         };
         
         appData.stages.push(newWorkflow);
-        
+
         closeModal();
         showAlert('워크플로우가 복사되었습니다.');
         switchView('stageManagement');
     });
+}
+
+// 워크플로우 단계 조립 (지도 단계 유형에서 선택)
+function editWorkflowStages(workflowId) {
+    const workflow = appData.stages.find(s => s.id === workflowId);
+    if (!workflow) {
+        showAlert('워크플로우를 찾을 수 없습니다.');
+        return;
+    }
+
+    // Store current workflow ID globally for helper functions
+    window._currentWorkflowId = workflowId;
+
+    const availableTypes = appData.types || [];
+    const availableCriteria = appData.evaluationCriteria || [];
+
+    // Initialize temporary stages array if not exists
+    window._tempWorkflowStages = workflow.steps.length > 0 ? JSON.parse(JSON.stringify(workflow.steps)) : [];
+
+    const renderStageAssembly = () => {
+        return `
+            <div class="space-y-4">
+                <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        지도 단계 유형을 선택하여 워크플로우를 구성합니다. 각 단계에 이름을 부여하고 평가가 필요한 단계에는 평가표를 매핑하세요.
+                    </p>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2">단계 유형 선택</h5>
+                    <select id="stage-type-select" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        <option value="">단계 유형을 선택하세요</option>
+                        ${availableTypes.map(t => `
+                            <option value="${t.id}">
+                                ${t.name} ${t.document ? '[문서]' : ''} ${t.presentation ? '[발표]' : ''}
+                            </option>
+                        `).join('')}
+                    </select>
+                    <button onclick="addStageFromType()" class="mt-2 text-sm bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700">
+                        + 단계 추가
+                    </button>
+                </div>
+
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-2">구성된 단계 (${window._tempWorkflowStages.length}개)</h5>
+                    <div id="stage-assembly-list" class="space-y-2">
+                        ${window._tempWorkflowStages.length === 0 ? `
+                            <p class="text-sm text-gray-500 text-center py-4">단계를 추가해주세요</p>
+                        ` : window._tempWorkflowStages.map((stage, idx) => `
+                            <div class="bg-white border border-gray-200 rounded p-3">
+                                <div class="flex items-start gap-3">
+                                    <span class="text-sm font-bold text-gray-400">${idx + 1}.</span>
+                                    <div class="flex-1 space-y-2">
+                                        <input type="text"
+                                               id="stage-name-${idx}"
+                                               value="${stage.name}"
+                                               placeholder="단계명 입력"
+                                               class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
+                                               onchange="updateTempStageName(${idx}, this.value)">
+                                        <div class="flex items-center gap-2">
+                                            <label class="flex items-center text-sm">
+                                                <input type="checkbox"
+                                                       id="stage-eval-${idx}"
+                                                       ${stage.hasEvaluation ? 'checked' : ''}
+                                                       onchange="toggleTempStageEvaluation(${idx})"
+                                                       class="mr-1">
+                                                평가 필요
+                                            </label>
+                                            ${stage.hasEvaluation ? `
+                                                <select id="stage-criteria-${idx}"
+                                                        onchange="updateTempStageCriteria(${idx}, this.value)"
+                                                        class="text-xs border border-gray-300 rounded px-2 py-1">
+                                                    <option value="">평가표 선택</option>
+                                                    ${availableCriteria.map(c => `
+                                                        <option value="${c.id}" ${stage.evaluationCriteriaId === c.id ? 'selected' : ''}>
+                                                            ${c.name}
+                                                        </option>
+                                                    `).join('')}
+                                                </select>
+                                            ` : ''}
+                                        </div>
+                                        ${stage.stageTypeId ? `
+                                            <p class="text-xs text-gray-500">
+                                                유형: ${availableTypes.find(t => t.id === stage.stageTypeId)?.name || ''}
+                                            </p>
+                                        ` : ''}
+                                    </div>
+                                    <div class="flex gap-1">
+                                        ${idx > 0 ? `
+                                            <button onclick="moveTempStageUp(${idx})" class="text-xs text-gray-600 hover:underline">↑</button>
+                                        ` : ''}
+                                        ${idx < window._tempWorkflowStages.length - 1 ? `
+                                            <button onclick="moveTempStageDown(${idx})" class="text-xs text-gray-600 hover:underline">↓</button>
+                                        ` : ''}
+                                        <button onclick="removeTempStage(${idx})" class="text-xs text-red-600 hover:underline">삭제</button>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    };
+
+    const content = renderStageAssembly();
+
+    openModal('워크플로우 단계 조립', content, '저장', () => {
+        // Validate all stages have names
+        for (let i = 0; i < window._tempWorkflowStages.length; i++) {
+            const name = document.getElementById(`stage-name-${i}`)?.value.trim();
+            if (!name) {
+                showAlert(`${i + 1}번 단계의 이름을 입력하세요.`);
+                return;
+            }
+            window._tempWorkflowStages[i].name = name;
+
+            // Validate evaluation criteria if needed
+            if (window._tempWorkflowStages[i].hasEvaluation) {
+                const criteriaId = parseInt(document.getElementById(`stage-criteria-${i}`)?.value);
+                if (!criteriaId) {
+                    showAlert(`${i + 1}번 단계의 평가표를 선택하세요.`);
+                    return;
+                }
+            }
+        }
+
+        // Update workflow with new stages
+        workflow.steps = window._tempWorkflowStages.map((stage, idx) => ({
+            ...stage,
+            order: idx + 1
+        }));
+        workflow.stageCount = workflow.steps.length;
+        workflow.evaluationCount = workflow.steps.filter(s => s.hasEvaluation).length;
+
+        closeModal();
+        showAlert('워크플로우 단계가 저장되었습니다.');
+        viewStageDetail(workflowId);
+    }, true);
+}
+
+// Helper functions for stage assembly
+function addStageFromType() {
+    const select = document.getElementById('stage-type-select');
+    const typeId = parseInt(select?.value);
+
+    if (!typeId) {
+        showAlert('단계 유형을 선택하세요.');
+        return;
+    }
+
+    const stageType = appData.types.find(t => t.id === typeId);
+    if (!stageType) return;
+
+    const newStage = {
+        id: Date.now() + Math.random(),
+        name: stageType.name,
+        stageTypeId: typeId,
+        hasEvaluation: false,
+        evaluationCriteriaId: null,
+        evaluationCriteriaName: null
+    };
+
+    window._tempWorkflowStages.push(newStage);
+
+    // Re-render the list
+    const listContainer = document.getElementById('stage-assembly-list');
+    if (listContainer) {
+        const workflow = appData.stages.find(s => s.id);
+        listContainer.outerHTML = document.createElement('div').innerHTML = editWorkflowStages.toString();
+        // Trigger re-render by calling parent function - but this won't work in modal context
+        // Instead, let's use a simpler approach: close and reopen
+    }
+
+    // Refresh modal content
+    showAlert('단계가 추가되었습니다. 이름을 수정하고 필요시 평가표를 선택하세요.');
+    // Close and reopen modal with updated content
+    const currentWorkflowId = window._currentWorkflowId;
+    closeModal();
+    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+}
+
+function updateTempStageName(idx, value) {
+    if (window._tempWorkflowStages[idx]) {
+        window._tempWorkflowStages[idx].name = value;
+    }
+}
+
+function toggleTempStageEvaluation(idx) {
+    const checkbox = document.getElementById(`stage-eval-${idx}`);
+    if (window._tempWorkflowStages[idx]) {
+        window._tempWorkflowStages[idx].hasEvaluation = checkbox.checked;
+    }
+
+    // Refresh modal
+    const currentWorkflowId = window._currentWorkflowId;
+    closeModal();
+    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+}
+
+function updateTempStageCriteria(idx, criteriaId) {
+    const id = parseInt(criteriaId);
+    if (window._tempWorkflowStages[idx]) {
+        const criteria = appData.evaluationCriteria.find(c => c.id === id);
+        window._tempWorkflowStages[idx].evaluationCriteriaId = id || null;
+        window._tempWorkflowStages[idx].evaluationCriteriaName = criteria ? criteria.name : null;
+    }
+}
+
+function removeTempStage(idx) {
+    window._tempWorkflowStages.splice(idx, 1);
+
+    // Refresh modal
+    const currentWorkflowId = window._currentWorkflowId;
+    closeModal();
+    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+}
+
+function moveTempStageUp(idx) {
+    if (idx > 0 && window._tempWorkflowStages[idx]) {
+        const temp = window._tempWorkflowStages[idx];
+        window._tempWorkflowStages[idx] = window._tempWorkflowStages[idx - 1];
+        window._tempWorkflowStages[idx - 1] = temp;
+
+        // Refresh modal
+        const currentWorkflowId = window._currentWorkflowId;
+        closeModal();
+        setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+    }
+}
+
+function moveTempStageDown(idx) {
+    if (idx < window._tempWorkflowStages.length - 1 && window._tempWorkflowStages[idx]) {
+        const temp = window._tempWorkflowStages[idx];
+        window._tempWorkflowStages[idx] = window._tempWorkflowStages[idx + 1];
+        window._tempWorkflowStages[idx + 1] = temp;
+
+        // Refresh modal
+        const currentWorkflowId = window._currentWorkflowId;
+        closeModal();
+        setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
+    }
 }
 
 // 평가표 선택 토글
