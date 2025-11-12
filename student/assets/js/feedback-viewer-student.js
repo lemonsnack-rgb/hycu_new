@@ -177,49 +177,49 @@ function renderStudentFeedbackViewerUI(feedbackId) {
                             <div id="inline-feedback-tab" style="display: none;">
                                 <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">📍 첨삭</h5>
                                 <div id="inline-feedback-list">
-                                    <!-- 첨삭 카드 (교수용과 동일 구조) -->
+                                    <!-- 첨삭 카드 (클릭 가능) -->
                                     <div class="inline-comment-card" data-page="3" data-annotation-id="1" onclick="jumpToAnnotation(3, 1)"
-                                         style="background: #F9FAFB; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.75rem; cursor: pointer; border: 1px solid #E5E7EB; transition: all 0.2s;">
+                                         style="background: #DBEAFE; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.5rem; cursor: pointer; border: 2px solid #93C5FD; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);">
                                         <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
                                             <div style="flex: 1;">
                                                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                                    <span style="font-size: 0.75rem; font-weight: 700; color: #1F2937;">김교수</span>
-                                                    <span style="font-size: 0.625rem; background: #DBEAFE; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600;">p.3</span>
+                                                    <span style="font-size: 0.75rem; font-weight: 700; color: #1E40AF;">김교수</span>
+                                                    <span style="font-size: 0.625rem; background: white; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600;">p.3</span>
                                                 </div>
-                                                <p style="font-size: 0.625rem; color: #6B7280;">2025-11-02 09:35</p>
+                                                <p style="font-size: 0.625rem; color: #1E3A8A;">2025-11-02 09:35</p>
                                             </div>
                                         </div>
-                                        <p style="font-size: 0.875rem; color: #374151; margin-bottom: 0.5rem;">표본 크기 산정 근거를 추가해주세요.</p>
+                                        <p style="font-size: 0.875rem; color: #1E3A8A; font-weight: 500;">표본 크기 산정 근거를 추가해주세요.</p>
+                                    </div>
 
-                                        <!-- 이 첨삭에 대한 답변 (댓글) -->
-                                        <div class="inline-replies" style="margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid #D1D5DB;">
-                                            <h6 style="font-size: 0.625rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">💬 답변 (<span id="inline-reply-count-1">0</span>)</h6>
+                                    <!-- 댓글 영역 (첨삭 카드와 분리) -->
+                                    <div class="inline-replies-section" style="margin-left: 1rem; padding-left: 0.75rem; border-left: 3px solid #BFDBFE; margin-bottom: 1.5rem;">
+                                        <h6 style="font-size: 0.625rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">💬 답변 (<span id="inline-reply-count-1">0</span>)</h6>
 
-                                            <!-- 등록된 답변 표시 영역 -->
-                                            <div id="inline-replies-list-1" style="margin-bottom: 0.5rem;">
-                                                <!-- 답변이 동적으로 추가됨 -->
-                                            </div>
-
-                                            <!-- 답변 입력창 -->
-                                            <textarea id="inline-reply-textarea-1"
-                                                      style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.75rem; resize: none;"
-                                                      rows="2"
-                                                      placeholder="이 첨삭에 대한 답변을 작성하세요..."></textarea>
-                                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
-                                                <button onclick="addStudentInlineReply(1)"
-                                                        style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; transition: background 0.2s;">
-                                                    <i class="fas fa-reply"></i>
-                                                    <span>댓글</span>
-                                                </button>
-                                                <button onclick="uploadStudentInlineAttachment(1)"
-                                                        style="font-size: 0.75rem; background: #E5E7EB; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; transition: background 0.2s;">
-                                                    <i class="fas fa-paperclip"></i>
-                                                    <span>첨부</span>
-                                                </button>
-                                            </div>
-                                            <input type="file" id="student-inline-attach-input-1" multiple accept=".png,.jpg,.jpeg,.pdf" style="display: none;">
-                                            <div id="student-inline-attach-display-1" style="margin-top: 0.5rem; font-size: 0.625rem; color: #6B7280;"></div>
+                                        <!-- 등록된 답변 표시 영역 -->
+                                        <div id="inline-replies-list-1" style="margin-bottom: 0.75rem;">
+                                            <!-- 답변이 동적으로 추가됨 -->
                                         </div>
+
+                                        <!-- 답변 입력창 -->
+                                        <textarea id="inline-reply-textarea-1"
+                                                  style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.75rem; resize: none; background: white;"
+                                                  rows="2"
+                                                  placeholder="이 첨삭에 대한 답변을 작성하세요..."></textarea>
+                                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                                            <button onclick="addStudentInlineReply(1)"
+                                                    style="font-size: 0.75rem; background: #3B82F6; color: white; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; transition: background 0.2s;">
+                                                <i class="fas fa-reply"></i>
+                                                <span>댓글</span>
+                                            </button>
+                                            <button onclick="uploadStudentInlineAttachment(1)"
+                                                    style="font-size: 0.75rem; background: #E5E7EB; color: #374151; padding: 0.375rem 0.75rem; border: none; border-radius: 0.375rem; cursor: pointer; display: flex; align-items: center; gap: 0.25rem; transition: background 0.2s;">
+                                                <i class="fas fa-paperclip"></i>
+                                                <span>첨부</span>
+                                            </button>
+                                        </div>
+                                        <input type="file" id="student-inline-attach-input-1" multiple accept=".png,.jpg,.jpeg,.pdf" style="display: none;">
+                                        <div id="student-inline-attach-display-1" style="margin-top: 0.5rem; font-size: 0.625rem; color: #6B7280;"></div>
                                     </div>
                                 </div>
                             </div>
