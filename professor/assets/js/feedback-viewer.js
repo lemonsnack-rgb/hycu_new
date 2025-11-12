@@ -362,34 +362,40 @@ function completeFeedback() {
         return;
     }
 
-    // 빈 첨삭 검사
+    // 빈 첨삭 검사 (feedback-tools.js의 annotations 전역 변수 사용)
     const emptyComments = [];
 
-    // 1. inline-feedback의 모든 textarea 검사
-    const inlineTextareas = document.querySelectorAll('#inline-feedback .inline-comment-input');
-    inlineTextareas.forEach((textarea, index) => {
-        const text = textarea.value.trim();
-        if (!text) {
-            emptyComments.push(`인라인 첨삭 #${index + 1}`);
-        }
-    });
+    if (window.annotations) {
+        let globalCommentIndex = 1;
 
-    // 2. 영역이 지정되었지만 내용이 없는 주석 검사
-    const feedbackData = window._currentFeedbackCtx?.data;
-    if (feedbackData && feedbackData.annotations) {
-        Object.keys(feedbackData.annotations).forEach(pageNum => {
-            const annotations = feedbackData.annotations[pageNum];
-            annotations.forEach((annot, index) => {
-                if (annot.type === 'comment' && (!annot.text || !annot.text.trim())) {
-                    emptyComments.push(`페이지 ${pageNum} 주석 #${index + 1}`);
+        // 모든 페이지 순회
+        for (const pageNum in window.annotations) {
+            const pageAnnotations = window.annotations[pageNum];
+            if (!pageAnnotations) continue;
+
+            // 각 페이지의 첨삭 검사
+            pageAnnotations.forEach(annot => {
+                // customType이 'comment'인 첨삭 영역만 검사
+                if (annot.customType === 'comment') {
+                    // comments 배열이 없거나 비어있으면 빈 첨삭
+                    if (!annot.comments || annot.comments.length === 0) {
+                        emptyComments.push(`페이지 ${pageNum} - 첨삭 #${globalCommentIndex}`);
+                    } else {
+                        // comments[0].text가 비어있으면 빈 첨삭
+                        const mainText = annot.comments[0]?.text || '';
+                        if (!mainText.trim()) {
+                            emptyComments.push(`페이지 ${pageNum} - 첨삭 #${globalCommentIndex}`);
+                        }
+                    }
+                    globalCommentIndex++;
                 }
             });
-        });
+        }
     }
 
     // 빈 첨삭이 있으면 경고
     if (emptyComments.length > 0) {
-        alert(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n- ${emptyComments.join('\n- ')}`);
+        alert(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n\n${emptyComments.join('\n')}`);
         return;
     }
 
