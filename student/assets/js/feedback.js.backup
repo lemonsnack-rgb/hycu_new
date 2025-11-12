@@ -98,11 +98,7 @@ function renderFeedback() {
 
 // 피드백 요청 모달
 function showFeedbackRequestModal() {
-    const modal = document.createElement("div");
-    modal.className = "modal-backdrop active";
-    modal.id = "feedback-request-modal";
-
-    modal.innerHTML = `
+    const modalContent = `
         <div class="modal">
             <div class="modal-content" style="max-width: 600px;">
                 <div class="modal-header">

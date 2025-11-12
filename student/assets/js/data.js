@@ -370,7 +370,28 @@ const StudentData = {
         english: 'Development of AI-based Customer Churn Prediction Model',
         registrationDate: '2025-09-01',
         lastModifiedDate: '2025-10-15'
-    }
+    },
+
+    // 자료실 게시글
+    resourceBoards: [
+        {
+            id: 1,
+            title: '논문 작성 가이드라인',
+            content: '<p>논문 작성 시 유의사항 및 가이드라인입니다.</p>',
+            authorId: 'P001',
+            authorName: '김교수',
+            authorRole: 'professor',
+            createdAt: '2025-11-01T10:00:00',
+            updatedAt: '2025-11-01T10:00:00',
+            views: 15,
+            files: [
+                { id: 'F1', name: '논문작성가이드.pdf', size: 2048000, url: '#' }
+            ],
+            comments: [],
+            viewerType: 'specific',
+            viewers: ['S001']
+        }
+    ]
 };
 
 // 데이터 접근 함수
@@ -409,5 +430,69 @@ const DataService = {
     
     getTitleChanges: () => StudentData.titleChanges,
     
-    getCurrentTitle: () => StudentData.currentTitle
+    getCurrentTitle: () => StudentData.currentTitle,
+
+    // 자료실 관련 메서드
+    getResourceBoards: () => StudentData.resourceBoards || [],
+
+    getResourceBoard: (id) => {
+        const boards = StudentData.resourceBoards || [];
+        return boards.find(b => b.id === id);
+    },
+
+    incrementResourceBoardViews: (id) => {
+        const board = DataService.getResourceBoard(id);
+        if (board) {
+            board.views = (board.views || 0) + 1;
+        }
+    },
+
+    addResourceBoardComment: (postId, commentData) => {
+        const board = DataService.getResourceBoard(postId);
+        if (board) {
+            const newComment = {
+                id: `C${Date.now()}`,
+                ...commentData,
+                createdAt: new Date().toISOString()
+            };
+            board.comments = board.comments || [];
+            board.comments.push(newComment);
+        }
+    },
+
+    deleteResourceBoardComment: (postId, commentId) => {
+        const board = DataService.getResourceBoard(postId);
+        if (board && board.comments) {
+            board.comments = board.comments.filter(c => c.id !== commentId);
+        }
+    },
+
+    createResourceBoard: (postData) => {
+        if (!StudentData.resourceBoards) {
+            StudentData.resourceBoards = [];
+        }
+        const newPost = {
+            id: StudentData.resourceBoards.length + 1,
+            ...postData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            views: 0,
+            comments: []
+        };
+        StudentData.resourceBoards.push(newPost);
+    },
+
+    updateResourceBoard: (id, postData) => {
+        const board = DataService.getResourceBoard(id);
+        if (board) {
+            Object.assign(board, postData);
+            board.updatedAt = new Date().toISOString();
+        }
+    },
+
+    deleteResourceBoard: (id) => {
+        if (StudentData.resourceBoards) {
+            StudentData.resourceBoards = StudentData.resourceBoards.filter(b => b.id !== id);
+        }
+    }
 };

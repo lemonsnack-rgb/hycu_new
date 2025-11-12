@@ -164,9 +164,9 @@ function showTitleChangeModal() {
                             <select id="title-language" required
                                     style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
                                 <option value="">선택하세요</option>
-                                <option value="한국어">한국어</option>
+                                <option value="한글">한글</option>
                                 <option value="영어">영어</option>
-                                <option value="한국어/영어">한국어/영어</option>
+                                <option value="한글/영어">한글/영어</option>
                             </select>
                         </div>
 
