@@ -3,10 +3,29 @@
  */
 
 function viewJournalReviewDetail(journalId) {
-    const journal = getJournalReviews().find(j => j.id === journalId);
+    console.log('viewJournalReviewDetail called with journalId:', journalId);
+
+    // getJournalReviews가 정의되어 있는지 확인
+    if (typeof getJournalReviews !== 'function') {
+        console.error('getJournalReviews is not defined');
+        alert('데이터를 불러올 수 없습니다. 페이지를 새로고침해주세요.');
+        return;
+    }
+
+    const allJournals = getJournalReviews();
+    console.log('All journals:', allJournals);
+
+    const journal = allJournals.find(j => j.id === journalId);
+    console.log('Found journal:', journal);
 
     if (!journal) {
-        alert('학술지 정보를 찾을 수 없습니다.');
+        alert('학술지 정보를 찾을 수 없습니다. (ID: ' + journalId + ')');
+        return;
+    }
+
+    // rubric 확인
+    if (!journal.rubric || !journal.rubric.items) {
+        alert('평가 기준 정보가 없습니다.');
         return;
     }
 

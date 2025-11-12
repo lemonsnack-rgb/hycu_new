@@ -29,11 +29,17 @@ function showStudentList() {
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800">내 지도학생 목록</h3>
-                    <div class="text-sm text-gray-600">
-                        총 <span class="font-semibold text-blue-600">${students.length}명</span>
+                    <div class="flex items-center gap-3">
+                        <button onclick="sendNotificationToSelected()"
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-sm font-medium">
+                            선택 학생에게 알림 발송
+                        </button>
+                        <div class="text-sm text-gray-600">
+                            총 <span class="font-semibold text-blue-600">${students.length}명</span>
+                        </div>
                     </div>
                 </div>
-                
+
                 <!-- 검색 영역 -->
                 <div class="bg-gray-50 p-4 rounded-lg">
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
@@ -49,16 +55,16 @@ function showStudentList() {
                             <option value="mid_thesis">중간논문</option>
                             <option value="final_thesis">최종논문</option>
                         </select>
-                        <input type="text" 
-                               id="filter-keyword" 
+                        <input type="text"
+                               id="filter-keyword"
                                placeholder="학번/성명 검색"
                                class="border border-gray-300 rounded px-3 py-2 text-sm">
                         <div class="flex gap-2">
-                            <button onclick="searchStudents()" 
+                            <button onclick="searchStudents()"
                                     class="flex-1 bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
                                 검색
                             </button>
-                            <button onclick="resetStudentSearch()" 
+                            <button onclick="resetStudentSearch()"
                                     class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-300">
                                 초기화
                             </button>
@@ -66,11 +72,16 @@ function showStudentList() {
                     </div>
                 </div>
             </div>
-            
+
             <div class="overflow-x-auto">
                 <table class="min-w-full">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                                <input type="checkbox" id="select-all-students"
+                                       onchange="toggleSelectAllStudents(this.checked)"
+                                       class="rounded border-gray-300">
+                            </th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
@@ -80,16 +91,20 @@ function showStudentList() {
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">내 지도횟수</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">전체 지도횟수</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">최근지도일</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">액션</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         ${students.map((student, idx) => {
                             const myRole = student.advisors.find(a => a.id === currentProf.id)?.role;
                             const myStats = student.guidanceStats[currentProf.id] || { count: 0, lastDate: '-' };
-                            
+
                             return `
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-center">
+                                        <input type="checkbox" class="student-checkbox rounded border-gray-300"
+                                               value="${student.studentId}" data-name="${student.name}">
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${student.name}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${student.studentId}</td>
@@ -99,8 +114,8 @@ function showStudentList() {
                                         <div class="flex flex-col gap-1">
                                             ${student.advisors.map(advisor => `
                                                 <span class="text-xs ${
-                                                    advisor.id === currentProf.id 
-                                                        ? 'font-semibold text-blue-600' 
+                                                    advisor.id === currentProf.id
+                                                        ? 'font-semibold text-blue-600'
                                                         : 'text-gray-500'
                                                 }">
                                                     ${advisor.name} ${advisor.role === 'primary' ? '(주)' : '(부)'}
@@ -114,7 +129,7 @@ function showStudentList() {
                                     <td class="py-3 px-4 text-center text-gray-600">${student.totalGuidanceCount}회</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${myStats.lastDate || '-'}</td>
                                     <td class="py-3 px-4 text-center">
-                                        <button onclick="showStudentDetail('${student.studentId}')" 
+                                        <button onclick="showStudentDetail('${student.studentId}')"
                                                 class="text-blue-600 hover:underline text-sm font-medium">
                                             상세보기
                                         </button>
@@ -210,16 +225,9 @@ function renderStudentDetail() {
             <div class="flex justify-between items-center mb-4">
                 <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                 <div class="flex items-center gap-3">
-                    <label class="flex items-center text-sm text-gray-700 cursor-pointer">
-                        <input type="checkbox" 
-                               ${showOnlyMyGuidance ? 'checked' : ''}
-                               onchange="toggleMyGuidanceFilter(this.checked)"
-                               class="mr-2">
-                        내 지도만 보기
-                    </label>
-                    <button onclick="openAddPlanModal()" 
+                    <button onclick="openAddPlanModal()"
                             class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
-                        + 지도 추가
+                        + 주차 추가
                     </button>
                 </div>
             </div>
@@ -343,13 +351,13 @@ function getStatusBadge(status) {
 function openAddPlanModal() {
     const student = DataService.getStudentDetail(currentStudentId);
     if (!student) return;
-    
+
     const currentProf = DataService.getCurrentProfessor();
     const plans = DataService.getWeeklyGuidancePlans(currentStudentId, false);
-    const nextWeek = plans.length > 0 
-        ? Math.max(...plans.map(p => p.week)) + 1 
+    const nextWeek = plans.length > 0
+        ? Math.max(...plans.map(p => p.week)) + 1
         : 1;
-    
+
     const modalContent = `
         <form id="add-plan-form" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
@@ -364,25 +372,36 @@ function openAddPlanModal() {
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
             </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">담당교수</label>
-                <input type="text" value="${currentProf.name}" readonly
-                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-50">
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
+                    ${student.advisors.map(advisor => `
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="advisors" value="${advisor.id}"
+                                   ${advisor.id === currentProf.id ? 'checked' : ''}
+                                   class="rounded border-gray-300 mr-2">
+                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">※ 복수 선택 가능</p>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
                 <input type="text" name="plannedTopic" placeholder="예: 연구방법론 개요"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
                 <textarea name="plannedContent" rows="4" placeholder="지도할 내용을 상세히 입력하세요"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required></textarea>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
                 <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
@@ -394,7 +413,7 @@ function openAddPlanModal() {
                     <option value="phone">전화</option>
                 </select>
             </div>
-            
+
             <div class="bg-blue-50 p-3 rounded-lg">
                 <p class="text-xs text-blue-800">
                     💡 계획을 저장한 후, 실제 지도를 진행하면 '실적입력' 버튼을 클릭하여 실행 내용을 기록하세요.
@@ -402,8 +421,8 @@ function openAddPlanModal() {
             </div>
         </form>
     `;
-    
-    createModal('지도 계획 추가', modalContent, [
+
+    createModal('주차별 지도 계획 추가', modalContent, [
         {
             text: '취소',
             className: 'btn-secondary',
@@ -568,6 +587,92 @@ function resetStudentSearch() {
     showStudentList();
 }
 
+// 체크박스 전체 선택/해제
+function toggleSelectAllStudents(checked) {
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    checkboxes.forEach(cb => cb.checked = checked);
+}
+
+// 선택된 학생에게 알림 발송
+function sendNotificationToSelected() {
+    const checkboxes = document.querySelectorAll('.student-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        showToast('학생을 선택해주세요', 'warning');
+        return;
+    }
+
+    const selectedStudents = Array.from(checkboxes).map(cb => ({
+        id: cb.value,
+        name: cb.dataset.name
+    }));
+
+    const modalContent = `
+        <div class="space-y-4">
+            <div class="bg-gray-50 p-3 rounded-lg">
+                <p class="text-sm font-medium text-gray-700 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
+                <div class="flex flex-wrap gap-2">
+                    ${selectedStudents.map(s => `
+                        <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                            ${s.name}
+                        </span>
+                    `).join('')}
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">알림 제목 *</label>
+                <input type="text" id="notif-title" placeholder="예: 주차별 지도계획 확인 요청"
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">알림 내용 *</label>
+                <textarea id="notif-message" rows="4" placeholder="학생들에게 전달할 메시지를 입력하세요"
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+            </div>
+        </div>
+    `;
+
+    createModal('알림 발송', modalContent, [
+        {
+            text: '취소',
+            className: 'btn-secondary',
+            onclick: 'return;'
+        },
+        {
+            text: '발송',
+            className: 'btn-primary',
+            onclick: 'confirmSendNotification(' + JSON.stringify(selectedStudents) + ')'
+        }
+    ]);
+}
+
+// 알림 발송 확인
+function confirmSendNotification(students) {
+    const title = document.getElementById('notif-title')?.value.trim();
+    const message = document.getElementById('notif-message')?.value.trim();
+
+    if (!title) {
+        showToast('알림 제목을 입력해주세요', 'warning');
+        return;
+    }
+
+    if (!message) {
+        showToast('알림 내용을 입력해주세요', 'warning');
+        return;
+    }
+
+    // 실제로는 서버에 알림 전송 요청
+    console.log('알림 발송:', { students, title, message });
+    showToast(`${students.length}명의 학생에게 알림이 발송되었습니다`, 'success');
+
+    // 체크박스 초기화
+    const checkboxes = document.querySelectorAll('.student-checkbox');
+    checkboxes.forEach(cb => cb.checked = false);
+    document.getElementById('select-all-students').checked = false;
+}
+
 // 전역으로 export
 window.initGuidance = initGuidance;
 window.showStudentList = showStudentList;
@@ -579,3 +684,6 @@ window.openExecutionModal = openExecutionModal;
 window.saveExecution = saveExecution;
 window.searchStudents = searchStudents;
 window.resetStudentSearch = resetStudentSearch;
+window.toggleSelectAllStudents = toggleSelectAllStudents;
+window.sendNotificationToSelected = sendNotificationToSelected;
+window.confirmSendNotification = confirmSendNotification;
