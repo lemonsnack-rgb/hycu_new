@@ -417,10 +417,10 @@ function saveJournalDraft(journalId) {
 }
 
 // 최종 결정 선택 (위원장)
-let selectedDecision = null;
+let journalSelectedDecision = null;
 
 function selectJournalDecision(decision) {
-    selectedDecision = decision;
+    journalSelectedDecision = decision;
 
     // 모든 버튼 초기화
     ['approve', 'hold', 'reject'].forEach(d => {
@@ -444,7 +444,7 @@ function selectJournalDecision(decision) {
 
 // 최종 결정 제출 (위원장)
 function submitJournalChairDecision(journalId) {
-    if (!selectedDecision) {
+    if (!journalSelectedDecision) {
         alert('결정을 선택해주세요.');
         return;
     }
@@ -459,7 +459,7 @@ function submitJournalChairDecision(journalId) {
 
     console.log('위원장 최종 결정:', {
         journalId,
-        decision: decisionText[selectedDecision],
+        decision: decisionText[journalSelectedDecision],
         comment
     });
 
@@ -470,9 +470,9 @@ function submitJournalChairDecision(journalId) {
     }
 
     if (typeof showToast === 'function') {
-        showToast(`최종 결정(${decisionText[selectedDecision]})이 제출되었습니다`, 'success');
+        showToast(`최종 결정(${decisionText[journalSelectedDecision]})이 제출되었습니다`, 'success');
     } else {
-        alert(`최종 결정(${decisionText[selectedDecision]})이 제출되었습니다.`);
+        alert(`최종 결정(${decisionText[journalSelectedDecision]})이 제출되었습니다.`);
     }
 
     // 목록 새로고침
