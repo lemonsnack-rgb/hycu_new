@@ -1,4 +1,7 @@
 // ========== 전역 데이터 저장소 ==========
+// 주의: 이 파일의 모든 데이터는 더미 데이터입니다.
+// - advisor 필드: 지도교수 배정 기능은 구현되지 않았습니다. (하드코딩된 값)
+// - reviewers 배열: 심사위원 배정 기능은 구현되지 않았습니다. (하드코딩된 값)
 const appData = {
     schedules: [
         { id: 1, name: '2025-1학기 연구계획서 제출 기간', target: '전체', startDate: '2025-03-01', endDate: '2025-03-15', description: '1학기 연구계획서 제출 마감' },
@@ -337,6 +340,7 @@ const appData = {
                 result: '대기',
                 fileUrl: '#',
                 fileName: '2023010_최지연_중간논문.pdf',
+                // 주의: reviewers는 더미 데이터입니다. 실제 심사위원 배정 기능은 구현되지 않았습니다.
                 reviewers: [
                     { name: '박교수', role: '주심', status: '완료', score: 88, comment: '연구 설계가 잘 되어 있습니다.' },
                     { name: '김교수', role: '부심', status: '완료', score: 85, comment: '이론적 배경이 충실합니다.' },
@@ -373,6 +377,7 @@ const appData = {
                 defenseDate: '2025-06-20',
                 fileUrl: '#',
                 fileName: '2022008_정태훈_최종논문.pdf',
+                // 주의: reviewers는 더미 데이터입니다. 실제 심사위원 배정 기능은 구현되지 않았습니다.
                 reviewers: [
                     { name: '홍길동', role: '주심', status: '완료', score: 94, comment: '학문적 기여도가 높은 우수한 연구입니다.' },
                     { name: '최교수', role: '부심', status: '완료', score: 91, comment: '연구 방법론이 탁월합니다.' },

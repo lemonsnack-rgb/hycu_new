@@ -8,7 +8,7 @@ const StudentData = {
         program: '석사과정',
         year: 2,
         major: '경영학과',
-        advisor: '김교수',
+        advisor: '김교수',  // 주의: 더미 데이터. 실제 지도교수 배정 기능은 구현되지 않았습니다.
         email: 'hong@hycu.ac.kr',
         enrollmentDate: '2023-03-01'
     },

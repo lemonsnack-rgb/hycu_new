@@ -3048,6 +3048,8 @@ function viewCommitteeEvaluations(submissionId) {
 }
 
 // 심사 배정 정보 가져오기 (제출물 ID로)
+// 주의: 이 함수는 더미 데이터만 반환합니다.
+// 실제 심사위원 배정 기능은 구현되지 않았습니다. (조회 전용)
 function getReviewAssignmentBySubmissionId(submissionId) {
     // admin_data.js의 데이터에서 찾기
     // 여기서는 더미 데이터 반환 (실제로는 appData에서 찾아야 함)
