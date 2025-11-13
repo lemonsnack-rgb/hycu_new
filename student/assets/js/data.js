@@ -325,7 +325,252 @@ const StudentData = {
             ]
         }
     ],
-    
+
+    // 주차별 지도 계획
+    weeklyGuidancePlans: [
+        {
+            id: 1,
+            week: 1,
+            plannedDate: '2025-09-10',
+            plannedTopic: '논문 주제 선정 및 방향 논의',
+            plannedContent: '연구 주제의 적절성과 연구 범위에 대해 논의합니다. 선행연구 조사 방향을 정하고, 예비 문헌 목록을 작성합니다.',
+            plannedMethod: 'meeting',
+            executionDate: '2025-09-10',
+            actualMethod: 'meeting',
+            executionContent: '고객 이탈 예측 모델에 대한 연구 주제를 확정했습니다. 머신러닝 기법을 활용하기로 결정했으며, 주요 선행연구 20편을 선정하여 검토하기로 했습니다.',
+            professorComment: '주제가 적절합니다. 선행연구 조사를 충실히 진행하세요.',
+            studentComment: '감사합니다. 선행연구를 체계적으로 정리하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-09-05T10:00:00',
+            updatedAt: '2025-09-10T15:30:00'
+        },
+        {
+            id: 2,
+            week: 2,
+            plannedDate: '2025-09-17',
+            plannedTopic: '선행연구 검토 및 이론적 배경 구성',
+            plannedContent: '수집한 선행연구를 분석하고, 이론적 배경의 체계를 구성합니다.',
+            plannedMethod: 'zoom',
+            executionDate: '2025-09-17',
+            actualMethod: 'zoom',
+            executionContent: '20편의 선행연구를 분석하여 주요 이론과 연구 방법을 정리했습니다. TAM(기술수용모델)과 기계학습 알고리즘에 대한 이론적 배경을 구성하기로 했습니다.',
+            professorComment: '이론적 배경이 잘 구성되고 있습니다. 각 이론의 연관성을 명확히 제시하세요.',
+            studentComment: '네, 이론 간 연결고리를 명확하게 작성하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-09-12T09:00:00',
+            updatedAt: '2025-09-17T16:00:00'
+        },
+        {
+            id: 3,
+            week: 3,
+            plannedDate: '2025-09-24',
+            plannedTopic: '연구 방법론 설계',
+            plannedContent: '데이터 수집 방법, 분석 기법, 연구 모형을 구체적으로 설계합니다.',
+            plannedMethod: 'meeting',
+            executionDate: '2025-09-24',
+            actualMethod: 'meeting',
+            executionContent: '연구 데이터는 공개 데이터셋을 활용하기로 했으며, Random Forest, XGBoost, Neural Network 3가지 모델을 비교 분석하기로 결정했습니다.',
+            professorComment: '연구 방법론이 적절합니다. 각 모델의 성능 지표를 명확히 정의하세요.',
+            studentComment: 'Accuracy, Precision, Recall, F1-Score를 주요 지표로 사용하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-09-19T10:00:00',
+            updatedAt: '2025-09-24T14:30:00'
+        },
+        {
+            id: 4,
+            week: 4,
+            plannedDate: '2025-10-01',
+            plannedTopic: '데이터 수집 및 전처리',
+            plannedContent: '연구에 필요한 데이터를 수집하고, 전처리 작업을 수행합니다.',
+            plannedMethod: 'email',
+            executionDate: '2025-10-01',
+            actualMethod: 'email',
+            executionContent: 'Kaggle의 Telco Customer Churn 데이터셋을 다운로드하고, 결측치 처리 및 이상치 제거 작업을 완료했습니다. 7,043건의 고객 데이터를 확보했습니다.',
+            professorComment: '데이터 전처리가 잘 되었습니다. 변수 간 상관관계도 분석해보세요.',
+            studentComment: '상관분석 결과를 다음 미팅에서 보고드리겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-09-26T09:00:00',
+            updatedAt: '2025-10-01T18:00:00'
+        },
+        {
+            id: 5,
+            week: 5,
+            plannedDate: '2025-10-08',
+            plannedTopic: '모델 학습 및 초기 결과 분석',
+            plannedContent: '설계한 모델을 학습시키고, 초기 결과를 분석합니다.',
+            plannedMethod: 'zoom',
+            executionDate: '2025-10-08',
+            actualMethod: 'zoom',
+            executionContent: '3가지 모델을 학습시켰으며, XGBoost가 가장 높은 성능(F1-Score: 0.85)을 보였습니다. 하이퍼파라미터 튜닝이 필요한 것으로 확인되었습니다.',
+            professorComment: 'XGBoost의 성능이 우수하네요. 하이퍼파라미터 최적화를 진행하세요.',
+            studentComment: 'Grid Search를 통해 최적 파라미터를 찾아보겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-10-03T10:00:00',
+            updatedAt: '2025-10-08T15:30:00'
+        },
+        {
+            id: 6,
+            week: 6,
+            plannedDate: '2025-10-15',
+            plannedTopic: '모델 최적화 및 성능 평가',
+            plannedContent: '하이퍼파라미터를 최적화하고, 최종 모델의 성능을 평가합니다.',
+            plannedMethod: 'meeting',
+            executionDate: '2025-10-15',
+            actualMethod: 'meeting',
+            executionContent: 'Grid Search 결과 최적 파라미터를 찾았으며, F1-Score가 0.87로 향상되었습니다. Cross-validation을 통해 모델의 안정성도 확인했습니다.',
+            professorComment: '성능이 많이 개선되었습니다. 결과를 논문에 잘 정리하세요.',
+            studentComment: '결과 분석을 상세히 작성하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-10-10T09:00:00',
+            updatedAt: '2025-10-15T16:00:00'
+        },
+        {
+            id: 7,
+            week: 7,
+            plannedDate: '2025-10-22',
+            plannedTopic: '논문 초안 작성 - 서론 및 이론적 배경',
+            plannedContent: '연구 배경, 목적, 이론적 배경을 작성합니다.',
+            plannedMethod: 'online',
+            executionDate: '2025-10-22',
+            actualMethod: 'email',
+            executionContent: '1장 서론과 2장 이론적 배경을 작성했습니다. 연구 배경에서 고객 이탈 예측의 중요성을 강조했으며, TAM과 ML 이론을 체계적으로 정리했습니다.',
+            professorComment: '서론과 이론적 배경이 잘 작성되었습니다. 연구의 독창성을 더 부각시켜 보세요.',
+            studentComment: '기존 연구와의 차별점을 명확히 하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-10-17T10:00:00',
+            updatedAt: '2025-10-22T17:30:00'
+        },
+        {
+            id: 8,
+            week: 8,
+            plannedDate: '2025-10-29',
+            plannedTopic: '논문 초안 작성 - 연구 방법',
+            plannedContent: '연구 설계, 데이터 수집, 분석 방법을 상세히 작성합니다.',
+            plannedMethod: 'meeting',
+            executionDate: '2025-10-29',
+            actualMethod: 'meeting',
+            executionContent: '3장 연구 방법을 작성했습니다. 데이터셋 설명, 전처리 과정, 3가지 모델의 알고리즘을 구체적으로 기술했습니다.',
+            professorComment: '연구 방법이 체계적으로 잘 정리되었습니다. 모델 선정 이유를 추가하면 좋겠습니다.',
+            studentComment: '각 모델의 장단점과 선정 근거를 추가하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-10-24T09:00:00',
+            updatedAt: '2025-10-29T15:00:00'
+        },
+        {
+            id: 9,
+            week: 9,
+            plannedDate: '2025-11-05',
+            plannedTopic: '논문 초안 작성 - 결과 및 논의',
+            plannedContent: '모델 성능 비교 결과와 시사점을 작성합니다.',
+            plannedMethod: 'zoom',
+            executionDate: '2025-11-05',
+            actualMethod: 'zoom',
+            executionContent: '4장 결과를 작성했습니다. 3가지 모델의 성능을 비교 분석했으며, XGBoost가 최고 성능을 보인 이유를 논의했습니다. 변수 중요도 분석 결과도 포함했습니다.',
+            professorComment: '결과 분석이 우수합니다. 실무 적용 가능성에 대한 논의를 추가하세요.',
+            studentComment: '실무 활용 방안과 기대효과를 작성하겠습니다.',
+            status: 'completed',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-10-31T10:00:00',
+            updatedAt: '2025-11-05T16:30:00'
+        },
+        {
+            id: 10,
+            week: 10,
+            plannedDate: '2025-11-12',
+            plannedTopic: '논문 초안 완성 - 결론 및 전체 검토',
+            plannedContent: '결론을 작성하고, 논문 전체를 검토합니다.',
+            plannedMethod: 'meeting',
+            status: 'planned',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-11-07T09:00:00'
+        },
+        {
+            id: 11,
+            week: 11,
+            plannedDate: '2025-11-19',
+            plannedTopic: '논문 수정 및 보완',
+            plannedContent: '교수님 피드백을 반영하여 논문을 수정합니다.',
+            plannedMethod: 'online',
+            status: 'planned',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'professor',
+            createdAt: '2025-11-07T09:00:00'
+        }
+    ],
+
     // 논문제목 변경 이력
     titleChanges: [
         {
@@ -551,5 +796,74 @@ const DataService = {
         if (StudentData.resourceBoards) {
             StudentData.resourceBoards = StudentData.resourceBoards.filter(b => b.id !== id);
         }
+    },
+
+    // 주차별 지도 계획 관련 메서드
+    getWeeklyGuidancePlans: () => StudentData.weeklyGuidancePlans || [],
+
+    getWeeklyGuidancePlan: (id) => {
+        const plans = StudentData.weeklyGuidancePlans || [];
+        return plans.find(p => p.id === id);
+    },
+
+    addWeeklyGuidancePlan: (planData) => {
+        if (!StudentData.weeklyGuidancePlans) {
+            StudentData.weeklyGuidancePlans = [];
+        }
+        const nextId = StudentData.weeklyGuidancePlans.length > 0
+            ? Math.max(...StudentData.weeklyGuidancePlans.map(p => p.id)) + 1
+            : 1;
+        const nextWeek = StudentData.weeklyGuidancePlans.length > 0
+            ? Math.max(...StudentData.weeklyGuidancePlans.map(p => p.week)) + 1
+            : 1;
+
+        const newPlan = {
+            id: nextId,
+            week: planData.week || nextWeek,
+            plannedDate: planData.plannedDate,
+            plannedTopic: planData.plannedTopic,
+            plannedContent: planData.plannedContent,
+            plannedMethod: planData.plannedMethod,
+            status: 'planned',
+            isPublic: true,
+            advisor: {
+                id: 'P001',
+                name: '김교수',
+                role: 'primary'
+            },
+            createdBy: 'student',
+            createdAt: new Date().toISOString()
+        };
+        StudentData.weeklyGuidancePlans.push(newPlan);
+        return newPlan;
+    },
+
+    updateWeeklyGuidancePlan: (id, planData) => {
+        const plan = DataService.getWeeklyGuidancePlan(id);
+        if (plan) {
+            // 학생은 교수가 작성한 실적은 수정할 수 없음
+            if (plan.createdBy === 'professor' && plan.executionDate) {
+                // 학생 코멘트만 추가 가능
+                if (planData.studentComment !== undefined) {
+                    plan.studentComment = planData.studentComment;
+                }
+            } else {
+                // 학생이 작성한 계획은 자유롭게 수정 가능
+                Object.assign(plan, {
+                    ...planData,
+                    updatedAt: new Date().toISOString()
+                });
+            }
+        }
+    },
+
+    deleteWeeklyGuidancePlan: (id) => {
+        const plan = DataService.getWeeklyGuidancePlan(id);
+        // 학생이 작성한 계획만 삭제 가능
+        if (plan && plan.createdBy === 'student') {
+            StudentData.weeklyGuidancePlans = StudentData.weeklyGuidancePlans.filter(p => p.id !== id);
+            return true;
+        }
+        return false;
     }
 };
