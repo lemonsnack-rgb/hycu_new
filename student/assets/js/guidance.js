@@ -64,7 +64,7 @@ function renderGuidanceDetail() {
                 <div class="space-y-4">
                     ${sortedPlans.map(plan => {
                         const isProfessorPlan = plan.createdBy === 'professor';
-                        const canEdit = !isProfessorPlan || !plan.executionDate;
+                        const canEdit = !plan.executionDate; // 실적이 입력되지 않은 경우만 수정 가능
                         return `
                             <div class="border ${isProfessorPlan ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <!-- 헤더 -->
@@ -90,17 +90,15 @@ function renderGuidanceDetail() {
                                         }">
                                             ${getMethodText(plan.actualMethod || plan.plannedMethod)}
                                         </span>
-                                        ${canEdit && !plan.executionDate ? `
+                                        ${canEdit ? `
                                             <button onclick="openEditPlanModal(${plan.id})"
                                                     class="text-blue-600 hover:underline text-xs font-medium">
                                                 수정
                                             </button>
-                                            ${!isProfessorPlan ? `
-                                                <button onclick="deletePlan(${plan.id})"
-                                                        class="text-red-600 hover:underline text-xs font-medium">
-                                                    삭제
-                                                </button>
-                                            ` : ''}
+                                            <button onclick="deletePlan(${plan.id})"
+                                                    class="text-red-600 hover:underline text-xs font-medium">
+                                                삭제
+                                            </button>
                                         ` : ''}
                                     </div>
                                 </div>
