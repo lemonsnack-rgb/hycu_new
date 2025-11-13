@@ -3,6 +3,111 @@
  * 모든 모달을 modal-backdrop active 구조로 통일
  */
 
+// ========== Toast 알림 표시 ==========
+function showToast(message, type = 'info') {
+    const toastContainer = document.getElementById('toast-container') || createToastContainer();
+
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+
+    const icons = {
+        success: '✓',
+        error: '✕',
+        warning: '⚠',
+        info: 'ℹ'
+    };
+
+    toast.innerHTML = `
+        <span class="toast-icon">${icons[type] || icons.info}</span>
+        <div class="toast-content">
+            <div class="toast-message">${message}</div>
+        </div>
+    `;
+
+    toast.style.cssText = `
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : type === 'warning' ? '#F59E0B' : '#3B82F6'};
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        margin-bottom: 0.5rem;
+        transition: opacity 0.3s;
+    `;
+
+    toastContainer.appendChild(toast);
+
+    // 3초 후 자동 제거
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
+function createToastContainer() {
+    const container = document.createElement('div');
+    container.id = 'toast-container';
+    container.style.cssText = `
+        position: fixed;
+        top: 5rem;
+        right: 1rem;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    `;
+    document.body.appendChild(container);
+    return container;
+}
+
+// ========== 모달 관련 함수 ==========
+function createModal(title, content, buttons) {
+    const modalId = 'modal-' + Date.now();
+    const modal = document.createElement('div');
+    modal.id = modalId;
+    modal.className = 'modal-backdrop active';
+
+    modal.innerHTML = `
+        <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto;">
+            <div class="modal-header">
+                <h3>${title}</h3>
+                <button onclick="closeModalById('${modalId}')" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
+            </div>
+            <div class="modal-body">
+                ${content}
+            </div>
+            <div class="modal-footer">
+                ${buttons.map(btn => `
+                    <button class="btn ${btn.className || 'btn-secondary'}"
+                            onclick="${btn.onclick}">
+                        ${btn.text}
+                    </button>
+                `).join('')}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 모달 외부 클릭 시 닫기
+    modal.addEventListener('click', (e) => {
+        if (e.target.classList.contains('modal-backdrop')) {
+            closeModalById(modalId);
+        }
+    });
+
+    return modalId;
+}
+
+function closeModalById(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.remove();
+    }
+}
+
 // ========== 피드백 요청 모달 ==========
 window.showFeedbackRequestModal = function() {
     const modal = document.createElement('div');

@@ -1,0 +1,406 @@
+// ===================================
+// 학생용 주차별 지도 계획 현황 화면
+// 교수용 화면의 학생별 상세 화면과 동일한 UI
+// 학생은 본인의 계획만 조회, 추가, 수정 가능
+// 교수가 입력한 실적은 조회만 가능
+// ===================================
+
+// 주차별 지도 계획 현황 초기화
+function initGuidance() {
+    console.log('학생용 주차별 지도 계획 현황 초기화');
+    renderGuidanceDetail();
+}
+
+// 주차별 지도 계획 상세 화면 렌더링
+function renderGuidanceDetail() {
+    const student = DataService.getStudent();
+    const plans = DataService.getWeeklyGuidancePlans();
+    const sortedPlans = plans.sort((a, b) => a.week - b.week);
+
+    const contentArea = document.getElementById('guidance-screen');
+    if (!contentArea) return;
+
+    contentArea.innerHTML = `
+        <!-- 헤더 -->
+        <div class="flex items-center justify-between mb-8">
+            <div class="flex items-center gap-4">
+                <button class="mobile-menu-toggle lg:hidden" onclick="toggleMobileMenu()"
+                        style="padding: 0.5rem; background: none; border: none; cursor: pointer;">
+                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 지도 계획 현황</h2>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="notification-bell cursor-pointer relative" onclick="toggleNotifications()">
+                    <span style="font-size: 20px;">🔔</span>
+                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">5</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="text-gray-600 hidden sm:block">${student.name}님</span>
+                    <img src="https://placehold.co/40x40/6A0028/FFFFFF?text=S"
+                         alt="학생 프로필"
+                         class="w-10 h-10 rounded-full cursor-pointer"
+                         onclick="toggleUserMenu()">
+                </div>
+            </div>
+        </div>
+
+        <!-- 주차별 지도 내역 -->
+        <div>
+            <div class="flex justify-between items-center mb-4">
+                <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
+                <div class="flex items-center gap-3">
+                    <button onclick="openAddPlanModal()"
+                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                        + 주차 추가
+                    </button>
+                </div>
+            </div>
+
+            ${sortedPlans.length > 0 ? `
+                <div class="space-y-4">
+                    ${sortedPlans.map(plan => {
+                        const isProfessorPlan = plan.createdBy === 'professor';
+                        const canEdit = !isProfessorPlan || !plan.executionDate;
+                        return `
+                            <div class="border ${isProfessorPlan ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <!-- 헤더 -->
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+                                            ${plan.week}주차
+                                        </span>
+                                        <span class="ml-2 text-sm text-gray-600">${formatDate(plan.plannedDate)}</span>
+                                        ${plan.executionDate ? `
+                                            <span class="ml-2 text-sm text-green-600 font-medium">
+                                                → ${formatDate(plan.executionDate)} 실행
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-xs px-2 py-1 rounded ${
+                                            plan.actualMethod === 'meeting' ? 'bg-green-100 text-green-700' :
+                                            plan.actualMethod === 'zoom' ? 'bg-purple-100 text-purple-700' :
+                                            plan.actualMethod === 'email' ? 'bg-yellow-100 text-yellow-700' :
+                                            plan.plannedMethod === 'meeting' ? 'bg-gray-100 text-gray-600' :
+                                            'bg-gray-100 text-gray-600'
+                                        }">
+                                            ${getMethodText(plan.actualMethod || plan.plannedMethod)}
+                                        </span>
+                                        ${canEdit && !plan.executionDate ? `
+                                            <button onclick="openEditPlanModal(${plan.id})"
+                                                    class="text-blue-600 hover:underline text-xs font-medium">
+                                                수정
+                                            </button>
+                                            ${!isProfessorPlan ? `
+                                                <button onclick="deletePlan(${plan.id})"
+                                                        class="text-red-600 hover:underline text-xs font-medium">
+                                                    삭제
+                                                </button>
+                                            ` : ''}
+                                        ` : ''}
+                                    </div>
+                                </div>
+
+                                <!-- 본문 -->
+                                <div class="space-y-2">
+                                    <div>
+                                        <span class="text-xs font-semibold text-gray-500">담당교수:</span>
+                                        <span class="text-sm ${isProfessorPlan ? 'text-blue-600 font-semibold' : 'text-gray-800'} ml-2">
+                                            ${plan.advisor.name}
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-semibold text-gray-500">지도주제:</span>
+                                        <span class="text-sm text-gray-800 ml-2">${plan.plannedTopic}</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-xs font-semibold text-gray-500">계획내용:</span>
+                                        <p class="text-sm text-gray-700 mt-1">${plan.plannedContent}</p>
+                                    </div>
+
+                                    ${plan.executionContent ? `
+                                        <div class="bg-green-50 border-l-4 border-green-400 p-3 mt-2">
+                                            <span class="text-xs font-semibold text-green-800">실행내용:</span>
+                                            <p class="text-sm text-green-900 mt-1">${plan.executionContent}</p>
+                                        </div>
+                                    ` : ''}
+
+                                    ${plan.professorComment ? `
+                                        <div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-2">
+                                            <span class="text-xs font-semibold text-amber-800">교수 의견:</span>
+                                            <p class="text-sm text-amber-900 mt-1">${plan.professorComment}</p>
+                                        </div>
+                                    ` : ''}
+
+                                    <div class="flex justify-between items-center pt-2">
+                                        ${getStatusBadge(plan.status)}
+                                        ${plan.createdBy ? `
+                                            <span class="text-xs text-gray-500">
+                                                ${plan.createdBy === 'professor' ? '교수님이 작성' : '내가 작성'}
+                                            </span>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            ` : `
+                <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <p class="mt-4 text-sm text-gray-600">등록된 지도 계획이 없습니다</p>
+                    <button onclick="openAddPlanModal()"
+                            class="mt-4 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                        첫 지도 계획 추가하기
+                    </button>
+                </div>
+            `}
+        </div>
+    `;
+}
+
+// 상태 배지
+function getStatusBadge(status) {
+    const badges = {
+        'planned': '<span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">계획중</span>',
+        'in_progress': '<span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700">진행중</span>',
+        'completed': '<span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">완료</span>'
+    };
+    return badges[status] || badges['planned'];
+}
+
+// 지도 방식 텍스트
+function getMethodText(method) {
+    const methods = {
+        'meeting': '대면',
+        'online': '온라인',
+        'zoom': 'Zoom',
+        'email': '이메일',
+        'phone': '전화'
+    };
+    return methods[method] || method;
+}
+
+// 날짜 포맷팅
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+// 계획 추가 모달
+function openAddPlanModal() {
+    const plans = DataService.getWeeklyGuidancePlans();
+    const nextWeek = plans.length > 0
+        ? Math.max(...plans.map(p => p.week)) + 1
+        : 1;
+
+    const modalContent = `
+        <form id="add-plan-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <input type="number" name="week" value="${nextWeek}" min="1"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <input type="date" name="plannedDate"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
+                <input type="text" name="plannedTopic" placeholder="예: 연구방법론 개요"
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
+                <textarea name="plannedContent" rows="4" placeholder="지도받을 내용을 상세히 입력하세요"
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">희망 지도 방식 *</label>
+                <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                    <option value="">선택하세요</option>
+                    <option value="meeting">대면</option>
+                    <option value="online">온라인</option>
+                    <option value="zoom">Zoom</option>
+                    <option value="email">이메일</option>
+                    <option value="phone">전화</option>
+                </select>
+            </div>
+
+            <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="text-xs text-blue-800">
+                    💡 계획을 저장하면 담당 교수님께 알림이 전송됩니다.
+                </p>
+            </div>
+        </form>
+    `;
+
+    createModal('주차별 지도 계획 추가', modalContent, [
+        {
+            text: '취소',
+            className: 'btn-secondary',
+            onclick: 'return;'
+        },
+        {
+            text: '저장',
+            className: 'btn-primary',
+            onclick: 'savePlan()'
+        }
+    ]);
+}
+
+// 계획 수정 모달
+function openEditPlanModal(planId) {
+    const plan = DataService.getWeeklyGuidancePlan(planId);
+    if (!plan) return;
+
+    const modalContent = `
+        <form id="edit-plan-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <input type="number" name="week" value="${plan.week}" min="1"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <input type="date" name="plannedDate" value="${plan.plannedDate}"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
+                <input type="text" name="plannedTopic" value="${plan.plannedTopic}"
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
+                <textarea name="plannedContent" rows="4"
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>${plan.plannedContent}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">희망 지도 방식 *</label>
+                <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                    <option value="meeting" ${plan.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                    <option value="online" ${plan.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                    <option value="zoom" ${plan.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
+                    <option value="email" ${plan.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                    <option value="phone" ${plan.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                </select>
+            </div>
+        </form>
+    `;
+
+    createModal('지도 계획 수정', modalContent, [
+        {
+            text: '취소',
+            className: 'btn-secondary',
+            onclick: 'return;'
+        },
+        {
+            text: '저장',
+            className: 'btn-primary',
+            onclick: `updatePlan(${planId})`
+        }
+    ]);
+}
+
+// 계획 저장
+function savePlan() {
+    const form = document.getElementById('add-plan-form');
+    const formData = new FormData(form);
+
+    if (!formData.get('week') || !formData.get('plannedDate') ||
+        !formData.get('plannedTopic') || !formData.get('plannedContent') ||
+        !formData.get('plannedMethod')) {
+        showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    const planData = {
+        week: parseInt(formData.get('week')),
+        plannedDate: formData.get('plannedDate'),
+        plannedTopic: formData.get('plannedTopic'),
+        plannedContent: formData.get('plannedContent'),
+        plannedMethod: formData.get('plannedMethod')
+    };
+
+    DataService.addWeeklyGuidancePlan(planData);
+    showToast('지도 계획이 저장되었습니다', 'success');
+
+    setTimeout(() => {
+        renderGuidanceDetail();
+    }, 100);
+}
+
+// 계획 수정
+function updatePlan(planId) {
+    const form = document.getElementById('edit-plan-form');
+    const formData = new FormData(form);
+
+    if (!formData.get('week') || !formData.get('plannedDate') ||
+        !formData.get('plannedTopic') || !formData.get('plannedContent') ||
+        !formData.get('plannedMethod')) {
+        showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    const planData = {
+        week: parseInt(formData.get('week')),
+        plannedDate: formData.get('plannedDate'),
+        plannedTopic: formData.get('plannedTopic'),
+        plannedContent: formData.get('plannedContent'),
+        plannedMethod: formData.get('plannedMethod')
+    };
+
+    DataService.updateWeeklyGuidancePlan(planId, planData);
+    showToast('지도 계획이 수정되었습니다', 'success');
+
+    setTimeout(() => {
+        renderGuidanceDetail();
+    }, 100);
+}
+
+// 계획 삭제
+function deletePlan(planId) {
+    if (!confirm('이 지도 계획을 삭제하시겠습니까?')) {
+        return;
+    }
+
+    const success = DataService.deleteWeeklyGuidancePlan(planId);
+    if (success) {
+        showToast('지도 계획이 삭제되었습니다', 'success');
+        renderGuidanceDetail();
+    } else {
+        showToast('삭제할 수 없는 계획입니다', 'error');
+    }
+}
+
+// 전역으로 export
+window.initGuidance = initGuidance;
+window.renderGuidanceDetail = renderGuidanceDetail;
+window.openAddPlanModal = openAddPlanModal;
+window.openEditPlanModal = openEditPlanModal;
+window.savePlan = savePlan;
+window.updatePlan = updatePlan;
+window.deletePlan = deletePlan;
