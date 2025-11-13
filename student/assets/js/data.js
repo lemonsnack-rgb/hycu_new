@@ -843,18 +843,18 @@ const DataService = {
         if (plan) {
             // 학생은 교수가 작성한 실적은 수정할 수 없음
             if (plan.createdBy === 'professor' && plan.executionDate) {
-                // 학생 코멘트만 추가 가능
-                if (planData.studentComment !== undefined) {
-                    plan.studentComment = planData.studentComment;
-                }
+                // 교수가 작성한 실적은 수정 불가
+                return false;
             } else {
                 // 학생이 작성한 계획은 자유롭게 수정 가능
                 Object.assign(plan, {
                     ...planData,
                     updatedAt: new Date().toISOString()
                 });
+                return true;
             }
         }
+        return false;
     },
 
     deleteWeeklyGuidancePlan: (id) => {

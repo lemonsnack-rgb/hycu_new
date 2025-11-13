@@ -136,20 +136,6 @@ function renderGuidanceDetail() {
                                         </div>
                                     ` : ''}
 
-                                    ${plan.studentComment ? `
-                                        <div class="bg-sky-50 border-l-4 border-sky-400 p-3 mt-2">
-                                            <span class="text-xs font-semibold text-sky-800">나의 의견:</span>
-                                            <p class="text-sm text-sky-900 mt-1">${plan.studentComment}</p>
-                                        </div>
-                                    ` : isProfessorPlan && plan.executionDate ? `
-                                        <div class="mt-2">
-                                            <button onclick="openStudentCommentModal(${plan.id})"
-                                                    class="text-sm text-blue-600 hover:underline">
-                                                + 의견 추가하기
-                                            </button>
-                                        </div>
-                                    ` : ''}
-
                                     <div class="flex justify-between items-center pt-2">
                                         ${getStatusBadge(plan.status)}
                                         ${plan.createdBy ? `
@@ -339,45 +325,6 @@ function openEditPlanModal(planId) {
     ]);
 }
 
-// 학생 의견 추가 모달
-function openStudentCommentModal(planId) {
-    const plan = DataService.getWeeklyGuidancePlan(planId);
-    if (!plan) return;
-
-    const modalContent = `
-        <div class="space-y-4">
-            <div class="bg-gray-50 p-4 rounded-lg">
-                <h4 class="font-semibold text-gray-800 mb-2">${plan.week}주차 - ${plan.plannedTopic}</h4>
-                ${plan.professorComment ? `
-                    <div class="mt-2">
-                        <span class="text-xs font-semibold text-gray-600">교수님 의견:</span>
-                        <p class="text-sm text-gray-700 mt-1">${plan.professorComment}</p>
-                    </div>
-                ` : ''}
-            </div>
-
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">나의 의견</label>
-                <textarea id="student-comment-input" rows="4" placeholder="교수님 의견에 대한 답변이나 추가 의견을 입력하세요"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${plan.studentComment || ''}</textarea>
-            </div>
-        </div>
-    `;
-
-    createModal('의견 추가', modalContent, [
-        {
-            text: '취소',
-            className: 'btn-secondary',
-            onclick: 'return;'
-        },
-        {
-            text: '저장',
-            className: 'btn-primary',
-            onclick: `saveStudentComment(${planId})`
-        }
-    ]);
-}
-
 // 계획 저장
 function savePlan() {
     const form = document.getElementById('add-plan-form');
@@ -449,33 +396,11 @@ function deletePlan(planId) {
     }
 }
 
-// 학생 의견 저장
-function saveStudentComment(planId) {
-    const comment = document.getElementById('student-comment-input')?.value.trim();
-
-    if (!comment) {
-        showToast('의견을 입력해주세요', 'warning');
-        return;
-    }
-
-    DataService.updateWeeklyGuidancePlan(planId, {
-        studentComment: comment
-    });
-
-    showToast('의견이 저장되었습니다', 'success');
-
-    setTimeout(() => {
-        renderGuidanceDetail();
-    }, 100);
-}
-
 // 전역으로 export
 window.initGuidance = initGuidance;
 window.renderGuidanceDetail = renderGuidanceDetail;
 window.openAddPlanModal = openAddPlanModal;
 window.openEditPlanModal = openEditPlanModal;
-window.openStudentCommentModal = openStudentCommentModal;
 window.savePlan = savePlan;
 window.updatePlan = updatePlan;
 window.deletePlan = deletePlan;
-window.saveStudentComment = saveStudentComment;
