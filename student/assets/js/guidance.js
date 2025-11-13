@@ -120,13 +120,6 @@ function renderGuidanceDetail() {
                                         <p class="text-sm text-gray-700 mt-1">${plan.plannedContent}</p>
                                     </div>
 
-                                    ${plan.materials && plan.materials.length > 0 ? `
-                                        <div>
-                                            <span class="text-xs font-semibold text-gray-500">자료:</span>
-                                            <p class="text-sm text-gray-700 mt-1">${Array.isArray(plan.materials) ? plan.materials.join(', ') : plan.materials}</p>
-                                        </div>
-                                    ` : ''}
-
                                     ${plan.executionContent ? `
                                         <div class="bg-green-50 border-l-4 border-green-400 p-3 mt-2">
                                             <span class="text-xs font-semibold text-green-800">실행내용:</span>
@@ -210,50 +203,61 @@ function openAddPlanModal() {
         ? Math.max(...plans.map(p => p.week)) + 1
         : 1;
 
-    const today = new Date().toISOString().split('T')[0];
-
     const modalContent = `
         <form id="add-plan-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">주차</label>
-                <input type="number" name="week" value="${nextWeek}" min="1"
-                       class="w-full border border-gray-300 rounded px-3 py-2" required>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <input type="number" name="week" value="${nextWeek}" min="1"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <input type="date" name="plannedDate"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">지도주제 *</label>
-                <input type="text" name="plannedTopic" placeholder="예: 연구방법론 검토"
-                       class="w-full border border-gray-300 rounded px-3 py-2" required>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
+                <input type="text" name="plannedTopic" placeholder="예: 연구방법론 개요"
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">계획내용 *</label>
-                <textarea name="plannedContent" rows="4" placeholder="지도 계획 내용을 입력하세요"
-                          class="w-full border border-gray-300 rounded px-3 py-2" required></textarea>
+                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
+                <textarea name="plannedContent" rows="4" placeholder="지도받을 내용을 상세히 입력하세요"
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required></textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">자료 (콤마로 구분)</label>
-                <input type="text" name="materials" placeholder="예: 교재 3장, 논문 링크"
-                       class="w-full border border-gray-300 rounded px-3 py-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
+                <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                    <option value="">선택하세요</option>
+                    <option value="meeting">대면</option>
+                    <option value="online">온라인</option>
+                    <option value="zoom">Zoom</option>
+                    <option value="email">이메일</option>
+                    <option value="phone">전화</option>
+                </select>
             </div>
 
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">등록일</label>
-                <input type="date" name="plannedDate" value="${today}"
-                       class="w-full border border-gray-300 rounded px-3 py-2" required>
+            <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="text-xs text-blue-800">
+                    💡 계획을 저장하면 담당 교수님께 알림이 전송됩니다.
+                </p>
             </div>
         </form>
     `;
 
-    createModal('새 주차 추가', modalContent, [
+    createModal('주차별 지도 계획 추가', modalContent, [
         {
             text: '취소',
             className: 'btn-secondary',
             onclick: 'return;'
         },
         {
-            text: '추가',
+            text: '저장',
             className: 'btn-primary',
             onclick: 'savePlan()'
         }
@@ -265,40 +269,42 @@ function openEditPlanModal(planId) {
     const plan = DataService.getWeeklyGuidancePlan(planId);
     if (!plan) return;
 
-    const materialsStr = plan.materials && Array.isArray(plan.materials)
-        ? plan.materials.join(', ')
-        : (plan.materials || '');
-
     const modalContent = `
         <form id="edit-plan-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">주차</label>
-                <input type="number" name="week" value="${plan.week}" min="1"
-                       class="w-full border border-gray-300 rounded px-3 py-2" required>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <input type="number" name="week" value="${plan.week}" min="1"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <input type="date" name="plannedDate" value="${plan.plannedDate}"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">지도주제 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
                 <input type="text" name="plannedTopic" value="${plan.plannedTopic}"
-                       class="w-full border border-gray-300 rounded px-3 py-2" required>
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">계획내용 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
                 <textarea name="plannedContent" rows="4"
-                          class="w-full border border-gray-300 rounded px-3 py-2" required>${plan.plannedContent}</textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>${plan.plannedContent}</textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">자료 (콤마로 구분)</label>
-                <input type="text" name="materials" value="${materialsStr}"
-                       class="w-full border border-gray-300 rounded px-3 py-2">
-            </div>
-
-            <div>
-                <label class="block text-sm font-semibold text-gray-700 mb-2">등록일</label>
-                <input type="date" name="plannedDate" value="${plan.plannedDate}"
-                       class="w-full border border-gray-300 rounded px-3 py-2" required>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
+                <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                    <option value="meeting" ${plan.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                    <option value="online" ${plan.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                    <option value="zoom" ${plan.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
+                    <option value="email" ${plan.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                    <option value="phone" ${plan.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                </select>
             </div>
         </form>
     `;
@@ -322,33 +328,19 @@ function savePlan() {
     const form = document.getElementById('add-plan-form');
     const formData = new FormData(form);
 
-    const week = parseInt(formData.get('week'));
-    const plannedTopic = formData.get('plannedTopic').trim();
-    const plannedContent = formData.get('plannedContent').trim();
-    const materialsStr = formData.get('materials').trim();
-    const plannedDate = formData.get('plannedDate');
-
-    if (!week || week < 1) {
-        showToast('올바른 주차를 입력해주세요', 'warning');
-        return;
-    }
-
-    if (!plannedTopic) {
-        showToast('지도주제를 입력해주세요', 'warning');
-        return;
-    }
-
-    if (!plannedContent) {
-        showToast('계획내용을 입력해주세요', 'warning');
+    if (!formData.get('week') || !formData.get('plannedDate') ||
+        !formData.get('plannedTopic') || !formData.get('plannedContent') ||
+        !formData.get('plannedMethod')) {
+        showToast('필수 항목을 모두 입력해주세요', 'warning');
         return;
     }
 
     const planData = {
-        week: week,
-        plannedDate: plannedDate,
-        plannedTopic: plannedTopic,
-        plannedContent: plannedContent,
-        materials: materialsStr ? materialsStr.split(',').map(m => m.trim()).filter(m => m) : []
+        week: parseInt(formData.get('week')),
+        plannedDate: formData.get('plannedDate'),
+        plannedTopic: formData.get('plannedTopic'),
+        plannedContent: formData.get('plannedContent'),
+        plannedMethod: formData.get('plannedMethod')
     };
 
     DataService.addWeeklyGuidancePlan(planData);
@@ -364,33 +356,19 @@ function updatePlan(planId) {
     const form = document.getElementById('edit-plan-form');
     const formData = new FormData(form);
 
-    const week = parseInt(formData.get('week'));
-    const plannedTopic = formData.get('plannedTopic').trim();
-    const plannedContent = formData.get('plannedContent').trim();
-    const materialsStr = formData.get('materials').trim();
-    const plannedDate = formData.get('plannedDate');
-
-    if (!week || week < 1) {
-        showToast('올바른 주차를 입력해주세요', 'warning');
-        return;
-    }
-
-    if (!plannedTopic) {
-        showToast('지도주제를 입력해주세요', 'warning');
-        return;
-    }
-
-    if (!plannedContent) {
-        showToast('계획내용을 입력해주세요', 'warning');
+    if (!formData.get('week') || !formData.get('plannedDate') ||
+        !formData.get('plannedTopic') || !formData.get('plannedContent') ||
+        !formData.get('plannedMethod')) {
+        showToast('필수 항목을 모두 입력해주세요', 'warning');
         return;
     }
 
     const planData = {
-        week: week,
-        plannedDate: plannedDate,
-        plannedTopic: plannedTopic,
-        plannedContent: plannedContent,
-        materials: materialsStr ? materialsStr.split(',').map(m => m.trim()).filter(m => m) : []
+        week: parseInt(formData.get('week')),
+        plannedDate: formData.get('plannedDate'),
+        plannedTopic: formData.get('plannedTopic'),
+        plannedContent: formData.get('plannedContent'),
+        plannedMethod: formData.get('plannedMethod')
     };
 
     DataService.updateWeeklyGuidancePlan(planId, planData);

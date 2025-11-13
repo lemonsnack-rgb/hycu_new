@@ -261,8 +261,18 @@ function renderStudentDetail() {
                                         }">
                                             ${getMethodText(plan.actualMethod || plan.plannedMethod)}
                                         </span>
+                                        ${isMyPlan && !plan.executionDate ? `
+                                            <button onclick="openEditPlanModal(${plan.id})"
+                                                    class="text-blue-600 hover:underline text-xs font-medium">
+                                                수정
+                                            </button>
+                                            <button onclick="deletePlan(${plan.id})"
+                                                    class="text-red-600 hover:underline text-xs font-medium">
+                                                삭제
+                                            </button>
+                                        ` : ''}
                                         ${isMyPlan && (plan.status === 'planned' || plan.status === 'in_progress') ? `
-                                            <button onclick="openExecutionModal(${plan.id})" 
+                                            <button onclick="openExecutionModal(${plan.id})"
                                                     class="text-green-600 hover:underline text-xs font-medium">
                                                 실적입력
                                             </button>
@@ -689,6 +699,138 @@ function confirmSendNotification(students) {
     document.getElementById('select-all-students').checked = false;
 }
 
+// 계획 수정 모달
+function openEditPlanModal(planId) {
+    const plan = findPlanById(planId);
+    if (!plan) return;
+
+    const student = DataService.getStudentDetail(currentStudentId);
+    if (!student) return;
+
+    const currentProf = DataService.getCurrentProfessor();
+
+    const modalContent = `
+        <form id="edit-plan-form" class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <input type="number" name="week" value="${plan.week}" min="1"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <input type="date" name="plannedDate" value="${plan.plannedDate}"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
+                    ${student.advisors.map(advisor => `
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="advisors" value="${advisor.id}"
+                                   ${advisor.id === plan.advisor.id ? 'checked' : ''}
+                                   class="rounded border-gray-300 mr-2">
+                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">※ 복수 선택 가능</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
+                <input type="text" name="plannedTopic" value="${plan.plannedTopic}"
+                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
+                <textarea name="plannedContent" rows="4"
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>${plan.plannedContent}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
+                <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                    <option value="meeting" ${plan.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                    <option value="online" ${plan.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                    <option value="zoom" ${plan.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
+                    <option value="email" ${plan.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                    <option value="phone" ${plan.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                </select>
+            </div>
+        </form>
+    `;
+
+    createModal('지도 계획 수정', modalContent, [
+        {
+            text: '취소',
+            className: 'btn-secondary',
+            onclick: 'return;'
+        },
+        {
+            text: '저장',
+            className: 'btn-primary',
+            onclick: `updatePlan(${planId})`
+        }
+    ]);
+}
+
+// 계획 수정 저장
+function updatePlan(planId) {
+    const form = document.getElementById('edit-plan-form');
+    const formData = new FormData(form);
+
+    if (!formData.get('week') || !formData.get('plannedDate') ||
+        !formData.get('plannedTopic') || !formData.get('plannedContent') ||
+        !formData.get('plannedMethod')) {
+        showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    const advisorIds = Array.from(form.querySelectorAll('input[name="advisors"]:checked'))
+        .map(cb => cb.value);
+
+    if (advisorIds.length === 0) {
+        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
+        return;
+    }
+
+    const planData = {
+        week: parseInt(formData.get('week')),
+        plannedDate: formData.get('plannedDate'),
+        plannedTopic: formData.get('plannedTopic'),
+        plannedContent: formData.get('plannedContent'),
+        plannedMethod: formData.get('plannedMethod'),
+        advisorId: advisorIds[0] // 첫 번째 선택된 교수를 담당교수로 설정
+    };
+
+    DataService.updateWeeklyGuidancePlan(currentStudentId, planId, planData);
+    showToast('지도 계획이 수정되었습니다', 'success');
+
+    setTimeout(() => {
+        renderStudentDetail();
+    }, 100);
+}
+
+// 계획 삭제
+function deletePlan(planId) {
+    if (!confirm('이 지도 계획을 삭제하시겠습니까?')) {
+        return;
+    }
+
+    DataService.deleteWeeklyGuidancePlan(currentStudentId, planId);
+    showToast('지도 계획이 삭제되었습니다', 'success');
+
+    setTimeout(() => {
+        renderStudentDetail();
+    }, 100);
+}
+
 // 전역으로 export
 window.initGuidance = initGuidance;
 window.showStudentList = showStudentList;
@@ -696,6 +838,9 @@ window.showStudentDetail = showStudentDetail;
 window.toggleMyGuidanceFilter = toggleMyGuidanceFilter;
 window.openAddPlanModal = openAddPlanModal;
 window.savePlan = savePlan;
+window.openEditPlanModal = openEditPlanModal;
+window.updatePlan = updatePlan;
+window.deletePlan = deletePlan;
 window.openExecutionModal = openExecutionModal;
 window.saveExecution = saveExecution;
 window.searchStudents = searchStudents;
