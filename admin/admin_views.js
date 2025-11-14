@@ -1992,9 +1992,9 @@ const views = {
                         });
 
                         return `
-                            <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                            <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden ${admin.status === 'suspended' ? 'opacity-60' : ''}" style="${admin.status === 'suspended' ? 'filter: grayscale(40%); background-color: #F5F5F5;' : ''}">
                                 <!-- 관리자 정보 헤더 -->
-                                <div class="bg-gray-100 p-4 flex justify-between items-center">
+                                <div class="p-4 flex justify-between items-center ${admin.status === 'suspended' ? 'bg-gray-200' : 'bg-gray-100'}">
                                     <div class="flex items-center gap-4">
                                         <div>
                                             <h4 class="font-bold text-gray-800">${admin.name}</h4>
@@ -2006,7 +2006,8 @@ const views = {
                                     </div>
                                     <div class="flex gap-2">
                                         <button onclick="saveAdminPermissions(${admin.id})"
-                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-1">
+                                                ${admin.status === 'suspended' ? 'disabled' : ''}
+                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-1 ${admin.status === 'suspended' ? 'opacity-50 cursor-not-allowed' : ''}">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                                             </svg>
@@ -2044,20 +2045,28 @@ const views = {
                                 </div>
 
                                 <!-- 권한 설정 테이블 -->
-                                <div class="p-4">
+                                <div class="p-4 ${admin.status === 'suspended' ? 'bg-gray-100' : ''}">
+                                    ${admin.status === 'suspended' ? `
+                                        <div class="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <p class="text-sm text-yellow-800">
+                                                <strong>⚠️ 권한 중지됨:</strong> 모든 권한이 비활성화되어 있습니다. "권한 활성화" 버튼을 눌러 다시 활성화하세요.
+                                            </p>
+                                        </div>
+                                    ` : ''}
                                     ${Object.entries(categories).map(([category, screens]) => `
                                         <div class="mb-4">
                                             <h5 class="font-semibold text-gray-700 mb-2 border-b pb-2">${category}</h5>
                                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                                 ${screens.map(screen => `
-                                                    <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                                    <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded ${admin.status === 'suspended' ? 'cursor-not-allowed' : 'cursor-pointer'}">
                                                         <input type="checkbox"
                                                                data-admin-id="${admin.id}"
                                                                data-screen-id="${screen.id}"
                                                                ${permissionMap[screen.id] ? 'checked' : ''}
+                                                               ${admin.status === 'suspended' ? 'disabled' : ''}
                                                                onchange="updatePermission(${admin.id}, '${screen.id}', this.checked)"
                                                                class="rounded border-gray-300">
-                                                        <span class="text-sm text-gray-700">${screen.name}</span>
+                                                        <span class="text-sm ${admin.status === 'suspended' ? 'text-gray-500' : 'text-gray-700'}">${screen.name}</span>
                                                     </label>
                                                 `).join('')}
                                             </div>
