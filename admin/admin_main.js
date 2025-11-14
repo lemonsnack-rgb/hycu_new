@@ -3077,7 +3077,7 @@ function addAdmin(employeeId, name, department) {
 
 // 권한 업데이트
 function updatePermission(adminId, screenId, hasAccess) {
-    const permission = appData.permissions.find(p => p.adminId === adminId && p.screenId === screenId);
+    const permission = appData.permissions.find(p => p.adminId == adminId && p.screenId === screenId);
     if (permission) {
         permission.hasAccess = hasAccess;
     }
@@ -3085,13 +3085,16 @@ function updatePermission(adminId, screenId, hasAccess) {
 
 // 관리자 권한 저장
 function saveAdminPermissions(adminId) {
-    const admin = appData.administrators.find(a => a.id === adminId);
-    if (!admin) return;
+    const admin = appData.administrators.find(a => a.id == adminId);
+    if (!admin) {
+        console.error('관리자를 찾을 수 없습니다:', adminId);
+        return;
+    }
 
     // 실제로는 서버에 저장 요청
     console.log('권한 저장:', {
         adminId: adminId,
-        permissions: appData.permissions.filter(p => p.adminId === adminId)
+        permissions: appData.permissions.filter(p => p.adminId == adminId)
     });
 
     showNotification(`${admin.name}님의 권한이 저장되었습니다.`, 'success');
@@ -3099,18 +3102,21 @@ function saveAdminPermissions(adminId) {
 
 // 관리자 삭제
 function removeAdmin(adminId) {
-    const admin = appData.administrators.find(a => a.id === adminId);
-    if (!admin) return;
+    const admin = appData.administrators.find(a => a.id == adminId);
+    if (!admin) {
+        console.error('관리자를 찾을 수 없습니다:', adminId);
+        return;
+    }
 
     if (!confirm(`${admin.name}님을 관리자에서 완전히 삭제하시겠습니까?\n\n⚠️ 삭제 후 재등록이 필요합니다.\n권한만 중지하려면 "권한 중지" 버튼을 사용하세요.`)) {
         return;
     }
 
     // 관리자 삭제
-    appData.administrators = appData.administrators.filter(a => a.id !== adminId);
+    appData.administrators = appData.administrators.filter(a => a.id != adminId);
 
     // 권한 삭제
-    appData.permissions = appData.permissions.filter(p => p.adminId !== adminId);
+    appData.permissions = appData.permissions.filter(p => p.adminId != adminId);
 
     // 직원 디렉토리에서 관리자 표시 제거
     const emp = appData.employeeDirectory.find(e => e.employeeId === admin.employeeId);
@@ -3126,8 +3132,11 @@ function removeAdmin(adminId) {
 
 // 관리자 권한 중지
 function suspendAdmin(adminId) {
-    const admin = appData.administrators.find(a => a.id === adminId);
-    if (!admin) return;
+    const admin = appData.administrators.find(a => a.id == adminId);
+    if (!admin) {
+        console.error('관리자를 찾을 수 없습니다:', adminId);
+        return;
+    }
 
     if (!confirm(`${admin.name}님의 모든 권한을 중지하시겠습니까?\n\n권한 중지 후 언제든 다시 활성화할 수 있습니다.`)) {
         return;
@@ -3137,7 +3146,7 @@ function suspendAdmin(adminId) {
     admin.status = 'suspended';
 
     // 모든 권한 비활성화
-    const permissions = appData.permissions.filter(p => p.adminId === adminId);
+    const permissions = appData.permissions.filter(p => p.adminId == adminId);
     permissions.forEach(p => {
         p.hasAccess = false;
     });
@@ -3150,8 +3159,11 @@ function suspendAdmin(adminId) {
 
 // 관리자 권한 활성화
 function activateAdmin(adminId) {
-    const admin = appData.administrators.find(a => a.id === adminId);
-    if (!admin) return;
+    const admin = appData.administrators.find(a => a.id == adminId);
+    if (!admin) {
+        console.error('관리자를 찾을 수 없습니다:', adminId);
+        return;
+    }
 
     if (!confirm(`${admin.name}님의 권한을 다시 활성화하시겠습니까?\n\n활성화 후 개별 화면 권한을 설정해야 합니다.`)) {
         return;

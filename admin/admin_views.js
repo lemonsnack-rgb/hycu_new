@@ -2081,19 +2081,20 @@ const views = {
                         </div>
                     `}
                 </div>
+            </div>
+        `;
+    },
 
-                <!-- 대리로그인 섹션 -->
-                <div class="p-6 mt-6 border-t-4 border-[#6A0028]">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 text-[#6A0028] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
-                        </svg>
-                        <h3 class="text-lg font-bold text-gray-800">대리로그인</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-4">
-                        시스템을 이용하는 교수 또는 학생의 계정으로 대리 로그인하여 화면을 확인할 수 있습니다.
-                    </p>
+    // ========== 대리로그인 ==========
+    proxyLogin: () => {
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h2 class="text-2xl font-bold text-gray-800">대리로그인</h2>
+                    <p class="text-sm text-gray-600 mt-2">시스템을 이용하는 교수 또는 학생의 계정으로 대리 로그인하여 화면을 확인할 수 있습니다.</p>
+                </div>
 
+                <div class="p-6">
                     <!-- 검색 및 필터 -->
                     <div class="mb-4 flex gap-4">
                         <select id="proxy-login-filter" class="border border-gray-300 rounded px-3 py-2 text-sm"
@@ -2118,7 +2119,7 @@ const views = {
                                     <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">대학원</th>
                                     <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">학과/전공</th>
                                     <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">이메일</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-700 w-32">액션</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-700">액션</th>
                                 </tr>
                             </thead>
                             <tbody id="proxy-login-table-body">
@@ -2140,10 +2141,10 @@ const views = {
                                             ${user.type === '교수' ? user.department : `${user.major}${user.degree ? ` (${user.degree})` : ''}`}
                                         </td>
                                         <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${user.email}</td>
-                                        <td class="border border-gray-200 px-4 py-3 text-center">
+                                        <td class="border border-gray-200 px-4 py-3">
                                             <button onclick="proxyLogin('${user.id}', '${user.type}', '${user.name}', '${user.loginUrl}')"
-                                                    class="bg-[#6A0028] text-white px-4 py-1.5 rounded text-xs hover:bg-[#5A0020] flex items-center gap-1 mx-auto">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020] w-full whitespace-nowrap">
+                                                <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                                 </svg>
                                                 대리로그인
