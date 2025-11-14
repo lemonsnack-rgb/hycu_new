@@ -1246,7 +1246,7 @@ const appData = {
         }
     ],
 
-    // ========== 주차별 지도 관리 데이터 ==========
+    // ========== 주차별 지도 관리 데이터 (교수용과 동일한 구조) ==========
     weeklyGuidance: {
         guidancePairs: [
             {
@@ -1261,7 +1261,10 @@ const appData = {
                     name: '김철수',
                     studentId: '2024001',
                     major: '컴퓨터공학',
-                    degree: '석사'
+                    degree: '석사',
+                    advisors: [
+                        { id: 'prof001', name: '김교수', role: 'primary', department: '컴퓨터공학과' }
+                    ]
                 },
                 semester: '2024-2학기',
                 status: 'active',
@@ -1281,7 +1284,10 @@ const appData = {
                     name: '박영희',
                     studentId: '2024002',
                     major: '경영학',
-                    degree: '박사'
+                    degree: '박사',
+                    advisors: [
+                        { id: 'prof002', name: '이교수', role: 'primary', department: '경영학과' }
+                    ]
                 },
                 semester: '2024-2학기',
                 status: 'active',
@@ -1301,7 +1307,10 @@ const appData = {
                     name: '홍길동',
                     studentId: '2024003',
                     major: '컴퓨터공학',
-                    degree: '석사'
+                    degree: '석사',
+                    advisors: [
+                        { id: 'prof001', name: '김교수', role: 'primary', department: '컴퓨터공학과' }
+                    ]
                 },
                 semester: '2024-2학기',
                 status: 'active',
@@ -1310,75 +1319,92 @@ const appData = {
                 lastUpdateDate: '2024-11-05'
             }
         ],
+        // 교수용/학생용과 동일한 구조로 변경
         weeklyPlans: {
             1: { // guidancePair id
-                weeks: [
+                plans: [
                     {
+                        id: 1,
                         week: 1,
-                        professorPlan: {
-                            goal: '연구 주제 선정',
-                            content: '관심 분야 논의 및 주제 탐색',
-                            materials: ['AI 관련 논문 목록'],
-                            createdAt: '2024-09-01'
-                        },
-                        studentReport: {
-                            achievement: '5편의 선행 연구 검토 완료',
-                            nextPlan: '연구 문제 정의',
-                            difficulties: '없음',
-                            submittedAt: '2024-09-07'
-                        },
-                        adminNote: '진행 양호'
+                        plannedDate: '2024-09-01',
+                        plannedTopic: '연구 주제 선정',
+                        plannedContent: '관심 분야 논의 및 주제 탐색',
+                        plannedMethod: 'meeting',
+                        advisor: { id: 'prof001', name: '김교수' },
+                        executionDate: '2024-09-07',
+                        actualMethod: 'meeting',
+                        executionContent: '5편의 선행 연구 검토 완료. 다음 주까지 연구 문제 정의 예정',
+                        professorComment: '진행 양호. 선행 연구 검토가 충실함',
+                        status: 'completed',
+                        isPublic: true
                     },
                     {
+                        id: 2,
                         week: 2,
-                        professorPlan: {
-                            goal: '연구 문제 정의',
-                            content: '연구 문제 및 가설 설정',
-                            materials: ['연구 방법론 교재'],
-                            createdAt: '2024-09-08'
-                        },
-                        studentReport: {
-                            achievement: '연구 문제 초안 작성',
-                            nextPlan: '선행 연구 분석',
-                            difficulties: '가설 설정에 어려움',
-                            submittedAt: '2024-09-14'
-                        },
-                        adminNote: ''
+                        plannedDate: '2024-09-08',
+                        plannedTopic: '연구 문제 정의',
+                        plannedContent: '연구 문제 및 가설 설정',
+                        plannedMethod: 'meeting',
+                        advisor: { id: 'prof001', name: '김교수' },
+                        executionDate: '2024-09-14',
+                        actualMethod: 'meeting',
+                        executionContent: '연구 문제 초안 작성 완료. 선행 연구 분석 진행 중',
+                        professorComment: '가설 설정에 추가 논의 필요. 다음 주 보완',
+                        status: 'completed',
+                        isPublic: true
+                    },
+                    {
+                        id: 3,
+                        week: 3,
+                        plannedDate: '2024-09-15',
+                        plannedTopic: '선행 연구 분석',
+                        plannedContent: '주요 선행 연구 심층 분석 및 연구 격차 파악',
+                        plannedMethod: 'online',
+                        advisor: { id: 'prof001', name: '김교수' },
+                        executionDate: null,
+                        actualMethod: null,
+                        executionContent: null,
+                        professorComment: null,
+                        status: 'planned',
+                        isPublic: true
                     }
                 ]
             },
             2: {
-                weeks: [
+                plans: [
                     {
+                        id: 4,
                         week: 1,
-                        professorPlan: {
-                            goal: '논문 주제 확정',
-                            content: '경영 전략 분야 주제 선정',
-                            materials: ['경영학 저널 논문'],
-                            createdAt: '2024-09-01'
-                        },
-                        studentReport: {
-                            achievement: '주제 확정 완료',
-                            nextPlan: '연구 설계',
-                            difficulties: '없음',
-                            submittedAt: '2024-09-06'
-                        },
-                        adminNote: '우수'
+                        plannedDate: '2024-09-01',
+                        plannedTopic: '논문 주제 확정',
+                        plannedContent: '경영 전략 분야 주제 선정 및 연구 범위 설정',
+                        plannedMethod: 'meeting',
+                        advisor: { id: 'prof002', name: '이교수' },
+                        executionDate: '2024-09-06',
+                        actualMethod: 'meeting',
+                        executionContent: '주제 확정 완료. 연구 설계 단계 진입',
+                        professorComment: '우수. 주제 선정이 명확하고 적절함',
+                        status: 'completed',
+                        isPublic: true
                     }
                 ]
             },
             3: {
-                weeks: [
+                plans: [
                     {
+                        id: 5,
                         week: 1,
-                        professorPlan: {
-                            goal: '기초 개념 학습',
-                            content: '머신러닝 기초 이론 학습',
-                            materials: ['머신러닝 교재'],
-                            createdAt: '2024-09-01'
-                        },
-                        studentReport: null,
-                        adminNote: '학생 실적 제출 독려 필요'
+                        plannedDate: '2024-09-01',
+                        plannedTopic: '기초 개념 학습',
+                        plannedContent: '머신러닝 기초 이론 학습 및 실습',
+                        plannedMethod: 'meeting',
+                        advisor: { id: 'prof001', name: '김교수' },
+                        executionDate: null,
+                        actualMethod: null,
+                        executionContent: null,
+                        professorComment: null,
+                        status: 'planned',
+                        isPublic: true
                     }
                 ]
             }
