@@ -146,7 +146,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>
-                        <span id="notificationBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                        <span id="notificationBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                     </button>
 
                     <!-- 알림 드롭다운 -->
@@ -157,7 +157,36 @@
                             <h3 class="font-bold">알림</h3>
                         </div>
                         <div id="notificationList" class="max-h-96 overflow-y-auto">
-                            <div class="p-4 text-center text-gray-500 text-sm">알림이 없습니다.</div>
+                            <div class="border-b hover:bg-gray-50 p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-800">새로운 논문 심사 신청이 접수되었습니다</p>
+                                        <p class="text-xs text-gray-500 mt-1">홍길동(2024001) 학생의 예비심사 신청을 확인하세요.</p>
+                                        <p class="text-xs text-gray-400 mt-1">30분 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-b hover:bg-gray-50 p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-800">월간 통계 보고서가 준비되었습니다</p>
+                                        <p class="text-xs text-gray-500 mt-1">2025년 1월 논문지도 현황 보고서를 확인하세요.</p>
+                                        <p class="text-xs text-gray-400 mt-1">4시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-b hover:bg-gray-50 p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-800">시스템 업데이트 안내</p>
+                                        <p class="text-xs text-gray-500 mt-1">논문지도 시스템이 2025년 1월 20일 업데이트 예정입니다.</p>
+                                        <p class="text-xs text-gray-400 mt-1">1일 전</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 

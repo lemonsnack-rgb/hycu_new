@@ -160,7 +160,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>
-                        <span id="notificationBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full hidden"></span>
+                        <span id="notificationBadge" class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
                     </button>
 
                     <!-- 알림 드롭다운 -->
@@ -171,7 +171,36 @@
                             <h3 class="font-bold">알림</h3>
                         </div>
                         <div id="notificationList" class="max-h-96 overflow-y-auto">
-                            <div class="p-4 text-center text-gray-500 text-sm">알림이 없습니다.</div>
+                            <div class="border-b hover:bg-gray-50 p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-800">학생의 논문 제출이 완료되었습니다</p>
+                                        <p class="text-xs text-gray-500 mt-1">홍길동(2024001) 학생이 중간논문을 제출했습니다.</p>
+                                        <p class="text-xs text-gray-400 mt-1">1시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-b hover:bg-gray-50 p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-800">새로운 미팅 요청이 있습니다</p>
+                                        <p class="text-xs text-gray-500 mt-1">김영희(2024002) 학생이 논문 상담을 요청했습니다.</p>
+                                        <p class="text-xs text-gray-400 mt-1">3시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-b hover:bg-gray-50 p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-gray-800">피드백 작성 기한이 임박했습니다</p>
+                                        <p class="text-xs text-gray-500 mt-1">이철수(2024003) 학생의 주차별 실적 피드백을 작성해주세요.</p>
+                                        <p class="text-xs text-gray-400 mt-1">6시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
