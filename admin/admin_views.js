@@ -1922,25 +1922,58 @@ const views = {
                     <p class="text-sm text-gray-600 mt-2">관리자별 화면 접근 권한을 관리합니다.</p>
                 </div>
 
-                <!-- 관리자 추가 -->
-                <div class="p-6 border-b bg-gray-50">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">관리자 추가</h3>
+                <!-- 관리자 검색 및 추가 섹션 -->
+                <div class="p-6 border-b" style="background: linear-gradient(to bottom, #FFFBF5, #FFF9F0);">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-6 h-6 text-[#6A0028] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                        </svg>
+                        <h3 class="text-lg font-bold text-gray-800">새 관리자 검색 및 추가</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">
+                        교번 또는 이름으로 검색하여 새로운 관리자를 추가할 수 있습니다.
+                    </p>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-blue-700">
+                                    <strong>예시:</strong> 교번 "A2024004" 또는 이름 "김직원"으로 검색하면 교무처 소속 김직원님을 관리자로 추가할 수 있습니다.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input type="text" id="search-employee-id" placeholder="교번 입력"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm">
-                        <input type="text" id="search-employee-name" placeholder="이름 입력"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm">
+                        <input type="text" id="search-employee-id" placeholder="예: A2024004"
+                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                        <input type="text" id="search-employee-name" placeholder="예: 김직원"
+                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
                         <button onclick="searchEmployee()"
-                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020] flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
                             검색
                         </button>
                         <div id="search-result" class="col-span-full"></div>
                     </div>
                 </div>
 
-                <!-- 관리자 목록 및 권한 설정 -->
-                <div class="p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">관리자 목록 및 권한 설정</h3>
+                <!-- 등록된 관리자 목록 및 권한 설정 섹션 -->
+                <div class="p-6" style="background-color: #FAFAFA;">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-6 h-6 text-[#6A0028] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                        </svg>
+                        <h3 class="text-lg font-bold text-gray-800">등록된 관리자 목록 및 권한 설정</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">
+                        각 관리자의 화면별 접근 권한을 설정하고, 권한을 중지하거나 관리자를 삭제할 수 있습니다.
+                    </p>
 
                     ${administrators.length > 0 ? administrators.map((admin, index) => {
                         const permissions = appData.permissions.filter(p => p.adminId === admin.id);
@@ -1967,18 +2000,45 @@ const views = {
                                             <h4 class="font-bold text-gray-800">${admin.name}</h4>
                                             <p class="text-sm text-gray-600">교번: ${admin.employeeId} | 소속: ${admin.department}</p>
                                         </div>
-                                        <span class="px-3 py-1 text-xs rounded-full ${admin.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                                            ${admin.status === 'active' ? '활성' : '비활성'}
+                                        <span class="px-3 py-1 text-xs rounded-full ${admin.status === 'active' ? 'bg-green-100 text-green-800' : admin.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
+                                            ${admin.status === 'active' ? '활성' : admin.status === 'suspended' ? '권한 중지' : '비활성'}
                                         </span>
                                     </div>
                                     <div class="flex gap-2">
                                         <button onclick="saveAdminPermissions(${admin.id})"
-                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-1">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
+                                            </svg>
                                             권한 저장
                                         </button>
+                                        ${admin.status === 'active' ? `
+                                        <button onclick="suspendAdmin(${admin.id})"
+                                                class="bg-yellow-600 text-white px-4 py-2 rounded text-sm hover:bg-yellow-700 flex items-center gap-1"
+                                                title="모든 권한을 비활성화합니다. 재등록 없이 다시 활성화할 수 있습니다.">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            권한 중지
+                                        </button>
+                                        ` : admin.status === 'suspended' ? `
+                                        <button onclick="activateAdmin(${admin.id})"
+                                                class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1"
+                                                title="중지된 권한을 다시 활성화합니다.">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                            </svg>
+                                            권한 활성화
+                                        </button>
+                                        ` : ''}
                                         <button onclick="removeAdmin(${admin.id})"
-                                                class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">
-                                            관리자 삭제
+                                                class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700 flex items-center gap-1"
+                                                title="관리자를 완전히 삭제합니다. 재등록이 필요합니다.">
+                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                            </svg>
+                                            완전 삭제
                                         </button>
                                     </div>
                                 </div>
