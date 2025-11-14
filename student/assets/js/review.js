@@ -222,10 +222,7 @@ function showReviewDetail(reviewId) {
     
     document.getElementById('modal-container').innerHTML = modalContent;
 }
-
-function showReviewApplicationModal() {
-    alert('심사 신청 기능은 데모에서 비활성화되어 있습니다.');
-}
+// ==================== 심사 신청 모달 ====================
 
 function downloadFile(filename) {
     alert(`${filename} 다운로드 (데모)`);
@@ -234,144 +231,6 @@ function downloadFile(filename) {
 function closeModal() {
     document.getElementById('modal-container').innerHTML = '';
 }
-
-// ==================== 심사 신청 모달 ====================
-
-function showReviewApplicationModal() {
-    const modalContent = `
-        <div class="modal">
-            <div class="modal-content" style="max-width: 600px;">
-                <div class="modal-header">
-                    <h3>심사 신청하기</h3>
-                    <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
-                </div>
-                <div class="modal-body">
-                    <!-- 심사 유형 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                            심사 유형 <span style="color: #EF4444;">*</span>
-                        </label>
-                        <select id="review-type" style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
-                            <option value="">선택하세요</option>
-                            <option value="연구계획서 심사">연구계획서 심사</option>
-                            <option value="중간논문 심사">중간논문 심사</option>
-                            <option value="최종논문 심사">최종논문 심사</option>
-                        </select>
-                    </div>
-                    
-                    <!-- 희망일자 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                            희망 심사일 <span style="color: #EF4444;">*</span>
-                        </label>
-                        <input type="date" id="review-date" 
-                               style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
-                    </div>
-                    
-                    <!-- 제출 파일 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                            제출 파일 <span style="color: #EF4444;">*</span>
-                        </label>
-                        <input type="file" id="review-file" accept=".pdf,.docx"
-                               style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
-                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
-                            PDF 또는 DOCX 파일만 업로드 가능합니다
-                        </p>
-                    </div>
-                    
-                    <!-- 비고 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                            비고
-                        </label>
-                        <textarea id="review-note" rows="3"
-                                  style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: vertical;"
-                                  placeholder="기타 전달사항이 있으시면 입력해주세요"></textarea>
-                    </div>
-                    
-                    <!-- 주의사항 -->
-                    <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
-                        <p style="font-weight: 600; color: #92400E; margin-bottom: 0.5rem;">주의사항</p>
-                        <ul style="font-size: 0.75rem; color: #92400E; margin-left: 1rem;">
-                            <li>신청 후 취소는 심사일 7일 전까지 가능합니다</li>
-                            <li>제출한 파일은 수정이 불가하오니 신중히 제출해주세요</li>
-                            <li>심사위원회 구성 후 일정 변경 시 개별 연락드립니다</li>
-                        </ul>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button onclick="submitReviewApplication()" class="btn btn-primary">
-                        신청하기
-                    </button>
-                    <button onclick="closeModal()" class="btn btn-secondary">
-                        취소
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    document.getElementById('modal-container').innerHTML = modalContent;
-}
-
-function submitReviewApplication() {
-    const type = document.getElementById('review-type').value;
-    const date = document.getElementById('review-date').value;
-    const file = document.getElementById('review-file').files[0];
-    
-    if (!type) {
-        alert('심사 유형을 선택해주세요');
-        return;
-    }
-    
-    if (!date) {
-        alert('희망 심사일을 선택해주세요');
-        return;
-    }
-    
-    if (!file) {
-        alert('제출 파일을 선택해주세요');
-        return;
-    }
-    
-    // 실제로는 서버로 전송
-    console.log('심사 신청:', { type, date, file: file.name });
-    
-    closeModal();
-    showSuccessNotification('심사 신청이 완료되었습니다');
-    
-    // 페이지 새로고침
-    setTimeout(() => {
-        renderReview();
-    }, 1000);
-}
-
-function showSuccessNotification(message) {
-    const notification = document.createElement('div');
-    notification.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #10B981;
-        color: white;
-        padding: 1rem 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        z-index: 9999;
-        animation: slideIn 0.3s ease-out;
-    `;
-    notification.textContent = message;
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        notification.remove();
-    }, 3000);
-}
-
-console.log('✅ 심사 신청 기능 로드 완료');
-
-// ==================== 학생 심사 개선 기능 ====================
 
 // 심사 신청 모달 (실제 구현)
 function showReviewApplicationModal() {
@@ -472,23 +331,6 @@ function handleReviewApplication(event) {
     // 실제로는 서버로 전송
     console.log('심사 신청:', { title, type, file: file.name });
 
-    alert('심사 신청이 완료되었습니다.\n관리자 승인 후 심사위원이 배정됩니다.');
-    closeModal();
-    renderReview();
-}
-
-// 심사 신청 제출
-function submitReviewApplication() {
-    const type = document.getElementById('review-type').value;
-    const date = document.getElementById('review-date').value;
-    const file = document.getElementById('review-file').files[0];
-    
-    if (!type || !date || !file) {
-        alert('모든 항목을 입력해주세요.');
-        return;
-    }
-    
-    // 실제로는 서버에 전송
     alert('심사 신청이 완료되었습니다.\n관리자 승인 후 심사위원이 배정됩니다.');
     closeModal();
     renderReview();

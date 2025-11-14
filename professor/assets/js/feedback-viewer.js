@@ -817,29 +817,6 @@ function refreshInlineTabMarker(){
     badge.classList.add('hidden');
   }
 }
-
-function downloadPlagiarismReport(type, requestId){
-  // 제출물 데이터 조회
-  const request = FeedbackDataService.getFeedbackRequest(requestId);
-  if (!request) {
-    alert('제출물을 찾을 수 없습니다.');
-    return;
-  }
-
-  let reportUrl;
-  if (type === 'combined') {
-    // 통합 리포트는 CopyKiller URL 사용
-    reportUrl = request.copyKillerReportUrl || `https://copykiller.hanyang.ac.kr/report/${requestId}`;
-  } else if (type === 'copykiller') {
-    reportUrl = request.copyKillerReportUrl || `https://copykiller.hanyang.ac.kr/report/${requestId}`;
-  } else if (type === 'gptkiller') {
-    reportUrl = request.gptKillerReportUrl || `https://gptkiller.hanyang.ac.kr/report/${requestId}`;
-  }
-
-  // 새 창으로 외부 리포트 열기
-  window.open(reportUrl, '_blank', 'width=1200,height=800,noopener,noreferrer');
-}
-
 // helper
 function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
 
