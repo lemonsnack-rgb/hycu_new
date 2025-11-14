@@ -22,7 +22,7 @@ function renderGuidanceDetail() {
 
     contentArea.innerHTML = `
         <!-- 헤더 -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex items-center mb-8">
             <div class="flex items-center gap-4">
                 <button class="mobile-menu-toggle lg:hidden" onclick="toggleMobileMenu()"
                         style="padding: 0.5rem; background: none; border: none; cursor: pointer;">
@@ -32,19 +32,6 @@ function renderGuidanceDetail() {
                     </svg>
                 </button>
                 <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문지도 현황</h2>
-            </div>
-            <div class="flex items-center gap-4">
-                <div class="notification-bell cursor-pointer relative" onclick="toggleNotifications()">
-                    <span style="font-size: 20px;">🔔</span>
-                    <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">5</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <span class="text-gray-600 hidden sm:block">${student.name}님</span>
-                    <img src="https://placehold.co/40x40/6A0028/FFFFFF?text=S"
-                         alt="학생 프로필"
-                         class="w-10 h-10 rounded-full cursor-pointer"
-                         onclick="toggleUserMenu()">
-                </div>
             </div>
         </div>
 
