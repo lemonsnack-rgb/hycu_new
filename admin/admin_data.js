@@ -1524,6 +1524,90 @@ const appData = {
                 ]
             }
         }
-    }
+    },
+
+    // 관리자 목록
+    administrators: [
+        { id: 1, employeeId: 'A2024001', name: '관리자1', department: '교학처', role: 'admin', status: 'active', createdAt: '2024-01-15' },
+        { id: 2, employeeId: 'A2024002', name: '관리자2', department: '대학원', role: 'admin', status: 'active', createdAt: '2024-02-01' },
+        { id: 3, employeeId: 'A2024003', name: '관리자3', department: 'IT지원팀', role: 'admin', status: 'active', createdAt: '2024-03-10' }
+    ],
+
+    // 화면(메뉴) 목록
+    screenList: [
+        { id: 'dashboard', name: '대시보드', category: '기본' },
+        { id: 'researchProposal', name: '연구계획서 제출', category: '제출 현황 관리' },
+        { id: 'thesisReview', name: '학위논문 심사 관리', category: '제출 현황 관리' },
+        { id: 'journalReview', name: '학술지 심사 관리', category: '제출 현황 관리' },
+        { id: 'titleChangeRequests', name: '논문 제목 변경 신청', category: '제출 현황 관리' },
+        { id: 'weeklyGuidance', name: '주차별 논문지도 현황', category: '진행 모니터링' },
+        { id: 'guidanceProgress', name: '온라인 피드백 현황', category: '진행 모니터링' },
+        { id: 'scheduleManagement', name: '논문지도 일정 관리', category: '프로세스 설정' },
+        { id: 'requirementManagement', name: '논문 제출 요건 관리', category: '프로세스 설정' },
+        { id: 'stageManagement', name: '논문지도 워크플로우 관리', category: '프로세스 설정' },
+        { id: 'typeManagement', name: '지도 단계 유형 관리', category: '프로세스 설정' },
+        { id: 'evaluationCriteria', name: '평가 기준 관리', category: '프로세스 설정' },
+        { id: 'permissionManagement', name: '권한 관리', category: '시스템 설정' }
+    ],
+
+    // 관리자별 권한 (관리자 ID와 화면 ID 매핑)
+    permissions: [
+        // 관리자1 - 모든 권한
+        { adminId: 1, screenId: 'dashboard', hasAccess: true },
+        { adminId: 1, screenId: 'researchProposal', hasAccess: true },
+        { adminId: 1, screenId: 'thesisReview', hasAccess: true },
+        { adminId: 1, screenId: 'journalReview', hasAccess: true },
+        { adminId: 1, screenId: 'titleChangeRequests', hasAccess: true },
+        { adminId: 1, screenId: 'weeklyGuidance', hasAccess: true },
+        { adminId: 1, screenId: 'guidanceProgress', hasAccess: true },
+        { adminId: 1, screenId: 'scheduleManagement', hasAccess: true },
+        { adminId: 1, screenId: 'requirementManagement', hasAccess: true },
+        { adminId: 1, screenId: 'stageManagement', hasAccess: true },
+        { adminId: 1, screenId: 'typeManagement', hasAccess: true },
+        { adminId: 1, screenId: 'evaluationCriteria', hasAccess: true },
+        { adminId: 1, screenId: 'permissionManagement', hasAccess: true },
+
+        // 관리자2 - 제출 현황 및 모니터링만
+        { adminId: 2, screenId: 'dashboard', hasAccess: true },
+        { adminId: 2, screenId: 'researchProposal', hasAccess: true },
+        { adminId: 2, screenId: 'thesisReview', hasAccess: true },
+        { adminId: 2, screenId: 'journalReview', hasAccess: true },
+        { adminId: 2, screenId: 'titleChangeRequests', hasAccess: true },
+        { adminId: 2, screenId: 'weeklyGuidance', hasAccess: true },
+        { adminId: 2, screenId: 'guidanceProgress', hasAccess: true },
+        { adminId: 2, screenId: 'scheduleManagement', hasAccess: false },
+        { adminId: 2, screenId: 'requirementManagement', hasAccess: false },
+        { adminId: 2, screenId: 'stageManagement', hasAccess: false },
+        { adminId: 2, screenId: 'typeManagement', hasAccess: false },
+        { adminId: 2, screenId: 'evaluationCriteria', hasAccess: false },
+        { adminId: 2, screenId: 'permissionManagement', hasAccess: false },
+
+        // 관리자3 - 대시보드와 모니터링만
+        { adminId: 3, screenId: 'dashboard', hasAccess: true },
+        { adminId: 3, screenId: 'researchProposal', hasAccess: false },
+        { adminId: 3, screenId: 'thesisReview', hasAccess: false },
+        { adminId: 3, screenId: 'journalReview', hasAccess: false },
+        { adminId: 3, screenId: 'titleChangeRequests', hasAccess: false },
+        { adminId: 3, screenId: 'weeklyGuidance', hasAccess: true },
+        { adminId: 3, screenId: 'guidanceProgress', hasAccess: true },
+        { adminId: 3, screenId: 'scheduleManagement', hasAccess: false },
+        { adminId: 3, screenId: 'requirementManagement', hasAccess: false },
+        { adminId: 3, screenId: 'stageManagement', hasAccess: false },
+        { adminId: 3, screenId: 'typeManagement', hasAccess: false },
+        { adminId: 3, screenId: 'evaluationCriteria', hasAccess: false },
+        { adminId: 3, screenId: 'permissionManagement', hasAccess: false }
+    ],
+
+    // 관리자 검색용 더미 데이터 (교번/이름으로 검색 시 나타날 후보)
+    employeeDirectory: [
+        { employeeId: 'A2024001', name: '관리자1', department: '교학처', isAdmin: true },
+        { employeeId: 'A2024002', name: '관리자2', department: '대학원', isAdmin: true },
+        { employeeId: 'A2024003', name: '관리자3', department: 'IT지원팀', isAdmin: true },
+        { employeeId: 'A2024004', name: '김직원', department: '교무처', isAdmin: false },
+        { employeeId: 'A2024005', name: '이직원', department: '학생처', isAdmin: false },
+        { employeeId: 'A2024006', name: '박직원', department: '대학원', isAdmin: false },
+        { employeeId: 'P2024001', name: '김교수', department: '교육공학과', isAdmin: false },
+        { employeeId: 'P2024002', name: '이교수', department: '경영학과', isAdmin: false }
+    ]
 };
 

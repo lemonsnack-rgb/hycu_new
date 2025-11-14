@@ -2977,6 +2977,159 @@ function submitAdminNotification() {
 window.toggleSelectAllAdmin = toggleSelectAllAdmin;
 window.sendNotificationToSelectedStudents = sendNotificationToSelectedStudents;
 window.openAdminNotificationModal = openAdminNotificationModal;
+
+// ========== 권한 관리 ==========
+
+// 직원 검색
+function searchEmployee() {
+    const employeeId = document.getElementById('search-employee-id').value.trim();
+    const employeeName = document.getElementById('search-employee-name').value.trim();
+    const resultDiv = document.getElementById('search-result');
+
+    if (!employeeId && !employeeName) {
+        resultDiv.innerHTML = '<p class="text-sm text-red-600">교번 또는 이름을 입력해주세요.</p>';
+        return;
+    }
+
+    // 직원 디렉토리에서 검색
+    const results = appData.employeeDirectory.filter(emp => {
+        const matchId = !employeeId || emp.employeeId.toLowerCase().includes(employeeId.toLowerCase());
+        const matchName = !employeeName || emp.name.includes(employeeName);
+        return matchId && matchName && !emp.isAdmin; // 이미 관리자인 경우 제외
+    });
+
+    if (results.length === 0) {
+        resultDiv.innerHTML = '<p class="text-sm text-gray-600">검색 결과가 없습니다.</p>';
+        return;
+    }
+
+    resultDiv.innerHTML = `
+        <div class="bg-white border border-gray-300 rounded-lg p-4 mt-2">
+            <h4 class="font-semibold text-gray-800 mb-2">검색 결과 (${results.length}건)</h4>
+            <div class="space-y-2">
+                ${results.map(emp => `
+                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded hover:bg-gray-100">
+                        <div>
+                            <p class="font-medium text-gray-800">${emp.name}</p>
+                            <p class="text-sm text-gray-600">교번: ${emp.employeeId} | 소속: ${emp.department}</p>
+                        </div>
+                        <button onclick="addAdmin('${emp.employeeId}', '${emp.name}', '${emp.department}')"
+                                class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">
+                            관리자 추가
+                        </button>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+    `;
+}
+
+// 관리자 추가
+function addAdmin(employeeId, name, department) {
+    // 이미 관리자인지 확인
+    const exists = appData.administrators.find(a => a.employeeId === employeeId);
+    if (exists) {
+        showNotification('이미 관리자로 등록되어 있습니다.', 'warning');
+        return;
+    }
+
+    // 새 관리자 ID 생성
+    const newId = Math.max(...appData.administrators.map(a => a.id), 0) + 1;
+
+    // 관리자 추가
+    const newAdmin = {
+        id: newId,
+        employeeId: employeeId,
+        name: name,
+        department: department,
+        role: 'admin',
+        status: 'active',
+        createdAt: new Date().toISOString().split('T')[0]
+    };
+
+    appData.administrators.push(newAdmin);
+
+    // 모든 화면에 대해 기본 권한 설정 (모두 false)
+    appData.screenList.forEach(screen => {
+        appData.permissions.push({
+            adminId: newId,
+            screenId: screen.id,
+            hasAccess: false
+        });
+    });
+
+    // 직원 디렉토리에서 관리자로 표시
+    const emp = appData.employeeDirectory.find(e => e.employeeId === employeeId);
+    if (emp) {
+        emp.isAdmin = true;
+    }
+
+    showNotification(`${name}님이 관리자로 추가되었습니다.`, 'success');
+
+    // 검색 결과 초기화
+    document.getElementById('search-employee-id').value = '';
+    document.getElementById('search-employee-name').value = '';
+    document.getElementById('search-result').innerHTML = '';
+
+    // 화면 새로고침
+    switchView('permissionManagement');
+}
+
+// 권한 업데이트
+function updatePermission(adminId, screenId, hasAccess) {
+    const permission = appData.permissions.find(p => p.adminId === adminId && p.screenId === screenId);
+    if (permission) {
+        permission.hasAccess = hasAccess;
+    }
+}
+
+// 관리자 권한 저장
+function saveAdminPermissions(adminId) {
+    const admin = appData.administrators.find(a => a.id === adminId);
+    if (!admin) return;
+
+    // 실제로는 서버에 저장 요청
+    console.log('권한 저장:', {
+        adminId: adminId,
+        permissions: appData.permissions.filter(p => p.adminId === adminId)
+    });
+
+    showNotification(`${admin.name}님의 권한이 저장되었습니다.`, 'success');
+}
+
+// 관리자 삭제
+function removeAdmin(adminId) {
+    const admin = appData.administrators.find(a => a.id === adminId);
+    if (!admin) return;
+
+    if (!confirm(`${admin.name}님을 관리자에서 삭제하시겠습니까?`)) {
+        return;
+    }
+
+    // 관리자 삭제
+    appData.administrators = appData.administrators.filter(a => a.id !== adminId);
+
+    // 권한 삭제
+    appData.permissions = appData.permissions.filter(p => p.adminId !== adminId);
+
+    // 직원 디렉토리에서 관리자 표시 제거
+    const emp = appData.employeeDirectory.find(e => e.employeeId === admin.employeeId);
+    if (emp) {
+        emp.isAdmin = false;
+    }
+
+    showNotification(`${admin.name}님이 관리자에서 삭제되었습니다.`, 'success');
+
+    // 화면 새로고침
+    switchView('permissionManagement');
+}
+
+// Export
+window.searchEmployee = searchEmployee;
+window.addAdmin = addAdmin;
+window.updatePermission = updatePermission;
+window.saveAdminPermissions = saveAdminPermissions;
+window.removeAdmin = removeAdmin;
 window.closeAdminNotificationModal = closeAdminNotificationModal;
 window.submitAdminNotification = submitAdminNotification;
 
