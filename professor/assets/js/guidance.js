@@ -418,7 +418,7 @@ function openAddPlanModal() {
         </form>
     `;
 
-    createModal('주차별 지도 계획 추가', modalContent, [
+    createModal('주차별 논문지도 계획 추가', modalContent, [
         {
             text: '취소',
             className: 'btn-secondary',

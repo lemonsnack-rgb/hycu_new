@@ -313,7 +313,7 @@ function showGuidancePairDetail(pairId) {
     `;
 }
 
-// 새주차 추가 모달 (교수용과 완전히 동일)
+// 계획 추가 모달 (교수용과 완전히 동일)
 function addNewWeeklyPlan() {
     const pair = appData.weeklyGuidance.guidancePairs.find(p => p.id === currentPairId);
     if (!pair) return;
@@ -388,10 +388,10 @@ function addNewWeeklyPlan() {
         </form>
     `;
 
-    openModal('새주차 추가', modalContent, '저장', saveNewPlan, true);
+    openModal('계획 추가', modalContent, '저장', saveNewPlan, true);
 }
 
-// 새주차 저장
+// 새 계획 저장
 function saveNewPlan() {
     const form = document.getElementById('add-plan-form');
     const formData = new FormData(form);

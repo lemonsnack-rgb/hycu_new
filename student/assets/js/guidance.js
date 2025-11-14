@@ -31,7 +31,7 @@ function renderGuidanceDetail() {
                               d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
-                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 지도 계획 현황</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문지도 현황</h2>
             </div>
             <div class="flex items-center gap-4">
                 <div class="notification-bell cursor-pointer relative" onclick="toggleNotifications()">
@@ -270,7 +270,7 @@ function openAddPlanModal() {
         </form>
     `;
 
-    createModal('주차별 지도 계획 추가', modalContent, [
+    createModal('주차별 논문지도 계획 추가', modalContent, [
         {
             text: '취소',
             className: 'btn-secondary',
