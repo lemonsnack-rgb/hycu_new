@@ -1114,81 +1114,196 @@ const appData = {
         },
         {
             id: 9,
-            name: 'Pass/Fail 평가표',
+            name: '연구윤리심의 평가표 (Pass/Fail)',
             type: 'passfail',
-            description: '단순 합격/불합격 평가',
-            itemCount: 4,
+            description: 'IRB 연구윤리심의 통과/불통과 평가 (인간대상연구 또는 동물실험)',
+            itemCount: 6,
             totalScore: null,
             passingScore: null,
-            passingCriteria: 'Pass',
+            passingCriteria: '모든 항목 Pass',
             createdDate: '2025-01-20',
             items: [
                 {
                     id: 1,
-                    name: '연구 윤리 준수',
+                    name: '연구 목적 및 필요성',
                     score: null,
-                    description: '연구 윤리 기준 충족 여부'
+                    evaluationType: 'passfail',
+                    description: '연구의 학술적 가치와 사회적 필요성이 명확히 제시되었는가'
                 },
                 {
                     id: 2,
-                    name: '개인정보 보호 계획',
+                    name: '연구 대상자 보호',
                     score: null,
-                    description: '개인정보 보호 대책 적절성'
+                    evaluationType: 'passfail',
+                    description: '연구 대상자의 권리와 안전을 충분히 보호하는 계획이 수립되었는가'
                 },
                 {
                     id: 3,
-                    name: '연구 참여자 동의서',
+                    name: '동의서 및 설명서',
                     score: null,
-                    description: '동의서 작성 및 확보'
+                    evaluationType: 'passfail',
+                    description: '연구 참여 동의서와 설명서가 적절하게 작성되었는가'
                 },
                 {
                     id: 4,
-                    name: '위험성 평가',
+                    name: '개인정보 보호',
                     score: null,
-                    description: '연구 위험성 평가 및 대응'
+                    evaluationType: 'passfail',
+                    description: '개인정보 수집, 저장, 파기 절차가 관련 법규에 부합하는가'
+                },
+                {
+                    id: 5,
+                    name: '위험/이득 평가',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구로 인한 위험과 이득이 적절히 평가되었는가'
+                },
+                {
+                    id: 6,
+                    name: '연구윤리 준수',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구진실성 및 연구윤리 관련 규정을 준수하는가'
                 }
             ]
         },
         {
             id: 10,
-            name: '5단계 평가표',
+            name: '학술대회 포스터발표 평가표 (등급형)',
             type: 'grade',
-            description: '5단계 등급 평가 (우수/상/중/하/미흡)',
-            itemCount: 5,
+            description: '5단계 등급 평가 (A/B/C/D/F) - 학술대회 포스터 발표 평가용',
+            itemCount: 6,
             totalScore: null,
             passingScore: null,
-            passingCriteria: '상 이상',
+            passingCriteria: 'C 이상',
             createdDate: '2025-01-20',
             items: [
                 {
                     id: 1,
-                    name: '연구 완성도',
+                    name: '포스터 구성',
                     score: null,
-                    description: '연구의 전체적 완성도'
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '포스터의 전체적인 구성과 시각적 표현 (제목, 서론, 방법, 결과, 결론 구분)'
                 },
                 {
                     id: 2,
-                    name: '연구 방법',
+                    name: '연구 내용 명확성',
                     score: null,
-                    description: '연구 방법의 적절성'
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구 목적, 방법, 결과가 명확하게 제시되었는가'
                 },
                 {
                     id: 3,
-                    name: '결과 분석',
+                    name: '연구 방법 적절성',
                     score: null,
-                    description: '결과 분석의 정확성'
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구 방법론의 타당성과 실행 가능성'
                 },
                 {
                     id: 4,
-                    name: '학술적 기여',
+                    name: '결과 제시',
                     score: null,
-                    description: '학문적 기여도'
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구 결과가 그래프, 표 등을 활용하여 명확히 제시되었는가'
                 },
                 {
                     id: 5,
-                    name: '발표 능력',
+                    name: '학술적 기여도',
                     score: null,
-                    description: '발표 및 질의응답 능력'
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구의 독창성과 학문 분야에 대한 기여 가능성'
+                },
+                {
+                    id: 6,
+                    name: '발표 및 질의응답',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '포스터 설명 능력과 질문에 대한 응답의 적절성'
+                }
+            ]
+        },
+        {
+            id: 11,
+            name: '자격시험 (Pass/Fail)',
+            type: 'passfail',
+            description: '박사과정 자격시험 통과/불통과 평가',
+            itemCount: 3,
+            totalScore: null,
+            passingScore: null,
+            passingCriteria: '모든 과목 Pass',
+            createdDate: '2025-01-21',
+            items: [
+                {
+                    id: 1,
+                    name: '전공필수 과목',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '전공 핵심 영역에 대한 이해도 평가 (Pass/Fail)'
+                },
+                {
+                    id: 2,
+                    name: '연구방법론',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구 설계 및 분석 방법에 대한 이해 평가 (Pass/Fail)'
+                },
+                {
+                    id: 3,
+                    name: '외국어',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '학술 논문 독해 및 작성 능력 평가 (Pass/Fail)'
+                }
+            ]
+        },
+        {
+            id: 12,
+            name: '연구진행상황 점검표 (등급형)',
+            type: 'grade',
+            description: '3단계 등급 평가 (우수/보통/미흡) - 정기 연구진행상황 점검용',
+            itemCount: 4,
+            totalScore: null,
+            passingScore: null,
+            passingCriteria: '보통 이상',
+            createdDate: '2025-01-21',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 진척도',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '계획 대비 연구 진행 정도'
+                },
+                {
+                    id: 2,
+                    name: '문헌 조사',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '선행 연구 검토 및 이론적 배경 정리 상태'
+                },
+                {
+                    id: 3,
+                    name: '자료 수집',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '연구 자료 수집 및 분석 진행 상황'
+                },
+                {
+                    id: 4,
+                    name: '지도교수 면담',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '지도교수와의 정기적 상담 및 피드백 반영'
                 }
             ]
         }
