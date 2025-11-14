@@ -1906,93 +1906,16 @@ const views = {
 
     // ========== 주차별 지도 관리 ==========
     weeklyGuidance: () => {
-        const data = appData.weeklyGuidance;
+        // 초기화는 admin_weekly_guidance.js에서 처리
+        setTimeout(() => {
+            if (typeof initWeeklyGuidance === 'function') {
+                initWeeklyGuidance();
+            }
+        }, 100);
+
         return `
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-2xl font-bold mb-6">주차별 지도 관리</h2>
-
-                <!-- 필터 -->
-                <div class="search-container">
-                    <div class="search-grid">
-                        <div>
-                            <label class="block text-sm font-medium mb-2">학기</label>
-                            <select id="semesterFilter" onchange="filterGuidancePairs()"
-                                    class="search-select">
-                                <option value="">전체</option>
-                                <option value="2024-2학기">2024-2학기</option>
-                                <option value="2024-1학기">2024-1학기</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">상태</label>
-                            <select id="statusFilter" onchange="filterGuidancePairs()"
-                                    class="search-select">
-                                <option value="">전체</option>
-                                <option value="active">진행중</option>
-                                <option value="completed">완료</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">교수명</label>
-                            <input type="text" id="professorSearch"
-                                   class="search-input"
-                                   placeholder="교수명 입력">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium mb-2">학생명</label>
-                            <input type="text" id="studentSearch"
-                                   class="search-input"
-                                   placeholder="학생명 입력">
-                        </div>
-                    </div>
-                    <div class="search-buttons">
-                        <button onclick="filterGuidancePairs()" class="search-btn search-btn-primary">
-                            <i class="fas fa-search"></i> 검색
-                        </button>
-                        <button onclick="resetGuidancePairsFilter()" class="search-btn search-btn-secondary">
-                            <i class="fas fa-redo"></i> 초기화
-                        </button>
-                    </div>
-                </div>
-
-                <!-- 목록 테이블 -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="guidancePairsTableBody" class="divide-y divide-gray-200">
-                            ${data.guidancePairs.map((pair, index) => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.student.major || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.student.degree || '석사'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.student.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${pair.student.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.professor.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${pair.semester}</td>
-                                    <td class="py-3 px-4 text-center">
-                                        <button onclick="viewWeeklyGuidanceDetail(${pair.id})"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
-                                            상세보기
-                                        </button>
-                                    </td>
-                                </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
-                </div>
+            <div id="weekly-guidance-content">
+                <!-- 목록/상세 화면이 여기에 렌더링됩니다 -->
             </div>
         `;
     },
