@@ -265,6 +265,31 @@
 
     <script src="admin_main.js"></script>
 
+    <!-- createModal wrapper for professor scripts compatibility -->
+    <script>
+        // Override createModal to use openModal (admin version)
+        window.createModal = function(title, content, buttons) {
+            // For journal review detail modal, use openModal with no footer
+            // since it only has a close button
+            if (buttons && buttons.length === 1 && buttons[0].text === '닫기') {
+                openModal(title, content, '', null, false);
+            } else {
+                // If multiple buttons, use first button as confirm
+                const confirmBtn = buttons && buttons.length > 0 ? buttons[buttons.length - 1] : null;
+                const confirmText = confirmBtn ? confirmBtn.text : '확인';
+                const onConfirm = confirmBtn && confirmBtn.onclick && confirmBtn.onclick !== 'return;'
+                    ? new Function(confirmBtn.onclick)
+                    : null;
+                openModal(title, content, confirmText, onConfirm, true);
+            }
+        };
+
+        // Override showToast to use showAlert (admin version)
+        window.showToast = function(message, type) {
+            showAlert(message);
+        };
+    </script>
+
 <!-- injected: i18n minimal handler -->
 <script data-i18n-ready>
 (function(){
