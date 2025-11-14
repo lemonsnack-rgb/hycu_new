@@ -84,58 +84,18 @@ function toggleNotifications() {
     }
 }
 
-// 사용자 메뉴 드롭다운 토글
-function toggleUserMenu() {
-    const userMenu = document.getElementById('user-menu-dropdown');
-    const dropdown = document.getElementById('notification-dropdown');
-    
-    if (userMenu) {
-        const isHidden = userMenu.classList.contains('hidden');
-        userMenu.classList.toggle('hidden');
-        
-        // 알림은 닫기
-        if (dropdown) {
-            dropdown.classList.add('hidden');
-        }
-        
-        // 외부 클릭 시 닫기
-        if (isHidden) {
-            setTimeout(() => {
-                document.addEventListener('click', closeUserMenuOnOutsideClick);
-            }, 100);
-        }
-    }
-}
-
-// 외부 클릭 시 알림 닫기
-function closeNotificationsOnOutsideClick(event) {
-    const dropdown = document.getElementById('notification-dropdown');
-    const button = event.target.closest('.notification-btn, #notification-dropdown');
-    
-    if (!button && dropdown && !dropdown.classList.contains('hidden')) {
-        dropdown.classList.add('hidden');
-        document.removeEventListener('click', closeNotificationsOnOutsideClick);
-    }
-}
-
-// 외부 클릭 시 사용자 메뉴 닫기
-function closeUserMenuOnOutsideClick(event) {
-    const userMenu = document.getElementById('user-menu-dropdown');
-    const button = event.target.closest('.user-profile, #user-menu-dropdown');
-    
-    if (!button && userMenu && !userMenu.classList.contains('hidden')) {
-        userMenu.classList.add('hidden');
-        document.removeEventListener('click', closeUserMenuOnOutsideClick);
-    }
-}
-
 // 로그아웃
 function logout() {
     if (confirm('로그아웃하시겠습니까?')) {
         alert('로그아웃되었습니다.');
-        // 실제로는 로그인 페이지로 이동
-        // window.location.href = '/login';
+        window.location.href = '../index.html';
     }
+}
+
+// 언어 전환
+function switchLanguage() {
+    // TODO: 다국어 지원 기능 구현 예정
+    alert('다국어 지원 기능은 추후 제공될 예정입니다.');
 }
 
 // 페이지 로드 시 초기화
