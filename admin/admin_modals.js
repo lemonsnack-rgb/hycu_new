@@ -3296,7 +3296,7 @@ function viewWeeklyGuidanceDetail(pairId) {
                     <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                     <button onclick="addNewWeeklyPlan(${pairId})"
                             class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
-                        + 주차 추가
+                        + 계획 추가
                     </button>
                 </div>
 
@@ -4491,7 +4491,7 @@ function addNewWeeklyPlan(pairId) {
     `;
 
     openModal(
-        '새 주차 추가',
+        '계획 추가',
         content,
         '추가',
         () => createNewWeeklyPlan(pairId),
@@ -4534,7 +4534,7 @@ function createNewWeeklyPlan(pairId) {
         return;
     }
 
-    // 새 주차 추가
+    // 새 계획 추가
     const newWeekPlan = {
         week: week,
         professorPlan: {
@@ -4551,7 +4551,7 @@ function createNewWeeklyPlan(pairId) {
     // 전체 주차 수 업데이트
     pair.totalWeeks = plansData.weeks.length;
 
-    showNotification('새 주차 계획이 추가되었습니다.', 'success');
+    showNotification('새 계획이 추가되었습니다.', 'success');
     closeModal();
 
     // 상세 화면 다시 표시

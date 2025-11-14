@@ -82,15 +82,13 @@ function showStudentList() {
                                        onchange="toggleSelectAllStudents(this.checked)"
                                        class="rounded border-gray-300">
                             </th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">과정</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">전체 지도 계획 수</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">지도 횟수</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">최근지도일</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                         </tr>
                     </thead>
@@ -106,28 +104,16 @@ function showStudentList() {
                                                value="${student.studentId}" data-name="${student.name}">
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${student.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${student.studentId}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${student.major || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${getDegreeText(student.degree)}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${getStageText(student.stage)}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${student.studentId}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${student.name}</td>
                                     <td class="py-3 px-4">
-                                        <div class="flex flex-col gap-1">
-                                            ${student.advisors.map(advisor => `
-                                                <span class="text-xs ${
-                                                    advisor.id === currentProf.id
-                                                        ? 'font-semibold text-blue-600'
-                                                        : 'text-gray-500'
-                                                }">
-                                                    ${advisor.name} ${advisor.role === 'primary' ? '(주)' : '(부)'}
-                                                </span>
-                                            `).join('')}
-                                        </div>
+                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                            재학
+                                        </span>
                                     </td>
-                                    <td class="py-3 px-4 text-center text-gray-600">${student.totalGuidanceCount}회</td>
-                                    <td class="py-3 px-4 text-center">
-                                        <span class="font-semibold text-blue-600">${myStats.count}회</span>
-                                    </td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${myStats.lastDate || '-'}</td>
                                     <td class="py-3 px-4 text-center">
                                         <button onclick="showStudentDetail('${student.studentId}')"
                                                 class="text-blue-600 hover:underline text-sm font-medium">
@@ -227,7 +213,7 @@ function renderStudentDetail() {
                 <div class="flex items-center gap-3">
                     <button onclick="openAddPlanModal()"
                             class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
-                        + 주차 추가
+                        + 계획 추가
                     </button>
                 </div>
             </div>
@@ -432,7 +418,7 @@ function openAddPlanModal() {
         </form>
     `;
 
-    createModal('주차별 지도 계획 추가', modalContent, [
+    createModal('주차별 논문지도 계획 추가', modalContent, [
         {
             text: '취소',
             className: 'btn-secondary',
