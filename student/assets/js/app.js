@@ -30,7 +30,7 @@ function showScreen(screenName) {
     // 페이지 타이틀 업데이트
     const titles = {
         'dashboard': '대시보드',
-        'guidance': '주차별 지도 계획 현황',
+        'guidance': '주차별 논문지도 현황',
         'meeting': '미팅관리',
         'feedback': '온라인 피드백',
         'review': '심사 신청',

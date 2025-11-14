@@ -25,6 +25,12 @@ function showGuidancePairsList() {
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center mb-4">
                     <h2 class="text-2xl font-bold text-gray-800">주차별 논문지도 현황</h2>
+                    <div class="flex items-center gap-3">
+                        <button onclick="sendNotificationToSelectedPairs()"
+                                class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            선택 학생에게 알림 발송
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 필터 -->
@@ -74,12 +80,18 @@ function showGuidancePairsList() {
                 <table class="min-w-full">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                                <input type="checkbox" id="select-all-pairs"
+                                       onchange="toggleSelectAllPairs(this.checked)"
+                                       class="rounded border-gray-300">
+                            </th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
@@ -88,12 +100,21 @@ function showGuidancePairsList() {
                     <tbody class="divide-y divide-gray-200">
                         ${data.guidancePairs.map((pair, index) => `
                             <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-center">
+                                    <input type="checkbox" class="pair-checkbox rounded border-gray-300"
+                                           value="${pair.student.studentId}" data-name="${pair.student.name}">
+                                </td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${pair.student.major || '-'}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${getAdminDegreeText(pair.student.degree)}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${pair.student.studentId}</td>
                                 <td class="py-3 px-4 text-sm font-medium text-gray-800">${pair.student.name}</td>
+                                <td class="py-3 px-4">
+                                    <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
+                                        재학
+                                    </span>
+                                </td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${pair.professor.name}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${pair.semester}</td>
                                 <td class="py-3 px-4 text-center">
@@ -187,7 +208,7 @@ function showGuidancePairDetail(pairId) {
                 <div class="flex items-center gap-3">
                     <button onclick="addNewWeeklyPlan()"
                             class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
-                        + 주차 추가
+                        + 계획 추가
                     </button>
                 </div>
             </div>
@@ -603,6 +624,40 @@ function resetGuidancePairsFilter() {
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
+// 체크박스 전체 선택/해제
+function toggleSelectAllPairs(checked) {
+    const checkboxes = document.querySelectorAll('.pair-checkbox');
+    checkboxes.forEach(cb => cb.checked = checked);
+}
+
+// 선택한 학생에게 알림 발송
+function sendNotificationToSelectedPairs() {
+    const checkboxes = document.querySelectorAll('.pair-checkbox:checked');
+
+    if (checkboxes.length === 0) {
+        showAlert('알림을 발송할 학생을 선택해주세요.');
+        return;
+    }
+
+    const students = Array.from(checkboxes).map(cb => ({
+        studentId: cb.value,
+        name: cb.getAttribute('data-name')
+    }));
+
+    const studentNames = students.map(s => s.name).join(', ');
+
+    if (confirm(`${students.length}명의 학생에게 알림을 발송하시겠습니까?\n\n학생: ${studentNames}`)) {
+        // 실제로는 서버에 알림 발송 요청
+        console.log('알림 발송 대상:', students);
+        showAlert(`${students.length}명의 학생에게 알림이 발송되었습니다.`);
+
+        // 체크박스 초기화
+        checkboxes.forEach(cb => cb.checked = false);
+        const selectAll = document.getElementById('select-all-pairs');
+        if (selectAll) selectAll.checked = false;
+    }
+}
+
 // 전역으로 export
 window.initWeeklyGuidance = initWeeklyGuidance;
 window.showGuidancePairsList = showGuidancePairsList;
@@ -614,3 +669,5 @@ window.updatePlan = updatePlan;
 window.deletePlan = deletePlan;
 window.filterGuidancePairs = filterGuidancePairs;
 window.resetGuidancePairsFilter = resetGuidancePairsFilter;
+window.toggleSelectAllPairs = toggleSelectAllPairs;
+window.sendNotificationToSelectedPairs = sendNotificationToSelectedPairs;

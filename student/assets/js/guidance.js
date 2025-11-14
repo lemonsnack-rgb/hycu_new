@@ -1,13 +1,13 @@
 // ===================================
-// 학생용 주차별 지도 계획 현황 화면
+// 학생용 주차별 논문지도 현황 화면
 // 교수용 화면의 학생별 상세 화면과 동일한 UI
 // 학생은 본인의 계획만 조회, 추가, 수정 가능
 // 교수가 입력한 실적은 조회만 가능
 // ===================================
 
-// 주차별 지도 계획 현황 초기화
+// 주차별 논문지도 현황 초기화
 function initGuidance() {
-    console.log('학생용 주차별 지도 계획 현황 초기화');
+    console.log('학생용 주차별 논문지도 현황 초기화');
     renderGuidanceDetail();
 }
 
@@ -55,7 +55,7 @@ function renderGuidanceDetail() {
                 <div class="flex items-center gap-3">
                     <button onclick="openAddPlanModal()"
                             class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
-                        + 주차 추가
+                        + 계획 추가
                     </button>
                 </div>
             </div>
