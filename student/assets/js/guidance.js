@@ -198,6 +198,9 @@ function formatDate(dateString) {
 
 // 계획 추가 모달
 function openAddPlanModal() {
+    const student = DataService.getStudent();
+    if (!student || !student.advisors) return;
+
     const plans = DataService.getWeeklyGuidancePlans();
     const nextWeek = plans.length > 0
         ? Math.max(...plans.map(p => p.week)) + 1
@@ -216,6 +219,23 @@ function openAddPlanModal() {
                     <input type="date" name="plannedDate"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
+                    ${student.advisors.map(advisor => `
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="advisors" value="${advisor.id}"
+                                   ${advisor.role === 'primary' ? 'checked' : ''}
+                                   class="rounded border-gray-300 mr-2">
+                            <span class="text-sm ${advisor.role === 'primary' ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">※ 복수 선택 가능</p>
             </div>
 
             <div>
@@ -269,6 +289,9 @@ function openEditPlanModal(planId) {
     const plan = DataService.getWeeklyGuidancePlan(planId);
     if (!plan) return;
 
+    const student = DataService.getStudent();
+    if (!student || !student.advisors) return;
+
     const modalContent = `
         <form id="edit-plan-form" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
@@ -282,6 +305,23 @@ function openEditPlanModal(planId) {
                     <input type="date" name="plannedDate" value="${plan.plannedDate}"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
+                    ${student.advisors.map(advisor => `
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="advisors" value="${advisor.id}"
+                                   ${advisor.id === plan.advisor.id ? 'checked' : ''}
+                                   class="rounded border-gray-300 mr-2">
+                            <span class="text-sm ${advisor.role === 'primary' ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">※ 복수 선택 가능</p>
             </div>
 
             <div>
@@ -328,10 +368,18 @@ function savePlan() {
     const form = document.getElementById('add-plan-form');
     const formData = new FormData(form);
 
+    const advisorIds = Array.from(form.querySelectorAll('input[name="advisors"]:checked'))
+        .map(cb => cb.value);
+
     if (!formData.get('week') || !formData.get('plannedDate') ||
         !formData.get('plannedTopic') || !formData.get('plannedContent') ||
         !formData.get('plannedMethod')) {
         showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    if (advisorIds.length === 0) {
+        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
         return;
     }
 
@@ -340,7 +388,8 @@ function savePlan() {
         plannedDate: formData.get('plannedDate'),
         plannedTopic: formData.get('plannedTopic'),
         plannedContent: formData.get('plannedContent'),
-        plannedMethod: formData.get('plannedMethod')
+        plannedMethod: formData.get('plannedMethod'),
+        advisorId: advisorIds[0] // 첫 번째 선택된 교수를 담당교수로 설정
     };
 
     DataService.addWeeklyGuidancePlan(planData);
@@ -356,10 +405,18 @@ function updatePlan(planId) {
     const form = document.getElementById('edit-plan-form');
     const formData = new FormData(form);
 
+    const advisorIds = Array.from(form.querySelectorAll('input[name="advisors"]:checked'))
+        .map(cb => cb.value);
+
     if (!formData.get('week') || !formData.get('plannedDate') ||
         !formData.get('plannedTopic') || !formData.get('plannedContent') ||
         !formData.get('plannedMethod')) {
         showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    if (advisorIds.length === 0) {
+        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
         return;
     }
 
@@ -368,7 +425,8 @@ function updatePlan(planId) {
         plannedDate: formData.get('plannedDate'),
         plannedTopic: formData.get('plannedTopic'),
         plannedContent: formData.get('plannedContent'),
-        plannedMethod: formData.get('plannedMethod')
+        plannedMethod: formData.get('plannedMethod'),
+        advisorId: advisorIds[0] // 첫 번째 선택된 교수를 담당교수로 설정
     };
 
     DataService.updateWeeklyGuidancePlan(planId, planData);
