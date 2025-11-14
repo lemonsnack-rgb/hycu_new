@@ -1608,6 +1608,151 @@ const appData = {
         { employeeId: 'A2024006', name: '박직원', department: '대학원', isAdmin: false },
         { employeeId: 'P2024001', name: '김교수', department: '교육공학과', isAdmin: false },
         { employeeId: 'P2024002', name: '이교수', department: '경영학과', isAdmin: false }
+    ],
+
+    // 대리로그인용 시스템 사용자 목록
+    systemUsers: [
+        // 교수 목록
+        {
+            id: 'P2024001',
+            type: '교수',
+            employeeId: 'P2024001',
+            name: '홍길동',
+            graduate: '일반대학원',
+            department: '교육공학과',
+            email: 'hong@hycu.ac.kr',
+            loginUrl: '../professor/index.html'
+        },
+        {
+            id: 'P2024002',
+            type: '교수',
+            employeeId: 'P2024002',
+            name: '박교수',
+            graduate: '일반대학원',
+            department: '경영학과',
+            email: 'park@hycu.ac.kr',
+            loginUrl: '../professor/index.html'
+        },
+        {
+            id: 'P2024003',
+            type: '교수',
+            employeeId: 'P2024003',
+            name: '김교수',
+            graduate: '일반대학원',
+            department: '컴퓨터공학과',
+            email: 'kim@hycu.ac.kr',
+            loginUrl: '../professor/index.html'
+        },
+        {
+            id: 'P2024004',
+            type: '교수',
+            employeeId: 'P2024004',
+            name: '최교수',
+            graduate: '일반대학원',
+            department: '교육학과',
+            email: 'choi@hycu.ac.kr',
+            loginUrl: '../professor/index.html'
+        },
+        {
+            id: 'P2024005',
+            type: '교수',
+            employeeId: 'P2024005',
+            name: '이교수',
+            graduate: '특수대학원',
+            department: '상담심리학과',
+            email: 'lee@hycu.ac.kr',
+            loginUrl: '../professor/index.html'
+        },
+
+        // 학생 목록
+        {
+            id: 'S2024001',
+            type: '학생',
+            studentId: '2024001',
+            name: '김철수',
+            graduate: '일반대학원',
+            major: '교육공학',
+            degree: '석사',
+            email: 'kimcs@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2024002',
+            type: '학생',
+            studentId: '2024002',
+            name: '이영희',
+            graduate: '일반대학원',
+            major: '경영학',
+            degree: '박사',
+            email: 'leeyh@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2024003',
+            type: '학생',
+            studentId: '2024003',
+            name: '홍길동',
+            graduate: '일반대학원',
+            major: '컴퓨터공학',
+            degree: '석사',
+            email: 'honggd@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2023005',
+            type: '학생',
+            studentId: '2023005',
+            name: '박민수',
+            graduate: '일반대학원',
+            major: '교육공학',
+            degree: '석사',
+            email: 'parkms@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2023010',
+            type: '학생',
+            studentId: '2023010',
+            name: '최지연',
+            graduate: '일반대학원',
+            major: '경영학',
+            degree: '석사',
+            email: 'choijy@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2022008',
+            type: '학생',
+            studentId: '2022008',
+            name: '정태훈',
+            graduate: '일반대학원',
+            major: '교육공학',
+            degree: '박사',
+            email: 'jungth@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2023012',
+            type: '학생',
+            studentId: '2023012',
+            name: '김민지',
+            graduate: '일반대학원',
+            major: '컴퓨터공학',
+            degree: '석사',
+            email: 'kimmj@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        },
+        {
+            id: 'S2023015',
+            type: '학생',
+            studentId: '2023015',
+            name: '이상민',
+            graduate: '특수대학원',
+            major: '상담심리학',
+            degree: '석사',
+            email: 'leesm@student.hycu.ac.kr',
+            loginUrl: '../student/index.html'
+        }
     ]
 };
 

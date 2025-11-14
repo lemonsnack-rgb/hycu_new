@@ -1992,9 +1992,9 @@ const views = {
                         });
 
                         return `
-                            <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                            <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden ${admin.status === 'suspended' ? 'opacity-60' : ''}" style="${admin.status === 'suspended' ? 'filter: grayscale(40%); background-color: #F5F5F5;' : ''}">
                                 <!-- 관리자 정보 헤더 -->
-                                <div class="bg-gray-100 p-4 flex justify-between items-center">
+                                <div class="p-4 flex justify-between items-center ${admin.status === 'suspended' ? 'bg-gray-200' : 'bg-gray-100'}">
                                     <div class="flex items-center gap-4">
                                         <div>
                                             <h4 class="font-bold text-gray-800">${admin.name}</h4>
@@ -2006,7 +2006,8 @@ const views = {
                                     </div>
                                     <div class="flex gap-2">
                                         <button onclick="saveAdminPermissions(${admin.id})"
-                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-1">
+                                                ${admin.status === 'suspended' ? 'disabled' : ''}
+                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-1 ${admin.status === 'suspended' ? 'opacity-50 cursor-not-allowed' : ''}">
                                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                                             </svg>
@@ -2044,20 +2045,28 @@ const views = {
                                 </div>
 
                                 <!-- 권한 설정 테이블 -->
-                                <div class="p-4">
+                                <div class="p-4 ${admin.status === 'suspended' ? 'bg-gray-100' : ''}">
+                                    ${admin.status === 'suspended' ? `
+                                        <div class="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                            <p class="text-sm text-yellow-800">
+                                                <strong>⚠️ 권한 중지됨:</strong> 모든 권한이 비활성화되어 있습니다. "권한 활성화" 버튼을 눌러 다시 활성화하세요.
+                                            </p>
+                                        </div>
+                                    ` : ''}
                                     ${Object.entries(categories).map(([category, screens]) => `
                                         <div class="mb-4">
                                             <h5 class="font-semibold text-gray-700 mb-2 border-b pb-2">${category}</h5>
                                             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                                                 ${screens.map(screen => `
-                                                    <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                                    <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded ${admin.status === 'suspended' ? 'cursor-not-allowed' : 'cursor-pointer'}">
                                                         <input type="checkbox"
                                                                data-admin-id="${admin.id}"
                                                                data-screen-id="${screen.id}"
                                                                ${permissionMap[screen.id] ? 'checked' : ''}
+                                                               ${admin.status === 'suspended' ? 'disabled' : ''}
                                                                onchange="updatePermission(${admin.id}, '${screen.id}', this.checked)"
                                                                class="rounded border-gray-300">
-                                                        <span class="text-sm text-gray-700">${screen.name}</span>
+                                                        <span class="text-sm ${admin.status === 'suspended' ? 'text-gray-500' : 'text-gray-700'}">${screen.name}</span>
                                                     </label>
                                                 `).join('')}
                                             </div>
@@ -2071,6 +2080,86 @@ const views = {
                             등록된 관리자가 없습니다.
                         </div>
                     `}
+                </div>
+
+                <!-- 대리로그인 섹션 -->
+                <div class="p-6 mt-6 border-t-4 border-[#6A0028]">
+                    <div class="flex items-center mb-4">
+                        <svg class="w-6 h-6 text-[#6A0028] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                        </svg>
+                        <h3 class="text-lg font-bold text-gray-800">대리로그인</h3>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-4">
+                        시스템을 이용하는 교수 또는 학생의 계정으로 대리 로그인하여 화면을 확인할 수 있습니다.
+                    </p>
+
+                    <!-- 검색 및 필터 -->
+                    <div class="mb-4 flex gap-4">
+                        <select id="proxy-login-filter" class="border border-gray-300 rounded px-3 py-2 text-sm"
+                                onchange="filterProxyLoginUsers()">
+                            <option value="all">전체</option>
+                            <option value="교수">교수</option>
+                            <option value="학생">학생</option>
+                        </select>
+                        <input type="text" id="proxy-login-search" placeholder="이름 또는 학번/교번으로 검색"
+                               class="border border-gray-300 rounded px-3 py-2 text-sm flex-1"
+                               oninput="filterProxyLoginUsers()">
+                    </div>
+
+                    <!-- 사용자 목록 테이블 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full border-collapse bg-white">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">구분</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">학번/교번</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">이름</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">대학원</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">학과/전공</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">이메일</th>
+                                    <th class="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-700 w-32">액션</th>
+                                </tr>
+                            </thead>
+                            <tbody id="proxy-login-table-body">
+                                ${(appData.systemUsers || []).map(user => `
+                                    <tr class="hover:bg-gray-50 proxy-login-row"
+                                        data-type="${user.type}"
+                                        data-search="${user.name} ${user.type === '교수' ? user.employeeId : user.studentId}">
+                                        <td class="border border-gray-200 px-4 py-3 text-sm">
+                                            <span class="px-2 py-1 rounded-full text-xs font-medium ${user.type === '교수' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
+                                                ${user.type}
+                                            </span>
+                                        </td>
+                                        <td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900">
+                                            ${user.type === '교수' ? user.employeeId : user.studentId}
+                                        </td>
+                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-900">${user.name}</td>
+                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-700">${user.graduate}</td>
+                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-700">
+                                            ${user.type === '교수' ? user.department : `${user.major}${user.degree ? ` (${user.degree})` : ''}`}
+                                        </td>
+                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${user.email}</td>
+                                        <td class="border border-gray-200 px-4 py-3 text-center">
+                                            <button onclick="proxyLogin('${user.id}', '${user.type}', '${user.name}', '${user.loginUrl}')"
+                                                    class="bg-[#6A0028] text-white px-4 py-1.5 rounded text-xs hover:bg-[#5A0020] flex items-center gap-1 mx-auto">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
+                                                </svg>
+                                                대리로그인
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    ${(appData.systemUsers || []).length === 0 ? `
+                        <div class="text-center py-8 text-gray-500">
+                            등록된 시스템 사용자가 없습니다.
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         `;

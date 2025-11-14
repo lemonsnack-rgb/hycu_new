@@ -3178,3 +3178,65 @@ window.closeAdminNotificationModal = closeAdminNotificationModal;
 window.submitAdminNotification = submitAdminNotification;
 
 console.log('✅ 관리자 알림 발송 기능 로드 완료');
+
+// ========== 대리로그인 ==========
+
+// 대리로그인 사용자 필터링
+function filterProxyLoginUsers() {
+    const filterType = document.getElementById('proxy-login-filter')?.value || 'all';
+    const searchTerm = document.getElementById('proxy-login-search')?.value.toLowerCase() || '';
+    const rows = document.querySelectorAll('.proxy-login-row');
+
+    rows.forEach(row => {
+        const type = row.dataset.type;
+        const searchText = row.dataset.search.toLowerCase();
+
+        const matchType = filterType === 'all' || type === filterType;
+        const matchSearch = searchText.includes(searchTerm);
+
+        if (matchType && matchSearch) {
+            row.style.display = '';
+        } else {
+            row.style.display = 'none';
+        }
+    });
+}
+
+// 대리로그인 실행
+function proxyLogin(userId, userType, userName, loginUrl) {
+    if (!confirm(`${userName}(${userType})님의 계정으로 대리 로그인하시겠습니까?\n\n새 창에서 해당 사용자의 화면이 열립니다.`)) {
+        return;
+    }
+
+    // 대리로그인 정보를 세션 스토리지에 저장
+    const proxyLoginData = {
+        userId: userId,
+        userType: userType,
+        userName: userName,
+        loginTime: new Date().toISOString(),
+        isProxyLogin: true
+    };
+
+    // 새 창으로 열기 전에 데이터 저장
+    try {
+        localStorage.setItem('proxyLoginData', JSON.stringify(proxyLoginData));
+
+        // 새 창으로 해당 사용자의 화면 열기
+        const newWindow = window.open(loginUrl, `_blank_${userId}`, 'width=1200,height=800,scrollbars=yes,resizable=yes');
+
+        if (!newWindow) {
+            showNotification('팝업이 차단되었습니다. 팝업 차단을 해제해주세요.', 'warning');
+        } else {
+            showNotification(`${userName}(${userType})님으로 대리 로그인되었습니다.`, 'success');
+        }
+    } catch (error) {
+        console.error('대리로그인 오류:', error);
+        showNotification('대리로그인 중 오류가 발생했습니다.', 'error');
+    }
+}
+
+// Export
+window.filterProxyLoginUsers = filterProxyLoginUsers;
+window.proxyLogin = proxyLogin;
+
+console.log('✅ 대리로그인 기능 로드 완료');
