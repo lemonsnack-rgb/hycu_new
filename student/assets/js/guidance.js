@@ -64,7 +64,7 @@ function renderGuidanceDetail() {
                 <div class="space-y-4">
                     ${sortedPlans.map(plan => {
                         const isProfessorPlan = plan.createdBy === 'professor';
-                        const canEdit = !isProfessorPlan || !plan.executionDate;
+                        const canEdit = !plan.executionDate; // 실적이 입력되지 않은 경우만 수정 가능
                         return `
                             <div class="border ${isProfessorPlan ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <!-- 헤더 -->
@@ -90,17 +90,15 @@ function renderGuidanceDetail() {
                                         }">
                                             ${getMethodText(plan.actualMethod || plan.plannedMethod)}
                                         </span>
-                                        ${canEdit && !plan.executionDate ? `
+                                        ${canEdit ? `
                                             <button onclick="openEditPlanModal(${plan.id})"
                                                     class="text-blue-600 hover:underline text-xs font-medium">
                                                 수정
                                             </button>
-                                            ${!isProfessorPlan ? `
-                                                <button onclick="deletePlan(${plan.id})"
-                                                        class="text-red-600 hover:underline text-xs font-medium">
-                                                    삭제
-                                                </button>
-                                            ` : ''}
+                                            <button onclick="deletePlan(${plan.id})"
+                                                    class="text-red-600 hover:underline text-xs font-medium">
+                                                삭제
+                                            </button>
                                         ` : ''}
                                     </div>
                                 </div>
@@ -200,6 +198,9 @@ function formatDate(dateString) {
 
 // 계획 추가 모달
 function openAddPlanModal() {
+    const student = DataService.getStudent();
+    if (!student || !student.advisors) return;
+
     const plans = DataService.getWeeklyGuidancePlans();
     const nextWeek = plans.length > 0
         ? Math.max(...plans.map(p => p.week)) + 1
@@ -221,6 +222,23 @@ function openAddPlanModal() {
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
+                    ${student.advisors.map(advisor => `
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="advisors" value="${advisor.id}"
+                                   ${advisor.role === 'primary' ? 'checked' : ''}
+                                   class="rounded border-gray-300 mr-2">
+                            <span class="text-sm ${advisor.role === 'primary' ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">※ 복수 선택 가능</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
                 <input type="text" name="plannedTopic" placeholder="예: 연구방법론 개요"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
@@ -233,7 +251,7 @@ function openAddPlanModal() {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">희망 지도 방식 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
                 <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                     <option value="">선택하세요</option>
                     <option value="meeting">대면</option>
@@ -271,6 +289,9 @@ function openEditPlanModal(planId) {
     const plan = DataService.getWeeklyGuidancePlan(planId);
     if (!plan) return;
 
+    const student = DataService.getStudent();
+    if (!student || !student.advisors) return;
+
     const modalContent = `
         <form id="edit-plan-form" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
@@ -287,6 +308,23 @@ function openEditPlanModal(planId) {
             </div>
 
             <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
+                    ${student.advisors.map(advisor => `
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox" name="advisors" value="${advisor.id}"
+                                   ${advisor.id === plan.advisor.id ? 'checked' : ''}
+                                   class="rounded border-gray-300 mr-2">
+                            <span class="text-sm ${advisor.role === 'primary' ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                            </span>
+                        </label>
+                    `).join('')}
+                </div>
+                <p class="text-xs text-gray-500 mt-1">※ 복수 선택 가능</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
                 <input type="text" name="plannedTopic" value="${plan.plannedTopic}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
@@ -299,7 +337,7 @@ function openEditPlanModal(planId) {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">희망 지도 방식 *</label>
+                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
                 <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                     <option value="meeting" ${plan.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
                     <option value="online" ${plan.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
@@ -330,10 +368,18 @@ function savePlan() {
     const form = document.getElementById('add-plan-form');
     const formData = new FormData(form);
 
+    const advisorIds = Array.from(form.querySelectorAll('input[name="advisors"]:checked'))
+        .map(cb => cb.value);
+
     if (!formData.get('week') || !formData.get('plannedDate') ||
         !formData.get('plannedTopic') || !formData.get('plannedContent') ||
         !formData.get('plannedMethod')) {
         showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    if (advisorIds.length === 0) {
+        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
         return;
     }
 
@@ -342,7 +388,8 @@ function savePlan() {
         plannedDate: formData.get('plannedDate'),
         plannedTopic: formData.get('plannedTopic'),
         plannedContent: formData.get('plannedContent'),
-        plannedMethod: formData.get('plannedMethod')
+        plannedMethod: formData.get('plannedMethod'),
+        advisorId: advisorIds[0] // 첫 번째 선택된 교수를 담당교수로 설정
     };
 
     DataService.addWeeklyGuidancePlan(planData);
@@ -358,10 +405,18 @@ function updatePlan(planId) {
     const form = document.getElementById('edit-plan-form');
     const formData = new FormData(form);
 
+    const advisorIds = Array.from(form.querySelectorAll('input[name="advisors"]:checked'))
+        .map(cb => cb.value);
+
     if (!formData.get('week') || !formData.get('plannedDate') ||
         !formData.get('plannedTopic') || !formData.get('plannedContent') ||
         !formData.get('plannedMethod')) {
         showToast('필수 항목을 모두 입력해주세요', 'warning');
+        return;
+    }
+
+    if (advisorIds.length === 0) {
+        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
         return;
     }
 
@@ -370,7 +425,8 @@ function updatePlan(planId) {
         plannedDate: formData.get('plannedDate'),
         plannedTopic: formData.get('plannedTopic'),
         plannedContent: formData.get('plannedContent'),
-        plannedMethod: formData.get('plannedMethod')
+        plannedMethod: formData.get('plannedMethod'),
+        advisorId: advisorIds[0] // 첫 번째 선택된 교수를 담당교수로 설정
     };
 
     DataService.updateWeeklyGuidancePlan(planId, planData);

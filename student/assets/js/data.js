@@ -9,6 +9,10 @@ const StudentData = {
         year: 2,
         major: '경영학과',
         advisor: '김교수',
+        advisors: [
+            { id: 'P001', name: '김교수', role: 'primary', department: '경영학과' },
+            { id: 'P002', name: '이교수', role: 'secondary', department: '경영학과' }
+        ],
         email: 'hong@hycu.ac.kr',
         enrollmentDate: '2023-03-01'
     },
@@ -817,6 +821,10 @@ const DataService = {
             ? Math.max(...StudentData.weeklyGuidancePlans.map(p => p.week)) + 1
             : 1;
 
+        // advisorId로부터 advisor 정보 가져오기
+        const student = StudentData.student;
+        const selectedAdvisor = student.advisors.find(a => a.id === planData.advisorId) || student.advisors[0];
+
         const newPlan = {
             id: nextId,
             week: planData.week || nextWeek,
@@ -827,9 +835,9 @@ const DataService = {
             status: 'planned',
             isPublic: true,
             advisor: {
-                id: 'P001',
-                name: '김교수',
-                role: 'primary'
+                id: selectedAdvisor.id,
+                name: selectedAdvisor.name,
+                role: selectedAdvisor.role
             },
             createdBy: 'student',
             createdAt: new Date().toISOString()
@@ -841,12 +849,26 @@ const DataService = {
     updateWeeklyGuidancePlan: (id, planData) => {
         const plan = DataService.getWeeklyGuidancePlan(id);
         if (plan) {
-            // 학생은 교수가 작성한 실적은 수정할 수 없음
-            if (plan.createdBy === 'professor' && plan.executionDate) {
-                // 교수가 작성한 실적은 수정 불가
+            // 실적이 입력되지 않은 경우만 수정 가능
+            if (plan.executionDate) {
+                // 실적이 입력된 계획은 수정 불가
                 return false;
             } else {
-                // 학생이 작성한 계획은 자유롭게 수정 가능
+                // advisorId로부터 advisor 정보 가져오기
+                if (planData.advisorId) {
+                    const student = StudentData.student;
+                    const selectedAdvisor = student.advisors.find(a => a.id === planData.advisorId);
+                    if (selectedAdvisor) {
+                        planData.advisor = {
+                            id: selectedAdvisor.id,
+                            name: selectedAdvisor.name,
+                            role: selectedAdvisor.role
+                        };
+                    }
+                    delete planData.advisorId; // advisorId는 제거
+                }
+
+                // 실적이 입력되지 않은 계획은 누구나 수정 가능
                 Object.assign(plan, {
                     ...planData,
                     updatedAt: new Date().toISOString()
@@ -859,8 +881,8 @@ const DataService = {
 
     deleteWeeklyGuidancePlan: (id) => {
         const plan = DataService.getWeeklyGuidancePlan(id);
-        // 학생이 작성한 계획만 삭제 가능
-        if (plan && plan.createdBy === 'student') {
+        // 실적이 입력되지 않은 계획만 삭제 가능
+        if (plan && !plan.executionDate) {
             StudentData.weeklyGuidancePlans = StudentData.weeklyGuidancePlans.filter(p => p.id !== id);
             return true;
         }
