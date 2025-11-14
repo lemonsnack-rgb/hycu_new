@@ -3102,7 +3102,7 @@ function removeAdmin(adminId) {
     const admin = appData.administrators.find(a => a.id === adminId);
     if (!admin) return;
 
-    if (!confirm(`${admin.name}님을 관리자에서 삭제하시겠습니까?`)) {
+    if (!confirm(`${admin.name}님을 관리자에서 완전히 삭제하시겠습니까?\n\n⚠️ 삭제 후 재등록이 필요합니다.\n권한만 중지하려면 "권한 중지" 버튼을 사용하세요.`)) {
         return;
     }
 
@@ -3118,7 +3118,49 @@ function removeAdmin(adminId) {
         emp.isAdmin = false;
     }
 
-    showNotification(`${admin.name}님이 관리자에서 삭제되었습니다.`, 'success');
+    showNotification(`${admin.name}님이 관리자에서 완전히 삭제되었습니다.`, 'success');
+
+    // 화면 새로고침
+    switchView('permissionManagement');
+}
+
+// 관리자 권한 중지
+function suspendAdmin(adminId) {
+    const admin = appData.administrators.find(a => a.id === adminId);
+    if (!admin) return;
+
+    if (!confirm(`${admin.name}님의 모든 권한을 중지하시겠습니까?\n\n권한 중지 후 언제든 다시 활성화할 수 있습니다.`)) {
+        return;
+    }
+
+    // 상태를 suspended로 변경
+    admin.status = 'suspended';
+
+    // 모든 권한 비활성화
+    const permissions = appData.permissions.filter(p => p.adminId === adminId);
+    permissions.forEach(p => {
+        p.hasAccess = false;
+    });
+
+    showNotification(`${admin.name}님의 권한이 중지되었습니다.`, 'success');
+
+    // 화면 새로고침
+    switchView('permissionManagement');
+}
+
+// 관리자 권한 활성화
+function activateAdmin(adminId) {
+    const admin = appData.administrators.find(a => a.id === adminId);
+    if (!admin) return;
+
+    if (!confirm(`${admin.name}님의 권한을 다시 활성화하시겠습니까?\n\n활성화 후 개별 화면 권한을 설정해야 합니다.`)) {
+        return;
+    }
+
+    // 상태를 active로 변경
+    admin.status = 'active';
+
+    showNotification(`${admin.name}님의 권한이 활성화되었습니다. 개별 화면 권한을 설정해주세요.`, 'success');
 
     // 화면 새로고침
     switchView('permissionManagement');
@@ -3130,6 +3172,8 @@ window.addAdmin = addAdmin;
 window.updatePermission = updatePermission;
 window.saveAdminPermissions = saveAdminPermissions;
 window.removeAdmin = removeAdmin;
+window.suspendAdmin = suspendAdmin;
+window.activateAdmin = activateAdmin;
 window.closeAdminNotificationModal = closeAdminNotificationModal;
 window.submitAdminNotification = submitAdminNotification;
 
