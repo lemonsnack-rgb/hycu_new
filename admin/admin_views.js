@@ -1909,4 +1909,110 @@ const views = {
             </div>
         `;
     },
+
+    // ========== 권한 관리 ==========
+    permissionManagement: () => {
+        const administrators = appData.administrators || [];
+        const screenList = appData.screenList || [];
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h2 class="text-2xl font-bold text-gray-800">권한 관리</h2>
+                    <p class="text-sm text-gray-600 mt-2">관리자별 화면 접근 권한을 관리합니다.</p>
+                </div>
+
+                <!-- 관리자 추가 -->
+                <div class="p-6 border-b bg-gray-50">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">관리자 추가</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" id="search-employee-id" placeholder="교번 입력"
+                               class="border border-gray-300 rounded px-3 py-2 text-sm">
+                        <input type="text" id="search-employee-name" placeholder="이름 입력"
+                               class="border border-gray-300 rounded px-3 py-2 text-sm">
+                        <button onclick="searchEmployee()"
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                            검색
+                        </button>
+                        <div id="search-result" class="col-span-full"></div>
+                    </div>
+                </div>
+
+                <!-- 관리자 목록 및 권한 설정 -->
+                <div class="p-6">
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">관리자 목록 및 권한 설정</h3>
+
+                    ${administrators.length > 0 ? administrators.map((admin, index) => {
+                        const permissions = appData.permissions.filter(p => p.adminId === admin.id);
+                        const permissionMap = {};
+                        permissions.forEach(p => {
+                            permissionMap[p.screenId] = p.hasAccess;
+                        });
+
+                        // 화면을 카테고리별로 그룹화
+                        const categories = {};
+                        screenList.forEach(screen => {
+                            if (!categories[screen.category]) {
+                                categories[screen.category] = [];
+                            }
+                            categories[screen.category].push(screen);
+                        });
+
+                        return `
+                            <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden">
+                                <!-- 관리자 정보 헤더 -->
+                                <div class="bg-gray-100 p-4 flex justify-between items-center">
+                                    <div class="flex items-center gap-4">
+                                        <div>
+                                            <h4 class="font-bold text-gray-800">${admin.name}</h4>
+                                            <p class="text-sm text-gray-600">교번: ${admin.employeeId} | 소속: ${admin.department}</p>
+                                        </div>
+                                        <span class="px-3 py-1 text-xs rounded-full ${admin.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                            ${admin.status === 'active' ? '활성' : '비활성'}
+                                        </span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button onclick="saveAdminPermissions(${admin.id})"
+                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700">
+                                            권한 저장
+                                        </button>
+                                        <button onclick="removeAdmin(${admin.id})"
+                                                class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700">
+                                            관리자 삭제
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 권한 설정 테이블 -->
+                                <div class="p-4">
+                                    ${Object.entries(categories).map(([category, screens]) => `
+                                        <div class="mb-4">
+                                            <h5 class="font-semibold text-gray-700 mb-2 border-b pb-2">${category}</h5>
+                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                                                ${screens.map(screen => `
+                                                    <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                                        <input type="checkbox"
+                                                               data-admin-id="${admin.id}"
+                                                               data-screen-id="${screen.id}"
+                                                               ${permissionMap[screen.id] ? 'checked' : ''}
+                                                               onchange="updatePermission(${admin.id}, '${screen.id}', this.checked)"
+                                                               class="rounded border-gray-300">
+                                                        <span class="text-sm text-gray-700">${screen.name}</span>
+                                                    </label>
+                                                `).join('')}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                    }).join('') : `
+                        <div class="text-center py-8 text-gray-500">
+                            등록된 관리자가 없습니다.
+                        </div>
+                    `}
+                </div>
+            </div>
+        `;
+    },
 };
