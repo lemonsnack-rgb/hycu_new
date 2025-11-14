@@ -1444,7 +1444,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">시작일</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">종료일</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">설명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">액션</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -1516,7 +1516,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문필수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지논문</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술대회논문</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">액션</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -1573,7 +1573,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가 단계</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">액션</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
