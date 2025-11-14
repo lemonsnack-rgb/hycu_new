@@ -518,7 +518,9 @@ const views = {
                                                class="rounded border-gray-300">
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
@@ -644,7 +646,9 @@ const views = {
                                                class="rounded border-gray-300">
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
@@ -770,7 +774,9 @@ const views = {
                                                class="rounded border-gray-300">
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
@@ -896,7 +902,9 @@ const views = {
                                         <td class="py-3 px-4 text-sm text-gray-600">${journal.major || '-'}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">${journal.degree || '석사'}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">${journal.studentId}</td>
-                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">${journal.studentName}</td>
+                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                            ${addStudentInfoIcon(journal.studentName, journal.studentId)}
+                                        </td>
                                         <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
                                             <div class="truncate" title="${journal.paperTitle}">
                                                 ${journal.paperTitle}
@@ -1040,7 +1048,9 @@ const views = {
                                                class="rounded border-gray-300">
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
@@ -1182,7 +1192,9 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.semester || '1'}학기</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.advisors ? item.advisors.join(', ') : (item.advisor || '-')}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                    </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
@@ -1362,7 +1374,9 @@ const views = {
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.degree}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.advisor}</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
+                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
+                                    </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.semesterCount || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-700">
                                         <div class="max-w-xs truncate font-medium" title="${item.documentTitle}">
@@ -1852,7 +1866,7 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
                                         <div class="truncate" title="${item.currentTitle}">
                                             ${item.currentTitle}
@@ -2110,38 +2124,40 @@ const views = {
 
                     <!-- 사용자 목록 테이블 -->
                     <div class="overflow-x-auto">
-                        <table class="w-full border-collapse bg-white">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">구분</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">학번/교번</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">이름</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">대학원</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">학과/전공</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-left text-sm font-semibold text-gray-700">이메일</th>
-                                    <th class="border border-gray-200 px-4 py-3 text-center text-sm font-semibold text-gray-700">액션</th>
+                        <table class="min-w-full">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">구분</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번/교번</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이메일</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">액션</th>
                                 </tr>
                             </thead>
-                            <tbody id="proxy-login-table-body">
+                            <tbody class="divide-y divide-gray-200">
                                 ${(appData.systemUsers || []).map(user => `
                                     <tr class="hover:bg-gray-50 proxy-login-row"
                                         data-type="${user.type}"
                                         data-search="${user.name} ${user.type === '교수' ? user.employeeId : user.studentId}">
-                                        <td class="border border-gray-200 px-4 py-3 text-sm">
+                                        <td class="py-3 px-4 text-sm">
                                             <span class="px-2 py-1 rounded-full text-xs font-medium ${user.type === '교수' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800'}">
                                                 ${user.type}
                                             </span>
                                         </td>
-                                        <td class="border border-gray-200 px-4 py-3 text-sm font-medium text-gray-900">
+                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">
                                             ${user.type === '교수' ? user.employeeId : user.studentId}
                                         </td>
-                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-900">${user.name}</td>
-                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-700">${user.graduate}</td>
-                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-700">
+                                        <td class="py-3 px-4 text-sm text-gray-800">
+                                            ${addStudentInfoIcon(user.name, user.type === '교수' ? user.employeeId : user.studentId)}
+                                        </td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">${user.graduate}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-800">
                                             ${user.type === '교수' ? user.department : `${user.major}${user.degree ? ` (${user.degree})` : ''}`}
                                         </td>
-                                        <td class="border border-gray-200 px-4 py-3 text-sm text-gray-600">${user.email}</td>
-                                        <td class="border border-gray-200 px-4 py-3">
+                                        <td class="py-3 px-4 text-sm text-gray-600">${user.email}</td>
+                                        <td class="py-3 px-4">
                                             <button onclick="proxyLogin('${user.id}', '${user.type}', '${user.name}', '${user.loginUrl}')"
                                                     class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020] w-full whitespace-nowrap">
                                                 <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
