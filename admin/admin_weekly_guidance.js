@@ -367,18 +367,7 @@ function addNewWeeklyPlan() {
         </form>
     `;
 
-    createModal('새주차 추가', modalContent, [
-        {
-            text: '취소',
-            className: 'btn-secondary',
-            onclick: 'return;'
-        },
-        {
-            text: '저장',
-            className: 'btn-primary',
-            onclick: 'saveNewPlan()'
-        }
-    ]);
+    openModal('새주차 추가', modalContent, '저장', saveNewPlan, true);
 }
 
 // 새주차 저장
@@ -389,7 +378,7 @@ function saveNewPlan() {
     if (!formData.get('week') || !formData.get('plannedDate') ||
         !formData.get('plannedTopic') || !formData.get('plannedContent') ||
         !formData.get('plannedMethod')) {
-        showToast('필수 항목을 모두 입력해주세요', 'warning');
+        showAlert('필수 항목을 모두 입력해주세요');
         return;
     }
 
@@ -397,7 +386,7 @@ function saveNewPlan() {
         .map(cb => cb.value);
 
     if (advisorIds.length === 0) {
-        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
+        showAlert('담당교수를 최소 1명 이상 선택해주세요');
         return;
     }
 
@@ -425,8 +414,9 @@ function saveNewPlan() {
     }
 
     appData.weeklyGuidance.weeklyPlans[currentPairId].plans.push(newPlan);
-    showToast('지도 계획이 저장되었습니다', 'success');
+    showAlert('지도 계획이 저장되었습니다');
 
+    closeModal();
     setTimeout(() => {
         showGuidancePairDetail(currentPairId);
     }, 100);
@@ -498,18 +488,7 @@ function editWeeklyPlan(planId) {
         </form>
     `;
 
-    createModal('지도 계획 수정', modalContent, [
-        {
-            text: '취소',
-            className: 'btn-secondary',
-            onclick: 'return;'
-        },
-        {
-            text: '저장',
-            className: 'btn-primary',
-            onclick: `updatePlan(${planId})`
-        }
-    ]);
+    openModal('지도 계획 수정', modalContent, '저장', () => updatePlan(planId), true);
 }
 
 // 계획 수정 저장
@@ -520,7 +499,7 @@ function updatePlan(planId) {
     if (!formData.get('week') || !formData.get('plannedDate') ||
         !formData.get('plannedTopic') || !formData.get('plannedContent') ||
         !formData.get('plannedMethod')) {
-        showToast('필수 항목을 모두 입력해주세요', 'warning');
+        showAlert('필수 항목을 모두 입력해주세요');
         return;
     }
 
@@ -528,7 +507,7 @@ function updatePlan(planId) {
         .map(cb => cb.value);
 
     if (advisorIds.length === 0) {
-        showToast('담당교수를 최소 1명 이상 선택해주세요', 'warning');
+        showAlert('담당교수를 최소 1명 이상 선택해주세요');
         return;
     }
 
@@ -545,8 +524,9 @@ function updatePlan(planId) {
     plan.plannedMethod = formData.get('plannedMethod');
     plan.advisor = { id: selectedAdvisor.id, name: selectedAdvisor.name };
 
-    showToast('지도 계획이 수정되었습니다', 'success');
+    showAlert('지도 계획이 수정되었습니다');
 
+    closeModal();
     setTimeout(() => {
         showGuidancePairDetail(currentPairId);
     }, 100);
@@ -563,7 +543,7 @@ function deletePlan(planId) {
 
     if (index !== -1) {
         plansData.plans.splice(index, 1);
-        showToast('지도 계획이 삭제되었습니다', 'success');
+        showAlert('지도 계획이 삭제되었습니다');
 
         setTimeout(() => {
             showGuidancePairDetail(currentPairId);
