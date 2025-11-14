@@ -1703,47 +1703,37 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가표명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유형</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가항목 수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">총점</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">통과기준</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">액션</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => {
                                 const itemCount = Array.isArray(item.items) ? item.items.length : 0;
-                                const passCriteriaText = item.passCriteria
-                                    ? `${item.passCriteria.type === 'average' ? '평균' : '총점'} ${item.passCriteria.passScore}점`
-                                    : '-';
-                                const failThresholdText = item.passCriteria && item.passCriteria.hasFailThreshold
-                                    ? ` (과락: ${item.passCriteria.failThreshold}점)`
-                                    : '';
+
+                                // 유형 표시 로직 개선
+                                let typeClass, typeName;
+                                if (item.type === 'passfail') {
+                                    typeClass = 'bg-green-100 text-green-800';
+                                    typeName = 'Pass/Fail형';
+                                } else if (item.type === 'grade') {
+                                    typeClass = 'bg-purple-100 text-purple-800';
+                                    typeName = '등급형';
+                                } else {
+                                    typeClass = 'bg-blue-100 text-blue-800';
+                                    typeName = '점수형';
+                                }
 
                                 return `
                                     <tr class="hover:bg-gray-50">
                                         <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                         <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">
-                                            <span class="px-2 py-1 text-xs rounded-full ${
-                                                item.evaluationType === 'score' ? 'bg-blue-100 text-blue-800' :
-                                                item.evaluationType === 'grade' ? 'bg-purple-100 text-purple-800' :
-                                                'bg-gray-100 text-gray-800'
-                                            }">
-                                                ${
-                                                    item.evaluationType === 'score' ? '점수형' :
-                                                    item.evaluationType === 'grade' ? '등급형' :
-                                                    'Pass/Fail형'
-                                                }
+                                            <span class="px-2 py-1 text-xs rounded-full ${typeClass}">
+                                                ${typeName}
                                             </span>
                                         </td>
                                         <td class="py-3 px-4 text-sm text-center">
                                             <span class="font-semibold text-blue-600">${itemCount}개</span>
-                                        </td>
-                                        <td class="py-3 px-4 text-sm text-center">
-                                            <span class="font-semibold text-green-600">${item.totalScore || '-'}점</span>
-                                        </td>
-                                        <td class="py-3 px-4 text-sm text-gray-600">
-                                            <div>${passCriteriaText}</div>
-                                            ${failThresholdText ? `<div class="text-xs text-red-600">${failThresholdText}</div>` : ''}
                                         </td>
                                         <td class="py-3 px-4">
                                             <div class="flex gap-2">
