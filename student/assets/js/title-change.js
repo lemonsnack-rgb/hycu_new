@@ -111,7 +111,7 @@ function renderTitleChange() {
                 </h4>
                 <ul style="font-size: 0.875rem; color: #1E40AF; padding-left: 1.25rem;">
                     <li style="margin-bottom: 0.5rem;">논문 제목은 연구 진행 중 변경 가능합니다.</li>
-                    <li style="margin-bottom: 0.5rem;">변경 신청 후 지도교수의 승인이 필요합니다.</li>
+                    <li style="margin-bottom: 0.5rem;">변경 신청 후 관리자의 승인이 필요합니다.</li>
                     <li style="margin-bottom: 0.5rem;">심사 단계별로 제목 변경이 제한될 수 있습니다.</li>
                     <li>최종 심사 이후에는 제목 변경이 불가합니다.</li>
                 </ul>
@@ -184,7 +184,7 @@ function showTitleChangeModal() {
                         <div style="background: #FEF3C7; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #F59E0B;">
                             <p style="font-size: 0.875rem; color: #92400E; font-weight: 600; margin-bottom: 0.5rem;">주의사항</p>
                             <ul style="font-size: 0.75rem; color: #92400E; padding-left: 1.25rem; margin: 0;">
-                                <li>제목 변경은 지도교수 및 관리자 승인 후 확정됩니다</li>
+                                <li>제목 변경은 관리자 승인 후 확정됩니다</li>
                                 <li>심사 진행 중인 경우 변경이 제한될 수 있습니다</li>
                                 <li>최종 심사 이후에는 제목 변경이 불가합니다</li>
                             </ul>
@@ -227,10 +227,10 @@ function handleTitleChange(event) {
 function showTitleChangeDetail(changeId) {
     const change = DataService.getTitleChanges().find(c => c.id === changeId);
     if (!change) return;
-    
+
     const modalContent = `
-        <div class="modal">
-            <div class="modal-content" style="max-width: 700px;">
+        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 2000;">
+            <div class="modal" style="max-width: 700px;">
                 <div class="modal-header">
                     <h3>제목 변경 신청 상세</h3>
                     <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
@@ -247,11 +247,11 @@ function showTitleChangeDetail(changeId) {
                             ${change.status}
                         </span>
                     </div>
-                    
+
                     <!-- 제목 변경 내역 -->
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">📝 제목 변경 내역</h4>
-                        
+
                         <div style="background: #FEF2F2; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
                             <p style="font-size: 0.875rem; font-weight: 600; color: #991B1B; margin-bottom: 0.5rem;">
                                 변경 전
@@ -263,11 +263,11 @@ function showTitleChangeDetail(changeId) {
                                 영문: ${change.oldTitle.english}
                             </p>
                         </div>
-                        
+
                         <div style="text-align: center; margin: 1rem 0;">
                             <span style="font-size: 2rem; color: #6A0028;">↓</span>
                         </div>
-                        
+
                         <div style="background: #ECFDF5; padding: 1rem; border-radius: 0.5rem;">
                             <p style="font-size: 0.875rem; font-weight: 600; color: #065F46; margin-bottom: 0.5rem;">
                                 변경 후
@@ -280,7 +280,7 @@ function showTitleChangeDetail(changeId) {
                             </p>
                         </div>
                     </div>
-                    
+
                     <!-- 변경 사유 -->
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">변경 사유</h4>
@@ -288,19 +288,7 @@ function showTitleChangeDetail(changeId) {
                             ${change.reason}
                         </div>
                     </div>
-                    
-                    <!-- 교수 의견 -->
-                    ${change.professorComment ? `
-                        <div style="margin-bottom: 1.5rem;">
-                            <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">💬 지도교수 의견</h4>
-                            <div style="padding: 1rem; background: #EFF6FF; border-left: 4px solid #3B82F6; border-radius: 0.5rem;">
-                                <p style="font-size: 0.875rem; color: #1E40AF; white-space: pre-line;">
-                                    ${change.professorComment}
-                                </p>
-                            </div>
-                        </div>
-                    ` : ''}
-                    
+
                     <!-- 첨부 파일 -->
                     ${change.attachments && change.attachments.length > 0 ? `
                         <div>
@@ -322,7 +310,7 @@ function showTitleChangeDetail(changeId) {
             </div>
         </div>
     `;
-    
+
     document.getElementById('modal-container').innerHTML = modalContent;
 }
 
