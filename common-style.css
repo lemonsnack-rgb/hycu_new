@@ -6,6 +6,27 @@
  * 3개 화면(관리자/교수/학생) 모두 적용
  */
 
+/* CSS 변수 - 한양사이버대학교 공식 가이드라인 */
+:root {
+    /* Colors */
+    --primary: #009DE8;
+    --primary-dark: #0087c9;
+    --success: #3CB526;
+
+    /* Grayscale */
+    --gray-0: #111111;
+    --gray-1: #333333;
+    --gray-2: #999999;
+    --gray-3: #cccccc;
+    --gray-4: #E5E5E5;
+
+    /* Secondary Colors */
+    --deep-blue-1: #2F35B7;
+    --deep-blue-2: #4A5DC4;
+    --purple: #5B28BE;
+    --green: #3CB526;
+}
+
 /* 기본 설정 */
 body {
     font-family: 'Noto Sans KR', sans-serif;
@@ -15,7 +36,7 @@ body {
 /* 사이드바 링크 */
 .sidebar-link.active {
     background-color: #F5F1E9;
-    color: #6A0028;
+    color: var(--primary);
     font-weight: 700;
 }
 
@@ -45,8 +66,8 @@ textarea {
 input:focus,
 select:focus,
 textarea:focus {
-    border-color: #6A0028 !important;
-    box-shadow: 0 0 0 1px #6A0028 !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 0 0 1px var(--primary) !important;
     outline: none !important;
 }
 
@@ -184,7 +205,7 @@ textarea:focus {
 
 /* 버튼 통일 */
 .btn-primary {
-    background-color: #6A0028;
+    background-color: var(--primary);
     color: white;
     padding: 0.625rem 1.25rem;
     height: 40px;
@@ -199,7 +220,7 @@ textarea:focus {
 }
 
 .btn-primary:hover {
-    background-color: #5A0020;
+    background-color: var(--primary-dark);
 }
 
 .btn-secondary {
@@ -256,14 +277,14 @@ textarea:focus {
 }
 
 .tab-button:hover {
-    border-color: #6A0028;
-    color: #6A0028;
+    border-color: var(--primary);
+    color: var(--primary);
 }
 
 .tab-button.active {
-    background: #6A0028;
+    background: var(--primary);
     color: white;
-    border-color: #6A0028;
+    border-color: var(--primary);
 }
 
 /* 테이블 통일 */
@@ -302,13 +323,13 @@ table tbody tr:hover {
 }
 
 .text-primary {
-    color: #6A0028;
+    color: var(--primary);
 }
 
 .bg-primary {
-    background-color: #6A0028;
+    background-color: var(--primary);
 }
 
 .border-primary {
-    border-color: #6A0028;
+    border-color: var(--primary);
 }
