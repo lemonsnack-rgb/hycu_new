@@ -482,7 +482,7 @@ const views = {
                 <!-- 알림 발송 버튼 -->
                 <div class="flex justify-end mb-4 px-6">
                     <button onclick="sendNotificationToSelectedStudents('thesisPlan')"
-                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
                         선택 학생에게 알림 발송
                     </button>
                 </div>
@@ -530,7 +530,7 @@ const views = {
                                         <span class="status-badge status-reviewing">${item.status}</span>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <button onclick="viewSubmissionDetail(${item.id}, 'thesisPlan')" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
+                                        <button onclick="viewSubmissionDetail(${item.id}, 'thesisPlan')" class="text-[#009DE8] hover:underline text-sm">상세보기</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -610,7 +610,7 @@ const views = {
                 <!-- 알림 발송 버튼 -->
                 <div class="flex justify-end mb-4 px-6">
                     <button onclick="sendNotificationToSelectedStudents('midThesis')"
-                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
                         선택 학생에게 알림 발송
                     </button>
                 </div>
@@ -658,7 +658,7 @@ const views = {
                                         <span class="status-badge status-reviewing">${item.status}</span>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <button onclick="viewSubmissionDetail(${item.id}, 'midThesis')" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
+                                        <button onclick="viewSubmissionDetail(${item.id}, 'midThesis')" class="text-[#009DE8] hover:underline text-sm">상세보기</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -738,7 +738,7 @@ const views = {
                 <!-- 알림 발송 버튼 -->
                 <div class="flex justify-end mb-4 px-6">
                     <button onclick="sendNotificationToSelectedStudents('finalThesis')"
-                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
                         선택 학생에게 알림 발송
                     </button>
                 </div>
@@ -786,7 +786,7 @@ const views = {
                                         <span class="status-badge status-completed">${item.result}</span>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <button onclick="viewSubmissionDetail(${item.id}, 'finalThesis')" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
+                                        <button onclick="viewSubmissionDetail(${item.id}, 'finalThesis')" class="text-[#009DE8] hover:underline text-sm">상세보기</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1010,7 +1010,7 @@ const views = {
                 <!-- 알림 발송 버튼 -->
                 <div class="flex justify-end mb-4 px-6">
                     <button onclick="sendNotificationToSelectedStudents('journalSubmission')"
-                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
                         선택 학생에게 알림 발송
                     </button>
                 </div>
@@ -1064,7 +1064,7 @@ const views = {
                                         <span class="status-badge status-reviewing">${item.status}</span>
                                     </td>
                                     <td class="py-3 px-4">
-                                        <button onclick="viewJournalDetail(${item.id})" class="text-[#6A0028] hover:underline text-sm">상세보기</button>
+                                        <button onclick="viewJournalDetail(${item.id})" class="text-[#009DE8] hover:underline text-sm">상세보기</button>
                                     </td>
                                 </tr>
                             `).join('')}
@@ -1419,7 +1419,7 @@ const views = {
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">논문지도 일정 관리</h3>
-                        <button onclick="openScheduleModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        <button onclick="openScheduleModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                             + 일정 추가
                         </button>
                     </div>
@@ -1490,7 +1490,7 @@ const views = {
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">논문 제출 요건 관리</h3>
-                        <button onclick="openRequirementModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        <button onclick="openRequirementModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                             + 요건 추가
                         </button>
                     </div>
@@ -1564,7 +1564,7 @@ const views = {
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">논문지도 워크플로우 관리</h3>
-                        <button onclick="openStageModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        <button onclick="openStageModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                             + 워크플로우 추가
                         </button>
                     </div>
@@ -1652,7 +1652,7 @@ const views = {
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b flex justify-between items-center">
                     <h3 class="text-lg font-bold text-gray-800">지도 단계 유형 관리 (레고 블록)</h3>
-                    <button onclick="openTypeModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                    <button onclick="openTypeModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                         + 유형 추가
                     </button>
                 </div>
@@ -1698,7 +1698,7 @@ const views = {
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">평가 기준 관리</h3>
-                        <button onclick="addEvaluationCriteria()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        <button onclick="addEvaluationCriteria()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                             + 평가표 추가
                         </button>
                     </div>
@@ -1939,7 +1939,7 @@ const views = {
                 <!-- 관리자 검색 및 추가 섹션 -->
                 <div class="p-6 border-b" style="background: linear-gradient(to bottom, #FFFBF5, #FFF9F0);">
                     <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 text-[#6A0028] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-[#009DE8] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
                         </svg>
                         <h3 class="text-lg font-bold text-gray-800">새 관리자 검색 및 추가</h3>
@@ -1963,11 +1963,11 @@ const views = {
                     </div>
                     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
                         <input type="text" id="search-employee-id" placeholder="예: A2024004"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                         <input type="text" id="search-employee-name" placeholder="예: 김직원"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                         <button onclick="searchEmployee()"
-                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020] flex items-center justify-center gap-2">
+                                class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] flex items-center justify-center gap-2">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                             </svg>
@@ -1980,7 +1980,7 @@ const views = {
                 <!-- 등록된 관리자 목록 및 권한 설정 섹션 -->
                 <div class="p-6" style="background-color: #FAFAFA;">
                     <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 text-[#6A0028] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-6 h-6 text-[#009DE8] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
                         <h3 class="text-lg font-bold text-gray-800">등록된 관리자 목록 및 권한 설정</h3>
@@ -2159,7 +2159,7 @@ const views = {
                                         <td class="py-3 px-4 text-sm text-gray-600">${user.email}</td>
                                         <td class="py-3 px-4">
                                             <button onclick="proxyLogin('${user.id}', '${user.type}', '${user.name}', '${user.loginUrl}')"
-                                                    class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020] w-full whitespace-nowrap">
+                                                    class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] w-full whitespace-nowrap">
                                                 <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
                                                 </svg>

@@ -102,15 +102,15 @@ function viewThesisReviewDetail(submissionId, viewType, submissionType) {
                     </h4>
                     <div class="space-y-2 text-sm text-blue-900">
                         <p class="flex items-center">
-                            <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
+                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
                             <span>각 항목 최소 <strong class="font-bold">60점 이상</strong> (과락)</span>
                         </p>
                         <p class="flex items-center">
-                            <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
+                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
                             <span>전체 평균 <strong class="font-bold">70점 이상</strong></span>
                         </p>
                         <p class="flex items-center">
-                            <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
+                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
                             <span>총점 <strong class="font-bold">70점 이상</strong> (100점 만점)</span>
                         </p>
                     </div>
@@ -273,7 +273,7 @@ function viewThesisReviewDetail(submissionId, viewType, submissionType) {
                     <button class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-colors">
                         임시 저장
                     </button>
-                    <button class="flex-1 bg-[#6A0028] hover:bg-[#5A0020] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    <button class="flex-1 bg-[#009DE8] hover:bg-[#0087c9] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                         평가 제출
                     </button>
                 </div>
@@ -354,7 +354,7 @@ function viewThesisReviewDetail(submissionId, viewType, submissionType) {
                                   placeholder="최종 심사 의견을 입력하세요"></textarea>
                     </div>
 
-                    <button class="w-full bg-[#6A0028] hover:bg-[#5A0020] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                    <button class="w-full bg-[#009DE8] hover:bg-[#0087c9] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                         최종 결정 제출
                     </button>
                 </div>

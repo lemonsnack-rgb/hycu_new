@@ -22,7 +22,7 @@ function renderJournalReviewList() {
                 <!-- 알림 발송 버튼 -->
                 <div class="flex justify-end mb-4">
                     <button onclick="sendNotificationToSelectedJournals()"
-                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
                         선택 학생에게 알림 발송
                     </button>
                 </div>
