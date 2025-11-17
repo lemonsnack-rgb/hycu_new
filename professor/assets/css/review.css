@@ -82,25 +82,6 @@
     overflow: hidden;
 }
 
-.review-table thead {
-    background: #f8f9fa;
-}
-
-.review-table th {
-    padding: 12px;
-    text-align: left;
-    font-weight: 600;
-    color: #495057;
-    font-size: 14px;
-    border-bottom: 2px solid #dee2e6;
-}
-
-.review-table td {
-    padding: 12px;
-    border-bottom: 1px solid #dee2e6;
-    font-size: 14px;
-}
-
 .review-row {
     cursor: pointer;
     transition: background 0.2s;
@@ -1040,24 +1021,6 @@
     font-weight: 500;
     cursor: pointer;
     transition: all 0.2s;
-}
-
-.btn-primary {
-    background: #4CAF50;
-    color: white;
-}
-
-.btn-primary:hover {
-    background: #45a049;
-}
-
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
-
-.btn-secondary:hover {
-    background: #5a6268;
 }
 
 .btn-lg {
