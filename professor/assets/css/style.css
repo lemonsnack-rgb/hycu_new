@@ -105,7 +105,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, #6A0028 0%, #8B0036 100%);
+    background: linear-gradient(135deg, #009DE8 0%, #8B0036 100%);
 }
 
 .login-container {
@@ -245,7 +245,7 @@ main {
     align-items: center;
     padding: 0.75rem;
     border-radius: 0.5rem;
-    color: #374151;
+    color: #333333;
     text-decoration: none;
     transition: all 0.2s;
     cursor: pointer;
@@ -253,7 +253,7 @@ main {
 
 .sidebar-link.active {
     background-color: #F5F1E9;
-    color: #6A0028;
+    color: #009DE8;
     font-weight: 700;
 }
 
@@ -1014,7 +1014,7 @@ main {
     grid-template-columns: 140px 1fr;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
 }
 
 .info-row:last-child {
@@ -1023,11 +1023,11 @@ main {
 
 .info-label {
     font-weight: 600;
-    color: #6B7280;
+    color: #999999;
 }
 
 .info-value {
-    color: #1F2937;
+    color: #333333;
 }
 
 .text-center { text-align: center; }
@@ -1138,11 +1138,11 @@ main {
     grid-template-columns: 140px 1fr; 
     gap: 1rem; 
     padding: 0.75rem 0;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
 }
 .info-row:last-child { border-bottom: none; }
-.info-label { font-weight: 600; color: #6B7280; }
-.info-value { color: #1F2937; }
+.info-label { font-weight: 600; color: #999999; }
+.info-value { color: #333333; }
 
 /* 점수 입력 필드 스타일 */
 .score-input {
@@ -1151,10 +1151,10 @@ main {
     font-size: 1.125rem;
     font-weight: 600;
     padding: 0.5rem;
-    border: 2px solid #E5E7EB;
+    border: 2px solid #E5E5E5;
     border-radius: 0.5rem;
 }
 .score-input:focus {
-    border-color: #6A0028;
-    box-shadow: 0 0 0 1px #6A0028;
+    border-color: #009DE8;
+    box-shadow: 0 0 0 1px #009DE8;
 }

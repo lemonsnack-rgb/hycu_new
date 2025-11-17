@@ -9,7 +9,7 @@
     grid-template-columns: 140px 1fr;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
 }
 
 .info-row:last-child {
@@ -18,12 +18,12 @@
 
 .info-label {
     font-weight: 600;
-    color: #6B7280;
+    color: #999999;
     font-size: 0.875rem;
 }
 
 .info-value {
-    color: #1F2937;
+    color: #333333;
     font-size: 0.875rem;
 }
 
@@ -41,7 +41,7 @@
     text-align: left;
     font-weight: 600;
     font-size: 0.75rem;
-    color: #6B7280;
+    color: #999999;
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
@@ -57,7 +57,7 @@
 
 /* 주차별 지도 카드 (관리자 스타일) */
 .guidance-card {
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     border-radius: 0.5rem;
     padding: 1rem;
     transition: box-shadow 0.2s;
@@ -118,7 +118,7 @@
 
 .method-badge.default {
     background-color: #F3F4F6;
-    color: #6B7280;
+    color: #999999;
 }
 
 /* 상태 배지 */
@@ -162,12 +162,12 @@
 }
 
 .advisor-badge.secondary {
-    color: #6B7280;
+    color: #999999;
 }
 
 /* 내 지도 강조 */
 .my-guidance-highlight {
-    border-left: 4px solid #6A0028;
+    border-left: 4px solid #009DE8;
 }
 
 /* 계획 정보 박스 */
@@ -222,7 +222,7 @@
 .back-button {
     display: flex;
     align-items: center;
-    color: #6B7280;
+    color: #999999;
     transition: color 0.2s;
     cursor: pointer;
     background: none;
@@ -231,7 +231,7 @@
 }
 
 .back-button:hover {
-    color: #1F2937;
+    color: #333333;
 }
 
 /* 필터 체크박스 */
@@ -239,7 +239,7 @@
     display: flex;
     align-items: center;
     font-size: 0.875rem;
-    color: #374151;
+    color: #333333;
     cursor: pointer;
 }
 
@@ -269,19 +269,19 @@
     margin: 0 auto;
     width: 3rem;
     height: 3rem;
-    color: #9CA3AF;
+    color: #cccccc;
     margin-bottom: 1rem;
 }
 
 .empty-state p {
     font-size: 0.875rem;
-    color: #6B7280;
+    color: #999999;
     margin-bottom: 1rem;
 }
 
 /* 공통 버튼 스타일 */
 .btn-primary {
-    background-color: #6A0028;
+    background-color: #009DE8;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
@@ -293,12 +293,12 @@
 }
 
 .btn-primary:hover {
-    background-color: #5A0020;
+    background-color: #0087c9;
 }
 
 .btn-secondary {
-    background-color: #E5E7EB;
-    color: #374151;
+    background-color: #E5E5E5;
+    color: #333333;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
     font-size: 0.875rem;

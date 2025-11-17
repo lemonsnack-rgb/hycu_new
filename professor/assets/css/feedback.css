@@ -106,7 +106,7 @@
     justify-content: center;
     align-items: flex-start;
     padding: 1rem;
-    background: #E5E7EB;
+    background: #E5E5E5;
 }
 
 #pdf-render-area {
@@ -200,7 +200,7 @@
 .comment-marker.highlight {
     transform: scale(1.3);
     background-color: #C9BC9C;
-    color: #6A0028;
+    color: #009DE8;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -211,7 +211,7 @@
     gap: 0.5rem;
     padding: 0.75rem 1rem;
     background: white;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
     flex-wrap: wrap;
 }
 
@@ -222,7 +222,7 @@
     cursor: pointer;
     border: none;
     background: transparent;
-    color: #374151;
+    color: #333333;
 }
 
 .pdf-toolbar-btn:hover {
@@ -231,7 +231,7 @@
 
 .pdf-toolbar-btn.active {
     background: #F5F1E9;
-    color: #6A0028;
+    color: #009DE8;
 }
 
 .pdf-toolbar-btn:disabled {
@@ -247,7 +247,7 @@
 
 .comment-card {
     background: white;
-    border: 2px solid #E5E7EB;
+    border: 2px solid #E5E5E5;
     border-radius: 0.5rem;
     padding: 1rem;
     transition: all 0.3s ease;
@@ -374,14 +374,14 @@ canvas.upper-canvas {
 
 .comment-bubble .timestamp {
     font-size: 0.6875rem;
-    color: #6B7280;
+    color: #999999;
     margin-top: 0.25rem;
 }
 
 /* 주지도교수 */
 .professor-main {
     background-color: #F5F1E9;
-    border-left: 3px solid #6A0028;
+    border-left: 3px solid #009DE8;
     align-self: flex-end;
 }
 
@@ -395,7 +395,7 @@ canvas.upper-canvas {
 /* 학생 */
 .student-comment {
     background-color: #F3F4F6;
-    border-left: 3px solid #6B7280;
+    border-left: 3px solid #999999;
     align-self: flex-start;
 }
 
@@ -451,7 +451,7 @@ canvas.upper-canvas {
 .quickmark-btn {
     font-size: 0.75rem;
     background: #F3F4F6;
-    color: #374151;
+    color: #333333;
     padding: 0.375rem 0.75rem;
     border-radius: 9999px;
     border: none;
@@ -460,7 +460,7 @@ canvas.upper-canvas {
 }
 
 .quickmark-btn:hover {
-    background: #E5E7EB;
+    background: #E5E5E5;
     transform: translateY(-1px);
 }
 
@@ -522,14 +522,14 @@ canvas.upper-canvas {
 .comment-thread::-webkit-scrollbar-thumb,
 .history-panel::-webkit-scrollbar-thumb,
 .comment-panel::-webkit-scrollbar-thumb {
-    background: #9CA3AF;
+    background: #cccccc;
     border-radius: 3px;
 }
 
 .comment-thread::-webkit-scrollbar-thumb:hover,
 .history-panel::-webkit-scrollbar-thumb:hover,
 .comment-panel::-webkit-scrollbar-thumb:hover {
-    background: #6B7280;
+    background: #999999;
 }
 
 /* ==================== 첨부파일 ==================== */
@@ -548,14 +548,14 @@ canvas.upper-canvas {
     background: #F3F4F6;
     border-radius: 0.25rem;
     font-size: 0.75rem;
-    color: #374151;
+    color: #333333;
     text-decoration: none;
     transition: all 0.2s;
 }
 
 .attachment-item:hover {
-    background: #E5E7EB;
-    color: #6A0028;
+    background: #E5E5E5;
+    color: #009DE8;
 }
 
 /* ==================== 동시 편집 경고 ==================== */
@@ -578,7 +578,7 @@ canvas.upper-canvas {
     width: 20px;
     height: 20px;
     border: 3px solid #F3F4F6;
-    border-top-color: #6A0028;
+    border-top-color: #009DE8;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -597,7 +597,7 @@ canvas.upper-canvas {
 .tabs { 
     display: flex; 
     gap: 4px; 
-    border-bottom: 2px solid #E5E7EB;
+    border-bottom: 2px solid #E5E5E5;
     margin-bottom: 0;
 }
 
@@ -605,7 +605,7 @@ canvas.upper-canvas {
     padding: 10px 16px; 
     font-size: 13px; 
     font-weight: 500;
-    color: #6B7280; 
+    color: #999999; 
     background: transparent;
     border: none;
     border-bottom: 3px solid transparent;
@@ -615,7 +615,7 @@ canvas.upper-canvas {
 }
 
 .tab:hover { 
-    color: #374151; 
+    color: #333333; 
     background: #F9FAFB;
 }
 
@@ -650,7 +650,7 @@ canvas.upper-canvas {
 .comment-main-section h6 {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #374151;
+    color: #333333;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -662,7 +662,7 @@ canvas.upper-canvas {
     margin-left: 1.5rem;
     margin-top: 0.75rem;
     padding-left: 1.5rem;
-    border-left: 2px solid #E5E7EB;  /* 전체 영역 왼쪽 선 */
+    border-left: 2px solid #E5E5E5;  /* 전체 영역 왼쪽 선 */
 }
 
 /* 기존 복잡한 연결선 제거 */
@@ -676,7 +676,7 @@ canvas.upper-canvas {
 
 .comment-replies {
     background: white;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     border-radius: 0.5rem;
     padding: 0.75rem;
 }
@@ -684,7 +684,7 @@ canvas.upper-canvas {
 .comment-replies h6 {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #374151;
+    color: #333333;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.025em;
@@ -699,23 +699,23 @@ canvas.upper-canvas {
 .comment-replies-section h6 {
     font-size: 0.75rem;
     font-weight: 700;
-    color: #374151;
+    color: #333333;
     margin-bottom: 0.5rem;
     text-transform: uppercase;
     letter-spacing: 0.025em;
 }
 
 .ver-pill { padding:2px 8px; border:1px solid #d1d5db; border-radius:9999px; margin-right:4px; font-size:12px; }
-.ver-pill.active { background:#1f2937; color:#fff; border-color:#1f2937; }
+.ver-pill.active { background:#333333; color:#fff; border-color:#333333; }
 
 
 /* === injected: left submission history sidebar === */
 .viewer-wrap { display:flex; gap:16px; }
-.submission-history{ width:220px; border-right:1px solid #e5e7eb; padding:8px 8px 8px 0; }
+.submission-history{ width:220px; border-right:1px solid #E5E5E5; padding:8px 8px 8px 0; }
 .submission-history .sh-header{ font-weight:600; margin:4px 0 8px 8px; color:#111827; }
 .submission-history .sh-list{ list-style:none; margin:0; padding:0 8px; }
 .submission-history .sh-list li{ padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
-.submission-history .sh-list li .sh-meta{ font-size:11px; color:#6b7280; margin-left:10px; }
+.submission-history .sh-list li .sh-meta{ font-size:11px; color:#999999; margin-left:10px; }
 .submission-history .sh-list li.active{ background:#eff6ff; color:#1d4ed8; }
 /* disable text select on pdf text layer (defensive) */
 #text-layer { user-select:none !important; pointer-events:none !important; }

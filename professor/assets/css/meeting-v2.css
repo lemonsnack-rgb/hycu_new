@@ -13,10 +13,10 @@
 
 .tab-btn {
     padding: 0.75rem 1.5rem;
-    border: 2px solid #E5E7EB;
+    border: 2px solid #E5E5E5;
     border-radius: 0.5rem;
     background: white;
-    color: #6B7280;
+    color: #999999;
     font-size: 0.875rem;
     font-weight: 500;
     cursor: pointer;
@@ -26,13 +26,13 @@
 }
 
 .tab-btn:hover {
-    border-color: #6A0028;
-    color: #6A0028;
+    border-color: #009DE8;
+    color: #009DE8;
 }
 
 .tab-btn.active {
-    background: #6A0028;
-    border-color: #6A0028;
+    background: #009DE8;
+    border-color: #009DE8;
     color: white;
 }
 
@@ -89,7 +89,7 @@
 
 /* 슬롯 카드 */
 .slot-card {
-    border: 2px solid #E5E7EB;
+    border: 2px solid #E5E5E5;
     border-radius: 0.5rem;
     padding: 1rem;
     background: white;
@@ -97,7 +97,7 @@
 }
 
 .slot-card:hover {
-    border-color: #6A0028;
+    border-color: #009DE8;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -178,7 +178,7 @@
 }
 
 .btn-download {
-    background: #6B7280;
+    background: #999999;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
@@ -195,7 +195,7 @@
 
 /* 버튼 */
 .btn-primary {
-    background: #6A0028;
+    background: #009DE8;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
@@ -207,12 +207,12 @@
 }
 
 .btn-primary:hover {
-    background: #5A0020;
+    background: #0087c9;
 }
 
 .btn-secondary {
-    background: #E5E7EB;
-    color: #374151;
+    background: #E5E5E5;
+    color: #333333;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
     font-size: 0.875rem;
@@ -253,7 +253,7 @@
 
 .input:focus {
     outline: none;
-    border-color: #6A0028;
+    border-color: #009DE8;
     box-shadow: 0 0 0 3px rgba(106, 0, 40, 0.1);
 }
 
@@ -310,19 +310,19 @@
 .fc-header-toolbar {
     padding: 1rem;
     background: #F9FAFB;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
 }
 
 .fc-toolbar-title {
     font-size: 1.25rem !important;
     font-weight: 700 !important;
-    color: #1F2937 !important;
+    color: #333333 !important;
 }
 
 .fc-button {
     background: white !important;
     border: 1px solid #D1D5DB !important;
-    color: #374151 !important;
+    color: #333333 !important;
     padding: 0.5rem 1rem !important;
     font-weight: 500 !important;
     text-transform: none !important;
@@ -333,8 +333,8 @@
 }
 
 .fc-button-active {
-    background: #6A0028 !important;
-    border-color: #6A0028 !important;
+    background: #009DE8 !important;
+    border-color: #009DE8 !important;
     color: white !important;
 }
 
@@ -392,11 +392,11 @@
 }
 
 .video-js .vjs-play-progress {
-    background-color: #6A0028;
+    background-color: #009DE8;
 }
 
 .video-js .vjs-volume-level {
-    background-color: #6A0028;
+    background-color: #009DE8;
 }
 
 .video-js .vjs-slider {
@@ -406,6 +406,6 @@
 /* 재생 속도 버튼 커스터마이징 */
 #speed-label {
     font-weight: 600;
-    color: #6A0028;
+    color: #009DE8;
 }
 

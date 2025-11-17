@@ -51,7 +51,7 @@
 
 .search-group button {
     padding: 8px 16px;
-    background: #6A0028;
+    background: #009DE8;
     color: white;
     border: none;
     border-radius: 4px;
@@ -60,7 +60,7 @@
 }
 
 .search-group button:hover {
-    background: #5A0020;
+    background: #0087c9;
 }
 
 /* 테이블 스타일 */
@@ -150,7 +150,7 @@
 
 .progress-fill {
     height: 100%;
-    background: #6A0028;
+    background: #009DE8;
     transition: width 0.3s;
 }
 
@@ -162,7 +162,7 @@
 }
 
 .due-date.normal {
-    color: #374151;
+    color: #333333;
 }
 
 .due-date.warning {
@@ -261,7 +261,7 @@
 
 .empty-state h3 {
     margin: 0 0 10px 0;
-    color: #374151;
+    color: #333333;
 }
 
 .empty-state p {
@@ -299,7 +299,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px 30px;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
 }
 
 .modal-header h2 {
@@ -322,7 +322,7 @@
 }
 
 .modal-close:hover {
-    color: #374151;
+    color: #333333;
 }
 
 .modal-body {
@@ -391,7 +391,7 @@
 .committee-info h4 {
     margin: 0 0 10px 0;
     font-size: 15px;
-    color: #374151;
+    color: #333333;
 }
 
 .committee-list {
@@ -453,7 +453,7 @@
 .weight-badge {
     padding: 4px 10px;
     background: #e9ecef;
-    color: #374151;
+    color: #333333;
     border-radius: 12px;
     font-size: 13px;
     font-weight: 500;
@@ -469,7 +469,7 @@
 .criteria-list {
     margin: 10px 0;
     padding-left: 20px;
-    color: #374151;
+    color: #333333;
     font-size: 13px;
 }
 
@@ -486,7 +486,7 @@
     margin-bottom: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #374151;
+    color: #333333;
 }
 
 .score-slider-wrapper {
@@ -500,7 +500,7 @@
     height: 6px;
     -webkit-appearance: none;
     appearance: none;
-    background: #E5E7EB;
+    background: #E5E5E5;
     border-radius: 3px;
     outline: none;
 }
@@ -510,7 +510,7 @@
     appearance: none;
     width: 20px;
     height: 20px;
-    background: #6A0028;
+    background: #009DE8;
     border-radius: 50%;
     cursor: pointer;
 }
@@ -518,7 +518,7 @@
 .score-slider::-moz-range-thumb {
     width: 20px;
     height: 20px;
-    background: #6A0028;
+    background: #009DE8;
     border-radius: 50%;
     cursor: pointer;
     border: none;
@@ -551,7 +551,7 @@
     margin-bottom: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #374151;
+    color: #333333;
 }
 
 .category-comment {
@@ -563,7 +563,7 @@
     margin: 30px 0;
     padding: 20px;
     background: #fff;
-    border: 2px solid #6A0028;
+    border: 2px solid #009DE8;
     border-radius: 8px;
 }
 
@@ -587,7 +587,7 @@
 .total-score {
     font-size: 32px;
     font-weight: 700;
-    color: #6A0028;
+    color: #009DE8;
 }
 
 .expected-result {
@@ -596,7 +596,7 @@
 }
 
 .result-pass {
-    color: #6A0028;
+    color: #009DE8;
 }
 
 .result-fail {
@@ -622,7 +622,7 @@
     margin-bottom: 8px;
     font-size: 14px;
     font-weight: 500;
-    color: #374151;
+    color: #333333;
 }
 
 .comment-group textarea {
@@ -648,7 +648,7 @@
     align-items: center;
     margin-bottom: 20px;
     padding-bottom: 15px;
-    border-bottom: 2px solid #E5E7EB;
+    border-bottom: 2px solid #E5E5E5;
 }
 
 .submitted-header h3 {
@@ -687,12 +687,12 @@
 
 .score-value {
     font-weight: 600;
-    color: #6A0028;
+    color: #009DE8;
 }
 
 .score-comment {
     margin: 8px 0 0 0;
-    color: #374151;
+    color: #333333;
     font-size: 14px;
     line-height: 1.5;
 }
@@ -711,7 +711,7 @@
 .score-large {
     font-size: 36px;
     font-weight: 700;
-    color: #6A0028;
+    color: #009DE8;
 }
 
 .result-badge {
@@ -735,7 +735,7 @@
     margin-top: 20px;
     padding: 20px;
     background: #fff;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     border-radius: 8px;
 }
 
@@ -755,7 +755,7 @@
 .comment-section strong {
     display: block;
     margin-bottom: 5px;
-    color: #374151;
+    color: #333333;
     font-size: 14px;
 }
 
@@ -784,7 +784,7 @@
 .chair-summary-section h4 {
     margin: 20px 0 15px 0;
     font-size: 16px;
-    color: #374151;
+    color: #333333;
 }
 
 .evaluation-status {
@@ -826,7 +826,7 @@
 .comparison-table td {
     padding: 10px;
     text-align: center;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     font-size: 13px;
 }
 
@@ -854,7 +854,7 @@
     margin-bottom: 15px;
     padding: 15px;
     background: white;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     border-radius: 8px;
 }
 
@@ -886,7 +886,7 @@
     justify-content: space-around;
     padding: 20px;
     background: white;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     border-radius: 8px;
 }
 
@@ -922,7 +922,7 @@
 .chair-decision-form h4 {
     margin: 0 0 20px 0;
     font-size: 16px;
-    color: #374151;
+    color: #333333;
 }
 
 .decision-options {
@@ -935,14 +935,14 @@
     padding: 12px;
     margin-bottom: 10px;
     background: white;
-    border: 2px solid #E5E7EB;
+    border: 2px solid #E5E5E5;
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
 }
 
 .decision-radio:hover {
-    border-color: #6A0028;
+    border-color: #009DE8;
     background: #F9FAFB;
 }
 
@@ -952,7 +952,7 @@
 
 .decision-radio input[type="radio"]:checked + span {
     font-weight: 600;
-    color: #6A0028;
+    color: #009DE8;
 }
 
 .decision-comment-group {

@@ -136,7 +136,7 @@ textarea:focus {
     grid-template-columns: 140px 1fr;
     gap: 1rem;
     padding: 0.75rem 0;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
 }
 
 .info-row:last-child {
@@ -145,11 +145,11 @@ textarea:focus {
 
 .info-label {
     font-weight: 600;
-    color: #6B7280;
+    color: #999999;
 }
 
 .info-value {
-    color: #1F2937;
+    color: #333333;
 }
 
 /* 헤더 유틸리티 (영문버전, 로그아웃 등) */
@@ -224,8 +224,8 @@ textarea:focus {
 }
 
 .btn-secondary {
-    background-color: #E5E7EB;
-    color: #374151;
+    background-color: #E5E5E5;
+    color: #333333;
     padding: 0.625rem 1.25rem;
     height: 40px;
     border-radius: 0.375rem;
@@ -245,7 +245,7 @@ textarea:focus {
 /* 취소 버튼 */
 .btn-cancel {
     background-color: #F3F4F6;
-    color: #6B7280;
+    color: #999999;
     padding: 0.625rem 1.25rem;
     height: 40px;
     border-radius: 0.375rem;
@@ -259,16 +259,16 @@ textarea:focus {
 }
 
 .btn-cancel:hover {
-    background-color: #E5E7EB;
-    border-color: #9CA3AF;
+    background-color: #E5E5E5;
+    border-color: #cccccc;
 }
 
 /* 탭 버튼 통일 */
 .tab-button {
     padding: 0.75rem 1.5rem;
     background: white;
-    color: #6B7280;
-    border: 2px solid #E5E7EB;
+    color: #999999;
+    border: 2px solid #E5E5E5;
     border-radius: 0.5rem;
     font-size: 0.875rem;
     font-weight: 600;
@@ -302,15 +302,15 @@ table th {
     text-align: left;
     font-size: 0.875rem;
     font-weight: 600;
-    color: #374151;
-    border-bottom: 2px solid #E5E7EB;
+    color: #333333;
+    border-bottom: 2px solid #E5E5E5;
 }
 
 table td {
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid #E5E7EB;
+    border-bottom: 1px solid #E5E5E5;
     font-size: 0.875rem;
-    color: #1F2937;
+    color: #333333;
 }
 
 table tbody tr:hover {

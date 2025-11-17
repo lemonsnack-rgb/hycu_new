@@ -5,7 +5,7 @@
 
 .search-container {
     background: #F9FAFB;
-    border: 1px solid #E5E7EB;
+    border: 1px solid #E5E5E5;
     border-radius: 0.5rem;
     padding: 1rem;
     margin-bottom: 1rem;
@@ -37,7 +37,7 @@
 }
 
 .search-input::placeholder {
-    color: #9CA3AF;
+    color: #cccccc;
 }
 
 .search-buttons {
@@ -62,17 +62,17 @@
 }
 
 .search-btn-primary {
-    background: #6A0028;
+    background: #009DE8;
     color: white;
 }
 
 .search-btn-primary:hover {
-    background: #5A0020;
+    background: #0087c9;
 }
 
 .search-btn-secondary {
-    background: #E5E7EB;
-    color: #374151;
+    background: #E5E5E5;
+    color: #333333;
 }
 
 .search-btn-secondary:hover {
