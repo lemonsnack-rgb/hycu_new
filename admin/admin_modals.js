@@ -57,7 +57,7 @@ function openModal(title, content, confirmText = '저장', onConfirm = null, sho
     // 단일 버튼 지원 (하위 호환성)
     else if (options.showExtraButton) {
         const extraBtn = document.createElement('button');
-        extraBtn.className = `modal-extra-btn px-4 py-2 rounded-md text-sm font-medium ${options.extraButtonClass || 'bg-[#6A0028] hover:bg-[#5A0020] text-white'}`;
+        extraBtn.className = `modal-extra-btn px-4 py-2 rounded-md text-sm font-medium ${options.extraButtonClass || 'bg-[#009DE8] hover:bg-[#0087c9] text-white'}`;
         extraBtn.textContent = options.extraButtonText || '추가 작업';
         extraBtn.onclick = options.onExtraButtonClick;
         
@@ -160,7 +160,7 @@ function viewSubmissionDetail(id, type) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <a href="${item.fileUrl}" class="text-blue-600 hover:underline">${item.fileName}</a>
-                        <button class="ml-auto bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
+                        <button class="ml-auto bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -222,7 +222,7 @@ function viewSubmissionDetail(id, type) {
                                     </div>
                                     <div class="text-right">
                                         ${type === 'finalThesis' && reviewer.score !== undefined && reviewer.score !== null ? `
-                                            <p class="font-bold text-lg text-[#6A0028]">${reviewer.score}점</p>
+                                            <p class="font-bold text-lg text-[#009DE8]">${reviewer.score}점</p>
                                             ${reviewer.comment ? `<p class="text-sm text-gray-600 line-clamp-1">${reviewer.comment}</p>` : ''}
                                         ` : `
                                             <span class="status-badge ${reviewer.status === '완료' ? 'status-complete' : reviewer.status === '검토중' ? 'status-reviewing' : 'status-pending'}">${reviewer.status}</span>
@@ -341,7 +341,7 @@ function viewSubmissionDetail(id, type) {
                         <div class="info-row">
                             <div class="info-label">최종 점수</div>
                             <div class="info-value">
-                                <span class="text-2xl font-bold text-[#6A0028]">${item.finalScore}점</span>
+                                <span class="text-2xl font-bold text-[#009DE8]">${item.finalScore}점</span>
                             </div>
                         </div>
                         <div class="info-row">
@@ -357,7 +357,7 @@ function viewSubmissionDetail(id, type) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <a href="${item.fileUrl}" class="text-blue-600 hover:underline">${item.fileName}</a>
-                        <button class="ml-auto bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
+                        <button class="ml-auto bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -419,7 +419,7 @@ function viewSubmissionDetail(id, type) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <a href="${item.fileUrl}" class="text-blue-600 hover:underline">${item.fileName}</a>
-                        <button class="ml-auto bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
+                        <button class="ml-auto bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -441,7 +441,7 @@ function viewSubmissionDetail(id, type) {
                     extraButtons: [
                         {
                             text: '승인',
-                            className: 'bg-[#6A0028] hover:bg-[#5A0020] text-white',
+                            className: 'bg-[#009DE8] hover:bg-[#0087c9] text-white',
                             onClick: () => {
                                 showConfirm(
                                     '이 연구계획서를 승인하시겠습니까?',
@@ -551,7 +551,7 @@ function viewPdfFeedback(id, readOnly = false) {
 
     // ID 25: 관리자는 읽기 전용으로 교수용 PDF 뷰어 호출
     const mode = readOnly ? '읽기 전용 (관리자)' : '편집 가능 (교수)';
-    const modeClass = readOnly ? 'bg-[#6A0028]' : 'bg-[#6A0028]';
+    const modeClass = readOnly ? 'bg-[#009DE8]' : 'bg-[#009DE8]';
     const readOnlyBadge = readOnly ? '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">읽기 전용</span>' : '';
 
     // 피드백 상태값 변환
@@ -732,7 +732,7 @@ function viewJournalDetail(id) {
                 ${item.impactFactor ? `
                 <div class="mt-3">
                     <span class="text-sm text-gray-600">Impact Factor: </span>
-                    <span class="font-bold text-lg text-[#6A0028]">${item.impactFactor}</span>
+                    <span class="font-bold text-lg text-[#009DE8]">${item.impactFactor}</span>
                 </div>
                 ` : ''}
             </div>
@@ -758,12 +758,12 @@ function viewJournalDetail(id) {
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <span class="flex-1">게재 증명서</span>
-                        <button class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
+                        <button class="bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">다운로드</button>
                     </div>
                     <div class="flex items-center space-x-3">
                         <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
                         <span class="flex-1">논문 원문</span>
-                        <button class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">다운로드</button>
+                        <button class="bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">다운로드</button>
                     </div>
                 </div>
             </div>
@@ -800,7 +800,7 @@ function openScheduleModal(id = null) {
                 <label class="block text-sm font-medium text-gray-700 mb-1">일정명 <span class="text-red-600">*</span></label>
                 <input type="text" id="schedule-name" value="${item.name || ''}" 
                        placeholder="예: 2025-1학기 연구계획서 제출 기간" 
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
             </div>
             
             <div>
@@ -813,7 +813,7 @@ function openScheduleModal(id = null) {
                     <label class="flex items-center cursor-pointer">
                         <input type="checkbox" id="target-all" onchange="toggleAllTargets(this)" 
                                ${selectedTargets.length === 0 ? 'checked' : ''}
-                               class="h-4 w-4 text-[#6A0028] rounded border-gray-300 focus:ring-[#6A0028]">
+                               class="h-4 w-4 text-[#009DE8] rounded border-gray-300 focus:ring-[#009DE8]">
                         <span class="ml-2 font-medium text-gray-900">✓ 전체 학과 적용</span>
                     </label>
                 </div>
@@ -825,7 +825,7 @@ function openScheduleModal(id = null) {
                         return `
                             <label class="flex items-center p-3 hover:bg-gray-50 border-b last:border-b-0 cursor-pointer">
                                 <input type="checkbox" 
-                                       class="target-checkbox h-4 w-4 text-[#6A0028] rounded border-gray-300 focus:ring-[#6A0028]" 
+                                       class="target-checkbox h-4 w-4 text-[#009DE8] rounded border-gray-300 focus:ring-[#009DE8]" 
                                        value="${deptId}"
                                        ${isChecked ? 'checked' : ''}
                                        onchange="updateTargetAll()">
@@ -844,12 +844,12 @@ function openScheduleModal(id = null) {
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">시작일 <span class="text-red-600">*</span></label>
                     <input type="date" id="schedule-start" value="${item.startDate || ''}" 
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">종료일 <span class="text-red-600">*</span></label>
                     <input type="date" id="schedule-end" value="${item.endDate || ''}" 
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
                 </div>
             </div>
             
@@ -857,7 +857,7 @@ function openScheduleModal(id = null) {
                 <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
                 <textarea id="schedule-desc" rows="3" 
                           placeholder="일정에 대한 추가 설명을 입력하세요"
-                          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">${item.description || ''}</textarea>
+                          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">${item.description || ''}</textarea>
             </div>
         </div>
     `;
@@ -962,7 +962,7 @@ function openRequirementModal(id = null) {
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">전공 <span class="text-red-600">*</span></label>
-                    <select id="req-major" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]" ${isEdit ? 'disabled' : ''}>
+                    <select id="req-major" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]" ${isEdit ? 'disabled' : ''}>
                         <option value="">선택하세요</option>
                         <option value="교육공학" ${item.major === '교육공학' ? 'selected' : ''}>교육공학</option>
                         <option value="경영학" ${item.major === '경영학' ? 'selected' : ''}>경영학</option>
@@ -972,7 +972,7 @@ function openRequirementModal(id = null) {
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">학위과정 <span class="text-red-600">*</span></label>
-                    <select id="req-degree" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]" ${isEdit ? 'disabled' : ''}>
+                    <select id="req-degree" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]" ${isEdit ? 'disabled' : ''}>
                         <option value="">선택하세요</option>
                         <option value="석사" ${item.degree === '석사' ? 'selected' : ''}>석사</option>
                         <option value="박사" ${item.degree === '박사' ? 'selected' : ''}>박사</option>
@@ -1005,7 +1005,7 @@ function openRequirementModal(id = null) {
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                             <p class="mb-2">등록된 요건이 없습니다</p>
-                            <button onclick="loadRequirementsFromSystem()" class="text-[#6A0028] hover:underline text-sm">
+                            <button onclick="loadRequirementsFromSystem()" class="text-[#009DE8] hover:underline text-sm">
                                 기관계 시스템에서 불러오기 →
                             </button>
                         </div>
@@ -1014,7 +1014,7 @@ function openRequirementModal(id = null) {
                         return `
                             <label class="flex items-start p-4 hover:bg-gray-50 border-b last:border-b-0 cursor-pointer">
                                 <input type="checkbox" 
-                                       class="requirement-checkbox mt-1 h-4 w-4 text-[#6A0028] rounded border-gray-300" 
+                                       class="requirement-checkbox mt-1 h-4 w-4 text-[#009DE8] rounded border-gray-300" 
                                        value="${req.id}"
                                        ${isChecked ? 'checked' : ''}>
                                 <div class="ml-3 flex-1">
@@ -1036,7 +1036,7 @@ function openRequirementModal(id = null) {
                 
                 <div class="mt-2 flex items-center justify-between">
                     <p class="text-xs text-gray-500">
-                        선택된 요건: <span id="selected-count" class="font-medium text-[#6A0028]">${selectedReqs.length}</span>개
+                        선택된 요건: <span id="selected-count" class="font-medium text-[#009DE8]">${selectedReqs.length}</span>개
                     </p>
                     <button onclick="loadRequirementsFromSystem()" 
                             class="text-xs text-blue-600 hover:underline flex items-center">
@@ -1155,7 +1155,7 @@ function openStageModal(id = null) {
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">전공 <span class="text-red-600">*</span></label>
-                    <select id="stage-major" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                    <select id="stage-major" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                         <option value="">선택하세요</option>
                         <option value="교육공학" ${item.major === '교육공학' ? 'selected' : ''}>교육공학</option>
                         <option value="경영학" ${item.major === '경영학' ? 'selected' : ''}>경영학</option>
@@ -1165,7 +1165,7 @@ function openStageModal(id = null) {
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">학위과정 <span class="text-red-600">*</span></label>
-                    <select id="stage-degree" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                    <select id="stage-degree" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                         <option value="">선택하세요</option>
                         <option value="석사" ${item.degree === '석사' ? 'selected' : ''}>석사</option>
                         <option value="박사" ${item.degree === '박사' ? 'selected' : ''}>박사</option>
@@ -1177,14 +1177,14 @@ function openStageModal(id = null) {
                 <label class="block text-sm font-medium text-gray-700 mb-1">워크플로우명 <span class="text-red-600">*</span></label>
                 <input type="text" id="stage-name" value="${item.name || ''}" 
                        placeholder="예: 2025-1학기 교육공학 석사 표준 계획"
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
             </div>
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">버전</label>
                 <input type="text" id="stage-version" value="${item.version || 'v1.0'}" 
                        placeholder="예: v1.0"
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
             </div>
             
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
@@ -1361,11 +1361,11 @@ function viewStageDetail(id) {
                     <div class="flex gap-2">
                         ${canEdit ? `
                             <button onclick="editWorkflowStages(${id})"
-                                    class="text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
+                                    class="text-sm bg-[#009DE8] text-white px-3 py-1 rounded hover:bg-[#0087c9]">
                                 <i class="fas fa-edit mr-1"></i> 단계 조립
                             </button>
                             <button onclick="addWorkflowStep(${id})"
-                                    class="text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
+                                    class="text-sm bg-[#009DE8] text-white px-3 py-1 rounded hover:bg-[#0087c9]">
                                 + 단계 추가
                             </button>
                         ` : ''}
@@ -1736,7 +1736,7 @@ function editWorkflowStages(workflowId) {
                             </option>
                         `).join('')}
                     </select>
-                    <button onclick="addStageFromType()" class="mt-2 text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
+                    <button onclick="addStageFromType()" class="mt-2 text-sm bg-[#009DE8] text-white px-3 py-1 rounded hover:bg-[#0087c9]">
                         + 단계 추가
                     </button>
                 </div>
@@ -2009,11 +2009,11 @@ function openEvaluationModal(id = null) {
                     <label class="block text-sm font-medium text-gray-700 mb-1">기준명 <span class="text-red-600">*</span></label>
                     <input type="text" id="eval-name" value="${item.name || ''}" 
                            placeholder="예: 석사 논문 평가 기준"
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">학위과정 <span class="text-red-600">*</span></label>
-                    <select id="eval-type" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                    <select id="eval-type" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                         <option value="">선택하세요</option>
                         <option value="석사" ${item.type === '석사' ? 'selected' : ''}>석사</option>
                         <option value="박사" ${item.type === '박사' ? 'selected' : ''}>박사</option>
@@ -2028,14 +2028,14 @@ function openEvaluationModal(id = null) {
                         <input type="radio" name="eval-method" value="score" 
                                ${item.evaluationType !== 'passfail' ? 'checked' : ''}
                                onchange="toggleEvaluationMethod()"
-                               class="h-4 w-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                               class="h-4 w-4 text-[#009DE8] border-gray-300 focus:ring-[#009DE8]">
                         <span class="ml-2 text-sm text-gray-700">배점 방식 (점수)</span>
                     </label>
                     <label class="flex items-center cursor-pointer">
                         <input type="radio" name="eval-method" value="passfail" 
                                ${item.evaluationType === 'passfail' ? 'checked' : ''}
                                onchange="toggleEvaluationMethod()"
-                               class="h-4 w-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                               class="h-4 w-4 text-[#009DE8] border-gray-300 focus:ring-[#009DE8]">
                         <span class="ml-2 text-sm text-gray-700">Pass/Fail 방식</span>
                     </label>
                 </div>
@@ -2046,7 +2046,7 @@ function openEvaluationModal(id = null) {
                     <label class="block text-sm font-medium text-gray-700 mb-1">총점 <span class="text-red-600">*</span></label>
                     <input type="number" id="eval-total-score" value="${item.totalScore || 100}" 
                            placeholder="100"
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
                 </div>
             </div>
             
@@ -2061,12 +2061,12 @@ function openEvaluationModal(id = null) {
                 </div>
                 
                 <button type="button" onclick="addEvaluationItem()" 
-                        class="w-full border-2 border-dashed border-gray-300 rounded-md py-2 text-sm text-gray-600 hover:border-[#6A0028] hover:text-[#6A0028] transition-colors">
+                        class="w-full border-2 border-dashed border-gray-300 rounded-md py-2 text-sm text-gray-600 hover:border-[#009DE8] hover:text-[#009DE8] transition-colors">
                     + 평가 항목 추가
                 </button>
                 
                 <div id="score-summary" class="mt-3 text-sm text-gray-600" ${item.evaluationType === 'passfail' ? 'style="display:none"' : ''}>
-                    총 배점: <span id="current-total" class="font-bold text-[#6A0028]">0</span>점 / 
+                    총 배점: <span id="current-total" class="font-bold text-[#009DE8]">0</span>점 / 
                     <span id="target-total">${item.totalScore || 100}</span>점
                 </div>
             </div>
@@ -2143,7 +2143,7 @@ function renderEvaluationItem(item, index, showScore = true) {
         <div class="evaluation-item flex gap-2 items-start bg-gray-50 p-3 rounded-md" data-index="${index}">
             <div class="flex-1">
                 <input type="text" 
-                       class="item-name w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]" 
+                       class="item-name w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]" 
                        placeholder="평가 항목명 (예: 연구 주제의 적절성)"
                        value="${item.name || item}"
                        onchange="updateScoreTotal()">
@@ -2151,7 +2151,7 @@ function renderEvaluationItem(item, index, showScore = true) {
             ${showScore ? `
             <div class="w-24">
                 <input type="number" 
-                       class="item-score w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]" 
+                       class="item-score w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]" 
                        placeholder="배점"
                        value="${item.score || 0}"
                        min="0"
@@ -2297,7 +2297,7 @@ function openTypeModal(id = null) {
                 <label class="block text-sm font-medium text-gray-700 mb-1">유형명 <span class="text-red-600">*</span></label>
                 <input type="text" id="type-name" value="${item.name || ''}" 
                        placeholder="예: 중간논문 심사"
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
             </div>
             
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
@@ -2319,7 +2319,7 @@ function openTypeModal(id = null) {
                     <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100">
                         <input type="checkbox" id="type-presentation" 
                                ${item.presentation ? 'checked' : ''}
-                               class="h-4 w-4 text-[#6A0028] rounded border-gray-300">
+                               class="h-4 w-4 text-[#009DE8] rounded border-gray-300">
                         <div class="ml-3">
                             <p class="font-medium text-gray-900">발표 필요</p>
                             <p class="text-xs text-gray-600">학생이 발표를 해야 하는 단계입니다</p>
@@ -2329,7 +2329,7 @@ function openTypeModal(id = null) {
                     <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100">
                         <input type="checkbox" id="type-document" 
                                ${item.document ? 'checked' : ''}
-                               class="h-4 w-4 text-[#6A0028] rounded border-gray-300">
+                               class="h-4 w-4 text-[#009DE8] rounded border-gray-300">
                         <div class="ml-3">
                             <p class="font-medium text-gray-900">문서 제출 필요</p>
                             <p class="text-xs text-gray-600">학생이 문서를 제출해야 하는 단계입니다</p>
@@ -2342,7 +2342,7 @@ function openTypeModal(id = null) {
                 <label class="block text-sm font-medium text-gray-700 mb-1">설명 (선택)</label>
                 <textarea id="type-description" rows="3" 
                           placeholder="이 유형에 대한 설명을 입력하세요"
-                          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#6A0028]">${item.description || ''}</textarea>
+                          class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">${item.description || ''}</textarea>
             </div>
         </div>
     `;
@@ -2503,7 +2503,7 @@ function viewEvaluationDetail(id) {
                 <div class="flex justify-between items-center mb-3">
                     <h4 class="font-bold text-gray-800">평가 항목 (총 ${criteria.itemCount}개)</h4>
                     <button onclick="addEvaluationItem(${id})"
-                            class="text-sm bg-[#6A0028] text-white px-3 py-1 rounded hover:bg-[#5A0020]">
+                            class="text-sm bg-[#009DE8] text-white px-3 py-1 rounded hover:bg-[#0087c9]">
                         + 항목 추가
                     </button>
                 </div>
@@ -2520,7 +2520,7 @@ function viewEvaluationDetail(id) {
                                 </div>
                                 <div class="flex items-center gap-3">
                                     ${evalType === 'score' ?
-                                        `<span class="text-lg font-bold text-[#6A0028]">${item.score || 0}점</span>` :
+                                        `<span class="text-lg font-bold text-[#009DE8]">${item.score || 0}점</span>` :
                                       evalType === 'grade' ?
                                         `<span class="text-sm text-gray-600">등급 평가</span>` :
                                         `<span class="text-sm text-gray-600">Pass/Fail</span>`
@@ -2544,7 +2544,7 @@ function viewEvaluationDetail(id) {
                     <div class="mt-4 pt-4 border-t border-gray-200">
                         <div class="flex justify-between items-center">
                             <span class="font-bold text-gray-700">총점</span>
-                            <span class="text-2xl font-bold text-[#6A0028]">${criteria.totalScore}점</span>
+                            <span class="text-2xl font-bold text-[#009DE8]">${criteria.totalScore}점</span>
                         </div>
                     </div>
                 ` : ''}
@@ -3209,7 +3209,7 @@ function viewIndividualEvaluation(submissionId, reviewerIndex, type) {
                     <div class="text-6xl font-bold text-blue-600 mb-2">${reviewer.score}<span class="text-3xl">점</span></div>
                     <div class="flex items-center justify-center gap-2 mt-3">
                         <div class="h-2 w-full bg-gray-200 rounded-full overflow-hidden max-w-xs">
-                            <div class="h-full bg-[#6A0028] rounded-full" style="width: ${reviewer.score}%"></div>
+                            <div class="h-full bg-[#009DE8] rounded-full" style="width: ${reviewer.score}%"></div>
                         </div>
                     </div>
                 </div>
@@ -3295,7 +3295,7 @@ function viewWeeklyGuidanceDetail(pairId) {
                 <div class="flex justify-between items-center mb-4">
                     <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                     <button onclick="addNewWeeklyPlan(${pairId})"
-                            class="bg-[#6A0028] hover:bg-[#5A0020] text-white px-4 py-2 rounded text-sm font-medium">
+                            class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
                         + 계획 추가
                     </button>
                 </div>
@@ -3509,7 +3509,7 @@ function renderGuidancePairsTable(pairs) {
             <td class="py-3 px-4">
                 <div class="flex items-center">
                     <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
-                        <div class="bg-[#6A0028] h-2 rounded-full"
+                        <div class="bg-[#009DE8] h-2 rounded-full"
                              style="width: ${(pair.completedWeeks/pair.totalWeeks*100)}%"></div>
                     </div>
                     <span class="text-sm">${pair.completedWeeks}/${pair.totalWeeks}주차</span>
@@ -3518,7 +3518,7 @@ function renderGuidancePairsTable(pairs) {
             </td>
             <td class="py-3 px-4 text-center">
                 <button onclick="viewWeeklyGuidanceDetail(${pair.id})"
-                        class="px-3 py-1 bg-[#6A0028] text-white rounded hover:bg-[#5A0020] text-sm">
+                        class="px-3 py-1 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-sm">
                     상세보기
                 </button>
             </td>
@@ -3679,7 +3679,7 @@ function openResearchProposalRegisterModal() {
                            class="flex-1 px-3 py-2 border rounded"
                            onkeypress="if(event.key==='Enter') searchStudentForRP()">
                     <button onclick="searchStudentForRP()"
-                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
+                            class="px-4 py-2 bg-[#009DE8] text-white rounded hover:bg-[#0087c9]">
                         검색
                     </button>
                 </div>
@@ -3915,7 +3915,7 @@ function viewResearchProposalDetail(id) {
                             ${proposal.fileUrl ? `
                                 <div class="flex items-center gap-2">
                                     <a href="${proposal.fileUrl}" target="_blank"
-                                       class="inline-flex items-center px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020] text-sm">
+                                       class="inline-flex items-center px-4 py-2 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-sm">
                                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                                   d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>

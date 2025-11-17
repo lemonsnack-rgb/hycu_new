@@ -976,7 +976,7 @@ function viewGuidanceProgressDetail(studentId) {
                  onclick="event.stopPropagation()">
                 
                 <!-- 헤더 -->
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">온라인 피드백 상세</h3>
                     <button onclick="closeFeedbackProgressDetailModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
@@ -1075,7 +1075,7 @@ function viewFeedbackRecordDetail(recordId) {
                  onclick="event.stopPropagation()">
                 
                 <!-- 헤더 -->
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-lg font-bold">피드백 내역 상세</h3>
                     <button onclick="closeFeedbackRecordDetailModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
@@ -1129,7 +1129,7 @@ function viewFeedbackRecordDetail(recordId) {
                             <div class="font-semibold text-gray-800 mb-2">${record.documentTitle}</div>
                             <div class="text-sm text-gray-600 mb-3">${record.fileName}</div>
                             <button onclick="alert('파일 다운로드: ${record.fileName}')" 
-                                    class="px-4 py-2 bg-[#6A0028] text-white rounded text-sm hover:bg-[#500020]">
+                                    class="px-4 py-2 bg-[#009DE8] text-white rounded text-sm hover:bg-[#500020]">
                                 <i class="fas fa-download"></i> 파일 다운로드
                             </button>
                         </div>
@@ -1300,7 +1300,7 @@ function viewStageDetail(stageId) {
                  onclick="event.stopPropagation()">
                 
                 <!-- 헤더 -->
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">워크플로우 상세</h3>
                     <button onclick="closeStageDetailModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
@@ -1392,7 +1392,7 @@ function viewStageDetail(stageId) {
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
                     <button onclick="editStage(${stageId})" 
-                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
+                            class="px-4 py-2 bg-[#009DE8] text-white rounded hover:bg-[#0087c9]">
                         <i class="fas fa-edit"></i> 수정
                     </button>
                     <button onclick="closeStageDetailModal()" 
@@ -1538,7 +1538,7 @@ function viewRequirementDetail(requirementId) {
                  onclick="event.stopPropagation()">
                 
                 <!-- 헤더 -->
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">졸업요건 상세</h3>
                     <button onclick="closeRequirementDetailModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
@@ -1611,7 +1611,7 @@ function viewRequirementDetail(requirementId) {
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
                     <button onclick="editRequirement(${requirement.id}); closeRequirementDetailModal();" 
-                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
+                            class="px-4 py-2 bg-[#009DE8] text-white rounded hover:bg-[#0087c9]">
                         <i class="fas fa-edit"></i> 수정
                     </button>
                     <button onclick="closeRequirementDetailModal()" 
@@ -1651,7 +1651,7 @@ function viewStudentAcademicHistory(studentId) {
             <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden"
                  onclick="event.stopPropagation()">
                 
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">학생 학적 이력</h3>
                     <button onclick="closeStudentHistoryModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">×</button>
@@ -1796,7 +1796,7 @@ function showStatisticsChart(type) {
             <div class="bg-white rounded-lg shadow-xl max-w-4xl w-full mx-4 max-h-[90vh] overflow-hidden"
                  onclick="event.stopPropagation()">
                 
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">통계 분석</h3>
                     <button onclick="closeStatsChartModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">×</button>
@@ -1813,7 +1813,7 @@ function showStatisticsChart(type) {
                                     <span class="text-sm font-semibold">45명 (30%)</span>
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-4">
-                                    <div class="bg-[#6A0028] h-4 rounded-full" style="width: 30%"></div>
+                                    <div class="bg-[#009DE8] h-4 rounded-full" style="width: 30%"></div>
                                 </div>
                             </div>
                             <div>
@@ -1877,7 +1877,7 @@ function showStatisticsChart(type) {
                         <div class="flex items-end justify-between h-64 border-b border-l border-gray-300 p-4">
                             ${[120, 145, 130, 150, 165, 180].map((value, idx) => `
                                 <div class="flex flex-col items-center flex-1">
-                                    <div class="bg-blue-500 w-12 rounded-t transition-all hover:bg-[#6A0028]" 
+                                    <div class="bg-blue-500 w-12 rounded-t transition-all hover:bg-[#009DE8]" 
                                          style="height: ${value/2}px"
                                          title="${value}건"></div>
                                     <div class="text-xs text-gray-600 mt-2">${idx+6}월</div>
@@ -1954,7 +1954,7 @@ function viewStudentDetail(studentId) {
                  onclick="event.stopPropagation()">
                 
                 <!-- 헤더 -->
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">학생 상세 정보: ${student.name}</h3>
                     <button onclick="closeStudentDetailModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
@@ -2011,7 +2011,7 @@ function viewStudentDetail(studentId) {
                                     ${student.credits} / ${student.requiredCredits}
                                 </div>
                                 <div class="w-full bg-gray-200 rounded-full h-3 mb-2">
-                                    <div class="bg-[#6A0028] h-3 rounded-full" style="width: ${creditProgress}%"></div>
+                                    <div class="bg-[#009DE8] h-3 rounded-full" style="width: ${creditProgress}%"></div>
                                 </div>
                                 <div class="text-sm text-gray-600">${creditProgress}% 완료</div>
                             </div>
@@ -2083,7 +2083,7 @@ function viewStudentDetail(studentId) {
                 <!-- 푸터 -->
                 <div class="border-t px-6 py-4 bg-gray-50 flex justify-end gap-2">
                     <button onclick="editStudent('${student.id}')" 
-                            class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#5A0020]">
+                            class="px-4 py-2 bg-[#009DE8] text-white rounded hover:bg-[#0087c9]">
                         <i class="fas fa-edit"></i> 수정
                     </button>
                     <button onclick="manageCredits('${student.id}')" 
@@ -2166,7 +2166,7 @@ function showStatisticsDashboard() {
                  onclick="event.stopPropagation()">
                 
                 <!-- 헤더 -->
-                <div class="bg-[#6A0028] text-white px-6 py-4 flex items-center justify-between">
+                <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
                     <h3 class="text-xl font-bold">통계 대시보드</h3>
                     <button onclick="closeStatisticsModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
@@ -2206,7 +2206,7 @@ function showStatisticsDashboard() {
                                                 <span class="text-gray-600 font-semibold">${item.count}명 (${percentage}%)</span>
                                             </div>
                                             <div class="w-full bg-gray-200 rounded-full h-2">
-                                                <div class="bg-[#6A0028] h-2 rounded-full" style="width: ${percentage}%"></div>
+                                                <div class="bg-[#009DE8] h-2 rounded-full" style="width: ${percentage}%"></div>
                                             </div>
                                         </div>
                                     `;
@@ -3014,7 +3014,7 @@ function searchEmployee() {
                             <p class="text-sm text-gray-600">교번: ${emp.employeeId} | 소속: ${emp.department}</p>
                         </div>
                         <button onclick="addAdmin('${emp.employeeId}', '${emp.name}', '${emp.department}')"
-                                class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">
+                                class="bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">
                             관리자 추가
                         </button>
                     </div>
