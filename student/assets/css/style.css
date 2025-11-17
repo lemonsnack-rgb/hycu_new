@@ -1180,23 +1180,43 @@ tr:hover {
     }
 }
 
-/* 태블릿: 768px ~ 1259px */
-@media (min-width: 768px) and (max-width: 1259px) {
+/* 태블릿 Large: 992px ~ 1259px */
+@media (min-width: 992px) and (max-width: 1259px) {
     #sidebar {
-        width: 200px;
+        width: 220px;
     }
-    
+
     .sidebar-link {
         padding: 0.625rem;
     }
-    
+
     .sidebar-link span {
         font-size: 13px;
     }
-    
+
     .sidebar-link svg {
         width: 20px;
         height: 20px;
+    }
+}
+
+/* 태블릿: 768px ~ 991px */
+@media (min-width: 768px) and (max-width: 991px) {
+    #sidebar {
+        width: 180px;
+    }
+
+    .sidebar-link {
+        padding: 0.5rem;
+    }
+
+    .sidebar-link span {
+        font-size: 12px;
+    }
+
+    .sidebar-link svg {
+        width: 18px;
+        height: 18px;
     }
 }
 
