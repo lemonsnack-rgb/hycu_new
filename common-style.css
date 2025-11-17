@@ -29,7 +29,7 @@
 
 /* 기본 설정 */
 body {
-    font-family: 'Noto Sans KR', sans-serif;
+    font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
     background-color: #F9F9F9;
 }
 
@@ -332,4 +332,10 @@ table tbody tr:hover {
 
 .border-primary {
     border-color: var(--primary);
+}
+
+/* 브랜드 텍스트 */
+.brand-text {
+    font-family: 'Pretendard Variable', 'Pretendard', sans-serif;
+    font-weight: 700;
 }
