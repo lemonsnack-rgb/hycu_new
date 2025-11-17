@@ -69,7 +69,7 @@ function renderAvailableTab() {
                         <div style="color: #6B7280; font-size: 0.875rem; margin-bottom: 0.75rem;">
                             <p>김교수 • Zoom 온라인</p>
                         </div>
-                        <button onclick="alert('미팅 신청')" style="width: 100%; background: #6A0028; color: white; padding: 0.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
+                        <button onclick="alert('미팅 신청')" style="width: 100%; background: #009DE8; color: white; padding: 0.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
                             이 시간에 신청하기
                         </button>
                     </div>
@@ -112,7 +112,7 @@ function renderApprovedTab() {
                         </div>
                     </div>
                     <button onclick="window.open('https://zoom.us/j/123456789')" 
-                            style="width: 100%; background: #6A0028; color: white; padding: 0.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
+                            style="width: 100%; background: #009DE8; color: white; padding: 0.5rem; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 600;">
                         Zoom 참여하기
                     </button>
                 </div>
