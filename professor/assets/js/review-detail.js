@@ -41,7 +41,7 @@ function renderReviewDetail(assignmentId, viewType) {
                 html += `<div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
                     <p class="text-yellow-800 font-semibold">⚠️ 위원장 승인 전에 먼저 위원 역할로 평가를 완료해주세요.</p>
                     <button onclick="openReviewDetail('${assignmentId}', 'member')"
-                            class="mt-3 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                            class="mt-3 bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
                         위원 평가 화면으로 이동
                     </button>
                 </div>`;
@@ -140,7 +140,7 @@ function renderThesisInfo(assignment) {
                 <div class="flex items-center space-x-3 bg-white rounded-lg p-3 border border-gray-300">
                     <a href="${assignment.thesisFile}" class="text-blue-600 hover:underline flex-1">${assignment.thesisFile}</a>
                     <button onclick="downloadThesis('${assignment.thesisFile}')"
-                            class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#5A0020]">
+                            class="bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">
                         다운로드
                     </button>
                 </div>
@@ -204,15 +204,15 @@ function renderEvaluationForm(template, existingEvaluation) {
                 </h4>
                 <div class="space-y-2 text-sm text-blue-900">
                     <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
+                        <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
                         <span>각 항목 최소 <strong class="font-bold">${minRule.value}점 이상</strong> (과락)</span>
                     </p>
                     <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
+                        <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
                         <span>전체 평균 <strong class="font-bold">${avgRule.value}점 이상</strong></span>
                     </p>
                     <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
+                        <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
                         <span>총점 <strong class="font-bold">${totalRule.value}점 이상</strong> (${totalRule.maxValue}점 만점)</span>
                     </p>
                 </div>
@@ -305,7 +305,7 @@ function renderEvaluationForm(template, existingEvaluation) {
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#5A0020] font-medium">
+                <button id="submit-evaluation-btn" class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-lg hover:bg-[#0087c9] font-medium">
                     최종 제출
                 </button>
             </div>
@@ -408,7 +408,7 @@ function renderPassFailForm(template, savedData) {
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#5A0020] font-medium">
+                <button id="submit-evaluation-btn" class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-lg hover:bg-[#0087c9] font-medium">
                     최종 제출
                 </button>
             </div>
@@ -1200,7 +1200,7 @@ function renderChairApprovalScreen(detail, allSubmitted) {
                     </div>
 
                     <button onclick="submitChairDecision()"
-                            class="w-full bg-[#6A0028] hover:bg-[#5A0020] text-white px-6 py-3 rounded-lg font-semibold">
+                            class="w-full bg-[#009DE8] hover:bg-[#0087c9] text-white px-6 py-3 rounded-lg font-semibold">
                         최종 결정 제출
                     </button>
                 </div>

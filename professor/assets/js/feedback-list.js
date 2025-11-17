@@ -28,7 +28,7 @@ function renderFeedbackList() {
                     </div>
                     <div class="flex items-center gap-4">
                         <button onclick="sendNotificationToSelected()"
-                                class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#500020] text-sm font-semibold flex items-center gap-2">
+                                class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#500020] text-sm font-semibold flex items-center gap-2">
                             <i class="fas fa-bell"></i>
                             선택한 학생에게 알림 발송
                         </button>
@@ -181,7 +181,7 @@ function renderFeedbackRow(request, idx) {
             <td class="py-3 px-4 text-gray-600 text-sm">${request.uploadDate || '-'}</td>
             <td class="py-3 px-4">
                 <button onclick="openFeedbackViewer('${request.id}'); event.stopPropagation();"
-                        class="text-[#6A0028] hover:underline text-sm">
+                        class="text-[#009DE8] hover:underline text-sm">
                     상세보기
                 </button>
             </td>
