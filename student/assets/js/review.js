@@ -53,7 +53,7 @@ function renderReview() {
                                             <span class="badge ${review.result === '합격' ? 'badge-success' : 'badge-danger'}">
                                                 ${review.result}
                                             </span>
-                                            ${review.score ? `<span style="font-size: 0.875rem; font-weight: 600; color: #6A0028; margin-left: 0.5rem;">${review.score}점</span>` : ''}
+                                            ${review.score ? `<span style="font-size: 0.875rem; font-weight: 600; color: #009DE8; margin-left: 0.5rem;">${review.score}점</span>` : ''}
                                         </div>
                                     ` : '<span style="color: #9CA3AF;">-</span>'}
                                 </td>
@@ -103,7 +103,7 @@ function showReviewDetail(reviewId) {
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">심사 진행 상황</h4>
                         <div style="background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; text-align: center;">
-                            <div style="font-size: 2rem; font-weight: 700; color: #6A0028; margin-bottom: 0.5rem;">
+                            <div style="font-size: 2rem; font-weight: 700; color: #009DE8; margin-bottom: 0.5rem;">
                                 ${review.progress}%
                             </div>
                             <div class="progress-bar" style="width: 100%; max-width: 400px; margin: 0 auto 1rem;">
@@ -131,7 +131,7 @@ function showReviewDetail(reviewId) {
                                 </div>
                                 ${reviewer.score ? `
                                     <p style="font-size: 0.875rem; color: #6B7280;">
-                                        점수: <strong style="color: #6A0028;">${reviewer.score}점</strong>
+                                        점수: <strong style="color: #009DE8;">${reviewer.score}점</strong>
                                     </p>
                                 ` : ''}
                                 ${reviewer.reviewDate ? `
@@ -146,7 +146,7 @@ function showReviewDetail(reviewId) {
                                 ` : ''}
                                 ${reviewer.status === '완료' ? `
                                     <button onclick="showReviewerFeedback(${review.id}, ${index})" 
-                                            style="margin-top: 0.5rem; padding: 0.375rem 0.75rem; background: #6A0028; color: white; border: none; border-radius: 0.25rem; font-size: 0.75rem; cursor: pointer;">
+                                            style="margin-top: 0.5rem; padding: 0.375rem 0.75rem; background: #009DE8; color: white; border: none; border-radius: 0.25rem; font-size: 0.75rem; cursor: pointer;">
                                         피드백 상세보기
                                     </button>
                                 ` : ''}
@@ -166,7 +166,7 @@ function showReviewDetail(reviewId) {
                                     ${review.result}
                                 </div>
                                 ${review.score ? `
-                                    <div style="font-size: 1.25rem; font-weight: 600; color: #6A0028;">
+                                    <div style="font-size: 1.25rem; font-weight: 600; color: #009DE8;">
                                         ${review.score}점
                                     </div>
                                     <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.5rem;">
@@ -369,7 +369,7 @@ function showReviewerFeedback(reviewId, reviewerIndex) {
                         <div style="margin-bottom: 1.5rem;">
                             <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">심사 점수</h4>
                             <div style="text-align: center; padding: 1.5rem; background: #F9FAFB; border-radius: 0.5rem;">
-                                <div style="font-size: 3rem; font-weight: 700; color: #6A0028;">
+                                <div style="font-size: 3rem; font-weight: 700; color: #009DE8;">
                                     ${reviewer.score}점
                                 </div>
                                 <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.5rem;">
@@ -383,7 +383,7 @@ function showReviewerFeedback(reviewId, reviewerIndex) {
                     ${reviewer.comment ? `
                         <div style="margin-bottom: 1.5rem;">
                             <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">심사 의견</h4>
-                            <div style="padding: 1rem; background: #F9FAFB; border-radius: 0.5rem; border-left: 4px solid #6A0028;">
+                            <div style="padding: 1rem; background: #F9FAFB; border-radius: 0.5rem; border-left: 4px solid #009DE8;">
                                 <p style="font-size: 0.875rem; color: #4B5563; white-space: pre-wrap;">
                                     ${reviewer.comment}
                                 </p>
@@ -483,7 +483,7 @@ function showReviewTimeline(reviewId) {
                             전체 진행률
                         </h4>
                         <div style="text-align: center;">
-                            <div style="font-size: 2.5rem; font-weight: 700; color: #6A0028; margin-bottom: 0.5rem;">
+                            <div style="font-size: 2.5rem; font-weight: 700; color: #009DE8; margin-bottom: 0.5rem;">
                                 ${review.progress}%
                             </div>
                             <div class="progress-bar" style="width: 100%; max-width: 400px; margin: 0 auto;">

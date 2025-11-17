@@ -637,7 +637,7 @@ function showSubmissionHistory() {
                             <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; ${index === submissions.length - 1 ? '' : 'padding-bottom: 1.5rem; border-bottom: 1px solid #E5E7EB;'}">
                                 <!-- 타임라인 라인 -->
                                 <div style="display: flex; flex-direction: column; align-items: center;">
-                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: ${sub.isLatest ? '#6A0028' : '#10B981'}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: ${sub.isLatest ? '#009DE8' : '#10B981'}; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; font-size: 0.875rem;">
                                         ${sub.version}
                                     </div>
                                     ${index < submissions.length - 1 ? `
@@ -651,7 +651,7 @@ function showSubmissionHistory() {
                                         <div>
                                             <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 0.25rem;">
                                                 ${sub.title}
-                                                ${sub.isLatest ? '<span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; background: #6A0028; color: white; border-radius: 0.25rem; margin-left: 0.5rem;">최신</span>' : ''}
+                                                ${sub.isLatest ? '<span style="font-size: 0.75rem; padding: 0.25rem 0.5rem; background: #009DE8; color: white; border-radius: 0.25rem; margin-left: 0.5rem;">최신</span>' : ''}
                                             </h4>
                                             <p style="font-size: 0.875rem; color: #6B7280;">
                                                 ${sub.uploadDate}

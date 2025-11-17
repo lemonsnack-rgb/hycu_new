@@ -80,7 +80,7 @@ function renderDashboard() {
                 </div>
                 <div class="card-body">
                     ${upcomingMeetings.length > 0 ? upcomingMeetings.map(meeting => `
-                        <div style="padding: 0.75rem; border-left: 3px solid #6A0028; background: #F9FAFB; border-radius: 0.375rem; margin-bottom: 0.75rem;">
+                        <div style="padding: 0.75rem; border-left: 3px solid #009DE8; background: #F9FAFB; border-radius: 0.375rem; margin-bottom: 0.75rem;">
                             <div style="font-weight: 600; color: #1F2937; margin-bottom: 0.25rem;">
                                 ${meeting.title}
                             </div>
@@ -426,10 +426,10 @@ function showAcademicHistory() {
                     <!-- 학적 이력 -->
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-weight: 600; margin-bottom: 1rem;">학적 변동 내역</h4>
-                        <div style="border-left: 3px solid #6A0028; padding-left: 1rem;">
+                        <div style="border-left: 3px solid #009DE8; padding-left: 1rem;">
                             <div style="margin-bottom: 1.5rem;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                                    <span style="font-weight: 600; color: #6A0028;">입학</span>
+                                    <span style="font-weight: 600; color: #009DE8;">입학</span>
                                     <span style="font-size: 0.875rem; color: #6B7280;">2024-03-02</span>
                                 </div>
                                 <div style="font-size: 0.875rem; color: #6B7280;">
@@ -711,7 +711,7 @@ function showProgressDetail() {
                     <!-- 전체 진행도 -->
                     <div style="background: #F9FAFB; padding: 1.5rem; border-radius: 0.5rem; margin-bottom: 1.5rem; text-align: center;">
                         <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">전체 진행도</h4>
-                        <div style="font-size: 3rem; font-weight: 700; color: #6A0028; margin-bottom: 1rem;">
+                        <div style="font-size: 3rem; font-weight: 700; color: #009DE8; margin-bottom: 1rem;">
                             ${totalProgress}%
                         </div>
                         <div class="progress-bar" style="width: 100%; max-width: 500px; margin: 0 auto;">

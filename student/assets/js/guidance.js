@@ -41,7 +41,7 @@ function renderGuidanceDetail() {
                 <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                 <div class="flex items-center gap-3">
                     <button onclick="openAddPlanModal()"
-                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
                         + 계획 추가
                     </button>
                 </div>
@@ -142,7 +142,7 @@ function renderGuidanceDetail() {
                     </svg>
                     <p class="mt-4 text-sm text-gray-600">등록된 지도 계획이 없습니다</p>
                     <button onclick="openAddPlanModal()"
-                            class="mt-4 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#5A0020]">
+                            class="mt-4 bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
                         첫 지도 계획 추가하기
                     </button>
                 </div>

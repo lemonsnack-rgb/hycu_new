@@ -78,7 +78,7 @@ function renderTitleChange() {
                                         ${change.oldTitle.korean}
                                     </p>
                                 </div>
-                                <div style="font-size: 1.5rem; color: #6A0028;">→</div>
+                                <div style="font-size: 1.5rem; color: #009DE8;">→</div>
                                 <div>
                                     <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">변경</p>
                                     <p style="font-size: 0.875rem; color: #1F2937; font-weight: 600;">
@@ -265,7 +265,7 @@ function showTitleChangeDetail(changeId) {
                         </div>
 
                         <div style="text-align: center; margin: 1rem 0;">
-                            <span style="font-size: 2rem; color: #6A0028;">↓</span>
+                            <span style="font-size: 2rem; color: #009DE8;">↓</span>
                         </div>
 
                         <div style="background: #ECFDF5; padding: 1rem; border-radius: 0.5rem;">
