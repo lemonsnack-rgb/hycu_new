@@ -163,24 +163,6 @@ body {
     transition: all 0.2s;
 }
 
-.btn-primary {
-    background: var(--primary);
-    color: white;
-}
-
-.btn-primary:hover {
-    background: var(--primary-dark);
-}
-
-.btn-secondary {
-    background: var(--gray-200);
-    color: var(--gray-700);
-}
-
-.btn-secondary:hover {
-    background: var(--gray-300);
-}
-
 .btn-success {
     background: var(--success);
     color: white;
@@ -395,34 +377,6 @@ main {
     overflow-x: auto;
 }
 
-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-thead {
-    background: var(--gray-50);
-}
-
-th {
-    padding: var(--spacing-3) var(--spacing-4);
-    text-align: left;
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--gray-700);
-    border-bottom: 2px solid var(--gray-200);
-}
-
-td {
-    padding: var(--spacing-3) var(--spacing-4);
-    border-bottom: 1px solid var(--gray-100);
-    font-size: 13px;
-}
-
-tr:hover {
-    background: var(--gray-50);
-}
-
 /* 배지 */
 .badge {
     display: inline-block;
@@ -430,34 +384,6 @@ tr:hover {
     border-radius: 10px;
     font-size: 11px;
     font-weight: 600;
-}
-
-/* 관리자 스타일 상태 배지 */
-.status-badge {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 0.25rem 0.75rem;
-    border-radius: 9999px;
-}
-
-.status-pending {
-    background-color: #FEF3C7;
-    color: #92400E;
-}
-
-.status-reviewing {
-    background-color: #DBEAFE;
-    color: #1E40AF;
-}
-
-.status-completed {
-    background-color: #D1FAE5;
-    color: #065F46;
-}
-
-.status-rejected {
-    background-color: #FEE2E2;
-    color: #991B1B;
 }
 
 /* 기존 배지 스타일 유지 */
