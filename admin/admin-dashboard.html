@@ -5,6 +5,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>논문 지도 관리 시스템 (관리자용) - 완전판</title>
     <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- HYCU UI Guidelines Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                screens: {
+                    'sm': '640px',
+                    'md': '768px',
+                    'lg': '992px',
+                    'xl': '1260px',
+                },
+                extend: {
+                    colors: {
+                        'primary': '#009DE8',
+                        'primary-dark': '#0087c9',
+                    }
+                }
+            }
+        }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
