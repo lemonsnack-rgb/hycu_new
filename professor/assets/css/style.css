@@ -139,19 +139,7 @@ body {
     color: var(--gray-700);
 }
 
-.form-group input {
-    padding: var(--spacing-3) var(--spacing-4);
-    border: 1px solid var(--gray-300);
-    border-radius: var(--radius-md);
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
+/* form-group input 스타일은 common-style.css에서 처리 */
 
 .btn {
     padding: var(--spacing-3) var(--spacing-4);
@@ -702,15 +690,7 @@ main {
 .inline-edit-table textarea,
 .inline-edit-table select {
     width: 100%;
-    padding: var(--spacing-2);
-    border: 1px solid var(--primary);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-}
-
-.inline-edit-table textarea {
-    min-height: 60px;
-    resize: vertical;
+    border-color: var(--primary);
 }
 
 .status-icon {

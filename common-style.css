@@ -23,6 +23,24 @@ body {
     background-color: #F3F4F6;
 }
 
+/* 입력 요소 표준 스타일 */
+input,
+select,
+textarea {
+    height: 40px;
+    padding: 0.5rem 0.75rem;
+    border: 1px solid #D1D5DB;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+textarea {
+    height: auto;
+    min-height: 80px;
+    resize: vertical;
+}
+
 /* 포커스 스타일 */
 input:focus,
 select:focus,

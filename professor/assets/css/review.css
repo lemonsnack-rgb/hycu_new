@@ -36,12 +36,7 @@
     color: #666;
 }
 
-.filter-group select {
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
-}
+/* filter-group select 스타일은 common-style.css에서 처리 */
 
 .search-group {
     display: flex;
@@ -52,10 +47,6 @@
 
 .search-group input {
     flex: 1;
-    padding: 8px 12px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 14px;
 }
 
 .search-group button {
@@ -565,12 +556,6 @@
 
 .category-comment {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
 }
 
 /* 총점 섹션 */
@@ -642,12 +627,6 @@
 
 .comment-group textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
 }
 
 /* 폼 액션 */
@@ -993,12 +972,6 @@
 
 .decision-comment-group textarea {
     width: 100%;
-    padding: 12px;
-    border: 1px solid #ced4da;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    resize: vertical;
 }
 
 .chair-decision-readonly {
