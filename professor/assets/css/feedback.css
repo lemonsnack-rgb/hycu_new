@@ -359,7 +359,7 @@ canvas.upper-canvas {
 .comment-bubble p {
     white-space: pre-wrap;
     word-break: break-word;
-    font-size: 0.875rem;
+    font-size: 1rem;
     margin: 0;
 }
 
