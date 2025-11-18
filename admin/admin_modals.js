@@ -4137,12 +4137,12 @@ function savePassCriteria(criteriaId) {
     loadView('evaluationCriteria');
 }
 
-// ==================== 논문 제목 변경 신청 관리 ====================
+// ==================== 논문 제목 등록 현황 ====================
 
 function viewTitleChangeDetail(id) {
     const request = appData.titleChangeRequests.find(r => r.id === id);
     if (!request) {
-        alert('신청 정보를 찾을 수 없습니다.');
+        alert('정보를 찾을 수 없습니다.');
         return;
     }
 
@@ -4175,94 +4175,37 @@ function viewTitleChangeDetail(id) {
                 </div>
             </div>
 
-            <!-- 논문 제목 변경 정보 -->
+            <!-- 논문 제목 정보 -->
             <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <h4 class="font-bold text-blue-900 mb-3">논문 제목 변경 정보</h4>
+                <h4 class="font-bold text-blue-900 mb-3">논문 제목</h4>
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">현재 논문 제목</label>
-                        <input type="text" value="${request.currentTitle}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                    </div>
-                    <div class="flex items-center justify-center text-blue-600">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">변경 논문 제목</label>
-                        <input type="text" value="${request.newTitle}" readonly
+                        <label class="block text-sm font-medium text-gray-700 mb-1">논문 제목 (국문)</label>
+                        <input type="text" value="${request.titleKo || request.currentTitle || '-'}" readonly
                                class="w-full px-3 py-2 border border-blue-300 rounded bg-blue-100 text-gray-900 font-medium">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">논문 언어</label>
-                        <input type="text" value="${request.language}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 변경 사유 -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold text-gray-800 mb-3">변경 사유</h4>
-                <textarea rows="4" readonly
-                          class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">${request.reason}</textarea>
-            </div>
-
-            <!-- 신청 정보 -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold text-gray-800 mb-3">신청 정보</h4>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">신청일</label>
-                        <input type="text" value="${request.requestDate}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">논문 제목 (영문)</label>
+                        <input type="text" value="${request.titleEn || request.newTitle || '-'}" readonly
+                               class="w-full px-3 py-2 border border-blue-300 rounded bg-blue-100 text-gray-900 font-medium">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">상태</label>
-                        <span class="inline-block px-4 py-2 rounded-full text-sm font-medium ${
-                            request.status === '승인' ? 'bg-green-100 text-green-700' :
-                            request.status === '대기' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-100 text-gray-700'
-                        }">
-                            ${request.status}
-                        </span>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">등록일</label>
+                        <input type="text" value="${request.registeredDate || request.requestDate || '-'}" readonly
+                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
                     </div>
-                    ${request.status === '승인' ? `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">승인일</label>
-                            <input type="text" value="${request.approvedDate}" readonly
-                                   class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">승인자</label>
-                            <input type="text" value="${request.approvedBy}" readonly
-                                   class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                        </div>
-                    ` : ''}
                 </div>
             </div>
         </div>
     `;
 
-    // 대기 상태면 승인 버튼 표시, 승인 상태면 닫기 버튼만 표시
-    if (request.status === '대기') {
-        openModal(
-            '논문 제목 변경 신청 상세',
-            content,
-            '승인',
-            () => approveTitleChange(id),
-            true
-        );
-    } else {
-        openModal(
-            '논문 제목 변경 신청 상세',
-            content,
-            '닫기',
-            closeModal,
-            true
-        );
-    }
+    openModal(
+        '논문 제목 상세',
+        content,
+        '닫기',
+        closeModal,
+        true
+    );
 }
 
 function approveTitleChange(id) {

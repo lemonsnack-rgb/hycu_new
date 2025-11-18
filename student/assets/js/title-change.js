@@ -1,327 +1,122 @@
-// ==================== 논문제목 변경 ====================
+// ==================== 논문 제목 관리 ====================
 
 function renderTitleChange() {
     const currentTitle = DataService.getCurrentTitle();
-    const titleChanges = DataService.getTitleChanges();
     const content = document.getElementById('title-change-screen');
     if (!content) return;
-    
+
     content.innerHTML = `
-        <!-- 현재 논문 제목 -->
-        <div class="card mb-6">
-            <div class="card-header">
-                <h3 style="font-size: 1.125rem; font-weight: 600; color: #1F2937;">
-                    📝 현재 논문 제목
-                </h3>
-                <button onclick="showTitleChangeModal()" class="btn btn-primary">
-                    제목 변경 신청하기
-                </button>
-            </div>
-            <div class="card-body">
-                <div style="margin-bottom: 1rem;">
-                    <label style="font-weight: 600; color: #6B7280; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
-                        국문 제목
-                    </label>
-                    <p style="font-size: 1.125rem; color: #1F2937; line-height: 1.6;">
-                        ${currentTitle.korean}
-                    </p>
-                </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="font-weight: 600; color: #6B7280; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
-                        영문 제목
-                    </label>
-                    <p style="font-size: 1.125rem; color: #1F2937; line-height: 1.6;">
-                        ${currentTitle.english}
-                    </p>
-                </div>
-                <div style="display: flex; gap: 2rem; font-size: 0.875rem; color: #6B7280;">
-                    <p>등록일: ${currentTitle.registrationDate}</p>
-                    <p>최종 변경일: ${currentTitle.lastModifiedDate}</p>
-                </div>
-            </div>
-        </div>
-        
-        <!-- 변경 신청 이력 -->
+        <!-- 논문 제목 관리 -->
         <div class="card">
             <div class="card-header">
-                <h3 style="font-size: 1.125rem; font-weight: 600; color: #1F2937;">
-                    변경 신청 이력
-                </h3>
+                <div>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">논문 제목 관리</h2>
+                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문 제목을 입력하고 수정할 수 있습니다.</p>
+                </div>
             </div>
             <div class="card-body">
-                ${titleChanges.map((change, index) => `
-                    <div style="padding: 1.5rem; border: 1px solid #E5E7EB; border-radius: 0.5rem; margin-bottom: 1rem; cursor: pointer;"
-                         onclick="showTitleChangeDetail(${change.id})">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <h4 style="font-weight: 600; color: #1F2937;">
-                                신청 #${titleChanges.length - index}
-                            </h4>
-                            <span class="badge ${change.status === '승인' ? 'badge-success' : change.status === '반려' ? 'badge-danger' : 'badge-warning'}">
-                                ${change.status}
-                            </span>
-                        </div>
-                        
-                        <div style="font-size: 0.875rem; color: #6B7280; margin-bottom: 1rem;">
-                            <p>신청일: ${formatDateTime2(change.applicationDate)}</p>
-                            ${change.approvalDate ? `<p>처리일: ${formatDateTime2(change.approvalDate)}</p>` : ''}
-                        </div>
-                        
-                        <!-- 변경 전후 -->
-                        <div style="background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem;">
-                            <p style="font-size: 0.875rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">
-                                변경 전 ▶ 변경 후
-                            </p>
-                            <div style="display: grid; grid-template-columns: 1fr auto 1fr; gap: 1rem; align-items: center;">
-                                <div>
-                                    <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">이전</p>
-                                    <p style="font-size: 0.875rem; color: #4B5563; font-weight: 500;">
-                                        ${change.oldTitle.korean}
-                                    </p>
-                                </div>
-                                <div style="font-size: 1.5rem; color: #009DE8;">→</div>
-                                <div>
-                                    <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">변경</p>
-                                    <p style="font-size: 0.875rem; color: #1F2937; font-weight: 600;">
-                                        ${change.newTitle.korean}
-                                    </p>
-                                </div>
+                <form id="title-form" onsubmit="saveTitleChange(event)" style="max-width: 800px;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #374151; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
+                            논문 제목 (국문) <span style="color: #DC2626;">*</span>
+                        </label>
+                        <input type="text"
+                               id="title-korean"
+                               value="${currentTitle.korean || ''}"
+                               placeholder="국문 논문 제목을 입력하세요"
+                               required
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
+                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                            예: 인공지능 기반 추천 시스템의 효율성 향상에 관한 연구
+                        </p>
+                    </div>
+
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #374151; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
+                            논문 제목 (영문) <span style="color: #DC2626;">*</span>
+                        </label>
+                        <input type="text"
+                               id="title-english"
+                               value="${currentTitle.english || ''}"
+                               placeholder="영문 논문 제목을 입력하세요"
+                               required
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
+                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                            예: A Study on Improving the Efficiency of AI-based Recommendation Systems
+                        </p>
+                    </div>
+
+                    ${currentTitle.registrationDate ? `
+                        <div style="background: #F3F4F6; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                            <div style="display: flex; gap: 2rem; font-size: 0.875rem; color: #6B7280;">
+                                <p><strong style="color: #374151;">등록일:</strong> ${currentTitle.registrationDate}</p>
+                                ${currentTitle.lastModifiedDate ? `<p><strong style="color: #374151;">최종 수정일:</strong> ${currentTitle.lastModifiedDate}</p>` : ''}
                             </div>
                         </div>
-                        
-                        <button onclick="event.stopPropagation(); showTitleChangeDetail(${change.id})" 
-                                class="btn btn-sm btn-secondary" style="margin-top: 0.5rem;">
-                            상세보기
+                    ` : ''}
+
+                    <div style="background: #EFF6FF; border: 1px solid #DBEAFE; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: start;">
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #3B82F6; flex-shrink: 0; margin-right: 0.75rem; margin-top: 0.125rem;"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div style="font-size: 0.875rem; color: #1E40AF;">
+                                <p style="font-weight: 600;">안내사항이 삽입될 예정입니다.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: center; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary" style="min-width: 120px;">
+                            저장
+                        </button>
+                        <button type="button" onclick="cancelTitleForm()" class="btn btn-secondary" style="min-width: 120px;">
+                            취소
                         </button>
                     </div>
-                `).join('')}
-                
-                ${titleChanges.length === 0 ? `
-                    <div style="text-align: center; padding: 3rem; color: #9CA3AF;">
-                        변경 신청 이력이 없습니다
-                    </div>
-                ` : ''}
-            </div>
-        </div>
-        
-        <!-- 안내사항 -->
-        <div class="card" style="background: #EFF6FF; border: 1px solid #BFDBFE;">
-            <div class="card-body">
-                <h4 style="font-weight: 600; color: #1E40AF; margin-bottom: 0.75rem;">
-                    📌 안내 문구가 삽입되는 위치입니다
-                </h4>
+                </form>
             </div>
         </div>
     `;
 }
 
-function showTitleChangeModal() {
-    const currentTitle = DataService.getCurrentTitle();
-
-    const modalContent = `
-        <div class="modal">
-            <div class="modal-content" style="max-width: 700px;">
-                <div class="modal-header">
-                    <h3>논문제목 변경 신청</h3>
-                    <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
-                </div>
-                <div class="modal-body">
-                    <form id="title-change-form" onsubmit="handleTitleChange(event)">
-                        <!-- 현재 제목 -->
-                        <div style="background: #F9FAFB; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                            <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">📝 현재 제목</h4>
-                            <div style="margin-bottom: 0.75rem;">
-                                <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">국문:</p>
-                                <p style="font-size: 0.875rem; color: #4B5563;">${currentTitle.korean}</p>
-                            </div>
-                            <div>
-                                <p style="font-size: 0.875rem; color: #6B7280; margin-bottom: 0.25rem;">영문:</p>
-                                <p style="font-size: 0.875rem; color: #4B5563;">${currentTitle.english}</p>
-                            </div>
-                        </div>
-
-                        <!-- 변경할 논문명 -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                                변경할 논문명 <span style="color: #EF4444;">*</span>
-                            </label>
-                            <input type="text" id="new-title" required
-                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;"
-                                   placeholder="변경할 논문 제목을 입력하세요">
-                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">권장: 50자 이내</p>
-                        </div>
-
-                        <!-- 논문명의 언어 -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                                논문명의 언어 <span style="color: #EF4444;">*</span>
-                            </label>
-                            <select id="title-language" required
-                                    style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
-                                <option value="">선택하세요</option>
-                                <option value="한글">한글</option>
-                                <option value="영어">영어</option>
-                                <option value="한글/영어">한글/영어</option>
-                            </select>
-                        </div>
-
-                        <!-- 변경 사유 -->
-                        <div style="margin-bottom: 1.5rem;">
-                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
-                                변경 사유 <span style="color: #EF4444;">*</span>
-                            </label>
-                            <textarea id="change-reason" required
-                                      style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; min-height: 120px; resize: vertical;"
-                                      placeholder="제목 변경이 필요한 구체적인 사유를 작성해주세요"></textarea>
-                        </div>
-
-                        <!-- 주의사항 -->
-                        <div style="background: #FEF3C7; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #F59E0B;">
-                            <p style="font-size: 0.875rem; color: #92400E; font-weight: 600; margin-bottom: 0.5rem;">주의사항</p>
-                            <ul style="font-size: 0.75rem; color: #92400E; padding-left: 1.25rem; margin: 0;">
-                                <li>제목 변경은 관리자 승인 후 확정됩니다</li>
-                                <li>심사 진행 중인 경우 변경이 제한될 수 있습니다</li>
-                                <li>최종 심사 이후에는 제목 변경이 불가합니다</li>
-                            </ul>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button onclick="closeModal()" class="btn btn-secondary">취소</button>
-                    <button onclick="document.getElementById('title-change-form').requestSubmit()" class="btn btn-primary">
-                        신청하기
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('modal-container').innerHTML = modalContent;
-}
-
-function handleTitleChange(event) {
+function saveTitleChange(event) {
     event.preventDefault();
 
-    const newTitle = document.getElementById('new-title').value;
-    const language = document.getElementById('title-language').value;
-    const reason = document.getElementById('change-reason').value;
+    const korean = document.getElementById('title-korean').value.trim();
+    const english = document.getElementById('title-english').value.trim();
 
-    if (!newTitle || !language || !reason) {
-        alert('모든 필수 항목을 입력해주세요');
+    if (!korean || !english) {
+        alert('국문 제목과 영문 제목을 모두 입력해주세요.');
         return;
     }
 
-    // 실제로는 서버로 전송
-    console.log('제목 변경 신청:', { newTitle, language, reason });
+    // 데이터 저장
+    DataService.updateTitle({
+        korean: korean,
+        english: english,
+        lastModifiedDate: new Date().toISOString().split('T')[0]
+    });
 
-    alert('제목 변경 신청이 완료되었습니다.\n관리자의 승인을 기다려주세요.');
-    closeModal();
+    showCustomAlert('논문 제목이 저장되었습니다.', 'success');
+
+    // 화면 새로고침
     renderTitleChange();
 }
 
-function showTitleChangeDetail(changeId) {
-    const change = DataService.getTitleChanges().find(c => c.id === changeId);
-    if (!change) return;
-
-    const modalContent = `
-        <div style="position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 2000;">
-            <div class="modal" style="max-width: 700px;">
-                <div class="modal-header">
-                    <h3>제목 변경 신청 상세</h3>
-                    <button onclick="closeModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
-                </div>
-                <div class="modal-body">
-                    <!-- 기본 정보 -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 2px solid #E5E7EB;">
-                        <div>
-                            <p style="font-size: 0.875rem; color: #6B7280;">신청 번호: #${change.id}</p>
-                            <p style="font-size: 0.875rem; color: #6B7280;">신청일: ${formatDateTime2(change.applicationDate)}</p>
-                            ${change.approvalDate ? `<p style="font-size: 0.875rem; color: #6B7280;">처리일: ${formatDateTime2(change.approvalDate)}</p>` : ''}
-                        </div>
-                        <span class="badge ${change.status === '승인' ? 'badge-success' : change.status === '반려' ? 'badge-danger' : 'badge-warning'}">
-                            ${change.status}
-                        </span>
-                    </div>
-
-                    <!-- 제목 변경 내역 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">📝 제목 변경 내역</h4>
-
-                        <div style="background: #FEF2F2; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
-                            <p style="font-size: 0.875rem; font-weight: 600; color: #991B1B; margin-bottom: 0.5rem;">
-                                변경 전
-                            </p>
-                            <p style="font-size: 0.875rem; color: #4B5563; margin-bottom: 0.5rem;">
-                                국문: ${change.oldTitle.korean}
-                            </p>
-                            <p style="font-size: 0.875rem; color: #4B5563;">
-                                영문: ${change.oldTitle.english}
-                            </p>
-                        </div>
-
-                        <div style="text-align: center; margin: 1rem 0;">
-                            <span style="font-size: 2rem; color: #009DE8;">↓</span>
-                        </div>
-
-                        <div style="background: #ECFDF5; padding: 1rem; border-radius: 0.5rem;">
-                            <p style="font-size: 0.875rem; font-weight: 600; color: #065F46; margin-bottom: 0.5rem;">
-                                변경 후
-                            </p>
-                            <p style="font-size: 0.875rem; color: #1F2937; font-weight: 600; margin-bottom: 0.5rem;">
-                                국문: ${change.newTitle.korean}
-                            </p>
-                            <p style="font-size: 0.875rem; color: #1F2937; font-weight: 600;">
-                                영문: ${change.newTitle.english}
-                            </p>
-                        </div>
-                    </div>
-
-                    <!-- 변경 사유 -->
-                    <div style="margin-bottom: 1.5rem;">
-                        <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">변경 사유</h4>
-                        <div style="padding: 1rem; background: #F9FAFB; border-radius: 0.5rem; white-space: pre-line;">
-                            ${change.reason}
-                        </div>
-                    </div>
-
-                    <!-- 첨부 파일 -->
-                    ${change.attachments && change.attachments.length > 0 ? `
-                        <div>
-                            <h4 style="font-weight: 600; color: #1F2937; margin-bottom: 1rem;">📎 첨부 파일</h4>
-                            ${change.attachments.map(file => `
-                                <div style="padding: 0.75rem; border: 1px solid #E5E7EB; border-radius: 0.5rem; margin-bottom: 0.5rem;">
-                                    <i class="fas fa-file"></i> ${file}
-                                    <button onclick="downloadFile('${file}')" class="btn btn-sm btn-secondary" style="float: right;">
-                                        <i class="fas fa-download"></i>
-                                    </button>
-                                </div>
-                            `).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="modal-footer">
-                    <button onclick="closeModal()" class="btn btn-primary">확인</button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.getElementById('modal-container').innerHTML = modalContent;
+function cancelTitleForm() {
+    const currentTitle = DataService.getCurrentTitle();
+    document.getElementById('title-korean').value = currentTitle.korean || '';
+    document.getElementById('title-english').value = currentTitle.english || '';
 }
 
-function formatDateTime2(dateStr) {
-    const date = new Date(dateStr);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
-    return `${year}-${month}-${day} ${hours}:${minutes}`;
-}
+// 초기화
+document.addEventListener('DOMContentLoaded', () => {
+    if (document.getElementById('title-change-screen')) {
+        renderTitleChange();
+    }
+});
 
-function downloadFile(filename) {
-    alert(`${filename} 다운로드 (데모)`);
-}
-
-function closeModal() {
-    document.getElementById('modal-container').innerHTML = '';
-}
+console.log('✅ title-change.js 로드 완료');

@@ -1771,15 +1771,15 @@ const views = {
         `;
     },
 
-    // ========== 논문 제목 변경 신청 관리 ==========
+    // ========== 논문 제목 등록 현황 ==========
     titleChangeRequests: () => {
         const data = appData.titleChangeRequests;
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">논문 제목 변경 신청 관리</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">논문 제목 등록 현황</h3>
 
-                    <!-- 검색 메뉴 (학위논문 심사관리와 동일하되 심사구분, 심사일, 심사상태 제거) -->
+                    <!-- 검색 메뉴 -->
                     <div class="search-container">
                         <div class="search-grid">
                             <!-- 1. 학년도 -->
@@ -1816,16 +1816,6 @@ const views = {
                                 <input type="text" id="title-search-student-name" placeholder="성명 입력"
                                        class="search-input">
                             </div>
-
-                            <!-- 5. 상태 -->
-                            <div class="search-field">
-                                <label class="search-label">상태</label>
-                                <select id="title-search-status" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="대기">대기</option>
-                                    <option value="승인">승인</option>
-                                </select>
-                            </div>
                         </div>
 
                         <!-- 검색/초기화 버튼 -->
@@ -1851,10 +1841,9 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">현재 논문 제목</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">변경 논문 제목</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">신청일</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">상태</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목 (국문)</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목 (영문)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
@@ -1868,25 +1857,16 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
-                                        <div class="truncate" title="${item.currentTitle}">
-                                            ${item.currentTitle}
+                                        <div class="truncate" title="${item.titleKo || item.currentTitle || '-'}">
+                                            ${item.titleKo || item.currentTitle || '-'}
                                         </div>
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
-                                        <div class="truncate" title="${item.newTitle}">
-                                            ${item.newTitle}
+                                        <div class="truncate" title="${item.titleEn || item.newTitle || '-'}">
+                                            ${item.titleEn || item.newTitle || '-'}
                                         </div>
                                     </td>
-                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.requestDate || '-'}</td>
-                                    <td class="py-3 px-4 text-center">
-                                        <span class="text-xs px-3 py-1.5 rounded-full ${
-                                            item.status === '승인' ? 'bg-green-100 text-green-700' :
-                                            item.status === '대기' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-gray-100 text-gray-700'
-                                        }">
-                                            ${item.status}
-                                        </span>
-                                    </td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
                                     <td class="py-3 px-4 text-center">
                                         <button onclick="viewTitleChangeDetail(${item.id})"
                                                 class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
@@ -1896,8 +1876,8 @@ const views = {
                                 </tr>
                             `).join('') : `
                                 <tr>
-                                    <td colspan="11" class="py-8 text-center text-gray-500">
-                                        논문 제목 변경 신청 내역이 없습니다.
+                                    <td colspan="10" class="py-8 text-center text-gray-500">
+                                        논문 제목 등록 내역이 없습니다.
                                     </td>
                                 </tr>
                             `}
