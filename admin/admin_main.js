@@ -1276,10 +1276,6 @@ function viewStageDetail(stageId) {
                     <div class="mt-3 pt-3 border-t border-gray-200">
                         <div class="text-xs text-gray-600 mb-1">평가표</div>
                         <div class="text-sm font-medium text-blue-600">${step.evaluationCriteriaName}</div>
-                        <button onclick="viewEvaluationCriteria(${step.evaluationCriteriaId})" 
-                                class="mt-2 text-xs text-blue-600 hover:underline">
-                            <i class="fas fa-eye"></i> 평가표 상세보기
-                        </button>
                     </div>
                 ` : '<div class="text-xs text-gray-500 mt-2">평가 없음</div>'}
             </div>
@@ -1374,10 +1370,6 @@ function viewStageDetail(stageId) {
                                             <div class="font-medium text-gray-800">${step.evaluationCriteriaName}</div>
                                         </div>
                                     </div>
-                                    <button onclick="viewEvaluationCriteria(${step.evaluationCriteriaId})" 
-                                            class="mt-3 px-4 py-2 bg-green-600 text-white rounded text-sm hover:bg-green-700">
-                                        <i class="fas fa-clipboard-list"></i> 평가표 보기
-                                    </button>
                                 </div>
                             `).join('')}
                             ${stage.steps.filter(s => s.hasEvaluation).length === 0 ? `

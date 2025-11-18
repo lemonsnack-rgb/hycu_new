@@ -1175,18 +1175,11 @@ function openStageModal(id = null) {
             
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">워크플로우명 <span class="text-red-600">*</span></label>
-                <input type="text" id="stage-name" value="${item.name || ''}" 
+                <input type="text" id="stage-name" value="${item.name || ''}"
                        placeholder="예: 2025-1학기 교육공학 석사 표준 계획"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
             </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">버전</label>
-                <input type="text" id="stage-version" value="${item.version || 'v1.0'}" 
-                       placeholder="예: v1.0"
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
-            </div>
-            
+
             <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
                 <div class="flex">
                     <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -1231,20 +1224,18 @@ function openStageModal(id = null) {
             const major = document.getElementById('stage-major').value;
             const degree = document.getElementById('stage-degree').value;
             const name = document.getElementById('stage-name').value.trim();
-            const version = document.getElementById('stage-version').value.trim();
-            
+
             if (!major || !degree || !name) {
                 showAlert('필수 항목을 모두 입력해주세요.');
                 return;
             }
-            
+
             if (isEdit) {
                 // 수정: 기존 steps 유지
                 const index = appData.stages.findIndex(s => s.id === id);
                 appData.stages[index].name = name;
                 appData.stages[index].major = major;
                 appData.stages[index].degree = degree;
-                appData.stages[index].version = version;
                 
                 closeModal();
                 showAlert('워크플로우가 수정되었습니다.');
@@ -1256,7 +1247,6 @@ function openStageModal(id = null) {
                     name: name,
                     major: major,
                     degree: degree,
-                    version: version,
                     stageCount: 0,
                     evaluationCount: 0,
                     steps: []
@@ -1316,10 +1306,6 @@ function viewStageDetail(id) {
                     <div>
                         <label class="text-xs font-medium text-gray-500">워크플로우명</label>
                         <p class="text-sm font-bold text-gray-800 mt-1">${workflow.name}</p>
-                    </div>
-                    <div>
-                        <label class="text-xs font-medium text-gray-500">버전</label>
-                        <p class="text-sm text-gray-800 mt-1">${workflow.version}</p>
                     </div>
                     <div>
                         <label class="text-xs font-medium text-gray-500">학과</label>
@@ -1392,6 +1378,12 @@ function viewStageDetail(id) {
                                                 '<span class="px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">평가안함</span>'
                                             }
                                         </div>
+                                        ${step.startDate || step.endDate ? `
+                                            <p class="text-xs text-gray-600 mt-1">
+                                                <i class="fas fa-calendar text-blue-600 mr-1"></i>
+                                                일정: ${step.startDate || '-'} ~ ${step.endDate || '-'}
+                                            </p>
+                                        ` : ''}
                                         ${step.hasEvaluation ? `
                                             <p class="text-xs text-gray-600 mt-1">
                                                 <i class="fas fa-check-circle text-green-600 mr-1"></i>
@@ -1757,6 +1749,24 @@ function editWorkflowStages(workflowId) {
                                                placeholder="단계명 입력"
                                                class="w-full border border-gray-300 rounded px-2 py-1 text-sm"
                                                onchange="updateTempStageName(${idx}, this.value)">
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="text-xs text-gray-600">시작일</label>
+                                                <input type="date"
+                                                       id="stage-start-${idx}"
+                                                       value="${stage.startDate || ''}"
+                                                       class="w-full border border-gray-300 rounded px-2 py-1 text-xs"
+                                                       onchange="updateTempStageDate(${idx}, 'start', this.value)">
+                                            </div>
+                                            <div>
+                                                <label class="text-xs text-gray-600">종료일</label>
+                                                <input type="date"
+                                                       id="stage-end-${idx}"
+                                                       value="${stage.endDate || ''}"
+                                                       class="w-full border border-gray-300 rounded px-2 py-1 text-xs"
+                                                       onchange="updateTempStageDate(${idx}, 'end', this.value)">
+                                            </div>
+                                        </div>
                                         <div class="flex items-center gap-2">
                                             <label class="flex items-center text-sm">
                                                 <input type="checkbox"
@@ -1883,6 +1893,16 @@ function addStageFromType() {
 function updateTempStageName(idx, value) {
     if (window._tempWorkflowStages[idx]) {
         window._tempWorkflowStages[idx].name = value;
+    }
+}
+
+function updateTempStageDate(idx, type, value) {
+    if (window._tempWorkflowStages[idx]) {
+        if (type === 'start') {
+            window._tempWorkflowStages[idx].startDate = value;
+        } else if (type === 'end') {
+            window._tempWorkflowStages[idx].endDate = value;
+        }
     }
 }
 
@@ -4598,6 +4618,7 @@ window.addWorkflowStep = addWorkflowStep;
 window.editWorkflowStages = editWorkflowStages;
 window.addStageFromType = addStageFromType;
 window.updateTempStageName = updateTempStageName;
+window.updateTempStageDate = updateTempStageDate;
 window.toggleTempStageEvaluation = toggleTempStageEvaluation;
 window.updateTempStageCriteria = updateTempStageCriteria;
 window.removeTempStage = removeTempStage;
