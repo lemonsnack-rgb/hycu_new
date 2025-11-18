@@ -1,36 +1,37 @@
-// Phase 3 재설계: 랩미팅관리 화면
+// Phase 3 재설계: 랩미팅관리 화면 (개선판)
 
-let currentMeetingTab = 'approved'; // ID 34: 예정된 미팅이 첫번째 탭
+let currentMeetingTab = 'confirmed'; // 확정됨이 첫번째 탭
 
 function initMeetingV2() {
-    console.log('미팅관리 V2 초기화');
+    console.log('✅ 미팅관리 V2 초기화');
     renderMeetingMainV2();
 }
 
 function renderMeetingMainV2() {
     const content = document.getElementById('meeting-content-area');
     if (!content) return;
-    
-    // ID 34: 탭 순서 변경 - 예정된 미팅 → 신청 목록 → 일정 설정 → 완료된 미팅
+
+    const stats = DataService.getMeetingStats();
+
     content.innerHTML = `
         <div class="meeting-tabs mb-6">
-            <button onclick="changeMeetingTab('approved')" class="tab-btn ${currentMeetingTab==='approved'?'active':''}">
-                ✅ 예정된 미팅 (${DataService.getMeetingStatsV2().approved})
+            <button onclick="changeMeetingTab('confirmed')" class="tab-btn ${currentMeetingTab==='confirmed'?'active':''}">
+                예정된 미팅 (${stats.confirmed})
             </button>
-            <button onclick="changeMeetingTab('requests')" class="tab-btn ${currentMeetingTab==='requests'?'active':''}">
-                ⏳ 신청 목록 (${DataService.getMeetingStatsV2().pending})
+            <button onclick="changeMeetingTab('waiting')" class="tab-btn ${currentMeetingTab==='waiting'?'active':''}">
+                신청 목록 (${stats.waiting})
             </button>
             <button onclick="changeMeetingTab('schedule')" class="tab-btn ${currentMeetingTab==='schedule'?'active':''}">
-                📅 일정 설정
+                일정 설정
             </button>
             <button onclick="changeMeetingTab('completed')" class="tab-btn ${currentMeetingTab==='completed'?'active':''}">
-                📼 완료된 미팅 (${DataService.getMeetingStatsV2().completed})
+                완료된 미팅 (${stats.completed})
             </button>
         </div>
-        
+
         <div id="meeting-tab-content"></div>
     `;
-    
+
     renderMeetingTabContent();
 }
 
@@ -42,71 +43,96 @@ function changeMeetingTab(tab) {
 function renderMeetingTabContent() {
     const tabContent = document.getElementById('meeting-tab-content');
     if (!tabContent) return;
-    
+
     switch(currentMeetingTab) {
-        case 'schedule':
-            renderScheduleTab();
+        case 'waiting':
+            renderWaitingTab();
             break;
-        case 'requests':
-            renderRequestsTab();
-            break;
-        case 'approved':
-            renderApprovedTab();
+        case 'confirmed':
+            renderConfirmedTab();
             break;
         case 'completed':
             renderCompletedTab();
             break;
+        case 'schedule':
+            renderScheduleTab();
+            break;
     }
 }
 
-// ==================== 일정 설정 탭 ====================
+// ==================== 시간 설정 탭 ====================
 function renderScheduleTab() {
     const slots = DataService.getAvailableSlots();
     const tabContent = document.getElementById('meeting-tab-content');
-    
+
     tabContent.innerHTML = `
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- 왼쪽: 캘린더 -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+            <!-- 좌측: 캘린더 조회 -->
             <div class="bg-white rounded-lg shadow-md p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold">미팅 가능 일정</h3>
-                    <div class="flex gap-2">
-                        <button onclick="openAddSlotModal('oneTime')" class="btn-secondary text-xs px-3 py-1">
-                            + 특정 날짜
-                        </button>
-                        <button onclick="openAddSlotModal('repeat')" class="btn-primary text-xs px-3 py-1">
-                            + 반복 일정
-                        </button>
-                    </div>
-                </div>
-                
-                <div id="calendar-container" class="mt-4"></div>
+                <h3 class="text-lg font-bold mb-4">캘린더</h3>
+                <div id="calendar-container"></div>
             </div>
-            
-            <!-- 오른쪽: 일정 목록 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold mb-4">등록된 일정</h3>
-                
-                <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                    <p class="text-sm text-blue-800">
-                        💡 학생들은 여기서 설정한 시간 중에서만 미팅을 신청할 수 있습니다.
-                    </p>
+
+            <!-- 우측: 등록한 일정 목록 및 액션 버튼 -->
+            <div class="space-y-6">
+                <!-- 액션 버튼 2개 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold mb-4">미팅 생성</h3>
+
+                    <div class="space-y-3">
+                        <!-- 1:1 미팅 시간 설정 -->
+                        <button onclick="openSetAvailableTimeModal()"
+                                class="w-full bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-left transition-colors"
+                                style="display: flex; align-items: center; justify-content: space-between; border: none; cursor: pointer;">
+                            <div>
+                                <div class="font-bold text-lg mb-1">📅 미팅 가능 시간 설정</div>
+                                <div class="text-sm text-blue-100">학생들이 예약 신청할 수 있습니다</div>
+                            </div>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+
+                        <!-- 그룹 미팅 생성 -->
+                        <button onclick="openCreateGroupMeetingModal()"
+                                class="w-full bg-green-500 hover:bg-green-600 text-white p-4 rounded-lg text-left transition-colors"
+                                style="display: flex; align-items: center; justify-content: space-between; border: none; cursor: pointer;">
+                            <div>
+                                <div class="font-bold text-lg mb-1">👥 그룹 미팅 생성</div>
+                                <div class="text-sm text-green-100">여러 학생을 직접 지정합니다</div>
+                            </div>
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
+                        <p class="text-sm text-blue-800">
+                            <strong>💡 안내</strong><br>
+                            • 1:1 미팅: 학생이 신청하면 승인 후 자동으로 Zoom 생성<br>
+                            • 그룹 미팅: 생성 즉시 Zoom 생성 및 학생에게 알림
+                        </p>
+                    </div>
                 </div>
-                
-                ${slots.length > 0 ? `
-                    <div class="space-y-3 max-h-[600px] overflow-y-auto">
-                        ${slots.map(slot => renderSlotCard(slot)).join('')}
-                    </div>
-                ` : `
-                    <div class="text-center py-12 text-gray-500">
-                        <p class="mb-4">설정된 일정이 없습니다</p>
-                        <p class="text-sm">캘린더에서 날짜를 클릭하거나<br>+ 버튼을 클릭하여 일정을 추가하세요</p>
-                    </div>
-                `}
+
+                <!-- 설정된 일정 목록 -->
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <h3 class="text-lg font-bold mb-4">설정된 미팅 가능 시간</h3>
+                    ${slots.length > 0 ? `
+                        <div class="space-y-3">
+                            ${slots.map(slot => renderSlotCard(slot)).join('')}
+                        </div>
+                    ` : `
+                        <div class="text-center py-12 text-gray-400">
+                            <p>설정된 시간이 없습니다</p>
+                        </div>
+                    `}
+                </div>
             </div>
         </div>
     `;
-    
+
     // 캘린더 초기화
     setTimeout(() => initCalendar(), 100);
 }
@@ -565,15 +591,247 @@ function confirmRejectV2(reqId) {
     setTimeout(() => renderMeetingMainV2(), 100);
 }
 
+// ==================== 신청 대기 탭 ====================
+function renderWaitingTab() {
+    const requests = DataService.getPendingRequests();
+    const tabContent = document.getElementById('meeting-tab-content');
+
+    tabContent.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-bold">신청 대기 중인 1:1 미팅 (${requests.length}건)</h3>
+                <p class="text-sm text-gray-600 mt-1">학생의 예약 신청을 승인하면 자동으로 Zoom 링크가 생성됩니다</p>
+            </div>
+
+            ${requests.length > 0 ? `
+                <div class="divide-y">
+                    ${requests.map(req => `
+                        <div class="p-6">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <span class="badge-yellow">대기 중</span>
+                                    <div class="text-xl font-bold mt-2">
+                                        ${req.selectedDate} (${getDayOfWeek(req.selectedDate)}) ${req.selectedTime}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                <div class="grid grid-cols-2 gap-4 mb-3">
+                                    <div>
+                                        <div class="text-sm text-gray-600">학생</div>
+                                        <div class="font-semibold">${req.studentName} (${req.studentNumber})</div>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm text-gray-600">신청 일시</div>
+                                        <div class="font-semibold">${formatDateTime(req.requestDate)}</div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="text-sm text-gray-600 mb-1">미팅 주제</div>
+                                    <div class="font-semibold">${req.topic}</div>
+                                </div>
+                                <div class="mt-3">
+                                    <div class="text-sm text-gray-600 mb-1">신청 내용</div>
+                                    <div class="text-sm">${req.description}</div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button onclick="approveRequest('${req.id}')"
+                                        class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
+                                    ✅ 승인 (자동 Zoom 생성)
+                                </button>
+                                <button onclick="rejectRequest('${req.id}')"
+                                        class="px-6 py-3 border-2 border-gray-300 hover:border-red-500 hover:text-red-500 rounded-lg font-semibold" style="background: none; cursor: pointer;">
+                                    거절
+                                </button>
+                            </div>
+
+                            <div class="mt-3 text-sm text-gray-500">
+                                ℹ️ 승인하면 시스템이 자동으로 Zoom 링크를 생성하고 학생에게 발송합니다
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            ` : `
+                <div class="p-12 text-center text-gray-400">
+                    <p>신청 대기 중인 미팅이 없습니다</p>
+                </div>
+            `}
+        </div>
+    `;
+}
+
+// ==================== 확정됨 탭 (1:1 + 그룹 통합) ====================
+function renderConfirmedTab() {
+    const meetings = DataService.getConfirmedMeetings();
+    const tabContent = document.getElementById('meeting-tab-content');
+
+    tabContent.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-bold">확정된 미팅 (${meetings.length}건)</h3>
+                <p class="text-sm text-gray-600 mt-1">Zoom 링크가 생성된 미팅입니다</p>
+            </div>
+
+            ${meetings.length > 0 ? `
+                <div class="divide-y">
+                    ${meetings.map(meeting => {
+                        const isGroup = meeting.type === 'group';
+                        return `
+                            <div class="p-6">
+                                <div class="flex gap-2 mb-2">
+                                    ${isGroup ?
+                                        '<span class="badge-green">그룹</span>' :
+                                        '<span class="badge-blue">1:1</span>'
+                                    }
+                                    <span class="badge-green">확정</span>
+                                </div>
+
+                                <div class="text-xl font-bold mb-2">
+                                    ${meeting.date || meeting.selectedDate} (${getDayOfWeek(meeting.date || meeting.selectedDate)}) ${meeting.startTime || meeting.selectedTime}
+                                </div>
+
+                                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                    ${isGroup ? `
+                                        <div class="text-sm text-gray-600 mb-2">참여 학생 (${meeting.participantCount}명)</div>
+                                        <div class="space-y-1">
+                                            ${meeting.participants.map(p => `
+                                                <div>• ${p.studentName} (${p.studentNumber})</div>
+                                            `).join('')}
+                                        </div>
+                                        ${meeting.topic ? `
+                                            <div class="mt-3 pt-3 border-t">
+                                                <div class="text-sm text-gray-600">주제</div>
+                                                <div class="font-semibold">${meeting.topic}</div>
+                                            </div>
+                                        ` : ''}
+                                    ` : `
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div class="text-sm text-gray-600">학생</div>
+                                                <div class="font-semibold">${meeting.studentName}</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-sm text-gray-600">승인일</div>
+                                                <div class="font-semibold">${formatDate(meeting.approvedDate)}</div>
+                                            </div>
+                                        </div>
+                                    `}
+                                </div>
+
+                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                    <div class="flex justify-between mb-2">
+                                        <div class="text-sm font-semibold text-blue-800">Zoom 링크</div>
+                                        <button onclick="copyToClipboard('${meeting.zoomJoinUrl}')"
+                                                class="text-xs bg-blue-500 text-white px-3 py-1 rounded" style="border: none; cursor: pointer;">
+                                            복사
+                                        </button>
+                                    </div>
+                                    <div class="text-sm text-blue-800 break-all">${meeting.zoomJoinUrl}</div>
+                                    ${meeting.zoomPassword ? `
+                                        <div class="mt-2 text-xs text-blue-700">
+                                            비밀번호: <span class="font-bold">${meeting.zoomPassword}</span>
+                                        </div>
+                                    ` : ''}
+                                </div>
+
+                                <div class="flex gap-3">
+                                    <button onclick="openZoomMeeting('${meeting.zoomStartUrl}')"
+                                            class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
+                                        🎥 Zoom 시작하기
+                                    </button>
+                                    <button onclick="cancelMeeting('${meeting.id}')"
+                                            class="px-6 py-3 border-2 border-red-300 text-red-600 rounded-lg font-semibold" style="background: none; cursor: pointer;">
+                                        취소
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            ` : `
+                <div class="p-12 text-center text-gray-400">
+                    <p>확정된 미팅이 없습니다</p>
+                </div>
+            `}
+        </div>
+    `;
+}
+
+// ==================== 취소됨 탭 ====================
+function renderCancelledTab() {
+    const meetings = DataService.getCancelledMeetings();
+    const tabContent = document.getElementById('meeting-tab-content');
+
+    tabContent.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-bold">취소된 미팅 (${meetings.length}건)</h3>
+            </div>
+
+            ${meetings.length > 0 ? `
+                <div class="divide-y">
+                    ${meetings.map(meeting => {
+                        const isGroup = meeting.type === 'group';
+                        return `
+                            <div class="p-6">
+                                <div class="flex gap-2 mb-2">
+                                    ${isGroup ? '<span class="badge-green">그룹</span>' : '<span class="badge-blue">1:1</span>'}
+                                    <span class="badge-red">취소됨</span>
+                                </div>
+
+                                <div class="text-xl font-bold mb-2">
+                                    ${meeting.date || meeting.selectedDate} (${getDayOfWeek(meeting.date || meeting.selectedDate)}) ${meeting.startTime || meeting.selectedTime}
+                                </div>
+
+                                <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                                    ${isGroup ? `
+                                        <div class="text-sm text-gray-600 mb-2">참여 학생 (${meeting.participantCount}명)</div>
+                                        <div class="space-y-1">
+                                            ${meeting.participants.map(p => `<div>• ${p.studentName}</div>`).join('')}
+                                        </div>
+                                    ` : `
+                                        <div>
+                                            <div class="text-sm text-gray-600">학생</div>
+                                            <div class="font-semibold">${meeting.studentName}</div>
+                                        </div>
+                                    `}
+                                </div>
+
+                                <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+                                    <div class="text-sm font-semibold text-red-800 mb-1">취소 사유</div>
+                                    <div class="text-sm text-red-700">${meeting.cancelReason || '(사유 없음)'}</div>
+                                    <div class="text-xs text-red-600 mt-2">취소일: ${formatDateTime(meeting.cancelledAt)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            ` : `
+                <div class="p-12 text-center text-gray-400">
+                    <p>취소된 미팅이 없습니다</p>
+                </div>
+            `}
+        </div>
+    `;
+}
+
 // Helper
 function getDayName(dayOfWeek) {
     const days = ['일', '월', '화', '수', '목', '금', '토'];
     return days[dayOfWeek] + '요일';
 }
 
+console.log('✅ meeting-v2.js 로드 완료 (개선판)');
+
 // Export
 window.initMeetingV2 = initMeetingV2;
 window.changeMeetingTab = changeMeetingTab;
+window.renderWaitingTab = renderWaitingTab;
+window.renderConfirmedTab = renderConfirmedTab;
+window.renderCancelledTab = renderCancelledTab;
 window.initCalendar = initCalendar;
 window.openAddSlotModal = openAddSlotModal;
 window.openAddSlotModalWithDate = openAddSlotModalWithDate;

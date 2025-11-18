@@ -265,4 +265,209 @@ function addStudentInfoIcon(studentName, studentId) {
     `;
 }
 
+// ==================== 미팅 관련 헬퍼 함수들 ====================
+
+// 날짜의 요일 구하기
+function getDayOfWeek(dateString) {
+    const days = ['일', '월', '화', '수', '목', '금', '토'];
+    const date = new Date(dateString);
+    return days[date.getDay()];
+}
+
+// 종료 시간 계산
+function calculateEndTime(startTime, duration) {
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const totalMinutes = hours * 60 + minutes + duration;
+    const endHours = Math.floor(totalMinutes / 60);
+    const endMinutes = totalMinutes % 60;
+    return `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+}
+
+// 오늘 날짜 (YYYY-MM-DD)
+function getTodayDate() {
+    return new Date().toISOString().split('T')[0];
+}
+
+// 시간 옵션 생성 (09:00 ~ 21:00, 30분 단위)
+function generateTimeOptions() {
+    const options = [];
+    for (let h = 9; h <= 21; h++) {
+        for (let m = 0; m < 60; m += 30) {
+            const time = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+            options.push(`<option value="${time}">${time}</option>`);
+        }
+    }
+    return options.join('');
+}
+
+// 클립보드 복사
+function copyToClipboard(text) {
+    if (!text) {
+        showNotification('복사할 내용이 없습니다', 'error');
+        return;
+    }
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => {
+            showNotification('클립보드에 복사되었습니다', 'success');
+        }).catch(err => {
+            console.error('복사 실패:', err);
+            showNotification('복사 실패', 'error');
+        });
+    } else {
+        // 구형 브라우저 fallback
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+        document.body.appendChild(textarea);
+        textarea.select();
+        try {
+            document.execCommand('copy');
+            showNotification('클립보드에 복사되었습니다', 'success');
+        } catch (err) {
+            console.error('복사 실패:', err);
+            showNotification('복사 실패', 'error');
+        }
+        document.body.removeChild(textarea);
+    }
+}
+
+// Zoom 열기
+function openZoomMeeting(url) {
+    if (!url) {
+        showNotification('Zoom 링크가 없습니다', 'error');
+        return;
+    }
+    window.open(url, '_blank');
+}
+
+function joinZoom(url) {
+    openZoomMeeting(url);
+}
+
+// 날짜 포맷팅
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ko-KR');
+}
+
+function formatDateTime(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('ko-KR');
+}
+
+// 로딩 표시
+function showLoading(message) {
+    // 기존 로딩이 있으면 제거
+    hideLoading();
+
+    const html = `
+        <div id="loading-overlay" style="position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                                          background: rgba(0,0,0,0.5); z-index: 9999;
+                                          display: flex; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 2rem; border-radius: 0.5rem; text-align: center; min-width: 200px;">
+                <div style="width: 40px; height: 40px; border: 4px solid #E5E7EB;
+                            border-top-color: #3B82F6; border-radius: 50%;
+                            animation: spin 1s linear infinite; margin: 0 auto 1rem;"></div>
+                <p style="color: #374151; font-weight: 500;">${message || '처리 중...'}</p>
+            </div>
+        </div>
+    `;
+    document.body.insertAdjacentHTML('beforeend', html);
+}
+
+function hideLoading() {
+    const loading = document.getElementById('loading-overlay');
+    if (loading) loading.remove();
+}
+
+// 알림 표시
+function showNotification(message, type) {
+    const colors = {
+        success: '#10B981',
+        error: '#EF4444',
+        warning: '#F59E0B',
+        info: '#3B82F6'
+    };
+
+    const notifId = 'notif-' + Date.now();
+    const html = `
+        <div id="${notifId}" style="position: fixed; top: 1rem; right: 1rem;
+                    background: ${colors[type] || colors.info};
+                    color: white; padding: 1rem 1.5rem; border-radius: 0.5rem;
+                    z-index: 10000; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+                    animation: slideIn 0.3s ease-out;">
+            ${message}
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+
+    setTimeout(() => {
+        const notif = document.getElementById(notifId);
+        if (notif) {
+            notif.style.animation = 'slideOut 0.3s ease-out';
+            setTimeout(() => notif.remove(), 300);
+        }
+    }, 3000);
+}
+
+// 모달 닫기
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.style.animation = 'fadeOut 0.2s ease-out';
+        setTimeout(() => modal.remove(), 200);
+    }
+}
+
+// 모달 생성 헬퍼
+function createModal(title, content, buttons) {
+    const modalId = 'modal-' + Date.now();
+    const buttonHtml = buttons ? buttons.map(btn => `
+        <button onclick="${btn.onclick}" class="${btn.className}"
+                style="flex: 1; padding: 0.75rem; border-radius: 0.375rem; font-weight: 600; border: none; cursor: pointer;">
+            ${btn.text}
+        </button>
+    `).join('') : '';
+
+    const html = `
+        <div id="${modalId}" class="modal-overlay" onclick="event.target === this && closeModal('${modalId}')">
+            <div class="modal-container" onclick="event.stopPropagation()">
+                <div class="modal-header">
+                    <h3 class="modal-title">${title}</h3>
+                    <button onclick="closeModal('${modalId}')" class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    ${content}
+                </div>
+                ${buttonHtml ? `
+                    <div style="display: flex; gap: 0.75rem; padding: 1.5rem; border-top: 1px solid #E5E7EB;">
+                        ${buttonHtml}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', html);
+
+    // ESC 키로 닫기
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            closeModal(modalId);
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+}
+
+// Toast 메시지 (기존 시스템과 호환)
+function showToast(message, type) {
+    showNotification(message, type);
+}
+
 console.log('✅ 공통 유틸리티 로드 완료');
