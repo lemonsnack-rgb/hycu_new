@@ -1841,9 +1841,8 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목 (국문)</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목 (영문)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일(수정일)</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
@@ -1856,14 +1855,9 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
+                                    <td class="py-3 px-4 text-sm text-gray-600 max-w-md">
                                         <div class="truncate" title="${item.titleKo || item.currentTitle || '-'}">
                                             ${item.titleKo || item.currentTitle || '-'}
-                                        </div>
-                                    </td>
-                                    <td class="py-3 px-4 text-sm text-gray-600 max-w-xs">
-                                        <div class="truncate" title="${item.titleEn || item.newTitle || '-'}">
-                                            ${item.titleEn || item.newTitle || '-'}
                                         </div>
                                     </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
