@@ -227,10 +227,7 @@ function showRequirementsModal() {
                     
                     <div style="background: #EFF6FF; padding: 1rem; border-radius: 0.5rem; border-left: 4px solid #3B82F6;">
                         <p style="font-weight: 600; color: #1E40AF; margin-bottom: 0.5rem;">
-                            📌 전체 완료율: 약 ${DataService.calculateProgress()}%
-                        </p>
-                        <p style="font-size: 0.875rem; color: #1E40AF;">
-                            현재 ${requirements.filter(r => r.completed).length}/${requirements.length}개 항목 완료
+                            📌 안내 문구가 삽입되는 위치입니다
                         </p>
                     </div>
                 </div>
