@@ -735,8 +735,18 @@ const DataService = {
     getReviews: () => StudentData.reviews,
     
     getTitleChanges: () => StudentData.titleChanges,
-    
+
     getCurrentTitle: () => StudentData.currentTitle,
+
+    updateTitle: (titleData) => {
+        if (!StudentData.currentTitle.registrationDate) {
+            StudentData.currentTitle.registrationDate = new Date().toISOString().split('T')[0];
+        }
+        StudentData.currentTitle.korean = titleData.korean;
+        StudentData.currentTitle.english = titleData.english;
+        StudentData.currentTitle.lastModifiedDate = titleData.lastModifiedDate;
+        return StudentData.currentTitle;
+    },
 
     // 자료실 관련 메서드
     getResourceBoards: () => StudentData.resourceBoards || [],
