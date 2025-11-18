@@ -104,14 +104,8 @@ function renderJournalSubmissionList() {
         <!-- 안내사항 -->
         <div style="margin-top: 1.5rem; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0.5rem; padding: 1rem;">
             <h4 style="font-weight: 600; color: #1E40AF; margin-bottom: 0.75rem;">
-                📌 학술지 대체 심사 안내
+                📌 안내 문구가 삽입되는 위치입니다
             </h4>
-            <ul style="font-size: 0.875rem; color: #1E40AF; padding-left: 1.25rem; margin: 0;">
-                <li style="margin-bottom: 0.5rem;">SCI, SSCI, SCIE 등급 학술지 게재 시 최종 논문 심사를 대체할 수 있습니다</li>
-                <li style="margin-bottom: 0.5rem;">제출 후에는 수정이 불가하오니 신중히 입력해주세요</li>
-                <li style="margin-bottom: 0.5rem;">관리자 승인 후 지도교수의 최종 확인이 필요합니다</li>
-                <li>자세한 사항은 지도교수 또는 관리자에게 문의하세요</li>
-            </ul>
         </div>
     `;
 

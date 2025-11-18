@@ -107,14 +107,8 @@ function renderTitleChange() {
         <div class="card" style="background: #EFF6FF; border: 1px solid #BFDBFE;">
             <div class="card-body">
                 <h4 style="font-weight: 600; color: #1E40AF; margin-bottom: 0.75rem;">
-                    📌 제목 변경 안내
+                    📌 안내 문구가 삽입되는 위치입니다
                 </h4>
-                <ul style="font-size: 0.875rem; color: #1E40AF; padding-left: 1.25rem;">
-                    <li style="margin-bottom: 0.5rem;">논문 제목은 연구 진행 중 변경 가능합니다.</li>
-                    <li style="margin-bottom: 0.5rem;">변경 신청 후 관리자의 승인이 필요합니다.</li>
-                    <li style="margin-bottom: 0.5rem;">심사 단계별로 제목 변경이 제한될 수 있습니다.</li>
-                    <li>최종 심사 이후에는 제목 변경이 불가합니다.</li>
-                </ul>
             </div>
         </div>
     `;

@@ -469,7 +469,7 @@ function renderRequestCard(req) {
             
             ${slot ? `
                 <div class="text-xs text-gray-500 mb-3">
-                    📌 학생이 선택한 교수 가능 시간: ${getDayName(slot.dayOfWeek)} ${slot.time} (${slot.duration}분)
+                    📌 안내 문구가 삽입되는 위치입니다
                 </div>
             ` : ''}
             
