@@ -174,20 +174,21 @@ function renderThesisInfo(assignment) {
 
 // ==================== 평가표 (심플 버전 + Pass/Fail 지원) ====================
 function renderEvaluationForm(template, existingEvaluation) {
-    const savedData = existingEvaluation || { scores: [], passFailResults: [] };
-    
+    const savedData = existingEvaluation || { scores: [], passFailResults: [], gradeResults: [] };
+
     // Pass/Fail 방식
     if (template.evaluationType === 'passfail') {
         return renderPassFailForm(template, savedData);
     }
-    
+
+    // 등급형 방식
+    if (template.evaluationType === 'grade') {
+        return renderGradeForm(template, savedData);
+    }
+
     // 점수형 방식 (기존)
-    // 통과 기준 정보 추출
-    const criteria = template.passingCriteria || {};
-    const rules = criteria.rules || [];
-    const minRule = rules.find(r => r.type === 'minimum') || { value: 60 };
-    const avgRule = rules.find(r => r.type === 'average') || { value: 70 };
-    const totalRule = rules.find(r => r.type === 'total') || { value: 70, maxValue: 100 };
+    const passCriteria = template.passCriteria || template.passingCriteria || {};
+    const totalScore = template.totalScore || 100;
 
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -196,110 +197,84 @@ function renderEvaluationForm(template, existingEvaluation) {
             <!-- 평가 기준 안내 -->
             <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
                 <h4 class="font-bold text-blue-900 mb-3 flex items-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
+                    <i class="fas fa-info-circle mr-2"></i>
                     평가 기준 안내
                 </h4>
                 <div class="space-y-2 text-sm text-blue-900">
                     <p class="flex items-center">
                         <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
-                        <span>각 항목 최소 <strong class="font-bold">${minRule.value}점 이상</strong> (과락)</span>
+                        <span>${passCriteria.description || '평가 기준이 설정되지 않았습니다.'}</span>
                     </p>
                     <p class="flex items-center">
                         <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
-                        <span>전체 평균 <strong class="font-bold">${avgRule.value}점 이상</strong></span>
-                    </p>
-                    <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
-                        <span>총점 <strong class="font-bold">${totalRule.value}점 이상</strong> (${totalRule.maxValue}점 만점)</span>
+                        <span>총점 ${totalScore}점 만점</span>
                     </p>
                 </div>
             </div>
-            
+
             <div id="evaluation-categories" class="space-y-4">
-                ${template.categories.map((category, index) => {
-                    const savedScore = savedData.scores.find(s => s.categoryId === category.id);
+                ${(template.items || template.categories || []).map((item, index) => {
+                    const savedScore = savedData.scores.find(s => s.categoryId === item.id || s.itemId === item.id);
                     const currentScore = savedScore?.score || 0;
                     const currentComment = savedScore?.comment || '';
-                    
+                    const maxScore = item.score || item.maxScore || 0;
+
                     return `
-                        <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4" 
-                             data-category-id="${category.id}">
-                            
-                            <!-- Grid: 제목 영역 | 가중치 (고정 너비) -->
-                            <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                                <div>
+                        <div class="evaluation-item bg-white border-2 border-gray-300 rounded-lg p-4"
+                             data-category-id="${item.id}">
+
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
                                     <h4 class="font-bold text-gray-800 mb-1">
-                                        ${index + 1}. ${category.name}
+                                        ${index + 1}. ${item.name}
                                     </h4>
-                                    <p class="text-sm text-gray-600">${category.description}</p>
+                                    ${item.description ? `<p class="text-sm text-gray-600">${item.description}</p>` : ''}
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-xs text-gray-500">가중치</div>
-                                    <div class="text-lg font-bold text-blue-600">${category.weight}%</div>
+                                <div class="text-right ml-4 flex-shrink-0">
+                                    <span class="text-2xl font-bold text-[#009DE8]">${maxScore}</span>
+                                    <span class="text-sm text-gray-600">점</span>
                                 </div>
                             </div>
-                            
-                            <!-- Grid: 점수 입력 (고정 너비) -->
-                            <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
-                                <label class="text-sm font-medium text-gray-700">점수:</label>
-                                <input type="number" 
-                                       class="score-input w-full" 
-                                       min="0" 
-                                       max="${category.maxScore}"
+
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
+                                <input type="number"
+                                       class="score-input w-full border border-gray-300 rounded-lg p-2"
+                                       min="0"
+                                       max="${maxScore}"
                                        step="0.5"
                                        value="${currentScore}"
-                                       data-category-id="${category.id}"
-                                       data-max="${category.maxScore}"
-                                       data-weight="${category.weight}">
-                                <span class="text-sm text-gray-600">/ ${category.maxScore}점</span>
-                                <span></span>
-                            </div>
-                            
-                            <!-- Grid: 가중 점수 표시 -->
-                            <div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">
-                                <span></span>
-                                <div class="text-sm text-gray-500">
-                                    → 가중 점수: 
-                                    <span class="weighted-score text-base font-bold text-blue-600">
-                                        ${calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1)}점
-                                    </span>
-                                    <span class="text-xs text-gray-400">(${category.weight}% 적용)</span>
-                                </div>
-                            </div>
-                            
-                            <!-- 평가 의견 -->
-                            <div>
-                                <label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>
-                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm" 
-                                          rows="2" 
+                                       placeholder="0 ~ ${maxScore}점"
+                                       data-category-id="${item.id}"
+                                       data-max="${maxScore}">
+
+                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
+                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm"
+                                          rows="2"
                                           placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                          data-category-id="${category.id}">${currentComment}</textarea>
+                                          data-category-id="${item.id}">${currentComment}</textarea>
                             </div>
                         </div>
                     `;
                 }).join('')}
             </div>
-            
+
             <!-- 총점 -->
-            <div class="mt-6 bg-blue-50 border-2 border-blue-200 rounded-lg p-4">
+            <div class="mt-6 bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
                 <div class="flex items-center justify-between">
                     <h4 class="text-lg font-bold text-gray-800">총점</h4>
-                    <div id="total-score" class="text-3xl font-bold text-blue-600">0.0점</div>
+                    <div id="total-score" class="text-3xl font-bold text-gray-400">0 / ${totalScore}점</div>
                 </div>
-                <div class="text-sm text-gray-600 mt-1 text-right">100점 만점 (합격 기준: ${template.passingScore}점)</div>
             </div>
-            
-            <!-- 종합 의견 (ID 51: 간소화) -->
+
+            <!-- 종합 의견 -->
             <div class="mt-6">
                 <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
-                <textarea id="overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm" 
-                          rows="4" 
+                <textarea id="overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                          rows="4"
                           placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment?.combined || savedData.overallComment?.conclusion || ''}</textarea>
             </div>
-            
+
             <!-- 버튼 -->
             <div class="mt-6 flex gap-3">
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
@@ -315,94 +290,101 @@ function renderEvaluationForm(template, existingEvaluation) {
 
 // ==================== Pass/Fail 평가표 ====================
 function renderPassFailForm(template, savedData) {
+    const passCriteria = template.passCriteria || {};
+
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
-            
-            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <p class="text-sm text-blue-800">
+
+            <!-- 평가 기준 안내 -->
+            <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    평가 기준 안내
+                </h4>
+                <p class="text-sm text-blue-900">
                     <strong>안내:</strong> 각 항목에 대해 Pass 또는 Fail을 선택해주세요.
-                    ${template.passingCriteria === 'all' ? '모든 항목이 Pass여야 합격입니다.' : '과반수가 Pass면 합격입니다.'}
+                    ${passCriteria.description || '통과 기준이 설정되지 않았습니다.'}
                 </p>
             </div>
-            
+
             <div id="passfail-items" class="space-y-4">
                 ${template.items.map((item, index) => {
                     const savedResult = savedData.passFailResults?.find(r => r.itemId === item.id);
                     const currentResult = savedResult?.result || '';
                     const currentComment = savedResult?.comment || '';
-                    
+
                     return `
-                        <div class="passfail-item bg-white border border-gray-300 rounded-lg p-4" 
+                        <div class="passfail-item bg-white border-2 border-gray-300 rounded-lg p-4"
                              data-item-id="${item.id}">
-                            <!-- 제목 -->
-                            <div class="flex items-start justify-between mb-3">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 mb-1">
-                                        ${index + 1}. ${item.name}
-                                        ${item.required ? '<span class="text-red-600 text-sm ml-1">[필수]</span>' : ''}
-                                    </h4>
-                                    <p class="text-sm text-gray-600">${item.description}</p>
-                                </div>
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${index + 1}. ${item.name}
+                                </h4>
+                                ${item.description ? `
+                                    <div class="mt-2 bg-gray-50 border border-gray-300 rounded p-3">
+                                        <p class="text-xs text-gray-900 font-medium mb-1">판단 기준:</p>
+                                        <p class="text-xs text-gray-700">${item.description}</p>
+                                    </div>
+                                ` : ''}
                             </div>
-                            
-                            <!-- Pass/Fail 선택 -->
-                            <div class="flex items-center gap-4 mb-3">
-                                <label class="text-sm font-medium text-gray-700">판정:</label>
-                                <div class="flex gap-3">
-                                    <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'} hover:border-green-400">
-                                        <input type="radio" 
-                                               name="result-${item.id}" 
-                                               value="pass" 
-                                               class="passfail-radio"
-                                               data-item-id="${item.id}"
-                                               ${currentResult === 'pass' ? 'checked' : ''}>
-                                        <span class="font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
-                                    </label>
-                                    <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'} hover:border-red-400">
-                                        <input type="radio" 
-                                               name="result-${item.id}" 
-                                               value="fail" 
-                                               class="passfail-radio"
-                                               data-item-id="${item.id}"
-                                               ${currentResult === 'fail' ? 'checked' : ''}>
-                                        <span class="font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
-                                    </label>
+
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4">
+                                    <label class="text-sm font-medium text-gray-700">판정:</label>
+                                    <div class="flex gap-3">
+                                        <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'} hover:border-green-400">
+                                            <input type="radio"
+                                                   name="result-${item.id}"
+                                                   value="pass"
+                                                   class="passfail-radio"
+                                                   data-item-id="${item.id}"
+                                                   ${currentResult === 'pass' ? 'checked' : ''}>
+                                            <span class="font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'} hover:border-red-400">
+                                            <input type="radio"
+                                                   name="result-${item.id}"
+                                                   value="fail"
+                                                   class="passfail-radio"
+                                                   data-item-id="${item.id}"
+                                                   ${currentResult === 'fail' ? 'checked' : ''}>
+                                            <span class="font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-                            
-                            <!-- 평가 의견 -->
-                            <div>
-                                <label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>
-                                <textarea class="passfail-comment w-full border border-gray-300 rounded-lg p-2 text-sm" 
-                                          rows="2" 
-                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                          data-item-id="${item.id}">${currentComment}</textarea>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 block">평가 의견:</label>
+                                    <textarea class="passfail-comment w-full border border-gray-300 rounded-lg p-2 text-sm mt-1"
+                                              rows="2"
+                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                              data-item-id="${item.id}">${currentComment}</textarea>
+                                </div>
                             </div>
                         </div>
                     `;
                 }).join('')}
             </div>
-            
+
             <!-- 최종 결과 -->
             <div class="mt-6 bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
                 <div class="flex items-center justify-between">
                     <h4 class="text-lg font-bold text-gray-800">최종 결과</h4>
                     <div id="passfail-result" class="text-2xl font-bold text-gray-400">미완료</div>
                 </div>
-                <div class="text-sm text-gray-600 mt-1 text-right" id="passfail-summary">
-                    ${template.passingCriteria === 'all' ? '모든 항목 Pass 필요' : '과반수 Pass 필요'}
-                </div>
+                <p class="text-sm text-gray-600 mt-1 text-right" id="passfail-summary">
+                    ${passCriteria.description || '통과 기준 설정 필요'}
+                </p>
             </div>
-            
+
             <!-- 종합 의견 -->
             <div class="mt-6">
                 <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
-                <textarea id="passfail-overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm" 
-                          rows="3" 
-                          placeholder="전체적인 평가 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
+                <textarea id="passfail-overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                          rows="4"
+                          placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
             </div>
-            
+
             <!-- 버튼 -->
             <div class="mt-6 flex gap-3">
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
@@ -416,9 +398,111 @@ function renderPassFailForm(template, savedData) {
     `;
 }
 
-// ==================== 가중 점수 계산 ====================
-function calculateWeightedScore(score, maxScore, weight) {
-    return (score / maxScore) * weight;
+// ==================== 등급형 평가표 ====================
+function renderGradeForm(template, savedData) {
+    const passCriteria = template.passCriteria || {};
+
+    return `
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
+
+            <!-- 평가 기준 안내 -->
+            <div class="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-purple-900 mb-3 flex items-center">
+                    <i class="fas fa-info-circle mr-2"></i>
+                    평가 기준 안내
+                </h4>
+                <div class="space-y-2 text-sm text-purple-900">
+                    <p class="flex items-center">
+                        <span class="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
+                        <span>각 항목을 A, B, C, D, F 등급으로 평가합니다.</span>
+                    </p>
+                    <p class="flex items-center">
+                        <span class="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
+                        <span>${passCriteria.description || '통과 기준이 설정되지 않았습니다.'}</span>
+                    </p>
+                </div>
+            </div>
+
+            <div id="grade-items" class="space-y-4">
+                ${template.items.map((item, index) => {
+                    const savedResult = savedData.gradeResults?.find(r => r.itemId === item.id);
+                    const currentGrade = savedResult?.grade || '';
+                    const currentComment = savedResult?.comment || '';
+
+                    return `
+                        <div class="grade-item bg-white border-2 border-gray-300 rounded-lg p-4"
+                             data-item-id="${item.id}">
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${index + 1}. ${item.name}
+                                </h4>
+                                ${item.description ? `
+                                    <div class="mt-2 bg-purple-50 border border-purple-200 rounded p-3">
+                                        <p class="text-xs text-purple-900 font-medium mb-1">등급 기준:</p>
+                                        <p class="text-xs text-gray-700 whitespace-pre-line">${item.description}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <div class="space-y-3">
+                                <label class="text-sm font-medium text-gray-700">등급 선택:</label>
+                                <div class="flex gap-2">
+                                    ${['A', 'B', 'C', 'D', 'F'].map(grade => `
+                                        <label class="flex items-center justify-center cursor-pointer p-3 rounded-lg border-2 ${currentGrade === grade ? 'border-purple-500 bg-purple-50' : 'border-gray-300 bg-white'} hover:border-purple-400 flex-1">
+                                            <input type="radio"
+                                                   name="grade-${item.id}"
+                                                   value="${grade}"
+                                                   class="grade-radio hidden"
+                                                   data-item-id="${item.id}"
+                                                   ${currentGrade === grade ? 'checked' : ''}>
+                                            <span class="font-bold ${currentGrade === grade ? 'text-purple-700' : 'text-gray-700'}">${grade}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 block mt-3">평가 의견:</label>
+                                    <textarea class="grade-comment w-full border border-gray-300 rounded-lg p-2 text-sm mt-1"
+                                              rows="2"
+                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                              data-item-id="${item.id}">${currentComment}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <!-- 최종 평가 -->
+            <div class="mt-6 bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-lg font-bold text-purple-900">최종 평가</h4>
+                    <div id="grade-result" class="text-2xl font-bold text-gray-400">미완료</div>
+                </div>
+                <p class="text-sm text-purple-800 mt-1 text-right" id="grade-summary">
+                    ${passCriteria.description || '통과 기준 설정 필요'}
+                </p>
+            </div>
+
+            <!-- 종합 의견 -->
+            <div class="mt-6">
+                <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
+                <textarea id="grade-overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                          rows="4"
+                          placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="mt-6 flex gap-3">
+                <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
+                    임시저장
+                </button>
+                <button id="submit-evaluation-btn" class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-lg hover:bg-[#0087c9] font-medium">
+                    최종 제출
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 // ==================== 제출된 평가 표시 (읽기 모드) ====================
@@ -537,8 +621,8 @@ function renderSubmittedEvaluation(template, evaluation) {
 
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p class="text-sm text-blue-800">
-                    <strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요.
-                    가중치가 적용되어 최종 점수가 계산됩니다.
+                    <strong>안내:</strong> 각 항목별로 점수를 입력해주세요.
+                    입력하신 점수가 합산되어 총점이 계산됩니다.
                 </p>
             </div>
 
@@ -552,53 +636,30 @@ function renderSubmittedEvaluation(template, evaluation) {
                         <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4"
                              data-category-id="${category.id}">
 
-                            <!-- Grid: 제목 영역 | 가중치 (고정 너비) -->
-                            <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 mb-1">
-                                        ${index + 1}. ${category.name}
-                                    </h4>
-                                    <p class="text-sm text-gray-600">${category.description}</p>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-xs text-gray-500">가중치</div>
-                                    <div class="text-lg font-bold text-blue-600">${category.weight}%</div>
-                                </div>
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${index + 1}. ${category.name}
+                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${category.maxScore}</span>
+                                    <span class="text-sm text-gray-600">점</span>
+                                </h4>
+                                <p class="text-sm text-gray-600 mt-1">${category.description}</p>
                             </div>
 
-                            <!-- Grid: 점수 입력 (고정 너비, 읽기 모드) -->
-                            <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
-                                <label class="text-sm font-medium text-gray-700">점수:</label>
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
                                 <input type="number"
-                                       class="score-input w-full bg-gray-50"
+                                       class="score-input w-full border border-gray-300 rounded-lg p-2 mt-2 bg-gray-50"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
                                        value="${currentScore}"
+                                       placeholder="0 ~ ${category.maxScore}점"
                                        data-category-id="${category.id}"
                                        data-max="${category.maxScore}"
-                                       data-weight="${category.weight}"
                                        disabled>
-                                <span class="text-sm text-gray-600">/ ${category.maxScore}점</span>
-                                <span></span>
-                            </div>
 
-                            <!-- Grid: 가중 점수 표시 -->
-                            <div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">
-                                <span></span>
-                                <div class="text-sm text-gray-500">
-                                    → 가중 점수:
-                                    <span class="weighted-score text-base font-bold text-blue-600">
-                                        ${calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1)}점
-                                    </span>
-                                    <span class="text-xs text-gray-400">(${category.weight}% 적용)</span>
-                                </div>
-                            </div>
-
-                            <!-- 평가 의견 (읽기 모드) -->
-                            <div>
-                                <label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>
-                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
+                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
+                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm mt-2 bg-gray-50"
                                           rows="2"
                                           placeholder="해당 항목에 대한 의견을 작성해주세요"
                                           data-category-id="${category.id}"
@@ -727,8 +788,8 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
 
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
                 <p class="text-sm text-blue-800">
-                    <strong>안내:</strong> 각 항목별로 0-10점 사이의 점수를 입력해주세요.
-                    가중치가 적용되어 최종 점수가 계산됩니다.
+                    <strong>안내:</strong> 각 항목별로 점수를 입력해주세요.
+                    입력하신 점수가 합산되어 총점이 계산됩니다.
                 </p>
             </div>
 
@@ -740,36 +801,31 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
 
                     return `
                         <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                            <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 mb-1">${index + 1}. ${category.name}</h4>
-                                    <p class="text-sm text-gray-600">${category.description}</p>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-xs text-gray-500">가중치</div>
-                                    <div class="text-lg font-bold text-blue-600">${category.weight}%</div>
-                                </div>
-                            </div>
-
-                            <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
-                                <label class="text-sm font-medium text-gray-700">점수:</label>
-                                <input type="number" class="w-full bg-gray-50" min="0" max="${category.maxScore}" step="0.5" value="${currentScore}" disabled>
-                                <span class="text-sm text-gray-600">/ ${category.maxScore}점</span>
-                                <span></span>
-                            </div>
-
-                            <div class="grid grid-cols-[60px_1fr] gap-3 items-center mb-4">
-                                <span></span>
-                                <div class="text-sm text-gray-500">
-                                    → 가중 점수:
-                                    <span class="text-base font-bold text-blue-600">${calculateWeightedScore(currentScore, category.maxScore, category.weight).toFixed(1)}점</span>
-                                    <span class="text-xs text-gray-400">(${category.weight}% 적용)</span>
-                                </div>
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${index + 1}. ${category.name}
+                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${category.maxScore}</span>
+                                    <span class="text-sm text-gray-600">점</span>
+                                </h4>
+                                <p class="text-sm text-gray-600 mt-1">${category.description}</p>
                             </div>
 
                             <div>
-                                <label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>
-                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>${currentComment}</textarea>
+                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
+                                <input type="number"
+                                       class="w-full border border-gray-300 rounded-lg p-2 mt-2 bg-gray-50"
+                                       min="0"
+                                       max="${category.maxScore}"
+                                       step="0.5"
+                                       value="${currentScore}"
+                                       placeholder="0 ~ ${category.maxScore}점"
+                                       disabled>
+
+                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-2 bg-gray-50"
+                                          rows="2"
+                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                          disabled>${currentComment}</textarea>
                             </div>
                         </div>
                     `;
@@ -796,33 +852,41 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
 function bindEvaluationEvents(detail, isSubmitted, isChair, allSubmitted) {
     if (!isSubmitted) {
         const template = detail.template;
-        
+
         // Pass/Fail 방식
         if (template.evaluationType === 'passfail') {
             // Pass/Fail 라디오 버튼 이벤트
             document.querySelectorAll('.passfail-radio').forEach(radio => {
                 radio.addEventListener('change', updatePassFailResult);
             });
-            
+
             // 초기 결과 계산
             updatePassFailResult();
+        } else if (template.evaluationType === 'grade') {
+            // 등급형 방식
+            document.querySelectorAll('.grade-radio').forEach(radio => {
+                radio.addEventListener('change', updateGradeResult);
+            });
+
+            // 초기 결과 계산
+            updateGradeResult();
         } else {
             // 점수형 방식 (기존)
             document.querySelectorAll('.score-input').forEach(input => {
-                input.addEventListener('input', updateScoreDisplay);
+                input.addEventListener('input', calculateTotalScore);
                 input.addEventListener('change', calculateTotalScore);
             });
-            
+
             // 초기 총점 계산
             calculateTotalScore();
         }
-        
+
         // 임시저장 버튼
         const saveDraftBtn = document.getElementById('save-draft-btn');
         if (saveDraftBtn) {
             saveDraftBtn.addEventListener('click', () => saveDraft(detail));
         }
-        
+
         // 제출 버튼
         const submitBtn = document.getElementById('submit-evaluation-btn');
         if (submitBtn) {
@@ -870,35 +934,75 @@ function updatePassFailResult() {
     }
 }
 
-// ==================== 점수 표시 업데이트 ====================
-function updateScoreDisplay(e) {
-    const input = e.target;
-    const container = input.closest('.evaluation-item');
-    const weightedScoreEl = container.querySelector('.weighted-score');
-    
-    const score = parseFloat(input.value) || 0;
-    const max = parseFloat(input.dataset.max);
-    const weight = parseFloat(input.dataset.weight);
-    
-    const weighted = calculateWeightedScore(score, max, weight);
-    weightedScoreEl.textContent = `${weighted.toFixed(1)}점`;
+// ==================== 등급형 결과 업데이트 ====================
+function updateGradeResult() {
+    const items = document.querySelectorAll('.grade-item');
+    let gradedCount = 0;
+    const totalCount = items.length;
+    const grades = { A: 0, B: 0, C: 0, D: 0, F: 0 };
+
+    items.forEach(item => {
+        const itemId = item.dataset.itemId;
+        const selected = item.querySelector(`.grade-radio[data-item-id="${itemId}"]:checked`);
+        if (selected) {
+            gradedCount++;
+            grades[selected.value]++;
+        }
+    });
+
+    const resultEl = document.getElementById('grade-result');
+    const summaryEl = document.getElementById('grade-summary');
+
+    if (gradedCount < totalCount) {
+        resultEl.textContent = '미완료';
+        resultEl.className = 'text-2xl font-bold text-gray-400';
+        summaryEl.textContent = `${gradedCount}/${totalCount} 항목 평가됨`;
+    } else {
+        // 평균 등급 계산 (A=4, B=3, C=2, D=1, F=0)
+        const gradePoints = { A: 4, B: 3, C: 2, D: 1, F: 0 };
+        let totalPoints = 0;
+        Object.keys(grades).forEach(grade => {
+            totalPoints += grades[grade] * gradePoints[grade];
+        });
+        const avgPoint = totalPoints / totalCount;
+
+        // 평균 점수를 등급으로 변환
+        let avgGrade = 'F';
+        if (avgPoint >= 3.5) avgGrade = 'A';
+        else if (avgPoint >= 2.5) avgGrade = 'B';
+        else if (avgPoint >= 1.5) avgGrade = 'C';
+        else if (avgPoint >= 0.5) avgGrade = 'D';
+
+        resultEl.textContent = avgGrade;
+        resultEl.className = `text-2xl font-bold ${avgGrade === 'A' || avgGrade === 'B' ? 'text-purple-600' : avgGrade === 'C' ? 'text-blue-600' : 'text-red-600'}`;
+        summaryEl.textContent = `A:${grades.A} B:${grades.B} C:${grades.C} D:${grades.D} F:${grades.F}`;
+    }
 }
 
 // ==================== 총점 계산 ====================
 function calculateTotalScore() {
     let total = 0;
+    let maxTotal = 0;
+
     document.querySelectorAll('.evaluation-item').forEach(item => {
         const input = item.querySelector('.score-input');
         const score = parseFloat(input.value) || 0;
-        const max = parseFloat(input.dataset.max);
-        const weight = parseFloat(input.dataset.weight);
-        
-        total += calculateWeightedScore(score, max, weight);
+        const max = parseFloat(input.dataset.max) || 0;
+
+        total += score;
+        maxTotal += max;
     });
-    
+
     const totalEl = document.getElementById('total-score');
     if (totalEl) {
-        totalEl.textContent = `${total.toFixed(1)}점`;
+        totalEl.textContent = `${total.toFixed(1)} / ${maxTotal}점`;
+
+        // 색상 업데이트
+        if (total > 0) {
+            totalEl.className = 'text-3xl font-bold text-[#009DE8]';
+        } else {
+            totalEl.className = 'text-3xl font-bold text-gray-400';
+        }
     }
 }
 
@@ -935,27 +1039,27 @@ function submitEvaluation(detail) {
 // ==================== 평가 데이터 수집 ====================
 function collectEvaluationData() {
     const template = EVALUATION_TEMPLATES[currentAssignmentId];
-    
+
     // Pass/Fail 방식
     if (template && template.evaluationType === 'passfail') {
         const passFailResults = [];
-        
+
         document.querySelectorAll('.passfail-item').forEach(item => {
             const itemId = item.dataset.itemId;
             const selected = item.querySelector(`.passfail-radio[data-item-id="${itemId}"]:checked`);
             const comment = item.querySelector(`.passfail-comment[data-item-id="${itemId}"]`);
-            
+
             passFailResults.push({
                 itemId: itemId,
                 result: selected ? selected.value : null,
                 comment: comment ? comment.value.trim() : ''
             });
         });
-        
+
         const passCount = passFailResults.filter(r => r.result === 'pass').length;
         const totalCount = passFailResults.length;
         const passed = passCount === totalCount; // 모든 항목 Pass
-        
+
         return {
             evaluationType: 'passfail',
             passFailResults,
@@ -965,27 +1069,66 @@ function collectEvaluationData() {
             overallComment: document.getElementById('passfail-overall-comment')?.value.trim() || ''
         };
     }
-    
-    // 점수형 방식 (기존)
+
+    // 등급형 방식
+    if (template && template.evaluationType === 'grade') {
+        const gradeResults = [];
+
+        document.querySelectorAll('.grade-item').forEach(item => {
+            const itemId = item.dataset.itemId;
+            const selected = item.querySelector(`.grade-radio[data-item-id="${itemId}"]:checked`);
+            const comment = item.querySelector(`.grade-comment[data-item-id="${itemId}"]`);
+
+            gradeResults.push({
+                itemId: itemId,
+                grade: selected ? selected.value : null,
+                comment: comment ? comment.value.trim() : ''
+            });
+        });
+
+        // 평균 등급 계산
+        const gradePoints = { A: 4, B: 3, C: 2, D: 1, F: 0 };
+        const grades = gradeResults.filter(r => r.grade !== null);
+        const totalPoints = grades.reduce((sum, r) => sum + gradePoints[r.grade], 0);
+        const avgPoint = grades.length > 0 ? totalPoints / grades.length : 0;
+
+        let avgGrade = 'F';
+        if (avgPoint >= 3.5) avgGrade = 'A';
+        else if (avgPoint >= 2.5) avgGrade = 'B';
+        else if (avgPoint >= 1.5) avgGrade = 'C';
+        else if (avgPoint >= 0.5) avgGrade = 'D';
+
+        return {
+            evaluationType: 'grade',
+            gradeResults,
+            averageGrade: avgGrade,
+            overallComment: document.getElementById('grade-overall-comment')?.value.trim() || ''
+        };
+    }
+
+    // 점수형 방식
     const scores = [];
-    
+    let total = 0;
+
     document.querySelectorAll('.evaluation-item').forEach(item => {
         const input = item.querySelector('.score-input');
         const comment = item.querySelector('.score-comment');
-        
+
+        const itemId = input.dataset.categoryId;
+        const score = parseFloat(input.value) || 0;
+        const maxScore = parseFloat(input.dataset.max) || 0;
+
         scores.push({
-            categoryId: input.dataset.categoryId,
-            score: parseFloat(input.value) || 0,
-            weight: parseFloat(input.dataset.weight),
+            categoryId: itemId,
+            itemId: itemId,
+            score: score,
+            maxScore: maxScore,
             comment: comment.value.trim()
         });
+
+        total += score;
     });
-    
-    const total = scores.reduce((sum, s) => {
-        const max = parseFloat(document.querySelector(`[data-category-id="${s.categoryId}"]`).dataset.max);
-        return sum + calculateWeightedScore(s.score, max, s.weight);
-    }, 0);
-    
+
     return {
         evaluationType: 'score',
         scores,
@@ -1003,35 +1146,61 @@ function validateEvaluationData(data, template) {
         // 모든 항목 평가 완료 확인
         const allEvaluated = data.passFailResults.every(r => r.result !== null);
         if (!allEvaluated) {
+            showToast('모든 항목을 평가해주세요', 'error');
             return false;
         }
-        
+
         // 종합 의견 확인
         if (!data.overallComment) {
+            showToast('종합 의견을 입력해주세요', 'error');
             return false;
         }
-        
+
         return true;
     }
-    
-    // 점수형 방식 (기존)
+
+    // 등급형 방식
+    if (data.evaluationType === 'grade') {
+        // 모든 항목 평가 완료 확인
+        const allEvaluated = data.gradeResults.every(r => r.grade !== null);
+        if (!allEvaluated) {
+            showToast('모든 항목에 등급을 선택해주세요', 'error');
+            return false;
+        }
+
+        // 종합 의견 확인
+        if (!data.overallComment) {
+            showToast('종합 의견을 입력해주세요', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    // 점수형 방식
+    const itemCount = template.items?.length || template.categories?.length || 0;
+
     // 모든 항목 점수 입력 확인
-    if (data.scores.length !== template.categories.length) {
+    if (data.scores.length !== itemCount) {
+        showToast('모든 항목을 평가해주세요', 'error');
         return false;
     }
-    
+
     // 점수 범위 확인
     for (const score of data.scores) {
         if (score.score === 0 || score.score === null) {
+            showToast('모든 항목에 점수를 입력해주세요', 'error');
             return false;
         }
     }
-    
+
     // 종합 의견 입력 확인
-    if (!data.overallComment.strengths || !data.overallComment.improvements || !data.overallComment.conclusion) {
+    const overallComment = data.overallComment?.combined || data.overallComment?.conclusion || '';
+    if (!overallComment) {
+        showToast('종합 의견을 입력해주세요', 'error');
         return false;
     }
-    
+
     return true;
 }
 
@@ -1307,3 +1476,6 @@ function submitChairDecision() {
 
 window.selectDecision = selectDecision;
 window.submitChairDecision = submitChairDecision;
+
+console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-19-002');
+console.log('   renderEvaluationForm:', typeof renderEvaluationForm);

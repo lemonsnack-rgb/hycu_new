@@ -2535,15 +2535,26 @@ function viewEvaluationDetail(id) {
                                     <span class="text-sm font-bold text-gray-400">${idx + 1}.</span>
                                     <div class="flex-1">
                                         <p class="text-sm font-bold text-gray-800">${item.name}</p>
-                                        <p class="text-xs text-gray-600 mt-1">${item.description || ''}</p>
+                                        ${evalType === 'score' ?
+                                            `<p class="text-xs text-gray-600 mt-1">${item.description || ''}</p>` :
+                                          evalType === 'grade' ?
+                                            `<div class="mt-2 bg-purple-50 border border-purple-200 rounded p-2">
+                                                <p class="text-xs text-purple-900 font-medium mb-1">등급 기준:</p>
+                                                <p class="text-xs text-gray-700 whitespace-pre-line">${item.description || ''}</p>
+                                            </div>` :
+                                            `<div class="mt-2 bg-gray-50 border border-gray-300 rounded p-2">
+                                                <p class="text-xs text-gray-900 font-medium mb-1">판단 기준:</p>
+                                                <p class="text-xs text-gray-700">${item.description || ''}</p>
+                                            </div>`
+                                        }
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-3">
                                     ${evalType === 'score' ?
                                         `<span class="text-lg font-bold text-[#009DE8]">${item.score || 0}점</span>` :
                                       evalType === 'grade' ?
-                                        `<span class="text-sm text-gray-600">등급 평가</span>` :
-                                        `<span class="text-sm text-gray-600">Pass/Fail</span>`
+                                        `<span class="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-800">A/B/C/D/F</span>` :
+                                        `<span class="px-2 py-1 text-xs rounded-full bg-gray-200 text-gray-800">Pass/Fail</span>`
                                     }
                                     <div class="flex gap-1">
                                         <button onclick="editEvaluationItem(${id}, ${item.id})"
@@ -2755,19 +2766,39 @@ function addEvaluationItem(criteriaId) {
             ` : ''}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    설명
+                    ${evalType === 'grade' ? '등급 기준 설명' : evalType === 'passfail' ? '판단 기준 설명' : '설명'}
+                    ${evalType !== 'score' ? '<span class="text-red-600">*</span>' : ''}
                 </label>
                 <textarea id="item-description"
-                          placeholder="이 평가 항목에 대한 설명${evalType === 'grade' ? ' (등급별 평가 기준을 설명해주세요)' : evalType === 'passfail' ? ' (Pass/Fail 판단 기준을 설명해주세요)' : ''}"
-                          rows="3"
+                          placeholder="${evalType === 'grade' ?
+                              'A: 매우 우수함\nB: 우수함\nC: 보통\nD: 미흡함\nF: 불합격' :
+                            evalType === 'passfail' ?
+                              'Pass/Fail을 판단하는 구체적인 기준을 작성해주세요.\n예: 연구 윤리 지침을 모두 준수하고 필수 서류가 완비된 경우 Pass' :
+                              '이 평가 항목에 대한 설명'}"
+                          rows="${evalType === 'grade' ? '5' : '3'}"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
             </div>
-            ${evalType === 'grade' || evalType === 'passfail' ? `
-                <div class="bg-blue-50 border border-blue-200 rounded p-3">
-                    <p class="text-sm text-blue-800">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        ${evalType === 'grade' ? '등급형 평가: 교수가 평가 시 A/B/C/D/F 등급으로 평가합니다.' : 'Pass/Fail형 평가: 교수가 평가 시 합격/불합격으로 평가합니다.'}
+            ${evalType === 'grade' ? `
+                <div class="bg-purple-50 border border-purple-200 rounded p-3">
+                    <p class="text-sm font-bold text-purple-900 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>등급형 평가 안내
                     </p>
+                    <ul class="text-xs text-purple-800 space-y-1 ml-5 list-disc">
+                        <li>교수가 평가 시 A, B, C, D, F 중 하나를 선택합니다.</li>
+                        <li>각 등급의 의미를 명확하게 설명해주세요.</li>
+                        <li>예시처럼 한 줄에 하나씩 작성하면 읽기 쉽습니다.</li>
+                    </ul>
+                </div>
+            ` : evalType === 'passfail' ? `
+                <div class="bg-gray-50 border border-gray-300 rounded p-3">
+                    <p class="text-sm font-bold text-gray-900 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>Pass/Fail형 평가 안내
+                    </p>
+                    <ul class="text-xs text-gray-700 space-y-1 ml-5 list-disc">
+                        <li>교수가 평가 시 Pass(합격) 또는 Fail(불합격)을 선택합니다.</li>
+                        <li>Pass로 판단하는 명확한 기준을 작성해주세요.</li>
+                        <li>정성적 평가 또는 체크리스트 방식으로 활용됩니다.</li>
+                    </ul>
                 </div>
             ` : ''}
         </div>
@@ -2779,6 +2810,12 @@ function addEvaluationItem(criteriaId) {
 
         if (!name) {
             showAlert('평가 항목명을 입력하세요.');
+            return;
+        }
+
+        // 등급형과 Pass/Fail형은 설명이 필수
+        if ((evalType === 'grade' || evalType === 'passfail') && !description) {
+            showAlert(evalType === 'grade' ? '등급 기준 설명을 입력하세요.' : '판단 기준 설명을 입력하세요.');
             return;
         }
 
@@ -2845,18 +2882,34 @@ function editEvaluationItem(criteriaId, itemId) {
             ` : ''}
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                    설명
+                    ${evalType === 'grade' ? '등급 기준 설명' : evalType === 'passfail' ? '판단 기준 설명' : '설명'}
+                    ${evalType !== 'score' ? '<span class="text-red-600">*</span>' : ''}
                 </label>
                 <textarea id="item-description"
-                          rows="3"
+                          rows="${evalType === 'grade' ? '5' : '3'}"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${item.description || ''}</textarea>
             </div>
-            ${evalType === 'grade' || evalType === 'passfail' ? `
-                <div class="bg-blue-50 border border-blue-200 rounded p-3">
-                    <p class="text-sm text-blue-800">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        ${evalType === 'grade' ? '등급형 평가: 교수가 평가 시 A/B/C/D/F 등급으로 평가합니다.' : 'Pass/Fail형 평가: 교수가 평가 시 합격/불합격으로 평가합니다.'}
+            ${evalType === 'grade' ? `
+                <div class="bg-purple-50 border border-purple-200 rounded p-3">
+                    <p class="text-sm font-bold text-purple-900 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>등급형 평가 안내
                     </p>
+                    <ul class="text-xs text-purple-800 space-y-1 ml-5 list-disc">
+                        <li>교수가 평가 시 A, B, C, D, F 중 하나를 선택합니다.</li>
+                        <li>각 등급의 의미를 명확하게 설명해주세요.</li>
+                        <li>예시처럼 한 줄에 하나씩 작성하면 읽기 쉽습니다.</li>
+                    </ul>
+                </div>
+            ` : evalType === 'passfail' ? `
+                <div class="bg-gray-50 border border-gray-300 rounded p-3">
+                    <p class="text-sm font-bold text-gray-900 mb-2">
+                        <i class="fas fa-info-circle mr-2"></i>Pass/Fail형 평가 안내
+                    </p>
+                    <ul class="text-xs text-gray-700 space-y-1 ml-5 list-disc">
+                        <li>교수가 평가 시 Pass(합격) 또는 Fail(불합격)을 선택합니다.</li>
+                        <li>Pass로 판단하는 명확한 기준을 작성해주세요.</li>
+                        <li>정성적 평가 또는 체크리스트 방식으로 활용됩니다.</li>
+                    </ul>
                 </div>
             ` : ''}
         </div>
@@ -2868,6 +2921,12 @@ function editEvaluationItem(criteriaId, itemId) {
 
         if (!name) {
             showAlert('평가 항목명을 입력하세요.');
+            return;
+        }
+
+        // 등급형과 Pass/Fail형은 설명이 필수
+        if ((evalType === 'grade' || evalType === 'passfail') && !description) {
+            showAlert(evalType === 'grade' ? '등급 기준 설명을 입력하세요.' : '판단 기준 설명을 입력하세요.');
             return;
         }
 
@@ -2898,7 +2957,11 @@ function deleteEvaluationItem(criteriaId, itemId) {
 
         criteria.items = criteria.items.filter(i => i.id !== itemId);
         criteria.itemCount = criteria.items.length;
-        criteria.totalScore = criteria.items.reduce((sum, item) => sum + item.score, 0);
+
+        // Only calculate totalScore for score-type evaluations
+        if (criteria.evaluationType === 'score') {
+            criteria.totalScore = criteria.items.reduce((sum, item) => sum + (item.score || 0), 0);
+        }
 
         showAlert('평가 항목이 삭제되었습니다.');
         viewEvaluationDetail(criteriaId);
@@ -4567,3 +4630,241 @@ window.updateTempStageCriteria = updateTempStageCriteria;
 window.removeTempStage = removeTempStage;
 window.moveTempStageUp = moveTempStageUp;
 window.moveTempStageDown = moveTempStageDown;
+
+// ========== 평가표 미리보기 ==========
+function previewEvaluationForm(criteriaId) {
+    const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
+    if (!criteria) {
+        showAlert('평가표를 찾을 수 없습니다.');
+        return;
+    }
+
+    const evalType = criteria.evaluationType || 'score';
+    let content = '';
+
+    if (evalType === 'score') {
+        // 점수형 미리보기
+        content = `
+            <div class="space-y-4">
+                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                    <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        평가 기준 안내
+                    </h4>
+                    <div class="space-y-2 text-sm text-blue-900">
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
+                            <span>${criteria.passCriteria?.description || '통과 기준 설정 필요'}</span>
+                        </p>
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
+                            <span>총점 ${criteria.totalScore || 0}점 만점</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    ${criteria.items.map((item, idx) => `
+                        <div class="evaluation-item bg-white border-2 border-gray-300 rounded-lg p-4">
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${idx + 1}. ${item.name}
+                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${item.score || 0}</span>
+                                    <span class="text-sm text-gray-600">점</span>
+                                </h4>
+                                ${item.description ? `<p class="text-sm text-gray-600 mt-1">${item.description}</p>` : ''}
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
+                                <input type="number"
+                                       class="w-full border border-gray-300 rounded-lg p-2 mt-2"
+                                       min="0"
+                                       max="${item.score || 0}"
+                                       step="0.5"
+                                       placeholder="0 ~ ${item.score || 0}점"
+                                       disabled>
+
+                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-2"
+                                          rows="2"
+                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                          disabled></textarea>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-lg font-bold text-gray-800">총점</h4>
+                        <div class="text-3xl font-bold text-gray-400">0 / ${criteria.totalScore || 0}점</div>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else if (evalType === 'grade') {
+        // 등급형 미리보기
+        content = `
+            <div class="space-y-4">
+                <div class="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
+                    <h4 class="font-bold text-purple-900 mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        평가 기준 안내
+                    </h4>
+                    <div class="space-y-2 text-sm text-purple-900">
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
+                            <span>각 항목을 A, B, C, D, F 등급으로 평가합니다.</span>
+                        </p>
+                        <p class="flex items-center">
+                            <span class="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
+                            <span>${criteria.passCriteria?.description || '통과 기준 설정 필요'}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    ${criteria.items.map((item, idx) => `
+                        <div class="bg-white border-2 border-gray-300 rounded-lg p-4">
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${idx + 1}. ${item.name}
+                                </h4>
+                                ${item.description ? `
+                                    <div class="mt-2 bg-purple-50 border border-purple-200 rounded p-3">
+                                        <p class="text-xs text-purple-900 font-medium mb-1">등급 기준:</p>
+                                        <p class="text-xs text-gray-700 whitespace-pre-line">${item.description}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <div class="space-y-3">
+                                <label class="text-sm font-medium text-gray-700">등급 선택:</label>
+                                <div class="flex gap-2">
+                                    ${['A', 'B', 'C', 'D', 'F'].map(grade => `
+                                        <label class="flex items-center justify-center cursor-pointer p-3 rounded-lg border-2 border-gray-300 bg-white hover:border-purple-400 flex-1">
+                                            <input type="radio" name="grade-preview-${idx}" value="${grade}" class="hidden" disabled>
+                                            <span class="font-bold text-gray-700">${grade}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 block mt-3">평가 의견:</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-1"
+                                              rows="2"
+                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                              disabled></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="bg-purple-50 border-2 border-purple-300 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-lg font-bold text-purple-900">최종 평가</h4>
+                        <div class="text-2xl font-bold text-gray-400">미완료</div>
+                    </div>
+                    <p class="text-sm text-purple-800 mt-1 text-right">
+                        ${criteria.passCriteria?.description || '통과 기준 설정 필요'}
+                    </p>
+                </div>
+            </div>
+        `;
+    } else {
+        // Pass/Fail형 미리보기
+        content = `
+            <div class="space-y-4">
+                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4">
+                    <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        평가 기준 안내
+                    </h4>
+                    <p class="text-sm text-blue-900">
+                        <strong>안내:</strong> 각 항목에 대해 Pass 또는 Fail을 선택해주세요.
+                        ${criteria.passCriteria?.description || '통과 기준 설정 필요'}
+                    </p>
+                </div>
+
+                <div class="space-y-4">
+                    ${criteria.items.map((item, idx) => `
+                        <div class="bg-white border-2 border-gray-300 rounded-lg p-4">
+                            <div class="mb-3">
+                                <h4 class="font-bold text-gray-800 mb-1">
+                                    ${idx + 1}. ${item.name}
+                                </h4>
+                                ${item.description ? `
+                                    <div class="mt-2 bg-gray-50 border border-gray-300 rounded p-3">
+                                        <p class="text-xs text-gray-900 font-medium mb-1">판단 기준:</p>
+                                        <p class="text-xs text-gray-700">${item.description}</p>
+                                    </div>
+                                ` : ''}
+                            </div>
+
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-4">
+                                    <label class="text-sm font-medium text-gray-700">판정:</label>
+                                    <div class="flex gap-3">
+                                        <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 border-gray-300 bg-white hover:border-green-400">
+                                            <input type="radio" name="pf-preview-${idx}" value="pass" disabled>
+                                            <span class="font-medium text-gray-700">Pass</span>
+                                        </label>
+                                        <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 border-gray-300 bg-white hover:border-red-400">
+                                            <input type="radio" name="pf-preview-${idx}" value="fail" disabled>
+                                            <span class="font-medium text-gray-700">Fail</span>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-sm font-medium text-gray-700 block">평가 의견:</label>
+                                    <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-1"
+                                              rows="2"
+                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                              disabled></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+
+                <div class="bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-lg font-bold text-gray-800">최종 결과</h4>
+                        <div class="text-2xl font-bold text-gray-400">미완료</div>
+                    </div>
+                    <p class="text-sm text-gray-600 mt-1 text-right">
+                        ${criteria.passCriteria?.description || '통과 기준 설정 필요'}
+                    </p>
+                </div>
+            </div>
+        `;
+    }
+
+    const evalTypeLabel = evalType === 'score' ? '점수형' : evalType === 'grade' ? '등급형' : 'Pass/Fail형';
+    const fullContent = `
+        <div class="mb-4">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-xl font-bold text-gray-800">${criteria.name}</h3>
+                <span class="px-3 py-1 text-sm rounded-full ${
+                    evalType === 'score' ? 'bg-blue-100 text-blue-800' :
+                    evalType === 'grade' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'
+                }">
+                    ${evalTypeLabel}
+                </span>
+            </div>
+            <p class="text-sm text-gray-600">${criteria.description || ''}</p>
+        </div>
+        <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-3 mb-4">
+            <p class="text-sm text-yellow-900">
+                <i class="fas fa-eye mr-2"></i>
+                <strong>미리보기 모드:</strong> 이 화면은 교수가 평가를 진행할 때 보게 되는 화면입니다. 입력은 비활성화되어 있습니다.
+            </p>
+        </div>
+        ${content}
+    `;
+
+    openModal('평가표 미리보기', fullContent, '닫기', closeModal, true);
+}
+
+window.previewEvaluationForm = previewEvaluationForm;
