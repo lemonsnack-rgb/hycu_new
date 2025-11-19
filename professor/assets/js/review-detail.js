@@ -190,6 +190,8 @@ function renderEvaluationForm(template, existingEvaluation) {
     const passCriteria = template.passCriteria || template.passingCriteria || {};
     const totalScore = template.totalScore || 100;
 
+    alert('renderEvaluationForm 실행됨! 항목 수: ' + (template.items || template.categories || []).length);
+
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
