@@ -4731,16 +4731,18 @@ function previewEvaluationForm(criteriaId) {
                 <div class="space-y-4">
                     ${criteria.items.map((item, idx) => `
                         <div class="bg-white border-2 border-gray-300 rounded-lg p-4">
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${idx + 1}. ${item.name}
-                                </h4>
-                                ${item.description ? `
-                                    <div class="mt-2 bg-purple-50 border border-purple-200 rounded p-3">
-                                        <p class="text-xs text-purple-900 font-medium mb-1">등급 기준:</p>
-                                        <p class="text-xs text-gray-700 whitespace-pre-line">${item.description}</p>
-                                    </div>
-                                ` : ''}
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-1">
+                                        ${idx + 1}. ${item.name}
+                                    </h4>
+                                    ${item.description ? `
+                                        <div class="mt-2 bg-purple-50 border border-purple-200 rounded p-3">
+                                            <p class="text-xs text-purple-900 font-medium mb-1">등급 기준:</p>
+                                            <p class="text-xs text-gray-700 whitespace-pre-line">${item.description}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
 
                             <div class="space-y-3">
@@ -4794,16 +4796,18 @@ function previewEvaluationForm(criteriaId) {
                 <div class="space-y-4">
                     ${criteria.items.map((item, idx) => `
                         <div class="bg-white border-2 border-gray-300 rounded-lg p-4">
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${idx + 1}. ${item.name}
-                                </h4>
-                                ${item.description ? `
-                                    <div class="mt-2 bg-gray-50 border border-gray-300 rounded p-3">
-                                        <p class="text-xs text-gray-900 font-medium mb-1">판단 기준:</p>
-                                        <p class="text-xs text-gray-700">${item.description}</p>
-                                    </div>
-                                ` : ''}
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-1">
+                                        ${idx + 1}. ${item.name}
+                                    </h4>
+                                    ${item.description ? `
+                                        <div class="mt-2 bg-gray-50 border border-gray-300 rounded p-3">
+                                            <p class="text-xs text-gray-900 font-medium mb-1">판단 기준:</p>
+                                            <p class="text-xs text-gray-700">${item.description}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
 
                             <div class="space-y-3">
