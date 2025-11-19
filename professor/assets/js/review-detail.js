@@ -636,19 +636,23 @@ function renderSubmittedEvaluation(template, evaluation) {
                         <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4"
                              data-category-id="${category.id}">
 
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${index + 1}. ${category.name}
-                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${category.maxScore}</span>
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-1">
+                                        ${index + 1}. ${category.name}
+                                    </h4>
+                                    <p class="text-sm text-gray-600">${category.description}</p>
+                                </div>
+                                <div class="text-right ml-4 flex-shrink-0">
+                                    <span class="text-2xl font-bold text-[#009DE8]">${category.maxScore}</span>
                                     <span class="text-sm text-gray-600">점</span>
-                                </h4>
-                                <p class="text-sm text-gray-600 mt-1">${category.description}</p>
+                                </div>
                             </div>
 
                             <div>
-                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
                                 <input type="number"
-                                       class="score-input w-full border border-gray-300 rounded-lg p-2 mt-2 bg-gray-50"
+                                       class="score-input w-full border border-gray-300 rounded-lg p-2 bg-gray-50"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
@@ -658,8 +662,8 @@ function renderSubmittedEvaluation(template, evaluation) {
                                        data-max="${category.maxScore}"
                                        disabled>
 
-                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
-                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm mt-2 bg-gray-50"
+                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
+                                <textarea class="score-input w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
                                           rows="2"
                                           placeholder="해당 항목에 대한 의견을 작성해주세요"
                                           data-category-id="${category.id}"
@@ -801,19 +805,23 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
 
                     return `
                         <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${index + 1}. ${category.name}
-                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${category.maxScore}</span>
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-1">
+                                        ${index + 1}. ${category.name}
+                                    </h4>
+                                    <p class="text-sm text-gray-600">${category.description}</p>
+                                </div>
+                                <div class="text-right ml-4 flex-shrink-0">
+                                    <span class="text-2xl font-bold text-[#009DE8]">${category.maxScore}</span>
                                     <span class="text-sm text-gray-600">점</span>
-                                </h4>
-                                <p class="text-sm text-gray-600 mt-1">${category.description}</p>
+                                </div>
                             </div>
 
                             <div>
-                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
                                 <input type="number"
-                                       class="w-full border border-gray-300 rounded-lg p-2 mt-2 bg-gray-50"
+                                       class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
@@ -821,8 +829,8 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                                        placeholder="0 ~ ${category.maxScore}점"
                                        disabled>
 
-                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
-                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-2 bg-gray-50"
+                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
                                           rows="2"
                                           placeholder="해당 항목에 대한 의견을 작성해주세요"
                                           disabled>${currentComment}</textarea>
