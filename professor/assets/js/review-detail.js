@@ -190,8 +190,6 @@ function renderEvaluationForm(template, existingEvaluation) {
     const passCriteria = template.passCriteria || template.passingCriteria || {};
     const totalScore = template.totalScore || 100;
 
-    alert('renderEvaluationForm 실행됨! 항목 수: ' + (template.items || template.categories || []).length);
-
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
@@ -225,16 +223,16 @@ function renderEvaluationForm(template, existingEvaluation) {
                         <div class="evaluation-item bg-white border-2 border-gray-300 rounded-lg p-4"
                              data-category-id="${item.id}">
 
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 mb-1">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
                                         ${index + 1}. ${item.name}
                                     </h4>
-                                    ${item.description ? `<p class="text-sm text-gray-600">${item.description}</p>` : ''}
+                                    ${item.description ? `<p style="font-size: 0.875rem; color: #4b5563;">${item.description}</p>` : ''}
                                 </div>
-                                <div class="text-right ml-4 flex-shrink-0">
-                                    <span class="text-2xl font-bold text-[#009DE8]">${maxScore}</span>
-                                    <span class="text-sm text-gray-600">점</span>
+                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${maxScore}</span>
+                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
 
