@@ -133,17 +133,17 @@ function viewJournalReviewDetail(journalId, viewType) {
 
                 <div class="space-y-4" id="evaluation-categories">
                     ${journal.rubric.items.map((item, index) => `
-                        <div class="evaluation-item bg-white border-2 border-gray-300 rounded-lg p-4" data-item-id="${item.id}">
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 mb-1">
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 2px solid #d1d5db; border-radius: 0.5rem;" data-item-id="${item.id}">
+                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 0.75rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
                                         ${index + 1}. ${item.name}
                                     </h4>
-                                    <p class="text-sm text-gray-600">${getItemDescription(item.name)}</p>
+                                    <p style="font-size: 0.875rem; color: #4b5563;">${getItemDescription(item.name)}</p>
                                 </div>
-                                <div class="text-right ml-4 flex-shrink-0">
-                                    <span class="text-2xl font-bold text-[#009DE8]">${item.maxScore}</span>
-                                    <span class="text-sm text-gray-600">점</span>
+                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${item.maxScore}</span>
+                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
 
