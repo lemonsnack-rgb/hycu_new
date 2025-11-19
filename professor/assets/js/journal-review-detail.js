@@ -123,55 +123,48 @@ function viewJournalReviewDetail(journalId, viewType) {
 
                 <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
                     <h4 class="font-bold text-blue-900 mb-3 flex items-center">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
+                        <i class="fas fa-info-circle mr-2"></i>
                         평가 기준 안내
                     </h4>
-                    <div class="space-y-2 text-sm text-blue-900">
-                        <p class="flex items-center">
-                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
-                            <span>각 항목 최소 <strong class="font-bold">60점 이상</strong> (과락)</span>
-                        </p>
-                        <p class="flex items-center">
-                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
-                            <span>전체 평균 <strong class="font-bold">70점 이상</strong></span>
-                        </p>
-                        <p class="flex items-center">
-                            <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
-                            <span>총점 <strong class="font-bold">70점 이상</strong> (100점 만점)</span>
-                        </p>
-                    </div>
+                    <p class="text-sm text-blue-900">
+                        <strong>안내:</strong> 각 항목별로 점수를 입력해주세요. 입력하신 점수가 합산되어 총점이 계산됩니다.
+                    </p>
                 </div>
 
                 <div class="space-y-4" id="evaluation-categories">
                     ${journal.rubric.items.map((item, index) => `
-                        <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                            <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                                <div>
-                                    <h4 class="font-bold text-gray-800 mb-1">${index + 1}. ${item.name}</h4>
+                        <div class="evaluation-item bg-white border-2 border-gray-300 rounded-lg p-4" data-item-id="${item.id}">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-1">
+                                        ${index + 1}. ${item.name}
+                                    </h4>
                                     <p class="text-sm text-gray-600">${getItemDescription(item.name)}</p>
                                 </div>
-                                <div class="text-right">
-                                    <div class="text-xs text-gray-500">가중치</div>
-                                    <div class="text-lg font-bold text-blue-600">20%</div>
+                                <div class="text-right ml-4 flex-shrink-0">
+                                    <span class="text-2xl font-bold text-[#009DE8]">${item.maxScore}</span>
+                                    <span class="text-sm text-gray-600">점</span>
                                 </div>
                             </div>
-                            <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
-                                <label class="text-sm font-medium text-gray-700">점수:</label>
-                                <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                       min="0" max="${item.maxScore}" step="0.5" value="0"
+
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
+                                <input type="number"
+                                       class="score-input w-full border border-gray-300 rounded-lg p-2"
+                                       min="0"
+                                       max="${item.maxScore}"
+                                       step="0.5"
+                                       value="0"
+                                       placeholder="0 ~ ${item.maxScore}점"
                                        data-item-id="${item.id}"
+                                       data-max="${item.maxScore}"
                                        onchange="updateJournalTotalScore()">
-                                <span class="text-sm text-gray-600">/ ${item.maxScore}점</span>
-                                <span></span>
-                            </div>
-                            <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
-                                <span></span>
-                                <div class="text-sm text-gray-500">
-                                    → 가중 점수: <span class="weighted-score-${item.id} text-base font-bold text-blue-600">0.0점</span>
-                                </div>
+
+                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
+                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm"
+                                          rows="2"
+                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                          data-item-id="${item.id}"></textarea>
                             </div>
                         </div>
                     `).join('')}
@@ -181,7 +174,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                 <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 my-6 border-2 border-blue-300">
                     <div class="flex justify-between items-center">
                         <span class="text-lg font-bold text-gray-800">총점</span>
-                        <span class="text-3xl font-bold text-blue-600" id="journal-total-score">0.0점</span>
+                        <span class="text-3xl font-bold text-blue-600" id="journal-total-score">0.0 / 100점</span>
                     </div>
                 </div>
 
@@ -342,23 +335,19 @@ function viewJournalReviewDetail(journalId, viewType) {
 // 총점 자동 계산
 function updateJournalTotalScore() {
     let total = 0;
+    let maxTotal = 0;
     const inputs = document.querySelectorAll('.score-input');
 
     inputs.forEach(input => {
         const value = parseFloat(input.value) || 0;
-        const itemId = input.dataset.itemId;
+        const max = parseFloat(input.dataset.max) || 0;
         total += value;
-
-        // 가중 점수 업데이트 (각 항목이 20점이므로 가중치는 1)
-        const weightedScoreEl = document.querySelector(`.weighted-score-${itemId}`);
-        if (weightedScoreEl) {
-            weightedScoreEl.textContent = value.toFixed(1) + '점';
-        }
+        maxTotal += max;
     });
 
     const totalScoreEl = document.getElementById('journal-total-score');
     if (totalScoreEl) {
-        totalScoreEl.textContent = total.toFixed(1) + '점';
+        totalScoreEl.textContent = `${total.toFixed(1)} / ${maxTotal}점`;
     }
 }
 
@@ -368,16 +357,22 @@ function submitJournalEvaluation(journalId) {
     if (!journal) return;
 
     const scores = {};
+    const itemComments = {};
     let hasEmptyScore = false;
 
     journal.rubric.items.forEach(item => {
         const input = document.querySelector(`.score-input[data-item-id="${item.id}"]`);
+        const commentTextarea = document.querySelector(`.score-comment[data-item-id="${item.id}"]`);
         const value = parseFloat(input.value);
 
         if (isNaN(value) || value < 0) {
             hasEmptyScore = true;
         } else {
             scores[item.id] = value;
+        }
+
+        if (commentTextarea) {
+            itemComments[item.id] = commentTextarea.value.trim();
         }
     });
 
@@ -394,7 +389,7 @@ function submitJournalEvaluation(journalId) {
 
     // 평가 저장
     if (typeof updateJournalEvaluation === 'function') {
-        updateJournalEvaluation(journalId, scores, comment);
+        updateJournalEvaluation(journalId, scores, comment, itemComments);
 
         // 모달 닫기
         const modalBackdrop = document.querySelector('.modal-backdrop');

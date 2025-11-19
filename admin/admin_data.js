@@ -139,18 +139,22 @@ const appData = {
             name: '석사 논문 평가 기준',
             type: '석사',
             evaluationType: 'score',
+            description: '석사 논문 심사를 위한 점수형 평가표',
+            createdDate: '2024-01-15',
+            itemCount: 4,
             items: [
-                { name: '연구 주제의 적절성', score: 25 },
-                { name: '연구 방법론', score: 25 },
-                { name: '결과 분석', score: 25 },
-                { name: '논문 작성 완성도', score: 25 }
+                { id: 1, name: '연구 주제의 적절성', score: 25, description: '연구 주제의 타당성과 학술적 가치를 평가합니다.' },
+                { id: 2, name: '연구 방법론', score: 25, description: '연구 방법론의 적절성과 논리성을 평가합니다.' },
+                { id: 3, name: '결과 분석', score: 25, description: '연구 결과의 정확성과 분석의 타당성을 평가합니다.' },
+                { id: 4, name: '논문 작성 완성도', score: 25, description: '논문의 구성, 논리 전개, 문장력을 종합적으로 평가합니다.' }
             ],
             totalScore: 100,
             passCriteria: {
-                type: 'average',  // 'average' 또는 'total'
-                passScore: 70,    // 통과 점수
-                hasFailThreshold: true,  // 과락 기준 있음
-                failThreshold: 60  // 과락 기준 점수 (항목별)
+                type: 'average',
+                passScore: 70,
+                description: '총점 70점 이상 합격',
+                hasFailThreshold: true,
+                failThreshold: 60
             }
         },
         {
@@ -158,29 +162,132 @@ const appData = {
             name: '박사 논문 평가 기준',
             type: '박사',
             evaluationType: 'score',
+            description: '박사 논문 심사를 위한 점수형 평가표',
+            createdDate: '2024-01-15',
+            itemCount: 5,
             items: [
-                { name: '연구의 독창성', score: 25 },
-                { name: '연구 방법론', score: 20 },
-                { name: '학문적 기여도', score: 25 },
-                { name: '논문 작성 완성도', score: 20 },
-                { name: '발표 능력', score: 10 }
+                { id: 1, name: '연구의 독창성', score: 25, description: '연구의 참신성과 독창적 기여도를 평가합니다.' },
+                { id: 2, name: '연구 방법론', score: 20, description: '연구 방법론의 적절성과 엄밀성을 평가합니다.' },
+                { id: 3, name: '학문적 기여도', score: 25, description: '학문 발전에 대한 기여도와 영향력을 평가합니다.' },
+                { id: 4, name: '논문 작성 완성도', score: 20, description: '논문의 완성도와 학술적 글쓰기 수준을 평가합니다.' },
+                { id: 5, name: '발표 능력', score: 10, description: '논문 내용에 대한 이해도와 발표 능력을 평가합니다.' }
             ],
             totalScore: 100,
             passCriteria: {
-                type: 'total',    // 총점 기준
-                passScore: 75,    // 통과 점수
-                hasFailThreshold: false,  // 과락 기준 없음
+                type: 'total',
+                passScore: 75,
+                description: '총점 75점 이상 합격',
+                hasFailThreshold: false,
                 failThreshold: null
             }
         },
         {
             id: 3,
+            name: '연구계획서 등급 평가표',
+            type: '석사',
+            evaluationType: 'grade',
+            description: '연구계획서 심사를 위한 등급형 평가표',
+            createdDate: '2024-02-10',
+            itemCount: 5,
+            items: [
+                {
+                    id: 1,
+                    name: '연구 주제의 참신성',
+                    description: 'A: 매우 독창적이고 참신함, B: 참신한 요소가 있음, C: 일반적인 주제, D: 진부함, F: 부적절함'
+                },
+                {
+                    id: 2,
+                    name: '연구 방법론의 타당성',
+                    description: 'A: 매우 적절하고 체계적, B: 대체로 적절함, C: 보통 수준, D: 개선 필요, F: 부적절함'
+                },
+                {
+                    id: 3,
+                    name: '선행연구 검토의 충실성',
+                    description: 'A: 매우 충실하고 비판적 검토, B: 충실한 검토, C: 기본적 검토, D: 미흡함, F: 불충분함'
+                },
+                {
+                    id: 4,
+                    name: '연구 일정의 현실성',
+                    description: 'A: 매우 구체적이고 실현 가능함, B: 실현 가능함, C: 보통 수준, D: 비현실적 요소 있음, F: 불가능함'
+                },
+                {
+                    id: 5,
+                    name: '기대효과 및 활용방안',
+                    description: 'A: 매우 명확하고 구체적, B: 명확함, C: 보통 수준, D: 모호함, F: 불명확함'
+                }
+            ],
+            totalScore: null,
+            passCriteria: {
+                minGrade: 'C',
+                description: 'C등급 이상 합격 (모든 항목 평균)'
+            }
+        },
+        {
+            id: 4,
             name: 'IRB 승인 심사',
             type: '박사',
             evaluationType: 'passfail',
-            items: ['연구 윤리 준수', '개인정보 보호 계획', '연구 참여자 동의서', '위험성 평가'],
+            description: '연구윤리 심사를 위한 Pass/Fail형 평가표',
+            createdDate: '2024-01-20',
+            itemCount: 4,
+            items: [
+                {
+                    id: 1,
+                    name: '연구 윤리 준수',
+                    description: '연구 윤리 지침을 준수하고 있는지 확인 (헬싱키 선언, 벨몬트 리포트 등)'
+                },
+                {
+                    id: 2,
+                    name: '개인정보 보호 계획',
+                    description: '개인정보 수집, 이용, 보관, 파기 계획이 적절한지 확인'
+                },
+                {
+                    id: 3,
+                    name: '연구 참여자 동의서',
+                    description: '연구 참여자에게 충분한 정보를 제공하고 자발적 동의를 받는지 확인'
+                },
+                {
+                    id: 4,
+                    name: '위험성 평가',
+                    description: '연구 참여로 인한 위험성과 이익을 평가하고 위험 최소화 방안이 있는지 확인'
+                }
+            ],
             totalScore: null,
-            passCriteria: null  // pass/fail 방식은 통과기준 없음
+            passCriteria: {
+                passRequired: true,
+                description: '모든 항목에서 Pass를 받아야 합격'
+            }
+        },
+        {
+            id: 5,
+            name: '발표 심사 평가표',
+            type: '석사',
+            evaluationType: 'passfail',
+            description: '논문 발표 심사를 위한 Pass/Fail형 평가표',
+            createdDate: '2024-03-05',
+            itemCount: 3,
+            items: [
+                {
+                    id: 1,
+                    name: '발표 내용의 충실성',
+                    description: '논문 내용을 정확하게 이해하고 명확하게 전달하는지 확인'
+                },
+                {
+                    id: 2,
+                    name: '질의응답 능력',
+                    description: '질문에 대한 적절한 답변과 논리적 설명이 가능한지 확인'
+                },
+                {
+                    id: 3,
+                    name: '발표 시간 준수',
+                    description: '규정된 발표 시간을 준수하는지 확인'
+                }
+            ],
+            totalScore: null,
+            passCriteria: {
+                passRequired: true,
+                description: '모든 항목에서 Pass를 받아야 합격'
+            }
         }
     ],
     

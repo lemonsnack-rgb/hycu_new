@@ -1242,12 +1242,13 @@ function getJournalReviews() {
     return journalReviews;
 }
 
-function updateJournalEvaluation(journalId, scores, comment) {
+function updateJournalEvaluation(journalId, scores, comment, itemComments = {}) {
     const journal = journalReviews.find(j => j.id === journalId);
     if (journal) {
         journal.evaluation = {
             scores: scores,
             comment: comment,
+            itemComments: itemComments,
             submittedAt: new Date().toISOString().split('T')[0]
         };
         journal.status = '심사완료';

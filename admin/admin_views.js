@@ -1724,12 +1724,13 @@ const views = {
                             ${data.map((item, idx) => {
                                 const itemCount = Array.isArray(item.items) ? item.items.length : 0;
 
-                                // 유형 표시 로직 개선
+                                // 유형 표시 로직 개선 (evaluationType 사용)
                                 let typeClass, typeName;
-                                if (item.type === 'passfail') {
-                                    typeClass = 'bg-green-100 text-green-800';
+                                const evalType = item.evaluationType || 'score';
+                                if (evalType === 'passfail') {
+                                    typeClass = 'bg-gray-100 text-gray-800';
                                     typeName = 'Pass/Fail형';
-                                } else if (item.type === 'grade') {
+                                } else if (evalType === 'grade') {
                                     typeClass = 'bg-purple-100 text-purple-800';
                                     typeName = '등급형';
                                 } else {
@@ -1754,6 +1755,10 @@ const views = {
                                                 <button onclick="viewEvaluationDetail(${item.id})"
                                                         class="text-blue-600 hover:underline text-sm">
                                                     관리
+                                                </button>
+                                                <button onclick="previewEvaluationForm(${item.id})"
+                                                        class="text-purple-600 hover:underline text-sm">
+                                                    미리보기
                                                 </button>
                                                 <button onclick="deleteEvaluationCriteria(${item.id})"
                                                         class="text-red-600 hover:underline text-sm">
