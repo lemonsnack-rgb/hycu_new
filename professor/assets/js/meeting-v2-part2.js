@@ -424,9 +424,8 @@ function openSetAvailableTimeModal() {
                         <div style="margin-bottom: 1rem;">
                             <label class="block text-sm font-semibold mb-2">미팅 유형 *</label>
                             <select id="input-meetingType" class="form-input w-full" required>
-                                <option value="online">온라인만</option>
-                                <option value="offline">대면만</option>
-                                <option value="both">온라인/대면 선택</option>
+                                <option value="online">온라인</option>
+                                <option value="offline">대면</option>
                             </select>
                         </div>
 
