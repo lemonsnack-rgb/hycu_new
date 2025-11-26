@@ -220,19 +220,19 @@ function renderEvaluationForm(template, existingEvaluation) {
                     const maxScore = item.score || item.maxScore || 0;
 
                     return `
-                        <div class="evaluation-item bg-white border-2 border-gray-300 rounded-lg p-4"
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 2px solid #d1d5db; border-radius: 0.5rem;"
                              data-category-id="${item.id}">
 
-                            <div class="flex justify-between items-start mb-3">
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-gray-800 mb-1">
+                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 1rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
                                         ${index + 1}. ${item.name}
                                     </h4>
-                                    ${item.description ? `<p class="text-sm text-gray-600">${item.description}</p>` : ''}
+                                    ${item.description ? `<p style="font-size: 0.875rem; color: #4b5563;">${item.description}</p>` : ''}
                                 </div>
-                                <div class="text-right ml-4 flex-shrink-0">
-                                    <span class="text-2xl font-bold text-[#009DE8]">${maxScore}</span>
-                                    <span class="text-sm text-gray-600">점</span>
+                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${maxScore}</span>
+                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
 
@@ -315,18 +315,20 @@ function renderPassFailForm(template, savedData) {
                     const currentComment = savedResult?.comment || '';
 
                     return `
-                        <div class="passfail-item bg-white border-2 border-gray-300 rounded-lg p-4"
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 2px solid #d1d5db; border-radius: 0.5rem;"
                              data-item-id="${item.id}">
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${index + 1}. ${item.name}
-                                </h4>
-                                ${item.description ? `
-                                    <div class="mt-2 bg-gray-50 border border-gray-300 rounded p-3">
-                                        <p class="text-xs text-gray-900 font-medium mb-1">판단 기준:</p>
-                                        <p class="text-xs text-gray-700">${item.description}</p>
-                                    </div>
-                                ` : ''}
+                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 1rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+                                        ${index + 1}. ${item.name}
+                                    </h4>
+                                    ${item.description ? `
+                                        <div style="margin-top: 0.5rem; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.75rem;">
+                                            <p style="font-size: 0.75rem; color: #111827; font-weight: 500; margin-bottom: 0.25rem;">판단 기준:</p>
+                                            <p style="font-size: 0.75rem; color: #374151;">${item.description}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
 
                             <div class="space-y-3">
@@ -431,18 +433,20 @@ function renderGradeForm(template, savedData) {
                     const currentComment = savedResult?.comment || '';
 
                     return `
-                        <div class="grade-item bg-white border-2 border-gray-300 rounded-lg p-4"
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 2px solid #d1d5db; border-radius: 0.5rem;"
                              data-item-id="${item.id}">
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${index + 1}. ${item.name}
-                                </h4>
-                                ${item.description ? `
-                                    <div class="mt-2 bg-purple-50 border border-purple-200 rounded p-3">
-                                        <p class="text-xs text-purple-900 font-medium mb-1">등급 기준:</p>
-                                        <p class="text-xs text-gray-700 whitespace-pre-line">${item.description}</p>
-                                    </div>
-                                ` : ''}
+                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 1rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+                                        ${index + 1}. ${item.name}
+                                    </h4>
+                                    ${item.description ? `
+                                        <div style="margin-top: 0.5rem; background: #faf5ff; border: 1px solid #e9d5ff; border-radius: 0.25rem; padding: 0.75rem;">
+                                            <p style="font-size: 0.75rem; color: #581c87; font-weight: 500; margin-bottom: 0.25rem;">등급 기준:</p>
+                                            <p style="font-size: 0.75rem; color: #374151; white-space: pre-line;">${item.description}</p>
+                                        </div>
+                                    ` : ''}
+                                </div>
                             </div>
 
                             <div class="space-y-3">
@@ -633,22 +637,26 @@ function renderSubmittedEvaluation(template, evaluation) {
                     const currentComment = score?.comment || '';
 
                     return `
-                        <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4"
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 1px solid #d1d5db; border-radius: 0.5rem;"
                              data-category-id="${category.id}">
 
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${index + 1}. ${category.name}
-                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${category.maxScore}</span>
-                                    <span class="text-sm text-gray-600">점</span>
-                                </h4>
-                                <p class="text-sm text-gray-600 mt-1">${category.description}</p>
+                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 0.75rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+                                        ${index + 1}. ${category.name}
+                                    </h4>
+                                    <p style="font-size: 0.875rem; color: #4b5563;">${category.description}</p>
+                                </div>
+                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${category.maxScore}</span>
+                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
+                                </div>
                             </div>
 
                             <div>
-                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
                                 <input type="number"
-                                       class="score-input w-full border border-gray-300 rounded-lg p-2 mt-2 bg-gray-50"
+                                       class="score-input w-full border border-gray-300 rounded-lg p-2 bg-gray-50"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
@@ -658,8 +666,8 @@ function renderSubmittedEvaluation(template, evaluation) {
                                        data-max="${category.maxScore}"
                                        disabled>
 
-                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
-                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm mt-2 bg-gray-50"
+                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
+                                <textarea class="score-input w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
                                           rows="2"
                                           placeholder="해당 항목에 대한 의견을 작성해주세요"
                                           data-category-id="${category.id}"
@@ -800,20 +808,24 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                     const currentComment = score?.comment || '';
 
                     return `
-                        <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                            <div class="mb-3">
-                                <h4 class="font-bold text-gray-800 mb-1">
-                                    ${index + 1}. ${category.name}
-                                    <span class="text-2xl font-bold text-[#009DE8] ml-2">${category.maxScore}</span>
-                                    <span class="text-sm text-gray-600">점</span>
-                                </h4>
-                                <p class="text-sm text-gray-600 mt-1">${category.description}</p>
+                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 1px solid #d1d5db; border-radius: 0.5rem;">
+                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 0.75rem;">
+                                <div style="flex: 1 1 0%;">
+                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+                                        ${index + 1}. ${category.name}
+                                    </h4>
+                                    <p style="font-size: 0.875rem; color: #4b5563;">${category.description}</p>
+                                </div>
+                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${category.maxScore}</span>
+                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
+                                </div>
                             </div>
 
                             <div>
-                                <label class="text-sm font-medium text-gray-700">점수 입력:</label>
+                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
                                 <input type="number"
-                                       class="w-full border border-gray-300 rounded-lg p-2 mt-2 bg-gray-50"
+                                       class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
@@ -821,8 +833,8 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                                        placeholder="0 ~ ${category.maxScore}점"
                                        disabled>
 
-                                <label class="text-sm font-medium text-gray-700 block mt-4">평가 의견:</label>
-                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm mt-2 bg-gray-50"
+                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
+                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
                                           rows="2"
                                           placeholder="해당 항목에 대한 의견을 작성해주세요"
                                           disabled>${currentComment}</textarea>
