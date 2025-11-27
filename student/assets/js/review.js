@@ -267,6 +267,18 @@ function showReviewApplicationModal() {
                             </select>
                         </div>
 
+                        <!-- 희망 심사 마감일 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                희망 심사 마감일 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="date" id="review-deadline" required
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                심사 완료를 희망하는 날짜를 선택하세요 (교수 화면 및 D-day 계산에 활용)
+                            </p>
+                        </div>
+
                         <!-- 첨부 파일 -->
                         <div style="margin-bottom: 1.5rem;">
                             <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
@@ -308,6 +320,7 @@ function handleReviewApplication(event) {
 
     const title = document.getElementById('review-title').value;
     const type = document.getElementById('review-type').value;
+    const deadline = document.getElementById('review-deadline').value;
     const file = document.getElementById('review-file').files[0];
 
     if (!file) {
@@ -329,7 +342,7 @@ function handleReviewApplication(event) {
     }
 
     // 실제로는 서버로 전송
-    console.log('심사 신청:', { title, type, file: file.name });
+    console.log('심사 신청:', { title, type, deadline, file: file.name });
 
     alert('심사 신청이 완료되었습니다.\n관리자 승인 후 심사위원이 배정됩니다.');
     closeModal();
