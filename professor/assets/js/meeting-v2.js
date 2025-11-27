@@ -142,7 +142,7 @@ function renderSlotCard(slot) {
     const typeText = {
         'online': '온라인',
         'offline': '대면',
-        'both': '온라인/대면'
+        'both': '온라인'  // 기존 데이터 호환성을 위해 'both'는 '온라인'으로 처리
     }[slot.meetingType];
     
     const isOneTime = slot.type === 'oneTime';
@@ -242,9 +242,8 @@ function openAddSlotModal(type) {
             <div>
                 <label class="block text-sm font-medium mb-1">미팅 유형 *</label>
                 <select name="meetingType" class="input" required>
-                    <option value="online">온라인만</option>
-                    <option value="offline">대면만</option>
-                    <option value="both">온라인/대면 선택</option>
+                    <option value="online">온라인</option>
+                    <option value="offline">대면</option>
                 </select>
             </div>
             
@@ -380,7 +379,12 @@ function initCalendar() {
             const slotId = info.event.id.split('-')[0];
             const slot = AVAILABLE_SLOTS.find(s => s.id === slotId);
             if (slot) {
-                alert(`${info.event.title}\n유형: ${slot.meetingType === 'online' ? '온라인' : slot.meetingType === 'offline' ? '대면' : '온라인/대면'}`);
+                const typeMap = {
+                    'online': '온라인',
+                    'offline': '대면',
+                    'both': '온라인'  // 기존 데이터 호환성
+                };
+                alert(`${info.event.title}\n유형: ${typeMap[slot.meetingType] || '온라인'}`);
             }
         },
         buttonText: {
@@ -425,9 +429,8 @@ function openAddSlotModalWithDate(date) {
             <div>
                 <label class="block text-sm font-medium mb-1">미팅 유형 *</label>
                 <select name="meetingType" class="input" required>
-                    <option value="online">온라인만</option>
-                    <option value="offline">대면만</option>
-                    <option value="both">온라인/대면 선택</option>
+                    <option value="online">온라인</option>
+                    <option value="offline">대면</option>
                 </select>
             </div>
             

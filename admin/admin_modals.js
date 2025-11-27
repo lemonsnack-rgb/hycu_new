@@ -1768,26 +1768,17 @@ function editWorkflowStages(workflowId) {
                                             </div>
                                         </div>
                                         <div class="flex items-center gap-2">
-                                            <label class="flex items-center text-sm">
-                                                <input type="checkbox"
-                                                       id="stage-eval-${idx}"
-                                                       ${stage.hasEvaluation ? 'checked' : ''}
-                                                       onchange="toggleTempStageEvaluation(${idx})"
-                                                       class="mr-1">
-                                                평가 필요
-                                            </label>
-                                            ${stage.hasEvaluation ? `
-                                                <select id="stage-criteria-${idx}"
-                                                        onchange="updateTempStageCriteria(${idx}, this.value)"
-                                                        class="text-xs border border-gray-300 rounded px-2 py-1">
-                                                    <option value="">평가표 선택</option>
-                                                    ${availableCriteria.map(c => `
-                                                        <option value="${c.id}" ${stage.evaluationCriteriaId === c.id ? 'selected' : ''}>
-                                                            ${c.name}
-                                                        </option>
-                                                    `).join('')}
-                                                </select>
-                                            ` : ''}
+                                            <label class="text-sm font-medium">평가표:</label>
+                                            <select id="stage-criteria-${idx}"
+                                                    onchange="updateTempStageCriteria(${idx}, this.value)"
+                                                    class="text-xs border border-gray-300 rounded px-2 py-1">
+                                                <option value="">평가 없음</option>
+                                                ${availableCriteria.map(c => `
+                                                    <option value="${c.id}" ${stage.evaluationCriteriaId === c.id ? 'selected' : ''}>
+                                                        ${c.name}
+                                                    </option>
+                                                `).join('')}
+                                            </select>
                                         </div>
                                         ${stage.stageTypeId ? `
                                             <p class="text-xs text-gray-500">
@@ -1906,24 +1897,14 @@ function updateTempStageDate(idx, type, value) {
     }
 }
 
-function toggleTempStageEvaluation(idx) {
-    const checkbox = document.getElementById(`stage-eval-${idx}`);
-    if (window._tempWorkflowStages[idx]) {
-        window._tempWorkflowStages[idx].hasEvaluation = checkbox.checked;
-    }
-
-    // Refresh modal
-    const currentWorkflowId = window._currentWorkflowId;
-    closeModal();
-    setTimeout(() => editWorkflowStages(currentWorkflowId), 100);
-}
-
 function updateTempStageCriteria(idx, criteriaId) {
     const id = parseInt(criteriaId);
     if (window._tempWorkflowStages[idx]) {
         const criteria = appData.evaluationCriteria.find(c => c.id === id);
         window._tempWorkflowStages[idx].evaluationCriteriaId = id || null;
         window._tempWorkflowStages[idx].evaluationCriteriaName = criteria ? criteria.name : null;
+        // 평가표가 선택되면 hasEvaluation true, "평가 없음"(빈 값)이면 false
+        window._tempWorkflowStages[idx].hasEvaluation = !!id;
     }
 }
 
@@ -4625,7 +4606,6 @@ window.editWorkflowStages = editWorkflowStages;
 window.addStageFromType = addStageFromType;
 window.updateTempStageName = updateTempStageName;
 window.updateTempStageDate = updateTempStageDate;
-window.toggleTempStageEvaluation = toggleTempStageEvaluation;
 window.updateTempStageCriteria = updateTempStageCriteria;
 window.removeTempStage = removeTempStage;
 window.moveTempStageUp = moveTempStageUp;
