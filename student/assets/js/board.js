@@ -78,13 +78,12 @@ function renderBoardList() {
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">작성자</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">작성일</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">첨부</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">조회</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         ${posts.length === 0 ? `
                             <tr>
-                                <td colspan="6" class="py-8 text-center text-gray-500">
+                                <td colspan="5" class="py-8 text-center text-gray-500">
                                     게시글이 없습니다.
                                 </td>
                             </tr>
@@ -103,7 +102,6 @@ function renderBoardList() {
                                 <td class="py-3 px-4 text-sm text-gray-600">
                                     ${post.files.length > 0 ? `📎 ${post.files.length}` : ''}
                                 </td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${post.views}</td>
                             </tr>
                         `).join('')}
                     </tbody>

@@ -227,6 +227,18 @@ window.showReviewApplicationModal = function() {
                         </select>
                     </div>
 
+                    <!-- 희망 심사 마감일 -->
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                            희망 심사 마감일 <span style="color: #EF4444;">*</span>
+                        </label>
+                        <input type="date" id="review-deadline" required
+                               style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                            심사 완료를 희망하는 날짜를 선택하세요 (교수 화면 및 D-day 계산에 활용)
+                        </p>
+                    </div>
+
                     <!-- 첨부 파일 -->
                     <div style="margin-bottom: 1.5rem;">
                         <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
