@@ -257,10 +257,10 @@ function renderStudentDetail() {
                                                 삭제
                                             </button>
                                         ` : ''}
-                                        ${isMyPlan && (plan.status === 'planned' || plan.status === 'in_progress') ? `
+                                        ${isMyPlan ? `
                                             <button onclick="openExecutionModal(${plan.id})"
                                                     class="text-green-600 hover:underline text-xs font-medium">
-                                                실적입력
+                                                ${plan.executionDate ? '실적수정' : '실적입력'}
                                             </button>
                                         ` : ''}
                                     </div>
@@ -299,11 +299,6 @@ function renderStudentDetail() {
                                     
                                     <div class="flex justify-between items-center pt-2">
                                         ${getStatusBadge(plan.status)}
-                                        ${plan.isPublic !== undefined ? `
-                                            <span class="text-xs ${plan.isPublic ? 'text-green-600' : 'text-gray-500'}">
-                                                ${plan.isPublic ? '학생 공개' : '비공개'}
-                                            </span>
-                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -462,14 +457,18 @@ function savePlan() {
     }, 100);
 }
 
-// 실적 입력 모달
+// 실적 입력/수정 모달
 function openExecutionModal(planId) {
     const plan = findPlanById(planId);
     if (!plan) return;
-    
+
     // 오늘 날짜를 YYYY-MM-DD 형식으로
     const today = new Date().toISOString().split('T')[0];
-    
+
+    // 수정 모드인지 확인 (실적 데이터가 이미 있는 경우)
+    const isEditMode = !!plan.executionDate;
+    const modalTitle = isEditMode ? '실적 수정' : '실적 입력';
+
     const modalContent = `
         <form id="execution-form" class="space-y-4">
             <div class="bg-gray-50 p-4 rounded-lg">
@@ -480,50 +479,50 @@ function openExecutionModal(planId) {
                     <p><span class="font-medium text-gray-600">계획 내용:</span> ${plan.plannedContent}</p>
                 </div>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">실제 실행일 *</label>
-                <input type="date" name="executionDate" value="${today}"
+                <input type="date" name="executionDate" value="${plan.executionDate || today}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">실제 지도 방식 *</label>
                 <select name="actualMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
-                    <option value="meeting" ${plan.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
-                    <option value="online" ${plan.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
-                    <option value="zoom" ${plan.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
-                    <option value="email" ${plan.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
-                    <option value="phone" ${plan.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                    <option value="meeting" ${(plan.actualMethod || plan.plannedMethod) === 'meeting' ? 'selected' : ''}>대면</option>
+                    <option value="online" ${(plan.actualMethod || plan.plannedMethod) === 'online' ? 'selected' : ''}>온라인</option>
+                    <option value="zoom" ${(plan.actualMethod || plan.plannedMethod) === 'zoom' ? 'selected' : ''}>Zoom</option>
+                    <option value="email" ${(plan.actualMethod || plan.plannedMethod) === 'email' ? 'selected' : ''}>이메일</option>
+                    <option value="phone" ${(plan.actualMethod || plan.plannedMethod) === 'phone' ? 'selected' : ''}>전화</option>
                 </select>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">실제 지도 내용 *</label>
                 <textarea name="executionContent" rows="4" placeholder="실제로 진행한 지도 내용을 상세히 입력하세요"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required></textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>${plan.executionContent || ''}</textarea>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">교수 코멘트</label>
                 <textarea name="professorComment" rows="3" placeholder="학생에게 전달할 피드백을 입력하세요"
-                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${plan.professorComment || ''}</textarea>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">다음 예정일</label>
-                <input type="date" name="nextPlanDate"
+                <input type="date" name="nextPlanDate" value="${plan.nextPlanDate || ''}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
-            
+
             <div class="flex items-center">
-                <input type="checkbox" name="isPublic" id="is-public" checked class="mr-2">
+                <input type="checkbox" name="isPublic" id="is-public" ${plan.isPublic !== false ? 'checked' : ''} class="mr-2">
                 <label for="is-public" class="text-sm text-gray-700">학생에게 공개</label>
             </div>
         </form>
     `;
-    
-    createModal('실적 입력', modalContent, [
+
+    createModal(modalTitle, modalContent, [
         {
             text: '취소',
             className: 'btn-secondary',
