@@ -40,7 +40,7 @@ function renderFeedback() {
         <div class="card">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">온라인 피드백</h2>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">논문 지도 현황</h2>
                     <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문을 제출하고 교수님의 피드백을 받으세요</p>
                 </div>
                 <button onclick="showFeedbackRequestModal()" class="btn-primary">
@@ -57,12 +57,14 @@ function renderFeedback() {
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">파일명</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">피드백 상태</th>
-                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">관리</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${feedbackRequests.map(req => `
-                            <tr style="border-bottom: 1px solid #E5E7EB;">
+                            <tr style="border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: background-color 0.2s;"
+                                onclick="openFeedbackViewer(${req.id})"
+                                onmouseover="this.style.backgroundColor='#F9FAFB'"
+                                onmouseout="this.style.backgroundColor='transparent'">
                                 <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${req.title}</td>
                                 <td style="padding: 0.75rem 1rem;">
                                     <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${req.stage}</span>
@@ -74,16 +76,11 @@ function renderFeedback() {
                                 <td style="padding: 0.75rem 1rem;">
                                     <span style="background: ${req.status === '피드백 완료' ? '#D1FAE5' : '#FEF3C7'}; color: ${req.status === '피드백 완료' ? '#065F46' : '#92400E'}; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${req.status}</span>
                                 </td>
-                                <td style="padding: 0.75rem 1rem; text-align: center;">
-                                    <a href="javascript:void(0)" onclick="openFeedbackViewer(${req.id})" style="color: #3B82F6; text-decoration: underline; font-size: 0.875rem;">
-                                        상세보기
-                                    </a>
-                                </td>
                             </tr>
                         `).join('')}
                         ${feedbackRequests.length === 0 ? `
                             <tr>
-                                <td colspan="6" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                <td colspan="5" style="padding: 3rem; text-align: center; color: #9CA3AF;">
                                     제출한 피드백 요청이 없습니다
                                 </td>
                             </tr>
