@@ -697,6 +697,162 @@ const StudentData = {
             viewerType: 'specific',
             viewers: ['P001']
         }
+    ],
+
+    // 학기별 논문지도 계획 (15주차 일괄 관리)
+    semesterGuidancePlans: [
+        {
+            id: 'SEM_2025_1_2023012345',
+            studentId: '2023012345',
+            year: 2025,
+            semester: 1,
+            createdAt: '2025-03-01T09:00:00',
+            updatedAt: '2025-03-15T14:30:00',
+            weeks: [
+                {
+                    week: 1,
+                    plannedDate: '2025-03-03',
+                    plannedTopic: '연구방법론 개요',
+                    plannedContent: '연구방법론의 기본 개념과 연구 설계 방법 학습',
+                    plannedMethod: 'zoom',
+                    executions: [
+                        {
+                            executionId: 'EXEC_001',
+                            professorId: 'P001',
+                            professorName: '김교수',
+                            executionDate: '2025-03-05',
+                            executionContent: '연구방법론 기초 개념 설명 및 질의응답',
+                            comment: '학생이 개념을 잘 이해하고 있음',
+                            method: 'zoom',
+                            createdAt: '2025-03-05T15:00:00'
+                        }
+                    ]
+                },
+                {
+                    week: 2,
+                    plannedDate: '2025-03-10',
+                    plannedTopic: '선행연구 조사 방법',
+                    plannedContent: '학술 데이터베이스 활용법 및 문헌 검색 전략',
+                    plannedMethod: 'online',
+                    executions: [
+                        {
+                            executionId: 'EXEC_003',
+                            professorId: 'P001',
+                            professorName: '김교수',
+                            executionDate: '2025-03-12',
+                            executionContent: '데이터베이스 검색 실습 및 논문 정리 방법 안내',
+                            comment: '검색 전략을 잘 이해함',
+                            method: 'online',
+                            createdAt: '2025-03-12T14:00:00'
+                        }
+                    ]
+                },
+                {
+                    week: 3,
+                    plannedDate: '2025-03-17',
+                    plannedTopic: '연구주제 선정',
+                    plannedContent: '관심 연구 분야 토의 및 주제 구체화',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 4,
+                    plannedDate: '2025-03-24',
+                    plannedTopic: '연구 설계',
+                    plannedContent: '연구 모형 설정 및 가설 수립',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 5,
+                    plannedDate: '2025-03-31',
+                    plannedTopic: '데이터 수집 방법',
+                    plannedContent: '설문지 설계 및 표본 선정 방법',
+                    plannedMethod: 'zoom',
+                    executions: []
+                },
+                {
+                    week: 6,
+                    plannedDate: '2025-04-07',
+                    plannedTopic: '중간 점검',
+                    plannedContent: '진행상황 점검 및 피드백',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 7,
+                    plannedDate: '2025-04-14',
+                    plannedTopic: '통계 분석 방법',
+                    plannedContent: 'SPSS 활용법 및 기초 통계 분석',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 8,
+                    plannedDate: '2025-04-21',
+                    plannedTopic: '연구계획서 작성',
+                    plannedContent: '연구계획서 구성 및 작성 요령',
+                    plannedMethod: 'zoom',
+                    executions: []
+                },
+                {
+                    week: 9,
+                    plannedDate: '2025-04-28',
+                    plannedTopic: '연구계획서 검토',
+                    plannedContent: '초안 검토 및 수정사항 논의',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 10,
+                    plannedDate: '2025-05-05',
+                    plannedTopic: '이론적 배경 작성',
+                    plannedContent: '선행연구 정리 및 이론 체계 구축',
+                    plannedMethod: 'email',
+                    executions: []
+                },
+                {
+                    week: 11,
+                    plannedDate: '2025-05-12',
+                    plannedTopic: '연구방법 세부화',
+                    plannedContent: '연구방법 상세 작성 및 검토',
+                    plannedMethod: 'zoom',
+                    executions: []
+                },
+                {
+                    week: 12,
+                    plannedDate: '2025-05-19',
+                    plannedTopic: '예비 발표 준비',
+                    plannedContent: '발표 자료 작성 및 연습',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 13,
+                    plannedDate: '2025-05-26',
+                    plannedTopic: '예비 발표',
+                    plannedContent: '연구계획서 발표 및 피드백',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 14,
+                    plannedDate: '2025-06-02',
+                    plannedTopic: '최종 수정',
+                    plannedContent: '발표 피드백 반영 및 최종 수정',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 15,
+                    plannedDate: '2025-06-09',
+                    plannedTopic: '학기 마무리',
+                    plannedContent: '학기 총정리 및 다음 학기 계획',
+                    plannedMethod: 'meeting',
+                    executions: []
+                }
+            ]
+        }
     ]
 };
 
@@ -897,5 +1053,16 @@ const DataService = {
             return true;
         }
         return false;
+    },
+
+    // 학기별 논문지도 계획 관련 (읽기 전용)
+    getAllSemesterPlans: () => {
+        return StudentData.semesterGuidancePlans || [];
+    },
+
+    getSemesterPlan: (year, semester) => {
+        return StudentData.semesterGuidancePlans.find(plan =>
+            plan.year === year && plan.semester === semester
+        );
     }
 };
