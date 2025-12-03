@@ -167,32 +167,63 @@ function renderWeekCard(week, plan) {
     return `
         <div class="week-card-v2 bg-white border border-gray-200 rounded-lg">
                 ${hasPlan ? `
-                    <!-- 계획 표시 영역 -->
-                    <div class="p-4 bg-gray-50 border-b border-gray-200">
-                        <div class="mb-3">
-                            <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
-                            <span class="text-gray-400 mx-2">-</span>
-                            <span class="text-base font-medium text-gray-800">${week.plannedTopic}</span>
-                            <span class="text-xs px-2 py-1 rounded ${getMethodBadgeClass(week.plannedMethod)} ml-2">
-                                ${getMethodText(week.plannedMethod)}
-                            </span>
-                        </div>
-                        <div class="mb-2">
-                            <span class="text-sm font-semibold text-gray-700">계획 내용:</span>
-                            <p class="text-sm text-gray-700 mt-1">${week.plannedContent}</p>
-                        </div>
-                        <div class="text-xs text-gray-500">
-                            계획일: ${formatDate(week.plannedDate)}
+                    <!-- 계획 입력 폼 (기존 계획 표시) -->
+                    <div class="p-4 bg-yellow-50 border-b border-yellow-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
+                                <input type="text" id="plan-topic-${week.week}" value="${week.plannedTopic}"
+                                       placeholder="예: 연구방법론 개요" readonly
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
+                                <textarea id="plan-content-${week.week}" rows="3" readonly
+                                          placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
+                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">${week.plannedContent}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
+                                <select id="plan-method-${week.week}" disabled
+                                        class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                                    <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                                    <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                                    <option value="zoom" ${week.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
+                                    <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                                    <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 ` : `
-                    <!-- 계획 입력 폼 -->
-                    <div class="p-4 bg-gray-50 border-b border-gray-200">
-                        <div class="mb-2">
-                            <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
-                        </div>
-                        <div class="text-sm text-gray-500 italic">
-                            교수님께서 아직 계획을 작성하지 않으셨습니다.
+                    <!-- 계획 입력 폼 (빈 상태) -->
+                    <div class="p-4 bg-yellow-50 border-b border-yellow-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
+                                <input type="text" id="plan-topic-${week.week}"
+                                       placeholder="예: 연구방법론 개요" readonly
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
+                                <textarea id="plan-content-${week.week}" rows="3" readonly
+                                          placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
+                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
+                                <select id="plan-method-${week.week}" disabled
+                                        class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                                    <option value="meeting">대면</option>
+                                    <option value="online">온라인</option>
+                                    <option value="zoom" selected>Zoom</option>
+                                    <option value="email">이메일</option>
+                                    <option value="phone">전화</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
                 `}
