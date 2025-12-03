@@ -13,33 +13,8 @@ function renderJournalSubmissionList() {
     const container = document.getElementById('journalSubmissionContainer');
     if (!container) return;
 
-    // Mock data - 실제로는 서버에서 가져옴
-    const submissions = [
-        {
-            id: 1,
-            paperTitle: 'AI 기반 데이터 분석 연구',
-            journalName: 'Journal of AI Research',
-            grade: 'SCI',
-            submitDate: '2025-10-15',
-            status: '승인 대기',
-            editable: false,
-            paperTitleEn: 'AI-Based Data Analysis Research',
-            firstAuthor: '홍길동',
-            correspondingAuthor: '김교수',
-            coAuthors: '이철수, 박영희',
-            volume: '25',
-            issue: '3',
-            publishYear: '2025',
-            startPage: '123',
-            endPage: '145',
-            doi: '10.1234/example.2025.001',
-            url: 'https://example.com/journal',
-            abstractKo: '이 연구는 인공지능 기반 데이터 분석 방법론에 대한 연구입니다.',
-            abstractEn: 'This study investigates AI-based data analysis methodologies.',
-            keywordsKo: '인공지능, 데이터 분석, 머신러닝',
-            keywordsEn: 'Artificial Intelligence, Data Analysis, Machine Learning'
-        }
-    ];
+    // Mock data - 실제로는 서버에서 가져옴 (빈 상태로 초기화)
+    const submissions = [];
 
     // 전역 변수에 저장 (detail view에서 사용)
     journalSubmissions = submissions;
@@ -49,79 +24,72 @@ function renderJournalSubmissionList() {
 
     const content = `
         <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학술지 대체 심사 신청</h2>
-                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 게재 실적으로 대체 심사를 신청하세요 ${hasSubmission ? '(최대 1건)' : ''}</p>
+            <div id="journal-list-view">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학술지 논문 제출</h2>
+                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 게재 실적으로 대체 심사를 신청하세요 ${hasSubmission ? '(최대 1건)' : ''}</p>
+                    </div>
+                    <button onclick="showJournalSubmissionForm()" class="btn-primary" ${hasSubmission ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
+                        + 심사 신청하기
+                    </button>
                 </div>
-                <button onclick="showJournalSubmissionModal()" class="btn-primary" ${hasSubmission ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                    + 학술지 대체 심사 실적 제출
-                </button>
-            </div>
 
-            <div class="card-body" style="padding: 0;">
-                <table style="width: 100%; border-collapse: collapse;">
-                    <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
-                        <tr>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문 제목</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">학술지명</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">등급</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
-                            <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">상태</th>
-                            <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">[관리]</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${submissions.length > 0 ? submissions.map(sub => `
-                            <tr style="border-bottom: 1px solid #E5E7EB;">
-                                <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${sub.paperTitle}</td>
-                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.journalName}</td>
-                                <td style="padding: 0.75rem 1rem;">
-                                    <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.grade}</span>
-                                </td>
-                                <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.submitDate}</td>
-                                <td style="padding: 0.75rem 1rem;">
-                                    <span style="background: #FEF3C7; color: #92400E; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.status}</span>
-                                </td>
-                                <td style="padding: 0.75rem 1rem; text-align: center;">
-                                    <a href="javascript:void(0)" onclick="viewJournalDetail(${sub.id})" style="color: #3B82F6; text-decoration: underline; font-size: 0.875rem;">
-                                        상세보기
-                                    </a>
-                                </td>
-                            </tr>
-                        `).join('') : `
+                <div class="card-body" style="padding: 0;">
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                             <tr>
-                                <td colspan="6" style="padding: 3rem; text-align: center; color: #9CA3AF;">
-                                    제출한 학술지 실적이 없습니다
-                                </td>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문 제목</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">학술지명</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">등급</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출일</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">상태</th>
+                                <th style="padding: 0.75rem 1rem; text-align: center; font-size: 0.875rem; font-weight: 600; color: #374151;">[관리]</th>
                             </tr>
-                        `}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- 안내사항 -->
-        <div style="margin-top: 1.5rem; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0.5rem; padding: 1rem;">
-            <h4 style="font-weight: 600; color: #1E40AF; margin-bottom: 0.75rem;">
-                📌 안내 문구가 삽입되는 위치입니다
-            </h4>
-        </div>
-    `;
-
-    container.innerHTML = content;
-}
-
-// 학술지 제출 모달
-function showJournalSubmissionModal() {
-    const modalContent = `
-        <div class="modal">
-            <div class="modal-content" style="max-width: 800px; max-height: 90vh; overflow-y: auto;">
-                <div class="modal-header">
-                    <h3>학술지 대체 심사 실적 제출</h3>
-                    <button onclick="closeJournalModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF;">×</button>
+                        </thead>
+                        <tbody>
+                            ${submissions.length > 0 ? submissions.map(sub => `
+                                <tr style="border-bottom: 1px solid #E5E7EB;">
+                                    <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${sub.paperTitle}</td>
+                                    <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.journalName}</td>
+                                    <td style="padding: 0.75rem 1rem;">
+                                        <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.grade}</span>
+                                    </td>
+                                    <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.submitDate}</td>
+                                    <td style="padding: 0.75rem 1rem;">
+                                        <span style="background: #FEF3C7; color: #92400E; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.status}</span>
+                                    </td>
+                                    <td style="padding: 0.75rem 1rem; text-align: center;">
+                                        <a href="javascript:void(0)" onclick="viewJournalDetail(${sub.id})" style="color: #3B82F6; text-decoration: underline; font-size: 0.875rem;">
+                                            상세보기
+                                        </a>
+                                    </td>
+                                </tr>
+                            `).join('') : `
+                                <tr>
+                                    <td colspan="6" style="padding: 3rem; text-align: center; color: #9CA3AF;">
+                                        제출한 학술지 실적이 없습니다
+                                    </td>
+                                </tr>
+                            `}
+                        </tbody>
+                    </table>
                 </div>
-                <div class="modal-body">
+            </div>
+
+            <!-- 신청 폼 화면 (초기에는 숨김) -->
+            <div id="journal-form-view" style="display: none;">
+                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학술지 논문 제출</h2>
+                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 대체 심사 실적 제출서를 작성해주세요</p>
+                    </div>
+                    <button onclick="hideJournalSubmissionForm()" class="btn-secondary">
+                        ← 목록으로
+                    </button>
+                </div>
+
+                <div class="card-body" style="padding: 2rem;">
                     <form id="journalSubmissionForm" onsubmit="submitJournal(event)" class="space-y-6">
 
                     <!-- 논문 정보 -->
@@ -310,7 +278,7 @@ function showJournalSubmissionModal() {
 
                     <!-- 제출 버튼 -->
                     <div class="flex justify-end gap-3">
-                        <button type="button" onclick="closeJournalModal()"
+                        <button type="button" onclick="hideJournalSubmissionForm()"
                                 class="px-6 py-2 border border-gray-300 rounded hover:bg-gray-50 transition-colors">
                             취소
                         </button>
@@ -330,16 +298,32 @@ function showJournalSubmissionModal() {
                         </ul>
                     </div>
                 </form>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- 안내사항 -->
+        <div style="margin-top: 1.5rem; background: #EFF6FF; border: 1px solid #BFDBFE; border-radius: 0.5rem; padding: 1rem;">
+            <h4 style="font-weight: 600; color: #1E40AF; margin-bottom: 0.75rem;">
+                📌 안내 문구가 삽입되는 위치입니다
+            </h4>
+        </div>
     `;
 
-    document.getElementById('modal-container').innerHTML = modalContent;
+    container.innerHTML = content;
 }
 
-function closeJournalModal() {
-    document.getElementById('modal-container').innerHTML = '';
+// 학술지 제출 폼 표시/숨김 (인라인 방식)
+function showJournalSubmissionForm() {
+    document.getElementById('journal-list-view').style.display = 'none';
+    document.getElementById('journal-form-view').style.display = 'block';
+}
+
+function hideJournalSubmissionForm() {
+    document.getElementById('journal-form-view').style.display = 'none';
+    document.getElementById('journal-list-view').style.display = 'block';
+    // 폼 초기화
+    document.getElementById('journalSubmissionForm').reset();
 }
 
 function submitJournal(e) {
@@ -386,7 +370,7 @@ function submitJournal(e) {
 
     alert('학술지 대체 심사 실적이 제출되었습니다.\n관리자의 승인을 기다려주세요.');
 
-    closeJournalModal();
+    hideJournalSubmissionForm();
     renderJournalSubmissionList();
 }
 
@@ -576,8 +560,8 @@ function closeJournalDetailModal() {
 
 // Export functions
 window.initJournalSubmission = initJournalSubmission;
-window.showJournalSubmissionModal = showJournalSubmissionModal;
-window.closeJournalModal = closeJournalModal;
+window.showJournalSubmissionForm = showJournalSubmissionForm;
+window.hideJournalSubmissionForm = hideJournalSubmissionForm;
 window.submitJournal = submitJournal;
 window.viewJournalDetail = viewJournalDetail;
 window.closeJournalDetailModal = closeJournalDetailModal;
