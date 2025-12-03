@@ -16,16 +16,32 @@ function renderStudentFeedbackViewerUI(feedbackId) {
     return `
         <div class="modal-backdrop active" id="feedback-modal" style="z-index: 100;">
             <div class="modal-content" style="max-width: 98%; width: 1600px; height: 90vh; max-height: 90vh; display: flex; flex-direction: column;">
-                <!-- 헤더 -->
+                <!-- 헤더 (교수용과 동일 구조) -->
                 <div class="modal-header" style="flex-shrink: 0; padding: 1rem; border-bottom: 1px solid #E5E7EB; background: white; display: flex; align-items: center; justify-content: space-between;">
                     <div style="flex: 1;">
-                        <div style="display: flex; align-items: center; gap: 1rem;">
-                            <h3 style="font-size: 1.25rem; font-weight: 700; color: #1F2937;">온라인 피드백</h3>
-                            <span id="current-version-badge" style="font-size: 0.75rem; padding: 0.25rem 0.625rem; border-radius: 9999px; background: #DBEAFE; color: #1E40AF; font-weight: 600;">v3</span>
+                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 0.75rem; color: #6B7280;">AI 기반 학습 분석</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <h3 style="font-size: 1.25rem; font-weight: 700; color: #1F2937;">홍길동 - 논문_최종본.pdf</h3>
+                                <span id="current-version-badge" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 9999px; background: #F3F4F6; color: #6B7280; font-weight: 600;">v3</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6B7280;">
+                                <span style="font-weight: 600; color: #059669;">CopyKiller: 8%</span>
+                                <span style="color: #D1D5DB;">/</span>
+                                <span style="font-weight: 600; color: #059669;">GPT Killer: 5%</span>
+                                <a href="#" onclick="event.preventDefault(); alert('표절 검사 결과보고서 보기');" style="color: #3B82F6; text-decoration: underline; font-size: 0.75rem; margin-left: 0.5rem;">
+                                    결과보고서(통합)
+                                </a>
+                            </div>
                         </div>
-                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문 제목: AI 기반 학습 분석</p>
                     </div>
-                    <button onclick="closeFeedbackViewer()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF; line-height: 1;">×</button>
+                    <button onclick="closeFeedbackViewer()" style="background: none; border: none; cursor: pointer; color: #6B7280; padding: 0.5rem; transition: color 0.2s;">
+                        <svg style="width: 1.5rem; height: 1.5rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
                 </div>
 
                 <!-- 본문: 3단 레이아웃 (제출 이력 + PDF + 댓글) -->
@@ -59,21 +75,58 @@ function renderStudentFeedbackViewerUI(feedbackId) {
 
                     <!-- 중앙: PDF 뷰어 -->
                     <div style="flex: 1; display: flex; flex-direction: column; background: #F3F4F6; overflow: hidden;">
-                        <!-- PDF 툴바 (학생용은 보기 전용) -->
-                        <div style="padding: 0.75rem; background: #FFFFFF; border-bottom: 1px solid #E5E7EB; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;">
+                        <!-- PDF 툴바 (교수용과 동일하나 일부 도구는 비활성화) -->
+                        <div style="padding: 0.75rem 1rem; background: #FFFFFF; border-bottom: 1px solid #E5E7EB; display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0;">
                             <!-- 페이지 네비게이션 -->
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <button id="prev-page-btn" onclick="changePage(-1)" style="padding: 0.375rem 0.75rem; background: #F3F4F6; border: none; border-radius: 0.375rem; cursor: pointer; transition: background 0.2s;">
-                                    <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                <button id="prev-page" onclick="changePage(-1)" style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280; transition: background 0.2s; display: flex; align-items: center; justify-content: center;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                                     </svg>
                                 </button>
-                                <span style="font-size: 0.875rem; color: #374151; min-width: 4rem; text-align: center;">
-                                    <span id="page-num">1</span> / <span id="page-count">45</span>
+                                <span style="font-size: 0.875rem; color: #374151;">
+                                    <span id="page-num">1</span> / <span id="page-count">0</span>
                                 </span>
-                                <button id="next-page-btn" onclick="changePage(1)" style="padding: 0.375rem 0.75rem; background: #F3F4F6; border: none; border-radius: 0.375rem; cursor: pointer; transition: background 0.2s;">
+                                <button id="next-page" onclick="changePage(1)" style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280; transition: background 0.2s; display: flex; align-items: center; justify-content: center;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <div style="width: 1px; height: 1.5rem; background: #D1D5DB;"></div>
+
+                            <!-- 도구 버튼들 (학생은 선택 도구만 활성화) -->
+                            <div style="display: flex; align-items: center; gap: 0.25rem;">
+                                <button id="select-tool" class="pdf-toolbar-btn active" title="선택 및 텍스트 드래그"
+                                        style="padding: 0.5rem; background: #EFF6FF; border: none; border-radius: 0.25rem; cursor: pointer; color: #1E40AF; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 16 16" fill="currentColor">
+                                        <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
+                                    </svg>
+                                </button>
+                                <button class="pdf-toolbar-btn" disabled title="첨삭 (학생 사용 불가)"
+                                        style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB; opacity: 0.4; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
                                     <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
-                                        <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                                        <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM9 9a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button class="pdf-toolbar-btn" disabled title="판서 (학생 사용 불가)"
+                                        style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB; opacity: 0.4; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
+                                    </svg>
+                                </button>
+                                <button class="pdf-toolbar-btn" disabled title="하이라이트 (학생 사용 불가)"
+                                        style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB; opacity: 0.4; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
+                                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
+                                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
+                                    </svg>
+                                </button>
+                                <button class="pdf-toolbar-btn" disabled title="지우개 (학생 사용 불가)"
+                                        style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: not-allowed; color: #D1D5DB; opacity: 0.4; transition: all 0.2s; display: flex; align-items: center; justify-content: center;">
+                                    <svg style="width: 1.25rem; height: 1.25rem;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 002.828 0L21 9.656a2 2 0 000-2.828L15.172 1a2 2 0 00-2.828 0L3 12z" />
                                     </svg>
                                 </button>
                             </div>
@@ -82,18 +135,18 @@ function renderStudentFeedbackViewerUI(feedbackId) {
 
                             <!-- 확대/축소 -->
                             <div style="display: flex; align-items: center; gap: 0.5rem;">
-                                <button id="zoom-out-btn" onclick="zoomOut()" style="padding: 0.375rem 0.75rem; background: #F3F4F6; border: none; border-radius: 0.375rem; cursor: pointer; transition: background 0.2s;">
+                                <button id="zoom-out-btn" onclick="zoomOut()" style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280; transition: background 0.2s; display: flex; align-items: center; justify-content: center;">
                                     <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM7 9a1 1 0 000 2h6a1 1 0 100-2H7z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
                                 <span id="zoom-level" style="font-size: 0.75rem; font-weight: 600; color: #374151; width: 3rem; text-align: center;">100%</span>
-                                <button id="zoom-in-btn" onclick="zoomIn()" style="padding: 0.375rem 0.75rem; background: #F3F4F6; border: none; border-radius: 0.375rem; cursor: pointer; transition: background 0.2s;">
+                                <button id="zoom-in-btn" onclick="zoomIn()" style="padding: 0.5rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280; transition: background 0.2s; display: flex; align-items: center; justify-content: center;">
                                     <svg style="width: 1.25rem; height: 1.25rem;" viewBox="0 0 20 20" fill="currentColor">
                                         <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v2H7a1 1 0 100 2h2v2a1 1 0 102 0v-2h2a1 1 0 100-2h-2V7z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
-                                <button id="fit-page-btn" onclick="fitPage()" style="font-size: 0.75rem; padding: 0.375rem 0.75rem; background: #F3F4F6; border: none; border-radius: 0.375rem; cursor: pointer; transition: background 0.2s;">
+                                <button id="fit-page-btn" onclick="fitPage()" style="padding: 0.5rem 0.75rem; background: none; border: none; border-radius: 0.25rem; cursor: pointer; color: #6B7280; font-size: 0.75rem; transition: background 0.2s;">
                                     맞춤
                                 </button>
                             </div>
