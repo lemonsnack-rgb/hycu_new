@@ -222,19 +222,28 @@ function renderStudentFeedbackViewerUI(feedbackId) {
                             <div id="inline-feedback-tab" style="display: none;">
                                 <h5 style="font-size: 0.75rem; font-weight: 700; color: #374151; margin-bottom: 0.5rem;">📍 첨삭</h5>
                                 <div id="inline-feedback-list">
-                                    <!-- 첨삭 카드 (클릭 가능) -->
-                                    <div class="inline-comment-card" data-page="3" data-annotation-id="1" onclick="jumpToAnnotation(3, 1)"
-                                         style="background: #DBEAFE; padding: 0.75rem; border-radius: 0.5rem; margin-bottom: 0.5rem; cursor: pointer; border: 2px solid #93C5FD; transition: all 0.2s; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);">
-                                        <div style="display: flex; align-items: start; gap: 0.5rem; margin-bottom: 0.5rem;">
-                                            <div style="flex: 1;">
-                                                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                                                    <span style="font-size: 0.75rem; font-weight: 700; color: #1E40AF;">김교수</span>
-                                                    <span style="font-size: 0.625rem; background: white; color: #1E40AF; padding: 0.125rem 0.5rem; border-radius: 0.25rem; font-weight: 600;">p.3</span>
-                                                </div>
-                                                <p style="font-size: 0.625rem; color: #1E3A8A;">2025-11-02 09:35</p>
+                                    <!-- 첨삭 카드 (교수용과 동일한 스타일) -->
+                                    <div class="comment-card" data-page="3" data-annotation-id="1"
+                                         style="background: white; border: 2px solid #E5E5E5; border-radius: 0.5rem; padding: 1rem; margin-bottom: 1rem; transition: all 0.3s ease; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">
+                                        <!-- 헤더: 페이지 번호 + 이동 버튼 -->
+                                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                                <span style="font-size: 0.75rem; font-weight: 700; color: #374151;">3페이지 💬 1</span>
+                                                <span style="font-size: 0.75rem; padding: 0.125rem 0.5rem; border-radius: 9999px; background: #DBEAFE; color: #1E40AF;">
+                                                    김교수
+                                                </span>
                                             </div>
+                                            <button onclick="jumpToAnnotation(3, 1)" style="font-size: 0.75rem; color: #3B82F6; background: none; border: none; cursor: pointer; transition: color 0.2s;">
+                                                이동 →
+                                            </button>
                                         </div>
-                                        <p style="font-size: 0.875rem; color: #1E3A8A; font-weight: 500;">표본 크기 산정 근거를 추가해주세요.</p>
+
+                                        <!-- 첨삭 내용 -->
+                                        <div style="margin-bottom: 0.75rem;">
+                                            <h6 style="font-size: 0.75rem; font-weight: 600; color: #6B7280; margin-bottom: 0.5rem;">📝 첨삭 내용</h6>
+                                            <p style="font-size: 0.875rem; color: #1F2937; background: #F9FAFB; padding: 0.75rem; border-radius: 0.375rem; border-left: 3px solid #3B82F6;">표본 크기 산정 근거를 추가해주세요.</p>
+                                            <p style="font-size: 0.625rem; color: #9CA3AF; margin-top: 0.25rem;">2025-11-02 09:35</p>
+                                        </div>
                                     </div>
 
                                     <!-- 댓글 영역 (첨삭 카드와 분리) -->
@@ -478,12 +487,62 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// 페이지 이동 더미 함수 (실제로는 PDF.js와 연동)
-function changePage(delta) { console.log('Page change:', delta); }
-function zoomIn() { console.log('Zoom in'); }
-function zoomOut() { console.log('Zoom out'); }
-function fitPage() { console.log('Fit page'); }
-function jumpToAnnotation(page, id) { console.log('Jump to:', page, id); }
+// 페이지 이동 함수 (feedback.js의 함수들을 재사용)
+function changePage(delta) {
+    if (delta < 0) {
+        window.onPrevPage();
+    } else {
+        window.onNextPage();
+    }
+}
+
+function zoomIn() {
+    if (window.zoomIn) window.zoomIn();
+}
+
+function zoomOut() {
+    if (window.zoomOut) window.zoomOut();
+}
+
+function fitPage() {
+    if (window.fitPage) window.fitPage();
+}
+
+// 첨삭 영역으로 이동 (페이지 이동 + 스크롤)
+function jumpToAnnotation(targetPage, annotationId) {
+    console.log('첨삭으로 이동:', targetPage, annotationId);
+
+    // PDF 변수가 로드되어 있는지 확인
+    if (!window.pdfDoc) {
+        console.warn('PDF가 아직 로드되지 않았습니다.');
+        return;
+    }
+
+    // 페이지 범위 확인
+    if (targetPage < 1 || targetPage > window.pdfDoc.numPages) {
+        console.warn('유효하지 않은 페이지 번호:', targetPage);
+        return;
+    }
+
+    // 현재 페이지와 다르면 페이지 이동
+    if (window.pageNum !== targetPage) {
+        window.pageNum = targetPage;
+        if (window.queueRenderPage) {
+            window.queueRenderPage(targetPage);
+        }
+    }
+
+    // 스크롤을 PDF 영역 최상단으로 이동
+    setTimeout(() => {
+        const pdfRenderWrapper = document.getElementById('pdf-render-wrapper');
+        if (pdfRenderWrapper) {
+            pdfRenderWrapper.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }, 300);
+
+    // 첨삭 탭으로 전환
+    switchStudentFeedbackTab('inline');
+}
 function closeFeedbackViewer() {
     const modal = document.getElementById('feedback-modal');
     if (modal) modal.remove();
@@ -498,5 +557,7 @@ window.uploadStudentGeneralAttachment = uploadStudentGeneralAttachment;
 window.uploadStudentInlineAttachment = uploadStudentInlineAttachment;
 window.renderStudentFeedbackViewerUI = renderStudentFeedbackViewerUI;
 window.closeFeedbackViewer = closeFeedbackViewer;
+window.changePage = changePage;
+window.jumpToAnnotation = jumpToAnnotation;
 
 console.log('✅ 학생용 피드백 뷰어 로드 완료 (교수 UI 구조 - 3단 레이아웃)');
