@@ -26,100 +26,120 @@ function showStudentList() {
     
     contentArea.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
+            <!-- 검색 영역 -->
             <div class="p-6 border-b">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">내 지도학생 목록</h3>
-                    <div class="flex items-center gap-3">
-                        <button onclick="sendNotificationToSelected()"
-                                class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
-                            선택 학생에게 알림 발송
-                        </button>
-                        <div class="text-sm text-gray-600">
-                            총 <span class="font-semibold text-blue-600">${students.length}명</span>
+                <div class="search-container">
+                    <div class="search-grid">
+                        <div class="search-field">
+                            <label class="search-label">대학원</label>
+                            <select id="filter-graduate" class="search-select">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="디자인대학원">디자인대학원</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">전공/학과</label>
+                            <select id="filter-major" class="search-select">
+                                <option value="">전체</option>
+                                <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                <option value="경영학과">경영학과</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학위과정</label>
+                            <select id="filter-degree" class="search-select">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학년도</label>
+                            <select id="filter-year" class="search-select">
+                                <option value="">전체</option>
+                                <option value="2025">2025학년도</option>
+                                <option value="2024">2024학년도</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학기차</label>
+                            <select id="filter-semester" class="search-select">
+                                <option value="">전체</option>
+                                <option value="1">1학기차</option>
+                                <option value="2">2학기차</option>
+                                <option value="3">3학기차</option>
+                                <option value="4">4학기차</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학번</label>
+                            <input type="text" id="filter-student-id" placeholder="학번 입력" class="search-input">
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">성명</label>
+                            <input type="text" id="filter-name" placeholder="성명 입력" class="search-input">
                         </div>
                     </div>
-                </div>
-
-                <!-- 검색 영역 -->
-                <div class="bg-gray-50 p-4 rounded-lg">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-3">
-                        <select id="filter-degree" class="border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="">학위과정 전체</option>
-                            <option value="석사">석사</option>
-                            <option value="박사">박사</option>
-                        </select>
-                        <select id="filter-stage" class="border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="">단계 전체</option>
-                            <option value="research_proposal">연구계획서</option>
-                            <option value="thesis_plan">논문작성계획서</option>
-                            <option value="mid_thesis">중간논문</option>
-                            <option value="final_thesis">최종논문</option>
-                        </select>
-                        <input type="text"
-                               id="filter-keyword"
-                               placeholder="학번/성명 검색"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm">
-                        <div class="flex gap-2">
-                            <button onclick="searchStudents()"
-                                    class="flex-1 bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
-                                검색
-                            </button>
-                            <button onclick="resetStudentSearch()"
-                                    class="flex-1 bg-gray-200 text-gray-700 px-4 py-2 rounded text-sm hover:bg-gray-300">
-                                초기화
-                            </button>
-                        </div>
+                    <div class="search-buttons">
+                        <button onclick="searchStudents()" class="btn-primary">
+                            <i class="fas fa-search"></i> 검색
+                        </button>
+                        <button onclick="resetStudentSearch()" class="btn-secondary">
+                            <i class="fas fa-redo"></i> 초기화
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead class="bg-gray-50">
+            <!-- 알림 발송 버튼 -->
+            <div class="p-6 border-b flex justify-end">
+                <button onclick="sendNotificationToSelected()"
+                        class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#0087c9] text-sm font-semibold flex items-center gap-2">
+                    <i class="fas fa-bell"></i>
+                    선택 학생에게 알림 발송
+                </button>
+            </div>
+
+            <!-- 테이블 -->
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">지도 학생 목록</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
                         <tr>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
                                 <input type="checkbox" id="select-all-students"
                                        onchange="toggleSelectAllStudents(this.checked)"
-                                       class="rounded border-gray-300">
+                                       class="rounded">
                             </th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공/학과</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학년도</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody id="guidance-list-body">
                         ${students.map((student, idx) => {
-                            const myRole = student.advisors.find(a => a.id === currentProf.id)?.role;
-                            const myStats = student.guidanceStats[currentProf.id] || { count: 0, lastDate: '-' };
-
                             return `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 text-center">
-                                        <input type="checkbox" class="student-checkbox rounded border-gray-300"
+                                <tr class="border-b hover:bg-gray-50 transition-colors cursor-pointer"
+                                    onclick="showSemesterGuidanceDetail('${student.studentId}')">
+                                    <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="student-checkbox rounded"
                                                value="${student.studentId}" data-name="${student.name}">
                                     </td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${student.major || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${getDegreeText(student.degree)}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${student.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${student.name}</td>
-                                    <td class="py-3 px-4">
-                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">
-                                            재학
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-4 text-center">
-                                        <button onclick="showStudentDetail('${student.studentId}')"
-                                                class="text-blue-600 hover:underline text-sm font-medium">
-                                            상세보기
-                                        </button>
-                                    </td>
+                                    <td class="py-3 px-4 text-gray-800">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-gray-600 text-sm">일반대학원</td>
+                                    <td class="py-3 px-4 text-gray-600 text-sm">${student.major || '-'}</td>
+                                    <td class="py-3 px-4 text-gray-600 text-sm">${getDegreeText(student.degree)}</td>
+                                    <td class="py-3 px-4 text-gray-600 text-sm">2024</td>
+                                    <td class="py-3 px-4 text-gray-600 text-sm">${student.semester || '-'}학기</td>
+                                    <td class="py-3 px-4 text-gray-600 text-sm">${student.studentId}</td>
+                                    <td class="py-3 px-4 font-medium text-gray-800">${student.name}</td>
                                 </tr>
                             `;
                         }).join('')}
@@ -206,17 +226,25 @@ function renderStudentDetail() {
             </div>
         </div>
         
-        <!-- 주차별 지도 내역 (카드 형태 - 관리자 스타일) -->
+        <!-- 학기별 지도 계획 -->
         <div>
             <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
+                <h4 class="font-bold text-gray-800">학기별 논문지도 계획</h4>
                 <div class="flex items-center gap-3">
-                    <button onclick="openAddPlanModal()"
-                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
-                        + 계획 추가
+                    <button onclick="showSemesterGuidanceDetail('${student.id}')"
+                            class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-2">
+                        <i class="fas fa-calendar-check"></i>
+                        학기별 계획 관리
+                    </button>
+                    <button onclick="openSemesterPlanEditor()"
+                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] flex items-center gap-2">
+                        <i class="fas fa-calendar-alt"></i>
+                        ${renderSemesterPlanButtonText()}
                     </button>
                 </div>
             </div>
+
+            ${renderSemesterPlansSummary()}
             
             ${sortedPlans.length > 0 ? `
                 <div class="space-y-4">
