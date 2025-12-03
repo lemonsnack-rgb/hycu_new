@@ -48,6 +48,7 @@ function renderFeedbackList() {
                                 <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
                                 <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
                                 <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문 지도 단계</th>
                                 <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">피드백상태</th>
                                 <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제출일</th>
                             </tr>
@@ -55,7 +56,7 @@ function renderFeedbackList() {
                         <tbody id="feedback-list-body">
                             ${filteredRequests.length > 0
                                 ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                                : '<tr><td colspan="11" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                                : '<tr><td colspan="12" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
                             }
                         </tbody>
                     </table>
@@ -106,6 +107,7 @@ function renderFeedbackRow(request, idx) {
             </td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.semester || '-'}학기</td>
             <td class="py-3 px-4 text-gray-700 text-sm">${request.thesisTitle || request.file}</td>
+            <td class="py-3 px-4 text-gray-600 text-sm">${request.guidanceStage || '연구계획서'}</td>
             <td class="py-3 px-4">
                 <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
                     ${feedbackStatus}
