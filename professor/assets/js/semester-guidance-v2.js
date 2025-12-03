@@ -236,9 +236,10 @@ function renderExecutionComment(execution, currentProf, weekNumber, studentId) {
     return `
         <div class="execution-comment ${isMyExecution ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'} border rounded-lg p-4">
             <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center gap-2">
+                <div>
                     <div class="text-sm font-semibold ${isMyExecution ? 'text-blue-800' : 'text-gray-800'}">
                         ${execution.professorName} ${isMyExecution ? '(나)' : ''}
+                    </div>
                     <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
                         <span>${formatDateWithTime(execution.executionDate)}</span>
                         <span>•</span>

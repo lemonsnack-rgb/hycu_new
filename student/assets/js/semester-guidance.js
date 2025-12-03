@@ -197,22 +197,18 @@ function renderWeekCard(week, plan) {
                     </div>
                 `}
 
-                <!-- 실적 목록 (읽기 전용) -->
+                <!-- 실적 목록 (댓글 형태) -->
                 <div class="p-4">
                     <h4 class="text-sm font-semibold text-gray-700 mb-3">
                         실적 및 교수의견 (${week.executions.length}건)
                     </h4>
 
                     <!-- 기존 실적 목록 -->
-                    ${hasExecutions ? `
-                        <div class="space-y-3">
+                    ${week.executions.length > 0 ? `
+                        <div class="space-y-3 mb-4">
                             ${week.executions.map(exec => renderExecutionComment(exec)).join('')}
                         </div>
-                    ` : `
-                        <div class="text-sm text-gray-500 text-center py-4 italic">
-                            아직 등록된 실적이 없습니다.
-                        </div>
-                    `}
+                    ` : ''}
                 </div>
         </div>
     `;
@@ -220,13 +216,13 @@ function renderWeekCard(week, plan) {
 
 // 실적 댓글 렌더링
 function renderExecutionComment(execution) {
-
     return `
         <div class="execution-comment bg-gray-50 border-gray-200 border rounded-lg p-4">
             <div class="flex justify-between items-start mb-2">
-                <div class="flex items-center gap-2">
+                <div>
                     <div class="text-sm font-semibold text-gray-800">
                         ${execution.professorName}
+                    </div>
                     <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
                         <span>${formatDateWithTime(execution.executionDate)}</span>
                         <span>•</span>
@@ -235,7 +231,7 @@ function renderExecutionComment(execution) {
                         </span>
                     </div>
                 </div>
-                           </div>
+            </div>
             <div class="space-y-2 mt-3">
                 <div>
                     <span class="text-xs font-semibold text-gray-600">실행 내용:</span>
