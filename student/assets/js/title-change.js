@@ -10,7 +10,7 @@ function renderTitleChange() {
         <div class="card">
             <div class="card-header">
                 <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">논문 제목 관리</h2>
+                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">최종 논문 제목 수정</h2>
                     <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문 제목을 입력하고 수정할 수 있습니다.</p>
                 </div>
             </div>
@@ -18,42 +18,18 @@ function renderTitleChange() {
                 <form id="title-form" onsubmit="saveTitleChange(event)" style="max-width: 800px;">
                     <div style="margin-bottom: 1.5rem;">
                         <label style="font-weight: 600; color: #374151; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
-                            논문 제목 (국문) <span style="color: #DC2626;">*</span>
+                            논문 제목 <span style="color: #DC2626;">*</span>
                         </label>
                         <input type="text"
-                               id="title-korean"
-                               value="${currentTitle.korean || ''}"
-                               placeholder="국문 논문 제목을 입력하세요"
+                               id="title-input"
+                               value="${currentTitle.title || ''}"
+                               placeholder="논문 제목을 입력하세요"
                                required
                                style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
                         <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
                             예: 인공지능 기반 추천 시스템의 효율성 향상에 관한 연구
                         </p>
                     </div>
-
-                    <div style="margin-bottom: 1.5rem;">
-                        <label style="font-weight: 600; color: #374151; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
-                            논문 제목 (영문) <span style="color: #DC2626;">*</span>
-                        </label>
-                        <input type="text"
-                               id="title-english"
-                               value="${currentTitle.english || ''}"
-                               placeholder="영문 논문 제목을 입력하세요"
-                               required
-                               style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem;">
-                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
-                            예: A Study on Improving the Efficiency of AI-based Recommendation Systems
-                        </p>
-                    </div>
-
-                    ${currentTitle.registrationDate ? `
-                        <div style="background: #F3F4F6; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                            <div style="display: flex; gap: 2rem; font-size: 0.875rem; color: #6B7280;">
-                                <p><strong style="color: #374151;">등록일:</strong> ${currentTitle.registrationDate}</p>
-                                ${currentTitle.lastModifiedDate ? `<p><strong style="color: #374151;">최종 수정일:</strong> ${currentTitle.lastModifiedDate}</p>` : ''}
-                            </div>
-                        </div>
-                    ` : ''}
 
                     <div style="background: #EFF6FF; border: 1px solid #DBEAFE; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
                         <div style="display: flex; align-items: start;">
@@ -85,19 +61,16 @@ function renderTitleChange() {
 function saveTitleChange(event) {
     event.preventDefault();
 
-    const korean = document.getElementById('title-korean').value.trim();
-    const english = document.getElementById('title-english').value.trim();
+    const title = document.getElementById('title-input').value.trim();
 
-    if (!korean || !english) {
-        alert('국문 제목과 영문 제목을 모두 입력해주세요.');
+    if (!title) {
+        alert('논문 제목을 입력해주세요.');
         return;
     }
 
     // 데이터 저장
     DataService.updateTitle({
-        korean: korean,
-        english: english,
-        lastModifiedDate: new Date().toISOString().split('T')[0]
+        title: title
     });
 
     showCustomAlert('논문 제목이 저장되었습니다.', 'success');
@@ -108,8 +81,7 @@ function saveTitleChange(event) {
 
 function cancelTitleForm() {
     const currentTitle = DataService.getCurrentTitle();
-    document.getElementById('title-korean').value = currentTitle.korean || '';
-    document.getElementById('title-english').value = currentTitle.english || '';
+    document.getElementById('title-input').value = currentTitle.title || '';
 }
 
 // 초기화
