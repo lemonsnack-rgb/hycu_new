@@ -1,13 +1,13 @@
 // ===================================
-// 학생용 주차별 논문지도 현황 화면
+// 학생용 주차별 논문 지도 현황 화면
 // 교수용 화면의 학생별 상세 화면과 동일한 UI
-// 학생은 본인의 계획만 조회, 추가, 수정 가능
-// 교수가 입력한 실적은 조회만 가능
+// 학생 정보 영역은 제거
+// 교수 코멘트 영역은 읽기 전용
 // ===================================
 
-// 주차별 논문지도 현황 초기화
+// 주차별 논문 지도 현황 초기화
 function initGuidance() {
-    console.log('학생용 주차별 논문지도 현황 초기화');
+    console.log('학생용 주차별 논문 지도 현황 초기화');
     renderGuidanceDetail();
 }
 
@@ -31,7 +31,7 @@ function renderGuidanceDetail() {
                               d="M4 6h16M4 12h16M4 18h16"></path>
                     </svg>
                 </button>
-                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문지도 현황</h2>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문 지도 현황</h2>
             </div>
         </div>
 
@@ -41,8 +41,9 @@ function renderGuidanceDetail() {
                 <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
                 <div class="flex items-center gap-3">
                     <button onclick="openAddPlanModal()"
-                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
-                        + 계획 추가
+                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] flex items-center gap-2">
+                        <i class="fas fa-calendar-alt"></i>
+                        계획 추가
                     </button>
                 </div>
             </div>
@@ -51,7 +52,7 @@ function renderGuidanceDetail() {
                 <div class="space-y-4">
                     ${sortedPlans.map(plan => {
                         const isProfessorPlan = plan.createdBy === 'professor';
-                        const canEdit = !plan.executionDate; // 실적이 입력되지 않은 경우만 수정 가능
+                        const canEdit = !plan.executionDate && !isProfessorPlan; // 실적이 입력되지 않고 학생이 작성한 경우만 수정 가능
                         return `
                             <div class="border ${isProfessorPlan ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <!-- 헤더 -->
@@ -123,11 +124,6 @@ function renderGuidanceDetail() {
 
                                     <div class="flex justify-between items-center pt-2">
                                         ${getStatusBadge(plan.status)}
-                                        ${plan.createdBy ? `
-                                            <span class="text-xs text-gray-500">
-                                                ${plan.createdBy === 'professor' ? '교수님이 작성' : '내가 작성'}
-                                            </span>
-                                        ` : ''}
                                     </div>
                                 </div>
                             </div>
@@ -376,7 +372,8 @@ function savePlan() {
         plannedTopic: formData.get('plannedTopic'),
         plannedContent: formData.get('plannedContent'),
         plannedMethod: formData.get('plannedMethod'),
-        advisorId: advisorIds[0] // 첫 번째 선택된 교수를 담당교수로 설정
+        advisorId: advisorIds[0], // 첫 번째 선택된 교수를 담당교수로 설정
+        createdBy: 'student' // 학생이 작성한 계획임을 표시
     };
 
     DataService.addWeeklyGuidancePlan(planData);
