@@ -527,8 +527,6 @@ function getMethodText(method) {
 // Export
 window.showSemesterGuidanceDetail = showSemesterGuidanceDetail;
 window.changeSemesterView = changeSemesterView;
-window.toggleWeekCardV2 = toggleWeekCardV2;
-window.toggleAllWeeksV2 = toggleAllWeeksV2;
 window.addExecutionV2 = addExecutionV2;
 window.deleteExecutionV2 = deleteExecutionV2;
 window.saveWeekPlan = saveWeekPlan;
