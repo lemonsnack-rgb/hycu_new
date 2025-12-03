@@ -1,0 +1,99 @@
+/* ===================================
+   학기별 논문지도 계획 V2 스타일 (댓글 방식)
+   =================================== */
+
+/* 주차 카드 */
+.week-card-v2 {
+    transition: all 0.2s ease;
+}
+
+/* 실적 댓글 */
+.execution-comment {
+    transition: all 0.2s ease;
+}
+
+.execution-comment:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* 실적 추가 폼 */
+.execution-input-form {
+    transition: all 0.2s ease;
+}
+
+.execution-input-form:hover {
+    border-color: #009DE8;
+    background-color: #f0f9ff;
+}
+
+.execution-input-form textarea:focus,
+.execution-input-form input:focus,
+.execution-input-form select:focus {
+    outline: none;
+    border-color: #009DE8;
+    ring: 2px;
+    ring-color: #009DE8;
+    ring-opacity: 0.2;
+}
+
+/* 학기 선택 드롭다운 */
+#select-year,
+#select-semester {
+    transition: all 0.2s ease;
+}
+
+#select-year:hover,
+#select-semester:hover {
+    border-color: #009DE8;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .week-card-v2 .week-card-header {
+        padding: 0.75rem;
+    }
+
+    .execution-comment {
+        padding: 0.75rem;
+    }
+
+    .execution-input-form {
+        padding: 0.75rem;
+    }
+
+    .execution-comment .ml-10 {
+        margin-left: 0;
+        margin-top: 0.5rem;
+    }
+}
+
+/* 실적 없음 메시지 */
+.no-executions-message {
+    padding: 2rem;
+    text-align: center;
+    color: #9ca3af;
+    font-style: italic;
+}
+
+/* 교수 아바타 */
+.professor-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-center;
+    color: white;
+    font-weight: bold;
+    font-size: 0.875rem;
+}
+
+/* 실적 개수 뱃지 */
+.execution-count-badge {
+    background-color: #f3f4f6;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    font-size: 0.75rem;
+    color: #6b7280;
+}
