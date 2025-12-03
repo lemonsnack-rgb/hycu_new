@@ -1,14 +1,13 @@
 // ===================================
-// 학생용 학기별 논문 지도 현황 (읽기 전용)
+// 학생용 학기별 논문지도 현황 (읽기 전용)
 // 교수용 semester-guidance-v2.js 기반
 // ===================================
 
 let currentSemesterView = { year: 2025, semester: 1 };
 let availableSemesters = []; // 조회 가능한 학기 목록
 
-// ==================== 학기별 상세 화면 초기화 ====================
+// ==================== 학기별 상세 화면 (통합) ====================
 function initSemesterGuidance() {
-    console.log('학생용 학기별 논문 지도 현황 초기화');
 
     const student = DataService.getStudent();
     if (!student) return;
@@ -67,11 +66,16 @@ function renderSemesterDetailScreen(student, allPlans) {
         p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
     );
 
+    const advisors = [];
+    const currentProf = {};
+
     // 계획이 없으면 빈 15주차 생성
     const weeks = currentPlan ? currentPlan.weeks : generateEmptyWeeks(15);
 
     return `
-        <!-- 헤더 -->
+        
+        
+                <!-- 헤더 -->
         <div class="flex items-center mb-8">
             <div class="flex items-center gap-4">
                 <button class="mobile-menu-toggle lg:hidden" onclick="toggleMobileMenu()"
@@ -85,7 +89,7 @@ function renderSemesterDetailScreen(student, allPlans) {
             </div>
         </div>
 
-        <!-- 학기 선택 카드 -->
+<!-- 학기 선택 카드 -->
         <div class="bg-blue-50 rounded-lg p-6 mb-6">
             <div class="flex items-center gap-4 mb-4">
                 <div>
@@ -111,7 +115,7 @@ function renderSemesterDetailScreen(student, allPlans) {
         </div>
 
         <!-- 주차별 지도 계획 및 실적 (항상 15주차 표시) -->
-        ${renderWeeklyCards(weeks)}
+        ${renderWeeklyCards(weeks, currentPlan)}
     `;
 }
 
@@ -121,7 +125,7 @@ function generateEmptyWeeks(count) {
     for (let i = 1; i <= count; i++) {
         weeks.push({
             week: i,
-            plannedDate: null,
+            plannedDate: null,  // 학사시스템에서 조회
             plannedTopic: '',
             plannedContent: '',
             plannedMethod: 'meeting',
@@ -142,21 +146,21 @@ function changeSemesterViewStudent() {
     initSemesterGuidance();
 }
 
-// ==================== 주차별 카드 렌더링 ====================
-function renderWeeklyCards(weeks) {
+// ==================== 주차별 카드 렌더링 (계획 유무 무관) ====================
+function renderWeeklyCards(weeks, existingPlan) {
     return `
         <div class="space-y-4">
             <div class="mb-4">
                 <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
             </div>
 
-            ${weeks.map(week => renderWeekCard(week)).join('')}
+            ${weeks.map(week => renderWeekCard(week, existingPlan)).join('')}
         </div>
     `;
 }
 
-// 개별 주차 카드 (읽기 전용)
-function renderWeekCard(week) {
+// 개별 주차 카드 (댓글 방식)
+function renderWeekCard(week, plan) {
     const hasExecutions = week.executions && week.executions.length > 0;
     const hasPlan = week.plannedTopic && week.plannedTopic.trim() !== '';
 
@@ -182,7 +186,7 @@ function renderWeekCard(week) {
                         </div>
                     </div>
                 ` : `
-                    <!-- 계획 없음 표시 -->
+                    <!-- 계획 입력 폼 -->
                     <div class="p-4 bg-gray-50 border-b border-gray-200">
                         <div class="mb-2">
                             <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
@@ -214,15 +218,15 @@ function renderWeekCard(week) {
     `;
 }
 
-// 실적 댓글 렌더링 (읽기 전용)
+// 실적 댓글 렌더링
 function renderExecutionComment(execution) {
+
     return `
         <div class="execution-comment bg-gray-50 border-gray-200 border rounded-lg p-4">
             <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center gap-2">
                     <div class="text-sm font-semibold text-gray-800">
                         ${execution.professorName}
-                    </div>
                     <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
                         <span>${formatDateWithTime(execution.executionDate)}</span>
                         <span>•</span>
@@ -231,7 +235,7 @@ function renderExecutionComment(execution) {
                         </span>
                     </div>
                 </div>
-            </div>
+                           </div>
             <div class="space-y-2 mt-3">
                 <div>
                     <span class="text-xs font-semibold text-gray-600">실행 내용:</span>
@@ -247,6 +251,11 @@ function renderExecutionComment(execution) {
 }
 
 // ==================== 유틸리티 ====================
+function getTodayDate() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
 function formatDate(dateString) {
     if (!dateString) return '-';
     const date = new Date(dateString);
@@ -261,6 +270,20 @@ function formatDateWithTime(dateString) {
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
     return `${month}월 ${day}일`;
+}
+
+function getDegreeText(degree) {
+    const map = { 'master': '석사', 'doctor': '박사' };
+    return map[degree] || degree;
+}
+
+function getStageText(stage) {
+    const map = {
+        'plan': '연구계획서',
+        'mid': '중간논문',
+        'final': '최종논문'
+    };
+    return map[stage] || stage;
 }
 
 function getMethodBadgeClass(method) {
@@ -287,7 +310,7 @@ function getMethodText(method) {
 
 // Export
 window.initGuidance = initSemesterGuidance;
-window.initSemesterGuidance = initSemesterGuidance; // 호환성을 위해 유지
+window.initSemesterGuidance = initSemesterGuidance;
 window.changeSemesterViewStudent = changeSemesterViewStudent;
 
 console.log('✅ 학생용 학기별 논문 지도 현황 모듈 로드 완료 (읽기 전용)');
