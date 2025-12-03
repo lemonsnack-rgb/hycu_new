@@ -286,7 +286,8 @@ function getMethodText(method) {
 }
 
 // Export
-window.initSemesterGuidance = initSemesterGuidance;
+window.initGuidance = initSemesterGuidance;
+window.initSemesterGuidance = initSemesterGuidance; // 호환성을 위해 유지
 window.changeSemesterViewStudent = changeSemesterViewStudent;
 
 console.log('✅ 학생용 학기별 논문 지도 현황 모듈 로드 완료 (읽기 전용)');
