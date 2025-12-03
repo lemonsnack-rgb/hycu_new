@@ -61,52 +61,53 @@ function renderBoardList() {
     console.log('조회된 게시글 수:', posts.length);
 
     const html = `
-        <div class="bg-white rounded-lg shadow p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-800">자료실</h2>
-                <button onclick="openBoardWriteModal()" class="btn-primary">
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b flex justify-end">
+                <button onclick="openBoardWriteModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#0087c9] text-sm font-semibold">
                     + 글쓰기
                 </button>
             </div>
 
-            <!-- 게시글 목록 -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제목</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">작성자</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">작성일</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">첨부</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200">
-                        ${posts.length === 0 ? `
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">게시글 목록</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
                             <tr>
-                                <td colspan="5" class="py-8 text-center text-gray-500">
-                                    게시글이 없습니다.
-                                </td>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">번호</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제목</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">작성자</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">작성일</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">첨부</th>
                             </tr>
-                        ` : posts.map((post, idx) => `
-                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewBoardPost(${post.id})">
-                                <td class="py-3 px-4 text-sm text-gray-800">${posts.length - idx}</td>
-                                <td class="py-3 px-4 text-sm text-gray-800">
-                                    ${post.title}
-                                    ${post.comments.length > 0 ? `<span class="text-blue-600 ml-2">[${post.comments.length}]</span>` : ''}
-                                </td>
-                                <td class="py-3 px-4 text-sm text-gray-800">
-                                    ${post.authorName}
-                                    ${post.authorRole === 'professor' ? '<span class="text-xs text-blue-600 ml-1">[교수]</span>' : '<span class="text-xs text-green-600 ml-1">[학생]</span>'}
-                                </td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${formatDateTime(post.createdAt)}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">
-                                    ${post.files.length > 0 ? `📎 ${post.files.length}` : ''}
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${posts.length === 0 ? `
+                                <tr>
+                                    <td colspan="5" class="py-8 text-center text-gray-500">
+                                        게시글이 없습니다.
+                                    </td>
+                                </tr>
+                            ` : posts.map((post, idx) => `
+                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewBoardPost(${post.id})">
+                                    <td class="py-3 px-4 text-sm text-gray-800">${posts.length - idx}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">
+                                        ${post.title}
+                                        ${post.comments.length > 0 ? `<span class="text-blue-600 ml-2">[${post.comments.length}]</span>` : ''}
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-800">
+                                        ${post.authorName}
+                                        ${post.authorRole === 'professor' ? '<span class="text-xs text-blue-600 ml-1">[교수]</span>' : '<span class="text-xs text-green-600 ml-1">[학생]</span>'}
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${formatDateTime(post.createdAt)}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">
+                                        ${post.files.length > 0 ? `📎 ${post.files.length}` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     `;

@@ -583,16 +583,17 @@ function openCreateGroupMeetingModal() {
                             <input type="text" id="student-search" class="form-input w-full mb-3"
                                    placeholder="🔍 학생 검색..." oninput="filterStudents(this.value)" />
 
+                            <h4 class="text-sm font-semibold text-gray-700 mb-2">학생 선택</h4>
                             <div id="student-list" class="border rounded-lg overflow-hidden bg-gray-50">
                                 <div class="max-h-80 overflow-y-auto">
                                     <table class="w-full text-sm">
-                                        <thead class="bg-gray-100 border-b sticky top-0">
+                                        <thead class="bg-gray-50 border-b sticky top-0">
                                             <tr>
-                                                <th class="px-3 py-2 text-center" style="width: 40px;"></th>
-                                                <th class="px-3 py-2 text-left" style="width: 140px;">전공</th>
-                                                <th class="px-3 py-2 text-center" style="width: 80px;">학기차</th>
-                                                <th class="px-3 py-2 text-center" style="width: 100px;">학번</th>
-                                                <th class="px-3 py-2 text-left">성명</th>
+                                                <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 40px;"></th>
+                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700" style="width: 140px;">전공</th>
+                                                <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 80px;">학기차</th>
+                                                <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 100px;">학번</th>
+                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700">성명</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y">

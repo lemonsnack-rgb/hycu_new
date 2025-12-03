@@ -20,117 +20,49 @@ function renderFeedbackList() {
     // ID 38: 테이블 컬럼 순서 변경 (제출일 추가)
     contentArea.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6 border-b">
-                <div class="flex justify-between items-center mb-4">
-                    <div>
-                        <h2 class="text-2xl font-bold text-gray-800">제출물 목록</h2>
-                        <p class="text-sm text-gray-600 mt-1">학생들이 제출한 문서를 확인하고 피드백을 작성하세요</p>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <button onclick="sendNotificationToSelected()"
-                                class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#500020] text-sm font-semibold flex items-center gap-2">
-                            <i class="fas fa-bell"></i>
-                            선택한 학생에게 알림 발송
-                        </button>
-                        <div class="text-sm text-gray-600">
-                            <span class="font-semibold text-blue-600">${filteredRequests.length}</span>건
-                            ${filteredRequests.length !== requests.length ? `(전체 ${requests.length}건)` : ''}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 검색 영역 (표준화) -->
-                <div class="search-container">
-                    <div class="search-grid">
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                대학원
-                            </label>
-                            <select id="feedback-filter-graduate" class="search-select" onchange="searchFeedback()">
-                                <option value="">전체</option>
-                                <option value="일반대학원">일반대학원</option>
-                                <option value="교육대학원">교육대학원</option>
-                                <option value="산업대학원">산업대학원</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학위과정
-                            </label>
-                            <select id="feedback-filter-program" class="search-select" onchange="searchFeedback()">
-                                <option value="">전체</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                상태
-                            </label>
-                            <select id="feedback-filter-status" class="search-select" onchange="searchFeedback()">
-                                <option value="">전체</option>
-                                <option value="대기">대기</option>
-                                <option value="진행중">진행중</option>
-                                <option value="완료">완료</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                키워드
-                            </label>
-                            <input type="text"
-                                   id="feedback-filter-keyword"
-                                   placeholder="학번/성명/논문명 검색"
-                                   class="search-input"
-                                   onkeypress="if(event.key==='Enter') searchFeedback()">
-                        </div>
-                    </div>
-                    <div class="search-buttons">
-                        <button onclick="searchFeedback()" class="search-btn search-btn-primary">
-                            <i class="fas fa-search"></i>검색
-                        </button>
-                        <button onclick="resetFeedbackSearch()" class="search-btn search-btn-secondary">
-                            <i class="fas fa-redo"></i>초기화
-                        </button>
-                    </div>
-                </div>
+            <div class="p-6 border-b flex justify-end">
+                <button onclick="sendNotificationToSelected()"
+                        class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#0087c9] text-sm font-semibold flex items-center gap-2">
+                    <i class="fas fa-bell"></i>
+                    선택한 학생에게 알림 발송
+                </button>
             </div>
 
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b">
-                        <tr>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
-                                <input type="checkbox"
-                                       id="select-all-feedbacks"
-                                       onchange="toggleAllFeedbacks(this)"
-                                       class="rounded">
-                            </th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">피드백상태</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제출일</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">관리</th>
-                        </tr>
-                    </thead>
-                    <tbody id="feedback-list-body">
-                        ${filteredRequests.length > 0
-                            ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                            : '<tr><td colspan="12" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
-                        }
-                    </tbody>
-                </table>
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">지도 대상 논문 목록</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                                    <input type="checkbox"
+                                           id="select-all-feedbacks"
+                                           onchange="toggleAllFeedbacks(this)"
+                                           class="rounded">
+                                </th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">피드백상태</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제출일</th>
+                            </tr>
+                        </thead>
+                        <tbody id="feedback-list-body">
+                            ${filteredRequests.length > 0
+                                ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
+                                : '<tr><td colspan="11" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                            }
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     `;
-    
-    // ID 38: 행 클릭 이벤트 제거 (상세보기 버튼만 사용)
 }
 
 // ==================== 제출물 행 렌더링 (ID 38, 48) ====================
@@ -154,9 +86,10 @@ function renderFeedbackRow(request, idx) {
     }
 
     return `
-        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors"
-            data-feedback-id="${request.id}">
-            <td class="py-3 px-4 text-center">
+        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors cursor-pointer"
+            data-feedback-id="${request.id}"
+            onclick="openFeedbackViewer('${request.id}')">
+            <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
                 <input type="checkbox"
                        class="feedback-checkbox rounded"
                        data-feedback-id="${request.id}"
@@ -179,12 +112,6 @@ function renderFeedbackRow(request, idx) {
                 </span>
             </td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.uploadDate || '-'}</td>
-            <td class="py-3 px-4">
-                <button onclick="openFeedbackViewer('${request.id}'); event.stopPropagation();"
-                        class="text-[#009DE8] hover:underline text-sm">
-                    상세보기
-                </button>
-            </td>
         </tr>
     `;
 }

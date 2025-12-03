@@ -47,99 +47,115 @@ function renderReviewList() {
     
     // ID 49-50: 테이블 컬럼 변경 + 체크박스 추가
     const html = `
-        <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead class="bg-gray-50">
-                    <tr>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
-                            <input type="checkbox" id="select-all-reviews"
-                                   onchange="toggleSelectAllReviews(this.checked)"
-                                   class="rounded border-gray-300">
-                        </th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사일</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    ${filteredAssignments.map((assignment, index) => `
-                        <tr class="hover:bg-gray-50">
-                            <td class="py-3 px-4 text-center">
-                                <input type="checkbox" class="review-checkbox rounded border-gray-300"
-                                       value="${assignment.id}"
-                                       data-name="${assignment.studentName}"
-                                       data-student-id="${assignment.studentNumber}">
-                            </td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.degree || '석사'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
-                            <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
-                                <div class="truncate" title="${assignment.thesisTitle}">
-                                    ${assignment.thesisTitle}
-                                </div>
-                            </td>
-                            <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
-                            <td class="py-3 px-4 text-center">
-                                <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
-                                    ${assignment.evaluationProgress}
-                                </span>
-                            </td>
-                            <td class="py-3 px-4 text-center">
-                                <div class="flex gap-2 justify-center">
-                                    <button onclick="openReviewDetail('${assignment.id}', 'member')"
-                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
-                                        심사
-                                    </button>
-                                    ${assignment.myRole === 'chair' ? `
-                                        <button onclick="openReviewDetail('${assignment.id}', 'chair')"
-                                                class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
-                                            승인
-                                        </button>
-                                    ` : ''}
-                                </div>
-                            </td>
+        <div class="p-6">
+            <h3 class="text-lg font-semibold text-gray-800 mb-4">심사 대상 논문 목록</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full">
+                    <thead class="bg-gray-50 border-b">
+                        <tr>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                                <input type="checkbox" id="select-all-reviews"
+                                       onchange="toggleSelectAllReviews(this.checked)"
+                                       class="rounded border-gray-300">
+                            </th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학부/대학원</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학과/전공</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정구분</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학적상태</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">심사일</th>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">심사진행상태</th>
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">관리</th>
                         </tr>
-                    `).join('')}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${filteredAssignments.map((assignment, index) => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 text-center">
+                                    <input type="checkbox" class="review-checkbox rounded border-gray-300"
+                                           value="${assignment.id}"
+                                           data-name="${assignment.studentName}"
+                                           data-student-id="${assignment.studentNumber}">
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.degree || '석사'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
+                                <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
+                                    <div class="truncate" title="${assignment.thesisTitle}">
+                                        ${assignment.thesisTitle}
+                                    </div>
+                                </td>
+                                <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
+                                <td class="py-3 px-4 text-center">
+                                    <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
+                                        ${assignment.evaluationProgress}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    <div class="flex gap-2 justify-center">
+                                        <button onclick="openReviewDetail('${assignment.id}', 'member')"
+                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                            심사
+                                        </button>
+                                        ${assignment.myRole === 'chair' ? `
+                                            <button onclick="openReviewDetail('${assignment.id}', 'chair')"
+                                                    class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
+                                                승인
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
         </div>
     `;
-    
+
     listContainer.innerHTML = html;
 }
 
-// ==================== 필터링 (ID 49-50) ====================
+// ==================== 필터링 (논문지도현황과 동일한 8개 필드) ====================
 function getCurrentFilters() {
     return {
+        graduate: document.getElementById('filter-graduate')?.value || '',
+        major: document.getElementById('filter-major')?.value || '',
+        degree: document.getElementById('filter-degree')?.value || '',
         year: document.getElementById('filter-year')?.value || '',
-        semester: document.getElementById('filter-semester')?.value || '',
         semesterCount: document.getElementById('filter-semester-count')?.value || '',
-        reviewType: document.getElementById('filter-review-type')?.value || '',
-        search: document.getElementById('filter-keyword')?.value || ''
+        studentId: document.getElementById('filter-student-id')?.value || '',
+        name: document.getElementById('filter-name')?.value || '',
+        thesis: document.getElementById('filter-thesis')?.value || ''
     };
 }
 
 function filterAssignments(assignments, filters) {
     return assignments.filter(assignment => {
-        // 학년도 필터
-        if (filters.year && (assignment.year || '2025') !== filters.year) {
+        // 대학원 필터
+        if (filters.graduate && assignment.graduate !== filters.graduate) {
             return false;
         }
 
-        // 학기 필터
-        if (filters.semester && (assignment.semester || '1') !== filters.semester) {
+        // 전공/학과 필터
+        if (filters.major && assignment.major !== filters.major) {
+            return false;
+        }
+
+        // 학위과정 필터
+        if (filters.degree && assignment.degree !== filters.degree) {
+            return false;
+        }
+
+        // 학년도 필터
+        if (filters.year && (assignment.year || '2025') !== filters.year) {
             return false;
         }
 
@@ -148,19 +164,23 @@ function filterAssignments(assignments, filters) {
             return false;
         }
 
-        // 심사구분 필터
-        if (filters.reviewType && assignment.submissionType !== filters.reviewType) {
-            return false;
+        // 학번 검색
+        if (filters.studentId) {
+            if (!assignment.studentNumber.includes(filters.studentId)) {
+                return false;
+            }
         }
 
-        // 검색
-        if (filters.search) {
-            const searchLower = filters.search.toLowerCase();
-            const matchStudent = assignment.studentName.toLowerCase().includes(searchLower);
-            const matchNumber = assignment.studentNumber.includes(searchLower);
-            const matchTitle = assignment.thesisTitle.toLowerCase().includes(searchLower);
+        // 성명 검색
+        if (filters.name) {
+            if (!assignment.studentName.toLowerCase().includes(filters.name.toLowerCase())) {
+                return false;
+            }
+        }
 
-            if (!matchStudent && !matchNumber && !matchTitle) {
+        // 논문명 검색
+        if (filters.thesis) {
+            if (!assignment.thesisTitle.toLowerCase().includes(filters.thesis.toLowerCase())) {
                 return false;
             }
         }
@@ -174,11 +194,14 @@ function searchReviews() {
 }
 
 function resetReviewSearch() {
+    document.getElementById('filter-graduate').value = '';
+    document.getElementById('filter-major').value = '';
+    document.getElementById('filter-degree').value = '';
     document.getElementById('filter-year').value = '';
-    document.getElementById('filter-semester').value = '';
     document.getElementById('filter-semester-count').value = '';
-    document.getElementById('filter-review-type').value = '';
-    document.getElementById('filter-keyword').value = '';
+    document.getElementById('filter-student-id').value = '';
+    document.getElementById('filter-name').value = '';
+    document.getElementById('filter-thesis').value = '';
     renderReviewList();
 }
 

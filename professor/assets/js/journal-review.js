@@ -100,8 +100,11 @@ function renderJournalReviewList() {
             </div>
 
             <!-- 학술지 목록 -->
-            <div id="journal-review-list">
-                ${renderJournalReviewRows(journals)}
+            <div class="p-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">학술지 심사 목록</h3>
+                <div id="journal-review-list">
+                    ${renderJournalReviewRows(journals)}
+                </div>
             </div>
         </div>
     `;
@@ -125,25 +128,25 @@ function renderJournalReviewRows(journals) {
 
     return `
         <div class="overflow-x-auto">
-            <table class="min-w-full">
-                <thead class="bg-gray-50">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b">
                     <tr>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
                             <input type="checkbox" id="select-all-journals"
                                    onchange="toggleSelectAllJournals(this.checked)"
                                    class="rounded border-gray-300">
                         </th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
-                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
-                        <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학부/대학원</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학과/전공</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정구분</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문제목</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학술지명</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">제출일</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">심사진행상태</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">관리</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">

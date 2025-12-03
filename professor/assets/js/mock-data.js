@@ -679,6 +679,209 @@ const MOCK_DATA = {
                 }
             ]
         }
+    ],
+
+    // 학기별 논문지도 계획 (15주차 일괄 관리)
+    semesterGuidancePlans: [
+        {
+            id: 'SEM_2025_1_S001',
+            studentId: 'S001',
+            year: 2025,
+            semester: 1,
+            createdAt: '2025-03-01T09:00:00',
+            updatedAt: '2025-03-15T14:30:00',
+            weeks: [
+                {
+                    week: 1,
+                    plannedDate: '2025-03-03',
+                    advisorIds: ['P001', 'P002'], // 모든 지도교수
+                    plannedTopic: '연구방법론 개요',
+                    plannedContent: '연구방법론의 기본 개념과 연구 설계 방법 학습',
+                    plannedMethod: 'zoom',
+                    executions: [
+                        {
+                            executionId: 'EXEC_001',
+                            professorId: 'P001',
+                            professorName: '김교수',
+                            executionDate: '2025-03-05',
+                            executionContent: '연구방법론 기초 개념 설명 및 질의응답',
+                            comment: '학생이 개념을 잘 이해하고 있음',
+                            method: 'zoom',
+                            createdAt: '2025-03-05T15:00:00'
+                        },
+                        {
+                            executionId: 'EXEC_002',
+                            professorId: 'P002',
+                            professorName: '이교수',
+                            executionDate: '2025-03-06',
+                            executionContent: '추가 보충 설명 및 참고문헌 추천',
+                            comment: '심화 학습이 필요함',
+                            method: 'meeting',
+                            createdAt: '2025-03-06T10:30:00'
+                        }
+                    ]
+                },
+                {
+                    week: 2,
+                    plannedDate: '2025-03-10',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '선행연구 조사 방법',
+                    plannedContent: '학술 데이터베이스 활용법 및 문헌 검색 전략',
+                    plannedMethod: 'online',
+                    executions: [
+                        {
+                            executionId: 'EXEC_003',
+                            professorId: 'P001',
+                            professorName: '김교수',
+                            executionDate: '2025-03-11',
+                            executionContent: 'DBpia, RISS 등 학술 DB 활용법 지도',
+                            comment: '검색 키워드 선정 능력이 우수함',
+                            method: 'online',
+                            createdAt: '2025-03-11T14:00:00'
+                        }
+                    ]
+                },
+                {
+                    week: 3,
+                    plannedDate: '2025-03-17',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구주제 선정',
+                    plannedContent: '관심 분야 탐색 및 연구주제 후보 도출',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 4,
+                    plannedDate: '2025-03-24',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구주제 확정',
+                    plannedContent: '연구주제 최종 확정 및 연구 범위 설정',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 5,
+                    plannedDate: '2025-03-31',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구계획서 작성 지도 (1)',
+                    plannedContent: '서론 및 연구 배경 작성법',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 6,
+                    plannedDate: '2025-04-07',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구계획서 작성 지도 (2)',
+                    plannedContent: '이론적 배경 및 선행연구 고찰',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 7,
+                    plannedDate: '2025-04-14',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구방법론 설계',
+                    plannedContent: '연구 설계 및 데이터 수집 방법 결정',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 8,
+                    plannedDate: '2025-04-21',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '중간 점검',
+                    plannedContent: '연구 진행 상황 점검 및 향후 일정 조율',
+                    plannedMethod: 'zoom',
+                    executions: []
+                },
+                {
+                    week: 9,
+                    plannedDate: '2025-04-28',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '데이터 수집 계획',
+                    plannedContent: '설문지 설계 및 데이터 수집 계획 수립',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 10,
+                    plannedDate: '2025-05-05',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '데이터 분석 방법',
+                    plannedContent: '통계 분석 방법 선정 및 분석 도구 학습',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 11,
+                    plannedDate: '2025-05-12',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구계획서 초안 검토',
+                    plannedContent: '작성한 연구계획서 초안 검토 및 피드백',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 12,
+                    plannedDate: '2025-05-19',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구계획서 수정',
+                    plannedContent: '피드백 반영 및 연구계획서 수정',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 13,
+                    plannedDate: '2025-05-26',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '연구계획서 최종 검토',
+                    plannedContent: '연구계획서 최종 검토 및 보완',
+                    plannedMethod: 'meeting',
+                    executions: []
+                },
+                {
+                    week: 14,
+                    plannedDate: '2025-06-02',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '발표 준비',
+                    plannedContent: '연구계획서 발표 자료 작성 및 연습',
+                    plannedMethod: 'online',
+                    executions: []
+                },
+                {
+                    week: 15,
+                    plannedDate: '2025-06-09',
+                    advisorIds: ['P001', 'P002'],
+                    plannedTopic: '학기 종합 평가',
+                    plannedContent: '학기 연구 진행 상황 종합 평가 및 향후 계획',
+                    plannedMethod: 'meeting',
+                    executions: []
+                }
+            ]
+        }
+    ],
+
+    // 교수 데이터 (실적 입력용)
+    professors: [
+        {
+            id: 'P001',
+            name: '김교수',
+            department: '경영학과',
+            role: 'primary'
+        },
+        {
+            id: 'P002',
+            name: '이교수',
+            department: '경영학과',
+            role: 'secondary'
+        },
+        {
+            id: 'P003',
+            name: '박교수',
+            department: '경영학과',
+            role: 'secondary'
+        }
     ]
 };
 
@@ -1075,6 +1278,270 @@ const DataService = {
         if (post) {
             post.views++;
         }
+    },
+
+    // ========== 학기별 논문지도 계획 관리 ==========
+
+    // 학사일정 계산 유틸리티
+    calculateSemesterDates(startDate, weekCount = 15) {
+        const dates = [];
+        const start = new Date(startDate);
+
+        for (let i = 0; i < weekCount; i++) {
+            const weekDate = new Date(start);
+            weekDate.setDate(start.getDate() + (i * 7));
+            dates.push(weekDate.toISOString().split('T')[0]);
+        }
+
+        return dates;
+    },
+
+    // 학기 ID 생성
+    generateSemesterId(studentId, year, semester) {
+        return `SEM_${year}_${semester}_${studentId}`;
+    },
+
+    // 학생의 특정 학기 계획 조회
+    getSemesterGuidancePlan(studentId, year, semester) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+        return localData.semesterGuidancePlans.find(plan => plan.id === semesterId);
+    },
+
+    // 학생의 모든 학기 계획 조회
+    getAllSemesterPlans(studentId) {
+        return localData.semesterGuidancePlans.filter(plan => plan.studentId === studentId);
+    },
+
+    // 15주차 일괄 저장 (신규 생성)
+    createSemesterGuidancePlan(studentId, year, semester, semesterStartDate, weeks) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+
+        // 중복 확인
+        const existing = localData.semesterGuidancePlans.find(plan => plan.id === semesterId);
+        if (existing) {
+            throw new Error('해당 학기 계획이 이미 존재합니다.');
+        }
+
+        // 학사일정 자동 계산
+        const weekDates = this.calculateSemesterDates(semesterStartDate, 15);
+
+        // 주차별 데이터 준비 (입력된 주차만 저장)
+        const processedWeeks = weeks.map((week, index) => ({
+            week: index + 1,
+            plannedDate: weekDates[index],
+            advisorIds: week.advisorIds || [],
+            plannedTopic: week.plannedTopic || '',
+            plannedContent: week.plannedContent || '',
+            plannedMethod: week.plannedMethod || 'meeting',
+            executions: []
+        })).filter(week => week.plannedTopic && week.plannedContent); // 빈 주차 제외
+
+        const semesterEndDate = weekDates[14]; // 15주차 날짜
+
+        const newPlan = {
+            id: semesterId,
+            studentId,
+            year,
+            semester,
+            semesterStartDate,
+            semesterEndDate,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+            weeks: processedWeeks
+        };
+
+        localData.semesterGuidancePlans.push(newPlan);
+        return newPlan;
+    },
+
+    // 15주차 일괄 수정
+    updateSemesterGuidancePlan(studentId, year, semester, weeks) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+        const planIndex = localData.semesterGuidancePlans.findIndex(plan => plan.id === semesterId);
+
+        if (planIndex === -1) {
+            throw new Error('해당 학기 계획을 찾을 수 없습니다.');
+        }
+
+        const existingPlan = localData.semesterGuidancePlans[planIndex];
+        const weekDates = this.calculateSemesterDates(existingPlan.semesterStartDate, 15);
+
+        // 주차별 데이터 업데이트 (기존 실적은 유지)
+        const updatedWeeks = weeks.map((week, index) => {
+            const existingWeek = existingPlan.weeks.find(w => w.week === (index + 1));
+
+            return {
+                week: index + 1,
+                plannedDate: weekDates[index],
+                advisorIds: week.advisorIds || [],
+                plannedTopic: week.plannedTopic || '',
+                plannedContent: week.plannedContent || '',
+                plannedMethod: week.plannedMethod || 'meeting',
+                executions: existingWeek ? existingWeek.executions : []
+            };
+        }).filter(week => week.plannedTopic && week.plannedContent);
+
+        localData.semesterGuidancePlans[planIndex].weeks = updatedWeeks;
+        localData.semesterGuidancePlans[planIndex].updatedAt = new Date().toISOString();
+
+        return localData.semesterGuidancePlans[planIndex];
+    },
+
+    // 특정 주차에 실적 추가
+    addExecution(studentId, year, semester, week, executionData) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+        const plan = localData.semesterGuidancePlans.find(p => p.id === semesterId);
+
+        if (!plan) {
+            throw new Error('해당 학기 계획을 찾을 수 없습니다.');
+        }
+
+        const weekPlan = plan.weeks.find(w => w.week === week);
+        if (!weekPlan) {
+            throw new Error(`${week}주차 계획을 찾을 수 없습니다.`);
+        }
+
+        const newExecution = {
+            executionId: `EXEC_${Date.now()}`,
+            professorId: executionData.professorId,
+            professorName: executionData.professorName,
+            executionDate: executionData.executionDate,
+            executionContent: executionData.executionContent,
+            comment: executionData.comment,
+            method: executionData.method,
+            createdAt: new Date().toISOString()
+        };
+
+        weekPlan.executions.push(newExecution);
+        plan.updatedAt = new Date().toISOString();
+
+        return newExecution;
+    },
+
+    // 실적 수정
+    updateExecution(studentId, year, semester, week, executionId, executionData) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+        const plan = localData.semesterGuidancePlans.find(p => p.id === semesterId);
+
+        if (!plan) {
+            throw new Error('해당 학기 계획을 찾을 수 없습니다.');
+        }
+
+        const weekPlan = plan.weeks.find(w => w.week === week);
+        if (!weekPlan) {
+            throw new Error(`${week}주차 계획을 찾을 수 없습니다.`);
+        }
+
+        const executionIndex = weekPlan.executions.findIndex(e => e.executionId === executionId);
+        if (executionIndex === -1) {
+            throw new Error('실적을 찾을 수 없습니다.');
+        }
+
+        // 본인의 실적만 수정 가능 확인 (호출하는 쪽에서 체크)
+        weekPlan.executions[executionIndex] = {
+            ...weekPlan.executions[executionIndex],
+            executionDate: executionData.executionDate,
+            executionContent: executionData.executionContent,
+            comment: executionData.comment,
+            method: executionData.method,
+            updatedAt: new Date().toISOString()
+        };
+
+        plan.updatedAt = new Date().toISOString();
+
+        return weekPlan.executions[executionIndex];
+    },
+
+    // 실적 삭제
+    deleteExecution(studentId, year, semester, week, executionId) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+        const plan = localData.semesterGuidancePlans.find(p => p.id === semesterId);
+
+        if (!plan) {
+            throw new Error('해당 학기 계획을 찾을 수 없습니다.');
+        }
+
+        const weekPlan = plan.weeks.find(w => w.week === week);
+        if (!weekPlan) {
+            throw new Error(`${week}주차 계획을 찾을 수 없습니다.`);
+        }
+
+        const executionIndex = weekPlan.executions.findIndex(e => e.executionId === executionId);
+        if (executionIndex === -1) {
+            throw new Error('실적을 찾을 수 없습니다.');
+        }
+
+        weekPlan.executions.splice(executionIndex, 1);
+        plan.updatedAt = new Date().toISOString();
+
+        return true;
+    },
+
+    // 주차별 계획 업데이트 (인라인 입력용)
+    updateWeekPlan(studentId, year, semester, week, planData) {
+        const semesterId = this.generateSemesterId(studentId, year, semester);
+        let plan = localData.semesterGuidancePlans.find(p => p.id === semesterId);
+
+        // 계획이 없으면 새로 생성
+        if (!plan) {
+            const student = localData.students.find(s => s.id === studentId);
+            if (!student) {
+                throw new Error('학생을 찾을 수 없습니다.');
+            }
+
+            plan = {
+                id: semesterId,
+                studentId: studentId,
+                year: year,
+                semester: semester,
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+                weeks: []
+            };
+
+            // 15주차 빈 구조 생성
+            for (let i = 1; i <= 15; i++) {
+                plan.weeks.push({
+                    week: i,
+                    plannedDate: null,
+                    plannedTopic: '',
+                    plannedContent: '',
+                    plannedMethod: 'meeting',
+                    executions: []
+                });
+            }
+
+            localData.semesterGuidancePlans.push(plan);
+        }
+
+        const weekPlan = plan.weeks.find(w => w.week === week);
+        if (!weekPlan) {
+            throw new Error(`${week}주차를 찾을 수 없습니다.`);
+        }
+
+        // 계획 데이터 업데이트
+        weekPlan.plannedTopic = planData.plannedTopic;
+        weekPlan.plannedContent = planData.plannedContent;
+        weekPlan.plannedMethod = planData.plannedMethod;
+        weekPlan.plannedDate = planData.plannedDate;
+
+        plan.updatedAt = new Date().toISOString();
+
+        return weekPlan;
+    },
+
+    // 교수 목록 조회 (실적 입력용)
+    getProfessors() {
+        return localData.professors || [];
+    },
+
+    // 학생의 지도교수 목록 조회
+    getStudentAdvisors(studentId) {
+        const student = localData.students.find(s => s.id === studentId);
+        if (!student) return [];
+
+        const advisorIds = student.advisors || [student.advisor];
+        return localData.professors.filter(p => advisorIds.includes(p.id));
     }
 };
 
