@@ -16,7 +16,7 @@ function renderStudentFeedbackViewerUI(feedbackId) {
     return `
         <div class="modal-backdrop active" id="feedback-modal" style="z-index: 100;">
             <div class="modal-content" style="max-width: 98%; width: 1600px; height: 90vh; max-height: 90vh; display: flex; flex-direction: column;">
-                <!-- 헤더 (교수용과 동일 구조) -->
+                <!-- 헤더 (교수용과 동일 구조, 단 표절률 제외) -->
                 <div class="modal-header" style="flex-shrink: 0; padding: 1rem; border-bottom: 1px solid #E5E7EB; background: white; display: flex; align-items: center; justify-content: space-between;">
                     <div style="flex: 1;">
                         <div style="display: flex; flex-direction: column; gap: 0.5rem;">
@@ -26,14 +26,6 @@ function renderStudentFeedbackViewerUI(feedbackId) {
                             <div style="display: flex; align-items: center; gap: 0.75rem;">
                                 <h3 style="font-size: 1.25rem; font-weight: 700; color: #1F2937;">홍길동 - 논문_최종본.pdf</h3>
                                 <span id="current-version-badge" style="font-size: 0.75rem; padding: 0.25rem 0.5rem; border-radius: 9999px; background: #F3F4F6; color: #6B7280; font-weight: 600;">v3</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.875rem; color: #6B7280;">
-                                <span style="font-weight: 600; color: #059669;">CopyKiller: 8%</span>
-                                <span style="color: #D1D5DB;">/</span>
-                                <span style="font-weight: 600; color: #059669;">GPT Killer: 5%</span>
-                                <a href="#" onclick="event.preventDefault(); alert('표절 검사 결과보고서 보기');" style="color: #3B82F6; text-decoration: underline; font-size: 0.75rem; margin-left: 0.5rem;">
-                                    결과보고서(통합)
-                                </a>
                             </div>
                         </div>
                     </div>

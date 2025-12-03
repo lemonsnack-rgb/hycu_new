@@ -419,9 +419,9 @@ function openFeedbackViewer(feedbackId) {
     setTimeout(() => loadPDF(), 100);
 }
 
-// PDF 로드 (샘플 PDF)
+// PDF 로드 (샘플 PDF - 교수용과 동일한 annotated PDF)
 function loadPDF() {
-    const url = 'https://raw.githubusercontent.com/mozilla/pdf.js/ba2edeae/examples/learning/helloworld.pdf';
+    const url = 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf';
     
     pdfjsLib.getDocument(url).promise.then(function(pdf) {
         pdfDoc = pdf;
