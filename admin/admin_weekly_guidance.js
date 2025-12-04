@@ -94,13 +94,12 @@ function showGuidancePairsList() {
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         ${data.guidancePairs.map((pair, index) => `
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-3 px-4 text-center">
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="showGuidancePairDetail(${pair.id})">
+                                <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
                                     <input type="checkbox" class="pair-checkbox rounded border-gray-300"
                                            value="${pair.student.studentId}" data-name="${pair.student.name}">
                                 </td>
@@ -117,12 +116,6 @@ function showGuidancePairsList() {
                                 </td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${pair.professor.name}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${pair.semester}</td>
-                                <td class="py-3 px-4 text-center">
-                                    <button onclick="showGuidancePairDetail(${pair.id})"
-                                            class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
-                                        상세보기
-                                    </button>
-                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -132,7 +125,7 @@ function showGuidancePairsList() {
     `;
 }
 
-// 상세 화면 (교수용 화면과 완전히 동일한 구조)
+// 상세 화면 (학생용 UI와 동일한 구조)
 function showGuidancePairDetail(pairId) {
     currentGuidanceView = 'detail';
     currentPairId = pairId;
@@ -145,7 +138,9 @@ function showGuidancePairDetail(pairId) {
         return;
     }
 
-    const sortedPlans = plansData.plans.sort((a, b) => a.week - b.week);
+    // 15주차 구조 생성 (학생용과 동일)
+    const weeks = generateAdminWeeks(plansData.plans);
+
     const contentArea = document.getElementById('weekly-guidance-content');
     if (!contentArea) return;
 
@@ -161,154 +156,204 @@ function showGuidancePairDetail(pairId) {
             </button>
         </div>
 
-        <!-- 학생 정보 카드 (교수용과 동일) -->
-        <div class="bg-gray-50 rounded-lg p-6 mb-6">
+        <!-- 헤더 -->
+        <div class="flex items-center mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">학기별 논문 지도 현황</h2>
+        </div>
+
+        <!-- 학생 정보 카드 -->
+        <div class="bg-blue-50 rounded-lg p-6 mb-6">
             <h4 class="font-bold text-gray-800 mb-4">학생 정보</h4>
             <div class="grid grid-cols-2 gap-4">
-                <div class="info-row">
-                    <div class="info-label">학생명</div>
-                    <div class="info-value">${pair.student.name} (${pair.student.studentId})</div>
+                <div>
+                    <span class="text-xs text-gray-600">학생명:</span>
+                    <span class="text-sm font-semibold text-gray-800 ml-2">${pair.student.name} (${pair.student.studentId})</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">전공 / 학위</div>
-                    <div class="info-value">${pair.student.major} / ${getAdminDegreeText(pair.student.degree)}</div>
+                <div>
+                    <span class="text-xs text-gray-600">전공 / 학위:</span>
+                    <span class="text-sm font-semibold text-gray-800 ml-2">${pair.student.major} / ${getAdminDegreeText(pair.student.degree)}</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">지도교수</div>
-                    <div class="info-value">
-                        ${pair.student.advisors.map(advisor => `
-                            <div class="${advisor.id === pair.professor.id ? 'font-semibold text-blue-600' : 'text-gray-600'}">
-                                ${advisor.name} ${advisor.role === 'primary' ? '(주지도교수)' : '(부지도교수)'}
-                            </div>
-                        `).join('')}
-                    </div>
+                <div>
+                    <span class="text-xs text-gray-600">지도교수:</span>
+                    <span class="text-sm font-semibold text-gray-800 ml-2">
+                        ${pair.student.advisors.map(advisor =>
+                            `${advisor.name} ${advisor.role === 'primary' ? '(주)' : '(부)'}`
+                        ).join(', ')}
+                    </span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">학기</div>
-                    <div class="info-value">${pair.semester}</div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">지도 현황</div>
-                    <div class="info-value">
-                        <span class="font-semibold text-blue-600">완료: ${pair.completedWeeks}주차</span>
-                        <span class="text-gray-600 ml-3">전체: ${pair.totalWeeks}주차</span>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <div class="info-label">최근 업데이트</div>
-                    <div class="info-value">${pair.lastUpdateDate || '-'}</div>
+                <div>
+                    <span class="text-xs text-gray-600">학기:</span>
+                    <span class="text-sm font-semibold text-gray-800 ml-2">${pair.semester}</span>
                 </div>
             </div>
         </div>
 
-        <!-- 주차별 지도 내역 (교수용과 완전히 동일한 카드 UI) -->
-        <div>
-            <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold text-gray-800">주차별 지도 내역</h4>
-                <div class="flex items-center gap-3">
-                    <button onclick="addNewWeeklyPlan()"
-                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
-                        + 계획 추가
-                    </button>
-                </div>
+        <!-- 주차별 지도 계획 및 실적 (항상 15주차 표시) -->
+        ${renderAdminWeeklyCards(weeks)}
+    `;
+}
+
+// 15주차 구조 생성 (학생용과 동일)
+function generateAdminWeeks(plans) {
+    const weeks = [];
+    for (let i = 1; i <= 15; i++) {
+        // 해당 주차의 모든 계획/실적 찾기
+        const weekPlans = plans.filter(p => p.week === i);
+
+        // 기본 주차 객체
+        const weekObj = {
+            week: i,
+            plannedDate: weekPlans[0]?.plannedDate || null,
+            plannedTopic: weekPlans[0]?.plannedTopic || '',
+            plannedContent: weekPlans[0]?.plannedContent || '',
+            plannedMethod: weekPlans[0]?.plannedMethod || 'meeting',
+            executions: []
+        };
+
+        // 실행된 계획들을 executions로 변환
+        weekPlans.forEach(plan => {
+            if (plan.executionDate) {
+                weekObj.executions.push({
+                    id: plan.id,
+                    professorName: plan.advisor.name,
+                    executionDate: plan.executionDate,
+                    method: plan.actualMethod || plan.plannedMethod,
+                    executionContent: plan.executionContent || '',
+                    comment: plan.professorComment || ''
+                });
+            }
+        });
+
+        weeks.push(weekObj);
+    }
+    return weeks;
+}
+
+// 주차별 카드 렌더링 (학생용과 동일)
+function renderAdminWeeklyCards(weeks) {
+    return `
+        <div class="space-y-4">
+            <div class="mb-4">
+                <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
             </div>
 
-            ${sortedPlans.length > 0 ? `
-                <div class="space-y-4">
-                    ${sortedPlans.map(plan => `
-                        <div class="border border-gray-200 bg-white rounded-lg p-4 hover:shadow-md transition-shadow">
-                            <!-- 헤더 -->
-                            <div class="flex justify-between items-start mb-3">
-                                <div>
-                                    <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
-                                        ${plan.week}주차
-                                    </span>
-                                    <span class="ml-2 text-sm text-gray-600">${formatAdminDate(plan.plannedDate)}</span>
-                                    ${plan.executionDate ? `
-                                        <span class="ml-2 text-sm text-green-600 font-medium">
-                                            → ${formatAdminDate(plan.executionDate)} 실행
-                                        </span>
-                                    ` : ''}
-                                </div>
-                                <div class="flex gap-2">
-                                    <span class="text-xs px-2 py-1 rounded ${
-                                        plan.actualMethod === 'meeting' ? 'bg-green-100 text-green-700' :
-                                        plan.actualMethod === 'zoom' ? 'bg-purple-100 text-purple-700' :
-                                        plan.actualMethod === 'email' ? 'bg-yellow-100 text-yellow-700' :
-                                        plan.plannedMethod === 'meeting' ? 'bg-gray-100 text-gray-600' :
-                                        'bg-gray-100 text-gray-600'
-                                    }">
-                                        ${getAdminMethodText(plan.actualMethod || plan.plannedMethod)}
-                                    </span>
-                                    ${!plan.executionDate ? `
-                                        <button onclick="editWeeklyPlan(${plan.id})"
-                                                class="text-blue-600 hover:underline text-xs font-medium">
-                                            수정
-                                        </button>
-                                        <button onclick="deletePlan(${plan.id})"
-                                                class="text-red-600 hover:underline text-xs font-medium">
-                                            삭제
-                                        </button>
-                                    ` : ''}
-                                </div>
+            ${weeks.map(week => renderAdminWeekCard(week)).join('')}
+        </div>
+    `;
+}
+
+// 개별 주차 카드 (학생용과 동일한 구조)
+function renderAdminWeekCard(week) {
+    const hasExecutions = week.executions && week.executions.length > 0;
+    const hasPlan = week.plannedTopic && week.plannedTopic.trim() !== '';
+
+    return `
+        <div class="week-card-v2 bg-white border border-gray-200 rounded-lg">
+                ${hasPlan ? `
+                    <!-- 계획 입력 폼 (기존 계획 표시) -->
+                    <div class="p-4 bg-yellow-50 border-b border-yellow-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
+                                <input type="text" value="${week.plannedTopic}"
+                                       placeholder="예: 연구방법론 개요" readonly
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
                             </div>
-
-                            <!-- 본문 -->
-                            <div class="space-y-2">
-                                <div>
-                                    <span class="text-xs font-semibold text-gray-500">담당교수:</span>
-                                    <span class="text-sm text-blue-600 font-semibold ml-2">
-                                        ${plan.advisor.name}
-                                    </span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-semibold text-gray-500">지도주제:</span>
-                                    <span class="text-sm text-gray-800 ml-2">${plan.plannedTopic}</span>
-                                </div>
-                                <div>
-                                    <span class="text-xs font-semibold text-gray-500">계획내용:</span>
-                                    <p class="text-sm text-gray-700 mt-1">${plan.plannedContent}</p>
-                                </div>
-
-                                ${plan.executionContent ? `
-                                    <div class="bg-green-50 border-l-4 border-green-400 p-3 mt-2">
-                                        <span class="text-xs font-semibold text-green-800">실행내용:</span>
-                                        <p class="text-sm text-green-900 mt-1">${plan.executionContent}</p>
-                                    </div>
-                                ` : ''}
-
-                                ${plan.professorComment ? `
-                                    <div class="bg-amber-50 border-l-4 border-amber-400 p-3 mt-2">
-                                        <span class="text-xs font-semibold text-amber-800">교수 의견:</span>
-                                        <p class="text-sm text-amber-900 mt-1">${plan.professorComment}</p>
-                                    </div>
-                                ` : ''}
-
-                                <div class="flex justify-between items-center pt-2">
-                                    ${getAdminStatusBadge(plan.status)}
-                                    ${plan.isPublic !== undefined ? `
-                                        <span class="text-xs ${plan.isPublic ? 'text-green-600' : 'text-gray-500'}">
-                                            ${plan.isPublic ? '학생 공개' : '비공개'}
-                                        </span>
-                                    ` : ''}
-                                </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
+                                <textarea rows="3" readonly
+                                          placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
+                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">${week.plannedContent}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
+                                <select disabled class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                                    <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                                    <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                                    <option value="zoom" ${week.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
+                                    <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                                    <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                                </select>
                             </div>
                         </div>
-                    `).join('')}
+                    </div>
+                ` : `
+                    <!-- 계획 입력 폼 (빈 상태) -->
+                    <div class="p-4 bg-yellow-50 border-b border-yellow-200">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
+                                <input type="text"
+                                       placeholder="예: 연구방법론 개요" readonly
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
+                                <textarea rows="3" readonly
+                                          placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
+                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100"></textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
+                                <select disabled class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                                    <option value="meeting">대면</option>
+                                    <option value="online">온라인</option>
+                                    <option value="zoom" selected>Zoom</option>
+                                    <option value="email">이메일</option>
+                                    <option value="phone">전화</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `}
+
+                <!-- 실적 목록 (댓글 형태) -->
+                <div class="p-4">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">
+                        실적 및 교수의견 (${week.executions.length}건)
+                    </h4>
+
+                    <!-- 기존 실적 목록 -->
+                    ${week.executions.length > 0 ? `
+                        <div class="space-y-3 mb-4">
+                            ${week.executions.map(exec => renderAdminExecutionComment(exec)).join('')}
+                        </div>
+                    ` : ''}
                 </div>
-            ` : `
-                <div class="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed border-gray-300">
-                    <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <p class="mt-4 text-sm text-gray-600">등록된 지도 계획이 없습니다</p>
-                    <button onclick="addNewWeeklyPlan()"
-                            class="mt-4 bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
-                        첫 지도 계획 추가하기
-                    </button>
+        </div>
+    `;
+}
+
+// 실적 댓글 렌더링 (학생용과 동일)
+function renderAdminExecutionComment(execution) {
+    return `
+        <div class="execution-comment bg-gray-50 border-gray-200 border rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <div class="text-sm font-semibold text-gray-800">
+                        ${execution.professorName}
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                        <span>${formatAdminDateWithTime(execution.executionDate)}</span>
+                        <span>•</span>
+                        <span class="px-2 py-0.5 rounded ${getAdminMethodBadgeClass(execution.method)}">
+                            ${getAdminMethodText(execution.method)}
+                        </span>
+                    </div>
                 </div>
-            `}
+            </div>
+            <div class="space-y-2 mt-3">
+                <div>
+                    <span class="text-xs font-semibold text-gray-600">실행 내용:</span>
+                    <p class="text-sm text-gray-800 mt-1">${execution.executionContent}</p>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-gray-600">교수 의견:</span>
+                    <p class="text-sm text-gray-800 mt-1">${execution.comment}</p>
+                </div>
+            </div>
         </div>
     `;
 }
@@ -601,6 +646,25 @@ function getAdminMethodText(method) {
         'phone': '전화'
     };
     return methodMap[method] || method || '대면';
+}
+
+function formatAdminDateWithTime(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}월 ${day}일`;
+}
+
+function getAdminMethodBadgeClass(method) {
+    const classes = {
+        'meeting': 'bg-green-100 text-green-700',
+        'zoom': 'bg-purple-100 text-purple-700',
+        'online': 'bg-blue-100 text-blue-700',
+        'email': 'bg-yellow-100 text-yellow-700',
+        'phone': 'bg-pink-100 text-pink-700'
+    };
+    return classes[method] || 'bg-gray-100 text-gray-700';
 }
 
 function getAdminStatusBadge(status) {
