@@ -194,12 +194,11 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">연구계획서 제목</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록일</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.length > 0 ? data.map((item, idx) => `
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewResearchProposalDetail(${item.id})">
                                     <td class="py-3 px-4 text-sm text-gray-800">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.year || '2025'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.semester || '1'}학기</td>
@@ -214,16 +213,10 @@ const views = {
                                         ${item.thesisTitle || '-'}
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.submitDate || '-'}</td>
-                                    <td class="py-3 px-4">
-                                        <button onclick="viewResearchProposalDetail(${item.id})"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded">
-                                            상세보기
-                                        </button>
-                                    </td>
                                 </tr>
                             `).join('') : `
                                 <tr>
-                                    <td colspan="11" class="py-8 text-center text-gray-500">
+                                    <td colspan="10" class="py-8 text-center text-gray-500">
                                         등록된 연구계획서가 없습니다.
                                     </td>
                                 </tr>
@@ -1351,7 +1344,6 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일시</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">상태</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -1367,7 +1359,7 @@ const views = {
                                     'bg-green-100 text-green-700';
 
                                 return `
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewPdfFeedback(${item.id}, true)">
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
@@ -1390,16 +1382,10 @@ const views = {
                                             ${statusText}
                                         </span>
                                     </td>
-                                    <td class="py-3 px-4 text-center">
-                                        <button onclick="viewPdfFeedback(${item.id}, true)"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded">
-                                            상세보기
-                                        </button>
-                                    </td>
                                 </tr>
                             `}).join('') : `
                                 <tr>
-                                    <td colspan="12" class="py-8 text-center text-gray-500">
+                                    <td colspan="11" class="py-8 text-center text-gray-500">
                                         데이터가 없습니다.
                                     </td>
                                 </tr>
@@ -1848,12 +1834,11 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일(수정일)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.length > 0 ? data.map((item, idx) => `
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewTitleChangeDetail(${item.id})">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
@@ -1866,16 +1851,10 @@ const views = {
                                         </div>
                                     </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
-                                    <td class="py-3 px-4 text-center">
-                                        <button onclick="viewTitleChangeDetail(${item.id})"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
-                                            상세보기
-                                        </button>
-                                    </td>
                                 </tr>
                             `).join('') : `
                                 <tr>
-                                    <td colspan="10" class="py-8 text-center text-gray-500">
+                                    <td colspan="9" class="py-8 text-center text-gray-500">
                                         논문 제목 등록 내역이 없습니다.
                                     </td>
                                 </tr>
