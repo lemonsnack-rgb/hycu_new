@@ -290,6 +290,12 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
     const tableBody = document.getElementById('professor-student-list');
     const noStudentsDiv = document.getElementById('professor-no-students');
 
+    // Null check: 요소가 없으면 함수 종료
+    if (!tableBody || !noStudentsDiv) {
+        console.warn('필요한 DOM 요소를 찾을 수 없습니다.');
+        return;
+    }
+
     if (data.length === 0) {
         tableBody.innerHTML = '';
         noStudentsDiv.style.display = 'block';
@@ -384,6 +390,135 @@ function resetProfessorAdvisorSearch() {
     alert('검색 조건이 초기화되었습니다.');
 }
 
+// 목록으로 돌아가기 (HTML 구조 복원)
+function returnToAdvisorAssignmentList() {
+    const screen = document.getElementById('advisor-assignment-screen');
+    if (!screen) return;
+
+    // 원래 HTML 구조 복원
+    screen.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 헤더 -->
+            <div class="p-6 border-b">
+                <h2 class="text-xl font-semibold text-gray-800">지도 학생 관리</h2>
+                <p class="text-sm text-gray-600 mt-1">나의 지도 학생 목록을 조회합니다.</p>
+            </div>
+
+            <!-- 검색 옵션 (관리자 화면과 동일) -->
+            <div class="p-6 border-b">
+                <div class="search-container">
+                    <div class="search-grid">
+                        <!-- 1. 학년도 -->
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학년도
+                            </label>
+                            <select id="prof-advisor-search-year" class="search-select">
+                                <option value="">전체</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                        </div>
+
+                        <!-- 2. 학기 -->
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학기
+                            </label>
+                            <select id="prof-advisor-search-semester" class="search-select">
+                                <option value="">전체</option>
+                                <option value="1">1학기</option>
+                                <option value="2">2학기</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. 학기차 -->
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학기차
+                            </label>
+                            <input type="text" id="prof-advisor-search-semester-count" placeholder="학기차 입력"
+                                   class="search-input">
+                        </div>
+
+                        <!-- 4. 학과/전공 -->
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학과/전공
+                            </label>
+                            <select id="prof-advisor-search-department" class="search-select">
+                                <option value="">전체</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. 학번 -->
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                학번
+                            </label>
+                            <input type="text" id="prof-advisor-search-student-id" placeholder="학번 입력"
+                                   class="search-input">
+                        </div>
+
+                        <!-- 6. 이름 -->
+                        <div class="search-field">
+                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                이름
+                            </label>
+                            <input type="text" id="prof-advisor-search-student-name" placeholder="이름 입력"
+                                   class="search-input">
+                        </div>
+                    </div>
+
+                    <!-- 검색/초기화 버튼 -->
+                    <div class="search-buttons">
+                        <button onclick="searchProfessorAdvisorAssignment()" class="search-btn search-btn-primary">
+                            <i class="fas fa-search"></i>검색
+                        </button>
+                        <button onclick="resetProfessorAdvisorSearch()" class="search-btn search-btn-secondary">
+                            <i class="fas fa-redo"></i>초기화
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 학생 목록 테이블 -->
+            <div class="p-6">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
+                            </tr>
+                        </thead>
+                        <tbody id="professor-student-list" class="bg-white divide-y divide-gray-200">
+                            <!-- JavaScript로 동적 생성 -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="professor-no-students" class="text-center py-8 text-gray-500" style="display: none;">
+                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                    </svg>
+                    <p>지도 학생이 없습니다.</p>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 초기화 호출하여 데이터 다시 로드
+    initAdvisorAssignment();
+}
+
 // 교수용 연구계획서 상세 보기 (읽기 전용 - 페이지 전환)
 function viewProfessorProposalDetail(proposalId) {
     console.log('연구계획서 상세 조회:', proposalId);
@@ -403,7 +538,7 @@ function viewProfessorProposalDetail(proposalId) {
             <!-- 헤더 -->
             <div class="px-8 py-6 border-b border-gray-200">
                 <div class="flex items-center justify-between mb-4">
-                    <button onclick="showScreen('advisor-assignment'); return false;"
+                    <button onclick="returnToAdvisorAssignmentList(); return false;"
                             class="flex items-center text-gray-600 hover:text-gray-900">
                         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
@@ -547,6 +682,7 @@ window.initAdvisorAssignment = initAdvisorAssignment;
 window.searchProfessorAdvisorAssignment = searchProfessorAdvisorAssignment;
 window.resetProfessorAdvisorSearch = resetProfessorAdvisorSearch;
 window.viewProfessorProposalDetail = viewProfessorProposalDetail;
+window.returnToAdvisorAssignmentList = returnToAdvisorAssignmentList;
 window.switchTab = switchTab;
 window.setupSearchInput = setupSearchInput;
 window.currentScreen = currentScreen;
