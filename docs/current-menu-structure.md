@@ -19,9 +19,9 @@
 - `schedule` - 논문일정
 - `process` - 논문지도절차
 
-#### ⭐ 학생 관리 (신규)
-- `advisorAssignment` - 지도교수 배정 (기존: 연구계획서 관리)
-- `stageManagement` - 학생 단계 관리 (기존: 워크플로우 관리)
+#### ⭐ 학생 관리 (신규 최상위 메뉴)
+- `advisorAssignment` - 지도교수 배정 (기존: 논문 제출 > 연구계획서 관리)
+- `studentStageManagement` - 학생 단계 관리 (신규 - 학생별 논문 지도 단계 부여/이관)
 
 #### 논문 제출
 - `requirementManagement` - 논문 제출 요건 등록
@@ -33,15 +33,15 @@
 
 #### 논문 심사
 - `committeeAssignment` - ⭐ 심사위원 배정 (신규 - 최상단)
-- `workflowManagement` - 워크플로우 관리 (기존: 심사 단계 등록)
-- `evaluationCriteria` - 심사 기준 등록
+- `stageRegistration` - 심사 단계 등록 (현행 유지)
+- `evaluationCriteria` - ⭐ 심사 기준 등록 (시스템 설정에서 이동)
 - `thesisReview` - 학위 논문 심사
 - `journalReview` - 학술지 논문 심사
+- `reviewResult` - 심사 결과 조회/판정
 
 #### 시스템 설정
 - `scheduleManagement` - 일정 관리
-- `thesisStageConfig` - 논문 지도 단계 설정 (기존: 심사 단계 등록)
-- `evaluationCriteria` - 심사 기준 등록
+- `thesisStageConfig` - ⭐ 논문 지도 단계 설정 (신규 - 학위별 단계 템플릿 관리)
 - `userManagement` - 사용자 관리
 - `permissionManagement` - 권한 관리
 - `userSupport` - ⭐ 사용자 지원 (신규)
@@ -196,7 +196,7 @@
 
 ## 2. 교수 화면 (professor-dashboard.html)
 
-### 현재 메뉴 구조
+### 변경 후 메뉴 구조 (2025-12-08 업데이트)
 
 #### 대시보드
 - `dashboard` - 대시보드
@@ -215,16 +215,17 @@
 #### 논문 지도
 - `guidance` - 주차별 논문지도 현황
 - `feedback` - 논문 지도 현황
+- `studentStatus` - ⭐ 학생 현황 조회 (관리자의 학생 단계 관리 화면과 유사, 읽기 전용)
 - `meeting` - 실시간 지도 예약
 
 #### 논문 심사
-- `evaluation-criteria` - 심사 기준 등록
-- `workflow` - 심사 단계 등록
-- `review` - 학위 논문 심사
-- `journal-review` - 학술지 논문 심사
+- `reviewInput` - ⭐ 심사 점수 입력 (신규)
+- `finalJudgment` - ⭐ 최종 판정 (신규 - 심사위원장 전용)
 
-#### 시스템 설정
-- (메뉴 확인 필요)
+#### ❌ 제외된 메뉴
+- 심사 기준 등록 (관리자만)
+- 심사 단계 등록 (관리자만)
+- 시스템 설정 전체 (관리자만)
 
 ---
 
@@ -424,3 +425,4 @@
 ## 변경 이력
 - 2025-12-08: 초안 작성 (현재 메뉴 구조 및 수정 대상 정리)
 - 2025-12-08: 메뉴 구조 개편 반영 (학생 관리 메뉴 신설, 심사위원 배정 독립)
+- 2025-12-08: 메뉴 구조 명확화 (학생 단계 관리 신규 기능, 논문 지도 단계 설정 분리, 교수 화면 정리)
