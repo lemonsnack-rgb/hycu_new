@@ -3451,39 +3451,25 @@ function viewProposalDetail(proposalId) {
                 </div>
 
                 ${assignment ? `
-                    <div class="space-y-4">
-                        <div class="flex items-start">
-                            <span class="w-32 text-gray-600 font-medium">지도교수:</span>
-                            <div class="flex-1">
-                                ${assignment.mainAdvisor ? `
-                                    <div class="bg-gray-50 px-4 py-3 rounded-lg">
-                                        <div>
-                                            <p class="font-medium text-gray-900">${assignment.mainAdvisor.name}</p>
-                                            <p class="text-sm text-gray-600">${assignment.mainAdvisor.department}</p>
-                                        </div>
-                                    </div>
-                                ` : `
-                                    <p class="text-gray-500">미배정</p>
-                                `}
-                            </div>
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium" style="min-width: 100px;">지도교수:</span>
+                            <span class="text-gray-900">
+                                ${assignment.mainAdvisor
+                                    ? `${assignment.mainAdvisor.name} ${assignment.mainAdvisor.department}`
+                                    : `<span class="text-gray-500">미배정</span>`
+                                }
+                            </span>
                         </div>
 
-                        <div class="flex items-start">
-                            <span class="w-32 text-gray-600 font-medium">부지도교수:</span>
-                            <div class="flex-1 space-y-2">
-                                ${assignment.coAdvisors && assignment.coAdvisors.length > 0 ? `
-                                    ${assignment.coAdvisors.map(coAdvisor => `
-                                        <div class="bg-gray-50 px-4 py-3 rounded-lg">
-                                            <div>
-                                                <p class="font-medium text-gray-900">${coAdvisor.name}</p>
-                                                <p class="text-sm text-gray-600">${coAdvisor.department}</p>
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                ` : `
-                                    <p class="text-gray-500">미배정</p>
-                                `}
-                            </div>
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium" style="min-width: 100px;">부지도교수:</span>
+                            <span class="text-gray-900">
+                                ${assignment.coAdvisors && assignment.coAdvisors.length > 0
+                                    ? assignment.coAdvisors.map(c => `${c.name} ${c.department}`).join(', ')
+                                    : `<span class="text-gray-500">미배정</span>`
+                                }
+                            </span>
                         </div>
 
                         <div class="flex justify-end mt-4">
@@ -3568,7 +3554,7 @@ function renderAdvisorAssignmentModal(student, type) {
                 <p class="text-sm text-gray-600">주지도교수는 1명, 부지도교수는 여러 명 선택할 수 있습니다.</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px; margin-bottom: 80px;">
                 <!-- 왼쪽: 주지도교수 -->
                 <div style="border-right: 1px solid #e5e7eb; padding-right: 24px; display: flex; flex-direction: column;">
                     <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">주지도교수</h4>
@@ -3591,7 +3577,15 @@ function renderAdvisorAssignmentModal(student, type) {
                         </div>
                     </div>
 
-                    <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px;" id="main-advisor-list">
+                    <!-- 컬럼 헤더 -->
+                    <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
+                        <div></div>
+                        <div>교번</div>
+                        <div>이름</div>
+                        <div>학과</div>
+                    </div>
+
+                    <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;" id="main-advisor-list">
                         ${mockProfessors.map(prof => renderAdvisorItem(prof, true, 'main')).join('')}
                     </div>
                 </div>
@@ -3618,13 +3612,21 @@ function renderAdvisorAssignmentModal(student, type) {
                         </div>
                     </div>
 
-                    <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px;" id="co-advisor-list">
+                    <!-- 컬럼 헤더 -->
+                    <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
+                        <div></div>
+                        <div>교번</div>
+                        <div>이름</div>
+                        <div>학과</div>
+                    </div>
+
+                    <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;" id="co-advisor-list">
                         ${mockProfessors.map(prof => renderAdvisorItem(prof, false, 'co')).join('')}
                     </div>
                 </div>
             </div>
 
-            <div class="modal-footer">
+            <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
                     취소
                 </button>
@@ -3702,18 +3704,16 @@ function renderAdvisorItem(prof, isMain, side = null) {
         : `data-dept="${prof.department}" data-name="${prof.name}"`;
 
     return `
-        <div class="advisor-item" ${dataAttrs}>
+        <div class="advisor-item" ${dataAttrs} style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; align-items: center; padding: 12px; border-bottom: 1px solid #e5e7eb;">
             <input type="${isMain ? 'radio' : 'checkbox'}"
                    name="${side ? side + '-advisor-select' : 'advisor-select'}"
                    value="${prof.id}"
                    ${isSelected ? 'checked' : ''}
-                   onchange="handleAdvisorSelection('${prof.id}', ${isMain})">
-            <div>
-                <p class="font-medium text-gray-900">${prof.name}</p>
-                <p class="text-sm text-gray-600">${prof.department}</p>
-            </div>
-            <div class="text-sm text-gray-600">${prof.title || '교수'}</div>
-            <div class="text-sm text-gray-600">${prof.email}</div>
+                   onchange="handleAdvisorSelection('${prof.id}', ${isMain})"
+                   style="margin: 0;">
+            <div class="text-sm text-gray-900">${prof.employeeNumber || '-'}</div>
+            <div class="text-sm font-medium text-gray-900">${prof.name}</div>
+            <div class="text-sm text-gray-600">${prof.department}</div>
         </div>
     `;
 }
