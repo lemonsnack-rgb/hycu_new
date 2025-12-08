@@ -3350,31 +3350,150 @@ function viewProposalDetail(proposalId) {
     // 배정 정보 찾기
     const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
 
-    // TODO: 상세 뷰로 전환 필요
-    // 임시로 alert 사용
-    let detailText = `[연구계획서 상세]\n\n`;
-    detailText += `학생: ${student?.name} (${student?.studentNumber})\n`;
-    detailText += `학위과정: ${proposal.degreeType}\n`;
-    detailText += `제목: ${proposal.title}\n`;
-    detailText += `연구목적: ${proposal.purpose}\n`;
-    detailText += `연구필요성: ${proposal.necessity}\n`;
-    detailText += `연구방법: ${proposal.method}\n`;
+    // 상세 뷰 렌더링
+    const detailView = `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 헤더 -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <button onclick="switchView('advisorAssignment')"
+                            class="flex items-center text-gray-600 hover:text-gray-900">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        목록으로
+                    </button>
+                    <span class="px-3 py-1 rounded text-sm font-medium ${proposal.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                        ${proposal.degreeType}
+                    </span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">${proposal.title}</h1>
+            </div>
 
-    if (proposal.desiredAdvisor) {
-        detailText += `\n희망 지도교수: ${proposal.desiredAdvisor.name}\n`;
-    }
+            <!-- 학생 정보 -->
+            <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">📋 학생 정보</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">학번:</span>
+                        <span class="text-gray-900">${student?.studentNumber}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">성명:</span>
+                        <span class="text-gray-900">${student?.name}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">학과:</span>
+                        <span class="text-gray-900">${student?.department}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">학년:</span>
+                        <span class="text-gray-900">${student?.grade}</span>
+                    </div>
+                </div>
+            </div>
 
-    if (assignment) {
-        detailText += `\n[배정 현황]\n`;
-        if (assignment.mainAdvisor) {
-            detailText += `지도교수: ${assignment.mainAdvisor.name} (${assignment.mainAdvisor.department})\n`;
-        }
-        if (assignment.coAdvisors && assignment.coAdvisors.length > 0) {
-            detailText += `부지도교수: ${assignment.coAdvisors.map(c => c.name).join(', ')}\n`;
-        }
-    }
+            <!-- 연구계획서 내용 -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">📝 연구계획서</h2>
 
-    alert(detailText);
+                <div class="space-y-6">
+                    <div>
+                        <h3 class="font-medium text-gray-700 mb-2">연구 목적</h3>
+                        <p class="text-gray-900 leading-relaxed">${proposal.purpose}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-medium text-gray-700 mb-2">연구 필요성</h3>
+                        <p class="text-gray-900 leading-relaxed">${proposal.necessity}</p>
+                    </div>
+
+                    <div>
+                        <h3 class="font-medium text-gray-700 mb-2">연구 문제 및 연구 방법</h3>
+                        <p class="text-gray-900 leading-relaxed">${proposal.method}</p>
+                    </div>
+
+                    ${proposal.desiredAdvisor ? `
+                        <div>
+                            <h3 class="font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</h3>
+                            <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- 지도교수 배정 현황 -->
+            <div class="px-8 py-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">👨‍🏫 지도교수 배정 현황</h2>
+                    ${assignment ? '' : `
+                        <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'main')"
+                                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
+                            지도교수 배정
+                        </button>
+                    `}
+                </div>
+
+                ${assignment ? `
+                    <div class="space-y-4">
+                        <div class="flex items-start">
+                            <span class="w-32 text-gray-600 font-medium">지도교수:</span>
+                            <div class="flex-1">
+                                ${assignment.mainAdvisor ? `
+                                    <div class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
+                                        <div>
+                                            <p class="font-medium text-gray-900">${assignment.mainAdvisor.name}</p>
+                                            <p class="text-sm text-gray-600">${assignment.mainAdvisor.department}</p>
+                                        </div>
+                                        <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'main')"
+                                                class="text-sm text-primary hover:text-primary-dark">
+                                            재배정
+                                        </button>
+                                    </div>
+                                ` : `
+                                    <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'main')"
+                                            class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white">
+                                        배정
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+
+                        <div class="flex items-start">
+                            <span class="w-32 text-gray-600 font-medium">부지도교수:</span>
+                            <div class="flex-1 space-y-2">
+                                ${assignment.coAdvisors && assignment.coAdvisors.length > 0 ? `
+                                    ${assignment.coAdvisors.map(coAdvisor => `
+                                        <div class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
+                                            <div>
+                                                <p class="font-medium text-gray-900">${coAdvisor.name}</p>
+                                                <p class="text-sm text-gray-600">${coAdvisor.department}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                    <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'co')"
+                                            class="mt-2 text-sm text-primary hover:text-primary-dark">
+                                        + 부지도교수 추가/변경
+                                    </button>
+                                ` : `
+                                    <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'co')"
+                                            class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50">
+                                        배정
+                                    </button>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                ` : `
+                    <p class="text-gray-500 text-center py-8">지도교수가 배정되지 않았습니다.</p>
+                `}
+            </div>
+        </div>
+    `;
+
+    // 콘텐츠 영역 업데이트
+    document.getElementById('content-area').innerHTML = detailView;
+    document.getElementById('view-title').textContent = '연구계획서 상세';
 }
 
 // 지도교수 배정 모달 표시
