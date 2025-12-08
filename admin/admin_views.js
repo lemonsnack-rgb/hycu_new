@@ -2166,6 +2166,9 @@ const views = {
             };
         });
 
+        // 필터링된 데이터 사용 (검색 기능용)
+        const data = window.filteredAdvisorData || proposalsWithAssignment;
+
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200">
@@ -2173,28 +2176,82 @@ const views = {
                     <p class="text-sm text-gray-600 mt-1">연구계획서를 제출한 학생에게 지도교수를 배정합니다.</p>
                 </div>
 
-                <!-- 필터 및 검색 -->
-                <div class="p-6 border-b border-gray-200 bg-gray-50">
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학과</label>
-                            <select id="filter-department" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                                <option value="">전체</option>
-                                ${mockDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                            </select>
+                <!-- 검색 옵션 (학위논문 심사와 동일한 디자인) -->
+                <div class="p-6 border-b">
+                    <div class="search-container">
+                        <div class="search-grid">
+                            <!-- 1. 학년도 -->
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학년도
+                                </label>
+                                <select id="advisor-search-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+
+                            <!-- 2. 학기 -->
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기
+                                </label>
+                                <select id="advisor-search-semester" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+
+                            <!-- 3. 학기차 -->
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학기차
+                                </label>
+                                <input type="text" id="advisor-search-semester-count" placeholder="학기차 입력"
+                                       class="search-input">
+                            </div>
+
+                            <!-- 4. 학과/전공 -->
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학과/전공
+                                </label>
+                                <select id="advisor-search-department" class="search-select">
+                                    <option value="">전체</option>
+                                    ${mockDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                                </select>
+                            </div>
+
+                            <!-- 5. 학번 -->
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    학번
+                                </label>
+                                <input type="text" id="advisor-search-student-id" placeholder="학번 입력"
+                                       class="search-input">
+                            </div>
+
+                            <!-- 6. 이름 -->
+                            <div class="search-field">
+                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                    이름
+                                </label>
+                                <input type="text" id="advisor-search-student-name" placeholder="이름 입력"
+                                       class="search-input">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">배정 상태</label>
-                            <select id="filter-status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
-                                <option value="">전체</option>
-                                <option value="pending">배정 대기</option>
-                                <option value="assigned">배정 완료</option>
-                            </select>
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">검색 (학번/이름)</label>
-                            <input type="text" id="search-student" placeholder="학번 또는 이름 입력"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md">
+
+                        <!-- 검색/초기화 버튼 -->
+                        <div class="search-buttons">
+                            <button onclick="searchAdvisorAssignment()" class="search-btn search-btn-primary">
+                                <i class="fas fa-search"></i>검색
+                            </button>
+                            <button onclick="resetAdvisorSearch()" class="search-btn search-btn-secondary">
+                                <i class="fas fa-redo"></i>초기화
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -2217,7 +2274,7 @@ const views = {
                                 </tr>
                             </thead>
                             <tbody id="advisor-assignment-table" class="bg-white divide-y divide-gray-200">
-                                ${proposalsWithAssignment.map(item => `
+                                ${data.map(item => `
                                     <tr class="hover:bg-gray-50 cursor-pointer"
                                         data-student-id="${item.studentId}"
                                         data-department="${item.department}"
@@ -2264,9 +2321,9 @@ const views = {
                         </table>
                     </div>
 
-                    ${proposalsWithAssignment.length === 0 ? `
+                    ${data.length === 0 ? `
                         <div class="text-center py-8 text-gray-500">
-                            제출된 연구계획서가 없습니다.
+                            ${window.filteredAdvisorData ? '검색 결과가 없습니다.' : '제출된 연구계획서가 없습니다.'}
                         </div>
                     ` : ''}
                 </div>

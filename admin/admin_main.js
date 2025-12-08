@@ -3261,6 +3261,69 @@ console.log('✅ 대리로그인 기능 로드 완료');
 
 // ========== 지도 학생 관리 기능 ==========
 
+// 지도교수 배정 검색 함수
+function searchAdvisorAssignment() {
+    // 검색 조건 수집
+    const year = document.getElementById('advisor-search-year')?.value || '';
+    const semester = document.getElementById('advisor-search-semester')?.value || '';
+    const semesterCount = document.getElementById('advisor-search-semester-count')?.value || '';
+    const department = document.getElementById('advisor-search-department')?.value || '';
+    const studentId = document.getElementById('advisor-search-student-id')?.value || '';
+    const studentName = document.getElementById('advisor-search-student-name')?.value || '';
+
+    // Mock 데이터가 없으면 종료
+    if (typeof mockResearchProposals === 'undefined' || typeof mockAdvisorAssignments === 'undefined') {
+        showAlert('Mock 데이터가 로드되지 않았습니다.');
+        return;
+    }
+
+    // 연구계획서와 배정 상태 통합
+    const proposalsWithAssignment = mockResearchProposals.map(proposal => {
+        const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
+        const student = mockStudents.find(s => s.id === proposal.studentId);
+        return {
+            ...proposal,
+            academicYear: student?.academicYear || '-',
+            semesterCount: student?.semesterCount || 0,
+            assignment: assignment || null
+        };
+    });
+
+    // 필터링
+    window.filteredAdvisorData = proposalsWithAssignment.filter(item => {
+        if (year && item.academicYear !== year) return false;
+        if (semester && !item.semester || semester) return false; // semester 필드가 없어서 임시 처리
+        if (semesterCount && item.semesterCount.toString() !== semesterCount) return false;
+        if (department && item.department !== department) return false;
+        if (studentId && !item.studentNumber.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        return true;
+    });
+
+    // 뷰 재렌더링
+    switchView('advisorAssignment');
+    showAlert(`검색 결과: ${window.filteredAdvisorData.length}건`);
+}
+
+// 지도교수 배정 검색 초기화
+function resetAdvisorSearch() {
+    // 검색 필드 초기화
+    document.querySelectorAll('input[id^="advisor-search"], select[id^="advisor-search"]').forEach(field => {
+        if (field.tagName === 'SELECT') {
+            field.selectedIndex = 0;
+        } else if (field.type !== 'checkbox') {
+            field.value = '';
+        }
+    });
+
+    // 필터링된 데이터 초기화
+    window.filteredAdvisorData = null;
+
+    // 뷰 재렌더링
+    switchView('advisorAssignment');
+    showAlert('검색 조건이 초기화되었습니다.');
+}
+
 // 학생 상세정보 모달 표시
 function showStudentInfo(studentId) {
     console.log('학생 상세정보 조회:', studentId);
