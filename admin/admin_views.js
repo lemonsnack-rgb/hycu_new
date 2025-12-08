@@ -2202,53 +2202,73 @@ const views = {
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과/전공</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제출일</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">배정 상태</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
                                 </tr>
                             </thead>
                             <tbody id="advisor-assignment-table" class="bg-white divide-y divide-gray-200">
                                 ${proposalsWithAssignment.map(item => `
-                                    <tr data-student-id="${item.studentId}" data-department="${item.department}" data-status="${item.status}">
+                                    <tr class="hover:bg-gray-50 cursor-pointer"
+                                        data-student-id="${item.studentId}"
+                                        data-department="${item.department}"
+                                        data-status="${item.status}"
+                                        onclick="viewProposalDetail('${item.id}')">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                                                ${item.degreeType}
+                                            </span>
+                                        </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.department}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.submittedDate}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap">
-                                            ${item.status === 'assigned'
-                                                ? '<span class="status-badge status-completed">배정 완료</span>'
-                                                : '<span class="status-badge status-pending">배정 대기</span>'}
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                            ${item.studentName}
+                                            <button onclick="event.stopPropagation(); showStudentInfo('${item.studentId}')"
+                                                    class="ml-1 text-gray-400 hover:text-primary"
+                                                    title="학생 상세정보">
+                                                <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
+                                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                                </svg>
+                                            </button>
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
                                             ${item.assignment && item.assignment.mainAdvisor
                                                 ? `
-                                                    <div class="space-y-1">
-                                                        <div>
-                                                            <span class="font-medium">${item.assignment.mainAdvisor.name}</span>
-                                                            ${item.assignment.mainAdvisor.isTenured
-                                                                ? '<span class="ml-1 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">전임</span>'
-                                                                : '<span class="ml-1 px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded">비전임</span>'}
-                                                        </div>
-                                                        ${item.assignment.coAdvisors.length > 0
-                                                            ? `<div class="text-xs text-gray-500">공동: ${item.assignment.coAdvisors.map(c => c.name).join(', ')}</div>`
-                                                            : ''}
+                                                    <div class="flex items-center justify-between">
+                                                        <span class="font-medium">${item.assignment.mainAdvisor.name}</span>
+                                                        <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'main')"
+                                                                class="ml-2 text-xs text-primary hover:text-primary-dark">
+                                                            재배정
+                                                        </button>
                                                     </div>
                                                 `
-                                                : '<span class="text-gray-400">미배정</span>'}
+                                                : `
+                                                    <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'main')"
+                                                            class="text-xs px-2 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white">
+                                                        배정
+                                                    </button>
+                                                `}
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                                            <button onclick="viewProposal('${item.id}')"
-                                                    class="text-primary hover:text-primary-dark">
-                                                계획서 보기
-                                            </button>
-                                            <button onclick="assignAdvisor('${item.studentId}')"
-                                                    class="text-primary hover:text-primary-dark">
-                                                ${item.status === 'assigned' ? '재배정' : '배정'}
-                                            </button>
+                                        <td class="px-6 py-4 text-sm text-gray-500">
+                                            ${item.assignment && item.assignment.coAdvisors.length > 0
+                                                ? `
+                                                    <div class="flex items-center justify-between">
+                                                        <span>${item.assignment.coAdvisors.map(c => c.name).join(', ')}</span>
+                                                        <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'co')"
+                                                                class="ml-2 text-xs text-primary hover:text-primary-dark">
+                                                            변경
+                                                        </button>
+                                                    </div>
+                                                `
+                                                : `
+                                                    <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'co')"
+                                                            class="text-xs px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50">
+                                                        배정
+                                                    </button>
+                                                `}
                                         </td>
                                     </tr>
                                 `).join('')}

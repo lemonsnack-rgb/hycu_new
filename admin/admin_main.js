@@ -24,7 +24,8 @@ function switchView(viewName) {
         requirementManagement: '논문 제출 요건 관리',
         stageManagement: '논문지도 단계 관리',
         typeManagement: '지도 단계 유형 관리',
-        evaluationCriteria: '평가 기준 관리'
+        evaluationCriteria: '평가 기준 관리',
+        advisorAssignment: '지도 학생 관리'
     };
     
     document.getElementById('view-title').textContent = viewTitles[viewName] || '대시보드';
@@ -3257,3 +3258,110 @@ window.filterProxyLoginUsers = filterProxyLoginUsers;
 window.proxyLogin = proxyLogin;
 
 console.log('✅ 대리로그인 기능 로드 완료');
+
+// ========== 지도 학생 관리 기능 ==========
+
+// 학생 상세정보 모달 표시
+function showStudentInfo(studentId) {
+    console.log('학생 상세정보 조회:', studentId);
+
+    // Mock 데이터에서 학생 정보 찾기
+    const student = mockStudents.find(s => s.id === studentId);
+
+    if (!student) {
+        showNotification('학생 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // TODO: 모달 구현 필요
+    // 임시로 alert 사용
+    alert(`[학생 상세정보]\n\n학번: ${student.studentNumber}\n성명: ${student.name}\n학과: ${student.department}\n학위과정: ${student.degreeType}\n학년: ${student.grade}\n입학일: ${student.admissionDate}\n이메일: ${student.email}\n전화번호: ${student.phone}`);
+}
+
+// 연구계획서 상세 페이지 조회
+function viewProposalDetail(proposalId) {
+    console.log('연구계획서 상세 조회:', proposalId);
+
+    // Mock 데이터에서 연구계획서 찾기
+    const proposal = mockResearchProposals.find(p => p.id === proposalId);
+
+    if (!proposal) {
+        showNotification('연구계획서를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // 학생 정보 찾기
+    const student = mockStudents.find(s => s.id === proposal.studentId);
+
+    // 배정 정보 찾기
+    const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
+
+    // TODO: 상세 뷰로 전환 필요
+    // 임시로 alert 사용
+    let detailText = `[연구계획서 상세]\n\n`;
+    detailText += `학생: ${student?.name} (${student?.studentNumber})\n`;
+    detailText += `학위과정: ${proposal.degreeType}\n`;
+    detailText += `제목: ${proposal.title}\n`;
+    detailText += `연구목적: ${proposal.purpose}\n`;
+    detailText += `연구필요성: ${proposal.necessity}\n`;
+    detailText += `연구방법: ${proposal.method}\n`;
+
+    if (proposal.desiredAdvisor) {
+        detailText += `\n희망 지도교수: ${proposal.desiredAdvisor.name}\n`;
+    }
+
+    if (assignment) {
+        detailText += `\n[배정 현황]\n`;
+        if (assignment.mainAdvisor) {
+            detailText += `지도교수: ${assignment.mainAdvisor.name} (${assignment.mainAdvisor.department})\n`;
+        }
+        if (assignment.coAdvisors && assignment.coAdvisors.length > 0) {
+            detailText += `부지도교수: ${assignment.coAdvisors.map(c => c.name).join(', ')}\n`;
+        }
+    }
+
+    alert(detailText);
+}
+
+// 지도교수 배정 모달 표시
+function assignAdvisor(studentId, proposalId, type = 'main') {
+    console.log('지도교수 배정:', { studentId, proposalId, type });
+
+    const student = mockStudents.find(s => s.id === studentId);
+    const assignment = mockAdvisorAssignments.find(a => a.studentId === studentId);
+
+    if (!student) {
+        showNotification('학생 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // TODO: 배정 모달 구현 필요
+    // 임시로 confirm 사용
+    const isReassign = assignment && (
+        (type === 'main' && assignment.mainAdvisor) ||
+        (type === 'co' && assignment.coAdvisors && assignment.coAdvisors.length > 0)
+    );
+
+    const action = isReassign ? '재배정' : '배정';
+    const advisorType = type === 'main' ? '지도교수' : '부지도교수';
+
+    if (confirm(`${student.name} 학생의 ${advisorType}를 ${action}하시겠습니까?\n\n교수 검색 모달이 열립니다.`)) {
+        showNotification(`${advisorType} ${action} 모달 구현 예정`, 'info');
+    }
+}
+
+// 연구계획서 제출 모달 표시 (학생용)
+function openProposalSubmitModal(degreeType) {
+    console.log('연구계획서 제출 모달:', degreeType);
+
+    // TODO: 제출 모달 구현 필요
+    showNotification(`${degreeType} 연구계획서 제출 모달 구현 예정`, 'info');
+}
+
+// Export
+window.showStudentInfo = showStudentInfo;
+window.viewProposalDetail = viewProposalDetail;
+window.assignAdvisor = assignAdvisor;
+window.openProposalSubmitModal = openProposalSubmitModal;
+
+console.log('✅ 지도 학생 관리 기능 로드 완료');
