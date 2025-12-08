@@ -3516,13 +3516,17 @@ function assignAdvisor(studentId, proposalId, type = 'main') {
     // 현재 배정 컨텍스트 저장
     currentAssignmentContext = { studentId, proposalId, type };
 
-    // 기존 배정 정보 로드
-    if (type === 'main') {
+    // 기존 배정 정보 로드 (both 타입이면 주/부 모두 로드)
+    if (type === 'both' || type === 'main') {
         selectedMainAdvisor = assignment?.mainAdvisor ? { ...assignment.mainAdvisor } : null;
-        selectedCoAdvisors = [];
     } else {
         selectedMainAdvisor = null;
+    }
+
+    if (type === 'both' || type === 'co') {
         selectedCoAdvisors = assignment?.coAdvisors ? [...assignment.coAdvisors] : [];
+    } else {
+        selectedCoAdvisors = [];
     }
 
     // 모달 내용 렌더링

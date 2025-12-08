@@ -2157,8 +2157,11 @@ const views = {
         // 연구계획서와 배정 상태 통합
         const proposalsWithAssignment = mockResearchProposals.map(proposal => {
             const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
+            const student = mockStudents.find(s => s.id === proposal.studentId);
             return {
                 ...proposal,
+                academicYear: student?.academicYear || '-',
+                semesterCount: student?.semesterCount || 0,
                 assignment: assignment || null
             };
         });
@@ -2202,12 +2205,15 @@ const views = {
                         <table class="min-w-full divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과/전공</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
                                 </tr>
                             </thead>
                             <tbody id="advisor-assignment-table" class="bg-white divide-y divide-gray-200">
@@ -2217,13 +2223,10 @@ const views = {
                                         data-department="${item.department}"
                                         data-status="${item.status}"
                                         onclick="viewProposalDetail('${item.id}')">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                                                ${item.degreeType}
-                                            </span>
-                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semesterCount}학기</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
                                         <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                                             ${item.studentName}
                                             <button onclick="event.stopPropagation(); showStudentInfo('${item.studentId}')"
@@ -2234,41 +2237,26 @@ const views = {
                                                 </svg>
                                             </button>
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                            <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                                                ${item.degreeType}
+                                            </span>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">
                                             ${item.assignment && item.assignment.mainAdvisor
-                                                ? `
-                                                    <div class="flex items-center justify-between">
-                                                        <span class="font-medium">${item.assignment.mainAdvisor.name}</span>
-                                                        <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'main')"
-                                                                class="ml-2 text-xs text-primary hover:text-primary-dark">
-                                                            재배정
-                                                        </button>
-                                                    </div>
-                                                `
-                                                : `
-                                                    <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'main')"
-                                                            class="text-xs px-2 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white">
-                                                        배정
-                                                    </button>
-                                                `}
+                                                ? item.assignment.mainAdvisor.name
+                                                : '-'}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">
+                                            ${item.assignment && item.assignment.coAdvisors.length > 0
+                                                ? item.assignment.coAdvisors.map(c => c.name).join(', ')
+                                                : '-'}
                                         </td>
                                         <td class="px-6 py-4 text-sm text-gray-500">
-                                            ${item.assignment && item.assignment.coAdvisors.length > 0
-                                                ? `
-                                                    <div class="flex items-center justify-between">
-                                                        <span>${item.assignment.coAdvisors.map(c => c.name).join(', ')}</span>
-                                                        <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'co')"
-                                                                class="ml-2 text-xs text-primary hover:text-primary-dark">
-                                                            변경
-                                                        </button>
-                                                    </div>
-                                                `
-                                                : `
-                                                    <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'co')"
-                                                            class="text-xs px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50">
-                                                        배정
-                                                    </button>
-                                                `}
+                                            <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'both')"
+                                                    class="text-xs px-3 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white">
+                                                ${item.assignment && (item.assignment.mainAdvisor || item.assignment.coAdvisors.length > 0) ? '재배정' : '배정'}
+                                            </button>
                                         </td>
                                     </tr>
                                 `).join('')}
