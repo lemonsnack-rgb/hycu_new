@@ -125,7 +125,7 @@ const mockAdvisorAssignments = mockResearchProposals.map((rp, index) => {
     }
 });
 
-// 논문 지도 단계 템플릿 데이터
+// 논문 지도 단계 템플릿 데이터 (워크플로우)
 const mockThesisStages = [
     {
         id: 'TS001',
@@ -134,11 +134,11 @@ const mockThesisStages = [
         stageCount: 5,
         createdDate: '2025-01-01',
         stages: [
-            { order: 1, name: '연구계획서 작성', type: 'submission', evaluationRequired: false },
-            { order: 2, name: '선행연구 검토', type: 'submission', evaluationRequired: false },
-            { order: 3, name: '연구 수행', type: 'submission', evaluationRequired: false },
-            { order: 4, name: '논문 작성', type: 'submission', evaluationRequired: false },
-            { order: 5, name: '최종 심사', type: 'review', evaluationRequired: true }
+            { order: 1, stepTypeId: 'ST001', name: '연구계획서 제출', type: 'submission', evaluationRequired: false },
+            { order: 2, stepTypeId: 'ST004', name: '선행연구 검토', type: 'submission', evaluationRequired: false },
+            { order: 3, stepTypeId: 'ST005', name: '연구 수행', type: 'submission', evaluationRequired: false },
+            { order: 4, stepTypeId: 'ST006', name: '논문 작성', type: 'submission', evaluationRequired: false },
+            { order: 5, stepTypeId: 'ST003', name: '본심사', type: 'review', evaluationRequired: true }
         ]
     },
     {
@@ -148,13 +148,13 @@ const mockThesisStages = [
         stageCount: 7,
         createdDate: '2025-01-01',
         stages: [
-            { order: 1, name: '연구계획서 작성', type: 'submission', evaluationRequired: false },
-            { order: 2, name: '선행연구 검토', type: 'submission', evaluationRequired: false },
-            { order: 3, name: '연구 제안서 심사', type: 'review', evaluationRequired: true },
-            { order: 4, name: '연구 수행', type: 'submission', evaluationRequired: false },
-            { order: 5, name: '예비 논문 심사', type: 'review', evaluationRequired: true },
-            { order: 6, name: '논문 작성', type: 'submission', evaluationRequired: false },
-            { order: 7, name: '최종 심사', type: 'review', evaluationRequired: true }
+            { order: 1, stepTypeId: 'ST001', name: '연구계획서 제출', type: 'submission', evaluationRequired: false },
+            { order: 2, stepTypeId: 'ST004', name: '선행연구 검토', type: 'submission', evaluationRequired: false },
+            { order: 3, stepTypeId: 'ST007', name: '연구제안서 심사', type: 'review', evaluationRequired: true },
+            { order: 4, stepTypeId: 'ST005', name: '연구 수행', type: 'submission', evaluationRequired: false },
+            { order: 5, stepTypeId: 'ST002', name: '예비심사', type: 'review', evaluationRequired: true },
+            { order: 6, stepTypeId: 'ST006', name: '논문 작성', type: 'submission', evaluationRequired: false },
+            { order: 7, stepTypeId: 'ST003', name: '본심사', type: 'review', evaluationRequired: true }
         ]
     }
 ];
@@ -182,3 +182,168 @@ const mockStudentStageAssignments = mockStudents.map((student, index) => {
         lastUpdated: '2025-03-01'
     };
 });
+
+// 심사 대상 학생 데이터 (심사 신청한 학생)
+// 심사 유형: 'proposal' (연구계획서), 'progress' (1차 보고서), 'final' (최종논문)
+const mockReviewTargets = [
+    // 연구계획서 심사 대상 (5명)
+    { id: 'RT001', studentId: 'STU002', studentNumber: '2024002', studentName: '이학생', department: '컴퓨터공학과', degreeType: '석사', academicYear: '2025', semesterCount: 4, reviewType: 'proposal', title: '블록체인 기반 데이터 무결성 보장 방안', submittedDate: '2025-03-11', advisorId: 'PROF001', advisorName: '김교수', status: 'pending' },
+    { id: 'RT002', studentId: 'STU003', studentNumber: '2024003', studentName: '박학생', department: '경영학과', degreeType: '석사', academicYear: '2025', semesterCount: 4, reviewType: 'proposal', title: '디지털 전환 시대의 기업 경쟁력 분석', submittedDate: '2025-03-12', advisorId: 'PROF003', advisorName: '박교수', status: 'pending' },
+    { id: 'RT003', studentId: 'STU005', studentNumber: '2024005', studentName: '정학생', department: '교육학과', degreeType: '석사', academicYear: '2025', semesterCount: 4, reviewType: 'proposal', title: '온라인 교육의 효과성 연구', submittedDate: '2025-03-14', advisorId: 'PROF005', advisorName: '정교수', status: 'pending' },
+    { id: 'RT004', studentId: 'STU007', studentNumber: '2024007', studentName: '조학생', department: '심리학과', degreeType: '석사', academicYear: '2025', semesterCount: 4, reviewType: 'proposal', title: 'SNS 사용이 청소년 심리에 미치는 영향', submittedDate: '2025-03-16', advisorId: 'PROF007', advisorName: '조교수', status: 'pending' },
+    { id: 'RT005', studentId: 'STU009', studentNumber: '2024009', studentName: '장학생', department: '사회복지학과', degreeType: '석사', academicYear: '2025', semesterCount: 4, reviewType: 'proposal', title: '노인 복지 정책의 효과성 분석', submittedDate: '2025-03-18', advisorId: 'PROF009', advisorName: '장교수', status: 'pending' },
+
+    // 최종논문 심사 대상 (3명) - 이미 심사위원 배정 완료
+    { id: 'RT006', studentId: 'STU004', studentNumber: '2024004', studentName: '최학생', department: '경영학과', degreeType: '석사', academicYear: '2024', semesterCount: 5, reviewType: 'final', title: 'ESG 경영이 기업 가치에 미치는 영향', submittedDate: '2025-02-15', advisorId: 'PROF003', advisorName: '박교수', status: 'assigned' },
+    { id: 'RT007', studentId: 'STU006', studentNumber: '2024006', studentName: '강학생', department: '교육학과', degreeType: '석사', academicYear: '2024', semesterCount: 5, reviewType: 'final', title: '메타버스를 활용한 교육 프로그램 개발', submittedDate: '2025-02-16', advisorId: 'PROF005', advisorName: '정교수', status: 'assigned' },
+    { id: 'RT008', studentId: 'STU008', studentNumber: '2024008', studentName: '윤학생', department: '심리학과', degreeType: '석사', academicYear: '2024', semesterCount: 5, reviewType: 'final', title: '직장인의 스트레스와 대처 방안 연구', submittedDate: '2025-02-17', advisorId: 'PROF007', advisorName: '조교수', status: 'assigned' },
+
+    // 박사 최종논문 심사 대상 (2명)
+    { id: 'RT009', studentId: 'STU014', studentNumber: '2023004', studentName: '양학생', department: '경영학과', degreeType: '박사', academicYear: '2023', semesterCount: 7, reviewType: 'final', title: '빅데이터 분석을 통한 소비자 행동 예측 모델', submittedDate: '2025-02-20', advisorId: 'PROF004', advisorName: '이교수', status: 'pending' },
+    { id: 'RT010', studentId: 'STU016', studentNumber: '2023006', studentName: '송학생', department: '교육학과', degreeType: '박사', academicYear: '2023', semesterCount: 7, reviewType: 'final', title: '인공지능 기반 개인화 학습 시스템 설계', submittedDate: '2025-02-21', advisorId: 'PROF006', advisorName: '강교수', status: 'pending' }
+];
+
+// 심사위원 배정 데이터
+const mockCommitteeAssignments = [
+    // RT006 (최학생 - 석사 최종논문) - 심사위원 배정 완료
+    {
+        id: 'CA001',
+        reviewTargetId: 'RT006',
+        studentId: 'STU004',
+        studentName: '최학생',
+        department: '경영학과',
+        degreeType: '석사',
+        reviewType: 'final',
+        chairId: 'PROF003', // 심사위원장 (지도교수)
+        chairName: '박교수',
+        members: [
+            { professorId: 'PROF003', professorName: '박교수', role: 'chair', department: '경영학과' },
+            { professorId: 'PROF004', professorName: '이교수', role: 'member', department: '경영학과' },
+            { professorId: 'PROF002', professorName: '이교수', role: 'member', department: '컴퓨터공학과' }
+        ],
+        assignedDate: '2025-02-20',
+        status: 'completed'
+    },
+    // RT007 (강학생 - 석사 최종논문) - 심사위원 배정 완료
+    {
+        id: 'CA002',
+        reviewTargetId: 'RT007',
+        studentId: 'STU006',
+        studentName: '강학생',
+        department: '교육학과',
+        degreeType: '석사',
+        reviewType: 'final',
+        chairId: 'PROF005',
+        chairName: '정교수',
+        members: [
+            { professorId: 'PROF005', professorName: '정교수', role: 'chair', department: '교육학과' },
+            { professorId: 'PROF006', professorName: '강교수', role: 'member', department: '교육학과' },
+            { professorId: 'PROF002', professorName: '이교수', role: 'member', department: '컴퓨터공학과' }
+        ],
+        assignedDate: '2025-02-21',
+        status: 'completed'
+    },
+    // RT008 (윤학생 - 석사 최종논문) - 심사위원 배정 완료
+    {
+        id: 'CA003',
+        reviewTargetId: 'RT008',
+        studentId: 'STU008',
+        studentName: '윤학생',
+        department: '심리학과',
+        degreeType: '석사',
+        reviewType: 'final',
+        chairId: 'PROF007',
+        chairName: '조교수',
+        members: [
+            { professorId: 'PROF007', professorName: '조교수', role: 'chair', department: '심리학과' },
+            { professorId: 'PROF008', professorName: '윤교수', role: 'member', department: '심리학과' },
+            { professorId: 'PROF005', professorName: '정교수', role: 'member', department: '교육학과' }
+        ],
+        assignedDate: '2025-02-22',
+        status: 'completed'
+    }
+];
+
+// =============================================================================
+// 단계 유형 데이터 (Step Types - 레고 블록)
+// =============================================================================
+
+const mockStepTypes = [
+    {
+        id: 'ST001',
+        name: '연구계획서 제출',
+        type: 'submission', // 'submission' | 'review'
+        requiresDocument: true,
+        requiresPresentation: false,
+        evaluationTemplateId: null,
+        description: '연구 주제 및 연구 방법을 문서로 제출하는 단계',
+        createdDate: '2025-01-01'
+    },
+    {
+        id: 'ST002',
+        name: '예비심사',
+        type: 'review',
+        requiresDocument: true,
+        requiresPresentation: true,
+        evaluationTemplateId: 'EVAL001',
+        description: '논문 초안에 대한 예비 심사 진행',
+        createdDate: '2025-01-01'
+    },
+    {
+        id: 'ST003',
+        name: '본심사',
+        type: 'review',
+        requiresDocument: true,
+        requiresPresentation: true,
+        evaluationTemplateId: 'EVAL002',
+        description: '최종 논문에 대한 본심사 진행',
+        createdDate: '2025-01-01'
+    },
+    {
+        id: 'ST004',
+        name: '선행연구 검토',
+        type: 'submission',
+        requiresDocument: true,
+        requiresPresentation: false,
+        evaluationTemplateId: null,
+        description: '관련 선행연구를 검토하고 요약 보고서 제출',
+        createdDate: '2025-01-01'
+    },
+    {
+        id: 'ST005',
+        name: '연구 수행',
+        type: 'submission',
+        requiresDocument: true,
+        requiresPresentation: false,
+        evaluationTemplateId: null,
+        description: '실제 연구를 수행하고 데이터 수집',
+        createdDate: '2025-01-01'
+    },
+    {
+        id: 'ST006',
+        name: '논문 작성',
+        type: 'submission',
+        requiresDocument: true,
+        requiresPresentation: false,
+        evaluationTemplateId: null,
+        description: '연구 결과를 바탕으로 논문 작성',
+        createdDate: '2025-01-01'
+    },
+    {
+        id: 'ST007',
+        name: '연구제안서 심사',
+        type: 'review',
+        requiresDocument: true,
+        requiresPresentation: true,
+        evaluationTemplateId: 'EVAL003',
+        description: '박사과정 연구제안서에 대한 심사',
+        createdDate: '2025-01-01'
+    }
+];
+
+// 평가표 템플릿 (간단한 참조용)
+const mockEvaluationTemplates = [
+    { id: 'EVAL001', name: '예비 심사 평가표', type: 'score' },
+    { id: 'EVAL002', name: '학위 논문 심사 평가표', type: 'score' },
+    { id: 'EVAL003', name: '연구제안서 심사 평가표', type: 'score' }
+];

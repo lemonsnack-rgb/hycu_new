@@ -2288,104 +2288,500 @@ function deleteEvaluation(id) {
 
 // ========== 지도단계 유형관리 CRUD ==========
 
-function openTypeModal(id = null) {
+function openStepTypeModal(id = null) {
     const isEdit = id !== null;
-    const item = isEdit ? appData.types.find(t => t.id === id) : {};
-    
+    const item = isEdit ? mockStepTypes.find(t => t.id === id) : {};
+
     const content = `
         <div class="space-y-4">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">유형명 <span class="text-red-600">*</span></label>
-                <input type="text" id="type-name" value="${item.name || ''}" 
-                       placeholder="예: 중간논문 심사"
+                <label class="block text-sm font-medium text-gray-700 mb-1">단계명 <span class="text-red-600">*</span></label>
+                <input type="text" id="steptype-name" value="${item.name || ''}"
+                       placeholder="예: 본심사, 예비심사, 연구계획서 제출"
                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
             </div>
-            
-            <div class="bg-blue-50 border-l-4 border-blue-500 p-4">
-                <div class="flex">
-                    <svg class="w-5 h-5 text-blue-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>
-                    <div class="text-sm text-blue-700">
-                        <p class="font-medium">활성화 설정</p>
-                        <p class="mt-1">이 유형을 활성화하면 해당 기능이 학생/교수 화면에 표시됩니다.</p>
-                    </div>
-                </div>
-            </div>
-            
+
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">요구 사항</label>
-                
+                <label class="block text-sm font-medium text-gray-700 mb-2">유형 <span class="text-red-600">*</span></label>
                 <div class="space-y-2">
                     <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100">
-                        <input type="checkbox" id="type-presentation" 
-                               ${item.presentation ? 'checked' : ''}
-                               class="h-4 w-4 text-[#009DE8] rounded border-gray-300">
+                        <input type="radio" name="steptype-type" id="steptype-submission" value="submission"
+                               ${!item.type || item.type === 'submission' ? 'checked' : ''}
+                               class="h-4 w-4 text-[#009DE8] border-gray-300">
                         <div class="ml-3">
-                            <p class="font-medium text-gray-900">발표 필요</p>
-                            <p class="text-xs text-gray-600">학생이 발표를 해야 하는 단계입니다</p>
+                            <p class="font-medium text-gray-900">제출</p>
+                            <p class="text-xs text-gray-600">학생이 문서를 제출하는 단계 (심사 없음)</p>
                         </div>
                     </label>
-                    
+
                     <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100">
-                        <input type="checkbox" id="type-document" 
-                               ${item.document ? 'checked' : ''}
+                        <input type="radio" name="steptype-type" id="steptype-review" value="review"
+                               ${item.type === 'review' ? 'checked' : ''}
+                               class="h-4 w-4 text-[#009DE8] border-gray-300"
+                               onchange="toggleEvaluationTemplate()">
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">심사</p>
+                            <p class="text-xs text-gray-600">심사위원이 평가하는 단계 (평가표 필요)</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div id="evaluation-template-section" style="display: ${item.type === 'review' ? 'block' : 'none'};">
+                <label class="block text-sm font-medium text-gray-700 mb-1">평가표 선택</label>
+                <select id="steptype-evaluation" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
+                    <option value="">선택 안 함</option>
+                    ${mockEvaluationTemplates.map(template => `
+                        <option value="${template.id}" ${item.evaluationTemplateId === template.id ? 'selected' : ''}>
+                            ${template.name}
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">요구 사항</label>
+                <div class="space-y-2">
+                    <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100">
+                        <input type="checkbox" id="steptype-document"
+                               ${item.requiresDocument ? 'checked' : ''}
                                class="h-4 w-4 text-[#009DE8] rounded border-gray-300">
                         <div class="ml-3">
                             <p class="font-medium text-gray-900">문서 제출 필요</p>
                             <p class="text-xs text-gray-600">학생이 문서를 제출해야 하는 단계입니다</p>
                         </div>
                     </label>
+
+                    <label class="flex items-center p-3 bg-gray-50 rounded-md cursor-pointer hover:bg-gray-100">
+                        <input type="checkbox" id="steptype-presentation"
+                               ${item.requiresPresentation ? 'checked' : ''}
+                               class="h-4 w-4 text-[#009DE8] rounded border-gray-300">
+                        <div class="ml-3">
+                            <p class="font-medium text-gray-900">발표 필요</p>
+                            <p class="text-xs text-gray-600">학생이 발표를 해야 하는 단계입니다</p>
+                        </div>
+                    </label>
                 </div>
             </div>
-            
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">설명 (선택)</label>
-                <textarea id="type-description" rows="3" 
-                          placeholder="이 유형에 대한 설명을 입력하세요"
+                <textarea id="steptype-description" rows="3"
+                          placeholder="이 단계에 대한 설명을 입력하세요"
                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">${item.description || ''}</textarea>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-yellow-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div class="text-sm text-yellow-700">
+                        <p class="font-medium">재사용 가능한 블록</p>
+                        <p class="mt-1">이 단계 유형은 여러 워크플로우에서 재사용할 수 있습니다.</p>
+                    </div>
+                </div>
             </div>
         </div>
     `;
-    
-    openModal(isEdit ? '유형 수정' : '유형 추가', content, '저장', () => {
-        const name = document.getElementById('type-name').value.trim();
-        
+
+    openModal(isEdit ? '단계 유형 수정' : '단계 유형 추가', content, '저장', () => {
+        const name = document.getElementById('steptype-name').value.trim();
+        const type = document.querySelector('input[name="steptype-type"]:checked').value;
+
         if (!name) {
-            showAlert('유형명을 입력해주세요.');
+            showAlert('단계명을 입력해주세요.');
             return;
         }
-        
+
         const newItem = {
-            id: isEdit ? id : appData.types.length + 1,
+            id: isEdit ? id : 'ST' + String(mockStepTypes.length + 1).padStart(3, '0'),
             name: name,
-            presentation: document.getElementById('type-presentation').checked,
-            document: document.getElementById('type-document').checked,
-            description: document.getElementById('type-description').value.trim()
+            type: type,
+            requiresDocument: document.getElementById('steptype-document').checked,
+            requiresPresentation: document.getElementById('steptype-presentation').checked,
+            evaluationTemplateId: type === 'review' ? document.getElementById('steptype-evaluation').value || null : null,
+            description: document.getElementById('steptype-description').value.trim(),
+            createdDate: isEdit ? item.createdDate : new Date().toISOString().split('T')[0]
         };
-        
+
         if (isEdit) {
-            const index = appData.types.findIndex(t => t.id === id);
-            appData.types[index] = newItem;
+            const index = mockStepTypes.findIndex(t => t.id === id);
+            mockStepTypes[index] = newItem;
         } else {
-            appData.types.push(newItem);
+            mockStepTypes.push(newItem);
         }
-        
+
         closeModal();
-        showAlert(`유형이 ${isEdit ? '수정' : '추가'}되었습니다.`);
+        showAlert(`단계 유형이 ${isEdit ? '수정' : '추가'}되었습니다.`);
         switchView('typeManagement');
+    });
+
+    // Add radio button change listener after modal opens
+    setTimeout(() => {
+        document.getElementById('steptype-submission').addEventListener('change', toggleEvaluationTemplate);
+        document.getElementById('steptype-review').addEventListener('change', toggleEvaluationTemplate);
+    }, 100);
+}
+
+function toggleEvaluationTemplate() {
+    const reviewSelected = document.getElementById('steptype-review').checked;
+    const section = document.getElementById('evaluation-template-section');
+    section.style.display = reviewSelected ? 'block' : 'none';
+}
+
+function editStepType(id) {
+    openStepTypeModal(id);
+}
+
+function deleteStepType(id) {
+    showConfirm('이 단계 유형을 삭제하시겠습니까?\n\n주의: 이미 사용 중인 워크플로우에 영향을 줄 수 있습니다.', () => {
+        const index = mockStepTypes.findIndex(t => t.id === id);
+        if (index !== -1) {
+            mockStepTypes.splice(index, 1);
+            showAlert('단계 유형이 삭제되었습니다.');
+            switchView('typeManagement');
+        }
     });
 }
 
-function editType(id) {
-    openTypeModal(id);
+// ========== 워크플로우 조립 관리 CRUD (구버전 - 주석 처리) ==========
+// 페이지 전환 방식으로 변경되어 더 이상 사용하지 않음
+// 새 함수들은 파일 하단 참조
+
+/*
+let workflowStages = []; // Temporary storage for stages being composed
+
+function openWorkflowModal(id = null) {
+    const isEdit = id !== null;
+    const item = isEdit ? mockThesisStages.find(s => s.id === id) : { stages: [] };
+
+    // Initialize temporary stages
+    workflowStages = isEdit ? JSON.parse(JSON.stringify(item.stages)) : [];
+
+    const content = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">워크플로우명 <span class="text-red-600">*</span></label>
+                <input type="text" id="workflow-name" value="${item.name || ''}"
+                       placeholder="예: 석사 표준 과정"
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">학위 유형 <span class="text-red-600">*</span></label>
+                <div class="flex gap-4">
+                    <label class="flex items-center">
+                        <input type="radio" name="workflow-degree" value="master"
+                               ${!item.degreeType || item.degreeType === 'master' ? 'checked' : ''}
+                               class="h-4 w-4 text-[#009DE8] border-gray-300">
+                        <span class="ml-2 text-sm text-gray-700">석사</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="workflow-degree" value="phd"
+                               ${item.degreeType === 'phd' ? 'checked' : ''}
+                               class="h-4 w-4 text-[#009DE8] border-gray-300">
+                        <span class="ml-2 text-sm text-gray-700">박사</span>
+                    </label>
+                </div>
+            </div>
+
+            <div class="border-t pt-4">
+                <div class="flex justify-between items-center mb-3">
+                    <label class="block text-sm font-medium text-gray-700">단계 구성 <span class="text-red-600">*</span></label>
+                    <button type="button" onclick="addWorkflowStage()"
+                            class="bg-green-600 text-white px-3 py-1 rounded-md hover:bg-green-700 text-xs">
+                        + 단계 추가
+                    </button>
+                </div>
+
+                <div id="workflow-stages-list" class="space-y-2 max-h-96 overflow-y-auto">
+                    ${renderWorkflowStages()}
+                </div>
+
+                ${workflowStages.length === 0 ? `
+                    <div class="text-center py-8 text-gray-400">
+                        <i class="fas fa-cube text-3xl mb-2"></i>
+                        <p class="text-sm">단계를 추가하여 워크플로우를 구성하세요</p>
+                    </div>
+                ` : ''}
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-500 p-4">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-yellow-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div class="text-sm text-yellow-700">
+                        <p class="font-medium">레고 블록 조립</p>
+                        <p class="mt-1">단계 유형(레고 블록)을 선택하여 워크플로우를 구성합니다. 같은 단계를 여러 번 사용할 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal(isEdit ? '워크플로우 수정' : '워크플로우 추가', content, '저장', () => {
+        const name = document.getElementById('workflow-name').value.trim();
+        const degreeType = document.querySelector('input[name="workflow-degree"]:checked').value;
+
+        if (!name) {
+            showAlert('워크플로우명을 입력해주세요.');
+            return;
+        }
+
+        if (workflowStages.length === 0) {
+            showAlert('최소 1개 이상의 단계를 추가해주세요.');
+            return;
+        }
+
+        const newItem = {
+            id: isEdit ? id : 'TS' + String(mockThesisStages.length + 1).padStart(3, '0'),
+            name: name,
+            degreeType: degreeType,
+            stageCount: workflowStages.length,
+            createdDate: isEdit ? item.createdDate : new Date().toISOString().split('T')[0],
+            stages: workflowStages.map((stage, idx) => ({
+                ...stage,
+                order: idx + 1
+            }))
+        };
+
+        if (isEdit) {
+            const index = mockThesisStages.findIndex(s => s.id === id);
+            mockThesisStages[index] = newItem;
+        } else {
+            mockThesisStages.push(newItem);
+        }
+
+        closeModal();
+        showAlert(`워크플로우가 ${isEdit ? '수정' : '추가'}되었습니다.`);
+        switchView('stageManagement');
+    });
 }
 
-function deleteType(id) {
-    showConfirm('이 유형을 삭제하시겠습니까?\n\n주의: 이미 사용 중인 워크플로우에 영향을 줄 수 있습니다.', () => {
-        appData.types = appData.types.filter(t => t.id !== id);
-        showAlert('유형이 삭제되었습니다.');
-        switchView('typeManagement');
+function renderWorkflowStages() {
+    if (workflowStages.length === 0) return '';
+
+    return workflowStages.map((stage, idx) => {
+        const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+        const typeLabel = stepType ? (stepType.type === 'submission' ? '제출' : '심사') : '';
+        const typeBgColor = stepType ? (stepType.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800') : 'bg-gray-100';
+
+        return `
+            <div class="flex items-center gap-2 p-3 bg-gray-50 rounded-md border border-gray-200">
+                <span class="font-semibold text-gray-600 w-8">${idx + 1}.</span>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2">
+                        <span class="font-medium text-gray-800">${stage.name}</span>
+                        <span class="px-2 py-0.5 rounded text-xs font-medium ${typeBgColor}">${typeLabel}</span>
+                        ${stage.evaluationRequired ? '<span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">심사</span>' : ''}
+                    </div>
+                    ${stepType && stepType.description ? `<p class="text-xs text-gray-500 mt-1">${stepType.description}</p>` : ''}
+                </div>
+                <div class="flex gap-1">
+                    ${idx > 0 ? `<button type="button" onclick="moveStageUp(${idx})" class="text-blue-600 hover:underline text-xs px-2">↑</button>` : ''}
+                    ${idx < workflowStages.length - 1 ? `<button type="button" onclick="moveStageDown(${idx})" class="text-blue-600 hover:underline text-xs px-2">↓</button>` : ''}
+                    <button type="button" onclick="removeWorkflowStage(${idx})" class="text-red-600 hover:underline text-xs px-2">삭제</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+function addWorkflowStage() {
+    const stageOptions = mockStepTypes.map(st => {
+        const typeLabel = st.type === 'submission' ? '[제출]' : '[심사]';
+        return `<option value="${st.id}">${typeLabel} ${st.name}</option>`;
+    }).join('');
+
+    const content = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">단계 유형 선택 <span class="text-red-600">*</span></label>
+                <select id="stage-type-select" onchange="updateStagePreview()" class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
+                    <option value="">선택하세요</option>
+                    ${stageOptions}
+                </select>
+            </div>
+
+            <div id="stage-preview" class="hidden bg-blue-50 border border-blue-200 rounded-lg p-3">
+                <p class="text-sm font-medium text-gray-700 mb-2">단계 미리보기</p>
+                <div id="stage-preview-content"></div>
+            </div>
+
+            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                <p class="text-xs text-gray-600">
+                    <i class="fas fa-lightbulb mr-1 text-yellow-500"></i>
+                    같은 단계 유형을 여러 번 추가할 수 있습니다. (예: 예비심사 2회)
+                </p>
+            </div>
+        </div>
+    `;
+
+    openModal('단계 추가', content, '추가', () => {
+        const stepTypeId = document.getElementById('stage-type-select').value;
+
+        if (!stepTypeId) {
+            showAlert('단계 유형을 선택해주세요.');
+            return;
+        }
+
+        const stepType = mockStepTypes.find(st => st.id === stepTypeId);
+        if (!stepType) {
+            showAlert('유효하지 않은 단계 유형입니다.');
+            return;
+        }
+
+        workflowStages.push({
+            stepTypeId: stepType.id,
+            name: stepType.name,
+            type: stepType.type,
+            evaluationRequired: stepType.type === 'review'
+        });
+
+        closeModal();
+
+        // Refresh the stages list
+        document.getElementById('workflow-stages-list').innerHTML = renderWorkflowStages();
+    });
+
+    // Add the updateStagePreview function to window scope
+    window.updateStagePreview = function() {
+        const stepTypeId = document.getElementById('stage-type-select').value;
+        const preview = document.getElementById('stage-preview');
+        const previewContent = document.getElementById('stage-preview-content');
+
+        if (!stepTypeId) {
+            preview.classList.add('hidden');
+            return;
+        }
+
+        const stepType = mockStepTypes.find(st => st.id === stepTypeId);
+        if (!stepType) return;
+
+        const typeLabel = stepType.type === 'submission' ? '제출' : '심사';
+        const typeBgColor = stepType.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
+
+        previewContent.innerHTML = `
+            <div class="space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="font-medium text-gray-800">${stepType.name}</span>
+                    <span class="px-2 py-0.5 rounded text-xs font-medium ${typeBgColor}">${typeLabel}</span>
+                </div>
+                ${stepType.description ? `<p class="text-xs text-gray-600">${stepType.description}</p>` : ''}
+                <div class="flex gap-3 text-xs">
+                    ${stepType.requiresDocument ? '<span class="text-green-600">✓ 문서 제출</span>' : '<span class="text-gray-400">✗ 문서 제출</span>'}
+                    ${stepType.requiresPresentation ? '<span class="text-green-600">✓ 발표</span>' : '<span class="text-gray-400">✗ 발표</span>'}
+                    ${stepType.evaluationTemplateId ? '<span class="text-orange-600">✓ 평가표</span>' : ''}
+                </div>
+            </div>
+        `;
+        preview.classList.remove('hidden');
+    };
+}
+
+function removeWorkflowStage(index) {
+    workflowStages.splice(index, 1);
+    document.getElementById('workflow-stages-list').innerHTML = renderWorkflowStages();
+}
+
+function moveStageUp(index) {
+    if (index === 0) return;
+    [workflowStages[index - 1], workflowStages[index]] = [workflowStages[index], workflowStages[index - 1]];
+    document.getElementById('workflow-stages-list').innerHTML = renderWorkflowStages();
+}
+
+function moveStageDown(index) {
+    if (index === workflowStages.length - 1) return;
+    [workflowStages[index], workflowStages[index + 1]] = [workflowStages[index + 1], workflowStages[index]];
+    document.getElementById('workflow-stages-list').innerHTML = renderWorkflowStages();
+}
+
+function viewWorkflowDetail(id) {
+    const workflow = mockThesisStages.find(s => s.id === id);
+    if (!workflow) {
+        showAlert('워크플로우를 찾을 수 없습니다.');
+        return;
+    }
+
+    const degreeLabel = workflow.degreeType === 'master' ? '석사' : '박사';
+    const evaluationCount = workflow.stages.filter(s => s.evaluationRequired).length;
+
+    const content = `
+        <div class="space-y-4">
+            <div class="bg-gray-50 rounded-lg p-4">
+                <div class="grid grid-cols-2 gap-4 mb-4">
+                    <div>
+                        <p class="text-xs text-gray-500">워크플로우명</p>
+                        <p class="font-medium text-gray-800">${workflow.name}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">학위 유형</p>
+                        <p class="font-medium text-gray-800">${degreeLabel}</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">총 단계 수</p>
+                        <p class="font-medium text-blue-600">${workflow.stageCount}단계</p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">심사 단계</p>
+                        <p class="font-medium text-green-600">${evaluationCount}개</p>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <p class="text-sm font-medium text-gray-700 mb-3">단계 구성</p>
+                <div class="space-y-2">
+                    ${workflow.stages.map(stage => {
+                        const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+                        const typeLabel = stepType ? (stepType.type === 'submission' ? '제출' : '심사') : '';
+                        const typeBgColor = stepType ? (stepType.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800') : 'bg-gray-100';
+
+                        return `
+                            <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                <span class="font-semibold text-gray-600 w-6">${stage.order}.</span>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-medium text-gray-800">${stage.name}</span>
+                                        <span class="px-2 py-0.5 rounded text-xs font-medium ${typeBgColor}">${typeLabel}</span>
+                                        ${stage.evaluationRequired ? '<span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">심사 필요</span>' : ''}
+                                    </div>
+                                    ${stepType && stepType.description ? `<p class="text-xs text-gray-500">${stepType.description}</p>` : ''}
+                                    ${stepType ? `
+                                        <div class="flex gap-3 mt-2 text-xs">
+                                            ${stepType.requiresDocument ? '<span class="text-green-600">✓ 문서 제출</span>' : ''}
+                                            ${stepType.requiresPresentation ? '<span class="text-green-600">✓ 발표</span>' : ''}
+                                            ${stepType.evaluationTemplateId ? `<span class="text-orange-600">✓ ${mockEvaluationTemplates.find(t => t.id === stepType.evaluationTemplateId)?.name || '평가표'}</span>` : ''}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('워크플로우 상세보기', content, '닫기', () => closeModal());
+}
+
+function editWorkflow(id) {
+    openWorkflowModal(id);
+}
+*/
+
+// deleteWorkflow는 페이지 전환 방식에서도 그대로 사용
+function deleteWorkflow(id) {
+    showConfirm('이 워크플로우를 삭제하시겠습니까?', () => {
+        const index = mockThesisStages.findIndex(s => s.id === id);
+        if (index !== -1) {
+            mockThesisStages.splice(index, 1);
+            showAlert('워크플로우가 삭제되었습니다.');
+            switchView('stageManagement');
+        }
     });
 }
 
@@ -4856,3 +5252,587 @@ function previewEvaluationForm(criteriaId) {
 }
 
 window.previewEvaluationForm = previewEvaluationForm;
+
+// ========== 워크플로우 페이지 전환 방식 함수들 ==========
+
+/**
+ * 워크플로우 저장 후 단계 구성 페이지로 이동
+ */
+function saveWorkflowAndCompose(workflowId) {
+    const name = document.getElementById('workflow-name').value.trim();
+    const degreeType = document.querySelector('input[name="degree-type"]:checked').value;
+    const description = document.getElementById('workflow-description').value.trim();
+
+    if (!name) {
+        showAlert('워크플로우명을 입력해주세요.');
+        return;
+    }
+
+    const isEdit = workflowId !== '';
+
+    if (isEdit) {
+        // 수정
+        const workflow = mockThesisStages.find(w => w.id === workflowId);
+        if (workflow) {
+            workflow.name = name;
+            workflow.degreeType = degreeType;
+            workflow.description = description;
+        }
+    } else {
+        // 신규 생성
+        const newWorkflow = {
+            id: 'TS' + String(mockThesisStages.length + 1).padStart(3, '0'),
+            name: name,
+            degreeType: degreeType,
+            description: description || '',
+            stageCount: 0,
+            createdDate: new Date().toISOString().split('T')[0],
+            stages: []
+        };
+        mockThesisStages.push(newWorkflow);
+        workflowId = newWorkflow.id;
+    }
+
+    showAlert('워크플로우가 저장되었습니다. 단계를 구성하세요.');
+    switchView('workflowStageCompose', workflowId);
+}
+
+/**
+ * 워크플로우 단계 구성 저장
+ */
+function saveWorkflowStages(workflowId) {
+    const workflow = mockThesisStages.find(w => w.id === workflowId);
+    if (!workflow) {
+        showAlert('워크플로우를 찾을 수 없습니다.');
+        return;
+    }
+
+    // composedStages 검증
+    if (!window.composedStages || window.composedStages.length === 0) {
+        showConfirm('단계가 구성되지 않았습니다. 빈 워크플로우로 저장하시겠습니까?', () => {
+            workflow.stages = [];
+            workflow.stageCount = 0;
+            showAlert('워크플로우가 저장되었습니다.');
+            switchView('stageManagement');
+        });
+        return;
+    }
+
+    workflow.stages = window.composedStages.map((stage, idx) => ({
+        ...stage,
+        order: idx + 1
+    }));
+    workflow.stageCount = workflow.stages.length;
+
+    showAlert(`워크플로우 "${workflow.name}"이(가) ${workflow.stageCount}개 단계로 저장되었습니다.`);
+    switchView('stageManagement');
+}
+
+/**
+ * 좌측 단계 유형 목록에서 단계 추가
+ */
+function addStageToComposition(stepTypeId) {
+    const stepType = mockStepTypes.find(st => st.id === stepTypeId);
+    if (!stepType) {
+        showAlert('단계 유형을 찾을 수 없습니다.');
+        return;
+    }
+
+    // composedStages 초기화 확인
+    if (!window.composedStages) {
+        window.composedStages = [];
+    }
+
+    window.composedStages.push({
+        stepTypeId: stepType.id,
+        name: stepType.name,
+        type: stepType.type,
+        evaluationRequired: stepType.type === 'review'
+    });
+
+    // 리렌더링
+    document.getElementById('composed-stages-list').innerHTML = renderComposedStages();
+
+    // 개수 업데이트
+    const stageCount = document.getElementById('stage-count');
+    if (stageCount) {
+        stageCount.textContent = `(${window.composedStages.length}개)`;
+    }
+}
+
+/**
+ * 구성된 단계 제거
+ */
+function removeStageFromComposition(index) {
+    if (!window.composedStages) return;
+
+    window.composedStages.splice(index, 1);
+    document.getElementById('composed-stages-list').innerHTML = renderComposedStages();
+
+    // 개수 업데이트
+    const stageCount = document.getElementById('stage-count');
+    if (stageCount) {
+        stageCount.textContent = `(${window.composedStages.length}개)`;
+    }
+
+    // 빈 상태 메시지 표시
+    if (window.composedStages.length === 0) {
+        document.querySelector('.p-6').innerHTML = `
+            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                구성된 단계
+                <span class="ml-2 text-sm font-normal text-gray-500" id="stage-count">(0개)</span>
+            </h3>
+
+            <div id="composed-stages-list" class="space-y-3"></div>
+
+            <div class="text-center py-16 text-gray-400">
+                <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                </svg>
+                <p class="text-lg font-medium mb-1">단계를 추가하세요</p>
+                <p class="text-sm">좌측에서 단계 유형을 클릭하면 여기에 추가됩니다</p>
+            </div>
+        `;
+    }
+}
+
+/**
+ * 단계 순서 변경
+ */
+function moveStageInComposition(index, direction) {
+    if (!window.composedStages) return;
+
+    if (direction === 'up' && index > 0) {
+        [window.composedStages[index - 1], window.composedStages[index]] =
+        [window.composedStages[index], window.composedStages[index - 1]];
+    } else if (direction === 'down' && index < window.composedStages.length - 1) {
+        [window.composedStages[index], window.composedStages[index + 1]] =
+        [window.composedStages[index + 1], window.composedStages[index]];
+    }
+
+    document.getElementById('composed-stages-list').innerHTML = renderComposedStages();
+}
+
+/**
+ * 구성된 단계 렌더링
+ */
+function renderComposedStages() {
+    if (!window.composedStages || window.composedStages.length === 0) {
+        return '';
+    }
+
+    return window.composedStages.map((stage, idx) => {
+        const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+        const typeLabel = stepType?.type === 'submission' ? '제출' : '심사';
+        const typeBg = stepType?.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
+
+        return `
+            <div class="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-lg hover:border-gray-300 transition-colors">
+                <span class="font-bold text-gray-600 text-lg w-8">${idx + 1}.</span>
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-1">
+                        <span class="font-medium text-gray-800">${stage.name}</span>
+                        <span class="px-2 py-0.5 rounded text-xs font-medium ${typeBg}">${typeLabel}</span>
+                        ${stage.evaluationRequired ? '<span class="px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-800">심사</span>' : ''}
+                    </div>
+                    ${stepType?.description ? `<p class="text-xs text-gray-500">${stepType.description}</p>` : ''}
+                </div>
+                <div class="flex gap-2">
+                    ${idx > 0 ? `
+                        <button onclick="moveStageInComposition(${idx}, 'up')"
+                                class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded border border-blue-200 hover:border-blue-300 transition-colors">
+                            ↑
+                        </button>
+                    ` : ''}
+                    ${idx < window.composedStages.length - 1 ? `
+                        <button onclick="moveStageInComposition(${idx}, 'down')"
+                                class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded border border-blue-200 hover:border-blue-300 transition-colors">
+                            ↓
+                        </button>
+                    ` : ''}
+                    <button onclick="removeStageFromComposition(${idx})"
+                            class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded border border-red-200 hover:border-red-300 transition-colors">
+                        삭제
+                    </button>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 좌측 단계 유형 검색 필터
+ */
+function filterStepTypes() {
+    const searchTerm = document.getElementById('step-type-search').value.toLowerCase();
+    const items = document.querySelectorAll('.step-type-item');
+
+    items.forEach(item => {
+        const stepName = item.getAttribute('data-step-name') || '';
+        if (stepName.includes(searchTerm)) {
+            item.style.display = '';
+        } else {
+            item.style.display = 'none';
+        }
+    });
+}
+
+// 전역으로 노출
+window.saveWorkflowAndCompose = saveWorkflowAndCompose;
+window.saveWorkflowStages = saveWorkflowStages;
+window.addStageToComposition = addStageToComposition;
+window.removeStageFromComposition = removeStageFromComposition;
+window.moveStageInComposition = moveStageInComposition;
+window.renderComposedStages = renderComposedStages;
+window.filterStepTypes = filterStepTypes;
+
+// ====================================================================
+// 워크플로우 통합 화면 함수들
+// ====================================================================
+
+// 단계 추가 모달 (커스텀 이름 + 평가표 매핑)
+function openAddStageModal(stepTypeId) {
+    const stepType = mockStepTypes.find(st => st.id === stepTypeId);
+    if (!stepType) return;
+
+    const isReview = stepType.type === 'review';
+    const defaultEvalTemplateId = stepType.evaluationTemplateId;
+
+    const content = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">단계 이름 *</label>
+                <input type="text"
+                       id="stage-custom-name"
+                       value="${stepType.name}"
+                       placeholder="예: 1차 본심사, 최종 예비심사"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">단계 유형: ${stepType.name}</p>
+            </div>
+
+            ${isReview ? `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">평가표 선택 *</label>
+                    <div class="space-y-2">
+                        ${mockEvaluationTemplates.map(template => `
+                            <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                                <input type="radio"
+                                       name="evaluation-template"
+                                       value="${template.id}"
+                                       ${template.id === defaultEvalTemplateId ? 'checked' : ''}
+                                       class="mt-1 mr-3">
+                                <div>
+                                    <div class="font-medium text-gray-800">${template.name}</div>
+                                    <div class="text-xs text-gray-500">항목 ${template.items.length}개</div>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+
+            <div class="bg-blue-50 border border-blue-200 rounded-md p-3">
+                <div class="flex items-start">
+                    <svg class="w-5 h-5 text-blue-600 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="text-sm text-blue-800">
+                        <strong>단계 유형</strong>은 재사용 가능한 템플릿이고, <strong>단계 이름</strong>은 워크플로우에서 사용할 실제 이름입니다.
+                        동일한 단계 유형을 여러 번 사용할 수 있습니다.
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('단계 추가', content, '추가', () => {
+        const customName = document.getElementById('stage-custom-name').value.trim();
+
+        if (!customName) {
+            alert('단계 이름을 입력해주세요.');
+            return false;
+        }
+
+        let evaluationTemplateId = null;
+        if (isReview) {
+            const selectedRadio = document.querySelector('input[name="evaluation-template"]:checked');
+            if (!selectedRadio) {
+                alert('평가표를 선택해주세요.');
+                return false;
+            }
+            evaluationTemplateId = selectedRadio.value;
+        }
+
+        // Add to composed stages
+        window.composedStages.push({
+            stepTypeId: stepType.id,
+            name: customName,
+            order: window.composedStages.length + 1,
+            type: stepType.type,
+            evaluationRequired: isReview,
+            evaluationTemplateId: evaluationTemplateId
+        });
+
+        refreshComposedStagesUnified();
+        return true;
+    });
+}
+
+// 단계 편집 모달 (이름 + 평가표 수정)
+function editStageUnified(index) {
+    const stage = window.composedStages[index];
+    const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+    if (!stepType) return;
+
+    const isReview = stepType.type === 'review';
+
+    const content = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">단계 이름 *</label>
+                <input type="text"
+                       id="stage-custom-name"
+                       value="${stage.name}"
+                       placeholder="예: 1차 본심사, 최종 예비심사"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <p class="text-xs text-gray-500 mt-1">단계 유형: ${stepType.name}</p>
+            </div>
+
+            ${isReview ? `
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">평가표 선택 *</label>
+                    <div class="space-y-2">
+                        ${mockEvaluationTemplates.map(template => `
+                            <label class="flex items-start p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                                <input type="radio"
+                                       name="evaluation-template"
+                                       value="${template.id}"
+                                       ${template.id === stage.evaluationTemplateId ? 'checked' : ''}
+                                       class="mt-1 mr-3">
+                                <div>
+                                    <div class="font-medium text-gray-800">${template.name}</div>
+                                    <div class="text-xs text-gray-500">항목 ${template.items.length}개</div>
+                                </div>
+                            </label>
+                        `).join('')}
+                    </div>
+                </div>
+            ` : ''}
+        </div>
+    `;
+
+    openModal('단계 편집', content, '저장', () => {
+        const customName = document.getElementById('stage-custom-name').value.trim();
+
+        if (!customName) {
+            alert('단계 이름을 입력해주세요.');
+            return false;
+        }
+
+        let evaluationTemplateId = stage.evaluationTemplateId;
+        if (isReview) {
+            const selectedRadio = document.querySelector('input[name="evaluation-template"]:checked');
+            if (!selectedRadio) {
+                alert('평가표를 선택해주세요.');
+                return false;
+            }
+            evaluationTemplateId = selectedRadio.value;
+        }
+
+        // Update stage
+        window.composedStages[index].name = customName;
+        window.composedStages[index].evaluationTemplateId = evaluationTemplateId;
+
+        refreshComposedStagesUnified();
+        return true;
+    });
+}
+
+// 단계 삭제
+function removeStageUnified(index) {
+    if (confirm('이 단계를 삭제하시겠습니까?')) {
+        window.composedStages.splice(index, 1);
+        // Reorder
+        window.composedStages.forEach((stage, idx) => {
+            stage.order = idx + 1;
+        });
+        refreshComposedStagesUnified();
+    }
+}
+
+// 단계 이동 (위/아래)
+function moveStageUnified(index, direction) {
+    if (direction === 'up' && index > 0) {
+        [window.composedStages[index - 1], window.composedStages[index]] =
+        [window.composedStages[index], window.composedStages[index - 1]];
+    } else if (direction === 'down' && index < window.composedStages.length - 1) {
+        [window.composedStages[index], window.composedStages[index + 1]] =
+        [window.composedStages[index + 1], window.composedStages[index]];
+    }
+
+    // Reorder
+    window.composedStages.forEach((stage, idx) => {
+        stage.order = idx + 1;
+    });
+
+    refreshComposedStagesUnified();
+}
+
+// 구성된 단계 렌더링
+function renderComposedStagesUnified() {
+    if (!window.composedStages || window.composedStages.length === 0) {
+        return '';
+    }
+
+    return `
+        <div class="space-y-3">
+            ${window.composedStages.map((stage, index) => {
+                const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+                const evalTemplate = stage.evaluationTemplateId
+                    ? mockEvaluationTemplates.find(t => t.id === stage.evaluationTemplateId)
+                    : null;
+
+                return `
+                    <div class="border border-gray-300 rounded-lg p-4 hover:shadow-md transition-shadow bg-white">
+                        <div class="flex items-start justify-between">
+                            <div class="flex-1">
+                                <div class="flex items-center mb-2">
+                                    <span class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-blue-600 text-white font-bold text-sm mr-3">
+                                        ${index + 1}
+                                    </span>
+                                    <h5 class="font-bold text-gray-800 text-lg">${stage.name}</h5>
+                                </div>
+                                <div class="ml-11 space-y-1">
+                                    <p class="text-sm text-gray-600">유형: ${stepType.name}</p>
+                                    ${evalTemplate ? `
+                                        <p class="text-sm text-orange-600">📋 평가표: ${evalTemplate.name}</p>
+                                    ` : ''}
+                                </div>
+                            </div>
+                            <div class="flex space-x-2 ml-4">
+                                <button onclick="moveStageUnified(${index}, 'up')"
+                                        ${index === 0 ? 'disabled' : ''}
+                                        class="p-1 text-gray-600 hover:text-blue-600 disabled:text-gray-300"
+                                        title="위로 이동">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="moveStageUnified(${index}, 'down')"
+                                        ${index === window.composedStages.length - 1 ? 'disabled' : ''}
+                                        class="p-1 text-gray-600 hover:text-blue-600 disabled:text-gray-300"
+                                        title="아래로 이동">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                    </svg>
+                                </button>
+                                <button onclick="editStageUnified(${index})"
+                                        class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded"
+                                        title="편집">
+                                    편집
+                                </button>
+                                <button onclick="removeStageUnified(${index})"
+                                        class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded"
+                                        title="삭제">
+                                    삭제
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
+        </div>
+    `;
+}
+
+// 구성된 단계 목록 새로고침
+function refreshComposedStagesUnified() {
+    const container = document.getElementById('composed-stages-list-unified');
+    if (container) {
+        container.innerHTML = renderComposedStagesUnified();
+    }
+
+    // Update save button state
+    const saveBtn = document.getElementById('unified-save-btn');
+    if (saveBtn) {
+        const hasStages = window.composedStages && window.composedStages.length > 0;
+        saveBtn.disabled = !hasStages;
+        saveBtn.className = `px-4 py-2 rounded-md ${!hasStages ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#009DE8] text-white hover:bg-opacity-90'}`;
+        saveBtn.textContent = `저장 (${window.composedStages.length}개 단계)`;
+    }
+
+    // Update header count
+    const header = document.querySelector('.flex-1.p-6 h4');
+    if (header) {
+        header.textContent = `구성된 단계 (${window.composedStages.length}개)`;
+    }
+}
+
+// 워크플로우 저장
+function saveUnifiedWorkflow() {
+    const name = document.getElementById('workflow-name').value.trim();
+    const degree = document.getElementById('workflow-degree').value;
+
+    if (!name) {
+        alert('워크플로우 이름을 입력해주세요.');
+        return;
+    }
+
+    if (!window.composedStages || window.composedStages.length === 0) {
+        alert('최소 1개 이상의 단계를 추가해주세요.');
+        return;
+    }
+
+    // Validate review stages have evaluation templates
+    const reviewStagesWithoutTemplate = window.composedStages.filter(stage => {
+        const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+        return stepType.type === 'review' && !stage.evaluationTemplateId;
+    });
+
+    if (reviewStagesWithoutTemplate.length > 0) {
+        alert('모든 심사 단계에 평가표를 지정해주세요.');
+        return;
+    }
+
+    const isEdit = window.currentWorkflowId !== null;
+
+    if (isEdit) {
+        // Update existing workflow
+        const workflow = mockThesisStages.find(s => s.id === window.currentWorkflowId);
+        if (workflow) {
+            workflow.name = name;
+            workflow.degree = degree;
+            workflow.stages = JSON.parse(JSON.stringify(window.composedStages));
+            showToast('워크플로우가 수정되었습니다.', 'success');
+        }
+    } else {
+        // Create new workflow
+        const newId = 'WF' + String(mockThesisStages.length + 1).padStart(3, '0');
+        mockThesisStages.push({
+            id: newId,
+            name: name,
+            degree: degree,
+            stages: JSON.parse(JSON.stringify(window.composedStages))
+        });
+        showToast('워크플로우가 등록되었습니다.', 'success');
+    }
+
+    // Clear global variables
+    window.composedStages = null;
+    window.currentWorkflowId = null;
+
+    // Navigate back to list
+    switchView('stageManagement');
+}
+
+// 전역으로 노출
+window.openAddStageModal = openAddStageModal;
+window.editStageUnified = editStageUnified;
+window.removeStageUnified = removeStageUnified;
+window.moveStageUnified = moveStageUnified;
+window.renderComposedStagesUnified = renderComposedStagesUnified;
+window.refreshComposedStagesUnified = refreshComposedStagesUnified;
+window.saveUnifiedWorkflow = saveUnifiedWorkflow;

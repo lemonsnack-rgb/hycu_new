@@ -1544,20 +1544,20 @@ const views = {
 
     // ========== 논문지도 워크플로우 관리 ==========
     stageManagement: () => {
-        const data = appData.stages;
+        const data = mockThesisStages;
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">논문지도 워크플로우 관리</h3>
-                        <button onclick="openStageModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        <h3 class="text-lg font-bold text-gray-800">논문지도 워크플로우 관리 (레고 조립)</h3>
+                        <button onclick="switchView('workflowCreateUnified')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                             + 워크플로우 추가
                         </button>
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <p class="text-sm text-blue-800">
                             <i class="fas fa-info-circle mr-2"></i>
-                            학과/학위별 논문 작성 워크플로우를 구성하고 각 단계에 평가표를 연결합니다.
+                            단계 유형(레고 블록)을 조합하여 학위별 논문 작성 워크플로우를 구성합니다.
                         </p>
                     </div>
                 </div>
@@ -1567,63 +1567,60 @@ const views = {
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">워크플로우명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">버전</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가 단계</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.map((item, idx) => `
+                            ${data.map((item, idx) => {
+                                const degreeLabel = item.degreeType === 'master' ? '석사' : '박사';
+                                const evaluationCount = item.stages.filter(s => s.evaluationRequired).length;
+
+                                return `
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.version}</td>
-                                    <td class="py-3 px-4 text-sm text-center">
-                                        <span class="font-semibold text-blue-600">${item.stageCount}단계</span>
+                                    <td class="py-3 px-4 text-sm">
+                                        <span class="px-2 py-1 rounded text-xs font-medium ${
+                                            item.degreeType === 'master' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                                        }">${degreeLabel}</span>
                                     </td>
                                     <td class="py-3 px-4 text-sm text-center">
-                                        <span class="font-semibold text-green-600">${item.evaluationCount}개 평가</span>
+                                        <span class="font-semibold text-blue-600">${item.stageCount}단계</span>
+                                        ${evaluationCount > 0 ? `<span class="text-xs text-green-600 ml-2">(${evaluationCount}개 심사)</span>` : ''}
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">
                                         <div class="flex items-center gap-1 flex-wrap">
-                                            ${item.steps.map((step, stepIdx) => `
-                                                <span class="px-2 py-1 rounded text-xs ${
-                                                    step.hasEvaluation ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'
-                                                }">
-                                                    ${step.name}
-                                                </span>
-                                                ${stepIdx < item.steps.length - 1 ? '<span class="text-gray-400">→</span>' : ''}
-                                            `).join('')}
+                                            ${item.stages.map((stage, stepIdx) => {
+                                                const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+                                                const bgColor = stage.type === 'submission' ? 'bg-gray-100 text-gray-700' :
+                                                               (stage.evaluationRequired ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700');
+
+                                                return `
+                                                    <span class="px-2 py-1 rounded text-xs ${bgColor}" title="${stepType ? stepType.description : ''}">
+                                                        ${stage.order}. ${stage.name}
+                                                    </span>
+                                                    ${stepIdx < item.stages.length - 1 ? '<span class="text-gray-400">→</span>' : ''}
+                                                `;
+                                            }).join('')}
                                         </div>
                                     </td>
                                     <td class="py-3 px-4">
                                         <div class="flex gap-2">
-                                            <button onclick="viewStageDetail(${item.id})"
+                                            <button onclick="switchView('workflowCreateUnified', '${item.id}')"
                                                     class="text-blue-600 hover:underline text-sm">
-                                                상세보기
-                                            </button>
-                                            <button onclick="editStage(${item.id})"
-                                                    class="text-purple-600 hover:underline text-sm">
                                                 수정
                                             </button>
-                                            <button onclick="copyStage(${item.id})"
-                                                    class="text-green-600 hover:underline text-sm">
-                                                복사
-                                            </button>
-                                            <button onclick="deleteStage(${item.id})"
+                                            <button onclick="deleteWorkflow('${item.id}')"
                                                     class="text-red-600 hover:underline text-sm">
                                                 삭제
                                             </button>
                                         </div>
                                     </td>
                                 </tr>
-                            `).join('')}
+                            `}).join('')}
                         </tbody>
                     </table>
                 </div>
@@ -1631,46 +1628,331 @@ const views = {
         `;
     },
 
+    // ========== 워크플로우 등록/수정 페이지 ==========
+    workflowCreate: (id = null) => {
+        const isEdit = id !== null;
+        const item = isEdit ? mockThesisStages.find(s => s.id === id) : {};
+
+        return `
+            <div class="bg-white rounded-lg shadow-md p-8 max-w-4xl mx-auto">
+                <!-- 헤더 -->
+                <div class="flex items-center mb-8">
+                    <button onclick="switchView('stageManagement')"
+                            class="text-gray-600 hover:text-gray-800 mr-4 flex items-center">
+                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                        뒤로가기
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-800">
+                        ${isEdit ? '워크플로우 수정' : '워크플로우 등록'}
+                    </h2>
+                </div>
+
+                <!-- 안내 메시지 -->
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="text-sm text-blue-700">
+                            <p class="font-medium">워크플로우를 먼저 생성하세요</p>
+                            <p class="mt-1">워크플로우명과 학위 유형을 입력하고 저장하면 단계 구성 페이지로 이동합니다.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 폼 -->
+                <form id="workflow-form" class="space-y-6">
+                    <!-- 워크플로우명 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            워크플로우명 <span class="text-red-600">*</span>
+                        </label>
+                        <input type="text" id="workflow-name"
+                               value="${item.name || ''}"
+                               placeholder="예: 논문작성1, 석사 표준 과정, 2025년 1학기 과정"
+                               class="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                        <p class="mt-1 text-xs text-gray-500">구분하기 쉬운 이름을 입력하세요</p>
+                    </div>
+
+                    <!-- 학위 유형 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-3">
+                            학위 유형 <span class="text-red-600">*</span>
+                        </label>
+                        <div class="flex gap-6">
+                            <label class="flex items-center cursor-pointer p-4 border-2 rounded-lg hover:bg-gray-50 ${!item.degreeType || item.degreeType === 'master' ? 'border-[#009DE8] bg-blue-50' : 'border-gray-300'}">
+                                <input type="radio" name="degree-type" value="master"
+                                       ${!item.degreeType || item.degreeType === 'master' ? 'checked' : ''}
+                                       class="h-4 w-4 text-[#009DE8]">
+                                <span class="ml-3 font-medium text-gray-800">석사</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer p-4 border-2 rounded-lg hover:bg-gray-50 ${item.degreeType === 'phd' ? 'border-[#009DE8] bg-blue-50' : 'border-gray-300'}">
+                                <input type="radio" name="degree-type" value="phd"
+                                       ${item.degreeType === 'phd' ? 'checked' : ''}
+                                       class="h-4 w-4 text-[#009DE8]">
+                                <span class="ml-3 font-medium text-gray-800">박사</span>
+                            </label>
+                            <label class="flex items-center cursor-pointer p-4 border-2 rounded-lg hover:bg-gray-50 ${item.degreeType === 'common' ? 'border-[#009DE8] bg-blue-50' : 'border-gray-300'}">
+                                <input type="radio" name="degree-type" value="common"
+                                       ${item.degreeType === 'common' ? 'checked' : ''}
+                                       class="h-4 w-4 text-[#009DE8]">
+                                <span class="ml-3 font-medium text-gray-800">공통</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 설명 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            설명 (선택)
+                        </label>
+                        <textarea id="workflow-description" rows="4"
+                                  placeholder="워크플로우에 대한 설명을 입력하세요 (예: 2025년 1학기 논문 작성 과정)"
+                                  class="w-full border border-gray-300 rounded-md px-4 py-3 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent"
+                        >${item.description || ''}</textarea>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="flex gap-4 pt-6 border-t">
+                        <button type="button" onclick="saveWorkflowAndCompose('${id || ''}')"
+                                class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-md hover:bg-opacity-90 font-medium flex items-center justify-center">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            ${isEdit ? '저장 후 단계 구성' : '저장 후 단계 구성하기'}
+                        </button>
+                        <button type="button" onclick="switchView('stageManagement')"
+                                class="px-6 py-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium">
+                            취소
+                        </button>
+                    </div>
+                </form>
+
+                ${isEdit && item.stages && item.stages.length > 0 ? `
+                    <div class="mt-8 p-4 bg-gray-50 rounded-lg border">
+                        <p class="text-sm font-medium text-gray-700 mb-2">현재 구성된 단계 (${item.stages.length}개)</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${item.stages.map(s => `
+                                <span class="px-3 py-1 bg-white border rounded-full text-xs text-gray-700">
+                                    ${s.order}. ${s.name}
+                                </span>
+                            `).join('')}
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+    },
+
+    // ========== 워크플로우 단계 구성 페이지 ==========
+    workflowStageCompose: (workflowId) => {
+        const workflow = mockThesisStages.find(w => w.id === workflowId);
+        if (!workflow) {
+            return `
+                <div class="bg-white rounded-lg shadow-md p-8 text-center">
+                    <p class="text-red-600">워크플로우를 찾을 수 없습니다.</p>
+                    <button onclick="switchView('stageManagement')" class="mt-4 text-blue-600 hover:underline">
+                        목록으로 돌아가기
+                    </button>
+                </div>
+            `;
+        }
+
+        const degreeLabel = workflow.degreeType === 'master' ? '석사' :
+                           workflow.degreeType === 'phd' ? '박사' : '공통';
+
+        // 임시 저장용 전역 변수 초기화
+        window.currentWorkflow = workflow;
+        window.composedStages = workflow.stages ? JSON.parse(JSON.stringify(workflow.stages)) : [];
+
+        return `
+            <div class="h-full flex flex-col">
+                <!-- 헤더 -->
+                <div class="bg-white border-b px-6 py-4 shadow-sm">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center">
+                            <button onclick="switchView('stageManagement')"
+                                    class="text-gray-600 hover:text-gray-800 mr-4 flex items-center">
+                                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                                목록으로
+                            </button>
+                            <div>
+                                <h2 class="text-2xl font-bold text-gray-800">워크플로우 단계 구성</h2>
+                                <p class="text-sm text-gray-600 mt-1">
+                                    워크플로우: <strong>${workflow.name}</strong>
+                                    <span class="px-2 py-1 rounded text-xs ml-2 ${
+                                        workflow.degreeType === 'master' ? 'bg-blue-100 text-blue-800' :
+                                        workflow.degreeType === 'phd' ? 'bg-purple-100 text-purple-800' :
+                                        'bg-gray-100 text-gray-800'
+                                    }">${degreeLabel}</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <button onclick="saveWorkflowStages('${workflowId}')"
+                                    class="bg-[#009DE8] text-white px-6 py-2 rounded-md hover:bg-opacity-90 font-medium flex items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                </svg>
+                                저장
+                            </button>
+                            <button onclick="switchView('stageManagement')"
+                                    class="bg-gray-300 text-gray-700 px-6 py-2 rounded-md hover:bg-gray-400 font-medium">
+                                취소
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2단 레이아웃 -->
+                <div class="flex-1 flex overflow-hidden">
+                    <!-- 좌측: 단계 유형 목록 -->
+                    <div class="w-1/3 bg-gray-50 border-r overflow-y-auto">
+                        <div class="p-4">
+                            <h3 class="font-bold text-gray-800 mb-3 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                </svg>
+                                단계 유형 목록
+                            </h3>
+
+                            <!-- 검색 -->
+                            <input type="text" id="step-type-search"
+                                   placeholder="단계 검색..."
+                                   onkeyup="filterStepTypes()"
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm mb-4 focus:ring-2 focus:ring-[#009DE8]">
+
+                            <!-- 제출 유형 -->
+                            <div class="mb-4">
+                                <p class="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center">
+                                    <span class="w-2 h-2 bg-blue-500 rounded-full mr-2"></span>
+                                    제출
+                                </p>
+                                <div class="space-y-2">
+                                    ${mockStepTypes.filter(st => st.type === 'submission').map(st => `
+                                        <div class="step-type-item bg-white border border-gray-200 rounded-md p-3 hover:bg-blue-50 hover:border-blue-300 cursor-pointer transition-all"
+                                             data-step-name="${st.name.toLowerCase()}"
+                                             onclick="addStageToComposition('${st.id}')">
+                                            <p class="font-medium text-sm text-gray-800">${st.name}</p>
+                                            ${st.description ? `<p class="text-xs text-gray-500 mt-1">${st.description}</p>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- 심사 유형 -->
+                            <div>
+                                <p class="text-xs font-semibold text-gray-500 uppercase mb-2 flex items-center">
+                                    <span class="w-2 h-2 bg-purple-500 rounded-full mr-2"></span>
+                                    심사
+                                </p>
+                                <div class="space-y-2">
+                                    ${mockStepTypes.filter(st => st.type === 'review').map(st => `
+                                        <div class="step-type-item bg-white border border-gray-200 rounded-md p-3 hover:bg-purple-50 hover:border-purple-300 cursor-pointer transition-all"
+                                             data-step-name="${st.name.toLowerCase()}"
+                                             onclick="addStageToComposition('${st.id}')">
+                                            <p class="font-medium text-sm text-gray-800">${st.name}</p>
+                                            ${st.description ? `<p class="text-xs text-gray-500 mt-1">${st.description}</p>` : ''}
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 우측: 구성된 단계 -->
+                    <div class="flex-1 overflow-y-auto">
+                        <div class="p-6">
+                            <h3 class="font-bold text-gray-800 mb-4 flex items-center">
+                                <svg class="w-5 h-5 mr-2 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                </svg>
+                                구성된 단계
+                                <span class="ml-2 text-sm font-normal text-gray-500" id="stage-count">
+                                    (${window.composedStages.length}개)
+                                </span>
+                            </h3>
+
+                            <div id="composed-stages-list" class="space-y-3">
+                                ${renderComposedStages()}
+                            </div>
+
+                            ${window.composedStages.length === 0 ? `
+                                <div class="text-center py-16 text-gray-400">
+                                    <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                    <p class="text-lg font-medium mb-1">단계를 추가하세요</p>
+                                    <p class="text-sm">좌측에서 단계 유형을 클릭하면 여기에 추가됩니다</p>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
     // ========== 지도 단계 유형 관리 ==========
     typeManagement: () => {
-        const data = appData.types;
+        const data = mockStepTypes;
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b flex justify-between items-center">
                     <h3 class="text-lg font-bold text-gray-800">지도 단계 유형 관리 (레고 블록)</h3>
-                    <button onclick="openTypeModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                    <button onclick="openStepTypeModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                         + 유형 추가
                     </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
-                    ${data.map(item => `
+                    ${data.map(item => {
+                        const typeLabel = item.type === 'submission' ? '제출' : '심사';
+                        const typeBgColor = item.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
+                        const evalTemplate = item.evaluationTemplateId ? mockEvaluationTemplates.find(t => t.id === item.evaluationTemplateId) : null;
+
+                        return `
                         <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                             <div class="flex justify-between items-start mb-3">
-                                <h4 class="font-bold text-gray-800">${item.name}</h4>
+                                <div class="flex-1">
+                                    <h4 class="font-bold text-gray-800 mb-2">${item.name}</h4>
+                                    <span class="inline-block px-2 py-1 rounded text-xs font-medium ${typeBgColor}">${typeLabel}</span>
+                                </div>
                                 <div class="flex space-x-2">
-                                    <button onclick="editType(${item.id})" class="text-blue-600 hover:underline text-xs">수정</button>
-                                    <button onclick="deleteType(${item.id})" class="text-red-600 hover:underline text-xs">삭제</button>
+                                    <button onclick="editStepType('${item.id}')" class="text-blue-600 hover:underline text-xs">수정</button>
+                                    <button onclick="deleteStepType('${item.id}')" class="text-red-600 hover:underline text-xs">삭제</button>
                                 </div>
                             </div>
                             <div class="space-y-2">
                                 <div class="flex items-center text-sm">
-                                    <svg class="w-4 h-4 mr-2 ${item.presentation ? 'text-green-600' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.presentation ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}"></path>
+                                    <svg class="w-4 h-4 mr-2 ${item.requiresPresentation ? 'text-green-600' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.requiresPresentation ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}"></path>
                                     </svg>
                                     <span class="text-gray-600">발표 필요</span>
                                 </div>
                                 <div class="flex items-center text-sm">
-                                    <svg class="w-4 h-4 mr-2 ${item.document ? 'text-green-600' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.document ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}"></path>
+                                    <svg class="w-4 h-4 mr-2 ${item.requiresDocument ? 'text-green-600' : 'text-gray-400'}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${item.requiresDocument ? 'M5 13l4 4L19 7' : 'M6 18L18 6M6 6l12 12'}"></path>
                                     </svg>
                                     <span class="text-gray-600">문서 제출 필요</span>
                                 </div>
+                                ${evalTemplate ? `
+                                <div class="flex items-center text-sm">
+                                    <svg class="w-4 h-4 mr-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <span class="text-gray-600">${evalTemplate.name}</span>
+                                </div>
+                                ` : ''}
                             </div>
                             ${item.description ? `
                                 <p class="mt-3 text-xs text-gray-500 border-t pt-2">${item.description}</p>
                             ` : ''}
                         </div>
-                    `).join('')}
+                    `}).join('')}
                 </div>
             </div>
         `;
@@ -2172,9 +2454,26 @@ const views = {
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800">지도교수 배정</h2>
-                    <p class="text-sm text-gray-600 mt-1">연구계획서를 제출한 학생에게 지도교수를 배정합니다.</p>
+                    <h2 class="text-xl font-bold text-gray-800">지도 학생 관리</h2>
+                    <p class="text-sm text-gray-600 mt-1">교수 배정 및 단계 관리를 수행합니다.</p>
                 </div>
+
+                <!-- 탭 네비게이션 -->
+                <div class="border-b border-gray-200">
+                    <nav class="flex -mb-px">
+                        <button id="tab-assignment" onclick="switchStudentManagementTab('assignment')"
+                                class="student-tab active px-6 py-3 border-b-2 border-primary text-primary font-medium text-sm">
+                            교수 배정
+                        </button>
+                        <button id="tab-stage" onclick="switchStudentManagementTab('stage')"
+                                class="student-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm">
+                            단계 관리
+                        </button>
+                    </nav>
+                </div>
+
+                <!-- 교수 배정 탭 -->
+                <div id="tab-content-assignment" class="tab-content active">
 
                 <!-- 검색 옵션 (학위논문 심사와 동일한 디자인) -->
                 <div class="p-6 border-b">
@@ -2326,6 +2625,183 @@ const views = {
                             ${window.filteredAdvisorData ? '검색 결과가 없습니다.' : '제출된 연구계획서가 없습니다.'}
                         </div>
                     ` : ''}
+                </div>
+                </div>
+                <!-- End 교수 배정 탭 -->
+
+                <!-- 단계 관리 탭 -->
+                <div id="tab-content-stage" class="tab-content" style="display: none;">
+                    <div id="stage-management-content"></div>
+                </div>
+                <!-- End 단계 관리 탭 -->
+
+            </div>
+
+            <style>
+            .student-tab.active {
+                border-bottom-color: #dc2626;
+                color: #dc2626;
+            }
+            .tab-content {
+                display: none;
+            }
+            .tab-content.active {
+                display: block;
+            }
+            </style>
+        `;
+    },
+
+    // 심사위원 배정 화면 (P1-5)
+    committeeAssignment: () => {
+        // Mock 데이터 로드
+        if (typeof mockReviewTargets === 'undefined' || typeof mockCommitteeAssignments === 'undefined') {
+            return `
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-red-500">
+                        <p class="text-lg">Mock 데이터가 로드되지 않았습니다.</p>
+                        <p class="text-sm mt-2">admin/assets/js/mockData.js 파일을 확인하세요.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // JavaScript 파일 동적 로드
+        if (!document.querySelector('script[src="assets/js/admin-committee-assignment.js"]')) {
+            const script = document.createElement('script');
+            script.src = 'assets/js/admin-committee-assignment.js';
+            script.onload = () => {
+                if (typeof renderCommitteeAssignmentContent === 'function') {
+                    renderCommitteeAssignmentContent();
+                }
+            };
+            document.body.appendChild(script);
+        }
+
+        return `<div id="committee-assignment-content"></div>`;
+    },
+
+    // ========== 워크플로우 등록 (통합 화면) ==========
+    workflowCreateUnified: (id = null) => {
+        const isEdit = id !== null;
+        const item = isEdit ? mockThesisStages.find(s => s.id === id) : null;
+
+        // Initialize global variable for composed stages
+        window.composedStages = isEdit ? JSON.parse(JSON.stringify(item.stages)) : [];
+        window.currentWorkflowId = id;
+
+        const handleSave = () => {
+            const name = document.getElementById('workflow-name').value;
+            const degree = document.getElementById('workflow-degree').value;
+
+            if (!name.trim()) {
+                alert('워크플로우 이름을 입력해주세요.');
+                return;
+            }
+
+            if (window.composedStages.length === 0) {
+                alert('최소 1개 이상의 단계를 추가해주세요.');
+                return;
+            }
+
+            saveUnifiedWorkflow();
+        };
+
+        // Setup button handlers after render
+        setTimeout(() => {
+            const saveBtn = document.getElementById('unified-save-btn');
+            if (saveBtn) {
+                saveBtn.onclick = handleSave;
+            }
+        }, 0);
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- Header -->
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">${isEdit ? '워크플로우 수정' : '워크플로우 등록'}</h3>
+                    <p class="text-sm text-gray-600 mt-1">단계를 조합하여 논문지도 워크플로우를 구성합니다.</p>
+                </div>
+
+                <!-- Workflow Basic Info -->
+                <div class="p-6 border-b bg-gray-50">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">워크플로우 이름 *</label>
+                            <input type="text"
+                                   id="workflow-name"
+                                   value="${isEdit ? item.name : ''}"
+                                   placeholder="예: 논문작성1, 석사과정 워크플로우"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학위 과정</label>
+                            <select id="workflow-degree"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="master" ${isEdit && item.degree === 'master' ? 'selected' : ''}>석사</option>
+                                <option value="doctoral" ${isEdit && item.degree === 'doctoral' ? 'selected' : ''}>박사</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Content: 2-Column Layout -->
+                <div class="flex divide-x" style="min-height: 500px;">
+                    <!-- Left: Step Types List -->
+                    <div class="w-1/3 p-6 bg-gray-50">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold text-gray-800">단계 유형</h4>
+                            <button onclick="openStepTypeModal()"
+                                    class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700">
+                                + 새 단계 유형 추가
+                            </button>
+                        </div>
+                        <p class="text-xs text-gray-500 mb-4">단계를 클릭하여 워크플로우에 추가하세요</p>
+                        <div class="space-y-2">
+                            ${mockStepTypes.map(st => {
+                                const typeLabel = st.type === 'submission' ? '제출' : '심사';
+                                const typeBgColor = st.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
+                                return `
+                                    <div onclick="openAddStageModal('${st.id}')"
+                                         class="border border-gray-300 rounded-lg p-3 hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition-all">
+                                        <div class="font-medium text-gray-800 mb-1">${st.name}</div>
+                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${typeBgColor}">${typeLabel}</span>
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Right: Composed Stages -->
+                    <div class="flex-1 p-6">
+                        <div class="flex justify-between items-center mb-4">
+                            <h4 class="font-bold text-gray-800">구성된 단계 (${window.composedStages.length}개)</h4>
+                        </div>
+                        ${window.composedStages.length === 0 ? `
+                            <div class="flex flex-col items-center justify-center h-64 text-gray-400">
+                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                </svg>
+                                <p class="text-sm">왼쪽에서 단계를 선택하여 추가하세요</p>
+                            </div>
+                        ` : ''}
+                        <div id="composed-stages-list-unified">
+                            ${renderComposedStagesUnified()}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer: Save Button -->
+                <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3">
+                    <button onclick="switchView('stageManagement')"
+                            class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
+                        취소
+                    </button>
+                    <button id="unified-save-btn"
+                            ${window.composedStages.length === 0 ? 'disabled' : ''}
+                            class="px-4 py-2 rounded-md ${window.composedStages.length === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#009DE8] text-white hover:bg-opacity-90'}">
+                        저장 (${window.composedStages.length}개 단계)
+                    </button>
                 </div>
             </div>
         `;
