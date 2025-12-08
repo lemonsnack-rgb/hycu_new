@@ -240,22 +240,57 @@ function initAdvisorAssignment() {
     const currentProfessorId = 'PROF001'; // 김교수
 
     // Mock 데이터 로드 확인
-    if (typeof mockStudents === 'undefined' || typeof mockAdvisorAssignments === 'undefined' || typeof mockResearchProposals === 'undefined') {
+    if (typeof mockStudents === 'undefined' || typeof mockAdvisorAssignments === 'undefined' || typeof mockResearchProposals === 'undefined' || typeof mockProfessors === 'undefined' || typeof mockDepartments === 'undefined') {
         document.getElementById('professor-no-students').style.display = 'block';
-        document.getElementById('professor-no-students').textContent = 'Mock 데이터가 로드되지 않았습니다.';
         return;
     }
 
-    // 현재 교수가 지도하는 학생 찾기
+    // 학과 옵션 채우기
+    const deptSelect = document.getElementById('prof-advisor-search-department');
+    if (deptSelect && mockDepartments) {
+        deptSelect.innerHTML = '<option value="">전체</option>' +
+            mockDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('');
+    }
+
+    // 데이터 렌더링
+    renderProfessorAdvisorAssignmentTable();
+}
+
+// 교수용 지도교수 배정 테이블 렌더링
+function renderProfessorAdvisorAssignmentTable(filteredData = null) {
+    const currentProfessorId = 'PROF001';
+
+    // 현재 교수가 지도하는 학생의 연구계획서 찾기
     const myAssignments = mockAdvisorAssignments.filter(a =>
         a.mainAdvisor?.id === currentProfessorId ||
         a.coAdvisors.some(co => co.id === currentProfessorId)
     );
 
+    // 연구계획서와 학생 정보 결합
+    let data = mockResearchProposals.map(proposal => {
+        const assignment = myAssignments.find(a => a.studentId === proposal.studentId);
+        if (!assignment) return null;
+
+        const student = mockStudents.find(s => s.id === proposal.studentId);
+        if (!student) return null;
+
+        return {
+            ...proposal,
+            academicYear: student.academicYear,
+            semesterCount: student.semesterCount,
+            assignment: assignment
+        };
+    }).filter(item => item !== null);
+
+    // 필터링된 데이터가 있으면 사용
+    if (filteredData !== null) {
+        data = filteredData;
+    }
+
     const tableBody = document.getElementById('professor-student-list');
     const noStudentsDiv = document.getElementById('professor-no-students');
 
-    if (myAssignments.length === 0) {
+    if (data.length === 0) {
         tableBody.innerHTML = '';
         noStudentsDiv.style.display = 'block';
         return;
@@ -263,37 +298,125 @@ function initAdvisorAssignment() {
 
     noStudentsDiv.style.display = 'none';
 
-    // 학생 목록 렌더링
-    tableBody.innerHTML = myAssignments.map(assignment => {
-        const student = mockStudents.find(s => s.id === assignment.studentId);
-        const proposal = mockResearchProposals.find(p => p.studentId === assignment.studentId);
+    // 학생 목록 렌더링 (관리자와 동일한 구조, 행 클릭 시 상세 화면, 읽기 전용)
+    tableBody.innerHTML = data.map(item => `
+        <tr class="hover:bg-gray-50 cursor-pointer"
+            onclick="viewProfessorProposalDetail('${item.id}')">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semesterCount}학기</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                    ${item.degreeType}
+                </span>
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-900">
+                ${item.assignment && item.assignment.mainAdvisor
+                    ? item.assignment.mainAdvisor.name
+                    : '-'}
+            </td>
+            <td class="px-6 py-4 text-sm text-gray-900">
+                ${item.assignment && item.assignment.coAdvisors.length > 0
+                    ? item.assignment.coAdvisors.map(c => c.name).join(', ')
+                    : '-'}
+            </td>
+        </tr>
+    `).join('');
+}
 
-        if (!student) return '';
+// 교수용 검색 기능
+function searchProfessorAdvisorAssignment() {
+    const currentProfessorId = 'PROF001';
 
-        return `
-            <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.academicYear}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.semesterCount}학기</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.studentNumber}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.department}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.name}</td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    <span class="px-2 py-1 text-xs rounded ${student.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                        ${student.degreeType}
-                    </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    ${proposal ? `<span class="text-blue-600 cursor-pointer hover:underline" onclick="alert('연구계획서: ${proposal.title}')">조회</span>` : '-'}
-                </td>
-            </tr>
-        `;
-    }).join('');
+    const year = document.getElementById('prof-advisor-search-year')?.value || '';
+    const semester = document.getElementById('prof-advisor-search-semester')?.value || '';
+    const semesterCount = document.getElementById('prof-advisor-search-semester-count')?.value || '';
+    const department = document.getElementById('prof-advisor-search-department')?.value || '';
+    const studentId = document.getElementById('prof-advisor-search-student-id')?.value || '';
+    const studentName = document.getElementById('prof-advisor-search-student-name')?.value || '';
+
+    // 현재 교수가 지도하는 학생의 연구계획서
+    const myAssignments = mockAdvisorAssignments.filter(a =>
+        a.mainAdvisor?.id === currentProfessorId ||
+        a.coAdvisors.some(co => co.id === currentProfessorId)
+    );
+
+    const proposalsWithAssignment = mockResearchProposals.map(proposal => {
+        const assignment = myAssignments.find(a => a.studentId === proposal.studentId);
+        if (!assignment) return null;
+
+        const student = mockStudents.find(s => s.id === proposal.studentId);
+        if (!student) return null;
+
+        return {
+            ...proposal,
+            academicYear: student.academicYear,
+            semesterCount: student.semesterCount,
+            assignment: assignment
+        };
+    }).filter(item => item !== null);
+
+    const filteredData = proposalsWithAssignment.filter(item => {
+        if (year && item.academicYear !== year) return false;
+        if (semesterCount && item.semesterCount.toString() !== semesterCount) return false;
+        if (department && item.department !== department) return false;
+        if (studentId && !item.studentNumber.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        return true;
+    });
+
+    renderProfessorAdvisorAssignmentTable(filteredData);
+    alert(`검색 결과: ${filteredData.length}건`);
+}
+
+// 교수용 검색 초기화
+function resetProfessorAdvisorSearch() {
+    document.querySelectorAll('input[id^="prof-advisor-search"], select[id^="prof-advisor-search"]').forEach(field => {
+        if (field.tagName === 'SELECT') {
+            field.selectedIndex = 0;
+        } else {
+            field.value = '';
+        }
+    });
+    renderProfessorAdvisorAssignmentTable();
+    alert('검색 조건이 초기화되었습니다.');
+}
+
+// 교수용 연구계획서 상세 보기 (읽기 전용)
+function viewProfessorProposalDetail(proposalId) {
+    const proposal = mockResearchProposals.find(p => p.id === proposalId);
+    if (!proposal) {
+        alert('연구계획서를 찾을 수 없습니다.');
+        return;
+    }
+
+    const student = mockStudents.find(s => s.id === proposal.studentId);
+    const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
+
+    let mainAdvisorName = '-';
+    let coAdvisorNames = '-';
+
+    if (assignment) {
+        if (assignment.mainAdvisor) {
+            mainAdvisorName = assignment.mainAdvisor.name;
+        }
+        if (assignment.coAdvisors && assignment.coAdvisors.length > 0) {
+            coAdvisorNames = assignment.coAdvisors.map(c => c.name).join(', ');
+        }
+    }
+
+    alert(`[연구계획서 상세 - 읽기 전용]\n\n학번: ${proposal.studentNumber}\n성명: ${proposal.studentName}\n학과: ${proposal.department}\n학위과정: ${proposal.degreeType}\n\n논문 제목: ${proposal.title}\n\n연구 목적:\n${proposal.purpose}\n\n연구의 필요성:\n${proposal.necessity}\n\n연구 방법:\n${proposal.method}\n\n제출일: ${proposal.submittedDate}\n\n주지도교수: ${mainAdvisorName}\n부지도교수: ${coAdvisorNames}`);
 }
 
 // 전역으로 export
 window.showScreen = showScreen;
 window.handleLogout = handleLogout;
 window.initAdvisorAssignment = initAdvisorAssignment;
+window.searchProfessorAdvisorAssignment = searchProfessorAdvisorAssignment;
+window.resetProfessorAdvisorSearch = resetProfessorAdvisorSearch;
+window.viewProfessorProposalDetail = viewProfessorProposalDetail;
 window.switchTab = switchTab;
 window.setupSearchInput = setupSearchInput;
 window.currentScreen = currentScreen;
