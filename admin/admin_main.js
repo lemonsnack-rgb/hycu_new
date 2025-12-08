@@ -3496,6 +3496,11 @@ function viewProposalDetail(proposalId) {
     document.getElementById('view-title').textContent = '연구계획서 상세';
 }
 
+// 전역 변수로 선택된 교수들 저장
+let selectedMainAdvisor = null;
+let selectedCoAdvisors = [];
+let currentAssignmentContext = null;
+
 // 지도교수 배정 모달 표시
 function assignAdvisor(studentId, proposalId, type = 'main') {
     console.log('지도교수 배정:', { studentId, proposalId, type });
@@ -3508,18 +3513,205 @@ function assignAdvisor(studentId, proposalId, type = 'main') {
         return;
     }
 
-    // TODO: 배정 모달 구현 필요
-    // 임시로 confirm 사용
-    const isReassign = assignment && (
-        (type === 'main' && assignment.mainAdvisor) ||
-        (type === 'co' && assignment.coAdvisors && assignment.coAdvisors.length > 0)
-    );
+    // 현재 배정 컨텍스트 저장
+    currentAssignmentContext = { studentId, proposalId, type };
 
-    const action = isReassign ? '재배정' : '배정';
-    const advisorType = type === 'main' ? '지도교수' : '부지도교수';
+    // 기존 배정 정보 로드
+    if (type === 'main') {
+        selectedMainAdvisor = assignment?.mainAdvisor ? { ...assignment.mainAdvisor } : null;
+        selectedCoAdvisors = [];
+    } else {
+        selectedMainAdvisor = null;
+        selectedCoAdvisors = assignment?.coAdvisors ? [...assignment.coAdvisors] : [];
+    }
 
-    if (confirm(`${student.name} 학생의 ${advisorType}를 ${action}하시겠습니까?\n\n교수 검색 모달이 열립니다.`)) {
-        showNotification(`${advisorType} ${action} 모달 구현 예정`, 'info');
+    // 모달 내용 렌더링
+    renderAdvisorAssignmentModal(student, type);
+
+    // 모달 열기
+    document.getElementById('advisor-assignment-modal').classList.add('active');
+}
+
+// 지도교수 배정 모달 닫기
+function closeAdvisorAssignmentModal() {
+    document.getElementById('advisor-assignment-modal').classList.remove('active');
+    selectedMainAdvisor = null;
+    selectedCoAdvisors = [];
+    currentAssignmentContext = null;
+}
+
+// 지도교수 배정 모달 내용 렌더링
+function renderAdvisorAssignmentModal(student, type) {
+    const isMain = type === 'main';
+    const advisorType = isMain ? '지도교수' : '부지도교수';
+
+    const content = `
+        <div class="search-section">
+            <h3 class="font-semibold text-gray-900 mb-3">
+                ${student.name} 학생의 ${advisorType} ${isMain ? '배정' : '선택'}
+            </h3>
+            <p class="text-sm text-gray-600 mb-4">
+                ${isMain ? '지도교수는 1명만 선택할 수 있습니다.' : '부지도교수는 여러 명 선택할 수 있습니다.'}
+            </p>
+
+            <div class="search-grid">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                    <select id="advisor-dept-filter" onchange="filterAdvisors()"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">전체</option>
+                        ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
+                            `<option value="${dept}">${dept}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                    <input type="text" id="advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors()"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                </div>
+                <div class="flex items-end">
+                    <button onclick="clearAdvisorFilters()"
+                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                        초기화
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="advisor-list" id="advisor-list">
+            ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
+        </div>
+
+        <div class="modal-footer">
+            <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
+                취소
+            </button>
+            <button onclick="saveAdvisorAssignment()" class="btn-primary" id="save-advisor-btn">
+                ${isMain ? '배정 완료' : '선택 완료'}
+            </button>
+        </div>
+    `;
+
+    document.getElementById('advisor-assignment-content').innerHTML = content;
+    updateSaveButtonState();
+}
+
+// 교수 항목 렌더링
+function renderAdvisorItem(prof, isMain) {
+    const isSelected = isMain
+        ? selectedMainAdvisor?.id === prof.id
+        : selectedCoAdvisors.some(a => a.id === prof.id);
+
+    return `
+        <div class="advisor-item" data-dept="${prof.department}" data-name="${prof.name}">
+            <input type="${isMain ? 'radio' : 'checkbox'}"
+                   name="advisor-select"
+                   value="${prof.id}"
+                   ${isSelected ? 'checked' : ''}
+                   onchange="handleAdvisorSelection('${prof.id}', ${isMain})">
+            <div>
+                <p class="font-medium text-gray-900">${prof.name}</p>
+                <p class="text-sm text-gray-600">${prof.department}</p>
+            </div>
+            <div class="text-sm text-gray-600">${prof.title || '교수'}</div>
+            <div class="text-sm text-gray-600">${prof.email}</div>
+        </div>
+    `;
+}
+
+// 교수 선택 처리
+function handleAdvisorSelection(profId, isMain) {
+    const prof = mockProfessors.find(p => p.id === profId);
+
+    if (!prof) return;
+
+    if (isMain) {
+        selectedMainAdvisor = { ...prof };
+    } else {
+        const index = selectedCoAdvisors.findIndex(a => a.id === profId);
+        if (index >= 0) {
+            selectedCoAdvisors.splice(index, 1);
+        } else {
+            selectedCoAdvisors.push({ ...prof });
+        }
+    }
+
+    updateSaveButtonState();
+}
+
+// 교수 필터링
+function filterAdvisors() {
+    const deptFilter = document.getElementById('advisor-dept-filter').value.toLowerCase();
+    const nameFilter = document.getElementById('advisor-name-filter').value.toLowerCase();
+
+    document.querySelectorAll('.advisor-item').forEach(item => {
+        const dept = item.dataset.dept.toLowerCase();
+        const name = item.dataset.name.toLowerCase();
+
+        const matchDept = !deptFilter || dept === deptFilter;
+        const matchName = !nameFilter || name.includes(nameFilter);
+
+        item.style.display = (matchDept && matchName) ? '' : 'none';
+    });
+}
+
+// 필터 초기화
+function clearAdvisorFilters() {
+    document.getElementById('advisor-dept-filter').value = '';
+    document.getElementById('advisor-name-filter').value = '';
+    filterAdvisors();
+}
+
+// 저장 버튼 상태 업데이트
+function updateSaveButtonState() {
+    const saveBtn = document.getElementById('save-advisor-btn');
+    if (!saveBtn) return;
+
+    const hasSelection = currentAssignmentContext?.type === 'main'
+        ? selectedMainAdvisor !== null
+        : selectedCoAdvisors.length > 0;
+
+    saveBtn.disabled = !hasSelection;
+}
+
+// 지도교수 배정 저장
+function saveAdvisorAssignment() {
+    if (!currentAssignmentContext) return;
+
+    const { studentId, proposalId, type } = currentAssignmentContext;
+    const student = mockStudents.find(s => s.id === studentId);
+
+    // Mock 데이터 업데이트 (실제로는 서버 API 호출)
+    let assignment = mockAdvisorAssignments.find(a => a.studentId === studentId);
+
+    if (!assignment) {
+        assignment = {
+            id: `ASSIGN${mockAdvisorAssignments.length + 1}`.padEnd(10, '0'),
+            studentId: studentId,
+            mainAdvisor: null,
+            coAdvisors: []
+        };
+        mockAdvisorAssignments.push(assignment);
+    }
+
+    if (type === 'main') {
+        assignment.mainAdvisor = selectedMainAdvisor;
+        showNotification(`${student.name} 학생의 지도교수를 ${selectedMainAdvisor.name} 교수로 배정했습니다.`, 'success');
+    } else {
+        assignment.coAdvisors = [...selectedCoAdvisors];
+        showNotification(`${student.name} 학생의 부지도교수 ${selectedCoAdvisors.length}명을 선택했습니다.`, 'success');
+    }
+
+    // 모달 닫기
+    closeAdvisorAssignmentModal();
+
+    // 현재 뷰 새로고침
+    const currentView = document.getElementById('view-title').textContent;
+    if (currentView === '연구계획서 상세') {
+        viewProposalDetail(proposalId);
+    } else {
+        switchView('advisorAssignment');
     }
 }
 
@@ -3536,6 +3728,14 @@ window.showStudentInfo = showStudentInfo;
 window.closeStudentInfoModal = closeStudentInfoModal;
 window.viewProposalDetail = viewProposalDetail;
 window.assignAdvisor = assignAdvisor;
+window.closeAdvisorAssignmentModal = closeAdvisorAssignmentModal;
+window.renderAdvisorAssignmentModal = renderAdvisorAssignmentModal;
+window.renderAdvisorItem = renderAdvisorItem;
+window.handleAdvisorSelection = handleAdvisorSelection;
+window.filterAdvisors = filterAdvisors;
+window.clearAdvisorFilters = clearAdvisorFilters;
+window.updateSaveButtonState = updateSaveButtonState;
+window.saveAdvisorAssignment = saveAdvisorAssignment;
 window.openProposalSubmitModal = openProposalSubmitModal;
 
 console.log('✅ 지도 학생 관리 기능 로드 완료');
