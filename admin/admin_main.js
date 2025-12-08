@@ -3372,7 +3372,7 @@ function viewProposalDetail(proposalId) {
 
             <!-- 학생 정보 -->
             <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">📋 학생 정보</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">학생 정보</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex">
                         <span class="w-24 text-gray-600 font-medium">학번:</span>
@@ -3395,28 +3395,44 @@ function viewProposalDetail(proposalId) {
 
             <!-- 연구계획서 내용 -->
             <div class="px-8 py-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">📝 연구계획서</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서</h2>
 
-                <div class="space-y-6">
+                <div class="space-y-4">
                     <div>
-                        <h3 class="font-medium text-gray-700 mb-2">연구 목적</h3>
-                        <p class="text-gray-900 leading-relaxed">${proposal.purpose}</p>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 목적
+                        </label>
+                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
+                        </div>
                     </div>
 
                     <div>
-                        <h3 class="font-medium text-gray-700 mb-2">연구 필요성</h3>
-                        <p class="text-gray-900 leading-relaxed">${proposal.necessity}</p>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 필요성
+                        </label>
+                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
+                        </div>
                     </div>
 
                     <div>
-                        <h3 class="font-medium text-gray-700 mb-2">연구 문제 및 연구 방법</h3>
-                        <p class="text-gray-900 leading-relaxed">${proposal.method}</p>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 문제 및 연구 방법
+                        </label>
+                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
+                        </div>
                     </div>
 
                     ${proposal.desiredAdvisor ? `
                         <div>
-                            <h3 class="font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</h3>
-                            <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                                희망 지도교수 (참고용)
+                            </label>
+                            <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                                <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
+                            </div>
                         </div>
                     ` : ''}
                 </div>
@@ -3425,9 +3441,9 @@ function viewProposalDetail(proposalId) {
             <!-- 지도교수 배정 현황 -->
             <div class="px-8 py-6">
                 <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">👨‍🏫 지도교수 배정 현황</h2>
+                    <h2 class="text-lg font-semibold text-gray-900">지도교수 배정 현황</h2>
                     ${assignment ? '' : `
-                        <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'main')"
+                        <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'both')"
                                 class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
                             지도교수 배정
                         </button>
@@ -3440,21 +3456,14 @@ function viewProposalDetail(proposalId) {
                             <span class="w-32 text-gray-600 font-medium">지도교수:</span>
                             <div class="flex-1">
                                 ${assignment.mainAdvisor ? `
-                                    <div class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
+                                    <div class="bg-gray-50 px-4 py-3 rounded-lg">
                                         <div>
                                             <p class="font-medium text-gray-900">${assignment.mainAdvisor.name}</p>
                                             <p class="text-sm text-gray-600">${assignment.mainAdvisor.department}</p>
                                         </div>
-                                        <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'main')"
-                                                class="text-sm text-primary hover:text-primary-dark">
-                                            재배정
-                                        </button>
                                     </div>
                                 ` : `
-                                    <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'main')"
-                                            class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white">
-                                        배정
-                                    </button>
+                                    <p class="text-gray-500">미배정</p>
                                 `}
                             </div>
                         </div>
@@ -3464,24 +3473,24 @@ function viewProposalDetail(proposalId) {
                             <div class="flex-1 space-y-2">
                                 ${assignment.coAdvisors && assignment.coAdvisors.length > 0 ? `
                                     ${assignment.coAdvisors.map(coAdvisor => `
-                                        <div class="flex items-center justify-between bg-gray-50 px-4 py-3 rounded-lg">
+                                        <div class="bg-gray-50 px-4 py-3 rounded-lg">
                                             <div>
                                                 <p class="font-medium text-gray-900">${coAdvisor.name}</p>
                                                 <p class="text-sm text-gray-600">${coAdvisor.department}</p>
                                             </div>
                                         </div>
                                     `).join('')}
-                                    <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'co')"
-                                            class="mt-2 text-sm text-primary hover:text-primary-dark">
-                                        + 부지도교수 추가/변경
-                                    </button>
                                 ` : `
-                                    <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'co')"
-                                            class="px-4 py-2 border border-gray-300 text-gray-600 rounded-lg hover:bg-gray-50">
-                                        배정
-                                    </button>
+                                    <p class="text-gray-500">미배정</p>
                                 `}
                             </div>
+                        </div>
+
+                        <div class="flex justify-end mt-4">
+                            <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'both')"
+                                    class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white">
+                                재배정
+                            </button>
                         </div>
                     </div>
                 ` : `
@@ -3546,71 +3555,156 @@ function closeAdvisorAssignmentModal() {
 
 // 지도교수 배정 모달 내용 렌더링
 function renderAdvisorAssignmentModal(student, type) {
+    const isBoth = type === 'both';
     const isMain = type === 'main';
-    const advisorType = isMain ? '지도교수' : '부지도교수';
 
-    const content = `
-        <div class="search-section">
-            <h3 class="font-semibold text-gray-900 mb-3">
-                ${student.name} 학생의 ${advisorType} ${isMain ? '배정' : '선택'}
-            </h3>
-            <p class="text-sm text-gray-600 mb-4">
-                ${isMain ? '지도교수는 1명만 선택할 수 있습니다.' : '부지도교수는 여러 명 선택할 수 있습니다.'}
-            </p>
+    let content = '';
 
-            <div class="search-grid">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
-                    <select id="advisor-dept-filter" onchange="filterAdvisors()"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                        <option value="">전체</option>
-                        ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
-                            `<option value="${dept}">${dept}</option>`
-                        ).join('')}
-                    </select>
+    if (isBoth) {
+        // 좌우 2분할 레이아웃 (주지도교수 + 부지도교수 동시 배정)
+        content = `
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-900 mb-2">${student.name} 학생의 지도교수 배정</h3>
+                <p class="text-sm text-gray-600">주지도교수는 1명, 부지도교수는 여러 명 선택할 수 있습니다.</p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px;">
+                <!-- 왼쪽: 주지도교수 -->
+                <div style="border-right: 1px solid #e5e7eb; padding-right: 24px; display: flex; flex-direction: column;">
+                    <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">주지도교수</h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                            <select id="main-advisor-dept-filter" onchange="filterAdvisors('main')"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="">전체</option>
+                                ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
+                                    `<option value="${dept}">${dept}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                            <input type="text" id="main-advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors('main')"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px;" id="main-advisor-list">
+                        ${mockProfessors.map(prof => renderAdvisorItem(prof, true, 'main')).join('')}
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
-                    <input type="text" id="advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors()"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
-                </div>
-                <div class="flex items-end">
-                    <button onclick="clearAdvisorFilters()"
-                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                        초기화
-                    </button>
+
+                <!-- 오른쪽: 부지도교수 -->
+                <div style="padding-left: 24px; display: flex; flex-direction: column;">
+                    <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">부지도교수 (복수 선택 가능)</h4>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                            <select id="co-advisor-dept-filter" onchange="filterAdvisors('co')"
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                <option value="">전체</option>
+                                ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
+                                    `<option value="${dept}">${dept}</option>`
+                                ).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                            <input type="text" id="co-advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors('co')"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        </div>
+                    </div>
+
+                    <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px;" id="co-advisor-list">
+                        ${mockProfessors.map(prof => renderAdvisorItem(prof, false, 'co')).join('')}
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="advisor-list" id="advisor-list">
-            ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
-        </div>
+            <div class="modal-footer">
+                <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
+                    취소
+                </button>
+                <button onclick="saveAdvisorAssignment()" class="btn-primary" id="save-advisor-btn">
+                    배정 완료
+                </button>
+            </div>
+        `;
+    } else {
+        // 기존 단일 컬럼 레이아웃 (주 또는 부 단독 배정)
+        const advisorType = isMain ? '지도교수' : '부지도교수';
 
-        <div class="modal-footer">
-            <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
-                취소
-            </button>
-            <button onclick="saveAdvisorAssignment()" class="btn-primary" id="save-advisor-btn">
-                ${isMain ? '배정 완료' : '선택 완료'}
-            </button>
-        </div>
-    `;
+        content = `
+            <div class="search-section">
+                <h3 class="font-semibold text-gray-900 mb-3">
+                    ${student.name} 학생의 ${advisorType} ${isMain ? '배정' : '선택'}
+                </h3>
+                <p class="text-sm text-gray-600 mb-4">
+                    ${isMain ? '지도교수는 1명만 선택할 수 있습니다.' : '부지도교수는 여러 명 선택할 수 있습니다.'}
+                </p>
+
+                <div class="search-grid">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                        <select id="advisor-dept-filter" onchange="filterAdvisors()"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">전체</option>
+                            ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
+                                `<option value="${dept}">${dept}</option>`
+                            ).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                        <input type="text" id="advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors()"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="clearAdvisorFilters()"
+                                class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
+                            초기화
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="advisor-list" id="advisor-list">
+                ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
+            </div>
+
+            <div class="modal-footer">
+                <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
+                    취소
+                </button>
+                <button onclick="saveAdvisorAssignment()" class="btn-primary" id="save-advisor-btn">
+                    ${isMain ? '배정 완료' : '선택 완료'}
+                </button>
+            </div>
+        `;
+    }
 
     document.getElementById('advisor-assignment-content').innerHTML = content;
     updateSaveButtonState();
 }
 
 // 교수 항목 렌더링
-function renderAdvisorItem(prof, isMain) {
+function renderAdvisorItem(prof, isMain, side = null) {
     const isSelected = isMain
         ? selectedMainAdvisor?.id === prof.id
         : selectedCoAdvisors.some(a => a.id === prof.id);
 
+    // side가 있으면 data-side 속성 추가 (좌우 분할 레이아웃용)
+    const dataAttrs = side
+        ? `data-dept="${prof.department}" data-name="${prof.name}" data-side="${side}"`
+        : `data-dept="${prof.department}" data-name="${prof.name}"`;
+
     return `
-        <div class="advisor-item" data-dept="${prof.department}" data-name="${prof.name}">
+        <div class="advisor-item" ${dataAttrs}>
             <input type="${isMain ? 'radio' : 'checkbox'}"
-                   name="advisor-select"
+                   name="${side ? side + '-advisor-select' : 'advisor-select'}"
                    value="${prof.id}"
                    ${isSelected ? 'checked' : ''}
                    onchange="handleAdvisorSelection('${prof.id}', ${isMain})">
@@ -3645,19 +3739,36 @@ function handleAdvisorSelection(profId, isMain) {
 }
 
 // 교수 필터링
-function filterAdvisors() {
-    const deptFilter = document.getElementById('advisor-dept-filter').value.toLowerCase();
-    const nameFilter = document.getElementById('advisor-name-filter').value.toLowerCase();
+function filterAdvisors(side = null) {
+    if (side) {
+        // 좌우 분할 레이아웃: 특정 side만 필터링
+        const deptFilter = document.getElementById(`${side}-advisor-dept-filter`)?.value.toLowerCase() || '';
+        const nameFilter = document.getElementById(`${side}-advisor-name-filter`)?.value.toLowerCase() || '';
 
-    document.querySelectorAll('.advisor-item').forEach(item => {
-        const dept = item.dataset.dept.toLowerCase();
-        const name = item.dataset.name.toLowerCase();
+        document.querySelectorAll(`.advisor-item[data-side="${side}"]`).forEach(item => {
+            const dept = item.dataset.dept.toLowerCase();
+            const name = item.dataset.name.toLowerCase();
 
-        const matchDept = !deptFilter || dept === deptFilter;
-        const matchName = !nameFilter || name.includes(nameFilter);
+            const matchDept = !deptFilter || dept === deptFilter;
+            const matchName = !nameFilter || name.includes(nameFilter);
 
-        item.style.display = (matchDept && matchName) ? '' : 'none';
-    });
+            item.style.display = (matchDept && matchName) ? '' : 'none';
+        });
+    } else {
+        // 단일 컬럼 레이아웃: 전체 필터링
+        const deptFilter = document.getElementById('advisor-dept-filter')?.value.toLowerCase() || '';
+        const nameFilter = document.getElementById('advisor-name-filter')?.value.toLowerCase() || '';
+
+        document.querySelectorAll('.advisor-item').forEach(item => {
+            const dept = item.dataset.dept.toLowerCase();
+            const name = item.dataset.name.toLowerCase();
+
+            const matchDept = !deptFilter || dept === deptFilter;
+            const matchName = !nameFilter || name.includes(nameFilter);
+
+            item.style.display = (matchDept && matchName) ? '' : 'none';
+        });
+    }
 }
 
 // 필터 초기화
@@ -3672,9 +3783,16 @@ function updateSaveButtonState() {
     const saveBtn = document.getElementById('save-advisor-btn');
     if (!saveBtn) return;
 
-    const hasSelection = currentAssignmentContext?.type === 'main'
-        ? selectedMainAdvisor !== null
-        : selectedCoAdvisors.length > 0;
+    let hasSelection = false;
+
+    if (currentAssignmentContext?.type === 'both') {
+        // 'both' 타입: 주지도교수만 필수 (부지도교수는 선택사항)
+        hasSelection = selectedMainAdvisor !== null;
+    } else if (currentAssignmentContext?.type === 'main') {
+        hasSelection = selectedMainAdvisor !== null;
+    } else {
+        hasSelection = selectedCoAdvisors.length > 0;
+    }
 
     saveBtn.disabled = !hasSelection;
 }
@@ -3699,7 +3817,17 @@ function saveAdvisorAssignment() {
         mockAdvisorAssignments.push(assignment);
     }
 
-    if (type === 'main') {
+    if (type === 'both') {
+        // 주지도교수 + 부지도교수 동시 배정
+        assignment.mainAdvisor = selectedMainAdvisor;
+        assignment.coAdvisors = [...selectedCoAdvisors];
+
+        let message = `${student.name} 학생의 지도교수를 ${selectedMainAdvisor.name} 교수로 배정했습니다.`;
+        if (selectedCoAdvisors.length > 0) {
+            message += ` (부지도교수 ${selectedCoAdvisors.length}명)`;
+        }
+        showNotification(message, 'success');
+    } else if (type === 'main') {
         assignment.mainAdvisor = selectedMainAdvisor;
         showNotification(`${student.name} 학생의 지도교수를 ${selectedMainAdvisor.name} 교수로 배정했습니다.`, 'success');
     } else {
