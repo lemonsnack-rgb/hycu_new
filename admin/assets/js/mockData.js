@@ -23,28 +23,28 @@ const mockProfessors = [
     { id: 'PROF010', employeeNumber: 'P2024002', name: '임교수', department: '사회복지학과', isTenured: false, email: 'lim@hycu.ac.kr', phone: '010-1111-1120' }
 ];
 
-// 학생 데이터 (20명)
+// 학생 데이터 (20명) - academicYear(학년도), semesterCount(학기차) 추가
 const mockStudents = [
-    { id: 'STU001', studentNumber: '2024001', name: '김학생', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', status: 'active', email: 'stu001@hycu.ac.kr', phone: '010-2222-0001', admissionDate: '2024-03-01' },
-    { id: 'STU002', studentNumber: '2024002', name: '이학생', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', status: 'active', email: 'stu002@hycu.ac.kr', phone: '010-2222-0002', admissionDate: '2024-03-01' },
-    { id: 'STU003', studentNumber: '2024003', name: '박학생', department: '경영학과', degreeType: '석사', grade: '석사1차', status: 'active', email: 'stu003@hycu.ac.kr', phone: '010-2222-0003', admissionDate: '2024-03-01' },
-    { id: 'STU004', studentNumber: '2024004', name: '최학생', department: '경영학과', degreeType: '석사', grade: '석사2차', status: 'active', email: 'stu004@hycu.ac.kr', phone: '010-2222-0004', admissionDate: '2023-09-01' },
-    { id: 'STU005', studentNumber: '2024005', name: '정학생', department: '교육학과', degreeType: '석사', grade: '석사1차', status: 'active', email: 'stu005@hycu.ac.kr', phone: '010-2222-0005', admissionDate: '2024-03-01' },
-    { id: 'STU006', studentNumber: '2024006', name: '강학생', department: '교육학과', degreeType: '석사', grade: '석사2차', status: 'active', email: 'stu006@hycu.ac.kr', phone: '010-2222-0006', admissionDate: '2023-09-01' },
-    { id: 'STU007', studentNumber: '2024007', name: '조학생', department: '심리학과', degreeType: '석사', grade: '석사1차', status: 'active', email: 'stu007@hycu.ac.kr', phone: '010-2222-0007', admissionDate: '2024-03-01' },
-    { id: 'STU008', studentNumber: '2024008', name: '윤학생', department: '심리학과', degreeType: '석사', grade: '석사2차', status: 'active', email: 'stu008@hycu.ac.kr', phone: '010-2222-0008', admissionDate: '2023-09-01' },
-    { id: 'STU009', studentNumber: '2024009', name: '장학생', department: '사회복지학과', degreeType: '석사', grade: '석사1차', status: 'active', email: 'stu009@hycu.ac.kr', phone: '010-2222-0009', admissionDate: '2024-03-01' },
-    { id: 'STU010', studentNumber: '2024010', name: '임학생', department: '사회복지학과', degreeType: '석사', grade: '석사2차', status: 'active', email: 'stu010@hycu.ac.kr', phone: '010-2222-0010', admissionDate: '2023-09-01' },
-    { id: 'STU011', studentNumber: '2023001', name: '한학생', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', status: 'active', email: 'stu011@hycu.ac.kr', phone: '010-2222-0011', admissionDate: '2023-03-01' },
-    { id: 'STU012', studentNumber: '2023002', name: '서학생', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', status: 'active', email: 'stu012@hycu.ac.kr', phone: '010-2222-0012', admissionDate: '2023-03-01' },
-    { id: 'STU013', studentNumber: '2023003', name: '오학생', department: '경영학과', degreeType: '박사', grade: '박사1차', status: 'active', email: 'stu013@hycu.ac.kr', phone: '010-2222-0013', admissionDate: '2023-03-01' },
-    { id: 'STU014', studentNumber: '2023004', name: '양학생', department: '경영학과', degreeType: '박사', grade: '박사2차', status: 'active', email: 'stu014@hycu.ac.kr', phone: '010-2222-0014', admissionDate: '2022-09-01' },
-    { id: 'STU015', studentNumber: '2023005', name: '권학생', department: '교육학과', degreeType: '박사', grade: '박사1차', status: 'active', email: 'stu015@hycu.ac.kr', phone: '010-2222-0015', admissionDate: '2023-03-01' },
-    { id: 'STU016', studentNumber: '2023006', name: '송학생', department: '교육학과', degreeType: '박사', grade: '박사2차', status: 'active', email: 'stu016@hycu.ac.kr', phone: '010-2222-0016', admissionDate: '2022-09-01' },
-    { id: 'STU017', studentNumber: '2023007', name: '백학생', department: '심리학과', degreeType: '박사', grade: '박사1차', status: 'active', email: 'stu017@hycu.ac.kr', phone: '010-2222-0017', admissionDate: '2023-03-01' },
-    { id: 'STU018', studentNumber: '2023008', name: '남학생', department: '심리학과', degreeType: '박사', grade: '박사2차', status: 'active', email: 'stu018@hycu.ac.kr', phone: '010-2222-0018', admissionDate: '2022-09-01' },
-    { id: 'STU019', studentNumber: '2023009', name: '문학생', department: '사회복지학과', degreeType: '박사', grade: '박사1차', status: 'active', email: 'stu019@hycu.ac.kr', phone: '010-2222-0019', admissionDate: '2023-03-01' },
-    { id: 'STU020', studentNumber: '2023010', name: '유학생', department: '사회복지학과', degreeType: '박사', grade: '박사2차', status: 'active', email: 'stu020@hycu.ac.kr', phone: '010-2222-0020', admissionDate: '2022-09-01' }
+    { id: 'STU001', studentNumber: '2024001', name: '김학생', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu001@hycu.ac.kr', phone: '010-2222-0001', admissionDate: '2024-03-01' },
+    { id: 'STU002', studentNumber: '2024002', name: '이학생', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu002@hycu.ac.kr', phone: '010-2222-0002', admissionDate: '2024-03-01' },
+    { id: 'STU003', studentNumber: '2024003', name: '박학생', department: '경영학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu003@hycu.ac.kr', phone: '010-2222-0003', admissionDate: '2024-03-01' },
+    { id: 'STU004', studentNumber: '2024004', name: '최학생', department: '경영학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu004@hycu.ac.kr', phone: '010-2222-0004', admissionDate: '2023-09-01' },
+    { id: 'STU005', studentNumber: '2024005', name: '정학생', department: '교육학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu005@hycu.ac.kr', phone: '010-2222-0005', admissionDate: '2024-03-01' },
+    { id: 'STU006', studentNumber: '2024006', name: '강학생', department: '교육학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu006@hycu.ac.kr', phone: '010-2222-0006', admissionDate: '2023-09-01' },
+    { id: 'STU007', studentNumber: '2024007', name: '조학생', department: '심리학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu007@hycu.ac.kr', phone: '010-2222-0007', admissionDate: '2024-03-01' },
+    { id: 'STU008', studentNumber: '2024008', name: '윤학생', department: '심리학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu008@hycu.ac.kr', phone: '010-2222-0008', admissionDate: '2023-09-01' },
+    { id: 'STU009', studentNumber: '2024009', name: '장학생', department: '사회복지학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu009@hycu.ac.kr', phone: '010-2222-0009', admissionDate: '2024-03-01' },
+    { id: 'STU010', studentNumber: '2024010', name: '임학생', department: '사회복지학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu010@hycu.ac.kr', phone: '010-2222-0010', admissionDate: '2023-09-01' },
+    { id: 'STU011', studentNumber: '2023001', name: '한학생', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu011@hycu.ac.kr', phone: '010-2222-0011', admissionDate: '2023-03-01' },
+    { id: 'STU012', studentNumber: '2023002', name: '서학생', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu012@hycu.ac.kr', phone: '010-2222-0012', admissionDate: '2023-03-01' },
+    { id: 'STU013', studentNumber: '2023003', name: '오학생', department: '경영학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu013@hycu.ac.kr', phone: '010-2222-0013', admissionDate: '2023-03-01' },
+    { id: 'STU014', studentNumber: '2023004', name: '양학생', department: '경영학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu014@hycu.ac.kr', phone: '010-2222-0014', admissionDate: '2022-09-01' },
+    { id: 'STU015', studentNumber: '2023005', name: '권학생', department: '교육학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu015@hycu.ac.kr', phone: '010-2222-0015', admissionDate: '2023-03-01' },
+    { id: 'STU016', studentNumber: '2023006', name: '송학생', department: '교육학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu016@hycu.ac.kr', phone: '010-2222-0016', admissionDate: '2022-09-01' },
+    { id: 'STU017', studentNumber: '2023007', name: '백학생', department: '심리학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu017@hycu.ac.kr', phone: '010-2222-0017', admissionDate: '2023-03-01' },
+    { id: 'STU018', studentNumber: '2023008', name: '남학생', department: '심리학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu018@hycu.ac.kr', phone: '010-2222-0018', admissionDate: '2022-09-01' },
+    { id: 'STU019', studentNumber: '2023009', name: '문학생', department: '사회복지학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu019@hycu.ac.kr', phone: '010-2222-0019', admissionDate: '2023-03-01' },
+    { id: 'STU020', studentNumber: '2023010', name: '유학생', department: '사회복지학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu020@hycu.ac.kr', phone: '010-2222-0020', admissionDate: '2022-09-01' }
 ];
 
 // 연구계획서 데이터 (20명) - degreeType, necessity, desiredAdvisor 추가

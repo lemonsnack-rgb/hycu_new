@@ -25,7 +25,7 @@ function switchView(viewName) {
         stageManagement: '논문지도 단계 관리',
         typeManagement: '지도 단계 유형 관리',
         evaluationCriteria: '평가 기준 관리',
-        advisorAssignment: '지도 학생 관리'
+        advisorAssignment: '지도교수 배정'
     };
     
     document.getElementById('view-title').textContent = viewTitles[viewName] || '대시보드';
