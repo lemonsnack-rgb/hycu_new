@@ -3554,7 +3554,7 @@ function renderAdvisorAssignmentModal(student, type) {
                 <p class="text-sm text-gray-600">주지도교수는 1명, 부지도교수는 여러 명 선택할 수 있습니다.</p>
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px; margin-bottom: 80px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px; margin-bottom: 20px;">
                 <!-- 왼쪽: 주지도교수 -->
                 <div style="border-right: 1px solid #e5e7eb; padding-right: 24px; display: flex; flex-direction: column;">
                     <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">주지도교수</h4>
@@ -3626,7 +3626,7 @@ function renderAdvisorAssignmentModal(student, type) {
                 </div>
             </div>
 
-            <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
+            <div style="padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
                     취소
                 </button>
@@ -3649,39 +3649,37 @@ function renderAdvisorAssignmentModal(student, type) {
                 </p>
             </div>
 
-            <div style="margin-bottom: 80px;">
-                <div class="search-grid" style="margin-bottom: 16px;">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
-                        <select id="advisor-dept-filter" onchange="filterAdvisors()"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
-                            <option value="">전체</option>
-                            ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
-                                `<option value="${dept}">${dept}</option>`
-                            ).join('')}
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
-                        <input type="text" id="advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors()"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
-                    </div>
+            <div class="search-grid" style="margin-bottom: 16px;">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                    <select id="advisor-dept-filter" onchange="filterAdvisors()"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                        <option value="">전체</option>
+                        ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
+                            `<option value="${dept}">${dept}</option>`
+                        ).join('')}
+                    </select>
                 </div>
-
-                <!-- 컬럼 헤더 -->
-                <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
-                    <div></div>
-                    <div>교번</div>
-                    <div>이름</div>
-                    <div>학과</div>
-                </div>
-
-                <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;" id="advisor-list">
-                    ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                    <input type="text" id="advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors()"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                 </div>
             </div>
 
-            <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
+            <!-- 컬럼 헤더 -->
+            <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
+                <div></div>
+                <div>교번</div>
+                <div>이름</div>
+                <div>학과</div>
+            </div>
+
+            <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px; margin-bottom: 20px;" id="advisor-list">
+                ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
+            </div>
+
+            <div style="padding-top: 20px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
                     취소
                 </button>
