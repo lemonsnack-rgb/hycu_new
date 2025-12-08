@@ -3640,19 +3640,21 @@ function renderAdvisorAssignmentModal(student, type) {
         const advisorType = isMain ? '지도교수' : '부지도교수';
 
         content = `
-            <div class="search-section">
-                <h3 class="font-semibold text-gray-900 mb-3">
+            <div class="mb-4">
+                <h3 class="font-semibold text-gray-900 mb-2">
                     ${student.name} 학생의 ${advisorType} ${isMain ? '배정' : '선택'}
                 </h3>
-                <p class="text-sm text-gray-600 mb-4">
+                <p class="text-sm text-gray-600">
                     ${isMain ? '지도교수는 1명만 선택할 수 있습니다.' : '부지도교수는 여러 명 선택할 수 있습니다.'}
                 </p>
+            </div>
 
-                <div class="search-grid">
+            <div style="margin-bottom: 80px;">
+                <div class="search-grid" style="margin-bottom: 16px;">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
                         <select id="advisor-dept-filter" onchange="filterAdvisors()"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                             <option value="">전체</option>
                             ${[...new Set(mockProfessors.map(p => p.department))].map(dept =>
                                 `<option value="${dept}">${dept}</option>`
@@ -3662,22 +3664,24 @@ function renderAdvisorAssignmentModal(student, type) {
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
                         <input type="text" id="advisor-name-filter" placeholder="교수명 검색" onkeyup="filterAdvisors()"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                               class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
                     </div>
-                    <div class="flex items-end">
-                        <button onclick="clearAdvisorFilters()"
-                                class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                            초기화
-                        </button>
-                    </div>
+                </div>
+
+                <!-- 컬럼 헤더 -->
+                <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
+                    <div></div>
+                    <div>교번</div>
+                    <div>이름</div>
+                    <div>학과</div>
+                </div>
+
+                <div style="max-height: 400px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;" id="advisor-list">
+                    ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
                 </div>
             </div>
 
-            <div class="advisor-list" id="advisor-list">
-                ${mockProfessors.map(prof => renderAdvisorItem(prof, isMain)).join('')}
-            </div>
-
-            <div class="modal-footer">
+            <div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 20px; background: white; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
                 <button onclick="closeAdvisorAssignmentModal()" class="btn-secondary">
                     취소
                 </button>
