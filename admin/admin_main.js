@@ -43,7 +43,20 @@ document.addEventListener('DOMContentLoaded', () => {
         link.addEventListener('click', (e) => {
             e.preventDefault();
             const view = link.dataset.view;
-            switchView(view);
+            if (view) {
+                switchView(view);
+            }
+        });
+    });
+
+    // 사이드바 서브링크 클릭 이벤트
+    document.querySelectorAll('.sidebar-sublink').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const view = link.dataset.view;
+            if (view) {
+                switchView(view);
+            }
         });
     });
 
