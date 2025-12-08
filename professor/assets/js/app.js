@@ -384,8 +384,10 @@ function resetProfessorAdvisorSearch() {
     alert('검색 조건이 초기화되었습니다.');
 }
 
-// 교수용 연구계획서 상세 보기 (읽기 전용)
+// 교수용 연구계획서 상세 보기 (읽기 전용 - 페이지 전환)
 function viewProfessorProposalDetail(proposalId) {
+    console.log('연구계획서 상세 조회:', proposalId);
+
     const proposal = mockResearchProposals.find(p => p.id === proposalId);
     if (!proposal) {
         alert('연구계획서를 찾을 수 없습니다.');
@@ -395,19 +397,147 @@ function viewProfessorProposalDetail(proposalId) {
     const student = mockStudents.find(s => s.id === proposal.studentId);
     const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
 
-    let mainAdvisorName = '-';
-    let coAdvisorNames = '-';
+    // 상세 뷰 렌더링 (관리자 화면과 동일, 읽기 전용)
+    const detailView = `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 헤더 -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <button onclick="showScreen('advisor-assignment'); return false;"
+                            class="flex items-center text-gray-600 hover:text-gray-900">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        목록으로
+                    </button>
+                    <span class="px-3 py-1 rounded text-sm font-medium ${proposal.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                        ${proposal.degreeType}
+                    </span>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-900">${proposal.title}</h1>
+            </div>
 
-    if (assignment) {
-        if (assignment.mainAdvisor) {
-            mainAdvisorName = assignment.mainAdvisor.name;
-        }
-        if (assignment.coAdvisors && assignment.coAdvisors.length > 0) {
-            coAdvisorNames = assignment.coAdvisors.map(c => c.name).join(', ');
-        }
+            <!-- 학생 정보 -->
+            <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">학생 정보</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">학번:</span>
+                        <span class="text-gray-900">${student?.studentNumber}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">성명:</span>
+                        <span class="text-gray-900">${student?.name}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">학과:</span>
+                        <span class="text-gray-900">${student?.department}</span>
+                    </div>
+                    <div class="flex">
+                        <span class="w-24 text-gray-600 font-medium">학년:</span>
+                        <span class="text-gray-900">${student?.grade}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 연구계획서 내용 -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서</h2>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 목적
+                        </label>
+                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 필요성
+                        </label>
+                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 문제 및 연구 방법
+                        </label>
+                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
+                        </div>
+                    </div>
+
+                    ${proposal.desiredAdvisor ? `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                                희망 지도교수 (참고용)
+                            </label>
+                            <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                                <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- 지도교수 배정 현황 (읽기 전용) -->
+            <div class="px-8 py-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">지도교수 배정 현황</h2>
+                </div>
+
+                ${assignment ? `
+                    <div class="space-y-3">
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium" style="min-width: 100px;">지도교수:</span>
+                            <span class="text-gray-900">
+                                ${assignment.mainAdvisor
+                                    ? `${assignment.mainAdvisor.name} ${assignment.mainAdvisor.department}`
+                                    : `<span class="text-gray-500">미배정</span>`
+                                }
+                            </span>
+                        </div>
+
+                        <div class="flex items-center">
+                            <span class="text-gray-600 font-medium" style="min-width: 100px;">부지도교수:</span>
+                            <span class="text-gray-900">
+                                ${assignment.coAdvisors && assignment.coAdvisors.length > 0
+                                    ? assignment.coAdvisors.map(c => `${c.name} ${c.department}`).join(', ')
+                                    : `<span class="text-gray-500">미배정</span>`
+                                }
+                            </span>
+                        </div>
+                    </div>
+                ` : `
+                    <p class="text-gray-500 text-center py-8">지도교수가 배정되지 않았습니다.</p>
+                `}
+
+                <!-- 읽기 전용 안내 -->
+                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                        </svg>
+                        <div class="flex-1">
+                            <p class="text-sm font-medium text-yellow-800">읽기 전용 모드</p>
+                            <p class="text-xs text-yellow-700 mt-1">이 화면은 학생의 연구계획서를 조회하기 위한 읽기 전용 화면입니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // advisor-assignment-screen 영역 업데이트 (페이지 전환)
+    const screen = document.getElementById('advisor-assignment-screen');
+    if (screen) {
+        screen.innerHTML = detailView;
     }
-
-    alert(`[연구계획서 상세 - 읽기 전용]\n\n학번: ${proposal.studentNumber}\n성명: ${proposal.studentName}\n학과: ${proposal.department}\n학위과정: ${proposal.degreeType}\n\n논문 제목: ${proposal.title}\n\n연구 목적:\n${proposal.purpose}\n\n연구의 필요성:\n${proposal.necessity}\n\n연구 방법:\n${proposal.method}\n\n제출일: ${proposal.submittedDate}\n\n주지도교수: ${mainAdvisorName}\n부지도교수: ${coAdvisorNames}`);
 }
 
 // 전역으로 export
