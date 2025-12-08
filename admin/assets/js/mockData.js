@@ -47,10 +47,10 @@ const mockStudents = [
     { id: 'STU020', studentNumber: '2023010', name: '유학생', department: '사회복지학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu020@hycu.ac.kr', phone: '010-2222-0020', admissionDate: '2022-09-01' }
 ];
 
-// 연구계획서 데이터 (20명) - degreeType, necessity, desiredAdvisor 추가
+// 연구계획서 데이터 (19명) - degreeType, necessity, desiredAdvisor 추가
+// STU001(김학생)은 연구계획서 미제출 상태로 설정
 const mockResearchProposals = [
-    // 석사과정 (10명)
-    { id: 'RP001', studentId: 'STU001', studentNumber: '2024001', studentName: '김학생', department: '컴퓨터공학과', degreeType: '석사', title: '인공지능 기반 추천 시스템 연구', purpose: '개인화된 추천 알고리즘 개발', necessity: '기존 추천 시스템의 한계를 극복하고자 함', method: '딥러닝 기반 협업 필터링', submittedDate: '2025-03-10', status: 'pending', desiredAdvisor: null },
+    // 석사과정 (9명)
     { id: 'RP002', studentId: 'STU002', studentNumber: '2024002', studentName: '이학생', department: '컴퓨터공학과', degreeType: '석사', title: '블록체인 기반 데이터 무결성 보장 방안', purpose: '분산 환경에서의 데이터 보안 강화', necessity: '중앙화된 시스템의 보안 문제 해결', method: '블록체인 기술 적용 및 검증', submittedDate: '2025-03-11', status: 'pending', desiredAdvisor: null },
     { id: 'RP003', studentId: 'STU003', studentNumber: '2024003', studentName: '박학생', department: '경영학과', degreeType: '석사', title: '디지털 전환 시대의 기업 경쟁력 분석', purpose: '기업의 디지털 전환 성공 요인 도출', necessity: '디지털 전환이 기업 경쟁력에 미치는 영향 연구', method: '사례 연구 및 통계 분석', submittedDate: '2025-03-12', status: 'pending', desiredAdvisor: null },
     { id: 'RP004', studentId: 'STU004', studentNumber: '2024004', studentName: '최학생', department: '경영학과', degreeType: '석사', title: 'ESG 경영이 기업 가치에 미치는 영향', purpose: 'ESG 경영의 재무적 성과 분석', necessity: 'ESG 경영의 중요성이 대두되고 있음', method: '재무제표 분석 및 회귀분석', submittedDate: '2025-03-13', status: 'assigned', desiredAdvisor: null },
