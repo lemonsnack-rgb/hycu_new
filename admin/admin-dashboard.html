@@ -492,6 +492,196 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
+<!-- ===================================
+     지도 학생 관리 모달들
+     =================================== -->
+
+<!-- 학생 상세정보 모달 -->
+<div id="student-info-modal" class="admin-modal">
+    <div class="admin-modal-content">
+        <div class="admin-modal-header">
+            <h2>👤 학생 상세정보</h2>
+            <button class="admin-modal-close" onclick="closeStudentInfoModal()">&times;</button>
+        </div>
+        <div class="admin-modal-body" id="student-info-content">
+            <!-- JavaScript에서 동적으로 렌더링 -->
+        </div>
+    </div>
+</div>
+
+<!-- 지도교수 배정 모달 -->
+<div id="advisor-assignment-modal" class="admin-modal">
+    <div class="admin-modal-content admin-modal-large">
+        <div class="admin-modal-header">
+            <h2>👨‍🏫 지도교수 배정</h2>
+            <button class="admin-modal-close" onclick="closeAdvisorAssignmentModal()">&times;</button>
+        </div>
+        <div class="admin-modal-body" id="advisor-assignment-content">
+            <!-- JavaScript에서 동적으로 렌더링 -->
+        </div>
+    </div>
+</div>
+
+<style>
+/* 관리자 모달 스타일 */
+.admin-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    overflow-y: auto;
+}
+
+.admin-modal.active {
+    display: block;
+}
+
+.admin-modal-content {
+    max-width: 800px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.admin-modal-large {
+    max-width: 1000px;
+}
+
+.admin-modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.admin-modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.admin-modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-modal-close:hover {
+    color: #333333;
+}
+
+.admin-modal-body {
+    padding: 30px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+.info-section {
+    margin-bottom: 20px;
+}
+
+.info-row {
+    display: grid;
+    grid-template-columns: 150px 1fr;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid #F3F4F6;
+}
+
+.info-label {
+    font-weight: 500;
+    color: #6B7280;
+}
+
+.info-value {
+    color: #1F2937;
+}
+
+.search-section {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: #F9FAFB;
+    border-radius: 8px;
+}
+
+.search-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.advisor-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.advisor-item {
+    display: grid;
+    grid-template-columns: auto 1fr 150px 150px;
+    gap: 12px;
+    padding: 12px;
+    border-bottom: 1px solid #E5E5E5;
+    align-items: center;
+}
+
+.advisor-item:hover {
+    background: #F9FAFB;
+}
+
+.modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #E5E5E5;
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+}
+
+.btn-secondary {
+    padding: 8px 16px;
+    border: 1px solid #D1D5DB;
+    background: white;
+    color: #374151;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    background: #F9FAFB;
+}
+
+.btn-primary {
+    padding: 8px 16px;
+    border: none;
+    background: #009DE8;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background: #0082C3;
+}
+
+.btn-primary:disabled {
+    background: #9CA3AF;
+    cursor: not-allowed;
+}
+</style>
+
 <!-- injected: similarity badge placeholder -->
 <script>
 document.addEventListener('DOMContentLoaded', function(){

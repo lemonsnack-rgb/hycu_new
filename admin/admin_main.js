@@ -3273,9 +3273,63 @@ function showStudentInfo(studentId) {
         return;
     }
 
-    // TODO: 모달 구현 필요
-    // 임시로 alert 사용
-    alert(`[학생 상세정보]\n\n학번: ${student.studentNumber}\n성명: ${student.name}\n학과: ${student.department}\n학위과정: ${student.degreeType}\n학년: ${student.grade}\n입학일: ${student.admissionDate}\n이메일: ${student.email}\n전화번호: ${student.phone}`);
+    // 모달 내용 렌더링
+    const content = `
+        <div class="info-section">
+            <div class="info-row">
+                <div class="info-label">학번</div>
+                <div class="info-value">${student.studentNumber}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">성명</div>
+                <div class="info-value">${student.name}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">학과/전공</div>
+                <div class="info-value">${student.department}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">학위과정</div>
+                <div class="info-value">
+                    <span class="px-2 py-1 rounded text-xs font-medium ${student.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                        ${student.degreeType}
+                    </span>
+                </div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">학년</div>
+                <div class="info-value">${student.grade}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">입학일</div>
+                <div class="info-value">${student.admissionDate}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">이메일</div>
+                <div class="info-value">${student.email}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">전화번호</div>
+                <div class="info-value">${student.phone}</div>
+            </div>
+            <div class="info-row">
+                <div class="info-label">상태</div>
+                <div class="info-value">
+                    <span class="px-2 py-1 rounded text-xs font-medium ${student.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                        ${student.status === 'active' ? '재학' : '휴학'}
+                    </span>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('student-info-content').innerHTML = content;
+    document.getElementById('student-info-modal').classList.add('active');
+}
+
+// 학생 상세정보 모달 닫기
+function closeStudentInfoModal() {
+    document.getElementById('student-info-modal').classList.remove('active');
 }
 
 // 연구계획서 상세 페이지 조회
@@ -3360,6 +3414,7 @@ function openProposalSubmitModal(degreeType) {
 
 // Export
 window.showStudentInfo = showStudentInfo;
+window.closeStudentInfoModal = closeStudentInfoModal;
 window.viewProposalDetail = viewProposalDetail;
 window.assignAdvisor = assignAdvisor;
 window.openProposalSubmitModal = openProposalSubmitModal;
