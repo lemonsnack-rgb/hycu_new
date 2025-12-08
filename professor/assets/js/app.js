@@ -49,6 +49,11 @@ function showScreen(screenId) {
             if (typeof initJournalReview === 'function') {
                 initJournalReview();
             }
+        } else if (screenId === 'advisor-assignment') {
+            // 지도 학생 관리 초기화
+            if (typeof initAdvisorAssignment === 'function') {
+                initAdvisorAssignment();
+            }
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];
             if (initFunction) {
@@ -229,9 +234,66 @@ window.addEventListener('beforeunload', (e) => {
     }
 });
 
+// 지도 학생 관리 초기화
+function initAdvisorAssignment() {
+    // 현재 로그인한 교수 ID (Mock - 실제로는 세션에서 가져와야 함)
+    const currentProfessorId = 'PROF001'; // 김교수
+
+    // Mock 데이터 로드 확인
+    if (typeof mockStudents === 'undefined' || typeof mockAdvisorAssignments === 'undefined' || typeof mockResearchProposals === 'undefined') {
+        document.getElementById('professor-no-students').style.display = 'block';
+        document.getElementById('professor-no-students').textContent = 'Mock 데이터가 로드되지 않았습니다.';
+        return;
+    }
+
+    // 현재 교수가 지도하는 학생 찾기
+    const myAssignments = mockAdvisorAssignments.filter(a =>
+        a.mainAdvisor?.id === currentProfessorId ||
+        a.coAdvisors.some(co => co.id === currentProfessorId)
+    );
+
+    const tableBody = document.getElementById('professor-student-list');
+    const noStudentsDiv = document.getElementById('professor-no-students');
+
+    if (myAssignments.length === 0) {
+        tableBody.innerHTML = '';
+        noStudentsDiv.style.display = 'block';
+        return;
+    }
+
+    noStudentsDiv.style.display = 'none';
+
+    // 학생 목록 렌더링
+    tableBody.innerHTML = myAssignments.map(assignment => {
+        const student = mockStudents.find(s => s.id === assignment.studentId);
+        const proposal = mockResearchProposals.find(p => p.studentId === assignment.studentId);
+
+        if (!student) return '';
+
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.academicYear}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.semesterCount}학기</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.studentNumber}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student.department}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.name}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 py-1 text-xs rounded ${student.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                        ${student.degreeType}
+                    </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    ${proposal ? `<span class="text-blue-600 cursor-pointer hover:underline" onclick="alert('연구계획서: ${proposal.title}')">조회</span>` : '-'}
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
 // 전역으로 export
 window.showScreen = showScreen;
 window.handleLogout = handleLogout;
+window.initAdvisorAssignment = initAdvisorAssignment;
 window.switchTab = switchTab;
 window.setupSearchInput = setupSearchInput;
 window.currentScreen = currentScreen;
