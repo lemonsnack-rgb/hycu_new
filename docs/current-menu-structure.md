@@ -7,7 +7,7 @@
 
 ## 1. 관리자 화면 (admin-dashboard.html)
 
-### 현재 메뉴 구조
+### 변경 후 메뉴 구조 (2025-12-08 업데이트)
 
 #### 대시보드
 - `dashboard` - 대시보드
@@ -19,6 +19,10 @@
 - `schedule` - 논문일정
 - `process` - 논문지도절차
 
+#### ⭐ 학생 관리 (신규)
+- `advisorAssignment` - 지도교수 배정 (기존: 연구계획서 관리)
+- `stageManagement` - 학생 단계 관리 (기존: 워크플로우 관리)
+
 #### 논문 제출
 - `requirementManagement` - 논문 제출 요건 등록
 - `titleChangeRequests` - 최종 논문 제목 등록
@@ -28,15 +32,19 @@
 - `guidanceProgress` - 논문 지도 현황
 
 #### 논문 심사
+- `committeeAssignment` - ⭐ 심사위원 배정 (신규 - 최상단)
+- `workflowManagement` - 워크플로우 관리 (기존: 심사 단계 등록)
 - `evaluationCriteria` - 심사 기준 등록
-- `stageManagement` - 심사 단계 등록
 - `thesisReview` - 학위 논문 심사
 - `journalReview` - 학술지 논문 심사
 
 #### 시스템 설정
+- `scheduleManagement` - 일정 관리
+- `thesisStageConfig` - 논문 지도 단계 설정 (기존: 심사 단계 등록)
+- `evaluationCriteria` - 심사 기준 등록
 - `userManagement` - 사용자 관리
 - `permissionManagement` - 권한 관리
-- `scheduleManagement` - 일정 관리
+- `userSupport` - ⭐ 사용자 지원 (신규)
 - `noticeManagement` - 안내문 관리
 
 ---
@@ -415,3 +423,4 @@
 
 ## 변경 이력
 - 2025-12-08: 초안 작성 (현재 메뉴 구조 및 수정 대상 정리)
+- 2025-12-08: 메뉴 구조 개편 반영 (학생 관리 메뉴 신설, 심사위원 배정 독립)
