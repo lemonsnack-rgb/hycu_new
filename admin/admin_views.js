@@ -2139,4 +2139,130 @@ const views = {
             </div>
         `;
     },
+
+    // 지도교수 배정 화면 (P1-1)
+    advisorAssignment: () => {
+        // Mock 데이터 로드
+        if (typeof mockResearchProposals === 'undefined' || typeof mockAdvisorAssignments === 'undefined') {
+            return `
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-red-500">
+                        <p class="text-lg">Mock 데이터가 로드되지 않았습니다.</p>
+                        <p class="text-sm mt-2">admin/assets/js/mockData.js 파일을 확인하세요.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // 연구계획서와 배정 상태 통합
+        const proposalsWithAssignment = mockResearchProposals.map(proposal => {
+            const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
+            return {
+                ...proposal,
+                assignment: assignment || null
+            };
+        });
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-800">지도교수 배정</h2>
+                    <p class="text-sm text-gray-600 mt-1">연구계획서를 제출한 학생에게 지도교수를 배정합니다.</p>
+                </div>
+
+                <!-- 필터 및 검색 -->
+                <div class="p-6 border-b border-gray-200 bg-gray-50">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학과</label>
+                            <select id="filter-department" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">전체</option>
+                                ${mockDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">배정 상태</label>
+                            <select id="filter-status" class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                                <option value="">전체</option>
+                                <option value="pending">배정 대기</option>
+                                <option value="assigned">배정 완료</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">검색 (학번/이름)</label>
+                            <input type="text" id="search-student" placeholder="학번 또는 이름 입력"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 학생 목록 테이블 -->
+                <div class="p-6">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제출일</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">배정 상태</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="advisor-assignment-table" class="bg-white divide-y divide-gray-200">
+                                ${proposalsWithAssignment.map(item => `
+                                    <tr data-student-id="${item.studentId}" data-department="${item.department}" data-status="${item.status}">
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.department}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${item.submittedDate}</td>
+                                        <td class="px-6 py-4 whitespace-nowrap">
+                                            ${item.status === 'assigned'
+                                                ? '<span class="status-badge status-completed">배정 완료</span>'
+                                                : '<span class="status-badge status-pending">배정 대기</span>'}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">
+                                            ${item.assignment && item.assignment.mainAdvisor
+                                                ? `
+                                                    <div class="space-y-1">
+                                                        <div>
+                                                            <span class="font-medium">${item.assignment.mainAdvisor.name}</span>
+                                                            ${item.assignment.mainAdvisor.isTenured
+                                                                ? '<span class="ml-1 px-2 py-0.5 text-xs bg-blue-100 text-blue-800 rounded">전임</span>'
+                                                                : '<span class="ml-1 px-2 py-0.5 text-xs bg-gray-100 text-gray-800 rounded">비전임</span>'}
+                                                        </div>
+                                                        ${item.assignment.coAdvisors.length > 0
+                                                            ? `<div class="text-xs text-gray-500">공동: ${item.assignment.coAdvisors.map(c => c.name).join(', ')}</div>`
+                                                            : ''}
+                                                    </div>
+                                                `
+                                                : '<span class="text-gray-400">미배정</span>'}
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
+                                            <button onclick="viewProposal('${item.id}')"
+                                                    class="text-primary hover:text-primary-dark">
+                                                계획서 보기
+                                            </button>
+                                            <button onclick="assignAdvisor('${item.studentId}')"
+                                                    class="text-primary hover:text-primary-dark">
+                                                ${item.status === 'assigned' ? '재배정' : '배정'}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    ${proposalsWithAssignment.length === 0 ? `
+                        <div class="text-center py-8 text-gray-500">
+                            제출된 연구계획서가 없습니다.
+                        </div>
+                    ` : ''}
+                </div>
+            </div>
+        `;
+    },
 };
