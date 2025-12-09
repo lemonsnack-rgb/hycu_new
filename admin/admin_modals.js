@@ -6486,3 +6486,100 @@ window.resetPermissionMatrix = resetPermissionMatrix;
 window.savePermissionMatrix = savePermissionMatrix;
 window.openUserSimulatorModal = openUserSimulatorModal;
 window.calculateUnionPermissions = calculateUnionPermissions;
+
+// ========================================
+// 공지사항 관련 함수 (Stub)
+// ========================================
+
+/**
+ * 공지사항 등록/수정 모달 열기
+ * @param {string} noticeId - 수정할 공지사항 ID (없으면 신규 등록)
+ */
+function openNoticeModal(noticeId = null) {
+    if (noticeId) {
+        alert(`공지사항 수정 모달 (ID: ${noticeId})\n\n추후 구현 예정입니다.`);
+    } else {
+        alert('공지사항 등록 모달\n\n추후 구현 예정입니다.');
+    }
+}
+
+/**
+ * 공지사항 상세 보기
+ * @param {string} noticeId - 공지사항 ID
+ */
+function viewNoticeDetail(noticeId) {
+    const notice = mockNotices.find(n => n.id === noticeId);
+    if (notice) {
+        alert(`[${notice.title}]\n\n${notice.content.replace(/<[^>]*>/g, '')}\n\n작성자: ${notice.authorName}\n작성일: ${notice.createdAt}`);
+    }
+}
+
+/**
+ * 공지사항 삭제
+ * @param {string} noticeId - 공지사항 ID
+ */
+function deleteNotice(noticeId) {
+    if (confirm('이 공지사항을 삭제하시겠습니까?')) {
+        const index = mockNotices.findIndex(n => n.id === noticeId);
+        if (index !== -1) {
+            mockNotices.splice(index, 1);
+            alert('삭제되었습니다.');
+            switchView('noticeManagement'); // 새로고침
+        }
+    }
+}
+
+/**
+ * 공지사항 검색
+ */
+function searchNotices() {
+    alert('공지사항 검색 기능\n\n추후 구현 예정입니다.');
+}
+
+// ========================================
+// 안내문 편집 관련 함수 (Stub)
+// ========================================
+
+/**
+ * 안내문 편집 모달 열기
+ * @param {string} type - 'ethics', 'schedule', 'procedure'
+ */
+function editGuideContent(type) {
+    const guide = mockGuides.find(g => g.type === type && g.isPublished);
+
+    const titleMap = {
+        'ethics': '연구윤리',
+        'schedule': '논문일정',
+        'procedure': '논문지도절차'
+    };
+
+    const currentContent = guide ? guide.content.substring(0, 100) + '...' : '(내용 없음)';
+
+    const newContent = prompt(
+        `${titleMap[type]} 편집\n\n현재 내용:\n${currentContent}\n\n※ 실제로는 HTML 에디터가 표시됩니다.\n\n수정할 내용을 입력하세요 (취소하려면 빈 값):`,
+        ''
+    );
+
+    if (newContent !== null && newContent.trim() !== '') {
+        // 임시로 간단한 업데이트
+        if (guide) {
+            guide.content = `<div class="prose max-w-none"><p>${newContent}</p></div>`;
+            guide.lastUpdatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+            guide.lastUpdatedByName = '관리자';
+
+            alert('저장되었습니다.');
+
+            // 화면 새로고침
+            if (type === 'ethics') switchView('ethicsGuide');
+            else if (type === 'schedule') switchView('scheduleGuide');
+            else if (type === 'procedure') switchView('processGuide');
+        }
+    }
+}
+
+// 전역으로 노출
+window.openNoticeModal = openNoticeModal;
+window.viewNoticeDetail = viewNoticeDetail;
+window.deleteNotice = deleteNotice;
+window.searchNotices = searchNotices;
+window.editGuideContent = editGuideContent;

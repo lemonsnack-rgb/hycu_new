@@ -3266,4 +3266,158 @@ const views = {
             </div>
         `;
     },
+
+    // ========== 공지사항 관리 ==========
+    noticeManagement: () => {
+        const notices = mockNotices || [];
+        const searchKeyword = '';
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- Header -->
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">공지사항 관리</h3>
+                            <p class="text-sm text-gray-600 mt-1">공지사항을 등록하고 관리합니다.</p>
+                        </div>
+                        <button onclick="openNoticeModal()" class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
+                            + 공지사항 등록
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Search -->
+                <div class="p-6 border-b bg-gray-50">
+                    <div class="flex gap-4">
+                        <input type="text" id="notice-search" placeholder="제목 또는 내용 검색..."
+                               class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+                        <select id="notice-category-filter" class="px-4 py-2 border border-gray-300 rounded-md">
+                            <option value="">전체 카테고리</option>
+                            <option value="important">중요</option>
+                            <option value="general">일반</option>
+                        </select>
+                        <button onclick="searchNotices()" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
+                            검색
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-100 border-b">
+                            <tr>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 5%;">번호</th>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 8%;">카테고리</th>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 8%;">고정</th>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 39%;">제목</th>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 10%;">작성자</th>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 12%;">작성일</th>
+                                <th class="text-center py-3 px-4 text-xs font-semibold text-gray-700" style="width: 8%;">조회수</th>
+                                <th class="text-center py-3 px-4 text-xs font-semibold text-gray-700" style="width: 10%;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${notices.length === 0 ? `
+                                <tr>
+                                    <td colspan="8" class="py-8 text-center text-gray-500">
+                                        등록된 공지사항이 없습니다.
+                                    </td>
+                                </tr>
+                            ` : notices.map((notice, idx) => `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-sm">${notices.length - idx}</td>
+                                    <td class="py-3 px-4 text-sm">
+                                        <span class="px-2 py-1 rounded text-xs ${notice.category === 'important' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}">
+                                            ${notice.category === 'important' ? '중요' : '일반'}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm">
+                                        ${notice.isPinned ? '<span class="text-blue-600">📌</span>' : '-'}
+                                    </td>
+                                    <td class="py-3 px-4 text-sm">
+                                        <a href="#" onclick="viewNoticeDetail('${notice.id}'); return false;" class="text-gray-800 hover:text-[#009DE8] hover:underline">
+                                            ${notice.title}
+                                        </a>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${notice.authorName}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${notice.createdAt.split(' ')[0]}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600 text-center">${notice.viewCount}</td>
+                                    <td class="py-3 px-4 text-sm text-center">
+                                        <button onclick="openNoticeModal('${notice.id}')" class="text-blue-600 hover:text-blue-800 mr-2">수정</button>
+                                        <button onclick="deleteNotice('${notice.id}')" class="text-red-600 hover:text-red-800">삭제</button>
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 연구윤리 안내 (관리자용 - 조회 + 편집) ==========
+    ethicsGuide: () => {
+        return renderGuideContent('ethics', true); // true = 관리자 권한
+    },
+
+    // ========== 논문일정 안내 (관리자용 - 조회 + 편집) ==========
+    scheduleGuide: () => {
+        return renderGuideContent('schedule', true); // true = 관리자 권한
+    },
+
+    // ========== 논문지도절차 안내 (관리자용 - 조회 + 편집) ==========
+    processGuide: () => {
+        return renderGuideContent('procedure', true); // true = 관리자 권한
+    },
 };
+
+// ========================================
+// 공통 렌더링 함수 (관리자/교수/학생 공유)
+// ========================================
+
+/**
+ * 안내문 렌더링 공통 함수
+ * @param {string} type - 'ethics', 'schedule', 'procedure'
+ * @param {boolean} isAdmin - 관리자 권한 여부
+ * @returns {string} HTML
+ */
+function renderGuideContent(type, isAdmin = false) {
+    const guide = mockGuides.find(g => g.type === type && g.isPublished);
+
+    const titleMap = {
+        'ethics': '연구윤리',
+        'schedule': '논문일정',
+        'procedure': '논문지도절차'
+    };
+
+    return `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- Header -->
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-xl font-bold text-gray-800">${titleMap[type]}</h2>
+                        <p class="text-sm text-gray-500 mt-1">최종 수정: ${guide?.lastUpdatedAt || '-'} (${guide?.lastUpdatedByName || '-'})</p>
+                    </div>
+                    ${isAdmin ? `
+                        <button onclick="editGuideContent('${type}')" class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
+                            편집
+                        </button>
+                    ` : ''}
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                ${guide?.content || '<p class="text-gray-500 text-center py-8">콘텐츠가 등록되지 않았습니다.</p>'}
+            </div>
+        </div>
+    `;
+}
+
+// 전역으로 노출 (교수/학생 화면에서도 사용)
+if (typeof window !== 'undefined') {
+    window.renderGuideContent = renderGuideContent;
+}

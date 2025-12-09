@@ -41,7 +41,11 @@ function switchView(viewName, param = null) {
         userManagement: '사용자 관리',
         roleManagement: '역할 관리',
         permissionManagement: '권한 관리',
-        rolePermissionMapping: '역할별 권한 설정'
+        rolePermissionMapping: '역할별 권한 설정',
+        noticeManagement: '공지사항 관리',
+        ethicsGuide: '연구윤리',
+        scheduleGuide: '논문일정',
+        processGuide: '논문지도절차'
     };
 
     document.getElementById('view-title').textContent = viewTitles[viewName] || '대시보드';

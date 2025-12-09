@@ -969,6 +969,285 @@ const mockUserMapping = [
     }
 ];
 
+// ========================================
+// 게시판 데이터
+// ========================================
+
+// 공지사항
+const mockNotices = [
+    {
+        id: 'NOTICE_001',
+        category: 'important',
+        title: '2025학년도 1학기 논문 제출 일정 안내',
+        content: `<p>2025학년도 1학기 논문 제출 일정을 안내드립니다.</p>
+<p><strong>주요 일정:</strong></p>
+<ul>
+<li>연구계획서 제출: 2025-03-01 ~ 2025-03-15</li>
+<li>예비심사: 2025-04-01 ~ 2025-04-30</li>
+<li>본심사: 2025-05-01 ~ 2025-05-31</li>
+<li>최종 제출: 2025-06-15</li>
+</ul>
+<p>자세한 사항은 논문일정 메뉴를 참고해주세요.</p>`,
+        authorId: 'admin',
+        authorName: '관리자',
+        createdAt: '2025-01-10 14:30',
+        updatedAt: '2025-01-10 14:30',
+        viewCount: 245,
+        isPinned: true,
+        attachments: []
+    },
+    {
+        id: 'NOTICE_002',
+        category: 'general',
+        title: '연구윤리 교육 이수 안내',
+        content: `<p>모든 대학원생은 논문 제출 전 연구윤리 교육을 이수해야 합니다.</p>
+<p>교육 이수 방법은 연구윤리 메뉴를 참고해주세요.</p>`,
+        authorId: 'admin',
+        authorName: '관리자',
+        createdAt: '2025-01-08 10:00',
+        updatedAt: '2025-01-08 10:00',
+        viewCount: 128,
+        isPinned: false,
+        attachments: []
+    },
+    {
+        id: 'NOTICE_003',
+        category: 'general',
+        title: '지도교수 배정 결과 발표',
+        content: `<p>2025학년도 신입생 지도교수 배정이 완료되었습니다.</p>
+<p>지도교수 배정 메뉴에서 확인 가능합니다.</p>`,
+        authorId: 'admin',
+        authorName: '관리자',
+        createdAt: '2025-01-05 09:00',
+        updatedAt: '2025-01-05 09:00',
+        viewCount: 89,
+        isPinned: false,
+        attachments: []
+    }
+];
+
+// 안내문 (연구윤리, 논문일정, 논문지도절차)
+const mockGuides = [
+    {
+        id: 'GUIDE_001',
+        type: 'ethics',
+        title: '연구윤리',
+        content: `<div class="prose max-w-none">
+<h2>연구윤리 준수사항</h2>
+
+<h3>1. 연구윤리의 중요성</h3>
+<p>학문적 진실성과 연구의 신뢰성을 위해 모든 연구자는 연구윤리를 준수해야 합니다.</p>
+
+<h3>2. 연구 부정행위</h3>
+<ul>
+<li><strong>위조(Fabrication):</strong> 존재하지 않는 데이터나 연구 결과를 만들어내는 행위</li>
+<li><strong>변조(Falsification):</strong> 연구 자료나 과정을 조작하여 연구 내용을 왜곡하는 행위</li>
+<li><strong>표절(Plagiarism):</strong> 타인의 아이디어, 연구내용, 결과 등을 적절한 인용 없이 사용하는 행위</li>
+<li><strong>중복게재:</strong> 이미 출판된 본인의 연구물을 새로운 것처럼 재출판하는 행위</li>
+</ul>
+
+<h3>3. 연구윤리 교육</h3>
+<p>모든 대학원생은 논문 제출 전 연구윤리 교육을 이수해야 합니다.</p>
+<ul>
+<li>온라인 교육 플랫폼: <a href="https://www.cre.or.kr" target="_blank">한국연구재단 연구윤리정보센터</a></li>
+<li>이수 시간: 최소 2시간</li>
+<li>이수증 제출 기한: 논문 제출 1개월 전</li>
+</ul>
+
+<h3>4. 인용 및 참고문헌 작성</h3>
+<p>타인의 연구를 인용할 때는 반드시 출처를 명확히 표시해야 합니다.</p>
+<ul>
+<li>직접 인용: 따옴표와 함께 정확한 페이지 번호 표기</li>
+<li>간접 인용: 원저자의 이름과 출판 연도 표기</li>
+<li>참고문헌: APA, MLA 등 학과별 규정에 따른 형식 준수</li>
+</ul>
+
+<h3>5. 문의</h3>
+<p>연구윤리 관련 문의사항은 대학원 행정팀(02-1234-5678)으로 연락주시기 바랍니다.</p>
+</div>`,
+        lastUpdatedBy: 'admin',
+        lastUpdatedByName: '관리자',
+        lastUpdatedAt: '2025-01-08 15:30',
+        isPublished: true,
+        order: 1
+    },
+    {
+        id: 'GUIDE_002',
+        type: 'schedule',
+        title: '논문일정',
+        content: `<div class="prose max-w-none">
+<h2>2025학년도 논문 제출 일정</h2>
+
+<h3>📅 학기별 주요 일정</h3>
+
+<h4>1학기 (2025년 3월 ~ 6월)</h4>
+<table class="min-w-full border">
+<thead class="bg-gray-100">
+<tr>
+<th class="border px-4 py-2">단계</th>
+<th class="border px-4 py-2">기간</th>
+<th class="border px-4 py-2">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="border px-4 py-2">연구계획서 제출</td>
+<td class="border px-4 py-2">3월 1일 ~ 3월 15일</td>
+<td class="border px-4 py-2">지도교수 승인 필수</td>
+</tr>
+<tr>
+<td class="border px-4 py-2">예비심사</td>
+<td class="border px-4 py-2">4월 1일 ~ 4월 30일</td>
+<td class="border px-4 py-2">심사위원 3인</td>
+</tr>
+<tr>
+<td class="border px-4 py-2">본심사</td>
+<td class="border px-4 py-2">5월 1일 ~ 5월 31일</td>
+<td class="border px-4 py-2">심사위원 3인(석사)/5인(박사)</td>
+</tr>
+<tr>
+<td class="border px-4 py-2">최종 논문 제출</td>
+<td class="border px-4 py-2">6월 15일</td>
+<td class="border px-4 py-2">심사 통과 후</td>
+</tr>
+</tbody>
+</table>
+
+<h4>2학기 (2025년 9월 ~ 12월)</h4>
+<table class="min-w-full border">
+<thead class="bg-gray-100">
+<tr>
+<th class="border px-4 py-2">단계</th>
+<th class="border px-4 py-2">기간</th>
+<th class="border px-4 py-2">비고</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class="border px-4 py-2">연구계획서 제출</td>
+<td class="border px-4 py-2">9월 1일 ~ 9월 15일</td>
+<td class="border px-4 py-2">지도교수 승인 필수</td>
+</tr>
+<tr>
+<td class="border px-4 py-2">예비심사</td>
+<td class="border px-4 py-2">10월 1일 ~ 10월 31일</td>
+<td class="border px-4 py-2">심사위원 3인</td>
+</tr>
+<tr>
+<td class="border px-4 py-2">본심사</td>
+<td class="border px-4 py-2">11월 1일 ~ 11월 30일</td>
+<td class="border px-4 py-2">심사위원 3인(석사)/5인(박사)</td>
+</tr>
+<tr>
+<td class="border px-4 py-2">최종 논문 제출</td>
+<td class="border px-4 py-2">12월 15일</td>
+<td class="border px-4 py-2">심사 통과 후</td>
+</tr>
+</tbody>
+</table>
+
+<h3>⚠️ 유의사항</h3>
+<ul>
+<li>각 단계별 기한 내 제출하지 않을 경우 다음 학기로 이월됩니다.</li>
+<li>심사 일정은 심사위원 일정에 따라 조정될 수 있습니다.</li>
+<li>최종 제출 전 표절 검사를 완료해야 합니다.</li>
+<li>제출 서류는 논문지도 시스템을 통해 온라인으로 제출합니다.</li>
+</ul>
+</div>`,
+        lastUpdatedBy: 'admin',
+        lastUpdatedByName: '관리자',
+        lastUpdatedAt: '2025-01-10 11:00',
+        isPublished: true,
+        order: 2
+    },
+    {
+        id: 'GUIDE_003',
+        type: 'procedure',
+        title: '논문지도절차',
+        content: `<div class="prose max-w-none">
+<h2>논문지도 절차 안내</h2>
+
+<h3>📋 전체 프로세스</h3>
+
+<div class="bg-blue-50 p-4 rounded-lg mb-4">
+<ol class="space-y-2">
+<li><strong>1단계:</strong> 지도교수 배정</li>
+<li><strong>2단계:</strong> 연구계획서 작성 및 제출</li>
+<li><strong>3단계:</strong> 주차별 논문지도</li>
+<li><strong>4단계:</strong> 예비심사</li>
+<li><strong>5단계:</strong> 본심사</li>
+<li><strong>6단계:</strong> 최종 논문 제출</li>
+</ol>
+</div>
+
+<h3>1️⃣ 지도교수 배정</h3>
+<ul>
+<li><strong>신청 시기:</strong> 매 학기 개강 2주 전</li>
+<li><strong>신청 방법:</strong> 논문지도 시스템 > 지도교수 배정 메뉴</li>
+<li><strong>배정 기준:</strong> 전공 적합성, 지도 가능 인원, 학생 희망</li>
+<li><strong>결과 발표:</strong> 개강 1주 전</li>
+</ul>
+
+<h3>2️⃣ 연구계획서 제출</h3>
+<ul>
+<li><strong>작성 항목:</strong> 연구 주제, 연구 목적, 연구 방법, 예상 결과</li>
+<li><strong>승인 절차:</strong> 학생 작성 → 지도교수 검토 → 지도교수 승인</li>
+<li><strong>제출 기한:</strong> 학기 시작 후 2주 이내</li>
+</ul>
+
+<h3>3️⃣ 주차별 논문지도</h3>
+<ul>
+<li><strong>지도 주기:</strong> 주 1회 이상 권장</li>
+<li><strong>지도 방법:</strong> 대면/비대면 병행 가능</li>
+<li><strong>기록 의무:</strong> 지도 내용은 시스템에 기록</li>
+<li><strong>진도 관리:</strong> 단계별 체크리스트 활용</li>
+</ul>
+
+<h3>4️⃣ 예비심사</h3>
+<ul>
+<li><strong>신청 자격:</strong> 논문 진행률 70% 이상</li>
+<li><strong>심사위원:</strong> 3인 (지도교수 포함)</li>
+<li><strong>심사 내용:</strong> 연구 주제의 타당성, 연구 방법의 적절성</li>
+<li><strong>결과:</strong> 통과/조건부통과/재심사</li>
+</ul>
+
+<h3>5️⃣ 본심사</h3>
+<ul>
+<li><strong>신청 자격:</strong> 예비심사 통과 후 논문 완성</li>
+<li><strong>심사위원:</strong> 3인(석사) / 5인(박사)</li>
+<li><strong>심사 내용:</strong> 논문 내용 전반, 연구 결과의 타당성</li>
+<li><strong>심사 방법:</strong> 발표(20분) + 질의응답(30분)</li>
+</ul>
+
+<h3>6️⃣ 최종 논문 제출</h3>
+<ul>
+<li><strong>수정 기한:</strong> 본심사 후 2주 이내</li>
+<li><strong>제출 서류:</strong>
+  <ul>
+  <li>최종 논문 파일 (PDF)</li>
+  <li>심사위원 승인서</li>
+  <li>연구윤리 이수증</li>
+  <li>표절 검사 결과</li>
+  </ul>
+</li>
+<li><strong>제출 방법:</strong> 논문지도 시스템을 통한 온라인 제출</li>
+</ul>
+
+<h3>📞 문의</h3>
+<p>논문지도 절차 관련 문의는 대학원 행정팀으로 연락주시기 바랍니다.</p>
+<ul>
+<li>전화: 02-1234-5678</li>
+<li>이메일: graduate@hycu.ac.kr</li>
+</ul>
+</div>`,
+        lastUpdatedBy: 'admin',
+        lastUpdatedByName: '관리자',
+        lastUpdatedAt: '2025-01-09 16:45',
+        isPublished: true,
+        order: 3
+    }
+];
+
 // 전역으로 노출 (window 객체에 할당)
 if (typeof window !== 'undefined') {
     // 기본 데이터
@@ -991,6 +1270,10 @@ if (typeof window !== 'undefined') {
     window.mockRoleGroupPermissions = mockRoleGroupPermissions;
     window.mockIndividualPermissions = mockIndividualPermissions;
     window.mockUserMapping = mockUserMapping;
+
+    // 게시판 데이터
+    window.mockNotices = mockNotices;
+    window.mockGuides = mockGuides;
 
     // 디버그: 로드 확인
     console.log('✅ mockData.js 로드 완료');
