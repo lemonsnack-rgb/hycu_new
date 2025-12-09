@@ -37,7 +37,11 @@ function switchView(viewName, param = null) {
         advisorAssignment: '지도교수 배정',
         workflowCreate: '워크플로우 등록',
         workflowStageCompose: '워크플로우 단계 구성',
-        workflowCreateUnified: '워크플로우 등록'
+        workflowCreateUnified: '워크플로우 등록',
+        userManagement: '사용자 관리',
+        roleManagement: '역할 관리',
+        permissionManagement: '권한 관리',
+        rolePermissionMapping: '역할별 권한 설정'
     };
 
     document.getElementById('view-title').textContent = viewTitles[viewName] || '대시보드';
@@ -3701,7 +3705,7 @@ function renderStageManagementContent() {
                         </label>
                         <select id="stage-search-department" class="search-select" ${!selectedStageId ? 'disabled' : ''}>
                             <option value="">전체</option>
-                            ${mockDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                            ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
                         </select>
                     </div>
 

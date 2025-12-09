@@ -5836,3 +5836,653 @@ window.moveStageUnified = moveStageUnified;
 window.renderComposedStagesUnified = renderComposedStagesUnified;
 window.refreshComposedStagesUnified = refreshComposedStagesUnified;
 window.saveUnifiedWorkflow = saveUnifiedWorkflow;
+
+// ====================================================================
+// 권한 관리 함수들
+// ====================================================================
+
+// 역할 권한 보기
+function viewRolePermissions(roleId) {
+    window.selectedRoleForMapping = roleId;
+    switchView('rolePermissionMapping');
+}
+
+// 역할-권한 매핑 화면 로드
+function loadRolePermissions(roleId) {
+    window.selectedRoleForMapping = roleId;
+
+    const rolePermission = mockRolePermissions.find(rp => rp.roleId === roleId);
+    const selectedPermissions = rolePermission ? rolePermission.permissionIds : [];
+
+    const categories = {
+        menu: '메뉴 접근 권한',
+        feature: '기능 실행 권한',
+        data: '데이터 레벨 권한',
+        admin: '관리자 전용 권한'
+    };
+
+    const container = document.getElementById('permission-checkboxes');
+    if (!container) return;
+
+    container.innerHTML = Object.entries(categories).map(([categoryKey, categoryName]) => `
+        <div class="border border-gray-200 rounded-lg p-4">
+            <h5 class="font-bold text-gray-800 mb-3 flex items-center">
+                <span class="w-2 h-2 rounded-full bg-[#009DE8] mr-2"></span>
+                ${categoryName}
+            </h5>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                ${mockPermissions
+                    .filter(p => p.category === categoryKey)
+                    .map(perm => `
+                        <label class="flex items-start p-2 hover:bg-gray-50 rounded cursor-pointer">
+                            <input type="checkbox"
+                                   value="${perm.id}"
+                                   ${selectedPermissions.includes(perm.id) ? 'checked' : ''}
+                                   class="mt-1 mr-3 rounded border-gray-300 text-[#009DE8] focus:ring-[#009DE8]">
+                            <div class="flex-1">
+                                <div class="font-medium text-sm text-gray-800">${perm.name}</div>
+                                <div class="text-xs text-gray-500">${perm.description}</div>
+                            </div>
+                        </label>
+                    `).join('')}
+            </div>
+        </div>
+    `).join('');
+}
+
+// 역할-권한 저장
+function saveRolePermissions() {
+    const roleId = document.getElementById('role-select').value;
+    const checkboxes = document.querySelectorAll('#permission-checkboxes input[type="checkbox"]:checked');
+    const permissionIds = Array.from(checkboxes).map(cb => cb.value);
+
+    // mockRolePermissions 업데이트
+    const index = mockRolePermissions.findIndex(rp => rp.roleId === roleId);
+    if (index >= 0) {
+        mockRolePermissions[index].permissionIds = permissionIds;
+    } else {
+        mockRolePermissions.push({ roleId, permissionIds });
+    }
+
+    showToast('권한이 저장되었습니다.', 'success');
+
+    // 역할 관리 화면으로 돌아가기
+    setTimeout(() => {
+        switchView('roleManagement');
+    }, 500);
+}
+
+// 역할 추가 모달
+function openRoleModal(roleId = null) {
+    const isEdit = roleId !== null;
+    const role = isEdit ? mockRoles.find(r => r.id === roleId) : null;
+
+    const content = `
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">역할명 *</label>
+                <input type="text"
+                       id="role-name"
+                       value="${role ? role.name : ''}"
+                       placeholder="예: 행정직원, 교직원"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">역할 코드 *</label>
+                <input type="text"
+                       id="role-code"
+                       value="${role ? role.code : ''}"
+                       placeholder="예: staff, instructor"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+                <p class="text-xs text-gray-500 mt-1">영문 소문자, 숫자, 언더스코어만 사용</p>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
+                <textarea id="role-description"
+                          rows="3"
+                          placeholder="역할에 대한 설명을 입력하세요"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">${role ? role.description : ''}</textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">권한 레벨 *</label>
+                <select id="role-level"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+                    <option value="1" ${role && role.level === 1 ? 'selected' : ''}>1 - 최상위 (관리자)</option>
+                    <option value="2" ${role && role.level === 2 ? 'selected' : ''}>2 - 상위 (교수, 직원)</option>
+                    <option value="3" ${role && role.level === 3 ? 'selected' : ''}>3 - 일반 (학생)</option>
+                    <option value="4" ${role && role.level === 4 ? 'selected' : ''}>4 - 제한적</option>
+                </select>
+            </div>
+        </div>
+    `;
+
+    openModal(isEdit ? '역할 수정' : '역할 추가', content, '저장', () => {
+        const name = document.getElementById('role-name').value.trim();
+        const code = document.getElementById('role-code').value.trim();
+        const description = document.getElementById('role-description').value.trim();
+        const level = parseInt(document.getElementById('role-level').value);
+
+        if (!name || !code) {
+            alert('역할명과 코드를 입력해주세요.');
+            return false;
+        }
+
+        // 코드 검증
+        if (!/^[a-z0-9_]+$/.test(code)) {
+            alert('역할 코드는 영문 소문자, 숫자, 언더스코어만 사용할 수 있습니다.');
+            return false;
+        }
+
+        // 중복 체크
+        const existingRole = mockRoles.find(r => r.code === code && r.id !== roleId);
+        if (existingRole) {
+            alert('이미 사용 중인 역할 코드입니다.');
+            return false;
+        }
+
+        if (isEdit) {
+            // 수정
+            const roleIndex = mockRoles.findIndex(r => r.id === roleId);
+            if (roleIndex >= 0) {
+                mockRoles[roleIndex] = {
+                    ...mockRoles[roleIndex],
+                    name,
+                    code,
+                    description,
+                    level
+                };
+                showToast('역할이 수정되었습니다.', 'success');
+            }
+        } else {
+            // 신규 생성
+            const newId = 'ROLE_CUSTOM_' + Date.now();
+            mockRoles.push({
+                id: newId,
+                name,
+                code,
+                description,
+                level,
+                isSystem: false
+            });
+            showToast('역할이 추가되었습니다.', 'success');
+        }
+
+        // 화면 새로고침
+        switchView('roleManagement');
+        return true;
+    });
+}
+
+// 역할 수정
+function editRole(roleId) {
+    openRoleModal(roleId);
+}
+
+// 역할 삭제
+function deleteRole(roleId) {
+    const role = mockRoles.find(r => r.id === roleId);
+    if (!role) return;
+
+    if (role.isSystem) {
+        alert('시스템 역할은 삭제할 수 없습니다.');
+        return;
+    }
+
+    if (!confirm(`"${role.name}" 역할을 삭제하시겠습니까?\n\n이 역할을 사용하는 사용자가 있다면 문제가 발생할 수 있습니다.`)) {
+        return;
+    }
+
+    // 역할 삭제
+    const roleIndex = mockRoles.findIndex(r => r.id === roleId);
+    if (roleIndex >= 0) {
+        mockRoles.splice(roleIndex, 1);
+    }
+
+    // 역할-권한 매핑 삭제
+    const mappingIndex = mockRolePermissions.findIndex(rp => rp.roleId === roleId);
+    if (mappingIndex >= 0) {
+        mockRolePermissions.splice(mappingIndex, 1);
+    }
+
+    showToast('역할이 삭제되었습니다.', 'success');
+    switchView('roleManagement');
+}
+
+// 전역으로 노출
+window.viewRolePermissions = viewRolePermissions;
+window.loadRolePermissions = loadRolePermissions;
+window.saveRolePermissions = saveRolePermissions;
+window.openRoleModal = openRoleModal;
+window.editRole = editRole;
+window.deleteRole = deleteRole;
+
+// =============================================================================
+// ERP 연동 기반 권한 관리 함수
+// =============================================================================
+
+/**
+ * 권한 관리 탭 전환
+ * @param {string} tabName - department, position, roleGroup, individual
+ */
+function switchPermissionTab(tabName) {
+    window.currentPermissionTab = tabName;
+
+    // 탭에 따라 첫 번째 대상 자동 선택
+    let firstTargetId = null;
+    if (tabName === 'department') {
+        firstTargetId = mockDepartments[0]?.id;
+    } else if (tabName === 'position') {
+        firstTargetId = mockPositions[0]?.id;
+    } else if (tabName === 'roleGroup') {
+        firstTargetId = mockRoleGroups[0]?.id;
+    } else if (tabName === 'individual') {
+        firstTargetId = mockUsers[0]?.id;
+    }
+
+    window.currentPermissionTargetId = firstTargetId;
+    switchView('permissionManagement');
+}
+
+/**
+ * 권한 대상 선택
+ * @param {string} tabName - 탭 이름
+ * @param {string} targetId - 대상 ID
+ */
+function selectPermissionTarget(tabName, targetId) {
+    window.currentPermissionTab = tabName;
+    window.currentPermissionTargetId = targetId;
+    switchView('permissionManagement');
+}
+
+/**
+ * 권한 매트릭스 초기화
+ */
+function resetPermissionMatrix() {
+    if (confirm('권한 설정을 초기화하시겠습니까?')) {
+        // 모든 체크박스 해제
+        const checkboxes = document.querySelectorAll('[data-menu][data-crud]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        showAlert('권한 설정이 초기화되었습니다.');
+    }
+}
+
+/**
+ * 권한 매트릭스 저장
+ */
+function savePermissionMatrix() {
+    const currentTab = window.currentPermissionTab || 'department';
+    const currentTargetId = window.currentPermissionTargetId;
+
+    if (!currentTargetId) {
+        showAlert('대상을 선택해주세요.');
+        return;
+    }
+
+    // 체크박스에서 권한 수집
+    const checkboxes = document.querySelectorAll('[data-menu][data-crud]');
+    const permissionsMap = {};
+
+    checkboxes.forEach(checkbox => {
+        const menuId = checkbox.getAttribute('data-menu');
+        const crudType = checkbox.getAttribute('data-crud');
+        const isChecked = checkbox.checked;
+
+        if (!permissionsMap[menuId]) {
+            permissionsMap[menuId] = {
+                menuId: menuId,
+                canRead: false,
+                canCreate: false,
+                canUpdate: false,
+                canDelete: false
+            };
+        }
+
+        if (crudType === 'R') permissionsMap[menuId].canRead = isChecked;
+        else if (crudType === 'C') permissionsMap[menuId].canCreate = isChecked;
+        else if (crudType === 'U') permissionsMap[menuId].canUpdate = isChecked;
+        else if (crudType === 'D') permissionsMap[menuId].canDelete = isChecked;
+    });
+
+    const permissions = Object.values(permissionsMap);
+
+    // 데이터 저장 (mock data 업데이트)
+    if (currentTab === 'department') {
+        const index = mockDepartmentPermissions.findIndex(dp => dp.departmentId === currentTargetId);
+        if (index >= 0) {
+            mockDepartmentPermissions[index].permissions = permissions;
+        } else {
+            mockDepartmentPermissions.push({
+                departmentId: currentTargetId,
+                permissions: permissions
+            });
+        }
+    } else if (currentTab === 'position') {
+        const index = mockPositionPermissions.findIndex(pp => pp.positionId === currentTargetId);
+        if (index >= 0) {
+            mockPositionPermissions[index].permissions = permissions;
+        } else {
+            mockPositionPermissions.push({
+                positionId: currentTargetId,
+                permissions: permissions
+            });
+        }
+    } else if (currentTab === 'roleGroup') {
+        const index = mockRoleGroupPermissions.findIndex(rp => rp.roleGroupId === currentTargetId);
+        if (index >= 0) {
+            mockRoleGroupPermissions[index].permissions = permissions;
+        } else {
+            mockRoleGroupPermissions.push({
+                roleGroupId: currentTargetId,
+                permissions: permissions
+            });
+        }
+    } else if (currentTab === 'individual') {
+        const index = mockIndividualPermissions.findIndex(ip => ip.userId === currentTargetId);
+        if (index >= 0) {
+            mockIndividualPermissions[index].permissions = permissions;
+        } else {
+            mockIndividualPermissions.push({
+                userId: currentTargetId,
+                permissions: permissions
+            });
+        }
+    }
+
+    showAlert('권한 설정이 저장되었습니다.');
+    console.log('권한 저장 완료:', { currentTab, currentTargetId, permissions });
+}
+
+/**
+ * 사용자 권한 시뮬레이터 모달 열기
+ */
+function openUserSimulatorModal() {
+    const searchValue = document.getElementById('user-simulator-search').value;
+
+    if (!searchValue) {
+        showAlert('사용자 이름 또는 사번을 입력하세요.');
+        return;
+    }
+
+    // 사용자 검색 (간단 구현 - 이름 또는 username 매칭)
+    const user = mockUsers.find(u =>
+        u.name.includes(searchValue) || u.username.includes(searchValue)
+    );
+
+    if (!user) {
+        showAlert('사용자를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 사용자 매핑 정보 가져오기
+    const userMapping = mockUserMapping.find(um => um.userId === user.username);
+    if (!userMapping) {
+        showAlert('사용자 매핑 정보가 없습니다.');
+        return;
+    }
+
+    // 부서, 신분, 역할그룹 정보 가져오기
+    const department = mockDepartments.find(d => d.id === userMapping.departmentId);
+    const position = mockPositions.find(p => p.id === userMapping.positionId);
+    const roleGroups = userMapping.roleGroupIds.map(rgId =>
+        mockRoleGroups.find(rg => rg.id === rgId)
+    ).filter(rg => rg);
+
+    // 사용자 상태 가져오기
+    const userStatus = mockUserStatus.find(us => us.userId === user.username);
+
+    // 권한 합집합 계산
+    const unionPermissions = calculateUnionPermissions(user.username);
+
+    // 권한 출처별 메뉴 수 계산
+    const deptPerms = mockDepartmentPermissions.find(dp => dp.departmentId === userMapping.departmentId);
+    const posPerms = mockPositionPermissions.find(pp => pp.positionId === userMapping.positionId);
+    const roleGroupPerms = userMapping.roleGroupIds.flatMap(rgId =>
+        mockRoleGroupPermissions.find(rp => rp.roleGroupId === rgId)?.permissions || []
+    );
+    const indvPerms = mockIndividualPermissions.find(ip => ip.userId === user.username);
+
+    const deptMenuCount = deptPerms ? deptPerms.permissions.length : 0;
+    const posMenuCount = posPerms ? posPerms.permissions.length : 0;
+    const roleGroupMenuCount = roleGroupPerms.length;
+    const indvMenuCount = indvPerms ? indvPerms.permissions.length : 0;
+
+    // 모달 컨텐츠 생성
+    const modalContent = `
+        <div>
+            <!-- 사용자 정보 -->
+            <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <span class="text-sm text-gray-600">이름</span>
+                        <div class="font-medium mt-1">${user.name}</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">사번/학번</span>
+                        <div class="font-medium mt-1">${user.username}</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">소속 부서</span>
+                        <div class="font-medium mt-1">${department ? `${department.name} (${department.code})` : '-'}</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">신분</span>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="font-medium">${position ? position.name : '-'}</span>
+                            ${userStatus ? `
+                                <span class="text-xs px-2 py-0.5 rounded-full ${
+                                    userStatus.status === 'active' ? 'bg-green-100 text-green-800' :
+                                    userStatus.status === 'leave' ? 'bg-yellow-100 text-yellow-800' :
+                                    'bg-red-100 text-red-800'
+                                }">${userStatus.statusName}</span>
+                            ` : ''}
+                        </div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">역할 그룹</span>
+                        <div class="font-medium mt-1">${roleGroups.length > 0 ? roleGroups.map(rg => rg.name).join(', ') : '-'}</div>
+                    </div>
+                    <div>
+                        <span class="text-sm text-gray-600">쓰기 권한</span>
+                        <div class="font-medium mt-1">
+                            ${userStatus && userStatus.canWrite ?
+                                '<span class="text-green-600">허용</span>' :
+                                '<span class="text-red-600">제한 (휴직/휴학)</span>'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 권한 출처 -->
+            <div class="mb-6">
+                <h4 class="font-semibold mb-3">권한 출처</h4>
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                            <span class="font-medium">부서별 권한</span>
+                        </div>
+                        <span class="text-sm text-gray-600">${department ? department.name : '-'} (${deptMenuCount}개 메뉴)</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            <span class="font-medium">신분별 권한</span>
+                        </div>
+                        <span class="text-sm text-gray-600">${position ? position.name : '-'} (${posMenuCount}개 메뉴)</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                            <span class="font-medium">역할별 권한</span>
+                        </div>
+                        <span class="text-sm text-gray-600">${roleGroups.map(rg => rg.name).join(', ') || '-'} (${roleGroupMenuCount}개 메뉴)</span>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                            <span class="font-medium">개인별 권한</span>
+                        </div>
+                        <span class="text-sm text-gray-600">특별 권한 (${indvMenuCount}개 메뉴)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 최종 권한 결과 -->
+            <div>
+                <h4 class="font-semibold mb-3">최종 권한 결과 (합집합)</h4>
+                <div class="border rounded-lg max-h-96 overflow-y-auto">
+                    <table class="w-full text-sm">
+                        <thead class="bg-gray-50 sticky top-0">
+                            <tr>
+                                <th class="text-left p-3 border-b">메뉴명</th>
+                                <th class="text-center p-3 border-b w-16">조회</th>
+                                <th class="text-center p-3 border-b w-16">등록</th>
+                                <th class="text-center p-3 border-b w-16">수정</th>
+                                <th class="text-center p-3 border-b w-16">삭제</th>
+                                <th class="text-left p-3 border-b">출처</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${unionPermissions.map(perm => {
+                                const menu = mockMenus.find(m => m.id === perm.menuId);
+                                const checkIcon = '<svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg>';
+                                const xIcon = '<svg class="w-5 h-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>';
+
+                                return `
+                                <tr class="border-b">
+                                    <td class="p-3">${menu ? menu.name : perm.menuId}</td>
+                                    <td class="text-center">${perm.canRead ? checkIcon : xIcon}</td>
+                                    <td class="text-center">${perm.canCreate && (!userStatus || userStatus.canWrite) ? checkIcon : xIcon}</td>
+                                    <td class="text-center">${perm.canUpdate && (!userStatus || userStatus.canWrite) ? checkIcon : xIcon}</td>
+                                    <td class="text-center">${perm.canDelete && (!userStatus || userStatus.canWrite) ? checkIcon : xIcon}</td>
+                                    <td class="p-3 text-xs text-gray-600">${perm.sources.join(', ')}</td>
+                                </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('사용자 권한 시뮬레이션', modalContent, '', null, false);
+}
+
+/**
+ * 사용자 권한 합집합 계산
+ * @param {string} userId - 사용자 ID
+ * @returns {Array} 합집합 권한 목록
+ */
+function calculateUnionPermissions(userId) {
+    const userMapping = mockUserMapping.find(um => um.userId === userId);
+    if (!userMapping) return [];
+
+    const permissionsMap = {};
+
+    // 1. 부서별 권한
+    const deptPerms = mockDepartmentPermissions.find(dp => dp.departmentId === userMapping.departmentId);
+    if (deptPerms) {
+        deptPerms.permissions.forEach(perm => {
+            if (!permissionsMap[perm.menuId]) {
+                permissionsMap[perm.menuId] = {
+                    menuId: perm.menuId,
+                    canRead: false,
+                    canCreate: false,
+                    canUpdate: false,
+                    canDelete: false,
+                    sources: []
+                };
+            }
+            permissionsMap[perm.menuId].canRead = permissionsMap[perm.menuId].canRead || perm.canRead;
+            permissionsMap[perm.menuId].canCreate = permissionsMap[perm.menuId].canCreate || perm.canCreate;
+            permissionsMap[perm.menuId].canUpdate = permissionsMap[perm.menuId].canUpdate || perm.canUpdate;
+            permissionsMap[perm.menuId].canDelete = permissionsMap[perm.menuId].canDelete || perm.canDelete;
+            permissionsMap[perm.menuId].sources.push('부서');
+        });
+    }
+
+    // 2. 신분별 권한
+    const posPerms = mockPositionPermissions.find(pp => pp.positionId === userMapping.positionId);
+    if (posPerms) {
+        posPerms.permissions.forEach(perm => {
+            if (!permissionsMap[perm.menuId]) {
+                permissionsMap[perm.menuId] = {
+                    menuId: perm.menuId,
+                    canRead: false,
+                    canCreate: false,
+                    canUpdate: false,
+                    canDelete: false,
+                    sources: []
+                };
+            }
+            permissionsMap[perm.menuId].canRead = permissionsMap[perm.menuId].canRead || perm.canRead;
+            permissionsMap[perm.menuId].canCreate = permissionsMap[perm.menuId].canCreate || perm.canCreate;
+            permissionsMap[perm.menuId].canUpdate = permissionsMap[perm.menuId].canUpdate || perm.canUpdate;
+            permissionsMap[perm.menuId].canDelete = permissionsMap[perm.menuId].canDelete || perm.canDelete;
+            permissionsMap[perm.menuId].sources.push('신분');
+        });
+    }
+
+    // 3. 역할그룹별 권한
+    userMapping.roleGroupIds.forEach(rgId => {
+        const roleGroupPerms = mockRoleGroupPermissions.find(rp => rp.roleGroupId === rgId);
+        if (roleGroupPerms) {
+            const roleGroup = mockRoleGroups.find(rg => rg.id === rgId);
+            roleGroupPerms.permissions.forEach(perm => {
+                if (!permissionsMap[perm.menuId]) {
+                    permissionsMap[perm.menuId] = {
+                        menuId: perm.menuId,
+                        canRead: false,
+                        canCreate: false,
+                        canUpdate: false,
+                        canDelete: false,
+                        sources: []
+                    };
+                }
+                permissionsMap[perm.menuId].canRead = permissionsMap[perm.menuId].canRead || perm.canRead;
+                permissionsMap[perm.menuId].canCreate = permissionsMap[perm.menuId].canCreate || perm.canCreate;
+                permissionsMap[perm.menuId].canUpdate = permissionsMap[perm.menuId].canUpdate || perm.canUpdate;
+                permissionsMap[perm.menuId].canDelete = permissionsMap[perm.menuId].canDelete || perm.canDelete;
+                permissionsMap[perm.menuId].sources.push(`역할(${roleGroup ? roleGroup.name : rgId})`);
+            });
+        }
+    });
+
+    // 4. 개인별 권한
+    const indvPerms = mockIndividualPermissions.find(ip => ip.userId === userId);
+    if (indvPerms) {
+        indvPerms.permissions.forEach(perm => {
+            if (!permissionsMap[perm.menuId]) {
+                permissionsMap[perm.menuId] = {
+                    menuId: perm.menuId,
+                    canRead: false,
+                    canCreate: false,
+                    canUpdate: false,
+                    canDelete: false,
+                    sources: []
+                };
+            }
+            permissionsMap[perm.menuId].canRead = permissionsMap[perm.menuId].canRead || perm.canRead;
+            permissionsMap[perm.menuId].canCreate = permissionsMap[perm.menuId].canCreate || perm.canCreate;
+            permissionsMap[perm.menuId].canUpdate = permissionsMap[perm.menuId].canUpdate || perm.canUpdate;
+            permissionsMap[perm.menuId].canDelete = permissionsMap[perm.menuId].canDelete || perm.canDelete;
+            permissionsMap[perm.menuId].sources.push('개인');
+        });
+    }
+
+    return Object.values(permissionsMap);
+}
+
+// 전역으로 노출
+window.switchPermissionTab = switchPermissionTab;
+window.selectPermissionTarget = selectPermissionTarget;
+window.resetPermissionMatrix = resetPermissionMatrix;
+window.savePermissionMatrix = savePermissionMatrix;
+window.openUserSimulatorModal = openUserSimulatorModal;
+window.calculateUnionPermissions = calculateUnionPermissions;

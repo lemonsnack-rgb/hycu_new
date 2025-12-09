@@ -2520,7 +2520,7 @@ const views = {
                                 </label>
                                 <select id="advisor-search-department" class="search-select">
                                     <option value="">전체</option>
-                                    ${mockDepartments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                                    ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
                                 </select>
                             </div>
 
@@ -2667,7 +2667,10 @@ const views = {
         }
 
         // JavaScript 파일 동적 로드
-        if (!document.querySelector('script[src="assets/js/admin-committee-assignment.js"]')) {
+        const existingScript = document.querySelector('script[src="assets/js/admin-committee-assignment.js"]');
+
+        if (!existingScript) {
+            // 스크립트가 없으면 새로 로드
             const script = document.createElement('script');
             script.src = 'assets/js/admin-committee-assignment.js';
             script.onload = () => {
@@ -2676,6 +2679,13 @@ const views = {
                 }
             };
             document.body.appendChild(script);
+        } else {
+            // 이미 로드된 경우 다음 틱에서 렌더링 함수 호출
+            setTimeout(() => {
+                if (typeof renderCommitteeAssignmentContent === 'function') {
+                    renderCommitteeAssignmentContent();
+                }
+            }, 0);
         }
 
         return `<div id="committee-assignment-content"></div>`;
@@ -2802,6 +2812,456 @@ const views = {
                             class="px-4 py-2 rounded-md ${window.composedStages.length === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#009DE8] text-white hover:bg-opacity-90'}">
                         저장 (${window.composedStages.length}개 단계)
                     </button>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 사용자 관리 ==========
+    userManagement: () => {
+        const users = mockUsers;
+        const departments = mockDepartments;
+        const positions = mockPositions;
+        const userMappings = mockUserMapping;
+        const userStatuses = mockUserStatus;
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">사용자 관리</h3>
+                            <p class="text-sm text-gray-600 mt-1">ERP 동기화된 사용자 정보를 조회합니다.</p>
+                        </div>
+                        <div class="flex space-x-2">
+                            <span class="text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+                                <i class="fas fa-sync-alt mr-1"></i> ERP 동기화: 2025-01-15 09:00
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Search & Filter -->
+                <div class="p-6 border-b bg-gray-50">
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <input type="text" placeholder="이름/사번 검색" class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                        <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                            <option value="">부서 전체</option>
+                            ${departments.map(dept => `<option value="${dept.id}">${dept.name}</option>`).join('')}
+                        </select>
+                        <select class="px-3 py-2 border border-gray-300 rounded-md text-sm">
+                            <option value="">신분 전체</option>
+                            ${positions.map(pos => `<option value="${pos.id}">${pos.name}</option>`).join('')}
+                        </select>
+                        <button class="px-4 py-2 bg-[#009DE8] text-white rounded-md text-sm hover:bg-opacity-90">
+                            검색
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Table -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">사번/학번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">소속 부서</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">신분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">역할</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">상태</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${users.map(user => {
+                                const userMapping = userMappings.find(um => um.userId === user.username);
+                                const department = departments.find(d => d.id === userMapping?.departmentId);
+                                const position = positions.find(p => p.id === userMapping?.positionId);
+                                const userStatus = userStatuses.find(us => us.userId === user.username);
+                                const role = mockRoles.find(r => r.id === user.roleId);
+
+                                const statusBadgeClass = userStatus?.status === 'active' ? 'bg-green-100 text-green-800' :
+                                                        userStatus?.status === 'leave' ? 'bg-yellow-100 text-yellow-800' :
+                                                        'bg-red-100 text-red-800';
+
+                                return `
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${user.name}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${user.username}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${department ? department.name : user.department}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${position ? position.name : '-'}</td>
+                                    <td class="py-3 px-4 text-sm">
+                                        <span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-800">
+                                            ${role ? role.name : '-'}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <span class="px-2 py-1 text-xs rounded ${statusBadgeClass}">
+                                            ${userStatus ? userStatus.statusName : '재직'}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button onclick="openUserSimulatorModal(); document.getElementById('user-simulator-search').value='${user.username}';"
+                                                class="text-[#009DE8] hover:underline text-sm">
+                                            권한 조회
+                                        </button>
+                                    </td>
+                                </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Info Box -->
+                <div class="p-6 bg-gray-50 border-t">
+                    <div class="flex items-start space-x-2 text-sm text-gray-600">
+                        <svg class="w-5 h-5 text-blue-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                        </svg>
+                        <div>
+                            <p class="font-medium">ERP 연동 정보</p>
+                            <p class="mt-1">사용자 정보는 ERP 시스템에서 자동으로 동기화됩니다. 사용자 생성/수정/삭제는 ERP 시스템에서 수행해야 합니다.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 역할 관리 ==========
+    roleManagement: () => {
+        const roles = mockRoles;
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">역할 관리</h3>
+                            <p class="text-sm text-gray-600 mt-1">시스템 역할을 관리하고 권한을 부여합니다.</p>
+                        </div>
+                        <button onclick="openRoleModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                            + 역할 추가
+                        </button>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        ${roles.map(role => {
+                            const permCount = mockRolePermissions.find(rp => rp.roleId === role.id)?.permissionIds.length || 0;
+                            const levelColor = role.level === 1 ? 'bg-red-100 text-red-800' :
+                                             role.level === 2 ? 'bg-blue-100 text-blue-800' :
+                                             'bg-green-100 text-green-800';
+                            return `
+                            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <div class="flex items-center mb-2">
+                                            <h4 class="font-bold text-gray-800">${role.name}</h4>
+                                            ${role.isSystem ? '<span class="ml-2 px-2 py-0.5 text-xs rounded bg-gray-200 text-gray-600">시스템</span>' : ''}
+                                        </div>
+                                        <p class="text-xs text-gray-600 mb-2">${role.description}</p>
+                                        <span class="inline-block px-2 py-1 rounded text-xs font-medium ${levelColor}">
+                                            Level ${role.level}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="border-t pt-3 mt-3">
+                                    <div class="text-sm text-gray-600 mb-2">
+                                        <i class="fas fa-key mr-1"></i> ${permCount}개 권한
+                                    </div>
+                                    <div class="flex space-x-2">
+                                        <button onclick="viewRolePermissions('${role.id}')"
+                                                class="flex-1 text-blue-600 hover:bg-blue-50 px-2 py-1 rounded text-xs">
+                                            권한 보기
+                                        </button>
+                                        ${!role.isSystem ? `
+                                            <button onclick="editRole('${role.id}')"
+                                                    class="flex-1 text-purple-600 hover:bg-purple-50 px-2 py-1 rounded text-xs">
+                                                수정
+                                            </button>
+                                            <button onclick="deleteRole('${role.id}')"
+                                                    class="flex-1 text-red-600 hover:bg-red-50 px-2 py-1 rounded text-xs">
+                                                삭제
+                                            </button>
+                                        ` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `}).join('')}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 권한 관리 (ERP 연동 기반) ==========
+    permissionManagement: () => {
+        // 초기화: 선택된 탭과 대상
+        const currentTab = window.currentPermissionTab || 'department';
+        const currentTargetId = window.currentPermissionTargetId || (currentTab === 'department' ? 'DEPT_001' : null);
+
+        // 탭별 데이터
+        const tabData = {
+            department: mockDepartments,
+            position: mockPositions,
+            roleGroup: mockRoleGroups,
+            individual: mockUsers
+        };
+
+        const currentData = tabData[currentTab];
+        const selectedTarget = currentData?.find(item => item.id === currentTargetId) || currentData?.[0];
+
+        // 현재 대상의 권한 가져오기
+        let currentPermissions = [];
+        if (currentTab === 'department') {
+            currentPermissions = mockDepartmentPermissions.find(dp => dp.departmentId === selectedTarget?.id)?.permissions || [];
+        } else if (currentTab === 'position') {
+            currentPermissions = mockPositionPermissions.find(pp => pp.positionId === selectedTarget?.id)?.permissions || [];
+        } else if (currentTab === 'roleGroup') {
+            currentPermissions = mockRoleGroupPermissions.find(rp => rp.roleGroupId === selectedTarget?.id)?.permissions || [];
+        } else if (currentTab === 'individual') {
+            currentPermissions = mockIndividualPermissions.find(ip => ip.userId === selectedTarget?.id)?.permissions || [];
+        }
+
+        // 권한 매트릭스 생성
+        const menuTree = mockMenus.filter(m => m.depth === 1);
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- Header -->
+                <div class="p-6 border-b">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-800">권한 관리</h3>
+                        <p class="text-sm text-gray-600 mt-1">부서, 신분, 역할그룹, 개인별 권한을 관리합니다.</p>
+                    </div>
+                </div>
+
+                <!-- 2-Column Layout -->
+                <div class="grid grid-cols-12 gap-4">
+                    <!-- Left Panel: Target Selection (30%) -->
+                    <div class="col-span-4 border-r" style="min-height: 600px;">
+                        <!-- Tabs -->
+                        <div class="border-b flex">
+                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'department' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
+                                    onclick="switchPermissionTab('department')">
+                                부서별
+                            </button>
+                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'position' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
+                                    onclick="switchPermissionTab('position')">
+                                신분별
+                            </button>
+                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'roleGroup' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
+                                    onclick="switchPermissionTab('roleGroup')">
+                                역할그룹별
+                            </button>
+                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'individual' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
+                                    onclick="switchPermissionTab('individual')">
+                                개인별
+                            </button>
+                        </div>
+
+                        <!-- Search -->
+                        <div class="p-4 border-b bg-gray-50">
+                            <input type="text"
+                                   id="target-search"
+                                   placeholder="검색..."
+                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+                        </div>
+
+                        <!-- Target List -->
+                        <div style="max-height: 500px; overflow-y: auto;">
+                            ${currentData?.map(item => {
+                                const isSelected = item.id === selectedTarget?.id;
+                                let displayName = '';
+                                let displayInfo = '';
+
+                                if (currentTab === 'department') {
+                                    displayName = item.name;
+                                    displayInfo = `코드: ${item.code}`;
+                                } else if (currentTab === 'position') {
+                                    displayName = item.name;
+                                    displayInfo = `코드: ${item.code}`;
+                                } else if (currentTab === 'roleGroup') {
+                                    displayName = item.name;
+                                    displayInfo = `코드: ${item.id}`;
+                                } else if (currentTab === 'individual') {
+                                    displayName = item.name;
+                                    displayInfo = `${item.employeeNumber || item.studentNumber || item.username}`;
+                                }
+
+                                return `
+                                <div class="px-4 py-3 border-b cursor-pointer hover:bg-gray-50 ${isSelected ? 'bg-blue-50 border-l-4 border-l-[#009DE8]' : ''}"
+                                     onclick="selectPermissionTarget('${currentTab}', '${item.id}')">
+                                    <div class="font-medium text-gray-800 text-sm">${displayName}</div>
+                                    <div class="text-xs text-gray-500 mt-1">${displayInfo}</div>
+                                </div>
+                                `;
+                            }).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Right Panel: CRUD Permission Matrix (70%) -->
+                    <div class="col-span-8">
+                        <div class="p-6 border-b bg-gray-50">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h4 class="font-bold text-gray-800">${selectedTarget?.name || '선택된 대상 없음'}</h4>
+                                    <p class="text-xs text-gray-500 mt-1">메뉴별 CRUD 권한을 설정합니다.</p>
+                                </div>
+                                <div class="flex space-x-2">
+                                    <button onclick="resetPermissionMatrix()"
+                                            class="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-100">
+                                        초기화
+                                    </button>
+                                    <button onclick="savePermissionMatrix()"
+                                            class="px-4 py-2 text-sm bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
+                                        저장
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Permission Matrix Table -->
+                        <div style="max-height: 520px; overflow-y: auto;">
+                            <table class="w-full">
+                                <thead class="bg-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 35%;">메뉴명</th>
+                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">조회<br/>(R)</th>
+                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">등록<br/>(C)</th>
+                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">수정<br/>(U)</th>
+                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">삭제<br/>(D)</th>
+                                        <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 13%;">비고</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${menuTree.map(menu1 => {
+                                        const perm1 = currentPermissions.find(p => p.menuId === menu1.id) || {};
+                                        const children = mockMenus.filter(m => m.parentId === menu1.id);
+
+                                        return `
+                                        <!-- 1depth Menu -->
+                                        <tr class="bg-blue-50 border-b">
+                                            <td class="py-3 px-4 font-semibold text-sm">${menu1.name}</td>
+                                            <td class="text-center py-2">
+                                                <input type="checkbox"
+                                                       ${perm1.canRead ? 'checked' : ''}
+                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                       data-menu="${menu1.id}" data-crud="R">
+                                            </td>
+                                            <td class="text-center py-2">
+                                                <input type="checkbox"
+                                                       ${perm1.canCreate ? 'checked' : ''}
+                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                       data-menu="${menu1.id}" data-crud="C">
+                                            </td>
+                                            <td class="text-center py-2">
+                                                <input type="checkbox"
+                                                       ${perm1.canUpdate ? 'checked' : ''}
+                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                       data-menu="${menu1.id}" data-crud="U">
+                                            </td>
+                                            <td class="text-center py-2">
+                                                <input type="checkbox"
+                                                       ${perm1.canDelete ? 'checked' : ''}
+                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                       data-menu="${menu1.id}" data-crud="D">
+                                            </td>
+                                            <td class="py-3 px-4 text-xs text-gray-500">-</td>
+                                        </tr>
+                                        ${children.map(menu2 => {
+                                            const perm2 = currentPermissions.find(p => p.menuId === menu2.id) || {};
+                                            return `
+                                            <!-- 2depth Menu -->
+                                            <tr class="border-b hover:bg-gray-50">
+                                                <td class="py-3 px-4 text-sm pl-8">└ ${menu2.name}</td>
+                                                <td class="text-center py-2">
+                                                    <input type="checkbox"
+                                                           ${perm2.canRead ? 'checked' : ''}
+                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                           data-menu="${menu2.id}" data-crud="R">
+                                                </td>
+                                                <td class="text-center py-2">
+                                                    <input type="checkbox"
+                                                           ${perm2.canCreate ? 'checked' : ''}
+                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                           data-menu="${menu2.id}" data-crud="C">
+                                                </td>
+                                                <td class="text-center py-2">
+                                                    <input type="checkbox"
+                                                           ${perm2.canUpdate ? 'checked' : ''}
+                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                           data-menu="${menu2.id}" data-crud="U">
+                                                </td>
+                                                <td class="text-center py-2">
+                                                    <input type="checkbox"
+                                                           ${perm2.canDelete ? 'checked' : ''}
+                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
+                                                           data-menu="${menu2.id}" data-crud="D">
+                                                </td>
+                                                <td class="py-3 px-4 text-xs text-gray-500">-</td>
+                                            </tr>
+                                            `;
+                                        }).join('')}
+                                        `;
+                                    }).join('')}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 역할-권한 매핑 ==========
+    rolePermissionMapping: () => {
+        const roles = mockRoles;
+        const selectedRoleId = window.selectedRoleForMapping || roles[0]?.id;
+
+        // 초기 로드를 위한 스크립트 추가
+        setTimeout(() => {
+            if (typeof loadRolePermissions === 'function') {
+                loadRolePermissions(selectedRoleId);
+            }
+        }, 0);
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">역할별 권한 설정</h3>
+                    <p class="text-sm text-gray-600 mt-1">역할에 권한을 부여하거나 회수합니다.</p>
+                </div>
+                <div class="p-6">
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">역할 선택</label>
+                        <select id="role-select"
+                                onchange="loadRolePermissions(this.value)"
+                                class="w-full md:w-96 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+                            ${roles.map(role => `
+                                <option value="${role.id}" ${role.id === selectedRoleId ? 'selected' : ''}>
+                                    ${role.name} - ${role.description}
+                                </option>
+                            `).join('')}
+                        </select>
+                    </div>
+
+                    <div id="permission-checkboxes" class="space-y-6">
+                        <!-- 동적으로 로드됨 -->
+                    </div>
+
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <button onclick="switchView('roleManagement')"
+                                class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
+                            취소
+                        </button>
+                        <button onclick="saveRolePermissions()"
+                                class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
+                            저장
+                        </button>
+                    </div>
                 </div>
             </div>
         `;

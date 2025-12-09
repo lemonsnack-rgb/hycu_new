@@ -1,7 +1,7 @@
 // Mock 데이터 - 프로토타입용 (업데이트됨 - 희망지도교수, 부지도교수 무제한)
 
-// 학과 목록
-const mockDepartments = [
+// 학과 목록 (간단한 문자열 배열)
+const mockDepartmentNames = [
     '컴퓨터공학과',
     '경영학과',
     '교육학과',
@@ -347,3 +347,653 @@ const mockEvaluationTemplates = [
     { id: 'EVAL002', name: '학위 논문 심사 평가표', type: 'score' },
     { id: 'EVAL003', name: '연구제안서 심사 평가표', type: 'score' }
 ];
+
+// =============================================================================
+// 권한 관리 데이터
+// =============================================================================
+
+// 역할 (Role)
+const mockRoles = [
+    {
+        id: 'ROLE_ADMIN',
+        name: '관리자',
+        code: 'admin',
+        description: '시스템 전체 관리 권한',
+        level: 1,
+        isSystem: true
+    },
+    {
+        id: 'ROLE_PROFESSOR',
+        name: '교수',
+        code: 'professor',
+        description: '논문지도 및 심사 권한',
+        level: 2,
+        isSystem: true
+    },
+    {
+        id: 'ROLE_STUDENT',
+        name: '학생',
+        code: 'student',
+        description: '논문 제출 및 조회 권한',
+        level: 3,
+        isSystem: true
+    }
+];
+
+// 권한 (Permission)
+const mockPermissions = [
+    // 메뉴 접근 권한
+    { id: 'PERM_MENU_DASHBOARD', name: '대시보드 접근', code: 'menu.dashboard', category: 'menu', description: '대시보드 메뉴 접근 권한' },
+    { id: 'PERM_MENU_RESEARCH_PROPOSAL', name: '연구계획서 메뉴', code: 'menu.research_proposal', category: 'menu', description: '연구계획서 관리 메뉴' },
+    { id: 'PERM_MENU_THESIS_PLAN', name: '논문작성계획서 메뉴', code: 'menu.thesis_plan', category: 'menu', description: '논문작성계획서 관리 메뉴' },
+    { id: 'PERM_MENU_MID_THESIS', name: '중간논문 메뉴', code: 'menu.mid_thesis', category: 'menu', description: '중간논문 관리 메뉴' },
+    { id: 'PERM_MENU_FINAL_THESIS', name: '최종논문 메뉴', code: 'menu.final_thesis', category: 'menu', description: '최종논문 관리 메뉴' },
+    { id: 'PERM_MENU_JOURNAL', name: '학술지 심사 메뉴', code: 'menu.journal_submission', category: 'menu', description: '학술지 심사 신청 메뉴' },
+    { id: 'PERM_MENU_GUIDANCE_PROGRESS', name: '논문지도 진행 메뉴', code: 'menu.guidance_progress', category: 'menu', description: '논문지도 진행 현황 메뉴' },
+    { id: 'PERM_MENU_SCHEDULE', name: '일정 관리 메뉴', code: 'menu.schedule_management', category: 'menu', description: '논문지도 일정 관리 메뉴' },
+    { id: 'PERM_MENU_REQUIREMENT', name: '제출 요건 메뉴', code: 'menu.requirement_management', category: 'menu', description: '논문 제출 요건 관리 메뉴' },
+    { id: 'PERM_MENU_STAGE', name: '단계 관리 메뉴', code: 'menu.stage_management', category: 'menu', description: '논문지도 단계 관리 메뉴' },
+    { id: 'PERM_MENU_TYPE', name: '단계 유형 메뉴', code: 'menu.type_management', category: 'menu', description: '지도 단계 유형 관리 메뉴' },
+    { id: 'PERM_MENU_COMMITTEE', name: '심사위원 배정 메뉴', code: 'menu.committee_assignment', category: 'menu', description: '심사위원 배정 메뉴' },
+    { id: 'PERM_MENU_EVALUATION', name: '평가 기준 메뉴', code: 'menu.evaluation_criteria', category: 'menu', description: '평가 기준 관리 메뉴' },
+    { id: 'PERM_MENU_ADVISOR', name: '지도교수 배정 메뉴', code: 'menu.advisor_assignment', category: 'menu', description: '지도교수 배정 메뉴' },
+
+    // 기능 실행 권한 (CRUD)
+    { id: 'PERM_RESEARCH_PROPOSAL_VIEW', name: '연구계획서 조회', code: 'research_proposal.view', category: 'feature', description: '연구계획서 조회 권한' },
+    { id: 'PERM_RESEARCH_PROPOSAL_CREATE', name: '연구계획서 생성', code: 'research_proposal.create', category: 'feature', description: '연구계획서 생성 권한' },
+    { id: 'PERM_RESEARCH_PROPOSAL_UPDATE', name: '연구계획서 수정', code: 'research_proposal.update', category: 'feature', description: '연구계획서 수정 권한' },
+    { id: 'PERM_RESEARCH_PROPOSAL_DELETE', name: '연구계획서 삭제', code: 'research_proposal.delete', category: 'feature', description: '연구계획서 삭제 권한' },
+
+    { id: 'PERM_ADVISOR_ASSIGN', name: '지도교수 배정', code: 'advisor.assign', category: 'feature', description: '지도교수 배정 권한' },
+    { id: 'PERM_COMMITTEE_ASSIGN', name: '심사위원 배정', code: 'committee.assign', category: 'feature', description: '심사위원 배정 권한' },
+    { id: 'PERM_STAGE_MANAGE', name: '단계 이관', code: 'stage.manage', category: 'feature', description: '학생 단계 이관 권한' },
+    { id: 'PERM_EVALUATION_MANAGE', name: '평가표 관리', code: 'evaluation.manage', category: 'feature', description: '평가표 생성/수정/삭제 권한' },
+
+    // 데이터 레벨 권한
+    { id: 'PERM_DATA_VIEW_ALL', name: '모든 데이터 조회', code: 'data.view_all', category: 'data', description: '모든 학생 데이터 조회 권한' },
+    { id: 'PERM_DATA_VIEW_OWN', name: '본인 데이터 조회', code: 'data.view_own', category: 'data', description: '본인 데이터만 조회 권한' },
+    { id: 'PERM_DATA_VIEW_ASSIGNED', name: '담당 학생 데이터 조회', code: 'data.view_assigned', category: 'data', description: '지도학생 데이터 조회 권한' },
+
+    // 관리자 전용 권한
+    { id: 'PERM_ADMIN_ROLE_MANAGE', name: '역할 관리', code: 'admin.role.manage', category: 'admin', description: '역할 생성/수정/삭제 권한' },
+    { id: 'PERM_ADMIN_PERMISSION_MANAGE', name: '권한 관리', code: 'admin.permission.manage', category: 'admin', description: '권한 부여/회수 권한' },
+    { id: 'PERM_ADMIN_USER_MANAGE', name: '사용자 관리', code: 'admin.user.manage', category: 'admin', description: '사용자 생성/수정/삭제 권한' }
+];
+
+// 역할-권한 매핑
+const mockRolePermissions = [
+    // 관리자 - 모든 권한
+    {
+        roleId: 'ROLE_ADMIN',
+        permissionIds: [
+            // 메뉴 권한
+            'PERM_MENU_DASHBOARD',
+            'PERM_MENU_RESEARCH_PROPOSAL',
+            'PERM_MENU_THESIS_PLAN',
+            'PERM_MENU_MID_THESIS',
+            'PERM_MENU_FINAL_THESIS',
+            'PERM_MENU_JOURNAL',
+            'PERM_MENU_GUIDANCE_PROGRESS',
+            'PERM_MENU_SCHEDULE',
+            'PERM_MENU_REQUIREMENT',
+            'PERM_MENU_STAGE',
+            'PERM_MENU_TYPE',
+            'PERM_MENU_COMMITTEE',
+            'PERM_MENU_EVALUATION',
+            'PERM_MENU_ADVISOR',
+            // 기능 권한
+            'PERM_RESEARCH_PROPOSAL_VIEW',
+            'PERM_RESEARCH_PROPOSAL_CREATE',
+            'PERM_RESEARCH_PROPOSAL_UPDATE',
+            'PERM_RESEARCH_PROPOSAL_DELETE',
+            'PERM_ADVISOR_ASSIGN',
+            'PERM_COMMITTEE_ASSIGN',
+            'PERM_STAGE_MANAGE',
+            'PERM_EVALUATION_MANAGE',
+            // 데이터 권한
+            'PERM_DATA_VIEW_ALL',
+            // 관리자 권한
+            'PERM_ADMIN_ROLE_MANAGE',
+            'PERM_ADMIN_PERMISSION_MANAGE',
+            'PERM_ADMIN_USER_MANAGE'
+        ]
+    },
+    // 교수 - 지도학생 관련 권한
+    {
+        roleId: 'ROLE_PROFESSOR',
+        permissionIds: [
+            // 메뉴 권한
+            'PERM_MENU_DASHBOARD',
+            'PERM_MENU_RESEARCH_PROPOSAL',
+            'PERM_MENU_THESIS_PLAN',
+            'PERM_MENU_MID_THESIS',
+            'PERM_MENU_FINAL_THESIS',
+            'PERM_MENU_GUIDANCE_PROGRESS',
+            // 기능 권한
+            'PERM_RESEARCH_PROPOSAL_VIEW',
+            'PERM_RESEARCH_PROPOSAL_UPDATE',
+            // 데이터 권한
+            'PERM_DATA_VIEW_ASSIGNED'
+        ]
+    },
+    // 학생 - 본인 데이터만
+    {
+        roleId: 'ROLE_STUDENT',
+        permissionIds: [
+            // 메뉴 권한
+            'PERM_MENU_DASHBOARD',
+            'PERM_MENU_RESEARCH_PROPOSAL',
+            'PERM_MENU_THESIS_PLAN',
+            'PERM_MENU_MID_THESIS',
+            'PERM_MENU_FINAL_THESIS',
+            // 기능 권한
+            'PERM_RESEARCH_PROPOSAL_VIEW',
+            'PERM_RESEARCH_PROPOSAL_CREATE',
+            'PERM_RESEARCH_PROPOSAL_UPDATE',
+            // 데이터 권한
+            'PERM_DATA_VIEW_OWN'
+        ]
+    }
+];
+
+// 사용자 (User)
+const mockUsers = [
+    {
+        id: 'USER_ADMIN_001',
+        username: 'admin',
+        name: '시스템 관리자',
+        roleId: 'ROLE_ADMIN',
+        email: 'admin@hycu.ac.kr',
+        department: null,
+        employeeNumber: null,
+        studentNumber: null,
+        status: 'active'
+    },
+    {
+        id: 'USER_PROF_001',
+        username: 'prof001',
+        name: '김교수',
+        roleId: 'ROLE_PROFESSOR',
+        email: 'kim@hycu.ac.kr',
+        department: '컴퓨터공학과',
+        employeeNumber: 'P2020001',
+        studentNumber: null,
+        status: 'active'
+    },
+    {
+        id: 'USER_STU_001',
+        username: 'stu001',
+        name: '김학생',
+        roleId: 'ROLE_STUDENT',
+        email: 'stu001@hycu.ac.kr',
+        department: '컴퓨터공학과',
+        employeeNumber: null,
+        studentNumber: '2024001',
+        status: 'active'
+    }
+];
+
+// =============================================================================
+// ERP 연동 기반 권한 관리 데이터
+// =============================================================================
+
+// ERP 부서 정보 (ERP View에서 동기화)
+const mockDepartments = [
+    {
+        id: 'DEPT_001',
+        code: 'DEPT_001',
+        name: '교무학사팀',
+        type: 'admin',
+        parentId: null,
+        memberCount: 12,
+        erpSyncDate: '2025-01-15 09:00:00'
+    },
+    {
+        id: 'DEPT_002',
+        code: 'DEPT_002',
+        name: '학생지원팀',
+        type: 'admin',
+        parentId: null,
+        memberCount: 8,
+        erpSyncDate: '2025-01-15 09:00:00'
+    },
+    {
+        id: 'DEPT_003',
+        code: 'DEPT_003',
+        name: '경영학과',
+        type: 'academic',
+        parentId: null,
+        memberCount: 45,
+        erpSyncDate: '2025-01-15 09:00:00'
+    },
+    {
+        id: 'DEPT_004',
+        code: 'DEPT_004',
+        name: '컴퓨터공학과',
+        type: 'academic',
+        parentId: null,
+        memberCount: 52,
+        erpSyncDate: '2025-01-15 09:00:00'
+    },
+    {
+        id: 'DEPT_005',
+        code: 'DEPT_005',
+        name: '입학관리팀',
+        type: 'admin',
+        parentId: null,
+        memberCount: 6,
+        erpSyncDate: '2025-01-15 09:00:00'
+    }
+];
+
+// 신분 정보 (ERP 기준)
+const mockPositions = [
+    {
+        id: 'POS_001',
+        code: 'PROF_FULL',
+        name: '전임교원',
+        category: 'professor',
+        description: '교수/부교수/조교수',
+        memberCount: 45
+    },
+    {
+        id: 'POS_002',
+        code: 'PROF_PART',
+        name: '비전임교원',
+        category: 'professor',
+        description: '겸임/초빙교수',
+        memberCount: 23
+    },
+    {
+        id: 'POS_003',
+        code: 'STAFF',
+        name: '직원',
+        category: 'staff',
+        description: '행정직원',
+        memberCount: 34
+    },
+    {
+        id: 'POS_004',
+        code: 'STUDENT',
+        name: '학생',
+        category: 'student',
+        description: '대학원생',
+        memberCount: 1234
+    }
+];
+
+// 역할 그룹 (쿼리 기반 동적 그룹)
+const mockRoleGroups = [
+    {
+        id: 'ROLEGROUP_001',
+        name: '논문심사위원',
+        description: '논문 심사 권한을 가진 교수진',
+        query: 'position=PROF_FULL AND status=active',
+        memberCount: 38,
+        createdBy: 'admin',
+        createdDate: '2025-01-10'
+    },
+    {
+        id: 'ROLEGROUP_002',
+        name: '졸업사정담당',
+        description: '졸업 사정 업무 담당자',
+        query: 'department=DEPT_001 AND role=graduation_officer',
+        memberCount: 3,
+        createdBy: 'admin',
+        createdDate: '2025-01-10'
+    },
+    {
+        id: 'ROLEGROUP_003',
+        name: '논문관리자',
+        description: '논문 시스템 전체 관리자',
+        query: 'department=DEPT_001 AND position=STAFF',
+        memberCount: 5,
+        createdBy: 'admin',
+        createdDate: '2025-01-10'
+    }
+];
+
+// 사용자 재직/재학 상태
+const mockUserStatus = [
+    {
+        userId: 'admin',
+        status: 'active',
+        statusName: '재직',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    },
+    {
+        userId: 'prof001',
+        status: 'active',
+        statusName: '재직',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    },
+    {
+        userId: 'prof002',
+        status: 'leave',
+        statusName: '휴직',
+        statusCode: 'LEAVE',
+        canWrite: false,
+        leaveStartDate: '2024-12-01',
+        leaveEndDate: '2025-02-28'
+    },
+    {
+        userId: 'stu001',
+        status: 'active',
+        statusName: '재학',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    }
+];
+
+// 메뉴 구조 (CRUD 세분화)
+const mockMenus = [
+    // 1depth: 논문 안내
+    {
+        id: 'MENU_001',
+        parentId: null,
+        name: '논문 안내',
+        code: 'guidance_info',
+        depth: 1,
+        order: 1
+    },
+    {
+        id: 'MENU_001_001',
+        parentId: 'MENU_001',
+        name: '공지사항',
+        code: 'notice',
+        depth: 2,
+        order: 1
+    },
+    {
+        id: 'MENU_001_002',
+        parentId: 'MENU_001',
+        name: '자료실',
+        code: 'board',
+        depth: 2,
+        order: 2
+    },
+    {
+        id: 'MENU_001_003',
+        parentId: 'MENU_001',
+        name: '연구윤리',
+        code: 'ethics',
+        depth: 2,
+        order: 3
+    },
+    // 1depth: 논문 제출
+    {
+        id: 'MENU_002',
+        parentId: null,
+        name: '논문 제출',
+        code: 'thesis_submission',
+        depth: 1,
+        order: 2
+    },
+    {
+        id: 'MENU_002_001',
+        parentId: 'MENU_002',
+        name: '연구계획서 제출',
+        code: 'research_proposal',
+        depth: 2,
+        order: 1
+    },
+    {
+        id: 'MENU_002_002',
+        parentId: 'MENU_002',
+        name: '중간논문 제출',
+        code: 'mid_thesis',
+        depth: 2,
+        order: 2
+    },
+    {
+        id: 'MENU_002_003',
+        parentId: 'MENU_002',
+        name: '최종논문 제출',
+        code: 'final_thesis',
+        depth: 2,
+        order: 3
+    },
+    // 1depth: 논문 지도
+    {
+        id: 'MENU_003',
+        parentId: null,
+        name: '논문 지도',
+        code: 'thesis_guidance',
+        depth: 1,
+        order: 3
+    },
+    {
+        id: 'MENU_003_001',
+        parentId: 'MENU_003',
+        name: '지도교수 배정',
+        code: 'advisor_assignment',
+        depth: 2,
+        order: 1
+    },
+    {
+        id: 'MENU_003_002',
+        parentId: 'MENU_003',
+        name: '논문 지도 현황',
+        code: 'guidance_progress',
+        depth: 2,
+        order: 2
+    },
+    // 1depth: 논문 심사
+    {
+        id: 'MENU_004',
+        parentId: null,
+        name: '논문 심사',
+        code: 'thesis_review',
+        depth: 1,
+        order: 4
+    },
+    {
+        id: 'MENU_004_001',
+        parentId: 'MENU_004',
+        name: '심사위원 배정',
+        code: 'committee_assignment',
+        depth: 2,
+        order: 1
+    },
+    {
+        id: 'MENU_004_002',
+        parentId: 'MENU_004',
+        name: '학위 논문 심사',
+        code: 'thesis_review_detail',
+        depth: 2,
+        order: 2
+    },
+    // 1depth: 시스템 설정
+    {
+        id: 'MENU_005',
+        parentId: null,
+        name: '시스템 설정',
+        code: 'system_settings',
+        depth: 1,
+        order: 5
+    },
+    {
+        id: 'MENU_005_001',
+        parentId: 'MENU_005',
+        name: '사용자 관리',
+        code: 'user_management',
+        depth: 2,
+        order: 1
+    },
+    {
+        id: 'MENU_005_002',
+        parentId: 'MENU_005',
+        name: '권한 관리',
+        code: 'permission_management',
+        depth: 2,
+        order: 2
+    }
+];
+
+// 부서별 권한 (Department Permissions)
+const mockDepartmentPermissions = [
+    {
+        departmentId: 'DEPT_001',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_001_001', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_001_002', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_002', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_002_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_003', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_003_001', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_003_002', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_004', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_004_001', canRead: true, canCreate: true, canUpdate: true, canDelete: false }
+        ]
+    },
+    {
+        departmentId: 'DEPT_002',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_001_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_002', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_002_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false }
+        ]
+    }
+];
+
+// 신분별 권한 (Position Permissions)
+const mockPositionPermissions = [
+    {
+        positionId: 'POS_001',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_002', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_003', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_003_002', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_004', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_004_002', canRead: true, canCreate: false, canUpdate: true, canDelete: false }
+        ]
+    },
+    {
+        positionId: 'POS_003',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_002', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_003', canRead: true, canCreate: false, canUpdate: false, canDelete: false }
+        ]
+    },
+    {
+        positionId: 'POS_004',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_002', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_002_001', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_002_002', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_002_003', canRead: true, canCreate: true, canUpdate: true, canDelete: false }
+        ]
+    }
+];
+
+// 역할그룹별 권한 (Role Group Permissions)
+const mockRoleGroupPermissions = [
+    {
+        roleGroupId: 'ROLEGROUP_001',
+        permissions: [
+            { menuId: 'MENU_004', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_004_001', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_004_002', canRead: true, canCreate: false, canUpdate: true, canDelete: false }
+        ]
+    },
+    {
+        roleGroupId: 'ROLEGROUP_002',
+        permissions: [
+            { menuId: 'MENU_002', canRead: true, canCreate: false, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_003', canRead: true, canCreate: false, canUpdate: false, canDelete: false }
+        ]
+    },
+    {
+        roleGroupId: 'ROLEGROUP_003',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_002', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_003', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_004', canRead: true, canCreate: true, canUpdate: true, canDelete: false },
+            { menuId: 'MENU_005', canRead: true, canCreate: false, canUpdate: false, canDelete: false },
+            { menuId: 'MENU_005_002', canRead: true, canCreate: false, canUpdate: false, canDelete: false }
+        ]
+    }
+];
+
+// 개인별 예외 권한 (Individual Permissions)
+const mockIndividualPermissions = [
+    {
+        userId: 'admin',
+        permissions: [
+            { menuId: 'MENU_005', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_005_001', canRead: true, canCreate: true, canUpdate: true, canDelete: true },
+            { menuId: 'MENU_005_002', canRead: true, canCreate: true, canUpdate: true, canDelete: true }
+        ]
+    },
+    {
+        userId: 'prof001',
+        permissions: [
+            { menuId: 'MENU_005_002', canRead: true, canCreate: false, canUpdate: false, canDelete: false }
+        ]
+    }
+];
+
+// 사용자-부서/신분/역할그룹 매핑 (User Mapping)
+const mockUserMapping = [
+    {
+        userId: 'admin',
+        departmentId: 'DEPT_001',
+        positionId: 'POS_003',
+        roleGroupIds: ['ROLEGROUP_003']
+    },
+    {
+        userId: 'prof001',
+        departmentId: 'DEPT_003',
+        positionId: 'POS_001',
+        roleGroupIds: ['ROLEGROUP_001', 'ROLEGROUP_003']
+    },
+    {
+        userId: 'prof002',
+        departmentId: 'DEPT_003',
+        positionId: 'POS_001',
+        roleGroupIds: ['ROLEGROUP_001']
+    },
+    {
+        userId: 'stu001',
+        departmentId: 'DEPT_004',
+        positionId: 'POS_004',
+        roleGroupIds: []
+    }
+];
+
+// 전역으로 노출 (window 객체에 할당)
+if (typeof window !== 'undefined') {
+    // 기본 데이터
+    window.mockDepartmentNames = mockDepartmentNames;
+
+    // 기존 권한 관리 데이터
+    window.mockRoles = mockRoles;
+    window.mockPermissions = mockPermissions;
+    window.mockRolePermissions = mockRolePermissions;
+    window.mockUsers = mockUsers;
+
+    // ERP 연동 기반 권한 관리 데이터
+    window.mockDepartments = mockDepartments;
+    window.mockPositions = mockPositions;
+    window.mockRoleGroups = mockRoleGroups;
+    window.mockUserStatus = mockUserStatus;
+    window.mockMenus = mockMenus;
+    window.mockDepartmentPermissions = mockDepartmentPermissions;
+    window.mockPositionPermissions = mockPositionPermissions;
+    window.mockRoleGroupPermissions = mockRoleGroupPermissions;
+    window.mockIndividualPermissions = mockIndividualPermissions;
+    window.mockUserMapping = mockUserMapping;
+
+    // 디버그: 로드 확인
+    console.log('✅ mockData.js 로드 완료');
+    console.log('mockUsers:', window.mockUsers ? window.mockUsers.length + '명' : 'undefined');
+    console.log('mockDepartments:', window.mockDepartments ? window.mockDepartments.length + '개' : 'undefined');
+}

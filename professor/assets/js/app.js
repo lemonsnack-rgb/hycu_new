@@ -50,7 +50,7 @@ function showScreen(screenId) {
                 initJournalReview();
             }
         } else if (screenId === 'advisor-assignment') {
-            // 지도 학생 관리 초기화
+            // 지도교수 배정 초기화
             if (typeof initAdvisorAssignment === 'function') {
                 initAdvisorAssignment();
             }
@@ -234,7 +234,7 @@ window.addEventListener('beforeunload', (e) => {
     }
 });
 
-// 지도 학생 관리 초기화
+// 지도교수 배정 초기화
 function initAdvisorAssignment() {
     // 현재 로그인한 교수 ID (Mock - 실제로는 세션에서 가져와야 함)
     const currentProfessorId = 'PROF001'; // 김교수
@@ -400,7 +400,7 @@ function returnToAdvisorAssignmentList() {
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더 -->
             <div class="p-6 border-b">
-                <h2 class="text-xl font-semibold text-gray-800">지도 학생 관리</h2>
+                <h2 class="text-xl font-semibold text-gray-800">지도교수 배정</h2>
                 <p class="text-sm text-gray-600 mt-1">나의 지도 학생 목록을 조회합니다.</p>
             </div>
 
