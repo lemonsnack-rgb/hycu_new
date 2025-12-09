@@ -54,6 +54,12 @@ function showScreen(screenId) {
             if (typeof initAdvisorAssignment === 'function') {
                 initAdvisorAssignment();
             }
+        } else if (screenId === 'ethics' || screenId === 'schedule' || screenId === 'process') {
+            // 안내문 화면 렌더링 (공통 함수 사용)
+            renderGuideScreen(screenId);
+        } else if (screenId === 'notice') {
+            // 공지사항 화면 렌더링
+            renderNoticeScreen();
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];
             if (initFunction) {
@@ -675,6 +681,128 @@ function viewProfessorProposalDetail(proposalId) {
     }
 }
 
+// 안내문 화면 렌더링 (연구윤리, 논문일정, 논문지도절차)
+function renderGuideScreen(screenId) {
+    const typeMap = {
+        'ethics': 'ethics',
+        'schedule': 'schedule',
+        'process': 'procedure'
+    };
+
+    const type = typeMap[screenId];
+    if (!type) return;
+
+    const targetScreen = document.getElementById(screenId + '-screen');
+    if (!targetScreen) return;
+
+    // 공통 렌더링 함수 사용 (isAdmin = false, 교수는 편집 권한 없음)
+    if (typeof window.renderGuideContent === 'function') {
+        targetScreen.innerHTML = window.renderGuideContent(type, false);
+    } else {
+        targetScreen.innerHTML = `
+            <div class="bg-white rounded-lg shadow-md p-8">
+                <div class="text-center text-gray-500">
+                    <p class="text-lg">콘텐츠를 불러올 수 없습니다.</p>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// 공지사항 화면 렌더링
+function renderNoticeScreen() {
+    const targetScreen = document.getElementById('notice-screen');
+    if (!targetScreen) return;
+
+    const notices = window.mockNotices || [];
+
+    targetScreen.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 헤더 -->
+            <div class="p-6 border-b">
+                <h2 class="text-xl font-semibold text-gray-800">공지사항</h2>
+                <p class="text-sm text-gray-600 mt-1">관리자가 등록한 공지사항을 조회합니다.</p>
+            </div>
+
+            <!-- 검색 영역 -->
+            <div class="p-6 border-b">
+                <div class="flex gap-3">
+                    <select id="notice-category-filter-prof" class="px-4 py-2 border border-gray-300 rounded-lg">
+                        <option value="">전체 카테고리</option>
+                        <option value="important">중요</option>
+                        <option value="general">일반</option>
+                    </select>
+                    <input type="text" id="notice-search-prof" placeholder="제목 또는 내용 검색"
+                           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg">
+                    <button onclick="searchNoticesProfessor()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                        검색
+                    </button>
+                </div>
+            </div>
+
+            <!-- 공지사항 목록 -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">번호</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">카테고리</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">고정</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">작성자</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">작성일</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">조회수</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notice-list-prof" class="bg-white divide-y divide-gray-200">
+                        ${notices.map((notice, index) => `
+                            <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewNoticeDetailProfessor('${notice.id}')">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notices.length - index}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="px-2 py-1 text-xs rounded ${notice.category === 'important' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
+                                        ${notice.category === 'important' ? '중요' : '일반'}
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                    ${notice.isPinned ? '<span class="text-blue-600">📌</span>' : ''}
+                                </td>
+                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">${notice.title}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notice.authorName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notice.createdAt}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">${notice.viewCount}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+
+            ${notices.length === 0 ? `
+                <div class="text-center py-12 text-gray-500">
+                    <p>등록된 공지사항이 없습니다.</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+}
+
+// 공지사항 상세 보기 (교수용)
+function viewNoticeDetailProfessor(noticeId) {
+    const notice = (window.mockNotices || []).find(n => n.id === noticeId);
+    if (!notice) {
+        alert('공지사항을 찾을 수 없습니다.');
+        return;
+    }
+
+    // HTML 태그 제거하여 표시
+    const plainContent = notice.content.replace(/<[^>]*>/g, '');
+    alert(`[${notice.title}]\n\n${plainContent}`);
+}
+
+// 공지사항 검색 (교수용)
+function searchNoticesProfessor() {
+    alert('검색 기능은 추후 구현 예정입니다.');
+}
+
 // 전역으로 export
 window.showScreen = showScreen;
 window.handleLogout = handleLogout;
@@ -683,6 +811,10 @@ window.searchProfessorAdvisorAssignment = searchProfessorAdvisorAssignment;
 window.resetProfessorAdvisorSearch = resetProfessorAdvisorSearch;
 window.viewProfessorProposalDetail = viewProfessorProposalDetail;
 window.returnToAdvisorAssignmentList = returnToAdvisorAssignmentList;
+window.renderGuideScreen = renderGuideScreen;
+window.renderNoticeScreen = renderNoticeScreen;
+window.viewNoticeDetailProfessor = viewNoticeDetailProfessor;
+window.searchNoticesProfessor = searchNoticesProfessor;
 window.switchTab = switchTab;
 window.setupSearchInput = setupSearchInput;
 window.currentScreen = currentScreen;
