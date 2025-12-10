@@ -2981,7 +2981,6 @@ function addEvaluationCriteria() {
                 <select id="criteria-evaluation-type"
                         class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                     <option value="score">점수형 - 점수로 평가 (예: 100점 만점)</option>
-                    <option value="grade">등급형 - 등급으로 평가 (예: A, B, C, D, F)</option>
                     <option value="passfail">Pass/Fail형 - 합격/불합격으로 평가</option>
                 </select>
                 <p class="text-xs text-gray-500 mt-1">
@@ -3399,6 +3398,339 @@ function toggleEvaluationSelect() {
     if (container) {
         container.style.display = hasEvaluation ? 'block' : 'none';
     }
+}
+
+// ========== 통합 평가표 편집 페이지 관련 함수 ==========
+function addEvaluationItem() {
+    const container = document.getElementById('evaluation-items-container');
+    const evaluationType = document.getElementById('edit-criteria-type').value;
+    const itemCount = container.querySelectorAll('.evaluation-item').length + 1;
+
+    let itemHtml = '';
+    if (evaluationType === 'score') {
+        itemHtml = `
+            <div class="evaluation-item mb-3 p-4 bg-white border border-gray-200 rounded-lg">
+                <div class="flex justify-between items-start mb-3">
+                    <h5 class="text-sm font-semibold text-gray-700">항목 ${itemCount}</h5>
+                    <button onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">항목명 <span class="text-red-600">*</span></label>
+                        <input type="text" class="item-name w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="평가 항목명" required>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-1">배점 <span class="text-red-600">*</span></label>
+                            <input type="number" class="item-score w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="점수" min="0" required onchange="updateTotalScore()">
+                        </div>
+                        <div>
+                            <div class="flex items-center mb-1">
+                                <input type="checkbox" class="item-fail-enabled mr-2" onchange="toggleFailScore(this)">
+                                <label class="text-xs font-medium text-gray-700">과락기준 설정</label>
+                            </div>
+                            <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-2 py-1 text-sm bg-gray-100" placeholder="최소 점수" min="0" disabled>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">설명 <span class="text-red-600">*</span></label>
+                        <textarea class="item-description w-full border border-gray-300 rounded px-2 py-1 text-sm" rows="2" placeholder="항목 설명" required></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        itemHtml = `
+            <div class="evaluation-item mb-3 p-4 bg-white border border-gray-200 rounded-lg">
+                <div class="flex justify-between items-start mb-3">
+                    <h5 class="text-sm font-semibold text-gray-700">항목 ${itemCount}</h5>
+                    <button onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">항목명 <span class="text-red-600">*</span></label>
+                        <input type="text" class="item-name w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="평가 항목명" required>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-700 mb-1">설명 <span class="text-red-600">*</span></label>
+                        <textarea class="item-description w-full border border-gray-300 rounded px-2 py-1 text-sm" rows="2" placeholder="항목 설명" required></textarea>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // Replace placeholder message if present
+    const placeholder = container.querySelector('p');
+    if (placeholder) {
+        placeholder.remove();
+    }
+
+    container.insertAdjacentHTML('beforeend', itemHtml);
+}
+
+function removeEvaluationItem(button) {
+    const item = button.closest('.evaluation-item');
+    item.remove();
+
+    // Check if container is empty
+    const container = document.getElementById('evaluation-items-container');
+    if (container.querySelectorAll('.evaluation-item').length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">평가 항목을 추가해주세요.</p>';
+    }
+
+    // Renumber items
+    container.querySelectorAll('.evaluation-item').forEach((item, idx) => {
+        const header = item.querySelector('h5');
+        if (header) {
+            header.textContent = `항목 ${idx + 1}`;
+        }
+    });
+
+    // Update total score
+    updateTotalScore();
+}
+
+// 과락기준 활성화/비활성화
+function toggleFailScore(checkbox) {
+    const parentDiv = checkbox.closest('.grid').querySelector('.item-fail-score');
+    if (checkbox.checked) {
+        parentDiv.disabled = false;
+        parentDiv.classList.remove('bg-gray-100');
+    } else {
+        parentDiv.disabled = true;
+        parentDiv.value = '';
+        parentDiv.classList.add('bg-gray-100');
+    }
+}
+
+// 총점 계산 및 업데이트
+function updateTotalScore() {
+    const evaluationType = document.getElementById('edit-criteria-type')?.value;
+    if (evaluationType !== 'score') return;
+
+    const container = document.getElementById('evaluation-items-container');
+    const scoreInputs = container.querySelectorAll('.item-score');
+
+    let totalScore = 0;
+    scoreInputs.forEach(input => {
+        const score = parseInt(input.value) || 0;
+        totalScore += score;
+    });
+
+    const displayElement = document.getElementById('total-score-display');
+    if (displayElement) {
+        displayElement.textContent = totalScore;
+
+        // 총점이 100이 아니면 색상 변경
+        if (totalScore !== 100) {
+            displayElement.classList.remove('text-blue-600');
+            displayElement.classList.add('text-red-600');
+        } else {
+            displayElement.classList.remove('text-red-600');
+            displayElement.classList.add('text-blue-600');
+        }
+    }
+}
+
+function saveEvaluationCriteria(criteriaId) {
+    const name = document.getElementById('edit-criteria-name').value.trim();
+    const description = document.getElementById('edit-criteria-description').value.trim();
+    const evaluationType = document.getElementById('edit-criteria-type').value;
+
+    // Validation
+    if (!name) {
+        showAlert('평가표명을 입력하세요.');
+        return;
+    }
+
+    if (!description) {
+        showAlert('설명을 입력하세요.');
+        return;
+    }
+
+    // Collect evaluation items
+    const container = document.getElementById('evaluation-items-container');
+    const itemElements = container.querySelectorAll('.evaluation-item');
+
+    if (itemElements.length === 0) {
+        showAlert('최소 1개 이상의 평가 항목을 추가해주세요.');
+        return;
+    }
+
+    const items = [];
+    let hasError = false;
+
+    itemElements.forEach((itemEl, idx) => {
+        const itemName = itemEl.querySelector('.item-name').value.trim();
+        const itemDescription = itemEl.querySelector('.item-description')?.value.trim() || '';
+
+        if (!itemName) {
+            showAlert(`항목 ${idx + 1}의 이름을 입력하세요.`);
+            hasError = true;
+            return;
+        }
+
+        const item = {
+            id: idx + 1,
+            name: itemName,
+            description: itemDescription
+        };
+
+        if (evaluationType === 'score') {
+            const score = parseInt(itemEl.querySelector('.item-score').value);
+            const failEnabled = itemEl.querySelector('.item-fail-enabled').checked;
+            const failScoreInput = itemEl.querySelector('.item-fail-score').value;
+
+            if (!score || score <= 0) {
+                showAlert(`항목 ${idx + 1}의 배점을 입력하세요.`);
+                hasError = true;
+                return;
+            }
+
+            item.score = score;
+
+            // 과락기준이 체크되어 있을 때만 저장
+            if (failEnabled) {
+                const failScore = parseInt(failScoreInput);
+                if (!failScore || failScore < 0) {
+                    showAlert(`항목 ${idx + 1}의 과락기준을 입력하세요.`);
+                    hasError = true;
+                    return;
+                }
+                // 과락점수가 배점보다 크면 오류
+                if (failScore > score) {
+                    showAlert(`항목 ${idx + 1}의 과락기준(${failScore}점)이 배점(${score}점)보다 클 수 없습니다.`);
+                    hasError = true;
+                    return;
+                }
+                item.failScore = failScore;
+            } else {
+                item.failScore = null;
+            }
+        }
+
+        items.push(item);
+    });
+
+    if (hasError) return;
+
+    // 점수형일 때 총점 검증
+    if (evaluationType === 'score') {
+        const totalScore = items.reduce((sum, item) => sum + (item.score || 0), 0);
+        if (totalScore !== 100) {
+            showAlert(`총점이 100점이 아닙니다. 현재 총점: ${totalScore}점\n\n총점이 반드시 100점이 되도록 배점을 조정해주세요.`);
+            return;
+        }
+
+        // 통과 기준 검증 (점수형만)
+        const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
+        const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
+        const minScore = parseInt(document.getElementById('pass-min-score')?.value);
+
+        if (!totalCommittee || totalCommittee <= 0) {
+            showAlert('총 심사위원 수를 입력하세요.');
+            return;
+        }
+
+        if (!requiredCommittee || requiredCommittee <= 0) {
+            showAlert('통과 필요 인원을 입력하세요.');
+            return;
+        }
+
+        if (requiredCommittee > totalCommittee) {
+            showAlert('통과 필요 인원은 총 심사위원 수보다 클 수 없습니다.');
+            return;
+        }
+
+        if (!minScore || minScore < 0 || minScore > 100) {
+            showAlert('최소 점수를 0-100 사이로 입력하세요.');
+            return;
+        }
+    }
+
+    // Save or update
+    if (criteriaId) {
+        // Update existing criteria
+        const criteria = appData.evaluationCriteria.find(c => c.id === criteriaId);
+        if (criteria) {
+            criteria.name = name;
+            criteria.description = description;
+            criteria.items = items;
+            criteria.itemCount = items.length;
+
+            if (evaluationType === 'score') {
+                const totalScore = items.reduce((sum, item) => sum + (item.score || 0), 0);
+                criteria.totalScore = totalScore;
+
+                // 통과 기준 저장
+                const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
+                const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
+                const minScore = parseInt(document.getElementById('pass-min-score')?.value);
+
+                criteria.passCriteria = {
+                    type: 'committee',
+                    totalCommittee: totalCommittee,
+                    requiredCommittee: requiredCommittee,
+                    passScore: minScore,
+                    description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
+                };
+            }
+        }
+        showToast('평가표가 수정되었습니다.', 'success');
+    } else {
+        // Create new criteria
+        const newId = Math.max(...appData.evaluationCriteria.map(c => c.id), 0) + 1;
+        const totalScore = evaluationType === 'score' ? items.reduce((sum, item) => sum + (item.score || 0), 0) : null;
+
+        let passCriteria = null;
+        if (evaluationType === 'score') {
+            const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
+            const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
+            const minScore = parseInt(document.getElementById('pass-min-score')?.value);
+
+            passCriteria = {
+                type: 'committee',
+                totalCommittee: totalCommittee,
+                requiredCommittee: requiredCommittee,
+                passScore: minScore,
+                description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
+            };
+        } else {
+            passCriteria = {
+                passRequired: true,
+                description: '모든 항목에서 Pass를 받아야 합격'
+            };
+        }
+
+        const newCriteria = {
+            id: newId,
+            name: name,
+            description: description,
+            evaluationType: evaluationType,
+            items: items,
+            itemCount: items.length,
+            createdDate: new Date().toISOString().split('T')[0],
+            totalScore: totalScore,
+            passCriteria: passCriteria
+        };
+        appData.evaluationCriteria.push(newCriteria);
+        showToast('새 평가표가 등록되었습니다.', 'success');
+    }
+
+    switchView('evaluationCriteria');
+}
+
+function deleteEvaluationCriteriaConfirm(id) {
+    showConfirm('이 평가표를 삭제하시겠습니까?\n\n주의: 이미 사용 중인 프로세스에 영향을 줄 수 있습니다.', () => {
+        appData.evaluationCriteria = appData.evaluationCriteria.filter(c => c.id !== id);
+        showToast('평가표가 삭제되었습니다.', 'success');
+        switchView('evaluationCriteria');
+    });
 }
 
 
@@ -5774,10 +6106,16 @@ function refreshComposedStagesUnified() {
 // 워크플로우 저장
 function saveUnifiedWorkflow() {
     const name = document.getElementById('workflow-name').value.trim();
-    const degree = document.getElementById('workflow-degree').value;
+    const degreeCheckboxes = document.querySelectorAll('input[name="workflow-degree"]:checked');
+    const selectedDegrees = Array.from(degreeCheckboxes).map(cb => cb.value);
 
     if (!name) {
         alert('워크플로우 이름을 입력해주세요.');
+        return;
+    }
+
+    if (selectedDegrees.length === 0) {
+        alert('학위 과정을 최소 1개 이상 선택해주세요.');
         return;
     }
 
@@ -5786,15 +6124,22 @@ function saveUnifiedWorkflow() {
         return;
     }
 
-    // Validate review stages have evaluation templates
-    const reviewStagesWithoutTemplate = window.composedStages.filter(stage => {
-        const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
-        return stepType.type === 'review' && !stage.evaluationTemplateId;
-    });
-
-    if (reviewStagesWithoutTemplate.length > 0) {
-        alert('모든 심사 단계에 평가표를 지정해주세요.');
-        return;
+    // 유효성 검사
+    for (let i = 0; i < window.composedStages.length; i++) {
+        const stage = window.composedStages[i];
+        if (!stage.categoryId) {
+            alert(`단계 ${i + 1}: 카테고리를 선택해주세요.`);
+            return;
+        }
+        if (!stage.name.trim()) {
+            alert(`단계 ${i + 1}: 단계 이름을 입력해주세요.`);
+            return;
+        }
+        // 제출 기간은 선택사항으로 변경 - 검증 제거
+        if (stage.evaluationTemplateId && (!stage.reviewStartDate || !stage.reviewEndDate)) {
+            alert(`단계 ${i + 1}: 평가표를 선택한 경우 심사 기간을 입력해주세요.`);
+            return;
+        }
     }
 
     const isEdit = window.currentWorkflowId !== null;
@@ -5804,20 +6149,63 @@ function saveUnifiedWorkflow() {
         const workflow = mockThesisStages.find(s => s.id === window.currentWorkflowId);
         if (workflow) {
             workflow.name = name;
-            workflow.degree = degree;
+            workflow.degreeType = selectedDegrees[0]; // 첫 번째 선택값 사용
+            workflow.stageCount = window.composedStages.length;
             workflow.stages = JSON.parse(JSON.stringify(window.composedStages));
-            showToast('워크플로우가 수정되었습니다.', 'success');
+
+            // type과 evaluationRequired 필드 자동 설정 (호환성)
+            workflow.stages.forEach(stage => {
+                stage.type = stage.evaluationTemplateId ? 'review' : 'submission';
+                stage.evaluationRequired = !!stage.evaluationTemplateId;
+
+                // categoryId 기반으로 stepTypeId 설정 (호환성)
+                if (!stage.stepTypeId) {
+                    const categoryMap = {
+                        'CAT_001': 'ST001',
+                        'CAT_002': 'ST002',
+                        'CAT_003': 'ST003',
+                        'CAT_004': 'ST003',
+                        'CAT_005': 'ST004'
+                    };
+                    stage.stepTypeId = categoryMap[stage.categoryId] || 'ST004';
+                }
+            });
+
+            showToast('심사 단계가 수정되었습니다.', 'success');
         }
     } else {
         // Create new workflow
-        const newId = 'WF' + String(mockThesisStages.length + 1).padStart(3, '0');
+        const newId = 'TS' + String(mockThesisStages.length + 1).padStart(3, '0');
+        const newStages = JSON.parse(JSON.stringify(window.composedStages));
+
+        // type과 evaluationRequired 필드 자동 설정
+        newStages.forEach((stage, idx) => {
+            stage.type = stage.evaluationTemplateId ? 'review' : 'submission';
+            stage.evaluationRequired = !!stage.evaluationTemplateId;
+            stage.order = idx + 1;
+
+            // categoryId 기반으로 stepTypeId 설정 (호환성)
+            if (!stage.stepTypeId) {
+                const categoryMap = {
+                    'CAT_001': 'ST001',
+                    'CAT_002': 'ST002',
+                    'CAT_003': 'ST003',
+                    'CAT_004': 'ST003',
+                    'CAT_005': 'ST004'
+                };
+                stage.stepTypeId = categoryMap[stage.categoryId] || 'ST004';
+            }
+        });
+
         mockThesisStages.push({
             id: newId,
             name: name,
-            degree: degree,
-            stages: JSON.parse(JSON.stringify(window.composedStages))
+            degreeType: selectedDegrees[0], // 첫 번째 선택값 사용
+            stageCount: newStages.length,
+            createdDate: new Date().toISOString().split('T')[0],
+            stages: newStages
         });
-        showToast('워크플로우가 등록되었습니다.', 'success');
+        showToast('심사 단계가 등록되었습니다.', 'success');
     }
 
     // Clear global variables
@@ -5825,7 +6213,7 @@ function saveUnifiedWorkflow() {
     window.currentWorkflowId = null;
 
     // Navigate back to list
-    switchView('stageManagement');
+    switchView('typeManagement');
 }
 
 // 전역으로 노출
@@ -6541,7 +6929,7 @@ function searchNotices() {
 // ========================================
 
 /**
- * 안내문 편집 모달 열기
+ * 안내문 편집 모달 열기 (HTML 에디터)
  * @param {string} type - 'ethics', 'schedule', 'procedure'
  */
 function editGuideContent(type) {
@@ -6553,27 +6941,124 @@ function editGuideContent(type) {
         'procedure': '논문지도절차'
     };
 
-    const currentContent = guide ? guide.content.substring(0, 100) + '...' : '(내용 없음)';
+    window.currentEditingGuide = { type, guide };
 
-    const newContent = prompt(
-        `${titleMap[type]} 편집\n\n현재 내용:\n${currentContent}\n\n※ 실제로는 HTML 에디터가 표시됩니다.\n\n수정할 내용을 입력하세요 (취소하려면 빈 값):`,
-        ''
-    );
+    // 모달 HTML 생성
+    const modalHtml = `
+        <div id="guide-editor-modal" class="modal-overlay" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="modal-content" style="background: white; border-radius: 8px; width: 90%; max-width: 1200px; max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;">
+                <!-- Header -->
+                <div style="padding: 24px; border-bottom: 1px solid #e5e7eb;">
+                    <h2 style="font-size: 1.5rem; font-weight: bold; color: #1f2937;">${titleMap[type]} 편집</h2>
+                    <p style="font-size: 0.875rem; color: #6b7280; margin-top: 4px;">HTML 형식으로 내용을 작성할 수 있습니다.</p>
+                </div>
 
-    if (newContent !== null && newContent.trim() !== '') {
-        // 임시로 간단한 업데이트
-        if (guide) {
-            guide.content = `<div class="prose max-w-none"><p>${newContent}</p></div>`;
-            guide.lastUpdatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
-            guide.lastUpdatedByName = '관리자';
+                <!-- Editor Area -->
+                <div style="padding: 24px; flex: 1; overflow-y: auto;">
+                    <textarea id="guide-content-editor" style="width: 100%; min-height: 500px; border: 1px solid #d1d5db; border-radius: 4px; padding: 12px; font-family: monospace; font-size: 14px;">${guide ? guide.content : ''}</textarea>
+                </div>
 
-            alert('저장되었습니다.');
+                <!-- Footer -->
+                <div style="padding: 16px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px;">
+                    <button onclick="closeGuideEditorModal()" style="padding: 8px 16px; border: 1px solid #d1d5db; border-radius: 6px; background: white; cursor: pointer;">
+                        취소
+                    </button>
+                    <button onclick="previewGuideContent()" style="padding: 8px 16px; border: 1px solid #009DE8; border-radius: 6px; background: white; color: #009DE8; cursor: pointer;">
+                        미리보기
+                    </button>
+                    <button onclick="saveGuideContent()" style="padding: 8px 16px; border: none; border-radius: 6px; background: #009DE8; color: white; cursor: pointer;">
+                        저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
 
-            // 화면 새로고침
-            if (type === 'ethics') switchView('ethicsGuide');
-            else if (type === 'schedule') switchView('scheduleGuide');
-            else if (type === 'procedure') switchView('processGuide');
-        }
+    // 모달 추가
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // 포커스
+    document.getElementById('guide-content-editor').focus();
+}
+
+/**
+ * 안내문 에디터 모달 닫기
+ */
+function closeGuideEditorModal() {
+    const modal = document.getElementById('guide-editor-modal');
+    if (modal) {
+        modal.remove();
+    }
+    window.currentEditingGuide = null;
+}
+
+/**
+ * 안내문 미리보기
+ */
+function previewGuideContent() {
+    const editor = document.getElementById('guide-content-editor');
+    const content = editor.value;
+
+    // 미리보기 창 열기
+    const previewWindow = window.open('', '안내문 미리보기', 'width=800,height=600');
+    previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>미리보기</title>
+            <script src="https://cdn.tailwindcss.com"></script>
+            <style>
+                body { padding: 20px; }
+                .prose { max-width: none; }
+                .prose h2 { font-size: 1.5rem; font-weight: bold; margin-top: 1.5rem; margin-bottom: 1rem; }
+                .prose h3 { font-size: 1.25rem; font-weight: bold; margin-top: 1.25rem; margin-bottom: 0.75rem; }
+                .prose h4 { font-size: 1.125rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem; }
+                .prose p { margin-bottom: 1rem; line-height: 1.6; }
+                .prose ul, .prose ol { margin-left: 1.5rem; margin-bottom: 1rem; }
+                .prose li { margin-bottom: 0.5rem; }
+                .prose table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+                .prose th, .prose td { border: 1px solid #d1d5db; padding: 0.5rem 1rem; }
+                .prose th { background: #f3f4f6; font-weight: 600; }
+                .prose a { color: #009DE8; text-decoration: underline; }
+                .prose strong { font-weight: bold; }
+            </style>
+        </head>
+        <body>
+            <div class="prose max-w-none">
+                ${content}
+            </div>
+        </body>
+        </html>
+    `);
+    previewWindow.document.close();
+}
+
+/**
+ * 안내문 저장
+ */
+function saveGuideContent() {
+    if (!window.currentEditingGuide) return;
+
+    const editor = document.getElementById('guide-content-editor');
+    const content = editor.value;
+
+    const { type, guide } = window.currentEditingGuide;
+
+    if (guide) {
+        guide.content = content;
+        guide.lastUpdatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        guide.lastUpdatedByName = '관리자';
+
+        alert('저장되었습니다.');
+
+        // 모달 닫기
+        closeGuideEditorModal();
+
+        // 화면 새로고침
+        if (type === 'ethics') switchView('ethicsGuide');
+        else if (type === 'schedule') switchView('scheduleGuide');
+        else if (type === 'procedure') switchView('processGuide');
     }
 }
 
@@ -6583,3 +7068,6 @@ window.viewNoticeDetail = viewNoticeDetail;
 window.deleteNotice = deleteNotice;
 window.searchNotices = searchNotices;
 window.editGuideContent = editGuideContent;
+window.closeGuideEditorModal = closeGuideEditorModal;
+window.previewGuideContent = previewGuideContent;
+window.saveGuideContent = saveGuideContent;

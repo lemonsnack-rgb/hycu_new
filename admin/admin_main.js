@@ -31,13 +31,14 @@ function switchView(viewName, param = null) {
         scheduleManagement: '논문지도 일정 관리',
         requirementManagement: '논문 제출 요건 관리',
         stageManagement: '논문지도 단계 관리',
-        typeManagement: '지도 단계 유형 관리',
+        typeManagement: '심사 단계 등록',
         committeeAssignment: '심사위원 배정',
-        evaluationCriteria: '평가 기준 관리',
+        evaluationCriteria: '심사 기준 등록',
+        evaluationCriteriaEdit: '심사 기준 등록',
         advisorAssignment: '지도교수 배정',
         workflowCreate: '워크플로우 등록',
         workflowStageCompose: '워크플로우 단계 구성',
-        workflowCreateUnified: '워크플로우 등록',
+        workflowCreateUnified: '심사 단계 등록',
         userManagement: '사용자 관리',
         roleManagement: '역할 관리',
         permissionManagement: '권한 관리',
@@ -55,6 +56,14 @@ function switchView(viewName, param = null) {
         document.getElementById('content-area').innerHTML = views[viewName](param);
     } else {
         document.getElementById('content-area').innerHTML = views[viewName]();
+    }
+
+    // 뷰별 후처리 (렌더링 후 추가 작업)
+    if (viewName === 'stageManagement') {
+        // 단계 관리 화면이 렌더링된 후 컨텐츠 로드
+        setTimeout(() => {
+            renderStageManagementContent();
+        }, 0);
     }
 }
 
@@ -3523,19 +3532,22 @@ function viewProposalDetail(proposalId) {
                         </div>
                     ` : ''}
                 </div>
+
+                <!-- 연구계획서 출력 버튼 -->
+                <div class="mt-6 flex justify-end">
+                    <button onclick="loadProposalForm('${proposal.id}')"
+                            class="px-6 py-3 bg-[#009DE8] text-white rounded-lg hover:bg-[#0087c9] flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        연구계획서 출력하기
+                    </button>
+                </div>
             </div>
 
             <!-- 지도교수 배정 현황 -->
             <div class="px-8 py-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">지도교수 배정 현황</h2>
-                    ${assignment ? '' : `
-                        <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'both')"
-                                class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark">
-                            지도교수 배정
-                        </button>
-                    `}
-                </div>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">지도교수 배정 현황</h2>
 
                 ${assignment ? `
                     <div class="space-y-3">
@@ -3558,17 +3570,23 @@ function viewProposalDetail(proposalId) {
                                 }
                             </span>
                         </div>
-
-                        <div class="flex justify-end mt-4">
-                            <button onclick="assignAdvisor('${proposal.studentId}', '${proposal.id}', 'both')"
-                                    class="px-4 py-2 border border-primary text-primary rounded-lg hover:bg-primary hover:text-white">
-                                재배정
-                            </button>
-                        </div>
                     </div>
                 ` : `
                     <p class="text-gray-500 text-center py-8">지도교수가 배정되지 않았습니다.</p>
                 `}
+
+                <!-- 안내 메시지 -->
+                <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4">
+                    <div class="flex">
+                        <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div class="text-sm text-blue-700">
+                            <p>지도교수 배정은 학교 시스템에서 관리됩니다.</p>
+                            <p class="mt-1">이 화면은 조회 전용이며, 배정 데이터는 학교 시스템에서 자동으로 불러옵니다.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     `;
@@ -3579,51 +3597,8 @@ function viewProposalDetail(proposalId) {
 }
 
 // ==============================================
-// 지도 학생 관리 탭 전환 함수
+// 논문 지도 단계 관리 함수
 // ==============================================
-
-// 현재 활성 탭 추적
-let currentStudentManagementTab = 'assignment';
-
-// 탭 전환 함수
-function switchStudentManagementTab(tabName) {
-    console.log('탭 전환:', tabName);
-
-    // 이전 탭 비활성화
-    const allTabs = document.querySelectorAll('.student-tab');
-    const allContents = document.querySelectorAll('.tab-content');
-
-    allTabs.forEach(tab => {
-        tab.classList.remove('active');
-        tab.style.borderBottomColor = 'transparent';
-        tab.style.color = '#6b7280';
-    });
-
-    allContents.forEach(content => {
-        content.classList.remove('active');
-        content.style.display = 'none';
-    });
-
-    // 새 탭 활성화
-    const activeTab = document.getElementById(`tab-${tabName}`);
-    const activeContent = document.getElementById(`tab-content-${tabName}`);
-
-    if (activeTab && activeContent) {
-        activeTab.classList.add('active');
-        activeTab.style.borderBottomColor = '#dc2626';
-        activeTab.style.color = '#dc2626';
-
-        activeContent.classList.add('active');
-        activeContent.style.display = 'block';
-
-        currentStudentManagementTab = tabName;
-
-        // 단계 관리 탭이면 컨텐츠 렌더링
-        if (tabName === 'stage') {
-            renderStageManagementContent();
-        }
-    }
-}
 
 // 단계 관리 컨텐츠 렌더링
 function renderStageManagementContent() {
@@ -4815,10 +4790,35 @@ function openProposalSubmitModal(degreeType) {
     showNotification(`${degreeType} 연구계획서 제출 모달 구현 예정`, 'info');
 }
 
+// 연구계획서 폼 불러오기 (새 창)
+function loadProposalForm(proposalId) {
+    console.log('연구계획서 폼 불러오기:', proposalId);
+
+    // Mock 데이터에서 연구계획서 찾기
+    const proposal = mockResearchProposals.find(p => p.id === proposalId);
+
+    if (!proposal) {
+        showNotification('연구계획서를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // formUrl이 있으면 새 창으로 열기
+    if (proposal.formUrl) {
+        const formWindow = window.open(proposal.formUrl, '_blank', 'width=1024,height=768');
+        if (!formWindow) {
+            showNotification('팝업 차단이 활성화되어 있습니다. 팝업 차단을 해제해주세요.', 'warning');
+        }
+    } else {
+        // formUrl이 없으면 안내 메시지
+        showNotification('학교 시스템에 등록된 연구계획서 폼이 없습니다.', 'info');
+    }
+}
+
 // Export
 window.showStudentInfo = showStudentInfo;
 window.closeStudentInfoModal = closeStudentInfoModal;
 window.viewProposalDetail = viewProposalDetail;
+window.loadProposalForm = loadProposalForm;
 window.assignAdvisor = assignAdvisor;
 window.closeAdvisorAssignmentModal = closeAdvisorAssignmentModal;
 window.renderAdvisorAssignmentModal = renderAdvisorAssignmentModal;
@@ -4831,3 +4831,371 @@ window.saveAdvisorAssignment = saveAdvisorAssignment;
 window.openProposalSubmitModal = openProposalSubmitModal;
 
 console.log('✅ 지도 학생 관리 기능 로드 완료');
+
+// ========================================
+// 신규 단계 카드 관리 함수
+// ========================================
+
+// 단계 카드 렌더링 함수
+function renderStageCards() {
+    if (!window.composedStages || window.composedStages.length === 0) {
+        return '<p class="text-gray-500 text-center py-8">단계가 없습니다.</p>';
+    }
+
+    return window.composedStages.map((stage, index) => renderStageCard(stage, index)).join('');
+}
+
+// 개별 단계 카드 렌더링
+function renderStageCard(stage, index) {
+    const category = mockStageCategories.find(c => c.id === stage.categoryId);
+    const categoryName = category ? category.name : '선택해주세요';
+    const categoryColor = category ? category.color : '#6B7280';
+
+    const isFirst = index === 0;
+    const isLast = index === window.composedStages.length - 1;
+
+    // 평가표 선택 여부에 따라 심사 기간 활성화/비활성화
+    const reviewDisabled = !stage.evaluationTemplateId;
+
+    return `
+        <div class="border border-gray-300 rounded-lg p-4 bg-white shadow-sm" data-stage-index="${index}">
+            <!-- 카드 헤더 -->
+            <div class="flex items-center justify-between mb-4 pb-3 border-b">
+                <div class="flex items-center gap-2">
+                    <span class="font-bold text-lg text-gray-800">단계 ${index + 1}</span>
+                    <div class="w-3 h-3 rounded-full" style="background-color: ${categoryColor}"></div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="deleteStageCard(${index})"
+                            class="text-red-600 hover:text-red-800 text-sm px-2 py-1">
+                        삭제
+                    </button>
+                    <button onclick="moveStageUp(${index})"
+                            ${isFirst ? 'disabled' : ''}
+                            class="text-gray-600 hover:text-gray-800 text-sm px-2 py-1 ${isFirst ? 'opacity-30 cursor-not-allowed' : ''}">
+                        ↑
+                    </button>
+                    <button onclick="moveStageDown(${index})"
+                            ${isLast ? 'disabled' : ''}
+                            class="text-gray-600 hover:text-gray-800 text-sm px-2 py-1 ${isLast ? 'opacity-30 cursor-not-allowed' : ''}">
+                        ↓
+                    </button>
+                </div>
+            </div>
+
+            <!-- 카테고리 선택 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">카테고리 *</label>
+                <select onchange="updateStageField(${index}, 'categoryId', this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">선택해주세요</option>
+                    ${mockStageCategories.map(cat => `
+                        <option value="${cat.id}" ${stage.categoryId === cat.id ? 'selected' : ''}>
+                            ${cat.name}
+                        </option>
+                    `).join('')}
+                    <option value="__ADD_NEW__" style="color: #0066cc; font-weight: 500;">+ 새 카테고리 추가...</option>
+                </select>
+                <div id="new-category-input-${index}" style="display: none;" class="mt-2">
+                    <input type="text"
+                           id="new-category-name-${index}"
+                           placeholder="카테고리 이름 입력"
+                           class="w-full px-3 py-2 border border-blue-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <div class="flex gap-2 mt-2">
+                        <button onclick="saveNewCategory(${index})"
+                                class="px-3 py-1 bg-[#009DE8] text-white text-sm rounded hover:bg-opacity-90">
+                            추가
+                        </button>
+                        <button onclick="cancelNewCategory(${index})"
+                                class="px-3 py-1 bg-gray-300 text-gray-700 text-sm rounded hover:bg-gray-400">
+                            취소
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 단계 이름 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">단계 이름 *</label>
+                <input type="text"
+                       value="${stage.name}"
+                       onchange="updateStageField(${index}, 'name', this.value)"
+                       placeholder="예: 1차 예비심사"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
+
+            <!-- 제출 요건 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">제출 요건</label>
+                <div class="flex items-center gap-4">
+                    <label class="flex items-center">
+                        <input type="checkbox"
+                               ${stage.requiresDocument ? 'checked' : ''}
+                               onchange="updateStageField(${index}, 'requiresDocument', this.checked)"
+                               class="mr-2 w-4 h-4">
+                        문서 제출 필요
+                    </label>
+                    <label class="flex items-center">
+                        <input type="checkbox"
+                               ${stage.requiresPresentation ? 'checked' : ''}
+                               onchange="updateStageField(${index}, 'requiresPresentation', this.checked)"
+                               class="mr-2 w-4 h-4">
+                        발표 필요
+                    </label>
+                </div>
+            </div>
+
+            <!-- 제출 기간 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">제출 기간</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">시작일</label>
+                        <input type="date"
+                               value="${stage.submissionStartDate}"
+                               onchange="updateStageField(${index}, 'submissionStartDate', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">마감일</label>
+                        <input type="date"
+                               value="${stage.submissionEndDate}"
+                               onchange="updateStageField(${index}, 'submissionEndDate', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 평가표 선택 -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">평가표</label>
+                <select onchange="updateStageEvaluationTemplate(${index}, this.value)"
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="">평가 없음</option>
+                    ${mockEvaluationTemplates.map(template => `
+                        <option value="${template.id}" ${stage.evaluationTemplateId === template.id ? 'selected' : ''}>
+                            ${template.name}
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+
+            <!-- 심사 기간 (평가표 선택 시에만 활성화) -->
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">심사 기간</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">시작일</label>
+                        <input type="date"
+                               value="${stage.reviewStartDate}"
+                               ${reviewDisabled ? 'disabled' : ''}
+                               onchange="updateStageField(${index}, 'reviewStartDate', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${reviewDisabled ? 'bg-gray-100 cursor-not-allowed' : ''}">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 mb-1 block">마감일</label>
+                        <input type="date"
+                               value="${stage.reviewEndDate}"
+                               ${reviewDisabled ? 'disabled' : ''}
+                               onchange="updateStageField(${index}, 'reviewEndDate', this.value)"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${reviewDisabled ? 'bg-gray-100 cursor-not-allowed' : ''}">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 설명 (선택사항) -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">설명 (선택사항)</label>
+                <textarea onchange="updateStageField(${index}, 'description', this.value)"
+                          placeholder="단계에 대한 추가 설명"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          rows="2">${stage.description || ''}</textarea>
+            </div>
+        </div>
+    `;
+}
+
+// 단계 추가
+function addNewStageCard() {
+    const newOrder = window.composedStages.length + 1;
+    window.composedStages.push({
+        id: 'STAGE_NEW_' + Date.now(),
+        order: newOrder,
+        categoryId: '',
+        name: '',
+        requiresDocument: false,
+        requiresPresentation: false,
+        submissionStartDate: '',
+        submissionEndDate: '',
+        evaluationTemplateId: '',
+        reviewStartDate: '',
+        reviewEndDate: '',
+        description: ''
+    });
+    refreshStageCards();
+}
+
+// 단계 삭제
+function deleteStageCard(index) {
+    if (window.composedStages.length === 1) {
+        alert('최소 1개 이상의 단계가 필요합니다.');
+        return;
+    }
+
+    if (confirm(`단계 ${index + 1}을(를) 삭제하시겠습니까?`)) {
+        window.composedStages.splice(index, 1);
+        // order 재정렬
+        window.composedStages.forEach((stage, idx) => {
+            stage.order = idx + 1;
+        });
+        refreshStageCards();
+    }
+}
+
+// 단계 위로 이동
+function moveStageUp(index) {
+    if (index === 0) return;
+
+    const temp = window.composedStages[index];
+    window.composedStages[index] = window.composedStages[index - 1];
+    window.composedStages[index - 1] = temp;
+
+    // order 재정렬
+    window.composedStages.forEach((stage, idx) => {
+        stage.order = idx + 1;
+    });
+
+    refreshStageCards();
+}
+
+// 단계 아래로 이동
+function moveStageDown(index) {
+    if (index === window.composedStages.length - 1) return;
+
+    const temp = window.composedStages[index];
+    window.composedStages[index] = window.composedStages[index + 1];
+    window.composedStages[index + 1] = temp;
+
+    // order 재정렬
+    window.composedStages.forEach((stage, idx) => {
+        stage.order = idx + 1;
+    });
+
+    refreshStageCards();
+}
+
+// 단계 필드 업데이트
+function updateStageField(index, field, value) {
+    if (window.composedStages[index]) {
+        // 카테고리 추가 옵션 선택 시
+        if (field === 'categoryId' && value === '__ADD_NEW__') {
+            const inputDiv = document.getElementById(`new-category-input-${index}`);
+            const selectElem = event.target;
+            if (inputDiv) {
+                inputDiv.style.display = 'block';
+                document.getElementById(`new-category-name-${index}`).focus();
+            }
+            // 선택을 이전 값으로 되돌림
+            selectElem.value = window.composedStages[index].categoryId || '';
+            return;
+        }
+        window.composedStages[index][field] = value;
+    }
+}
+
+// 평가표 업데이트 (심사 기간 활성화/비활성화 처리)
+function updateStageEvaluationTemplate(index, templateId) {
+    if (window.composedStages[index]) {
+        window.composedStages[index].evaluationTemplateId = templateId;
+
+        // 평가표가 없으면 심사 기간 초기화
+        if (!templateId) {
+            window.composedStages[index].reviewStartDate = '';
+            window.composedStages[index].reviewEndDate = '';
+        }
+
+        refreshStageCards();
+    }
+}
+
+// 단계 카드 새로고침
+function refreshStageCards() {
+    const container = document.getElementById('stage-cards-container');
+    if (container) {
+        container.innerHTML = renderStageCards();
+    }
+
+    // 저장 버튼 텍스트 업데이트
+    const saveBtn = document.getElementById('unified-save-btn');
+    if (saveBtn) {
+        saveBtn.textContent = '저장';
+    }
+}
+
+// 전역 함수로 export
+window.renderStageCards = renderStageCards;
+window.renderStageCard = renderStageCard;
+window.addNewStageCard = addNewStageCard;
+window.deleteStageCard = deleteStageCard;
+window.moveStageUp = moveStageUp;
+window.moveStageDown = moveStageDown;
+window.updateStageField = updateStageField;
+window.updateStageEvaluationTemplate = updateStageEvaluationTemplate;
+window.refreshStageCards = refreshStageCards;
+
+console.log('✅ 신규 단계 카드 관리 함수 로드 완료');
+
+// ====================================================================
+// 인라인 카테고리 추가 함수
+// ====================================================================
+
+function saveNewCategory(stageIndex) {
+    const input = document.getElementById(`new-category-name-${stageIndex}`);
+    const name = input.value.trim();
+
+    if (!name) {
+        alert('카테고리 이름을 입력해주세요.');
+        input.focus();
+        return;
+    }
+
+    // 중복 확인
+    const duplicate = mockStageCategories.find(c => c.name === name);
+    if (duplicate) {
+        alert('이미 존재하는 카테고리입니다.');
+        input.focus();
+        return;
+    }
+
+    // 새 카테고리 추가
+    const newId = 'CAT_' + String(mockStageCategories.length + 1).padStart(3, '0');
+    mockStageCategories.push({
+        id: newId,
+        name: name
+    });
+
+    // 현재 단계에 새 카테고리 적용
+    window.composedStages[stageIndex].categoryId = newId;
+
+    // UI 숨기기
+    document.getElementById(`new-category-input-${stageIndex}`).style.display = 'none';
+    input.value = '';
+
+    // 카드 새로고침
+    refreshStageCards();
+    showToast('새 카테고리가 추가되었습니다.', 'success');
+}
+
+function cancelNewCategory(stageIndex) {
+    const inputDiv = document.getElementById(`new-category-input-${stageIndex}`);
+    const input = document.getElementById(`new-category-name-${stageIndex}`);
+
+    inputDiv.style.display = 'none';
+    input.value = '';
+}
+
+// 전역으로 노출
+window.saveNewCategory = saveNewCategory;
+window.cancelNewCategory = cancelNewCategory;
+
+console.log('✅ 인라인 카테고리 추가 함수 로드 완료');

@@ -1549,15 +1549,15 @@ const views = {
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">논문지도 워크플로우 관리 (레고 조립)</h3>
+                        <h3 class="text-lg font-bold text-gray-800">심사 단계 관리</h3>
                         <button onclick="switchView('workflowCreateUnified')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 워크플로우 추가
+                            + 심사 단계 추가
                         </button>
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
                         <p class="text-sm text-blue-800">
                             <i class="fas fa-info-circle mr-2"></i>
-                            단계 유형(레고 블록)을 조합하여 학위별 논문 작성 워크플로우를 구성합니다.
+                            학위별 논문 심사 단계를 구성하고 관리합니다.
                         </p>
                     </div>
                 </div>
@@ -1566,7 +1566,7 @@ const views = {
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">워크플로우명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 단계명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
@@ -1965,8 +1965,8 @@ const views = {
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">평가 기준 관리</h3>
-                        <button onclick="addEvaluationCriteria()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        <h3 class="text-lg font-bold text-gray-800">심사 기준 등록</h3>
+                        <button onclick="switchView('evaluationCriteriaEdit')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                             + 평가표 추가
                         </button>
                     </div>
@@ -1984,14 +1984,10 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가표명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유형</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가항목 수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => {
-                                const itemCount = Array.isArray(item.items) ? item.items.length : 0;
-
                                 // 유형 표시 로직 개선 (evaluationType 사용)
                                 let typeClass, typeName;
                                 const evalType = item.evaluationType || 'score';
@@ -2007,7 +2003,7 @@ const views = {
                                 }
 
                                 return `
-                                    <tr class="hover:bg-gray-50">
+                                    <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('evaluationCriteriaEdit', '${item.id}')">
                                         <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                         <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">
@@ -2015,30 +2011,230 @@ const views = {
                                                 ${typeName}
                                             </span>
                                         </td>
-                                        <td class="py-3 px-4 text-sm text-center">
-                                            <span class="font-semibold text-blue-600">${itemCount}개</span>
-                                        </td>
-                                        <td class="py-3 px-4">
-                                            <div class="flex gap-2">
-                                                <button onclick="viewEvaluationDetail(${item.id})"
-                                                        class="text-blue-600 hover:underline text-sm">
-                                                    관리
-                                                </button>
-                                                <button onclick="previewEvaluationForm(${item.id})"
-                                                        class="text-purple-600 hover:underline text-sm">
-                                                    미리보기
-                                                </button>
-                                                <button onclick="deleteEvaluationCriteria(${item.id})"
-                                                        class="text-red-600 hover:underline text-sm">
-                                                    삭제
-                                                </button>
-                                            </div>
-                                        </td>
                                     </tr>
                                 `;
                             }).join('')}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 심사 기준 등록 - 상세/편집 (통합) ==========
+    evaluationCriteriaEdit: (param) => {
+        const criteriaId = param ? parseInt(param) : null;
+        const isEdit = criteriaId !== null;
+        const criteria = isEdit ? appData.evaluationCriteria.find(c => c.id === criteriaId) : null;
+
+        // 디버깅
+        if (isEdit && criteria) {
+            console.log('Edit mode - criteria:', criteria);
+            console.log('Items:', criteria.items);
+            console.log('PassCriteria:', criteria.passCriteria);
+        }
+
+        // 초기값 설정
+        const name = isEdit && criteria ? criteria.name : '';
+        const description = isEdit && criteria ? criteria.description : '';
+        const evaluationType = isEdit && criteria ? criteria.evaluationType : 'score';
+        const items = isEdit && criteria && Array.isArray(criteria.items) ? criteria.items : [];
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">${isEdit ? '심사 기준 수정' : '심사 기준 등록'}</h3>
+                        <div class="flex gap-2">
+                            <button onclick="switchView('evaluationCriteria')" class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50 text-sm">
+                                취소
+                            </button>
+                            <button onclick="saveEvaluationCriteria(${criteriaId})" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                                저장
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6">
+                    <!-- 평가표 기본 정보 -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-md font-semibold text-gray-800 mb-4">평가표 기본 정보</h4>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    평가표명 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="text" id="edit-criteria-name" value="${name}"
+                                       placeholder="예: 일반 연구계획서 평가표"
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    평가표 유형 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="edit-criteria-type" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" ${isEdit ? 'disabled' : ''}>
+                                    <option value="score" ${evaluationType === 'score' ? 'selected' : ''}>점수형 - 점수로 평가 (예: 100점 만점)</option>
+                                    <option value="passfail" ${evaluationType === 'passfail' ? 'selected' : ''}>Pass/Fail형 - 합격/불합격으로 평가</option>
+                                </select>
+                                ${isEdit ? '<p class="text-xs text-gray-500 mt-1">평가표 유형은 수정할 수 없습니다.</p>' : '<p class="text-xs text-gray-500 mt-1">선택한 유형에 따라 평가 항목의 입력 방식이 달라집니다.</p>'}
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">
+                                    설명 <span class="text-red-600">*</span>
+                                </label>
+                                <textarea id="edit-criteria-description" rows="3"
+                                          placeholder="이 평가표의 용도와 특징을 설명해주세요"
+                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${description}</textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 통과 기준 (점수형만) -->
+                    ${evaluationType === 'score' ? `
+                        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                            <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
+                            <div class="grid grid-cols-1 gap-4">
+                                <div class="grid grid-cols-3 gap-3 items-end">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            총 심사위원 수 <span class="text-red-600">*</span>
+                                        </label>
+                                        <input type="number" id="pass-total-committee"
+                                               value="${isEdit && criteria?.passCriteria?.totalCommittee !== undefined ? criteria.passCriteria.totalCommittee : 3}"
+                                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                               min="1" placeholder="예: 3">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            통과 필요 인원 <span class="text-red-600">*</span>
+                                        </label>
+                                        <input type="number" id="pass-required-committee"
+                                               value="${isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2}"
+                                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                               min="1" placeholder="예: 2">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-700 mb-1">
+                                            최소 점수 <span class="text-red-600">*</span>
+                                        </label>
+                                        <input type="number" id="pass-min-score"
+                                               value="${isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70}"
+                                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                               min="0" max="100" placeholder="예: 70">
+                                    </div>
+                                </div>
+                                <div class="bg-blue-50 border border-blue-200 rounded p-3">
+                                    <p class="text-sm text-blue-800">
+                                        <i class="fas fa-info-circle mr-2"></i>
+                                        예시: 총 심사위원 3명 중 2명 이상이 70점 이상을 줘야 통과
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    ` : ''}
+
+                    <!-- 총점 표시 (점수형만) -->
+                    ${evaluationType === 'score' ? `
+                        <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center">
+                                    <i class="fas fa-calculator text-blue-600 mr-3 text-xl"></i>
+                                    <span class="text-sm font-medium text-gray-700">총점:</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="total-score-display" class="text-2xl font-bold text-blue-600">
+                                        ${items.reduce((sum, item) => sum + (item.score || 0), 0)}
+                                    </span>
+                                    <span class="text-sm text-gray-600">점</span>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-600 mt-2">
+                                <i class="fas fa-info-circle mr-1"></i>
+                                총점은 반드시 100점이어야 합니다.
+                            </p>
+                        </div>
+                    ` : ''}
+
+                    <!-- 평가 항목 -->
+                    <div class="mb-6">
+                        <div class="mb-4">
+                            <h4 class="text-md font-semibold text-gray-800">평가 항목</h4>
+                        </div>
+                        <div id="evaluation-items-container">
+                            ${items.length > 0 ? items.map((item, idx) => {
+                                if (evaluationType === 'score') {
+                                    return `
+                                        <div class="evaluation-item mb-3 p-4 bg-white border border-gray-200 rounded-lg" data-item-id="${item.id}">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <h5 class="text-sm font-semibold text-gray-700">항목 ${idx + 1}</h5>
+                                                <button onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm">
+                                                    <i class="fas fa-trash"></i> 삭제
+                                                </button>
+                                            </div>
+                                            <div class="grid grid-cols-1 gap-3">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">항목명 <span class="text-red-600">*</span></label>
+                                                    <input type="text" class="item-name w-full border border-gray-300 rounded px-2 py-1 text-sm" value="${(item.name || '').replace(/"/g, '&quot;')}" placeholder="평가 항목명" required>
+                                                </div>
+                                                <div class="grid grid-cols-2 gap-3">
+                                                    <div>
+                                                        <label class="block text-xs font-medium text-gray-700 mb-1">배점 <span class="text-red-600">*</span></label>
+                                                        <input type="number" class="item-score w-full border border-gray-300 rounded px-2 py-1 text-sm" value="${item.score || 0}" placeholder="점수" min="0" required onchange="updateTotalScore()">
+                                                    </div>
+                                                    <div>
+                                                        <div class="flex items-center mb-1">
+                                                            <input type="checkbox" class="item-fail-enabled mr-2" ${item.failScore !== undefined && item.failScore !== null ? 'checked' : ''} onchange="toggleFailScore(this)">
+                                                            <label class="text-xs font-medium text-gray-700">과락기준 설정</label>
+                                                        </div>
+                                                        <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-2 py-1 text-sm ${item.failScore !== undefined && item.failScore !== null ? '' : 'bg-gray-100'}" value="${item.failScore !== undefined && item.failScore !== null ? item.failScore : ''}" placeholder="최소 점수" min="0" ${item.failScore !== undefined && item.failScore !== null ? '' : 'disabled'}>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">설명 <span class="text-red-600">*</span></label>
+                                                    <textarea class="item-description w-full border border-gray-300 rounded px-2 py-1 text-sm" rows="2" placeholder="항목 설명" required>${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                } else {
+                                    return `
+                                        <div class="evaluation-item mb-3 p-4 bg-white border border-gray-200 rounded-lg" data-item-id="${item.id}">
+                                            <div class="flex justify-between items-start mb-3">
+                                                <h5 class="text-sm font-semibold text-gray-700">항목 ${idx + 1}</h5>
+                                                <button onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm">
+                                                    <i class="fas fa-trash"></i> 삭제
+                                                </button>
+                                            </div>
+                                            <div class="grid grid-cols-1 gap-3">
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">항목명 <span class="text-red-600">*</span></label>
+                                                    <input type="text" class="item-name w-full border border-gray-300 rounded px-2 py-1 text-sm" value="${(item.name || '').replace(/"/g, '&quot;')}" placeholder="평가 항목명" required>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-1">설명 <span class="text-red-600">*</span></label>
+                                                    <textarea class="item-description w-full border border-gray-300 rounded px-2 py-1 text-sm" rows="2" placeholder="항목 설명" required>${(item.description || '').replace(/</g, '&lt;').replace(/>/g, '&gt;')}</textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    `;
+                                }
+                            }).join('') : '<p class="text-sm text-gray-500 text-center py-4">평가 항목을 추가해주세요.</p>'}
+                        </div>
+                        <div class="mt-4 text-center">
+                            <button onclick="addEvaluationItem()" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 text-sm">
+                                <i class="fas fa-plus mr-2"></i>항목 추가
+                            </button>
+                        </div>
+                    </div>
+
+                    ${isEdit && criteria ? `
+                        <div class="flex justify-end gap-2 pt-4 border-t">
+                            <button onclick="deleteEvaluationCriteriaConfirm(${criteriaId})" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
+                                <i class="fas fa-trash mr-1"></i> 평가표 삭제
+                            </button>
+                        </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -2454,26 +2650,9 @@ const views = {
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800">지도 학생 관리</h2>
-                    <p class="text-sm text-gray-600 mt-1">교수 배정 및 단계 관리를 수행합니다.</p>
+                    <h2 class="text-xl font-bold text-gray-800">지도교수 배정</h2>
+                    <p class="text-sm text-gray-600 mt-1">학생의 지도교수 배정 현황을 조회합니다.</p>
                 </div>
-
-                <!-- 탭 네비게이션 -->
-                <div class="border-b border-gray-200">
-                    <nav class="flex -mb-px">
-                        <button id="tab-assignment" onclick="switchStudentManagementTab('assignment')"
-                                class="student-tab active px-6 py-3 border-b-2 border-primary text-primary font-medium text-sm">
-                            교수 배정
-                        </button>
-                        <button id="tab-stage" onclick="switchStudentManagementTab('stage')"
-                                class="student-tab px-6 py-3 border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 font-medium text-sm">
-                            단계 관리
-                        </button>
-                    </nav>
-                </div>
-
-                <!-- 교수 배정 탭 -->
-                <div id="tab-content-assignment" class="tab-content active">
 
                 <!-- 검색 옵션 (학위논문 심사와 동일한 디자인) -->
                 <div class="p-6 border-b">
@@ -2569,7 +2748,6 @@ const views = {
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
                                 </tr>
                             </thead>
                             <tbody id="advisor-assignment-table" class="bg-white divide-y divide-gray-200">
@@ -2608,12 +2786,6 @@ const views = {
                                                 ? item.assignment.coAdvisors.map(c => c.name).join(', ')
                                                 : '-'}
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-500">
-                                            <button onclick="event.stopPropagation(); assignAdvisor('${item.studentId}', '${item.id}', 'both')"
-                                                    class="text-xs px-3 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white">
-                                                ${item.assignment && (item.assignment.mainAdvisor || item.assignment.coAdvisors.length > 0) ? '재배정' : '배정'}
-                                            </button>
-                                        </td>
                                     </tr>
                                 `).join('')}
                             </tbody>
@@ -2626,29 +2798,91 @@ const views = {
                         </div>
                     ` : ''}
                 </div>
-                </div>
-                <!-- End 교수 배정 탭 -->
-
-                <!-- 단계 관리 탭 -->
-                <div id="tab-content-stage" class="tab-content" style="display: none;">
-                    <div id="stage-management-content"></div>
-                </div>
-                <!-- End 단계 관리 탭 -->
 
             </div>
+        `;
+    },
 
-            <style>
-            .student-tab.active {
-                border-bottom-color: #dc2626;
-                color: #dc2626;
-            }
-            .tab-content {
-                display: none;
-            }
-            .tab-content.active {
-                display: block;
-            }
-            </style>
+    // 논문 지도 단계 관리 화면
+    stageManagement: () => {
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b border-gray-200">
+                    <h2 class="text-xl font-bold text-gray-800">논문 지도 단계 관리</h2>
+                    <p class="text-sm text-gray-600 mt-1">학생들의 논문 지도 단계를 관리하고 일괄 이관을 수행합니다.</p>
+                </div>
+
+                <!-- 단계 관리 컨텐츠 영역 -->
+                <div id="stage-management-content"></div>
+
+            </div>
+        `;
+    },
+
+    // 워크플로우 관리 (심사 단계 등록)
+    typeManagement: () => {
+        const data = mockThesisStages;
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-bold text-gray-800">심사 단계 관리</h3>
+                        <button onclick="switchView('workflowCreateUnified')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                            + 심사 단계 추가
+                        </button>
+                    </div>
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                        <p class="text-sm text-blue-800">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            학위별 논문 심사 단계를 구성하고 관리합니다. 행을 클릭하여 상세 내용을 확인하세요.
+                        </p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 단계명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${data.map((item, idx) => {
+                                const degreeLabel = item.degreeType === 'master' ? '석사' : '박사';
+
+                                return `
+                                <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('workflowCreateUnified', '${item.id}')">
+                                    <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
+                                    <td class="py-3 px-4 text-sm">
+                                        <span class="px-2 py-1 rounded text-xs font-medium ${
+                                            item.degreeType === 'master' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800'
+                                        }">${degreeLabel}</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">
+                                        <div class="flex items-center gap-1 flex-wrap">
+                                            ${item.stages.map((stage, stepIdx) => {
+                                                const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
+                                                const bgColor = stage.type === 'submission' ? 'bg-gray-100 text-gray-700' :
+                                                               (stage.evaluationRequired ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700');
+
+                                                return `
+                                                    <span class="px-2 py-1 rounded text-xs ${bgColor}" title="${stepType ? stepType.description : ''}">
+                                                        ${stage.order}. ${stage.name}
+                                                    </span>
+                                                    ${stepIdx < item.stages.length - 1 ? '<span class="text-gray-400">→</span>' : ''}
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         `;
     },
 
@@ -2691,27 +2925,61 @@ const views = {
         return `<div id="committee-assignment-content"></div>`;
     },
 
-    // ========== 워크플로우 등록 (통합 화면) ==========
+    // ========== 워크플로우 등록 (신규 단일 패널 방식) ==========
     workflowCreateUnified: (id = null) => {
         const isEdit = id !== null;
         const item = isEdit ? mockThesisStages.find(s => s.id === id) : null;
 
-        // Initialize global variable for composed stages
-        window.composedStages = isEdit ? JSON.parse(JSON.stringify(item.stages)) : [];
+        // Initialize global variable: 신규 등록 시 빈 카드 1개 기본 표시
+        window.composedStages = isEdit ? JSON.parse(JSON.stringify(item.stages)) : [{
+            id: 'STAGE_NEW_' + Date.now(),
+            order: 1,
+            categoryId: '',
+            name: '',
+            requiresDocument: false,
+            requiresPresentation: false,
+            submissionStartDate: '',
+            submissionEndDate: '',
+            evaluationTemplateId: '',
+            reviewStartDate: '',
+            reviewEndDate: '',
+            description: ''
+        }];
         window.currentWorkflowId = id;
 
         const handleSave = () => {
             const name = document.getElementById('workflow-name').value;
-            const degree = document.getElementById('workflow-degree').value;
+            const degreeCheckboxes = document.querySelectorAll('input[name="workflow-degree"]:checked');
 
             if (!name.trim()) {
                 alert('워크플로우 이름을 입력해주세요.');
                 return;
             }
 
-            if (window.composedStages.length === 0) {
-                alert('최소 1개 이상의 단계를 추가해주세요.');
+            if (degreeCheckboxes.length === 0) {
+                alert('학위 과정을 최소 1개 이상 선택해주세요.');
                 return;
+            }
+
+            // 단계 유효성 검사
+            for (let i = 0; i < window.composedStages.length; i++) {
+                const stage = window.composedStages[i];
+                if (!stage.categoryId) {
+                    alert(`단계 ${i + 1}: 카테고리를 선택해주세요.`);
+                    return;
+                }
+                if (!stage.name.trim()) {
+                    alert(`단계 ${i + 1}: 단계 이름을 입력해주세요.`);
+                    return;
+                }
+                if (!stage.submissionStartDate || !stage.submissionEndDate) {
+                    alert(`단계 ${i + 1}: 제출 기간을 입력해주세요.`);
+                    return;
+                }
+                if (stage.evaluationTemplateId && (!stage.reviewStartDate || !stage.reviewEndDate)) {
+                    alert(`단계 ${i + 1}: 평가표를 선택한 경우 심사 기간을 입력해주세요.`);
+                    return;
+                }
             }
 
             saveUnifiedWorkflow();
@@ -2729,88 +2997,67 @@ const views = {
             <div class="bg-white rounded-lg shadow-md">
                 <!-- Header -->
                 <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800">${isEdit ? '워크플로우 수정' : '워크플로우 등록'}</h3>
-                    <p class="text-sm text-gray-600 mt-1">단계를 조합하여 논문지도 워크플로우를 구성합니다.</p>
+                    <h3 class="text-lg font-bold text-gray-800">${isEdit ? '심사 단계 수정' : '심사 단계 등록'}</h3>
+                    <p class="text-sm text-gray-600 mt-1">단계를 직접 입력하여 논문 심사 단계를 구성합니다.</p>
                 </div>
 
                 <!-- Workflow Basic Info -->
                 <div class="p-6 border-b bg-gray-50">
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">워크플로우 이름 *</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">심사 단계 이름 *</label>
                             <input type="text"
                                    id="workflow-name"
                                    value="${isEdit ? item.name : ''}"
-                                   placeholder="예: 논문작성1, 석사과정 워크플로우"
+                                   placeholder="예: 석사 표준 과정"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학위 과정</label>
-                            <select id="workflow-degree"
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="master" ${isEdit && item.degree === 'master' ? 'selected' : ''}>석사</option>
-                                <option value="doctoral" ${isEdit && item.degree === 'doctoral' ? 'selected' : ''}>박사</option>
-                            </select>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학위 과정 *</label>
+                            <div class="flex items-center gap-4 mt-2">
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="workflow-degree" value="master"
+                                           ${isEdit && item.degreeType === 'master' ? 'checked' : ''}
+                                           class="mr-2 w-4 h-4">
+                                    석사
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="checkbox" name="workflow-degree" value="phd"
+                                           ${isEdit && item.degreeType === 'phd' ? 'checked' : ''}
+                                           class="mr-2 w-4 h-4">
+                                    박사
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Main Content: 2-Column Layout -->
-                <div class="flex divide-x" style="min-height: 500px;">
-                    <!-- Left: Step Types List -->
-                    <div class="w-1/3 p-6 bg-gray-50">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-gray-800">단계 유형</h4>
-                            <button onclick="openStepTypeModal()"
-                                    class="bg-green-600 text-white px-3 py-1 rounded text-xs hover:bg-green-700">
-                                + 새 단계 유형 추가
-                            </button>
-                        </div>
-                        <p class="text-xs text-gray-500 mb-4">단계를 클릭하여 워크플로우에 추가하세요</p>
-                        <div class="space-y-2">
-                            ${mockStepTypes.map(st => {
-                                const typeLabel = st.type === 'submission' ? '제출' : '심사';
-                                const typeBgColor = st.type === 'submission' ? 'bg-blue-100 text-blue-800' : 'bg-purple-100 text-purple-800';
-                                return `
-                                    <div onclick="openAddStageModal('${st.id}')"
-                                         class="border border-gray-300 rounded-lg p-3 hover:bg-blue-50 hover:border-blue-400 cursor-pointer transition-all">
-                                        <div class="font-medium text-gray-800 mb-1">${st.name}</div>
-                                        <span class="inline-block px-2 py-0.5 rounded text-xs font-medium ${typeBgColor}">${typeLabel}</span>
-                                    </div>
-                                `;
-                            }).join('')}
-                        </div>
+                <!-- Main Content: Single Panel with Stage Cards -->
+                <div class="p-6">
+                    <div class="mb-4">
+                        <h4 class="font-bold text-gray-800 mb-2">단계 구성 (${window.composedStages.length}개)</h4>
+                        <p class="text-xs text-gray-500">각 단계의 정보를 직접 입력하세요. 제출/심사 일정은 안내용 메타데이터입니다.</p>
                     </div>
 
-                    <!-- Right: Composed Stages -->
-                    <div class="flex-1 p-6">
-                        <div class="flex justify-between items-center mb-4">
-                            <h4 class="font-bold text-gray-800">구성된 단계 (${window.composedStages.length}개)</h4>
-                        </div>
-                        ${window.composedStages.length === 0 ? `
-                            <div class="flex flex-col items-center justify-center h-64 text-gray-400">
-                                <svg class="w-16 h-16 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                                </svg>
-                                <p class="text-sm">왼쪽에서 단계를 선택하여 추가하세요</p>
-                            </div>
-                        ` : ''}
-                        <div id="composed-stages-list-unified">
-                            ${renderComposedStagesUnified()}
-                        </div>
+                    <div id="stage-cards-container" class="space-y-4">
+                        ${renderStageCards()}
                     </div>
+
+                    <button onclick="addNewStageCard()"
+                            class="mt-4 w-full px-4 py-3 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all">
+                        + 단계 추가
+                    </button>
                 </div>
 
                 <!-- Footer: Save Button -->
                 <div class="p-6 border-t bg-gray-50 flex justify-end space-x-3">
-                    <button onclick="switchView('stageManagement')"
+                    <button onclick="switchView('typeManagement')"
                             class="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-100">
                         취소
                     </button>
                     <button id="unified-save-btn"
-                            ${window.composedStages.length === 0 ? 'disabled' : ''}
-                            class="px-4 py-2 rounded-md ${window.composedStages.length === 0 ? 'bg-gray-300 text-gray-500 cursor-not-allowed' : 'bg-[#009DE8] text-white hover:bg-opacity-90'}">
-                        저장 (${window.composedStages.length}개 단계)
+                            class="px-4 py-2 rounded-md bg-[#009DE8] text-white hover:bg-opacity-90">
+                        저장
                     </button>
                 </div>
             </div>
