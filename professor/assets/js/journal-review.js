@@ -128,25 +128,25 @@ function renderJournalReviewRows(journals) {
 
     return `
         <div class="overflow-x-auto">
-            <table class="w-full">
+            <table class="min-w-full table-fixed">
                 <thead class="bg-gray-50 border-b">
                     <tr>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">
                             <input type="checkbox" id="select-all-journals"
                                    onchange="toggleSelectAllJournals(this.checked)"
                                    class="rounded border-gray-300">
                         </th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학부/대학원</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학과/전공</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정구분</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문제목</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학술지명</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">제출일</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">심사진행상태</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">관리</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">대학원</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학과</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학위과정</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학번</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">이름</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">논문제목</th>
+                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학술지명</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">제출일</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">심사진행상태</th>
+                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">관리</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-200">
@@ -283,7 +283,7 @@ function sendNotificationToSelectedJournals() {
     const modalContent = `
         <div class="space-y-4">
             <div class="bg-gray-50 p-3 rounded-lg">
-                <p class="text-sm font-medium text-gray-700 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
+                <p class="text-sm font-medium text-gray-800 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
                 <div class="flex flex-wrap gap-2">
                     ${selectedStudents.map(s => `
                         <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
@@ -294,27 +294,27 @@ function sendNotificationToSelectedJournals() {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">발송 방법 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-2">발송 방법 *</label>
                 <div class="flex gap-4">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="journal-notif-type" value="kakao" checked class="rounded-full">
-                        <span class="text-sm text-gray-700">카카오톡</span>
+                        <span class="text-sm text-gray-800">카카오톡</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="journal-notif-type" value="sms" class="rounded-full">
-                        <span class="text-sm text-gray-700">SMS</span>
+                        <span class="text-sm text-gray-800">SMS</span>
                     </label>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">알림 제목 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">알림 제목 *</label>
                 <input type="text" id="journal-notif-title" placeholder="예: 학술지 심사 결과 확인 요청"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">알림 내용 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">알림 내용 *</label>
                 <textarea id="journal-notif-message" rows="4" placeholder="학생들에게 전달할 메시지를 입력하세요"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
             </div>

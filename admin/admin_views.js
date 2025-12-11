@@ -181,17 +181,17 @@ const views = {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">연구계획서 제목</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록일</th>
                             </tr>
@@ -209,7 +209,7 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-800">
                                         ${addStudentInfoIcon(item.studentName, item.studentId)}
                                     </td>
-                                    <td class="py-3 px-4 text-sm text-gray-800 max-w-xs truncate" title="${item.thesisTitle || '-'}">
+                                    <td class="py-3 px-4 text-sm text-gray-800 td-truncate-long" title="${item.thesisTitle || '-'}">
                                         ${item.thesisTitle || '-'}
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.submitDate || '-'}</td>
@@ -329,20 +329,20 @@ const views = {
 
                 <!-- 테이블 (ID 11: 통합 테이블) -->
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">
                                     <input type="checkbox" onclick="toggleAllCheckboxes(this)">
                                 </th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기차</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
@@ -384,7 +384,7 @@ const views = {
                                             ${item.submissionTypeName}
                                         </span>
                                     </td>
-                                    <td class="py-3 px-4 text-sm text-gray-800 max-w-xs truncate" title="${item.thesisTitle || '미정'}">${item.thesisTitle || '미정'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-800 td-truncate-long" title="${item.thesisTitle || '미정'}">${item.thesisTitle || '미정'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.submitDate || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">${item.evalDate || '-'}</td>
                                     <td class="py-3 px-4">
@@ -481,7 +481,7 @@ const views = {
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
@@ -492,7 +492,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출일</th>
@@ -609,7 +609,7 @@ const views = {
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
@@ -620,7 +620,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출일</th>
@@ -737,7 +737,7 @@ const views = {
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
@@ -748,7 +748,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출일</th>
@@ -869,15 +869,15 @@ const views = {
 
                 <!-- 학술지 심사 목록 -->
                 <div id="admin-journal-review-list" class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일</th>
@@ -898,15 +898,11 @@ const views = {
                                         <td class="py-3 px-4 text-sm font-medium text-gray-800">
                                             ${addStudentInfoIcon(journal.studentName, journal.studentId)}
                                         </td>
-                                        <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
-                                            <div class="truncate" title="${journal.paperTitle}">
-                                                ${journal.paperTitle}
-                                            </div>
+                                        <td class="py-3 px-4 text-sm text-gray-600 td-truncate-extra-long" title="${journal.paperTitle}">
+                                            ${journal.paperTitle}
                                         </td>
-                                        <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 200px;">
-                                            <div class="truncate" title="${journal.journalName}">
-                                                ${journal.journalName}
-                                            </div>
+                                        <td class="py-3 px-4 text-sm text-gray-600 td-truncate" title="${journal.journalName}">
+                                            ${journal.journalName}
                                         </td>
                                         <td class="py-3 px-4 text-center text-sm text-gray-600">${journal.submissionDate || '-'}</td>
                                         <td class="py-3 px-4 text-center">
@@ -1009,7 +1005,7 @@ const views = {
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
@@ -1020,7 +1016,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학생명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">게재연월</th>
@@ -1156,17 +1152,17 @@ const views = {
 
                 <!-- 테이블 (Task 1-4: ID 18 기준) -->
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문지도교수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기차</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">지도계획 수립여부</th>
@@ -1330,16 +1326,16 @@ const views = {
                 </div>
 
                 <div class="overflow-x-auto">
-                    <table class="min-w-full text-sm">
+                    <table class="min-w-full table-fixed text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기차</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일시</th>
@@ -1371,7 +1367,7 @@ const views = {
                                     </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.semesterCount || '-'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-700">
-                                        <div class="max-w-xs truncate font-medium" title="${item.documentTitle}">
+                                        <div class="td-truncate font-medium" title="${item.documentTitle}">
                                             ${item.documentTitle}
                                         </div>
                                         <div class="text-xs text-gray-500 mt-1">${item.fileName}</div>
@@ -1405,8 +1401,8 @@ const views = {
                 <div class="p-6 border-b">
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">논문지도 일정 관리</h3>
-                        <button onclick="openScheduleModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 일정 추가
+                        <button onclick="switchView('scheduleCreate')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                            등록
                         </button>
                     </div>
                     
@@ -1436,33 +1432,180 @@ const views = {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table id="schedule-table" class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">일정명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">적용대상</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">시작일</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">종료일</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">설명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">카테고리</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출 기간</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 기간</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.map(item => `
-                                <tr class="hover:bg-gray-50">
+                                <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('scheduleCreate', ${item.id})">
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.target}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.startDate}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.endDate}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.description}</td>
-                                    <td class="py-3 px-4 space-x-2">
-                                        <button onclick="editSchedule(${item.id})" class="text-blue-600 hover:underline text-sm">수정</button>
-                                        <button onclick="deleteSchedule(${item.id})" class="text-red-600 hover:underline text-sm">삭제</button>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.category || '-'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.semester || '-'}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">
+                                        <div>${item.submissionStartDate || item.startDate}</div>
+                                        <div class="text-xs text-gray-500">~ ${item.submissionEndDate || item.endDate}</div>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">
+                                        <div>${item.reviewStartDate || item.startDate}</div>
+                                        <div class="text-xs text-gray-500">~ ${item.reviewEndDate || item.endDate}</div>
                                     </td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 일정 등록 (신규/수정) ==========
+    scheduleCreate: (id = null) => {
+        const isEdit = id !== null;
+        const item = isEdit ? appData.schedules.find(s => s.id === id) : {};
+        const categories = getCategoryList();
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">${isEdit ? '일정 수정' : '일정 등록'}</h3>
+                </div>
+                <div class="p-6">
+                    <form id="schedule-form" class="space-y-6">
+                        <!-- 일정 제목 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                일정 제목 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="text" id="schedule-title" value="${item.title || ''}"
+                                   placeholder="예: 2025학년도 1학기 연구계획서 심사"
+                                   class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                            <p class="mt-1 text-xs text-gray-500">대시보드에 표시될 일정 제목을 입력하세요</p>
+                        </div>
+
+                        <!-- 카테고리 선택 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">
+                                카테고리 (심사 단계) <span class="text-red-600">*</span>
+                            </label>
+                            <select id="schedule-category"
+                                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                <option value="">선택하세요</option>
+                                ${categories.map(cat => `
+                                    <option value="${cat}" ${item.category === cat ? 'selected' : ''}>
+                                        ${cat}
+                                    </option>
+                                `).join('')}
+                            </select>
+                            <p class="mt-1 text-xs text-gray-500">
+                                <i class="fas fa-info-circle"></i>
+                                이 카테고리는 모든 학위/전공의 동일 단계에 적용됩니다.
+                            </p>
+                        </div>
+
+                        <!-- 학기 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학기</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">학년도</label>
+                                    <input type="number" id="schedule-year" value="${item.year || ''}"
+                                           placeholder="예: 2025"
+                                           min="2020"
+                                           max="2099"
+                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">학기</label>
+                                    <select id="schedule-term"
+                                            class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                        <option value="">선택</option>
+                                        <option value="1" ${item.term === '1' ? 'selected' : ''}>1학기</option>
+                                        <option value="2" ${item.term === '2' ? 'selected' : ''}>2학기</option>
+                                        <option value="여름" ${item.term === '여름' ? 'selected' : ''}>여름학기</option>
+                                        <option value="겨울" ${item.term === '겨울' ? 'selected' : ''}>겨울학기</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <p class="mt-1 text-xs text-gray-500">학기 구분이 필요한 경우 입력하세요 (선택사항)</p>
+                        </div>
+
+                        <!-- 제출 기간 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                제출 기간 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">제출 시작일</label>
+                                    <input type="date" id="schedule-submission-start"
+                                           value="${item.submissionStartDate || item.startDate || ''}"
+                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">제출 마감일</label>
+                                    <input type="date" id="schedule-submission-end"
+                                           value="${item.submissionEndDate || item.endDate || ''}"
+                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 심사 기간 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                심사 기간 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">심사 시작일</label>
+                                    <input type="date" id="schedule-review-start"
+                                           value="${item.reviewStartDate || ''}"
+                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                </div>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">심사 종료일</label>
+                                    <input type="date" id="schedule-review-end"
+                                           value="${item.reviewEndDate || ''}"
+                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 설명 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                            <textarea id="schedule-desc" rows="3"
+                                      placeholder="일정에 대한 추가 설명을 입력하세요"
+                                      class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">${item.description || ''}</textarea>
+                        </div>
+
+                        <!-- 버튼 영역 -->
+                        <div class="flex ${isEdit ? 'justify-between' : 'justify-end'} pt-4 border-t">
+                            ${isEdit ? `
+                            <button type="button" onclick="deleteSchedule(${id})"
+                                    class="px-4 py-2 bg-red-600 text-white rounded-md text-sm font-medium hover:bg-red-700">
+                                삭제
+                            </button>
+                            ` : ''}
+                            <div class="flex space-x-3">
+                                <button type="button" onclick="switchView('scheduleManagement')"
+                                        class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                    취소
+                                </button>
+                                <button type="button" onclick="saveScheduleFromPage(${isEdit ? id : null})"
+                                        class="px-4 py-2 bg-[#009DE8] text-white rounded-md text-sm font-medium hover:bg-opacity-90">
+                                    ${isEdit ? '수정' : '등록'}
+                                </button>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
         `;
@@ -1477,7 +1620,7 @@ const views = {
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">논문 제출 요건 관리</h3>
                         <button onclick="openRequirementModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 요건 추가
+                            등록
                         </button>
                     </div>
                     
@@ -1491,7 +1634,7 @@ const views = {
                                 <option value="컴퓨터공학">컴퓨터공학</option>
                             </select>
                             <select id="requirement-search-degree" class="search-select" onchange="searchRequirement()">
-                                <option value="">학위 전체</option>
+                                <option value="">학위과정 전체</option>
                                 <option value="석사">석사</option>
                                 <option value="박사">박사</option>
                             </select>
@@ -1507,10 +1650,10 @@ const views = {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table id="requirement-table" class="min-w-full">
+                    <table id="requirement-table" class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">최소학점</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문필수</th>
@@ -1551,7 +1694,7 @@ const views = {
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">심사 단계 관리</h3>
                         <button onclick="switchView('workflowCreateUnified')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 심사 단계 추가
+                            등록
                         </button>
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -1562,12 +1705,12 @@ const views = {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 단계명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 수</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
@@ -1905,7 +2048,7 @@ const views = {
                 <div class="p-6 border-b flex justify-between items-center">
                     <h3 class="text-lg font-bold text-gray-800">지도 단계 유형 관리 (레고 블록)</h3>
                     <button onclick="openStepTypeModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                        + 유형 추가
+                        등록
                     </button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
@@ -1967,7 +2110,7 @@ const views = {
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">심사 기준 등록</h3>
                         <button onclick="switchView('evaluationCriteriaEdit')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 평가표 추가
+                            등록
                         </button>
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
@@ -1978,7 +2121,7 @@ const views = {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
@@ -2301,15 +2444,15 @@ const views = {
 
                 <!-- 테이블 -->
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">전공</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일(수정일)</th>
                             </tr>
@@ -2323,10 +2466,8 @@ const views = {
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600 max-w-md">
-                                        <div class="truncate" title="${item.titleKo || item.currentTitle || '-'}">
-                                            ${item.titleKo || item.currentTitle || '-'}
-                                        </div>
+                                    <td class="py-3 px-4 text-sm text-gray-600 td-truncate-extra-long" title="${item.titleKo || item.currentTitle || '-'}">
+                                        ${item.titleKo || item.currentTitle || '-'}
                                     </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
                                 </tr>
@@ -2560,14 +2701,14 @@ const views = {
 
                     <!-- 사용자 목록 테이블 -->
                     <div class="overflow-x-auto">
-                        <table class="min-w-full">
+                        <table class="min-w-full table-fixed">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">구분</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번/교번</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이메일</th>
                                     <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">액션</th>
                                 </tr>
@@ -2735,16 +2876,15 @@ const views = {
                 </div>
 
                 <!-- 학생 목록 테이블 -->
-                <div class="p-6">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full table-fixed divide-y divide-gray-200">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
                                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
@@ -2790,7 +2930,6 @@ const views = {
                                 `).join('')}
                             </tbody>
                         </table>
-                    </div>
 
                     ${data.length === 0 ? `
                         <div class="text-center py-8 text-gray-500">
@@ -2828,7 +2967,7 @@ const views = {
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-lg font-bold text-gray-800">심사 단계 관리</h3>
                         <button onclick="switchView('workflowCreateUnified')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 심사 단계 추가
+                            등록
                         </button>
                     </div>
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
@@ -2839,12 +2978,12 @@ const views = {
                     </div>
                 </div>
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 단계명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
                             </tr>
                         </thead>
@@ -3108,7 +3247,7 @@ const views = {
 
                 <!-- User Table -->
                 <div class="overflow-x-auto">
-                    <table class="min-w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
@@ -3189,7 +3328,7 @@ const views = {
                             <p class="text-sm text-gray-600 mt-1">시스템 역할을 관리하고 권한을 부여합니다.</p>
                         </div>
                         <button onclick="openRoleModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            + 역할 추가
+                            등록
                         </button>
                     </div>
                 </div>
@@ -3372,7 +3511,7 @@ const views = {
 
                         <!-- Permission Matrix Table -->
                         <div style="max-height: 520px; overflow-y: auto;">
-                            <table class="w-full">
+                            <table class="w-full table-fixed">
                                 <thead class="bg-gray-100 sticky top-0">
                                     <tr>
                                         <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 35%;">메뉴명</th>
@@ -3528,8 +3667,8 @@ const views = {
                             <h3 class="text-lg font-bold text-gray-800">공지사항 관리</h3>
                             <p class="text-sm text-gray-600 mt-1">공지사항을 등록하고 관리합니다.</p>
                         </div>
-                        <button onclick="openNoticeModal()" class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
-                            + 공지사항 등록
+                        <button onclick="switchView('noticeEdit')" class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
+                            등록
                         </button>
                     </div>
                 </div>
@@ -3539,11 +3678,6 @@ const views = {
                     <div class="flex gap-4">
                         <input type="text" id="notice-search" placeholder="제목 또는 내용 검색..."
                                class="flex-1 px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
-                        <select id="notice-category-filter" class="px-4 py-2 border border-gray-300 rounded-md">
-                            <option value="">전체 카테고리</option>
-                            <option value="important">중요</option>
-                            <option value="general">일반</option>
-                        </select>
                         <button onclick="searchNotices()" class="px-6 py-2 bg-gray-700 text-white rounded-md hover:bg-gray-800">
                             검색
                         </button>
@@ -3552,53 +3686,251 @@ const views = {
 
                 <!-- Table -->
                 <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-100 border-b">
+                    <table class="min-w-full table-fixed">
+                        <thead class="bg-gray-50">
                             <tr>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 5%;">번호</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 8%;">카테고리</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 8%;">고정</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 39%;">제목</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 10%;">작성자</th>
-                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 12%;">작성일</th>
-                                <th class="text-center py-3 px-4 text-xs font-semibold text-gray-700" style="width: 8%;">조회수</th>
-                                <th class="text-center py-3 px-4 text-xs font-semibold text-gray-700" style="width: 10%;">관리</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제목</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">작성자</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">작성일</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${notices.length === 0 ? `
                                 <tr>
-                                    <td colspan="8" class="py-8 text-center text-gray-500">
+                                    <td colspan="4" class="py-8 text-center text-gray-500">
                                         등록된 공지사항이 없습니다.
                                     </td>
                                 </tr>
                             ` : notices.map((notice, idx) => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 text-sm">${notices.length - idx}</td>
-                                    <td class="py-3 px-4 text-sm">
-                                        <span class="px-2 py-1 rounded text-xs ${notice.category === 'important' ? 'bg-red-100 text-red-700' : 'bg-gray-100 text-gray-700'}">
-                                            ${notice.category === 'important' ? '중요' : '일반'}
-                                        </span>
-                                    </td>
-                                    <td class="py-3 px-4 text-sm">
-                                        ${notice.isPinned ? '<span class="text-blue-600">📌</span>' : '-'}
-                                    </td>
-                                    <td class="py-3 px-4 text-sm">
-                                        <a href="#" onclick="viewNoticeDetail('${notice.id}'); return false;" class="text-gray-800 hover:text-[#009DE8] hover:underline">
-                                            ${notice.title}
-                                        </a>
-                                    </td>
+                                <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('noticeDetail', '${notice.id}')">
+                                    <td class="py-3 px-4 text-sm text-gray-600">${notices.length - idx}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${notice.title}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${notice.authorName}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${notice.createdAt.split(' ')[0]}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600 text-center">${notice.viewCount}</td>
-                                    <td class="py-3 px-4 text-sm text-center">
-                                        <button onclick="openNoticeModal('${notice.id}')" class="text-blue-600 hover:text-blue-800 mr-2">수정</button>
-                                        <button onclick="deleteNotice('${notice.id}')" class="text-red-600 hover:text-red-800">삭제</button>
-                                    </td>
                                 </tr>
                             `).join('')}
                         </tbody>
                     </table>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 공지사항 상세 ==========
+    noticeDetail: (id) => {
+        const notice = mockNotices.find(n => n.id === id);
+
+        if (!notice) {
+            return `
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="text-center text-gray-500">
+                        공지사항을 찾을 수 없습니다.
+                    </div>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <h3 class="text-xl font-bold text-gray-800 mb-2">${notice.title}</h3>
+                            <div class="flex items-center text-sm text-gray-600 space-x-4">
+                                <span>작성자: ${notice.authorName}</span>
+                                <span>작성일: ${notice.createdAt}</span>
+                                ${notice.updatedAt !== notice.createdAt ? `<span>수정일: ${notice.updatedAt}</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="flex space-x-2 ml-4">
+                            <button
+                                onclick="switchView('noticeEdit', '${notice.id}')"
+                                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
+                                수정
+                            </button>
+                            <button
+                                onclick="deleteNotice('${notice.id}')"
+                                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors">
+                                삭제
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <div class="prose max-w-none">
+                        ${notice.content}
+                    </div>
+                    ${notice.attachments && notice.attachments.length > 0 ? `
+                        <div class="mt-6 pt-6 border-t">
+                            <h4 class="font-semibold text-gray-700 mb-3">첨부파일</h4>
+                            <ul class="space-y-2">
+                                ${notice.attachments.map(file => `
+                                    <li>
+                                        <a href="${file.url}" class="text-primary hover:underline flex items-center">
+                                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                            </svg>
+                                            ${file.name}
+                                        </a>
+                                    </li>
+                                `).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+                <div class="p-6 border-t bg-gray-50">
+                    <button
+                        onclick="switchView('noticeManagement')"
+                        class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition-colors">
+                        목록으로
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 공지사항 작성/수정 ==========
+    noticeEdit: (id = null) => {
+        const isEdit = id !== null;
+        const notice = isEdit ? mockNotices.find(n => n.id === id) : {};
+
+        // HTML 태그 제거하여 순수 텍스트만 추출 (초기 로드용)
+        const stripHtml = (html) => {
+            const tmp = document.createElement('div');
+            tmp.innerHTML = html || '';
+            return tmp.textContent || tmp.innerText || '';
+        };
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">${isEdit ? '공지사항 수정' : '공지사항 작성'}</h3>
+                </div>
+                <div class="p-6">
+                    <form id="notice-edit-form" class="space-y-6">
+                        <!-- 제목 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                제목 <span class="text-red-600">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="notice-title"
+                                value="${isEdit ? notice.title : ''}"
+                                class="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent"
+                                placeholder="공지사항 제목을 입력하세요"
+                                required>
+                        </div>
+
+                        <!-- 에디터 툴바 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                내용 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="border rounded-lg">
+                                <!-- 툴바 -->
+                                <div class="bg-gray-50 border-b p-2 flex flex-wrap gap-1">
+                                    <!-- 폰트 크기 -->
+                                    <select onchange="applyFormat('fontSize', this.value)" class="px-2 py-1 border rounded text-sm">
+                                        <option value="">크기</option>
+                                        <option value="1">작게</option>
+                                        <option value="3" selected>보통</option>
+                                        <option value="5">크게</option>
+                                        <option value="7">아주 크게</option>
+                                    </select>
+
+                                    <!-- 텍스트 스타일 -->
+                                    <button type="button" onclick="applyFormat('bold')" class="px-3 py-1 border rounded hover:bg-gray-200" title="굵게">
+                                        <strong>B</strong>
+                                    </button>
+                                    <button type="button" onclick="applyFormat('italic')" class="px-3 py-1 border rounded hover:bg-gray-200" title="기울임">
+                                        <em>I</em>
+                                    </button>
+                                    <button type="button" onclick="applyFormat('underline')" class="px-3 py-1 border rounded hover:bg-gray-200" title="밑줄">
+                                        <u>U</u>
+                                    </button>
+                                    <button type="button" onclick="applyFormat('strikeThrough')" class="px-3 py-1 border rounded hover:bg-gray-200" title="취소선">
+                                        <s>S</s>
+                                    </button>
+
+                                    <div class="border-l mx-1"></div>
+
+                                    <!-- 정렬 -->
+                                    <button type="button" onclick="applyFormat('justifyLeft')" class="px-3 py-1 border rounded hover:bg-gray-200" title="왼쪽 정렬">
+                                        ≡
+                                    </button>
+                                    <button type="button" onclick="applyFormat('justifyCenter')" class="px-3 py-1 border rounded hover:bg-gray-200" title="가운데 정렬">
+                                        ≡
+                                    </button>
+                                    <button type="button" onclick="applyFormat('justifyRight')" class="px-3 py-1 border rounded hover:bg-gray-200" title="오른쪽 정렬">
+                                        ≡
+                                    </button>
+
+                                    <div class="border-l mx-1"></div>
+
+                                    <!-- 목록 -->
+                                    <button type="button" onclick="applyFormat('insertUnorderedList')" class="px-3 py-1 border rounded hover:bg-gray-200" title="글머리 기호">
+                                        • 목록
+                                    </button>
+                                    <button type="button" onclick="applyFormat('insertOrderedList')" class="px-3 py-1 border rounded hover:bg-gray-200" title="번호 매기기">
+                                        1. 목록
+                                    </button>
+
+                                    <div class="border-l mx-1"></div>
+
+                                    <!-- 링크 -->
+                                    <button type="button" onclick="insertLink()" class="px-3 py-1 border rounded hover:bg-gray-200" title="링크">
+                                        🔗
+                                    </button>
+
+                                    <div class="border-l mx-1"></div>
+
+                                    <!-- 제목 스타일 -->
+                                    <select onchange="applyFormat('formatBlock', this.value); this.value='';" class="px-2 py-1 border rounded text-sm">
+                                        <option value="">스타일</option>
+                                        <option value="h1">제목 1</option>
+                                        <option value="h2">제목 2</option>
+                                        <option value="h3">제목 3</option>
+                                        <option value="h4">제목 4</option>
+                                        <option value="p">본문</option>
+                                    </select>
+
+                                    <div class="border-l mx-1"></div>
+
+                                    <!-- 색상 -->
+                                    <input type="color" onchange="applyFormat('foreColor', this.value)" class="w-8 h-8 border rounded cursor-pointer" title="글자색">
+                                    <input type="color" onchange="applyFormat('backColor', this.value)" class="w-8 h-8 border rounded cursor-pointer" title="배경색">
+                                </div>
+
+                                <!-- 에디터 영역 -->
+                                <div
+                                    id="notice-content-editor"
+                                    contenteditable="true"
+                                    class="min-h-[400px] p-4 focus:outline-none focus:ring-2 focus:ring-primary"
+                                    style="max-height: 600px; overflow-y: auto;">
+                                    ${isEdit ? notice.content : '<p>공지사항 내용을 입력하세요.</p>'}
+                                </div>
+                            </div>
+                            <p class="mt-1 text-sm text-gray-500">* 기본 에디터 기능을 제공합니다. 향후 네이버 스마트에디터로 교체 예정</p>
+                        </div>
+
+                        <!-- 버튼 영역 -->
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button
+                                type="button"
+                                onclick="switchView('${isEdit ? 'noticeDetail' : 'noticeManagement'}', '${isEdit ? id : ''}')"
+                                class="px-6 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors">
+                                취소
+                            </button>
+                            <button
+                                type="button"
+                                onclick="saveNoticeFromPage('${isEdit ? id : ''}')"
+                                class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors">
+                                ${isEdit ? '수정 완료' : '등록'}
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         `;
@@ -3617,6 +3949,172 @@ const views = {
     // ========== 논문지도절차 안내 (관리자용 - 조회 + 편집) ==========
     processGuide: () => {
         return renderGuideContent('procedure', true); // true = 관리자 권한
+    },
+
+    // ========== 안내문 편집 페이지 ==========
+    guideEdit: (type) => {
+        const guide = mockGuides.find(g => g.type === type && g.isPublished);
+
+        const titleMap = {
+            'ethics': '연구윤리',
+            'schedule': '논문일정',
+            'procedure': '논문지도절차'
+        };
+
+        const viewMap = {
+            'ethics': 'ethicsGuide',
+            'schedule': 'scheduleGuide',
+            'procedure': 'processGuide'
+        };
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">${titleMap[type]} 편집</h3>
+                </div>
+                <div class="p-6">
+                    <form id="guide-edit-form" class="space-y-4">
+                        <!-- 에디터 영역 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                내용 <span class="text-red-600">*</span>
+                            </label>
+
+                            <!-- 에디터 툴바 -->
+                            <div class="border border-gray-300 rounded-t-md bg-gray-50 px-2 py-2 flex items-center gap-2 flex-wrap">
+                                <!-- 폰트 크기 -->
+                                <select id="fontSize" onchange="applyFormat('fontSize', this.value)"
+                                        class="text-sm border border-gray-300 rounded px-2 py-1">
+                                    <option value="">폰트 크기</option>
+                                    <option value="1">매우 작게</option>
+                                    <option value="2">작게</option>
+                                    <option value="3">보통</option>
+                                    <option value="4">크게</option>
+                                    <option value="5">매우 크게</option>
+                                    <option value="6">아주 크게</option>
+                                    <option value="7">최대</option>
+                                </select>
+
+                                <div class="border-l border-gray-300 h-6 mx-1"></div>
+
+                                <!-- 텍스트 스타일 -->
+                                <button type="button" onclick="applyFormat('bold')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm font-bold"
+                                        title="굵게">
+                                    B
+                                </button>
+                                <button type="button" onclick="applyFormat('italic')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm italic"
+                                        title="기울임">
+                                    I
+                                </button>
+                                <button type="button" onclick="applyFormat('underline')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm underline"
+                                        title="밑줄">
+                                    U
+                                </button>
+                                <button type="button" onclick="applyFormat('strikeThrough')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm line-through"
+                                        title="취소선">
+                                    S
+                                </button>
+
+                                <div class="border-l border-gray-300 h-6 mx-1"></div>
+
+                                <!-- 정렬 -->
+                                <button type="button" onclick="applyFormat('justifyLeft')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                                        title="왼쪽 정렬">
+                                    ◧
+                                </button>
+                                <button type="button" onclick="applyFormat('justifyCenter')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                                        title="가운데 정렬">
+                                    ▥
+                                </button>
+                                <button type="button" onclick="applyFormat('justifyRight')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                                        title="오른쪽 정렬">
+                                    ◨
+                                </button>
+
+                                <div class="border-l border-gray-300 h-6 mx-1"></div>
+
+                                <!-- 목록 -->
+                                <button type="button" onclick="applyFormat('insertUnorderedList')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                                        title="글머리 기호">
+                                    • 목록
+                                </button>
+                                <button type="button" onclick="applyFormat('insertOrderedList')"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                                        title="번호 매기기">
+                                    1. 목록
+                                </button>
+
+                                <div class="border-l border-gray-300 h-6 mx-1"></div>
+
+                                <!-- 링크 -->
+                                <button type="button" onclick="insertLink()"
+                                        class="px-3 py-1 border border-gray-300 rounded hover:bg-gray-200 text-sm"
+                                        title="링크 삽입">
+                                    링크
+                                </button>
+
+                                <div class="border-l border-gray-300 h-6 mx-1"></div>
+
+                                <!-- 제목 -->
+                                <select id="formatBlock" onchange="applyFormat('formatBlock', this.value)"
+                                        class="text-sm border border-gray-300 rounded px-2 py-1">
+                                    <option value="">제목 스타일</option>
+                                    <option value="h1">제목 1</option>
+                                    <option value="h2">제목 2</option>
+                                    <option value="h3">제목 3</option>
+                                    <option value="h4">제목 4</option>
+                                    <option value="p">본문</option>
+                                </select>
+
+                                <div class="border-l border-gray-300 h-6 mx-1"></div>
+
+                                <!-- 색상 -->
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <span class="text-xs">글자색</span>
+                                    <input type="color" id="textColor" onchange="applyFormat('foreColor', this.value)"
+                                           class="w-8 h-8 border border-gray-300 rounded cursor-pointer">
+                                </label>
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <span class="text-xs">배경색</span>
+                                    <input type="color" id="bgColor" onchange="applyFormat('backColor', this.value)"
+                                           class="w-8 h-8 border border-gray-300 rounded cursor-pointer">
+                                </label>
+                            </div>
+
+                            <!-- 에디터 본문 -->
+                            <div id="guide-content-editor"
+                                 contenteditable="true"
+                                 class="border border-t-0 border-gray-300 rounded-b-md px-4 py-3 min-h-[500px] bg-white focus:outline-none focus:ring-2 focus:ring-[#009DE8]"
+                                 style="max-height: 600px; overflow-y: auto;">${guide?.content || ''}</div>
+
+                            <p class="mt-2 text-xs text-gray-500">
+                                * 기본 에디터 기능을 제공합니다. (향후 네이버 스마트에디터로 교체 예정)
+                            </p>
+                        </div>
+
+                        <!-- 버튼 영역 -->
+                        <div class="flex justify-end space-x-3 pt-4 border-t">
+                            <button type="button" onclick="switchView('${viewMap[type]}')"
+                                    class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">
+                                취소
+                            </button>
+                            <button type="button" onclick="saveGuideContent('${type}')"
+                                    class="px-4 py-2 bg-[#009DE8] text-white rounded-md text-sm font-medium hover:bg-opacity-90">
+                                저장
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        `;
     },
 };
 
@@ -3645,11 +4143,11 @@ function renderGuideContent(type, isAdmin = false) {
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
                     <div>
-                        <h2 class="text-xl font-bold text-gray-800">${titleMap[type]}</h2>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">${titleMap[type]}</h2>
                         <p class="text-sm text-gray-500 mt-1">최종 수정: ${guide?.lastUpdatedAt || '-'} (${guide?.lastUpdatedByName || '-'})</p>
                     </div>
                     ${isAdmin ? `
-                        <button onclick="editGuideContent('${type}')" class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
+                        <button onclick="switchView('guideEdit', '${type}')" class="px-4 py-2 bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
                             편집
                         </button>
                     ` : ''}

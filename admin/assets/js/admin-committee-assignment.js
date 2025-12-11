@@ -21,7 +21,7 @@ function renderCommitteeAssignmentContent() {
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더 -->
             <div class="p-6 border-b border-gray-200">
-                <h2 class="text-xl font-bold text-gray-800">심사위원 배정</h2>
+                <h2 class="text-lg font-bold text-gray-800">심사위원 배정</h2>
                 <p class="text-sm text-gray-600 mt-1">학생의 논문 심사를 위한 심사위원을 배정합니다.</p>
             </div>
 
@@ -123,16 +123,15 @@ function renderCommitteeAssignmentContent() {
             </div>
 
             <!-- 학생 목록 테이블 -->
-            <div class="p-6">
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed">
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">심사 대상</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">논문 제목</th>
@@ -174,7 +173,7 @@ function renderCommitteeAssignmentContent() {
                                             ${getReviewTypeLabel(item.reviewType)}
                                         </span>
                                     </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900 max-w-xs truncate" title="${item.title}">
+                                    <td class="px-6 py-4 text-sm text-gray-900 td-truncate-long" title="${item.title}">
                                         ${item.title}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.advisorName}</td>
@@ -189,10 +188,9 @@ function renderCommitteeAssignmentContent() {
                             `).join('')}
                         </tbody>
                     </table>
-                </div>
 
                 ${pendingReviews.length === 0 ? '' : `
-                    <div class="mt-4 text-sm text-gray-600">
+                    <div class="px-6 py-4 text-sm text-gray-600 border-t">
                         총 <span class="font-semibold text-primary">${pendingReviews.length}</span>건의 심사 대기 중
                     </div>
                 `}

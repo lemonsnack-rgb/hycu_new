@@ -8,20 +8,20 @@ function renderReview() {
     if (!content) return;
 
     content.innerHTML = `
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">학위 논문 제출</h2>
+                <p class="text-sm text-gray-600 mt-2">심사 단계별로 논문을 제출하고 진행 상황을 확인하세요</p>
+            </div>
+        </div>
+
         <!-- 학위 논문 제출 -->
         <div class="card">
             <!-- 목록 화면 -->
             <div id="review-list-view">
-                <div class="card-header">
-                    <div>
-                        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학위 논문 제출</h2>
-                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">심사 단계별로 논문을 제출하고 진행 상황을 확인하세요</p>
-                    </div>
-                </div>
-
                 <div class="card-body" style="padding: 0;">
                     <!-- 테이블 -->
-                    <table style="width: 100%; border-collapse: collapse;">
+                    <table class="table-fixed" style="width: 100%; border-collapse: collapse;">
                         <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                             <tr>
                                 <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">심사 단계</th>

@@ -1,0 +1,109 @@
+/**
+ * 테이블 셀 텍스트 자동 truncate 스타일
+ *
+ * 사용법:
+ * <td class="td-truncate">긴 텍스트...</td>
+ * <td class="td-truncate" title="전체 텍스트">긴 텍스트...</td>
+ */
+
+/* 기본 truncate (약 15-20자) */
+.td-truncate {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 짧은 truncate (약 10-15자) */
+.td-truncate-short {
+    max-width: 150px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 긴 truncate (약 25-30자) */
+.td-truncate-long {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 매우 긴 truncate (약 40-50자) */
+.td-truncate-extra-long {
+    max-width: 400px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* hover 시 커서 변경 (title 속성이 있는 경우) */
+.td-truncate[title]:hover,
+.td-truncate-short[title]:hover,
+.td-truncate-long[title]:hover,
+.td-truncate-extra-long[title]:hover {
+    cursor: help;
+}
+
+/* 반응형: 모바일에서 더 짧게 */
+@media (max-width: 768px) {
+    .td-truncate {
+        max-width: 120px;
+    }
+
+    .td-truncate-short {
+        max-width: 100px;
+    }
+
+    .td-truncate-long {
+        max-width: 180px;
+    }
+
+    .td-truncate-extra-long {
+        max-width: 250px;
+    }
+}
+
+/* 테이블 가로 스크롤 확인용 (이미 적용되어 있지만 명시) */
+.table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch; /* iOS 부드러운 스크롤 */
+}
+
+/* 테이블 고정 레이아웃: truncate가 제대로 작동하도록 */
+table.table-fixed {
+    table-layout: auto;  /* auto로 변경하여 내용에 맞게 자동 조정 */
+    width: 100%;
+}
+
+/* 테이블 헤더 줄바꿈 방지 */
+table.table-fixed thead th {
+    white-space: nowrap;
+}
+
+/* tbody의 일반 셀도 기본적으로 줄바꿈 방지 (truncate 제외) */
+table.table-fixed tbody td {
+    white-space: nowrap;
+}
+
+/* truncate 적용된 셀에 명시적 너비 설정 */
+.td-truncate {
+    width: 200px;
+    min-width: 200px;
+}
+
+.td-truncate-short {
+    width: 150px;
+    min-width: 150px;
+}
+
+.td-truncate-long {
+    width: 300px;
+    min-width: 300px;
+}
+
+.td-truncate-extra-long {
+    width: 400px;
+    min-width: 400px;
+}

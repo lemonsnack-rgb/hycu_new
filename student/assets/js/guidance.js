@@ -21,18 +21,8 @@ function renderGuidanceDetail() {
     if (!contentArea) return;
 
     contentArea.innerHTML = `
-        <!-- 헤더 -->
-        <div class="flex items-center mb-8">
-            <div class="flex items-center gap-4">
-                <button class="mobile-menu-toggle lg:hidden" onclick="toggleMobileMenu()"
-                        style="padding: 0.5rem; background: none; border: none; cursor: pointer;">
-                    <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M4 6h16M4 12h16M4 18h16"></path>
-                    </svg>
-                </button>
-                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문 지도 현황</h2>
-            </div>
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문 지도 현황</h2>
         </div>
 
         <!-- 주차별 지도 내역 -->

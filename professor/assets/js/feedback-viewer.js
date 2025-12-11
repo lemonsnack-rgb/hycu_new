@@ -105,7 +105,7 @@ function createFeedbackModal(request, feedbackData) {
                     <!-- ID 39: 논문명 표시 -->
                     <div class="flex flex-col">
                         <span class="text-xs text-gray-500">${request.thesisTitle || '논문명'}</span>
-                        <h3 class="text-xl font-bold text-gray-800">
+                        <h3 class="text-lg font-bold text-gray-800">
                             ${request.studentName} - ${request.file}
                         </h3>
                     </div>

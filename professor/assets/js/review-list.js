@@ -50,25 +50,25 @@ function renderReviewList() {
         <div class="p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-4">심사 대상 논문 목록</h3>
             <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead class="bg-gray-50 border-b">
+                <table class="min-w-full table-fixed">
+                    <thead class="bg-gray-50">
                         <tr>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
                                 <input type="checkbox" id="select-all-reviews"
                                        onchange="toggleSelectAllReviews(this.checked)"
                                        class="rounded border-gray-300">
                             </th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학부/대학원</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학과/전공</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정구분</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학적상태</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">심사일</th>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">심사진행상태</th>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">관리</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사일</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
@@ -87,10 +87,8 @@ function renderReviewList() {
                                 <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
                                 <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
-                                    <div class="truncate" title="${assignment.thesisTitle}">
-                                        ${assignment.thesisTitle}
-                                    </div>
+                                <td class="py-3 px-4 text-sm text-gray-600 td-truncate-long" title="${assignment.thesisTitle}">
+                                    ${assignment.thesisTitle}
                                 </td>
                                 <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
                                 <td class="py-3 px-4 text-center">
@@ -144,7 +142,7 @@ function filterAssignments(assignments, filters) {
             return false;
         }
 
-        // 전공/학과 필터
+        // 학과 필터
         if (filters.major && assignment.major !== filters.major) {
             return false;
         }

@@ -31,12 +31,12 @@ function renderJournalSubmissionList() {
                         <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">학술지 게재 실적으로 대체 심사를 신청하세요 ${hasSubmission ? '(최대 1건)' : ''}</p>
                     </div>
                     <button onclick="showJournalSubmissionForm()" class="btn-primary" ${hasSubmission ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>
-                        + 심사 신청하기
+                        심사 신청하기
                     </button>
                 </div>
 
                 <div class="card-body" style="padding: 0;">
-                    <table style="width: 100%; border-collapse: collapse;">
+                    <table class="table-fixed" style="width: 100%; border-collapse: collapse;">
                         <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                             <tr>
                                 <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문 제목</th>
@@ -50,8 +50,8 @@ function renderJournalSubmissionList() {
                         <tbody>
                             ${submissions.length > 0 ? submissions.map(sub => `
                                 <tr style="border-bottom: 1px solid #E5E7EB;">
-                                    <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${sub.paperTitle}</td>
-                                    <td style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;">${sub.journalName}</td>
+                                    <td class="td-truncate-long" style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;" title="${sub.paperTitle}">${sub.paperTitle}</td>
+                                    <td class="td-truncate" style="padding: 0.75rem 1rem; color: #6B7280; font-size: 0.875rem;" title="${sub.journalName}">${sub.journalName}</td>
                                     <td style="padding: 0.75rem 1rem;">
                                         <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${sub.grade}</span>
                                     </td>
@@ -120,13 +120,13 @@ function renderJournalSubmissionList() {
                                     <label class="block text-sm font-medium mb-1">제1저자 *</label>
                                     <input type="text" id="firstAuthor" required
                                            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                           placeholder="성명">
+                                           placeholder="이름">
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium mb-1">교신저자 *</label>
                                     <input type="text" id="correspondingAuthor" required
                                            class="w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                           placeholder="성명">
+                                           placeholder="이름">
                                 </div>
                             </div>
                             <div>

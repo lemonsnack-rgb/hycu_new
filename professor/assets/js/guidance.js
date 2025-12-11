@@ -39,7 +39,7 @@ function showStudentList() {
                             </select>
                         </div>
                         <div class="search-field">
-                            <label class="search-label">전공/학과</label>
+                            <label class="search-label">학과</label>
                             <select id="filter-major" class="search-select">
                                 <option value="">전체</option>
                                 <option value="컴퓨터공학과">컴퓨터공학과</option>
@@ -105,22 +105,22 @@ function showStudentList() {
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">지도 학생 목록</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50 border-b">
                         <tr>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">
                                 <input type="checkbox" id="select-all-students"
                                        onchange="toggleSelectAllStudents(this.checked)"
                                        class="rounded">
                             </th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공/학과</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학년도</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">대학원</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학과</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학위과정</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학년도</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학기차</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학번</th>
+                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">이름</th>
                         </tr>
                     </thead>
                     <tbody id="guidance-list-body">
@@ -195,7 +195,7 @@ function renderStudentDetail() {
                     <div class="info-value">${student.name} (${student.studentId})</div>
                 </div>
                 <div class="info-row">
-                    <div class="info-label">전공 / 학위</div>
+                    <div class="info-label">학과 / 학위</div>
                     <div class="info-value">${student.major} / ${getDegreeText(student.degree)}</div>
                 </div>
                 <div class="info-row">
@@ -308,7 +308,7 @@ function renderStudentDetail() {
                                     </div>
                                     <div>
                                         <span class="text-xs font-semibold text-gray-500">계획내용:</span>
-                                        <p class="text-sm text-gray-700 mt-1">${plan.plannedContent}</p>
+                                        <p class="text-sm text-gray-800 mt-1">${plan.plannedContent}</p>
                                     </div>
                                     
                                     ${plan.executionContent ? `
@@ -381,26 +381,26 @@ function openAddPlanModal() {
         <form id="add-plan-form" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <label class="block text-sm font-medium text-gray-800 mb-1">주차 *</label>
                     <input type="number" name="week" value="${nextWeek}" min="1"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <label class="block text-sm font-medium text-gray-800 mb-1">계획일 *</label>
                     <input type="date" name="plannedDate"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-2">담당교수 선택 *</label>
                 <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
                     ${student.advisors.map(advisor => `
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" name="advisors" value="${advisor.id}"
                                    ${advisor.id === currentProf.id ? 'checked' : ''}
                                    class="rounded border-gray-300 mr-2">
-                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-800'}">
                                 ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
                             </span>
                         </label>
@@ -410,19 +410,19 @@ function openAddPlanModal() {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">지도 주제 *</label>
                 <input type="text" name="plannedTopic" placeholder="예: 연구방법론 개요"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">계획 내용 *</label>
                 <textarea name="plannedContent" rows="4" placeholder="지도할 내용을 상세히 입력하세요"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required></textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">지도 방식 *</label>
                 <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                     <option value="">선택하세요</option>
                     <option value="meeting">대면</option>
@@ -509,13 +509,13 @@ function openExecutionModal(planId) {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">실제 실행일 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">실제 실행일 *</label>
                 <input type="date" name="executionDate" value="${plan.executionDate || today}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">실제 지도 방식 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">실제 지도 방식 *</label>
                 <select name="actualMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                     <option value="meeting" ${(plan.actualMethod || plan.plannedMethod) === 'meeting' ? 'selected' : ''}>대면</option>
                     <option value="online" ${(plan.actualMethod || plan.plannedMethod) === 'online' ? 'selected' : ''}>온라인</option>
@@ -526,26 +526,26 @@ function openExecutionModal(planId) {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">실제 지도 내용 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">실제 지도 내용 *</label>
                 <textarea name="executionContent" rows="4" placeholder="실제로 진행한 지도 내용을 상세히 입력하세요"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>${plan.executionContent || ''}</textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">교수 코멘트</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">교수 코멘트</label>
                 <textarea name="professorComment" rows="3" placeholder="학생에게 전달할 피드백을 입력하세요"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${plan.professorComment || ''}</textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">다음 예정일</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">다음 예정일</label>
                 <input type="date" name="nextPlanDate" value="${plan.nextPlanDate || ''}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
 
             <div class="flex items-center">
                 <input type="checkbox" name="isPublic" id="is-public" ${plan.isPublic !== false ? 'checked' : ''} class="mr-2">
-                <label for="is-public" class="text-sm text-gray-700">학생에게 공개</label>
+                <label for="is-public" class="text-sm text-gray-800">학생에게 공개</label>
             </div>
         </form>
     `;
@@ -633,7 +633,7 @@ function sendNotificationToSelected() {
     const modalContent = `
         <div class="space-y-4">
             <div class="bg-gray-50 p-3 rounded-lg">
-                <p class="text-sm font-medium text-gray-700 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
+                <p class="text-sm font-medium text-gray-800 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
                 <div class="flex flex-wrap gap-2">
                     ${selectedStudents.map(s => `
                         <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
@@ -644,27 +644,27 @@ function sendNotificationToSelected() {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">발송 방법 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-2">발송 방법 *</label>
                 <div class="flex gap-4">
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="notif-type" value="kakao" checked class="rounded-full">
-                        <span class="text-sm text-gray-700">카카오톡</span>
+                        <span class="text-sm text-gray-800">카카오톡</span>
                     </label>
                     <label class="flex items-center gap-2 cursor-pointer">
                         <input type="radio" name="notif-type" value="sms" class="rounded-full">
-                        <span class="text-sm text-gray-700">SMS</span>
+                        <span class="text-sm text-gray-800">SMS</span>
                     </label>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">알림 제목 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">알림 제목 *</label>
                 <input type="text" id="notif-title" placeholder="예: 주차별 지도계획 확인 요청"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">알림 내용 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">알림 내용 *</label>
                 <textarea id="notif-message" rows="4" placeholder="학생들에게 전달할 메시지를 입력하세요"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
             </div>
@@ -726,26 +726,26 @@ function openEditPlanModal(planId) {
         <form id="edit-plan-form" class="space-y-4">
             <div class="grid grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">주차 *</label>
+                    <label class="block text-sm font-medium text-gray-800 mb-1">주차 *</label>
                     <input type="number" name="week" value="${plan.week}" min="1"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">계획일 *</label>
+                    <label class="block text-sm font-medium text-gray-800 mb-1">계획일 *</label>
                     <input type="date" name="plannedDate" value="${plan.plannedDate}"
                            class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                 </div>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">담당교수 선택 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-2">담당교수 선택 *</label>
                 <div class="space-y-2 bg-gray-50 p-3 rounded-lg">
                     ${student.advisors.map(advisor => `
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox" name="advisors" value="${advisor.id}"
                                    ${advisor.id === plan.advisor.id ? 'checked' : ''}
                                    class="rounded border-gray-300 mr-2">
-                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-700'}">
+                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-800'}">
                                 ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
                             </span>
                         </label>
@@ -755,19 +755,19 @@ function openEditPlanModal(planId) {
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">지도 주제 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">지도 주제 *</label>
                 <input type="text" name="plannedTopic" value="${plan.plannedTopic}"
                        class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">계획 내용 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">계획 내용 *</label>
                 <textarea name="plannedContent" rows="4"
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>${plan.plannedContent}</textarea>
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">지도 방식 *</label>
+                <label class="block text-sm font-medium text-gray-800 mb-1">지도 방식 *</label>
                 <select name="plannedMethod" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
                     <option value="meeting" ${plan.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
                     <option value="online" ${plan.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>

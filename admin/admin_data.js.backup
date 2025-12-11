@@ -1,86 +1,8 @@
 // ========== 전역 데이터 저장소 ==========
 const appData = {
     schedules: [
-        {
-            id: 1,
-            name: '2025-1학기 연구계획서 제출 및 심사',
-            title: null,  // 사용자 지정 제목 (대시보드 표시용)
-            category: '연구계획서',
-            categoryType: 'evaluation',
-            year: '2025',  // 학년도
-            term: '1',  // 학기
-            semester: '2025-1',  // 하위 호환용
-            submissionStartDate: '2025-03-01',
-            submissionEndDate: '2025-03-15',
-            reviewStartDate: '2025-03-16',
-            reviewEndDate: '2025-03-30',
-            target: '전체',
-            startDate: '2025-03-01',
-            endDate: '2025-03-30',
-            description: '1학기 연구계획서 제출 및 심사 기간',
-            createdAt: '2025-01-10',
-            createdBy: 'admin'
-        },
-        {
-            id: 2,
-            name: '2025-1학기 중간논문 제출 및 심사',
-            title: null,  // 사용자 지정 제목 (대시보드 표시용)
-            category: '중간논문',
-            categoryType: 'evaluation',
-            year: '2025',  // 학년도
-            term: '1',  // 학기
-            semester: '2025-1',  // 하위 호환용
-            submissionStartDate: '2025-05-01',
-            submissionEndDate: '2025-05-15',
-            reviewStartDate: '2025-05-16',
-            reviewEndDate: '2025-05-31',
-            target: '전체',
-            startDate: '2025-05-01',
-            endDate: '2025-05-31',
-            description: '1학기 중간논문 제출 및 심사 기간',
-            createdAt: '2025-01-10',
-            createdBy: 'admin'
-        },
-        {
-            id: 3,
-            name: '2025-1학기 예비심사 제출 및 심사',
-            title: null,  // 사용자 지정 제목 (대시보드 표시용)
-            category: '예비심사',
-            categoryType: 'evaluation',
-            year: '2025',  // 학년도
-            term: '1',  // 학기
-            semester: '2025-1',  // 하위 호환용
-            submissionStartDate: '2025-10-01',
-            submissionEndDate: '2025-10-15',
-            reviewStartDate: '2025-10-16',
-            reviewEndDate: '2025-10-31',
-            target: '전체',
-            startDate: '2025-10-01',
-            endDate: '2025-10-31',
-            description: '1학기 예비심사 제출 및 심사 기간',
-            createdAt: '2025-01-10',
-            createdBy: 'admin'
-        },
-        {
-            id: 4,
-            name: '2025-1학기 최종논문 제출 및 심사',
-            title: null,  // 사용자 지정 제목 (대시보드 표시용)
-            category: '최종논문',
-            categoryType: 'evaluation',
-            year: '2025',  // 학년도
-            term: '1',  // 학기
-            semester: '2025-1',  // 하위 호환용
-            submissionStartDate: '2025-11-01',
-            submissionEndDate: '2025-11-15',
-            reviewStartDate: '2025-11-16',
-            reviewEndDate: '2025-11-30',
-            target: '전체',
-            startDate: '2025-11-01',
-            endDate: '2025-11-30',
-            description: '1학기 최종논문 제출 및 심사 기간',
-            createdAt: '2025-01-10',
-            createdBy: 'admin'
-        }
+        { id: 1, name: '2025-1학기 연구계획서 제출 기간', target: '전체', startDate: '2025-03-01', endDate: '2025-03-15', description: '1학기 연구계획서 제출 마감' },
+        { id: 2, name: '2025-1학기 중간논문 제출 기간', target: '교육공학-석사', startDate: '2025-05-01', endDate: '2025-05-31', description: '중간논문 제출 및 심사' }
     ],
     requirements: [
         { id: 1, major: '교육공학', degree: '석사', minCredits: 24, thesisRequired: true, journalPapers: 1, conferencePapers: 0 },
@@ -775,6 +697,683 @@ const appData = {
         }
     ],
     
+    // ========== 평가 기준 관리 (독립적 평가표) ==========
+    evaluationCriteria: [
+        {
+            id: 1,
+            name: '석사 논문계획서 평가표',
+            type: 'thesis_plan',
+            description: '범용 연구계획서 평가 기준 (모든 학과 적용 가능)',
+            itemCount: 5,
+            totalScore: 100,
+            passingScore: 70,
+            passingCriteria: {
+                type: 'complex',
+                description: '평균 70점 이상, 최저 60점 이상',
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: '각 항목 최소 60점 이상 (과락)'
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: '전체 평균 70점 이상'
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        maxValue: 100,
+                        description: '총점 70점 이상 (100점 만점)'
+                    }
+                ]
+            },
+            createdDate: '2025-01-10',
+            items: [
+                {
+                    id: 1,
+                    name: '연구주제 적절성',
+                    score: 20,
+                    description: '연구 주제의 명확성 및 타당성'
+                },
+                {
+                    id: 2,
+                    name: '연구방법 타당성',
+                    score: 30,
+                    description: '연구 방법론의 적절성 및 실현가능성'
+                },
+                {
+                    id: 3,
+                    name: '선행연구 검토',
+                    score: 20,
+                    description: '관련 문헌 검토의 충실성'
+                },
+                {
+                    id: 4,
+                    name: '연구계획 실현성',
+                    score: 15,
+                    description: '연구 수행의 현실적 가능성'
+                },
+                {
+                    id: 5,
+                    name: '형식 및 체계',
+                    score: 15,
+                    description: '연구계획서의 형식적 완성도'
+                }
+            ]
+        },
+        {
+            id: 2,
+            name: '박사 논문계획서 평가표',
+            type: 'thesis_plan',
+            description: '박사 과정 연구계획서 평가 기준',
+            itemCount: 6,
+            totalScore: 100,
+            passingScore: 75,
+            passingCriteria: {
+                type: 'complex',
+                description: '평균 75점 이상, 최저 65점 이상',
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 65,
+                        description: '각 항목 최소 65점 이상 (과락)'
+                    },
+                    {
+                        type: 'average',
+                        value: 75,
+                        description: '전체 평균 75점 이상'
+                    },
+                    {
+                        type: 'total',
+                        value: 75,
+                        maxValue: 100,
+                        description: '총점 75점 이상 (100점 만점)'
+                    }
+                ]
+            },
+            createdDate: '2025-01-15',
+            items: [
+                {
+                    id: 1,
+                    name: '연구주제 적절성',
+                    score: 15,
+                    description: '연구 주제의 명확성 및 독창성'
+                },
+                {
+                    id: 2,
+                    name: '이론적 기반',
+                    score: 25,
+                    description: '이론적 배경의 탄탄함'
+                },
+                {
+                    id: 3,
+                    name: '연구방법 타당성',
+                    score: 20,
+                    description: '연구 방법론의 적절성'
+                },
+                {
+                    id: 4,
+                    name: '학문적 기여도',
+                    score: 20,
+                    description: '학문 발전에 대한 기여 가능성'
+                },
+                {
+                    id: 5,
+                    name: '선행연구 검토',
+                    score: 10,
+                    description: '관련 문헌 검토의 충실성'
+                },
+                {
+                    id: 6,
+                    name: '형식 및 체계',
+                    score: 10,
+                    description: '논문의 형식적 완성도'
+                }
+            ]
+        },
+        {
+            id: 3,
+            name: '석사 중간발표 평가표',
+            type: 'mid_presentation',
+            description: '석사 과정 중간발표 평가 기준',
+            itemCount: 5,
+            totalScore: 100,
+            passingScore: 70,
+            passingCriteria: {
+                type: 'complex',
+                description: '평균 70점 이상, 최저 60점 이상',
+                rules: [
+                    {
+                        type: 'minimum',
+                        value: 60,
+                        description: '각 항목 최소 60점 이상 (과락)'
+                    },
+                    {
+                        type: 'average',
+                        value: 70,
+                        description: '전체 평균 70점 이상'
+                    },
+                    {
+                        type: 'total',
+                        value: 70,
+                        maxValue: 100,
+                        description: '총점 70점 이상 (100점 만점)'
+                    }
+                ]
+            },
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 진행 상황',
+                    score: 25,
+                    description: '연구 진행 정도 및 계획 대비 달성도'
+                },
+                {
+                    id: 2,
+                    name: '발표 내용',
+                    score: 25,
+                    description: '발표 내용의 명확성 및 논리성'
+                },
+                {
+                    id: 3,
+                    name: '자료 분석',
+                    score: 20,
+                    description: '수집 자료의 분석 적절성'
+                },
+                {
+                    id: 4,
+                    name: '발표 태도',
+                    score: 15,
+                    description: '발표 자세 및 질의응답 능력'
+                },
+                {
+                    id: 5,
+                    name: '향후 계획',
+                    score: 15,
+                    description: '향후 연구 계획의 실현 가능성'
+                }
+            ]
+        },
+        {
+            id: 4,
+            name: '박사 중간발표 평가표',
+            type: 'mid_presentation',
+            description: '박사 과정 중간발표 평가 기준',
+            itemCount: 6,
+            totalScore: 100,
+            passingScore: 75,
+            passingCriteria: '총점 75점 이상',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 진행 상황',
+                    score: 20,
+                    description: '연구 진행 정도 및 계획 대비 달성도'
+                },
+                {
+                    id: 2,
+                    name: '발표 내용',
+                    score: 20,
+                    description: '발표 내용의 명확성 및 논리성'
+                },
+                {
+                    id: 3,
+                    name: '자료 분석',
+                    score: 20,
+                    description: '수집 자료의 분석 적절성'
+                },
+                {
+                    id: 4,
+                    name: '학문적 기여도',
+                    score: 20,
+                    description: '연구의 학문적 기여 가능성'
+                },
+                {
+                    id: 5,
+                    name: '발표 태도',
+                    score: 10,
+                    description: '발표 자세 및 질의응답 능력'
+                },
+                {
+                    id: 6,
+                    name: '향후 계획',
+                    score: 10,
+                    description: '향후 연구 계획의 실현 가능성'
+                }
+            ]
+        },
+        {
+            id: 5,
+            name: '석사 최종심사 평가표',
+            type: 'final_thesis',
+            description: '석사 과정 최종논문 심사 평가 기준',
+            itemCount: 8,
+            totalScore: 100,
+            passingScore: 80,
+            passingCriteria: '총점 80점 이상',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구문제 명확성',
+                    score: 15,
+                    description: '연구문제의 명확한 제시'
+                },
+                {
+                    id: 2,
+                    name: '이론적 배경',
+                    score: 15,
+                    description: '이론적 기반의 충실성'
+                },
+                {
+                    id: 3,
+                    name: '연구방법 적절성',
+                    score: 15,
+                    description: '연구 방법의 타당성'
+                },
+                {
+                    id: 4,
+                    name: '자료 분석',
+                    score: 15,
+                    description: '자료 분석의 정확성'
+                },
+                {
+                    id: 5,
+                    name: '연구 결과',
+                    score: 15,
+                    description: '연구 결과의 명확한 제시'
+                },
+                {
+                    id: 6,
+                    name: '논의 및 해석',
+                    score: 10,
+                    description: '결과에 대한 논의의 깊이'
+                },
+                {
+                    id: 7,
+                    name: '형식 및 체계',
+                    score: 10,
+                    description: '논문의 형식적 완성도'
+                },
+                {
+                    id: 8,
+                    name: '연구 윤리',
+                    score: 5,
+                    description: '연구 윤리 준수'
+                }
+            ]
+        },
+        {
+            id: 6,
+            name: '박사 최종심사 평가표',
+            type: 'final_thesis',
+            description: '박사 과정 최종논문 심사 평가 기준',
+            itemCount: 10,
+            totalScore: 100,
+            passingScore: 85,
+            passingCriteria: '총점 85점 이상',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구문제 명확성',
+                    score: 10,
+                    description: '연구문제의 명확한 제시'
+                },
+                {
+                    id: 2,
+                    name: '이론적 배경',
+                    score: 10,
+                    description: '이론적 기반의 충실성'
+                },
+                {
+                    id: 3,
+                    name: '연구방법 적절성',
+                    score: 10,
+                    description: '연구 방법의 타당성'
+                },
+                {
+                    id: 4,
+                    name: '자료 수집',
+                    score: 10,
+                    description: '자료 수집의 적절성'
+                },
+                {
+                    id: 5,
+                    name: '자료 분석',
+                    score: 10,
+                    description: '자료 분석의 정확성'
+                },
+                {
+                    id: 6,
+                    name: '연구 결과',
+                    score: 10,
+                    description: '연구 결과의 명확한 제시'
+                },
+                {
+                    id: 7,
+                    name: '논의 및 해석',
+                    score: 10,
+                    description: '결과에 대한 논의의 깊이'
+                },
+                {
+                    id: 8,
+                    name: '연구의 의의',
+                    score: 15,
+                    description: '학문적/실무적 기여도'
+                },
+                {
+                    id: 9,
+                    name: '형식 및 체계',
+                    score: 10,
+                    description: '논문의 형식적 완성도'
+                },
+                {
+                    id: 10,
+                    name: '연구 윤리',
+                    score: 5,
+                    description: '연구 윤리 준수'
+                }
+            ]
+        },
+        {
+            id: 7,
+            name: '학술지 게재 평가표 (기본)',
+            type: 'journal',
+            description: '학술지 논문 게재 심사 기본 평가표',
+            itemCount: 5,
+            totalScore: 100,
+            passingScore: 70,
+            passingCriteria: '총점 70점 이상',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 주제',
+                    score: 20,
+                    description: '연구 주제의 참신성과 중요성'
+                },
+                {
+                    id: 2,
+                    name: '연구 방법',
+                    score: 25,
+                    description: '연구 방법의 타당성'
+                },
+                {
+                    id: 3,
+                    name: '연구 결과',
+                    score: 25,
+                    description: '연구 결과의 신뢰성'
+                },
+                {
+                    id: 4,
+                    name: '학술적 기여',
+                    score: 20,
+                    description: '학문 분야에 대한 기여도'
+                },
+                {
+                    id: 5,
+                    name: '논문 완성도',
+                    score: 10,
+                    description: '논문의 전체적 완성도'
+                }
+            ]
+        },
+        {
+            id: 8,
+            name: '학술지 게재 평가표 (고급)',
+            type: 'journal',
+            description: '학술지 논문 게재 심사 고급 평가표 (상위 등급 학술지용)',
+            itemCount: 7,
+            totalScore: 100,
+            passingScore: 80,
+            passingCriteria: '총점 80점 이상',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 주제',
+                    score: 15,
+                    description: '연구 주제의 참신성과 중요성'
+                },
+                {
+                    id: 2,
+                    name: '문헌 검토',
+                    score: 15,
+                    description: '선행 연구 검토의 충실성'
+                },
+                {
+                    id: 3,
+                    name: '연구 방법',
+                    score: 20,
+                    description: '연구 방법의 타당성과 엄밀성'
+                },
+                {
+                    id: 4,
+                    name: '연구 결과',
+                    score: 15,
+                    description: '연구 결과의 신뢰성'
+                },
+                {
+                    id: 5,
+                    name: '논의',
+                    score: 15,
+                    description: '결과 해석의 깊이'
+                },
+                {
+                    id: 6,
+                    name: '학술적 기여',
+                    score: 15,
+                    description: '학문 분야에 대한 기여도'
+                },
+                {
+                    id: 7,
+                    name: '논문 완성도',
+                    score: 5,
+                    description: '논문의 전체적 완성도'
+                }
+            ]
+        },
+        {
+            id: 9,
+            name: '연구윤리심의 평가표 (Pass/Fail)',
+            type: 'passfail',
+            description: 'IRB 연구윤리심의 통과/불통과 평가 (인간대상연구 또는 동물실험)',
+            itemCount: 6,
+            totalScore: null,
+            passingScore: null,
+            passingCriteria: '모든 항목 Pass',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 목적 및 필요성',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구의 학술적 가치와 사회적 필요성이 명확히 제시되었는가'
+                },
+                {
+                    id: 2,
+                    name: '연구 대상자 보호',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구 대상자의 권리와 안전을 충분히 보호하는 계획이 수립되었는가'
+                },
+                {
+                    id: 3,
+                    name: '동의서 및 설명서',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구 참여 동의서와 설명서가 적절하게 작성되었는가'
+                },
+                {
+                    id: 4,
+                    name: '개인정보 보호',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '개인정보 수집, 저장, 파기 절차가 관련 법규에 부합하는가'
+                },
+                {
+                    id: 5,
+                    name: '위험/이득 평가',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구로 인한 위험과 이득이 적절히 평가되었는가'
+                },
+                {
+                    id: 6,
+                    name: '연구윤리 준수',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구진실성 및 연구윤리 관련 규정을 준수하는가'
+                }
+            ]
+        },
+        {
+            id: 10,
+            name: '학술대회 포스터발표 평가표 (등급형)',
+            type: 'grade',
+            description: '5단계 등급 평가 (A/B/C/D/F) - 학술대회 포스터 발표 평가용',
+            itemCount: 6,
+            totalScore: null,
+            passingScore: null,
+            passingCriteria: 'C 이상',
+            createdDate: '2025-01-20',
+            items: [
+                {
+                    id: 1,
+                    name: '포스터 구성',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '포스터의 전체적인 구성과 시각적 표현 (제목, 서론, 방법, 결과, 결론 구분)'
+                },
+                {
+                    id: 2,
+                    name: '연구 내용 명확성',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구 목적, 방법, 결과가 명확하게 제시되었는가'
+                },
+                {
+                    id: 3,
+                    name: '연구 방법 적절성',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구 방법론의 타당성과 실행 가능성'
+                },
+                {
+                    id: 4,
+                    name: '결과 제시',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구 결과가 그래프, 표 등을 활용하여 명확히 제시되었는가'
+                },
+                {
+                    id: 5,
+                    name: '학술적 기여도',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '연구의 독창성과 학문 분야에 대한 기여 가능성'
+                },
+                {
+                    id: 6,
+                    name: '발표 및 질의응답',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['A', 'B', 'C', 'D', 'F'],
+                    description: '포스터 설명 능력과 질문에 대한 응답의 적절성'
+                }
+            ]
+        },
+        {
+            id: 11,
+            name: '자격시험 (Pass/Fail)',
+            type: 'passfail',
+            description: '박사과정 자격시험 통과/불통과 평가',
+            itemCount: 3,
+            totalScore: null,
+            passingScore: null,
+            passingCriteria: '모든 과목 Pass',
+            createdDate: '2025-01-21',
+            items: [
+                {
+                    id: 1,
+                    name: '전공필수 과목',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '전공 핵심 영역에 대한 이해도 평가 (Pass/Fail)'
+                },
+                {
+                    id: 2,
+                    name: '연구방법론',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '연구 설계 및 분석 방법에 대한 이해 평가 (Pass/Fail)'
+                },
+                {
+                    id: 3,
+                    name: '외국어',
+                    score: null,
+                    evaluationType: 'passfail',
+                    description: '학술 논문 독해 및 작성 능력 평가 (Pass/Fail)'
+                }
+            ]
+        },
+        {
+            id: 12,
+            name: '연구진행상황 점검표 (등급형)',
+            type: 'grade',
+            description: '3단계 등급 평가 (우수/보통/미흡) - 정기 연구진행상황 점검용',
+            itemCount: 4,
+            totalScore: null,
+            passingScore: null,
+            passingCriteria: '보통 이상',
+            createdDate: '2025-01-21',
+            items: [
+                {
+                    id: 1,
+                    name: '연구 진척도',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '계획 대비 연구 진행 정도'
+                },
+                {
+                    id: 2,
+                    name: '문헌 조사',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '선행 연구 검토 및 이론적 배경 정리 상태'
+                },
+                {
+                    id: 3,
+                    name: '자료 수집',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '연구 자료 수집 및 분석 진행 상황'
+                },
+                {
+                    id: 4,
+                    name: '지도교수 면담',
+                    score: null,
+                    evaluationType: 'grade',
+                    gradeOptions: ['우수', '보통', '미흡'],
+                    description: '지도교수와의 정기적 상담 및 피드백 반영'
+                }
+            ]
+        }
+    ],
 
     // ========== 논문 제목 변경 신청 관리 ==========
     titleChangeRequests: [

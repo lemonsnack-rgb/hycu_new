@@ -1,4 +1,6 @@
-// 학생용 지도교수 배정 조회 및 연구계획서 제출 기능
+// 학생용 지도교수 배정 조회 기능 (읽기 전용)
+// 학교 시스템에서 연구계획서 등록 및 지도교수 배정을 관리하므로,
+// 본 시스템에서는 조회 기능만 제공
 
 // 학생용 지도교수 배정 조회 초기화
 function initStudentAdvisorAssignment() {
@@ -7,13 +9,16 @@ function initStudentAdvisorAssignment() {
     // Mock 데이터 로드 확인
     if (typeof mockStudents === 'undefined' || typeof mockResearchProposals === 'undefined' || typeof mockProfessors === 'undefined') {
         console.error('Mock 데이터가 로드되지 않았습니다.');
-        document.getElementById('student-no-proposal').style.display = 'block';
-        document.getElementById('student-no-proposal').innerHTML = `
-            <div class="text-center py-12">
-                <p class="text-red-600 font-semibold">Mock 데이터가 로드되지 않았습니다.</p>
-                <p class="text-gray-500 mt-2">페이지를 새로고침해주세요.</p>
-            </div>
-        `;
+        const noProposalDiv = document.getElementById('student-no-proposal');
+        if (noProposalDiv) {
+            noProposalDiv.style.display = 'block';
+            noProposalDiv.innerHTML = `
+                <div class="text-center py-12">
+                    <p class="text-red-600 font-semibold">Mock 데이터가 로드되지 않았습니다.</p>
+                    <p class="text-gray-500 mt-2">페이지를 새로고침해주세요.</p>
+                </div>
+            `;
+        }
         return;
     }
 
@@ -36,24 +41,35 @@ function renderStudentProposalTable() {
 
     const tableBody = document.getElementById('student-proposal-list');
     const noProposalDiv = document.getElementById('student-no-proposal');
-    const addButton = document.getElementById('student-add-proposal-btn');
 
-    if (!tableBody || !noProposalDiv || !addButton) {
+    if (!tableBody || !noProposalDiv) {
         console.warn('필요한 DOM 요소를 찾을 수 없습니다.');
         return;
     }
 
     if (!myProposal) {
-        // 연구계획서 미제출 시
+        // 연구계획서가 학교 시스템에 등록되지 않은 경우
         tableBody.innerHTML = '';
         noProposalDiv.style.display = 'block';
-        addButton.style.display = 'inline-flex';
+        noProposalDiv.innerHTML = `
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-lg">
+                <div class="flex items-start">
+                    <svg class="w-6 h-6 text-blue-500 mr-3 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <div class="text-sm text-blue-700">
+                        <p class="font-semibold mb-2">학교 시스템에서 연구계획서를 등록해주세요.</p>
+                        <p>연구계획서는 학교의 ERP 시스템에서 등록하며, 등록된 데이터가 자동으로 이곳에 표시됩니다.</p>
+                        <p class="mt-2">지도교수 배정은 연구계획서 등록 후 학교에서 자동으로 진행됩니다.</p>
+                    </div>
+                </div>
+            </div>
+        `;
         return;
     }
 
-    // 연구계획서 제출 완료 시
+    // 연구계획서가 등록된 경우
     noProposalDiv.style.display = 'none';
-    addButton.style.display = 'none';
 
     // 지도교수 배정 정보 조회
     const assignment = typeof mockAdvisorAssignments !== 'undefined'
@@ -81,164 +97,28 @@ function renderStudentProposalTable() {
     `;
 }
 
-// 연구계획서 등록 폼 표시
-function showStudentProposalForm() {
-    const currentStudentId = 'STU001';
-    const student = mockStudents.find(s => s.id === currentStudentId);
+// 학교 시스템 연구계획서 폼 불러오기
+function loadProposalFormStudent(proposalId) {
+    console.log('학생용 연구계획서 폼 불러오기:', proposalId);
 
-    if (!student) {
-        alert('학생 정보를 찾을 수 없습니다.');
+    const proposal = mockResearchProposals.find(p => p.id === proposalId);
+
+    if (!proposal) {
+        alert('연구계획서를 찾을 수 없습니다.');
         return;
     }
 
-    const screen = document.getElementById('advisor-assignment-screen');
-    if (!screen) return;
-
-    // 등록 폼 HTML
-    screen.innerHTML = `
-        <div class="bg-white rounded-lg shadow-md">
-            <!-- 헤더 -->
-            <div class="px-8 py-6 border-b border-gray-200">
-                <div class="flex items-center justify-between mb-4">
-                    <button onclick="returnToStudentProposalList(); return false;"
-                            class="flex items-center text-gray-600 hover:text-gray-900">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        목록으로
-                    </button>
-                </div>
-                <h1 class="text-2xl font-bold text-gray-900">연구계획서 등록</h1>
-            </div>
-
-            <!-- 학생 정보 -->
-            <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">학생 정보</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학번:</span>
-                        <span class="text-gray-900">${student.studentNumber}</span>
-                    </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">성명:</span>
-                        <span class="text-gray-900">${student.name}</span>
-                    </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학과:</span>
-                        <span class="text-gray-900">${student.department}</span>
-                    </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학위과정:</span>
-                        <span class="text-gray-900">${student.degreeType}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 연구계획서 입력 폼 -->
-            <form id="student-proposal-form" class="px-8 py-6">
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            논문 제목 <span class="text-red-500">*</span>
-                        </label>
-                        <input type="text" id="proposal-title" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               placeholder="논문 제목을 입력하세요">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 목적 <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="proposal-purpose" required rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  placeholder="연구의 목적을 입력하세요"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구의 필요성 <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="proposal-necessity" required rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  placeholder="연구의 필요성을 입력하세요"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 문제 및 연구 방법 <span class="text-red-500">*</span>
-                        </label>
-                        <textarea id="proposal-method" required rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                  placeholder="연구 방법을 입력하세요"></textarea>
-                    </div>
-                </div>
-
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="returnToStudentProposalList()"
-                            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        취소
-                    </button>
-                    <button type="submit"
-                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        제출
-                    </button>
-                </div>
-            </form>
-        </div>
-    `;
-
-    // 폼 제출 이벤트 리스너
-    const form = document.getElementById('student-proposal-form');
-    if (form) {
-        form.addEventListener('submit', submitStudentProposal);
+    if (proposal.formUrl) {
+        const formWindow = window.open(proposal.formUrl, '_blank', 'width=1024,height=768');
+        if (!formWindow) {
+            alert('팝업 차단이 활성화되어 있습니다. 팝업 차단을 해제해주세요.');
+        }
+    } else {
+        alert('학교 시스템에 등록된 연구계획서 폼이 없습니다.');
     }
 }
 
-// 연구계획서 제출 처리
-function submitStudentProposal(event) {
-    event.preventDefault();
-
-    const currentStudentId = 'STU001';
-    const student = mockStudents.find(s => s.id === currentStudentId);
-
-    if (!student) {
-        alert('학생 정보를 찾을 수 없습니다.');
-        return;
-    }
-
-    const title = document.getElementById('proposal-title').value;
-    const purpose = document.getElementById('proposal-purpose').value;
-    const necessity = document.getElementById('proposal-necessity').value;
-    const method = document.getElementById('proposal-method').value;
-
-    // 새로운 연구계획서 데이터 생성
-    const newProposal = {
-        id: `RP${String(mockResearchProposals.length + 1).padStart(3, '0')}`,
-        studentId: currentStudentId,
-        studentNumber: student.studentNumber,
-        studentName: student.name,
-        department: student.department,
-        degreeType: student.degreeType,
-        title: title,
-        purpose: purpose,
-        necessity: necessity,
-        method: method,
-        submittedDate: new Date().toISOString().split('T')[0],
-        status: 'pending',
-        desiredAdvisor: null
-    };
-
-    // mockResearchProposals에 추가
-    mockResearchProposals.push(newProposal);
-
-    alert('연구계획서가 제출되었습니다.');
-
-    // 목록으로 복귀
-    returnToStudentProposalList();
-}
-
-// 연구계획서 상세 보기 (수정 가능)
+// 연구계획서 상세 보기 (읽기 전용)
 function viewStudentProposalDetail(proposalId) {
     const currentStudentId = 'STU001';
     const proposal = mockResearchProposals.find(p => p.id === proposalId);
@@ -256,7 +136,7 @@ function viewStudentProposalDetail(proposalId) {
     const screen = document.getElementById('advisor-assignment-screen');
     if (!screen) return;
 
-    // 상세 뷰 + 수정 가능 폼
+    // 읽기 전용 상세 뷰
     screen.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더 -->
@@ -273,7 +153,7 @@ function viewStudentProposalDetail(proposalId) {
                         ${proposal.degreeType}
                     </span>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900">연구계획서 수정</h1>
+                <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">연구계획서 조회</h1>
             </div>
 
             <!-- 학생 정보 -->
@@ -285,7 +165,7 @@ function viewStudentProposalDetail(proposalId) {
                         <span class="text-gray-900">${student?.studentNumber}</span>
                     </div>
                     <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">성명:</span>
+                        <span class="w-24 text-gray-600 font-medium">이름:</span>
                         <span class="text-gray-900">${student?.name}</span>
                     </div>
                     <div class="flex">
@@ -299,63 +179,64 @@ function viewStudentProposalDetail(proposalId) {
                 </div>
             </div>
 
-            <!-- 연구계획서 수정 폼 -->
-            <form id="student-proposal-edit-form" class="px-8 py-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서</h2>
+            <!-- 연구계획서 (읽기 전용) -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="text-lg font-semibold text-gray-900">연구계획서</h2>
+                    <button onclick="loadProposalFormStudent('${proposal.id}')"
+                            class="px-4 py-3 bg-[#009DE8] text-white rounded-lg hover:bg-[#0087c9] flex items-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                        </svg>
+                        연구계획서 출력하기
+                    </button>
+                </div>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            논문 제목 <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-gray-800 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            논문 제목
                         </label>
-                        <input type="text" id="edit-proposal-title" required
-                               class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                               value="${proposal.title}">
+                        <div class="w-full px-4 py-3 border border-gray-300 rounded-b-lg bg-gray-50 text-gray-900">
+                            ${proposal.title}
+                        </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 목적 <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-gray-800 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 목적
                         </label>
-                        <textarea id="edit-proposal-purpose" required rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${proposal.purpose}</textarea>
+                        <div class="w-full px-4 py-3 border border-gray-300 rounded-b-lg bg-gray-50 text-gray-900 whitespace-pre-wrap">
+                            ${proposal.purpose}
+                        </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 필요성 <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-gray-800 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 필요성
                         </label>
-                        <textarea id="edit-proposal-necessity" required rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${proposal.necessity}</textarea>
+                        <div class="w-full px-4 py-3 border border-gray-300 rounded-b-lg bg-gray-50 text-gray-900 whitespace-pre-wrap">
+                            ${proposal.necessity}
+                        </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 문제 및 연구 방법 <span class="text-red-500">*</span>
+                        <label class="block text-sm font-medium text-gray-800 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            연구 문제 및 연구 방법
                         </label>
-                        <textarea id="edit-proposal-method" required rows="6"
-                                  class="w-full px-4 py-3 border border-gray-300 rounded-b-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">${proposal.method}</textarea>
+                        <div class="w-full px-4 py-3 border border-gray-300 rounded-b-lg bg-gray-50 text-gray-900 whitespace-pre-wrap">
+                            ${proposal.method}
+                        </div>
                     </div>
 
                     <div class="text-xs text-gray-500 pt-3 border-t">
                         제출일: ${proposal.submittedDate}
                     </div>
                 </div>
-
-                <div class="flex justify-end gap-3 mt-6">
-                    <button type="button" onclick="returnToStudentProposalList()"
-                            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors">
-                        취소
-                    </button>
-                    <button type="submit"
-                            class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                        수정
-                    </button>
-                </div>
-            </form>
+            </div>
 
             <!-- 지도교수 배정 현황 -->
-            <div class="px-8 py-6">
+            <div class="px-8 py-6 border-b border-gray-200">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">지도교수 배정 현황</h2>
 
                 ${assignment ? `
@@ -393,43 +274,23 @@ function viewStudentProposalDetail(proposalId) {
                     </div>
                 `}
             </div>
+
+            <!-- 안내 메시지 -->
+            <div class="px-8 py-6">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-lg">
+                    <div class="flex items-start">
+                        <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div class="text-sm text-blue-700">
+                            <p>연구계획서는 학교 시스템에서 관리됩니다.</p>
+                            <p class="mt-1">수정이 필요한 경우 학교 ERP 시스템을 통해 진행해주세요.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     `;
-
-    // 수정 폼 제출 이벤트 리스너
-    const editForm = document.getElementById('student-proposal-edit-form');
-    if (editForm) {
-        editForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            updateStudentProposal(proposalId);
-        });
-    }
-}
-
-// 연구계획서 수정 처리
-function updateStudentProposal(proposalId) {
-    const proposal = mockResearchProposals.find(p => p.id === proposalId);
-
-    if (!proposal) {
-        alert('연구계획서를 찾을 수 없습니다.');
-        return;
-    }
-
-    const title = document.getElementById('edit-proposal-title').value;
-    const purpose = document.getElementById('edit-proposal-purpose').value;
-    const necessity = document.getElementById('edit-proposal-necessity').value;
-    const method = document.getElementById('edit-proposal-method').value;
-
-    // 연구계획서 업데이트
-    proposal.title = title;
-    proposal.purpose = purpose;
-    proposal.necessity = necessity;
-    proposal.method = method;
-
-    alert('연구계획서가 수정되었습니다.');
-
-    // 목록으로 복귀
-    returnToStudentProposalList();
 }
 
 // 목록으로 돌아가기 (HTML 구조 복원)
@@ -444,29 +305,24 @@ function returnToStudentProposalList() {
             <div class="p-6 border-b">
                 <div class="flex items-center justify-between">
                     <div>
-                        <h2 class="text-xl font-semibold text-gray-800">지도교수 배정 조회</h2>
-                        <p class="text-sm text-gray-600 mt-1">나의 연구계획서와 배정된 지도교수를 조회합니다.</p>
+                        <h2 class="text-lg font-bold text-gray-800">지도교수 배정 조회</h2>
+                        <p class="text-sm text-gray-600 mt-1">학교 시스템에 등록된 연구계획서와 배정된 지도교수를 조회합니다.</p>
                     </div>
-                    <button id="student-add-proposal-btn" onclick="showStudentProposalForm()"
-                            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                            style="display: none;">
-                        <i class="fas fa-plus mr-2"></i>연구계획서 등록
-                    </button>
                 </div>
             </div>
 
             <!-- 연구계획서 목록 테이블 -->
             <div class="p-6">
                 <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
+                    <table class="min-w-full table-fixed divide-y divide-gray-200">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">논문 제목</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제출일</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">학년도</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">학기차</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">논문 제목</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">제출일</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">지도교수</th>
+                                <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600">부지도교수</th>
                             </tr>
                         </thead>
                         <tbody id="student-proposal-list" class="bg-white divide-y divide-gray-200">
@@ -476,10 +332,7 @@ function returnToStudentProposalList() {
                 </div>
 
                 <div id="student-no-proposal" class="text-center py-8 text-gray-500" style="display: none;">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <p>연구계획서를 제출해주세요.</p>
+                    <!-- JavaScript로 동적 생성 -->
                 </div>
             </div>
         </div>

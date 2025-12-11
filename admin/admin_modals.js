@@ -775,163 +775,253 @@ function viewJournalDetail(id) {
 
 // ========== 수정사항 1: 일정 관리 - 다중 학과 선택 ==========
 
+// 카테고리 목록 추출 (stages.steps에서 hasEvaluation=true인 name)
+function getCategoryList() {
+    const allStepNames = new Set();
+
+    if (appData && appData.stages) {
+        appData.stages.forEach(stage => {
+            if (stage.steps) {
+                stage.steps.forEach(step => {
+                    if (step.hasEvaluation) {
+                        allStepNames.add(step.name);
+                    }
+                });
+            }
+        });
+    }
+
+    return Array.from(allStepNames).sort();
+}
+
 function openScheduleModal(id = null) {
     const isEdit = id !== null;
     const item = isEdit ? appData.schedules.find(s => s.id === id) : {};
-    
-    // 학과 목록 (실제로는 API에서 가져와야 함)
-    const departments = [
-        { id: 'edu-master', name: '교육공학', degree: '석사' },
-        { id: 'edu-phd', name: '교육공학', degree: '박사' },
-        { id: 'business-master', name: '경영학', degree: '석사' },
-        { id: 'business-phd', name: '경영학', degree: '박사' },
-        { id: 'cs-master', name: '컴퓨터공학', degree: '석사' },
-        { id: 'cs-phd', name: '컴퓨터공학', degree: '박사' },
-        { id: 'psychology-master', name: '심리학', degree: '석사' },
-        { id: 'psychology-phd', name: '심리학', degree: '박사' }
-    ];
-    
-    // 기존 선택된 대상 파싱
-    const selectedTargets = item.targets || (item.target === '전체' ? [] : item.target ? [item.target] : []);
-    
+
+    // 카테고리 목록
+    const categories = getCategoryList();
+
     const content = `
         <div class="space-y-4">
+            <!-- 일정 제목 -->
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">일정명 <span class="text-red-600">*</span></label>
-                <input type="text" id="schedule-name" value="${item.name || ''}" 
-                       placeholder="예: 2025-1학기 연구계획서 제출 기간" 
-                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
-            </div>
-            
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">
-                    적용 대상 <span class="text-red-600">*</span>
-                    <span class="text-xs font-normal text-gray-500">(다중 선택 가능)</span>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    일정 제목 <span class="text-red-600">*</span>
                 </label>
-                
-                <div class="mb-3 bg-blue-50 p-3 rounded-md">
-                    <label class="flex items-center cursor-pointer">
-                        <input type="checkbox" id="target-all" onchange="toggleAllTargets(this)" 
-                               ${selectedTargets.length === 0 ? 'checked' : ''}
-                               class="h-4 w-4 text-[#009DE8] rounded border-gray-300 focus:ring-[#009DE8]">
-                        <span class="ml-2 font-medium text-gray-900">✓ 전체 학과 적용</span>
-                    </label>
-                </div>
-                
-                <div id="target-list" class="border border-gray-200 rounded-md max-h-64 overflow-y-auto">
-                    ${departments.map(dept => {
-                        const deptId = `${dept.name}-${dept.degree}`;
-                        const isChecked = selectedTargets.includes(deptId);
-                        return `
-                            <label class="flex items-center p-3 hover:bg-gray-50 border-b last:border-b-0 cursor-pointer">
-                                <input type="checkbox" 
-                                       class="target-checkbox h-4 w-4 text-[#009DE8] rounded border-gray-300 focus:ring-[#009DE8]" 
-                                       value="${deptId}"
-                                       ${isChecked ? 'checked' : ''}
-                                       onchange="updateTargetAll()">
-                                <span class="ml-3 text-sm text-gray-700">${dept.name} <span class="text-gray-500">(${dept.degree})</span></span>
-                            </label>
-                        `;
-                    }).join('')}
-                </div>
-                <p class="mt-2 text-xs text-gray-500">
-                    <svg class="w-3 h-3 inline" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path></svg>
-                    전체 학과를 선택하면 개별 선택이 해제됩니다
+                <input type="text" id="schedule-title" value="${item.title || ''}"
+                       placeholder="예: 2025학년도 1학기 연구계획서 심사"
+                       class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                <p class="mt-1 text-xs text-gray-500">대시보드에 표시될 일정 제목을 입력하세요</p>
+            </div>
+
+            <!-- 카테고리 선택 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                    카테고리 (심사 단계) <span class="text-red-600">*</span>
+                </label>
+                <select id="schedule-category"
+                        class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                    <option value="">선택하세요</option>
+                    ${categories.map(cat => `
+                        <option value="${cat}" ${item.category === cat ? 'selected' : ''}>
+                            ${cat}
+                        </option>
+                    `).join('')}
+                </select>
+                <p class="mt-1 text-xs text-gray-500">
+                    <i class="fas fa-info-circle"></i>
+                    이 카테고리는 모든 학위/전공의 동일 단계에 적용됩니다.
                 </p>
             </div>
-            
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">시작일 <span class="text-red-600">*</span></label>
-                    <input type="date" id="schedule-start" value="${item.startDate || ''}" 
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+
+            <!-- 학기 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">학기</label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">학년도</label>
+                        <input type="number" id="schedule-year" value="${item.year || ''}"
+                               placeholder="예: 2025"
+                               min="2020"
+                               max="2099"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">학기</label>
+                        <select id="schedule-term"
+                                class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                            <option value="">선택</option>
+                            <option value="1" ${item.term === '1' ? 'selected' : ''}>1학기</option>
+                            <option value="2" ${item.term === '2' ? 'selected' : ''}>2학기</option>
+                            <option value="여름" ${item.term === '여름' ? 'selected' : ''}>여름학기</option>
+                            <option value="겨울" ${item.term === '겨울' ? 'selected' : ''}>겨울학기</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">종료일 <span class="text-red-600">*</span></label>
-                    <input type="date" id="schedule-end" value="${item.endDate || ''}" 
-                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                <p class="mt-1 text-xs text-gray-500">학기 구분이 필요한 경우 입력하세요 (선택사항)</p>
+            </div>
+
+            <!-- 제출 기간 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    제출 기간 <span class="text-red-600">*</span>
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">제출 시작일</label>
+                        <input type="date" id="schedule-submission-start"
+                               value="${item.submissionStartDate || item.startDate || ''}"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">제출 마감일</label>
+                        <input type="date" id="schedule-submission-end"
+                               value="${item.submissionEndDate || item.endDate || ''}"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                    </div>
                 </div>
             </div>
-            
+
+            <!-- 심사 기간 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                    심사 기간 <span class="text-red-600">*</span>
+                </label>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">심사 시작일</label>
+                        <input type="date" id="schedule-review-start"
+                               value="${item.reviewStartDate || ''}"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">심사 종료일</label>
+                        <input type="date" id="schedule-review-end"
+                               value="${item.reviewEndDate || ''}"
+                               class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 설명 -->
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
-                <textarea id="schedule-desc" rows="3" 
+                <textarea id="schedule-desc" rows="3"
                           placeholder="일정에 대한 추가 설명을 입력하세요"
                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">${item.description || ''}</textarea>
             </div>
         </div>
     `;
-    
+
     openModal(isEdit ? '일정 수정' : '일정 추가', content, '저장', () => {
-        // 유효성 검사
-        const name = document.getElementById('schedule-name').value.trim();
-        const startDate = document.getElementById('schedule-start').value;
-        const endDate = document.getElementById('schedule-end').value;
-        
-        if (!name || !startDate || !endDate) {
-            showAlert('필수 항목을 모두 입력해주세요.');
-            return;
-        }
-        
-        if (new Date(startDate) > new Date(endDate)) {
-            showAlert('종료일은 시작일보다 이후여야 합니다.');
-            return;
-        }
-        
-        const isAllTargets = document.getElementById('target-all').checked;
-        const selectedCheckboxes = Array.from(document.querySelectorAll('.target-checkbox:checked'));
-        const targets = isAllTargets ? [] : selectedCheckboxes.map(cb => cb.value);
-        
-        if (!isAllTargets && targets.length === 0) {
-            showAlert('적용 대상을 최소 1개 이상 선택해주세요.');
-            return;
-        }
-        
-        const newItem = {
-            id: isEdit ? id : appData.schedules.length + 1,
-            name: name,
-            target: isAllTargets ? '전체' : targets.join(', '),
-            targets: targets,
-            startDate: startDate,
-            endDate: endDate,
-            description: document.getElementById('schedule-desc').value.trim()
-        };
-        
-        if (isEdit) {
-            const index = appData.schedules.findIndex(s => s.id === id);
-            appData.schedules[index] = newItem;
-        } else {
-            appData.schedules.push(newItem);
-        }
-        
-        closeModal();
-        showAlert(`일정이 ${isEdit ? '수정' : '추가'}되었습니다.`);
-        switchView('scheduleManagement');
+        saveSchedule(id, isEdit);
     });
 }
 
-// 전체 선택 토글
-function toggleAllTargets(checkbox) {
-    const targetCheckboxes = document.querySelectorAll('.target-checkbox');
-    if (checkbox.checked) {
-        targetCheckboxes.forEach(cb => {
-            cb.checked = false;
-            cb.disabled = true;
-        });
-    } else {
-        targetCheckboxes.forEach(cb => {
-            cb.disabled = false;
-        });
-    }
-}
+function saveSchedule(id, isEdit) {
+    // 입력값 수집
+    const title = document.getElementById('schedule-title').value.trim();
+    const category = document.getElementById('schedule-category').value.trim();
+    const year = document.getElementById('schedule-year').value.trim();
+    const term = document.getElementById('schedule-term').value.trim();
+    const submissionStart = document.getElementById('schedule-submission-start').value;
+    const submissionEnd = document.getElementById('schedule-submission-end').value;
+    const reviewStart = document.getElementById('schedule-review-start').value;
+    const reviewEnd = document.getElementById('schedule-review-end').value;
+    const description = document.getElementById('schedule-desc').value.trim();
 
-// 개별 선택 시 전체 선택 해제
-function updateTargetAll() {
-    const allCheckbox = document.getElementById('target-all');
-    const anyChecked = document.querySelectorAll('.target-checkbox:checked').length > 0;
-    if (anyChecked) {
-        allCheckbox.checked = false;
+    // 필수 입력 검증
+    if (!title) {
+        showAlert('일정 제목을 입력하세요.');
+        return;
     }
+
+    if (!category) {
+        showAlert('카테고리를 선택하세요.');
+        return;
+    }
+
+    if (!submissionStart || !submissionEnd || !reviewStart || !reviewEnd) {
+        showAlert('모든 날짜를 입력하세요.');
+        return;
+    }
+
+    // 날짜 유효성 검사
+    const dates = {
+        submissionStart: new Date(submissionStart),
+        submissionEnd: new Date(submissionEnd),
+        reviewStart: new Date(reviewStart),
+        reviewEnd: new Date(reviewEnd)
+    };
+
+    if (dates.submissionEnd < dates.submissionStart) {
+        showAlert('제출 마감일은 제출 시작일보다 늦어야 합니다.');
+        return;
+    }
+
+    if (dates.reviewStart <= dates.submissionEnd) {
+        showAlert('심사 시작일은 제출 마감일보다 늦어야 합니다.');
+        return;
+    }
+
+    if (dates.reviewEnd < dates.reviewStart) {
+        showAlert('심사 종료일은 심사 시작일보다 늦어야 합니다.');
+        return;
+    }
+
+    // 학기 정보 조합 (하위 호환을 위해 semester 필드 유지)
+    let semesterStr = null;
+    if (year && term) {
+        const termDisplay = term === '1' ? '1학기' :
+                           term === '2' ? '2학기' :
+                           term === '여름' ? '여름학기' :
+                           term === '겨울' ? '겨울학기' : term;
+        semesterStr = `${year}-${term}`;
+    }
+
+    // 새 일정 객체 생성
+    const newSchedule = {
+        id: isEdit ? id : (appData.schedules.length + 1),
+        name: title,  // 사용자 지정 제목 (필수)
+        title: title,  // 사용자 지정 제목 (대시보드 표시용)
+
+        // 카테고리 (학교 공통)
+        category: category,
+        categoryType: 'evaluation',
+
+        // 학기 정보 (선택)
+        year: year || null,  // 학년도
+        term: term || null,  // 학기 (1, 2, 여름, 겨울)
+        semester: semesterStr,  // 하위 호환용 (예: 2025-1)
+
+        // 일정
+        submissionStartDate: submissionStart,
+        submissionEndDate: submissionEnd,
+        reviewStartDate: reviewStart,
+        reviewEndDate: reviewEnd,
+
+        // 하위호환
+        target: '전체',
+        startDate: submissionStart,
+        endDate: reviewEnd,
+
+        description: description || `${category} 제출 및 심사 기간`,
+        createdAt: new Date().toISOString().split('T')[0],
+        createdBy: 'admin'
+    };
+
+    // 저장 (수정 or 신규)
+    if (isEdit) {
+        const index = appData.schedules.findIndex(s => s.id === id);
+        appData.schedules[index] = newSchedule;
+    } else {
+        appData.schedules.push(newSchedule);
+    }
+
+    // UI 갱신
+    closeModal();
+    showAlert(`일정이 ${isEdit ? '수정' : '추가'}되었습니다.`);
+    switchView('scheduleManagement');
 }
 
 function editSchedule(id) {
@@ -944,6 +1034,189 @@ function deleteSchedule(id) {
         showAlert('일정이 삭제되었습니다.');
         switchView('scheduleManagement');
     });
+}
+
+// ========== 일정 등록 페이지에서 저장 ==========
+function saveScheduleFromPage(id) {
+    const isEdit = id !== null;
+
+    // 입력값 수집
+    const title = document.getElementById('schedule-title').value.trim();
+    const category = document.getElementById('schedule-category').value.trim();
+    const year = document.getElementById('schedule-year').value.trim();
+    const term = document.getElementById('schedule-term').value.trim();
+    const submissionStart = document.getElementById('schedule-submission-start').value;
+    const submissionEnd = document.getElementById('schedule-submission-end').value;
+    const reviewStart = document.getElementById('schedule-review-start').value;
+    const reviewEnd = document.getElementById('schedule-review-end').value;
+    const description = document.getElementById('schedule-desc').value.trim();
+
+    // 필수 입력 검증
+    if (!title) {
+        showAlert('일정 제목을 입력하세요.');
+        return;
+    }
+
+    if (!category) {
+        showAlert('카테고리를 선택하세요.');
+        return;
+    }
+
+    if (!submissionStart || !submissionEnd || !reviewStart || !reviewEnd) {
+        showAlert('모든 날짜를 입력하세요.');
+        return;
+    }
+
+    // 날짜 유효성 검사
+    const dates = {
+        submissionStart: new Date(submissionStart),
+        submissionEnd: new Date(submissionEnd),
+        reviewStart: new Date(reviewStart),
+        reviewEnd: new Date(reviewEnd)
+    };
+
+    if (dates.submissionEnd < dates.submissionStart) {
+        showAlert('제출 마감일은 제출 시작일보다 늦어야 합니다.');
+        return;
+    }
+
+    if (dates.reviewStart <= dates.submissionEnd) {
+        showAlert('심사 시작일은 제출 마감일보다 늦어야 합니다.');
+        return;
+    }
+
+    if (dates.reviewEnd < dates.reviewStart) {
+        showAlert('심사 종료일은 심사 시작일보다 늦어야 합니다.');
+        return;
+    }
+
+    // 학기 정보 조합 (하위 호환을 위해 semester 필드 유지)
+    let semesterStr = null;
+    if (year && term) {
+        semesterStr = `${year}-${term}`;
+    }
+
+    // 새 일정 객체 생성
+    const newSchedule = {
+        id: isEdit ? id : (appData.schedules.length + 1),
+        name: title,  // 사용자 지정 제목 (필수)
+        title: title,  // 사용자 지정 제목 (대시보드 표시용)
+
+        // 카테고리 (학교 공통)
+        category: category,
+        categoryType: 'evaluation',
+
+        // 학기 정보 (선택)
+        year: year || null,  // 학년도
+        term: term || null,  // 학기 (1, 2, 여름, 겨울)
+        semester: semesterStr,  // 하위 호환용 (예: 2025-1)
+
+        // 일정
+        submissionStartDate: submissionStart,
+        submissionEndDate: submissionEnd,
+        reviewStartDate: reviewStart,
+        reviewEndDate: reviewEnd,
+
+        // 하위호환
+        target: '전체',
+        startDate: submissionStart,
+        endDate: reviewEnd,
+
+        description: description || `${category} 제출 및 심사 기간`,
+        createdAt: new Date().toISOString().split('T')[0],
+        createdBy: 'admin'
+    };
+
+    // 저장 (수정 or 신규)
+    if (isEdit) {
+        const index = appData.schedules.findIndex(s => s.id === id);
+        appData.schedules[index] = newSchedule;
+    } else {
+        appData.schedules.push(newSchedule);
+    }
+
+    // UI 갱신
+    showAlert(`일정이 ${isEdit ? '수정' : '등록'}되었습니다.`);
+    switchView('scheduleManagement');
+}
+
+// ========== 공지사항 저장 (페이지 기반) ==========
+function saveNoticeFromPage(id) {
+    const isEdit = id !== null && id !== '';
+
+    // 입력값 수집
+    const title = document.getElementById('notice-title').value.trim();
+    const editor = document.getElementById('notice-content-editor');
+    const content = editor ? editor.innerHTML : '';
+
+    // 필수 입력 검증
+    if (!title) {
+        showAlert('제목을 입력하세요.');
+        return;
+    }
+
+    if (!content || content === '<p>공지사항 내용을 입력하세요.</p>' || content.trim() === '') {
+        showAlert('내용을 입력하세요.');
+        return;
+    }
+
+    const now = new Date().toISOString().slice(0, 16).replace('T', ' ');
+
+    if (isEdit) {
+        // 수정
+        const index = mockNotices.findIndex(n => n.id === id);
+        if (index !== -1) {
+            mockNotices[index].title = title;
+            mockNotices[index].content = content;
+            mockNotices[index].updatedAt = now;
+
+            showAlert('공지사항이 수정되었습니다.');
+            switchView('noticeDetail', id);
+        } else {
+            showAlert('공지사항을 찾을 수 없습니다.');
+        }
+    } else {
+        // 신규 등록
+        const newId = 'NOTICE_' + String(mockNotices.length + 1).padStart(3, '0');
+        const newNotice = {
+            id: newId,
+            category: 'general',
+            title: title,
+            content: content,
+            authorId: 'admin',
+            authorName: '관리자',
+            createdAt: now,
+            updatedAt: now,
+            viewCount: 0,
+            isPinned: false,
+            attachments: []
+        };
+
+        mockNotices.unshift(newNotice);  // 최신 글을 맨 위에 추가
+
+        showAlert('공지사항이 등록되었습니다.');
+        switchView('noticeManagement');
+    }
+}
+
+// ========== 공지사항 삭제 ==========
+function deleteNotice(id) {
+    const notice = mockNotices.find(n => n.id === id);
+    if (!notice) {
+        showAlert('공지사항을 찾을 수 없습니다.');
+        return;
+    }
+
+    if (!confirm(`"${notice.title}" 공지사항을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.`)) {
+        return;
+    }
+
+    const index = mockNotices.findIndex(n => n.id === id);
+    if (index !== -1) {
+        mockNotices.splice(index, 1);
+        showAlert('공지사항이 삭제되었습니다.');
+        switchView('noticeManagement');
+    }
 }
 
 // ========== 수정사항 2: 논문 제출 요건 관리 - 기관계 시스템 연동 ==========
@@ -4396,15 +4669,15 @@ function renderAdminJournalRows(journals) {
     }
 
     return `
-        <table class="min-w-full">
+        <table class="min-w-full table-fixed">
             <thead class="bg-gray-50">
                 <tr>
-                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문제목</th>
                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지명</th>
                     <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일</th>
@@ -4423,15 +4696,11 @@ function renderAdminJournalRows(journals) {
                             <td class="py-3 px-4 text-sm text-gray-600">${journal.degree || '석사'}</td>
                             <td class="py-3 px-4 text-sm text-gray-600">${journal.studentId}</td>
                             <td class="py-3 px-4 text-sm font-medium text-gray-800">${journal.studentName}</td>
-                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
-                                <div class="truncate" title="${journal.paperTitle}">
-                                    ${journal.paperTitle}
-                                </div>
+                            <td class="py-3 px-4 text-sm text-gray-600 td-truncate-extra-long" title="${journal.paperTitle}">
+                                ${journal.paperTitle}
                             </td>
-                            <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 200px;">
-                                <div class="truncate" title="${journal.journalName}">
-                                    ${journal.journalName}
-                                </div>
+                            <td class="py-3 px-4 text-sm text-gray-600 td-truncate" title="${journal.journalName}">
+                                ${journal.journalName}
                             </td>
                             <td class="py-3 px-4 text-center text-sm text-gray-600">${journal.submissionDate || '-'}</td>
                             <td class="py-3 px-4 text-center">
@@ -6724,7 +6993,7 @@ function openUserSimulatorModal() {
             <div>
                 <h4 class="font-semibold mb-3">최종 권한 결과 (합집합)</h4>
                 <div class="border rounded-lg max-h-96 overflow-y-auto">
-                    <table class="w-full text-sm">
+                    <table class="w-full text-sm table-fixed">
                         <thead class="bg-gray-50 sticky top-0">
                             <tr>
                                 <th class="text-left p-3 border-b">메뉴명</th>
@@ -7035,30 +7304,52 @@ function previewGuideContent() {
 }
 
 /**
- * 안내문 저장
+ * 안내문 저장 (페이지 전환 방식)
+ * @param {string} type - 'ethics', 'schedule', 'procedure'
  */
-function saveGuideContent() {
-    if (!window.currentEditingGuide) return;
-
+function saveGuideContent(type) {
     const editor = document.getElementById('guide-content-editor');
-    const content = editor.value;
+    const content = editor ? editor.innerHTML : '';
 
-    const { type, guide } = window.currentEditingGuide;
+    if (!content.trim()) {
+        showAlert('내용을 입력하세요.');
+        return;
+    }
+
+    const guide = mockGuides.find(g => g.type === type && g.isPublished);
 
     if (guide) {
         guide.content = content;
         guide.lastUpdatedAt = new Date().toISOString().slice(0, 16).replace('T', ' ');
         guide.lastUpdatedByName = '관리자';
 
-        alert('저장되었습니다.');
-
-        // 모달 닫기
-        closeGuideEditorModal();
+        showAlert('저장되었습니다.');
 
         // 화면 새로고침
         if (type === 'ethics') switchView('ethicsGuide');
         else if (type === 'schedule') switchView('scheduleGuide');
         else if (type === 'procedure') switchView('processGuide');
+    }
+}
+
+/**
+ * 에디터 포맷 적용
+ * @param {string} command - execCommand 명령어
+ * @param {string} value - 명령어에 전달할 값
+ */
+function applyFormat(command, value = null) {
+    document.execCommand(command, false, value);
+    document.getElementById('guide-content-editor').focus();
+}
+
+/**
+ * 링크 삽입
+ */
+function insertLink() {
+    const url = prompt('링크 URL을 입력하세요:');
+    if (url) {
+        document.execCommand('createLink', false, url);
+        document.getElementById('guide-content-editor').focus();
     }
 }
 
@@ -7071,3 +7362,5 @@ window.editGuideContent = editGuideContent;
 window.closeGuideEditorModal = closeGuideEditorModal;
 window.previewGuideContent = previewGuideContent;
 window.saveGuideContent = saveGuideContent;
+window.applyFormat = applyFormat;
+window.insertLink = insertLink;

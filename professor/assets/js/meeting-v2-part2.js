@@ -25,32 +25,57 @@ function renderApprovedTab() {
 function renderApprovedCard(req) {
     const typeText = req.meetingType === 'online' ? '온라인' : '대면';
     const isOnline = req.meetingType === 'online';
-    
+
+    // 시작-종료 시간 계산
+    const startTime = req.selectedTime;
+    const [hours, minutes] = startTime.split(':').map(Number);
+    const endHours = Math.floor((hours * 60 + minutes + req.duration) / 60);
+    const endMinutes = (hours * 60 + minutes + req.duration) % 60;
+    const endTime = `${String(endHours).padStart(2, '0')}:${String(endMinutes).padStart(2, '0')}`;
+
     return `
         <div class="approved-card">
             <div class="flex justify-between items-start mb-3">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-user-graduate text-blue-600" style="font-size: 1.25rem;"></i>
                         <span class="font-semibold text-lg">${req.studentName}</span>
                         <span class="text-sm text-gray-500">(${req.studentNumber})</span>
-                        <span class="badge-purple">${typeText}</span>
                     </div>
-                    <p class="text-sm text-gray-600">승인일: ${req.approvedDate}</p>
+                    <div class="flex items-center gap-3 text-sm text-gray-600">
+                        <div class="flex items-center gap-1">
+                            <i class="fas fa-${isOnline ? 'video' : 'handshake'}" style="color: ${isOnline ? '#8B5CF6' : '#6B7280'};"></i>
+                            <span>${typeText}</span>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <i class="fas fa-calendar-check" style="color: #10B981;"></i>
+                            <span>승인일: ${req.approvedDate}</span>
+                        </div>
+                    </div>
                 </div>
                 <span class="badge-blue">승인됨</span>
             </div>
-            
+
             <div class="bg-green-50 p-4 rounded-lg mb-3">
-                <h4 class="font-semibold text-green-900 mb-2">${req.topic}</h4>
-                <div class="grid grid-cols-2 gap-2 text-sm text-green-800">
-                    <div>📅 일시: <span class="font-medium">${req.selectedDate}</span></div>
-                    <div>⏰ 시간: <span class="font-medium">${req.selectedTime} (${req.duration}분)</span></div>
+                <h4 class="font-semibold text-green-900 mb-3">${req.topic}</h4>
+                <div class="grid grid-cols-2 gap-3 text-sm text-green-800">
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-calendar" style="color: #059669;"></i>
+                        <span>일시: <span class="font-medium">${req.selectedDate}</span></span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <i class="far fa-clock" style="color: #059669;"></i>
+                        <span>시간: <span class="font-medium">${startTime} - ${endTime}</span></span>
+                    </div>
                 </div>
             </div>
-            
+
             ${isOnline && req.zoomJoinUrl ? `
                 <div class="bg-purple-50 p-4 rounded-lg mb-3 border-l-4 border-purple-400">
-                    <p class="text-xs font-semibold text-purple-800 mb-2">🎥 Zoom 미팅 정보</p>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i class="fas fa-video" style="color: #7C3AED;"></i>
+                        <p class="text-xs font-semibold text-purple-800">Zoom 미팅 정보</p>
+                    </div>
                     <div class="space-y-2 text-sm">
                         <div>
                             <span class="text-purple-700">미팅 ID:</span>
@@ -77,17 +102,20 @@ function renderApprovedCard(req) {
                     </div>
                 </div>
             ` : ''}
-            
+
             <div class="flex gap-2">
                 ${isOnline ? `
-                    <button onclick="openZoomWindow('${req.zoomStartUrl}')" class="btn-primary flex-1">
-                        🎥 Zoom 시작
+                    <button onclick="openZoomWindow('${req.zoomStartUrl}')" class="btn-primary flex-1 flex items-center justify-center gap-2">
+                        <i class="fas fa-video"></i>
+                        Zoom 시작
                     </button>
-                    <button onclick="completeMeetingV2('${req.id}')" class="btn-secondary flex-1">
+                    <button onclick="completeMeetingV2('${req.id}')" class="btn-secondary flex-1 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i>
                         완료 처리
                     </button>
                 ` : `
-                    <button onclick="completeMeetingV2('${req.id}')" class="btn-primary flex-1">
+                    <button onclick="completeMeetingV2('${req.id}')" class="btn-primary flex-1 flex items-center justify-center gap-2">
+                        <i class="fas fa-check-circle"></i>
                         완료 처리
                     </button>
                 `}
@@ -157,14 +185,33 @@ function confirmCompleteV2(reqId) {
 function renderCompletedTab() {
     const completed = DataService.getMeetingRequestsV2('completed');
     const tabContent = document.getElementById('meeting-tab-content');
-    
+
     tabContent.innerHTML = `
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-bold mb-4">완료된 미팅</h3>
-            
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h3 class="text-lg font-bold">완료된 미팅 (${completed.length}건)</h3>
+                <p class="text-sm text-gray-600 mt-1">완료된 미팅 이력을 조회합니다</p>
+            </div>
+
             ${completed.length > 0 ? `
-                <div class="space-y-4">
-                    ${completed.map(req => renderCompletedCard(req)).join('')}
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 table-fixed">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">번호</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">완료일</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">학생명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">학번</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">주제</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">유형</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">일시</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">실제시간</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            ${completed.map((req, index) => renderCompletedRow(req, index + 1)).join('')}
+                        </tbody>
+                    </table>
                 </div>
             ` : `
                 <div class="text-center py-12 text-gray-500">
@@ -175,104 +222,89 @@ function renderCompletedTab() {
     `;
 }
 
-function renderCompletedCard(req) {
+function renderCompletedRow(req, index) {
     const typeText = req.meetingType === 'online' ? '온라인' : '대면';
-    const hasRecording = req.recordingUrl;
-    
+
     return `
-        <div class="completed-card">
-            <div class="flex justify-between items-start mb-3">
-                <div>
-                    <div class="flex items-center gap-2 mb-1">
-                        <span class="font-semibold text-lg">${req.studentName}</span>
-                        <span class="text-sm text-gray-500">(${req.studentNumber})</span>
-                        <span class="badge-purple">${typeText}</span>
-                        ${hasRecording ? '<span class="badge-red">📹 녹화본</span>' : ''}
-                    </div>
-                    <p class="text-sm text-gray-600">완료일: ${req.completedDate}</p>
-                </div>
-                <span class="badge-green">완료</span>
-            </div>
-            
-            <div class="bg-gray-50 p-4 rounded-lg mb-3">
-                <h4 class="font-semibold text-gray-900 mb-2">${req.topic}</h4>
-                <div class="grid grid-cols-2 gap-2 text-sm text-gray-700">
-                    <div>📅 일시: ${req.selectedDate}</div>
-                    <div>⏰ 시간: ${req.selectedTime} (실제 ${req.actualDuration}분)</div>
-                </div>
-            </div>
-            
-            ${hasRecording ? `
-                <div class="recording-section">
-                    <div class="recording-header">
-                        <div>
-                            <p class="text-sm font-semibold text-red-900">📹 Zoom 클라우드 녹화본</p>
-                            <p class="text-xs text-red-700">
-                                ${req.recordingDuration}분 · ${req.recordingSize}
-                            </p>
-                        </div>
-                        <div class="flex gap-2">
-                            <button onclick="playRecording('${req.id}')" class="btn-play">
-                                ▶ 재생
-                            </button>
-                            <a href="${req.recordingUrl}" target="_blank" class="btn-download">
-                                ⬇ 다운로드
-                            </a>
-                        </div>
-                    </div>
-                    
-                    <div id="player-${req.id}" class="recording-player hidden">
-                        <div class="aspect-video bg-black rounded-lg overflow-hidden">
-                            <video 
-                                id="video-player-${req.id}"
-                                class="video-js vjs-default-skin vjs-big-play-centered"
-                                controls
-                                preload="auto"
-                                style="width: 100%; height: 100%;">
-                                <source src="${req.recordingUrl}" type="video/mp4">
-                                <p class="vjs-no-js">
-                                    비디오를 재생하려면 JavaScript를 활성화하세요.
-                                </p>
-                            </video>
-                        </div>
-                        <div class="mt-3 flex justify-between items-center">
-                            <div class="text-sm text-gray-600">
-                                <span class="font-medium">${req.recordingDuration}분</span>
-                                <span class="mx-2">·</span>
-                                <span>${req.recordingSize}</span>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="togglePlaybackSpeed('${req.id}')" class="text-xs px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded">
-                                    배속 <span id="speed-${req.id}">1.0x</span>
-                                </button>
-                                <button onclick="hideRecording('${req.id}')" class="text-sm text-gray-600 hover:text-gray-800">
-                                    닫기
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ` : req.meetingType === 'online' ? `
-                <div class="bg-gray-100 p-3 rounded text-center">
-                    <p class="text-sm text-gray-600">
-                        📹 녹화본이 없습니다
-                    </p>
-                </div>
-            ` : ''}
-        </div>
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.completedDate}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${req.studentName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.studentNumber}</td>
+            <td class="px-6 py-4 text-sm text-blue-600 hover:text-blue-800 td-truncate-long cursor-pointer"
+                title="${req.topic}"
+                onclick="viewCompletedMeetingDetail('${req.id}')">
+                ${req.topic}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm">
+                <span class="px-2 py-1 text-xs rounded ${req.meetingType === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                    ${typeText}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.selectedDate} ${req.selectedTime}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.actualDuration}분</td>
+        </tr>
     `;
 }
 
-function playRecording(reqId) {
-    const playerDiv = document.getElementById(`player-${reqId}`);
-    if (!playerDiv) return;
-    
-    playerDiv.classList.remove('hidden');
-    
-    // Video.js 플레이어 초기화
-    const videoElement = document.getElementById(`video-player-${reqId}`);
-    if (videoElement && !videoElement.player) {
-        const player = videojs(`video-player-${reqId}`, {
+// 녹화본 재생 모달
+function openRecordingModal(reqId) {
+    const meetings = DataService.getMeetingRequestsV2('completed');
+    const req = meetings.find(m => m.id === reqId);
+    if (!req || !req.recordingUrl) return;
+
+    const modalHtml = `
+        <div id="recording-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeRecordingModal(event)">
+            <div class="bg-white rounded-lg shadow-xl w-11/12 max-w-4xl max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+                <div class="p-6 border-b flex justify-between items-center">
+                    <h3 class="text-lg font-bold">녹화본 재생</h3>
+                    <button onclick="closeRecordingModal()" class="text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+
+                <div class="p-6">
+                    <div class="mb-4">
+                        <p class="text-sm text-gray-600 mb-1">학생: ${req.studentName} (${req.studentNumber})</p>
+                        <p class="text-sm text-gray-600 mb-1">주제: ${req.topic}</p>
+                        <p class="text-sm text-gray-600">일시: ${req.selectedDate} ${req.selectedTime}</p>
+                    </div>
+
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                        <p class="text-sm font-semibold text-red-900">Zoom 클라우드 녹화본</p>
+                        <p class="text-xs text-red-700">${req.recordingDuration}분 · ${req.recordingSize}</p>
+                    </div>
+
+                    <div class="aspect-video bg-black rounded-lg overflow-hidden">
+                        <video
+                            id="modal-video-player"
+                            class="video-js vjs-default-skin vjs-big-play-centered"
+                            controls
+                            preload="auto"
+                            style="width: 100%; height: 100%;">
+                            <source src="${req.recordingUrl}" type="video/mp4">
+                            <p class="vjs-no-js">비디오를 재생하려면 JavaScript를 활성화하세요.</p>
+                        </video>
+                    </div>
+
+                    <div class="mt-4 flex justify-between items-center">
+                        <a href="${req.recordingUrl}" target="_blank" download class="text-sm text-blue-600 hover:text-blue-800">
+                            다운로드
+                        </a>
+                        <button onclick="closeRecordingModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm">
+                            닫기
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+    // Video.js 초기화
+    setTimeout(() => {
+        const player = videojs('modal-video-player', {
             controls: true,
             autoplay: false,
             preload: 'auto',
@@ -291,43 +323,171 @@ function playRecording(reqId) {
                 ]
             }
         });
-        
-        videoElement.player = player;
-        
-        // 재생 속도 변경 이벤트
-        player.on('ratechange', function() {
-            const speedLabel = document.getElementById(`speed-${reqId}`);
-            if (speedLabel) {
-                speedLabel.textContent = player.playbackRate() + 'x';
-            }
-        });
+        window.currentVideoPlayer = player;
+    }, 100);
+}
+
+function closeRecordingModal(event) {
+    if (event && event.target.id !== 'recording-modal') return;
+
+    // Video.js 플레이어 정리
+    if (window.currentVideoPlayer) {
+        window.currentVideoPlayer.dispose();
+        window.currentVideoPlayer = null;
+    }
+
+    const modal = document.getElementById('recording-modal');
+    if (modal) {
+        modal.remove();
     }
 }
 
-function hideRecording(reqId) {
-    const playerDiv = document.getElementById(`player-${reqId}`);
-    if (!playerDiv) return;
-    
-    // Video.js 플레이어 일시정지
-    const videoElement = document.getElementById(`video-player-${reqId}`);
-    if (videoElement && videoElement.player) {
-        videoElement.player.pause();
-    }
-    
-    playerDiv.classList.add('hidden');
+// 완료된 미팅 상세보기 (페이지 전환)
+function viewCompletedMeetingDetail(reqId) {
+    const meetings = DataService.getMeetingRequestsV2('completed');
+    const req = meetings.find(m => m.id === reqId);
+    if (!req) return;
+
+    // 현재 미팅 ID 저장
+    window.currentMeetingDetailId = reqId;
+
+    // 상세 페이지 렌더링
+    renderCompletedMeetingDetailPage(req);
 }
 
-function togglePlaybackSpeed(reqId) {
-    const videoElement = document.getElementById(`video-player-${reqId}`);
-    if (!videoElement || !videoElement.player) return;
-    
-    const player = videoElement.player;
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const currentSpeed = player.playbackRate();
-    const currentIndex = speeds.indexOf(currentSpeed);
-    const nextIndex = (currentIndex + 1) % speeds.length;
-    
-    player.playbackRate(speeds[nextIndex]);
+function renderCompletedMeetingDetailPage(req) {
+    const typeText = req.meetingType === 'online' ? '온라인' : '대면';
+    const hasRecording = req.recordingUrl;
+    const tabContent = document.getElementById('meeting-tab-content');
+
+    tabContent.innerHTML = `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 헤더: 뒤로가기 버튼 -->
+            <div class="p-6 border-b flex items-center gap-4">
+                <button onclick="backToCompletedList()" class="text-gray-600 hover:text-gray-800">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                <h3 class="text-lg font-bold">완료된 미팅 상세정보</h3>
+            </div>
+
+            <!-- 본문 -->
+            <div class="p-6">
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">학생명</p>
+                        <p class="font-medium text-lg">${req.studentName}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">학번</p>
+                        <p class="font-medium text-lg">${req.studentNumber}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">완료일</p>
+                        <p class="font-medium text-lg">${req.completedDate}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">유형</p>
+                        <p class="font-medium">
+                            <span class="px-3 py-1 text-sm rounded ${req.meetingType === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
+                                ${typeText}
+                            </span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="mb-6">
+                    <p class="text-sm text-gray-600 mb-2">주제</p>
+                    <p class="font-medium text-lg">${req.topic}</p>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">예정 일시</p>
+                        <p class="font-medium text-lg">${req.selectedDate} ${req.selectedTime}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm text-gray-600 mb-1">실제 소요시간</p>
+                        <p class="font-medium text-lg">${req.actualDuration}분</p>
+                    </div>
+                </div>
+
+                ${hasRecording ? `
+                    <div class="mb-6">
+                        <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-4">
+                            <p class="text-sm font-semibold text-red-900 mb-1">Zoom 클라우드 녹화본</p>
+                            <p class="text-xs text-red-700">${req.recordingDuration}분 · ${req.recordingSize}</p>
+                        </div>
+
+                        <div class="aspect-video bg-black rounded-lg overflow-hidden mb-4">
+                            <video
+                                id="detail-video-player"
+                                class="video-js vjs-default-skin vjs-big-play-centered"
+                                controls
+                                preload="auto"
+                                style="width: 100%; height: 100%;">
+                                <source src="${req.recordingUrl}" type="video/mp4">
+                                <p class="vjs-no-js">비디오를 재생하려면 JavaScript를 활성화하세요.</p>
+                            </video>
+                        </div>
+
+                        <div class="flex justify-start">
+                            <a href="${req.recordingUrl}" target="_blank" download class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+                                <i class="fas fa-download mr-2"></i>다운로드
+                            </a>
+                        </div>
+                    </div>
+                ` : req.meetingType === 'online' ? `
+                    <div class="bg-gray-100 p-4 rounded text-center mb-6">
+                        <p class="text-sm text-gray-600">녹화본이 없습니다</p>
+                    </div>
+                ` : ''}
+
+                <div class="flex justify-end border-t pt-6">
+                    <button onclick="backToCompletedList()" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium">
+                        목록으로
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Video.js 초기화 (녹화본이 있는 경우)
+    if (hasRecording) {
+        setTimeout(() => {
+            const player = videojs('detail-video-player', {
+                controls: true,
+                autoplay: false,
+                preload: 'auto',
+                fluid: true,
+                playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+                controlBar: {
+                    children: [
+                        'playToggle',
+                        'volumePanel',
+                        'currentTimeDisplay',
+                        'timeDivider',
+                        'durationDisplay',
+                        'progressControl',
+                        'playbackRateMenuButton',
+                        'fullscreenToggle'
+                    ]
+                }
+            });
+            window.currentDetailVideoPlayer = player;
+        }, 100);
+    }
+}
+
+// 목록으로 돌아가기
+function backToCompletedList() {
+    // Video.js 플레이어 정리
+    if (window.currentDetailVideoPlayer) {
+        window.currentDetailVideoPlayer.dispose();
+        window.currentDetailVideoPlayer = null;
+    }
+
+    // 완료된 미팅 목록 다시 렌더링
+    renderCompletedTab();
 }
 
 // ==================== 모달 함수들 ====================
@@ -521,7 +681,7 @@ function submitSetAvailableTime(event) {
         };
     }
 
-    console.log('✅ 시간 설정:', slotData);
+    console.log('시간 설정:', slotData);
 
     // DataService에 저장
     DataService.addAvailableSlot(slotData);
@@ -586,14 +746,14 @@ function openCreateGroupMeetingModal() {
                             <h4 class="text-sm font-semibold text-gray-700 mb-2">학생 선택</h4>
                             <div id="student-list" class="border rounded-lg overflow-hidden bg-gray-50">
                                 <div class="max-h-80 overflow-y-auto">
-                                    <table class="w-full text-sm">
+                                    <table class="w-full table-fixed text-sm">
                                         <thead class="bg-gray-50 border-b sticky top-0">
                                             <tr>
                                                 <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 40px;"></th>
-                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700" style="width: 140px;">전공</th>
+                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700" style="width: 140px;">학과</th>
                                                 <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 80px;">학기차</th>
                                                 <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 100px;">학번</th>
-                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700">성명</th>
+                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700">이름</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y">
@@ -753,7 +913,7 @@ function approveRequest(requestId) {
 
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                         <p class="text-sm text-blue-800">
-                            <strong>✅ 승인하면 자동으로:</strong><br>
+                            <strong>승인하면 자동으로:</strong><br>
                             • Zoom 링크 생성<br>
                             • 학생에게 알림 발송
                         </p>
@@ -934,7 +1094,7 @@ async function confirmCancel(meetingId) {
     }
 }
 
-console.log('✅ meeting-v2-part2.js 로드 완료');
+console.log('meeting-v2-part2.js 로드 완료');
 
 // Export
 window.renderApprovedTab = renderApprovedTab;
@@ -942,9 +1102,6 @@ window.renderCompletedTab = renderCompletedTab;
 window.openZoomWindow = openZoomWindow;
 window.completeMeetingV2 = completeMeetingV2;
 window.confirmCompleteV2 = confirmCompleteV2;
-window.playRecording = playRecording;
-window.hideRecording = hideRecording;
-window.togglePlaybackSpeed = togglePlaybackSpeed;
 window.openSetAvailableTimeModal = openSetAvailableTimeModal;
 window.submitSetAvailableTime = submitSetAvailableTime;
 window.openCreateGroupMeetingModal = openCreateGroupMeetingModal;

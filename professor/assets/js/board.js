@@ -71,14 +71,14 @@ function renderBoardList() {
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">게시글 목록</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="w-full table-fixed">
                         <thead class="bg-gray-50 border-b">
                             <tr>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">번호</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제목</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">작성자</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">작성일</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">첨부</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">제목</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">작성자</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">작성일</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">첨부</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -162,7 +162,7 @@ function viewBoardPost(postId) {
                 <!-- 첨부파일 -->
                 ${post.files.length > 0 ? `
                     <div class="border-t border-gray-200 pt-4 mb-6">
-                        <p class="text-sm font-semibold text-gray-700 mb-2">첨부파일 (${post.files.length})</p>
+                        <p class="text-sm font-semibold text-gray-800 mb-2">첨부파일 (${post.files.length})</p>
                         <div class="space-y-2">
                             ${post.files.map(file => `
                                 <div class="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 cursor-pointer p-2 rounded hover:bg-gray-50">
@@ -179,7 +179,7 @@ function viewBoardPost(postId) {
 
                 <!-- 댓글 -->
                 <div class="border-t border-gray-200 pt-4">
-                    <p class="text-sm font-semibold text-gray-700 mb-4">댓글 (${post.comments.length})</p>
+                    <p class="text-sm font-semibold text-gray-800 mb-4">댓글 (${post.comments.length})</p>
 
                     <!-- 댓글 목록 -->
                     <div class="space-y-3 mb-4">
@@ -197,7 +197,7 @@ function viewBoardPost(postId) {
                                             ${isCommentAuthor ? `<button onclick="deleteComment(${post.id}, '${comment.id}')" class="text-xs text-red-600 hover:text-red-800">삭제</button>` : ''}
                                         </div>
                                     </div>
-                                    <p class="text-sm text-gray-700">${comment.content}</p>
+                                    <p class="text-sm text-gray-800">${comment.content}</p>
                                 </div>
                             `;
                         }).join('')}
@@ -266,7 +266,7 @@ function openBoardWriteModal() {
         <div class="modal-content" style="max-width: 80rem; width: 95%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">글쓰기</h3>
+                    <h3 class="text-lg font-bold text-gray-800">글쓰기</h3>
                     <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>
@@ -275,13 +275,13 @@ function openBoardWriteModal() {
                 <div class="space-y-4">
                     <!-- 제목 -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">제목 *</label>
+                        <label class="block text-sm font-medium text-gray-800 mb-2">제목 *</label>
                         <input type="text" id="postTitle" class="w-full px-3 py-2 border border-gray-300 rounded-lg" placeholder="제목을 입력하세요">
                     </div>
 
                     <!-- 내용 (리치 텍스트 에디터) -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">내용 *</label>
+                        <label class="block text-sm font-medium text-gray-800 mb-2">내용 *</label>
                         <div class="border border-gray-300 rounded-lg overflow-hidden">
                             <!-- 에디터 툴바 -->
                             <div class="bg-gray-50 border-b border-gray-300 p-2 flex gap-2">
@@ -315,7 +315,7 @@ function openBoardWriteModal() {
                     <!-- 열람자 지정 -->
                     ${currentUser.role === 'professor' ? `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">열람자 지정 *</label>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">열람자 지정 *</label>
                             <select id="postViewerType" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="toggleStudentSelection()">
                                 <option value="all">전체 학생</option>
                                 <option value="masters">석사과정만</option>
@@ -326,7 +326,7 @@ function openBoardWriteModal() {
 
                         <!-- 개별 학생 선택 -->
                         <div id="studentSelectionDiv" style="display: none;">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학생 선택</label>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">학생 선택</label>
                             <div class="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2">
                                 ${students.map(student => `
                                     <label class="flex items-center gap-2 cursor-pointer">
@@ -339,14 +339,14 @@ function openBoardWriteModal() {
                     ` : `
                         <input type="hidden" id="postViewerType" value="specific">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">공개 범위</label>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">공개 범위</label>
                             <p class="text-sm text-gray-600">이 글은 지도교수에게만 공개됩니다.</p>
                         </div>
                     `}
 
                     <!-- 파일 첨부 -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">파일 첨부</label>
+                        <label class="block text-sm font-medium text-gray-800 mb-2">파일 첨부</label>
                         <input type="file" id="postFiles" multiple class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                         <p class="text-xs text-gray-500 mt-1">최대 10개 파일, 각 50MB 이하</p>
                     </div>
@@ -393,7 +393,7 @@ function openBoardEditModal(postId) {
         <div class="modal-content" style="max-width: 80rem; width: 95%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">글 수정</h3>
+                    <h3 class="text-lg font-bold text-gray-800">글 수정</h3>
                     <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>
@@ -402,13 +402,13 @@ function openBoardEditModal(postId) {
                 <div class="space-y-4">
                     <!-- 제목 -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">제목 *</label>
+                        <label class="block text-sm font-medium text-gray-800 mb-2">제목 *</label>
                         <input type="text" id="postTitle" value="${post.title}" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
                     </div>
 
                     <!-- 내용 (리치 텍스트 에디터) -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">내용 *</label>
+                        <label class="block text-sm font-medium text-gray-800 mb-2">내용 *</label>
                         <div class="border border-gray-300 rounded-lg overflow-hidden">
                             <!-- 에디터 툴바 -->
                             <div class="bg-gray-50 border-b border-gray-300 p-2 flex gap-2">
@@ -440,7 +440,7 @@ function openBoardEditModal(postId) {
                     <!-- 열람자 지정 -->
                     ${post.authorRole === 'professor' ? `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">열람자 지정 *</label>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">열람자 지정 *</label>
                             <select id="postViewerType" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="toggleStudentSelection()">
                                 <option value="all" ${post.viewerType === 'all' ? 'selected' : ''}>전체 학생</option>
                                 <option value="masters" ${post.viewerType === 'masters' ? 'selected' : ''}>석사과정만</option>
@@ -451,7 +451,7 @@ function openBoardEditModal(postId) {
 
                         <!-- 개별 학생 선택 -->
                         <div id="studentSelectionDiv" style="display: ${post.viewerType === 'specific' ? 'block' : 'none'};">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학생 선택</label>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">학생 선택</label>
                             <div class="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2">
                                 ${students.map(student => `
                                     <label class="flex items-center gap-2 cursor-pointer">
@@ -472,7 +472,7 @@ function openBoardEditModal(postId) {
                     <!-- 기존 파일 -->
                     ${post.files.length > 0 ? `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">첨부된 파일</label>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">첨부된 파일</label>
                             <div class="space-y-2" id="existingFiles">
                                 ${post.files.map(file => `
                                     <div class="flex items-center gap-2 text-sm text-gray-600 p-2 bg-gray-50 rounded">
@@ -490,7 +490,7 @@ function openBoardEditModal(postId) {
 
                     <!-- 새 파일 첨부 -->
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">파일 추가</label>
+                        <label class="block text-sm font-medium text-gray-800 mb-2">파일 추가</label>
                         <input type="file" id="postFiles" multiple class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm">
                         <p class="text-xs text-gray-500 mt-1">최대 10개 파일, 각 50MB 이하</p>
                     </div>

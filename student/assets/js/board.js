@@ -62,15 +62,15 @@ function renderBoardList() {
     const html = `
         <div class="bg-white rounded-lg shadow p-6">
             <div class="flex justify-between items-center mb-6">
-                <h2 class="text-xl font-bold text-gray-800">자료실</h2>
+                <h2 class="text-lg font-bold text-gray-800">자료실</h2>
                 <button onclick="openBoardWriteModal()" class="btn-primary">
-                    + 글쓰기
+                    글쓰기
                 </button>
             </div>
 
             <!-- 게시글 목록 -->
             <div class="overflow-x-auto">
-                <table class="min-w-full">
+                <table class="min-w-full table-fixed">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
@@ -90,7 +90,7 @@ function renderBoardList() {
                         ` : posts.map((post, idx) => `
                             <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewBoardPost(${post.id})">
                                 <td class="py-3 px-4 text-sm text-gray-800">${posts.length - idx}</td>
-                                <td class="py-3 px-4 text-sm text-gray-800">
+                                <td class="py-3 px-4 text-sm text-gray-800 td-truncate-long" title="${post.title}">
                                     ${post.title}
                                     ${post.comments.length > 0 ? `<span class="text-blue-600 ml-2">[${post.comments.length}]</span>` : ''}
                                 </td>
@@ -329,7 +329,7 @@ function openBoardWriteModal() {
         <div class="modal-content" style="max-width: 56rem;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">글쓰기</h3>
+                    <h3 class="text-lg font-bold text-gray-800">글쓰기</h3>
                     <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>
@@ -432,7 +432,7 @@ function openBoardEditModal(postId) {
         <div class="modal-content" style="max-width: 56rem;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">글 수정</h3>
+                    <h3 class="text-lg font-bold text-gray-800">글 수정</h3>
                     <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>

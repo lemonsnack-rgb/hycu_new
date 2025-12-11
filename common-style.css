@@ -626,3 +626,120 @@ table tbody tr:hover {
 .btn-danger:hover {
     background-color: #DC2626;
 }
+
+/* ===================================
+   모바일 메뉴 숨김 처리
+   =================================== */
+
+/* 교수/학생 화면에서는 모바일 메뉴 버튼 항상 숨김 */
+.mobile-menu-toggle {
+    display: none !important;
+}
+
+/* 모바일 메뉴 오버레이도 숨김 */
+#mobile-menu-overlay {
+    display: none !important;
+}
+
+/* ===================================
+   사이드바 접힘/열림 처리
+   =================================== */
+
+/* 사이드바 기본 상태 */
+#sidebar {
+    transition: width 0.3s ease;
+}
+
+/* 사이드바 펼침 상태 (기본) */
+#sidebar.expanded {
+    width: 16rem; /* 256px = w-64 */
+}
+
+/* 사이드바 접힘 상태 */
+#sidebar.collapsed {
+    width: 4.5rem; /* 72px */
+}
+
+/* 토글 버튼 스타일 */
+.sidebar-toggle-btn {
+    position: absolute;
+    right: -12px;
+    top: 32px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: white;
+    border: 2px solid #E5E5E5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 40;
+    transition: all 0.2s;
+}
+
+.sidebar-toggle-btn:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* 접힌 상태에서 텍스트 숨김 */
+#sidebar.collapsed .sidebar-text {
+    display: none;
+}
+
+/* 접힌 상태에서 로고 이미지 숨김 */
+#sidebar.collapsed .logo-image {
+    display: none;
+}
+
+/* 접힌 상태에서 제목 축소 */
+#sidebar.collapsed .sidebar-title {
+    font-size: 0.75rem;
+    text-align: center;
+    padding: 0;
+}
+
+/* 접힌 상태에서 역할 뱃지 숨김 */
+#sidebar.collapsed .role-badge {
+    display: none;
+}
+
+/* 접힌 상태에서 화살표 아이콘 숨김 */
+#sidebar.collapsed .submenu-arrow {
+    display: none;
+}
+
+/* 접힌 상태에서 메뉴 아이템 중앙 정렬 */
+#sidebar.collapsed .sidebar-link,
+#sidebar.collapsed .sidebar-sublink {
+    justify-content: center;
+    padding: 0.75rem;
+}
+
+/* 접힌 상태에서 서브메뉴 숨김 */
+#sidebar.collapsed .submenu-container {
+    display: none !important;
+}
+
+/* 접힌 상태에서 아이콘 크기 유지 */
+#sidebar.collapsed .sidebar-link svg,
+#sidebar.collapsed .sidebar-sublink svg {
+    margin: 0;
+}
+
+/* 메인 콘텐츠 영역 조정 */
+.main-content {
+    transition: margin-left 0.3s ease;
+}
+
+/* 사이드바 펼침 시 콘텐츠 마진 */
+#sidebar.expanded ~ .main-content {
+    margin-left: 0;
+}
+
+/* 사이드바 접힘 시 콘텐츠 마진 */
+#sidebar.collapsed ~ .main-content {
+    margin-left: 0;
+}

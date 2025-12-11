@@ -247,65 +247,30 @@ const StudentData = {
     
     // 심사 현황
     reviews: [
+        // 연구계획서 - 완료된 상태
         {
             id: 1,
-            type: '중간논문 심사',
-            applicationDate: '2025-10-28',
-            status: '심사 진행중',
-            statusDetail: '심사위원 2/3 완료',
-            progress: 66,
-            expectedDate: '2025-11-15',
-            result: null,
-            score: null,
-            file: 'midterm_thesis.pdf',
-            plagiarismRate: 8,
-            plagiarismStatus: '통과',
-            reviewers: [
-                {
-                    name: '김교수',
-                    role: '주심',
-                    status: '완료',
-                    score: 88,
-                    reviewDate: '2025-11-02',
-                    comment: '연구 설계가 잘 되어 있습니다. 데이터 분석 부분을 더 보강하세요.',
-                    revisionRequests: [
-                        '3장의 데이터 분석 방법을 더 구체적으로 기술',
-                        '통계 분석 결과에 대한 해석을 추가',
-                        '그래프와 표의 일관성 확인'
-                    ]
-                },
-                {
-                    name: '이교수',
-                    role: '부심',
-                    status: '완료',
-                    score: 85,
-                    reviewDate: '2025-11-03',
-                    comment: '이론적 배경이 충실합니다. 결과 해석을 더 깊이 있게 다루면 좋겠습니다.',
-                    revisionRequests: [
-                        '4장 결과 부분의 논의를 더 깊이있게 작성',
-                        '선행연구와의 비교 분석 추가',
-                        '연구의 한계점 보완'
-                    ]
-                },
-                {
-                    name: '박교수',
-                    role: '부심',
-                    status: '대기중',
-                    score: null,
-                    reviewDate: null,
-                    comment: null
-                }
-            ]
-        },
-        {
-            id: 2,
-            type: '연구계획서 심사',
-            applicationDate: '2025-09-15',
+            type: '연구계획서',
+            stepId: 1,
+            stepOrder: 1,
+            schedule: {
+                id: 1,
+                category: '연구계획서',
+                semester: '2025-1',
+                submissionStartDate: '2025-03-01',
+                submissionEndDate: '2025-03-15',
+                reviewStartDate: '2025-03-16',
+                reviewEndDate: '2025-03-30'
+            },
+            scheduleStatus: 'registered',
+            submissionStatus: 'completed',
+            applicationDate: '2025-03-10',
+            submissionDate: '2025-03-10',
             status: '심사 완료',
             statusDetail: null,
-            progress: 100,
             result: '합격',
             score: 85,
+            title: '고객 이탈 예측을 위한 머신러닝 모델 연구',
             file: 'research_proposal.pdf',
             plagiarismRate: 12,
             plagiarismStatus: '통과',
@@ -315,7 +280,7 @@ const StudentData = {
                     role: '주심',
                     status: '완료',
                     score: 90,
-                    reviewDate: '2025-09-20',
+                    reviewDate: '2025-03-20',
                     comment: '연구 주제가 명확하고 연구 방법이 적절합니다.'
                 },
                 {
@@ -323,10 +288,89 @@ const StudentData = {
                     role: '부심',
                     status: '완료',
                     score: 80,
-                    reviewDate: '2025-09-22',
+                    reviewDate: '2025-03-22',
                     comment: '선행연구 검토가 잘 되어있습니다.'
                 }
             ]
+        },
+        // 중간논문 - 제출 가능 상태 (예시)
+        {
+            id: 2,
+            type: '중간논문',
+            stepId: 2,
+            stepOrder: 2,
+            schedule: {
+                id: 2,
+                category: '중간논문',
+                semester: '2025-1',
+                submissionStartDate: '2025-12-01',
+                submissionEndDate: '2025-12-20',
+                reviewStartDate: '2025-12-21',
+                reviewEndDate: '2026-01-10'
+            },
+            scheduleStatus: 'registered',
+            submissionStatus: 'not_submitted',
+            applicationDate: null,
+            submissionDate: null,
+            status: '미제출',
+            statusDetail: null,
+            result: null,
+            score: null,
+            title: null,
+            file: null,
+            plagiarismRate: null,
+            plagiarismStatus: null,
+            reviewers: []
+        },
+        // 예비심사 - 제출 기간 전
+        {
+            id: 3,
+            type: '예비심사',
+            stepId: 3,
+            stepOrder: 3,
+            schedule: {
+                id: 3,
+                category: '예비심사',
+                semester: '2025-1',
+                submissionStartDate: '2026-05-01',
+                submissionEndDate: '2026-05-15',
+                reviewStartDate: '2026-05-16',
+                reviewEndDate: '2026-05-30'
+            },
+            scheduleStatus: 'registered',
+            submissionStatus: 'not_available',
+            applicationDate: null,
+            submissionDate: null,
+            status: '제출 불가',
+            statusDetail: null,
+            result: null,
+            score: null,
+            title: null,
+            file: null,
+            plagiarismRate: null,
+            plagiarismStatus: null,
+            reviewers: []
+        },
+        // 최종논문 - 일정 미등록
+        {
+            id: 4,
+            type: '최종논문',
+            stepId: 4,
+            stepOrder: 4,
+            schedule: null,
+            scheduleStatus: 'no_schedule',
+            submissionStatus: 'no_schedule',
+            applicationDate: null,
+            submissionDate: null,
+            status: '일정 미등록',
+            statusDetail: null,
+            result: null,
+            score: null,
+            title: null,
+            file: null,
+            plagiarismRate: null,
+            plagiarismStatus: null,
+            reviewers: []
         }
     ],
 
@@ -853,6 +897,85 @@ const StudentData = {
                 }
             ]
         }
+    ],
+
+    // 심사 단계 설정 (관리자 데이터와 동기화 - 실제로는 API로 가져옴)
+    stages: [
+        {
+            id: 1,
+            name: '2025-1학기 교육공학 석사 표준 계획',
+            major: '교육공학',
+            degree: '석사',
+            steps: [
+                { id: 1, name: '연구계획서', order: 1, hasEvaluation: true },
+                { id: 2, name: '중간논문', order: 2, hasEvaluation: true },
+                { id: 3, name: '최종논문', order: 3, hasEvaluation: true }
+            ]
+        },
+        {
+            id: 2,
+            name: '2025-1학기 경영학 석사 표준 계획',
+            major: '경영학',
+            degree: '석사',
+            steps: [
+                { id: 1, name: '연구계획서', order: 1, hasEvaluation: true },
+                { id: 2, name: '중간논문', order: 2, hasEvaluation: true },
+                { id: 3, name: '예비심사', order: 3, hasEvaluation: true },
+                { id: 4, name: '최종논문', order: 4, hasEvaluation: true }
+            ]
+        },
+        {
+            id: 3,
+            name: '2025-1학기 경영학 박사 표준 계획',
+            major: '경영학',
+            degree: '박사',
+            steps: [
+                { id: 1, name: '연구계획서', order: 1, hasEvaluation: true },
+                { id: 2, name: '중간논문', order: 2, hasEvaluation: true },
+                { id: 3, name: '예비심사', order: 3, hasEvaluation: true },
+                { id: 4, name: '최종논문', order: 4, hasEvaluation: true }
+            ]
+        }
+    ],
+
+    // 일정 관리 (관리자 데이터와 동기화 - 실제로는 API로 가져옴)
+    schedules: [
+        {
+            id: 1,
+            category: '연구계획서',
+            semester: '2025-1',
+            submissionStartDate: '2025-03-01',
+            submissionEndDate: '2025-03-15',
+            reviewStartDate: '2025-03-16',
+            reviewEndDate: '2025-03-30'
+        },
+        {
+            id: 2,
+            category: '중간논문',
+            semester: '2025-1',
+            submissionStartDate: '2025-04-01',
+            submissionEndDate: '2025-04-15',
+            reviewStartDate: '2025-04-16',
+            reviewEndDate: '2025-04-30'
+        },
+        {
+            id: 3,
+            category: '예비심사',
+            semester: '2025-1',
+            submissionStartDate: '2025-05-01',
+            submissionEndDate: '2025-05-15',
+            reviewStartDate: '2025-05-16',
+            reviewEndDate: '2025-05-30'
+        },
+        {
+            id: 4,
+            category: '최종논문',
+            semester: '2025-1',
+            submissionStartDate: '2025-06-01',
+            submissionEndDate: '2025-06-15',
+            reviewStartDate: '2025-06-16',
+            reviewEndDate: '2025-06-30'
+        }
     ]
 };
 
@@ -1066,3 +1189,145 @@ const DataService = {
         );
     }
 };
+
+// ==================== 심사 제출 목록 자동 생성 로직 ====================
+
+/**
+ * 학생의 심사 제출 목록을 자동으로 초기화하는 함수
+ * - 학생의 학위/전공에 맞는 stage를 찾음
+ * - hasEvaluation=true인 step들을 추출
+ * - 각 step에 대해 category로 schedule을 매칭
+ * - 일정이 없어도 항목 생성 (status: no_schedule)
+ */
+function initializeStudentReviews() {
+    const student = StudentData.student;
+    const degree = student.program; // '석사과정' 또는 '박사과정'
+    const major = student.major;
+
+    // degree 정규화 ('석사과정' -> '석사', '박사과정' -> '박사')
+    const normalizedDegree = degree.replace('과정', '');
+
+    // 해당 학생의 stage 찾기
+    const studentStage = StudentData.stages.find(stage =>
+        stage.degree === normalizedDegree && stage.major === major
+    );
+
+    if (!studentStage) {
+        console.warn(`No stage found for ${normalizedDegree} ${major}`);
+        return;
+    }
+
+    // 평가가 있는 step들만 추출
+    const evaluationSteps = studentStage.steps.filter(step => step.hasEvaluation);
+
+    // 각 step에 대해 review 항목 생성
+    const generatedReviews = evaluationSteps.map(step => {
+        // step.name으로 schedule 찾기 (category 매칭)
+        const schedule = StudentData.schedules.find(s => s.category === step.name);
+
+        // 기존 review 데이터에서 동일 type이 있는지 확인
+        const existingReview = StudentData.reviews.find(r => r.type === step.name);
+
+        // 이미 존재하면 schedule 정보만 업데이트
+        if (existingReview) {
+            if (schedule) {
+                existingReview.schedule = schedule;
+                existingReview.scheduleStatus = 'registered';
+            } else {
+                existingReview.scheduleStatus = 'no_schedule';
+            }
+            return existingReview;
+        }
+
+        // 새로운 review 항목 생성
+        const newReview = {
+            id: StudentData.reviews.length + step.id,
+            type: step.name,
+            stepId: step.id,
+            stepOrder: step.order,
+            schedule: schedule || null,
+            scheduleStatus: schedule ? 'registered' : 'no_schedule',
+            submissionStatus: getSubmissionStatus(null, schedule),
+            applicationDate: null,
+            submissionDate: null,
+            status: '미제출',
+            statusDetail: schedule ? getStatusDetail(schedule) : '일정 미등록',
+            progress: 0,
+            result: null,
+            score: null,
+            file: null,
+            title: null,
+            reviewers: []
+        };
+
+        return newReview;
+    });
+
+    // 기존 reviews를 generatedReviews로 병합 (기존 데이터 유지하면서 새 항목 추가)
+    const existingIds = new Set(StudentData.reviews.map(r => r.type));
+    const newItems = generatedReviews.filter(r => !existingIds.has(r.type));
+
+    // reviews 배열을 stepOrder 순서로 정렬하여 재구성
+    StudentData.reviews = [...StudentData.reviews, ...newItems]
+        .sort((a, b) => (a.stepOrder || 0) - (b.stepOrder || 0));
+}
+
+/**
+ * 제출 상태 계산 함수
+ * @param {Date|null} submissionDate - 제출일
+ * @param {Object|null} schedule - 일정 정보
+ * @returns {string} - 상태 코드
+ */
+function getSubmissionStatus(submissionDate, schedule) {
+    if (!schedule) {
+        return 'no_schedule'; // 일정 미등록
+    }
+
+    const now = new Date();
+    const submissionStart = new Date(schedule.submissionStartDate);
+    const submissionEnd = new Date(schedule.submissionEndDate);
+    const reviewStart = new Date(schedule.reviewStartDate);
+
+    if (submissionDate) {
+        if (now < reviewStart) {
+            return 'waiting'; // 심사 대기
+        } else {
+            return 'in_review'; // 심사 중
+        }
+    } else {
+        if (now < submissionStart) {
+            return 'not_available'; // 제출 불가 (기간 전)
+        } else if (now <= submissionEnd) {
+            return 'not_submitted'; // 미제출 (제출 가능)
+        } else {
+            return 'overdue'; // 제출 기한 경과
+        }
+    }
+}
+
+/**
+ * 상태 상세 정보 생성 함수
+ * @param {Object} schedule - 일정 정보
+ * @returns {string} - 상태 상세 문자열
+ */
+function getStatusDetail(schedule) {
+    const now = new Date();
+    const submissionStart = new Date(schedule.submissionStartDate);
+    const submissionEnd = new Date(schedule.submissionEndDate);
+
+    if (now < submissionStart) {
+        return `제출 시작: ${schedule.submissionStartDate}`;
+    } else if (now <= submissionEnd) {
+        return `제출 마감: ${schedule.submissionEndDate}`;
+    } else {
+        return '제출 기한 경과';
+    }
+}
+
+// 페이지 로드 시 자동 초기화 실행
+if (typeof window !== 'undefined') {
+    window.addEventListener('DOMContentLoaded', () => {
+        initializeStudentReviews();
+        console.log('Student reviews initialized:', StudentData.reviews);
+    });
+}

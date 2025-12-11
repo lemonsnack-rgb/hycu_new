@@ -51,27 +51,27 @@ const mockStudents = [
 // STU001(김학생)은 연구계획서 미제출 상태로 설정
 const mockResearchProposals = [
     // 석사과정 (9명)
-    { id: 'RP002', studentId: 'STU002', studentNumber: '2024002', studentName: '이학생', department: '컴퓨터공학과', degreeType: '석사', title: '블록체인 기반 데이터 무결성 보장 방안', purpose: '분산 환경에서의 데이터 보안 강화', necessity: '중앙화된 시스템의 보안 문제 해결', method: '블록체인 기술 적용 및 검증', submittedDate: '2025-03-11', status: 'pending', desiredAdvisor: null },
-    { id: 'RP003', studentId: 'STU003', studentNumber: '2024003', studentName: '박학생', department: '경영학과', degreeType: '석사', title: '디지털 전환 시대의 기업 경쟁력 분석', purpose: '기업의 디지털 전환 성공 요인 도출', necessity: '디지털 전환이 기업 경쟁력에 미치는 영향 연구', method: '사례 연구 및 통계 분석', submittedDate: '2025-03-12', status: 'pending', desiredAdvisor: null },
-    { id: 'RP004', studentId: 'STU004', studentNumber: '2024004', studentName: '최학생', department: '경영학과', degreeType: '석사', title: 'ESG 경영이 기업 가치에 미치는 영향', purpose: 'ESG 경영의 재무적 성과 분석', necessity: 'ESG 경영의 중요성이 대두되고 있음', method: '재무제표 분석 및 회귀분석', submittedDate: '2025-03-13', status: 'assigned', desiredAdvisor: null },
-    { id: 'RP005', studentId: 'STU005', studentNumber: '2024005', studentName: '정학생', department: '교육학과', degreeType: '석사', title: '온라인 교육의 효과성 연구', purpose: '온라인 교육의 학습 효과 분석', necessity: '코로나19 이후 온라인 교육 확대', method: '실험 연구 및 설문 조사', submittedDate: '2025-03-14', status: 'pending', desiredAdvisor: null },
-    { id: 'RP006', studentId: 'STU006', studentNumber: '2024006', studentName: '강학생', department: '교육학과', degreeType: '석사', title: '메타버스를 활용한 교육 프로그램 개발', purpose: '몰입형 교육 환경 구축', necessity: '새로운 교육 매체로서의 메타버스', method: '메타버스 플랫폼 개발 및 효과 검증', submittedDate: '2025-03-15', status: 'assigned', desiredAdvisor: null },
-    { id: 'RP007', studentId: 'STU007', studentNumber: '2024007', studentName: '조학생', department: '심리학과', degreeType: '석사', title: 'SNS 사용이 청소년 심리에 미치는 영향', purpose: 'SNS 사용 패턴과 심리적 건강의 관계 분석', necessity: '청소년의 SNS 사용 증가', method: '설문 조사 및 통계 분석', submittedDate: '2025-03-16', status: 'pending', desiredAdvisor: null },
-    { id: 'RP008', studentId: 'STU008', studentNumber: '2024008', studentName: '윤학생', department: '심리학과', degreeType: '석사', title: '직장인의 스트레스와 대처 방안 연구', purpose: '직장 내 스트레스 관리 방법 제시', necessity: '직장인의 정신 건강 문제 증가', method: '인터뷰 및 질적 연구', submittedDate: '2025-03-17', status: 'assigned', desiredAdvisor: null },
-    { id: 'RP009', studentId: 'STU009', studentNumber: '2024009', studentName: '장학생', department: '사회복지학과', degreeType: '석사', title: '노인 복지 정책의 효과성 분석', purpose: '노인 복지 제도의 개선 방안 제시', necessity: '고령화 사회의 노인 복지 필요성', method: '정책 분석 및 사례 연구', submittedDate: '2025-03-18', status: 'pending', desiredAdvisor: null },
-    { id: 'RP010', studentId: 'STU010', studentNumber: '2024010', studentName: '임학생', department: '사회복지학과', degreeType: '석사', title: '장애인 고용 촉진 방안 연구', purpose: '장애인 고용 정책의 실효성 제고', necessity: '장애인 고용률이 낮은 현실', method: '통계 분석 및 인터뷰', submittedDate: '2025-03-19', status: 'assigned', desiredAdvisor: null },
+    { id: 'RP002', studentId: 'STU002', studentNumber: '2024002', studentName: '이학생', department: '컴퓨터공학과', degreeType: '석사', title: '블록체인 기반 데이터 무결성 보장 방안', purpose: '분산 환경에서의 데이터 보안 강화', necessity: '중앙화된 시스템의 보안 문제 해결', method: '블록체인 기술 적용 및 검증', submittedDate: '2025-03-11', status: 'pending', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP002.pdf' },
+    { id: 'RP003', studentId: 'STU003', studentNumber: '2024003', studentName: '박학생', department: '경영학과', degreeType: '석사', title: '디지털 전환 시대의 기업 경쟁력 분석', purpose: '기업의 디지털 전환 성공 요인 도출', necessity: '디지털 전환이 기업 경쟁력에 미치는 영향 연구', method: '사례 연구 및 통계 분석', submittedDate: '2025-03-12', status: 'pending', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP003.pdf' },
+    { id: 'RP004', studentId: 'STU004', studentNumber: '2024004', studentName: '최학생', department: '경영학과', degreeType: '석사', title: 'ESG 경영이 기업 가치에 미치는 영향', purpose: 'ESG 경영의 재무적 성과 분석', necessity: 'ESG 경영의 중요성이 대두되고 있음', method: '재무제표 분석 및 회귀분석', submittedDate: '2025-03-13', status: 'assigned', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP004.pdf' },
+    { id: 'RP005', studentId: 'STU005', studentNumber: '2024005', studentName: '정학생', department: '교육학과', degreeType: '석사', title: '온라인 교육의 효과성 연구', purpose: '온라인 교육의 학습 효과 분석', necessity: '코로나19 이후 온라인 교육 확대', method: '실험 연구 및 설문 조사', submittedDate: '2025-03-14', status: 'pending', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP005.pdf' },
+    { id: 'RP006', studentId: 'STU006', studentNumber: '2024006', studentName: '강학생', department: '교육학과', degreeType: '석사', title: '메타버스를 활용한 교육 프로그램 개발', purpose: '몰입형 교육 환경 구축', necessity: '새로운 교육 매체로서의 메타버스', method: '메타버스 플랫폼 개발 및 효과 검증', submittedDate: '2025-03-15', status: 'assigned', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP006.pdf' },
+    { id: 'RP007', studentId: 'STU007', studentNumber: '2024007', studentName: '조학생', department: '심리학과', degreeType: '석사', title: 'SNS 사용이 청소년 심리에 미치는 영향', purpose: 'SNS 사용 패턴과 심리적 건강의 관계 분석', necessity: '청소년의 SNS 사용 증가', method: '설문 조사 및 통계 분석', submittedDate: '2025-03-16', status: 'pending', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP007.pdf' },
+    { id: 'RP008', studentId: 'STU008', studentNumber: '2024008', studentName: '윤학생', department: '심리학과', degreeType: '석사', title: '직장인의 스트레스와 대처 방안 연구', purpose: '직장 내 스트레스 관리 방법 제시', necessity: '직장인의 정신 건강 문제 증가', method: '인터뷰 및 질적 연구', submittedDate: '2025-03-17', status: 'assigned', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP008.pdf' },
+    { id: 'RP009', studentId: 'STU009', studentNumber: '2024009', studentName: '장학생', department: '사회복지학과', degreeType: '석사', title: '노인 복지 정책의 효과성 분석', purpose: '노인 복지 제도의 개선 방안 제시', necessity: '고령화 사회의 노인 복지 필요성', method: '정책 분석 및 사례 연구', submittedDate: '2025-03-18', status: 'pending', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP009.pdf' },
+    { id: 'RP010', studentId: 'STU010', studentNumber: '2024010', studentName: '임학생', department: '사회복지학과', degreeType: '석사', title: '장애인 고용 촉진 방안 연구', purpose: '장애인 고용 정책의 실효성 제고', necessity: '장애인 고용률이 낮은 현실', method: '통계 분석 및 인터뷰', submittedDate: '2025-03-19', status: 'assigned', desiredAdvisor: null, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP010.pdf' },
 
     // 박사과정 (10명) - desiredAdvisor 포함
-    { id: 'RP011', studentId: 'STU011', studentNumber: '2023001', studentName: '한학생', department: '컴퓨터공학과', degreeType: '박사', title: '양자 컴퓨팅 알고리즘 최적화', purpose: '양자 알고리즘의 효율성 향상', necessity: '양자 컴퓨팅의 발전 가능성', method: '양자 시뮬레이터를 활용한 실험', submittedDate: '2025-03-20', status: 'pending', desiredAdvisor: { id: 'PROF001', name: '김교수' } },
-    { id: 'RP012', studentId: 'STU012', studentNumber: '2023002', studentName: '서학생', department: '컴퓨터공학과', degreeType: '박사', title: '엣지 컴퓨팅 환경에서의 데이터 처리', purpose: '실시간 데이터 처리 성능 개선', necessity: 'IoT 환경에서의 데이터 처리 필요성', method: '엣지 디바이스를 활용한 실험', submittedDate: '2025-03-21', status: 'assigned', desiredAdvisor: { id: 'PROF002', name: '이교수' } },
-    { id: 'RP013', studentId: 'STU013', studentNumber: '2023003', studentName: '오학생', department: '경영학과', degreeType: '박사', title: '스타트업 성공 요인 분석', purpose: '스타트업의 생존율 향상 방안 제시', necessity: '스타트업 생태계 활성화', method: '다중 회귀 분석', submittedDate: '2025-03-22', status: 'pending', desiredAdvisor: { id: 'PROF003', name: '박교수' } },
-    { id: 'RP014', studentId: 'STU014', studentNumber: '2023004', studentName: '양학생', department: '경영학과', degreeType: '박사', title: '소셜 미디어 마케팅 전략 연구', purpose: '소셜 미디어를 통한 고객 참여 증대', necessity: '소셜 미디어의 영향력 확대', method: '사례 연구 및 실험', submittedDate: '2025-03-23', status: 'assigned', desiredAdvisor: { id: 'PROF004', name: '최교수' } },
-    { id: 'RP015', studentId: 'STU015', studentNumber: '2023005', studentName: '권학생', department: '교육학과', degreeType: '박사', title: '평생 교육 프로그램 효과성 평가', purpose: '성인 학습자의 교육 효과 극대화', necessity: '평생 교육의 중요성 증가', method: '종단 연구', submittedDate: '2025-03-24', status: 'pending', desiredAdvisor: { id: 'PROF005', name: '정교수' } },
-    { id: 'RP016', studentId: 'STU016', studentNumber: '2023006', studentName: '송학생', department: '교육학과', degreeType: '박사', title: '창의성 교육 프로그램 개발', purpose: '학습자의 창의력 향상', necessity: '창의적 인재 양성의 필요성', method: '프로그램 개발 및 효과 검증', submittedDate: '2025-03-25', status: 'assigned', desiredAdvisor: { id: 'PROF006', name: '강교수' } },
-    { id: 'RP017', studentId: 'STU017', studentNumber: '2023007', studentName: '백학생', department: '심리학과', degreeType: '박사', title: '외상 후 스트레스 장애 치료 방법 연구', purpose: 'PTSD 환자의 치료 효과 향상', necessity: 'PTSD 치료의 어려움', method: '임상 실험 및 질적 분석', submittedDate: '2025-03-26', status: 'pending', desiredAdvisor: { id: 'PROF007', name: '조교수' } },
-    { id: 'RP018', studentId: 'STU018', studentNumber: '2023008', studentName: '남학생', department: '심리학과', degreeType: '박사', title: '긍정 심리학 기반 행복 증진 프로그램', purpose: '개인의 행복감 향상', necessity: '긍정 심리학의 발전', method: '프로그램 개발 및 효과 검증', submittedDate: '2025-03-27', status: 'assigned', desiredAdvisor: { id: 'PROF008', name: '윤교수' } },
-    { id: 'RP019', studentId: 'STU019', studentNumber: '2023009', studentName: '문학생', department: '사회복지학과', degreeType: '박사', title: '아동 복지 제도의 개선 방안', purpose: '아동 학대 예방 및 보호 강화', necessity: '아동 복지 사각지대 존재', method: '정책 분석 및 사례 연구', submittedDate: '2025-03-28', status: 'pending', desiredAdvisor: { id: 'PROF009', name: '장교수' } },
-    { id: 'RP020', studentId: 'STU020', studentNumber: '2023010', studentName: '유학생', department: '사회복지학과', degreeType: '박사', title: '다문화 가정 지원 정책 연구', purpose: '다문화 가정의 사회 통합 촉진', necessity: '다문화 사회로의 전환', method: '설문 조사 및 정책 분석', submittedDate: '2025-03-29', status: 'assigned', desiredAdvisor: { id: 'PROF010', name: '임교수' } }
+    { id: 'RP011', studentId: 'STU011', studentNumber: '2023001', studentName: '한학생', department: '컴퓨터공학과', degreeType: '박사', title: '양자 컴퓨팅 알고리즘 최적화', purpose: '양자 알고리즘의 효율성 향상', necessity: '양자 컴퓨팅의 발전 가능성', method: '양자 시뮬레이터를 활용한 실험', submittedDate: '2025-03-20', status: 'pending', desiredAdvisor: { id: 'PROF001', name: '김교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP011.pdf' },
+    { id: 'RP012', studentId: 'STU012', studentNumber: '2023002', studentName: '서학생', department: '컴퓨터공학과', degreeType: '박사', title: '엣지 컴퓨팅 환경에서의 데이터 처리', purpose: '실시간 데이터 처리 성능 개선', necessity: 'IoT 환경에서의 데이터 처리 필요성', method: '엣지 디바이스를 활용한 실험', submittedDate: '2025-03-21', status: 'assigned', desiredAdvisor: { id: 'PROF002', name: '이교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP012.pdf' },
+    { id: 'RP013', studentId: 'STU013', studentNumber: '2023003', studentName: '오학생', department: '경영학과', degreeType: '박사', title: '스타트업 성공 요인 분석', purpose: '스타트업의 생존율 향상 방안 제시', necessity: '스타트업 생태계 활성화', method: '다중 회귀 분석', submittedDate: '2025-03-22', status: 'pending', desiredAdvisor: { id: 'PROF003', name: '박교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP013.pdf' },
+    { id: 'RP014', studentId: 'STU014', studentNumber: '2023004', studentName: '양학생', department: '경영학과', degreeType: '박사', title: '소셜 미디어 마케팅 전략 연구', purpose: '소셜 미디어를 통한 고객 참여 증대', necessity: '소셜 미디어의 영향력 확대', method: '사례 연구 및 실험', submittedDate: '2025-03-23', status: 'assigned', desiredAdvisor: { id: 'PROF004', name: '최교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP014.pdf' },
+    { id: 'RP015', studentId: 'STU015', studentNumber: '2023005', studentName: '권학생', department: '교육학과', degreeType: '박사', title: '평생 교육 프로그램 효과성 평가', purpose: '성인 학습자의 교육 효과 극대화', necessity: '평생 교육의 중요성 증가', method: '종단 연구', submittedDate: '2025-03-24', status: 'pending', desiredAdvisor: { id: 'PROF005', name: '정교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP015.pdf' },
+    { id: 'RP016', studentId: 'STU016', studentNumber: '2023006', studentName: '송학생', department: '교육학과', degreeType: '박사', title: '창의성 교육 프로그램 개발', purpose: '학습자의 창의력 향상', necessity: '창의적 인재 양성의 필요성', method: '프로그램 개발 및 효과 검증', submittedDate: '2025-03-25', status: 'assigned', desiredAdvisor: { id: 'PROF006', name: '강교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP016.pdf' },
+    { id: 'RP017', studentId: 'STU017', studentNumber: '2023007', studentName: '백학생', department: '심리학과', degreeType: '박사', title: '외상 후 스트레스 장애 치료 방법 연구', purpose: 'PTSD 환자의 치료 효과 향상', necessity: 'PTSD 치료의 어려움', method: '임상 실험 및 질적 분석', submittedDate: '2025-03-26', status: 'pending', desiredAdvisor: { id: 'PROF007', name: '조교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP017.pdf' },
+    { id: 'RP018', studentId: 'STU018', studentNumber: '2023008', studentName: '남학생', department: '심리학과', degreeType: '박사', title: '긍정 심리학 기반 행복 증진 프로그램', purpose: '개인의 행복감 향상', necessity: '긍정 심리학의 발전', method: '프로그램 개발 및 효과 검증', submittedDate: '2025-03-27', status: 'assigned', desiredAdvisor: { id: 'PROF008', name: '윤교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP018.pdf' },
+    { id: 'RP019', studentId: 'STU019', studentNumber: '2023009', studentName: '문학생', department: '사회복지학과', degreeType: '박사', title: '아동 복지 제도의 개선 방안', purpose: '아동 학대 예방 및 보호 강화', necessity: '아동 복지 사각지대 존재', method: '정책 분석 및 사례 연구', submittedDate: '2025-03-28', status: 'pending', desiredAdvisor: { id: 'PROF009', name: '장교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP019.pdf' },
+    { id: 'RP020', studentId: 'STU020', studentNumber: '2023010', studentName: '유학생', department: '사회복지학과', degreeType: '박사', title: '다문화 가정 지원 정책 연구', purpose: '다문화 가정의 사회 통합 촉진', necessity: '다문화 사회로의 전환', method: '설문 조사 및 정책 분석', submittedDate: '2025-03-29', status: 'assigned', desiredAdvisor: { id: 'PROF010', name: '임교수' }, formUrl: 'https://school-system.hycu.ac.kr/research-proposal/RP020.pdf' }
 ];
 
 // 지도교수 배정 데이터 - coAdvisors 무제한으로 변경
@@ -134,11 +134,91 @@ const mockThesisStages = [
         stageCount: 5,
         createdDate: '2025-01-01',
         stages: [
-            { order: 1, stepTypeId: 'ST001', name: '연구계획서 제출', type: 'submission', evaluationRequired: false },
-            { order: 2, stepTypeId: 'ST004', name: '선행연구 검토', type: 'submission', evaluationRequired: false },
-            { order: 3, stepTypeId: 'ST005', name: '연구 수행', type: 'submission', evaluationRequired: false },
-            { order: 4, stepTypeId: 'ST006', name: '논문 작성', type: 'submission', evaluationRequired: false },
-            { order: 5, stepTypeId: 'ST003', name: '본심사', type: 'review', evaluationRequired: true }
+            {
+                id: 'STAGE_TS001_001',
+                order: 1,
+                stepTypeId: 'ST001', // 구버전 호환용
+                categoryId: 'CAT_001', // 신규 필드
+                name: '연구계획서 제출',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-03-01',
+                submissionEndDate: '2025-03-31',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '연구 주제 및 방법을 문서로 제출'
+            },
+            {
+                id: 'STAGE_TS001_002',
+                order: 2,
+                stepTypeId: 'ST004',
+                categoryId: 'CAT_005',
+                name: '선행연구 검토',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-04-01',
+                submissionEndDate: '2025-04-30',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '관련 선행연구 검토 및 요약'
+            },
+            {
+                id: 'STAGE_TS001_003',
+                order: 3,
+                stepTypeId: 'ST005',
+                categoryId: 'CAT_005',
+                name: '연구 수행',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-05-01',
+                submissionEndDate: '2025-08-31',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '실제 연구 수행 및 데이터 수집'
+            },
+            {
+                id: 'STAGE_TS001_004',
+                order: 4,
+                stepTypeId: 'ST006',
+                categoryId: 'CAT_005',
+                name: '논문 작성',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-09-01',
+                submissionEndDate: '2025-10-31',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '연구 결과를 논문으로 작성'
+            },
+            {
+                id: 'STAGE_TS001_005',
+                order: 5,
+                stepTypeId: 'ST003',
+                categoryId: 'CAT_003',
+                name: '본심사',
+                type: 'review',
+                evaluationRequired: true,
+                requiresDocument: true,
+                requiresPresentation: true,
+                submissionStartDate: '2025-11-01',
+                submissionEndDate: '2025-11-15',
+                evaluationTemplateId: 'EVAL002',
+                reviewStartDate: '2025-11-20',
+                reviewEndDate: '2025-12-05',
+                description: '최종 논문 본심사'
+            }
         ]
     },
     {
@@ -148,13 +228,125 @@ const mockThesisStages = [
         stageCount: 7,
         createdDate: '2025-01-01',
         stages: [
-            { order: 1, stepTypeId: 'ST001', name: '연구계획서 제출', type: 'submission', evaluationRequired: false },
-            { order: 2, stepTypeId: 'ST004', name: '선행연구 검토', type: 'submission', evaluationRequired: false },
-            { order: 3, stepTypeId: 'ST007', name: '연구제안서 심사', type: 'review', evaluationRequired: true },
-            { order: 4, stepTypeId: 'ST005', name: '연구 수행', type: 'submission', evaluationRequired: false },
-            { order: 5, stepTypeId: 'ST002', name: '예비심사', type: 'review', evaluationRequired: true },
-            { order: 6, stepTypeId: 'ST006', name: '논문 작성', type: 'submission', evaluationRequired: false },
-            { order: 7, stepTypeId: 'ST003', name: '본심사', type: 'review', evaluationRequired: true }
+            {
+                id: 'STAGE_TS002_001',
+                order: 1,
+                stepTypeId: 'ST001',
+                categoryId: 'CAT_001',
+                name: '연구계획서 제출',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-03-01',
+                submissionEndDate: '2025-03-31',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '연구 주제 및 방법을 문서로 제출'
+            },
+            {
+                id: 'STAGE_TS002_002',
+                order: 2,
+                stepTypeId: 'ST004',
+                categoryId: 'CAT_005',
+                name: '선행연구 검토',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-04-01',
+                submissionEndDate: '2025-04-30',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '관련 선행연구 검토 및 요약'
+            },
+            {
+                id: 'STAGE_TS002_003',
+                order: 3,
+                stepTypeId: 'ST007',
+                categoryId: 'CAT_002',
+                name: '연구제안서 심사',
+                type: 'review',
+                evaluationRequired: true,
+                requiresDocument: true,
+                requiresPresentation: true,
+                submissionStartDate: '2025-05-01',
+                submissionEndDate: '2025-05-15',
+                evaluationTemplateId: 'EVAL003',
+                reviewStartDate: '2025-05-20',
+                reviewEndDate: '2025-06-05',
+                description: '박사과정 연구제안서 심사'
+            },
+            {
+                id: 'STAGE_TS002_004',
+                order: 4,
+                stepTypeId: 'ST005',
+                categoryId: 'CAT_005',
+                name: '연구 수행',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-06-10',
+                submissionEndDate: '2025-09-30',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '실제 연구 수행 및 데이터 수집'
+            },
+            {
+                id: 'STAGE_TS002_005',
+                order: 5,
+                stepTypeId: 'ST002',
+                categoryId: 'CAT_002',
+                name: '예비심사',
+                type: 'review',
+                evaluationRequired: true,
+                requiresDocument: true,
+                requiresPresentation: true,
+                submissionStartDate: '2025-10-01',
+                submissionEndDate: '2025-10-15',
+                evaluationTemplateId: 'EVAL001',
+                reviewStartDate: '2025-10-20',
+                reviewEndDate: '2025-11-05',
+                description: '논문 초안 예비심사'
+            },
+            {
+                id: 'STAGE_TS002_006',
+                order: 6,
+                stepTypeId: 'ST006',
+                categoryId: 'CAT_005',
+                name: '논문 작성',
+                type: 'submission',
+                evaluationRequired: false,
+                requiresDocument: true,
+                requiresPresentation: false,
+                submissionStartDate: '2025-11-10',
+                submissionEndDate: '2025-12-20',
+                evaluationTemplateId: '',
+                reviewStartDate: '',
+                reviewEndDate: '',
+                description: '연구 결과를 논문으로 작성'
+            },
+            {
+                id: 'STAGE_TS002_007',
+                order: 7,
+                stepTypeId: 'ST003',
+                categoryId: 'CAT_003',
+                name: '본심사',
+                type: 'review',
+                evaluationRequired: true,
+                requiresDocument: true,
+                requiresPresentation: true,
+                submissionStartDate: '2025-12-25',
+                submissionEndDate: '2026-01-10',
+                evaluationTemplateId: 'EVAL002',
+                reviewStartDate: '2026-01-15',
+                reviewEndDate: '2026-01-30',
+                description: '최종 논문 본심사'
+            }
         ]
     }
 ];
@@ -179,9 +371,106 @@ const mockStudentStageAssignments = mockStudents.map((student, index) => {
         currentStageName: currentStage.name,
         currentStageType: currentStage.type,
         canProceed: index % 2 === 0,
-        lastUpdated: '2025-03-01'
+        lastUpdated: '2025-03-01',
+        workflowAssignedDate: '2025-03-01',  // 워크플로우 최초 배정일
+        workflowLastChangedDate: null,       // 마지막 변경일 (변경 없으면 null)
+        isWorkflowChanged: false             // 워크플로우 변경 여부
     };
 });
+
+// 심사 단계 미배정 학생 추가 (일 배치로 가져온 신규 학생)
+mockStudentStageAssignments.push(
+    {
+        studentId: 'STU021',
+        studentNumber: '2025001',
+        studentName: '신규학생1',
+        department: '컴퓨터공학과',
+        degreeType: '석사',
+        grade: '석사1차',
+        thesisStageId: null,
+        thesisStageName: null,
+        currentStageOrder: null,
+        currentStageName: null,
+        currentStageType: null,
+        canProceed: false,
+        lastUpdated: '2025-03-01',
+        workflowAssignedDate: null,
+        workflowLastChangedDate: null,
+        isWorkflowChanged: false
+    },
+    {
+        studentId: 'STU022',
+        studentNumber: '2025002',
+        studentName: '신규학생2',
+        department: '경영학과',
+        degreeType: '석사',
+        grade: '석사1차',
+        thesisStageId: null,
+        thesisStageName: null,
+        currentStageOrder: null,
+        currentStageName: null,
+        currentStageType: null,
+        canProceed: false,
+        lastUpdated: '2025-03-01',
+        workflowAssignedDate: null,
+        workflowLastChangedDate: null,
+        isWorkflowChanged: false
+    },
+    {
+        studentId: 'STU023',
+        studentNumber: '2025003',
+        studentName: '신규학생3',
+        department: '사회복지학과',
+        degreeType: '석사',
+        grade: '석사1차',
+        thesisStageId: null,
+        thesisStageName: null,
+        currentStageOrder: null,
+        currentStageName: null,
+        currentStageType: null,
+        canProceed: false,
+        lastUpdated: '2025-03-01',
+        workflowAssignedDate: null,
+        workflowLastChangedDate: null,
+        isWorkflowChanged: false
+    },
+    {
+        studentId: 'STU024',
+        studentNumber: '2025004',
+        studentName: '신규학생4',
+        department: '교육학과',
+        degreeType: '박사',
+        grade: '박사1차',
+        thesisStageId: null,
+        thesisStageName: null,
+        currentStageOrder: null,
+        currentStageName: null,
+        currentStageType: null,
+        canProceed: false,
+        lastUpdated: '2025-03-01',
+        workflowAssignedDate: null,
+        workflowLastChangedDate: null,
+        isWorkflowChanged: false
+    },
+    {
+        studentId: 'STU025',
+        studentNumber: '2025005',
+        studentName: '신규학생5',
+        department: '심리학과',
+        degreeType: '박사',
+        grade: '박사1차',
+        thesisStageId: null,
+        thesisStageName: null,
+        currentStageOrder: null,
+        currentStageName: null,
+        currentStageType: null,
+        canProceed: false,
+        lastUpdated: '2025-03-01',
+        workflowAssignedDate: null,
+        workflowLastChangedDate: null,
+        isWorkflowChanged: false
+    }
+);
 
 // 심사 대상 학생 데이터 (심사 신청한 학생)
 // 심사 유형: 'proposal' (연구계획서), 'progress' (1차 보고서), 'final' (최종논문)
@@ -268,6 +557,16 @@ const mockCommitteeAssignments = [
 // 단계 유형 데이터 (Step Types - 레고 블록)
 // =============================================================================
 
+// 신규: 단계 카테고리 (단순 분류자 - 설정 상속 없음)
+const mockStageCategories = [
+    { id: 'CAT_001', name: '연구계획서 제출' },
+    { id: 'CAT_002', name: '예비심사' },
+    { id: 'CAT_003', name: '본심사' },
+    { id: 'CAT_004', name: '최종심사' },
+    { id: 'CAT_005', name: '기타' }
+];
+
+// 구버전 호환용 (추후 제거 예정)
 const mockStepTypes = [
     {
         id: 'ST001',
@@ -1081,7 +1380,7 @@ const mockGuides = [
 <h3>📅 학기별 주요 일정</h3>
 
 <h4>1학기 (2025년 3월 ~ 6월)</h4>
-<table class="min-w-full border">
+<table class="min-w-full border table-fixed">
 <thead class="bg-gray-100">
 <tr>
 <th class="border px-4 py-2">단계</th>
@@ -1114,7 +1413,7 @@ const mockGuides = [
 </table>
 
 <h4>2학기 (2025년 9월 ~ 12월)</h4>
-<table class="min-w-full border">
+<table class="min-w-full border table-fixed">
 <thead class="bg-gray-100">
 <tr>
 <th class="border px-4 py-2">단계</th>

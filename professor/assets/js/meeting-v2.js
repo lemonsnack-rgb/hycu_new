@@ -3,7 +3,7 @@
 let currentMeetingTab = 'confirmed'; // 확정됨이 첫번째 탭
 
 function initMeetingV2() {
-    console.log('✅ 미팅관리 V2 초기화');
+    console.log('미팅관리 V2 초기화');
     renderMeetingMainV2();
 }
 
@@ -85,7 +85,7 @@ function renderScheduleTab() {
                                 class="w-full bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-left transition-colors"
                                 style="display: flex; align-items: center; justify-content: space-between; border: none; cursor: pointer;">
                             <div>
-                                <div class="font-bold text-lg mb-1">📅 미팅 가능 시간 설정</div>
+                                <div class="font-bold text-lg mb-1">미팅 가능 시간 설정</div>
                                 <div class="text-sm text-blue-100">학생들이 예약 신청할 수 있습니다</div>
                             </div>
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -146,10 +146,10 @@ function renderSlotCard(slot) {
     }[slot.meetingType];
     
     const isOneTime = slot.type === 'oneTime';
-    const dateLabel = isOneTime 
-        ? `📅 ${slot.date}` 
+    const dateLabel = isOneTime
+        ? `${slot.date}`
         : `${days[slot.dayOfWeek]}요일`;
-    
+
     return `
         <div class="slot-card">
             <div class="flex justify-between items-start">
@@ -161,10 +161,10 @@ function renderSlotCard(slot) {
                         <span class="badge-purple">${typeText}</span>
                     </div>
                     <div class="text-sm text-gray-600">
-                        ${isOneTime 
-                            ? `<span>📌 1회만 (${slot.date})</span>` 
-                            : `<span>📅 ${slot.startDate} ~ ${slot.endDate}</span>
-                               <span class="ml-3">🔁 매주 반복</span>`
+                        ${isOneTime
+                            ? `<span>1회만 (${slot.date})</span>`
+                            : `<span>${slot.startDate} ~ ${slot.endDate}</span>
+                               <span class="ml-3">매주 반복</span>`
                         }
                     </div>
                 </div>
@@ -491,14 +491,14 @@ function renderRequestCard(req) {
             <div class="bg-blue-50 p-4 rounded-lg mb-3">
                 <h4 class="font-semibold text-blue-900 mb-3">${req.topic}</h4>
                 <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div class="text-blue-700">📅 희망일: <span class="font-medium">${req.selectedDate}</span></div>
-                    <div class="text-blue-700">⏰ 시간: <span class="font-medium">${req.selectedTime} (${req.duration}분)</span></div>
+                    <div class="text-blue-700">희망일: <span class="font-medium">${req.selectedDate}</span></div>
+                    <div class="text-blue-700">시간: <span class="font-medium">${req.selectedTime} (${req.duration}분)</span></div>
                 </div>
             </div>
-            
+
             ${slot ? `
                 <div class="text-xs text-gray-500 mb-3">
-                    📌 안내 문구가 삽입되는 위치입니다
+                    안내 문구가 삽입되는 위치입니다
                 </div>
             ` : ''}
             
@@ -535,7 +535,7 @@ function approveRequestV2(reqId) {
             ${req.meetingType === 'online' ? `
                 <div class="bg-purple-50 p-3 rounded">
                     <p class="text-sm text-purple-800">
-                        🎥 온라인 미팅입니다. 승인 시 자동으로 Zoom 미팅이 생성되며, 링크가 학생에게 전달됩니다.
+                        온라인 미팅입니다. 승인 시 자동으로 Zoom 미팅이 생성되며, 링크가 학생에게 전달됩니다.
                     </p>
                 </div>
             ` : ''}
@@ -643,7 +643,7 @@ function renderWaitingTab() {
                             <div class="flex gap-3">
                                 <button onclick="approveRequest('${req.id}')"
                                         class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
-                                    ✅ 승인 (자동 Zoom 생성)
+                                    승인 (자동 Zoom 생성)
                                 </button>
                                 <button onclick="rejectRequest('${req.id}')"
                                         class="px-6 py-3 border-2 border-gray-300 hover:border-red-500 hover:text-red-500 rounded-lg font-semibold" style="background: none; cursor: pointer;">
@@ -743,7 +743,7 @@ function renderConfirmedTab() {
                                 <div class="flex gap-3">
                                     <button onclick="openZoomMeeting('${meeting.zoomStartUrl}')"
                                             class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
-                                        🎥 Zoom 시작하기
+                                        Zoom 시작하기
                                     </button>
                                     <button onclick="cancelMeeting('${meeting.id}')"
                                             class="px-6 py-3 border-2 border-red-300 text-red-600 rounded-lg font-semibold" style="background: none; cursor: pointer;">
@@ -827,7 +827,7 @@ function getDayName(dayOfWeek) {
     return days[dayOfWeek] + '요일';
 }
 
-console.log('✅ meeting-v2.js 로드 완료 (개선판)');
+console.log('meeting-v2.js 로드 완료 (개선판)');
 
 // Export
 window.initMeetingV2 = initMeetingV2;

@@ -37,19 +37,19 @@ function renderFeedback() {
     ];
 
     content.innerHTML = `
-        <div class="card">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">논문 지도 현황</h2>
-                    <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문을 제출하고 교수님의 피드백을 받으세요</p>
-                </div>
-                <button onclick="showFeedbackRequestModal()" class="btn-primary">
-                    + 피드백 요청
-                </button>
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">논문 지도 현황</h2>
+                <p class="text-sm text-gray-600 mt-2">논문을 제출하고 교수님의 피드백을 받으세요</p>
             </div>
+            <button onclick="showFeedbackRequestModal()" class="btn-primary">
+                피드백 요청
+            </button>
+        </div>
 
+        <div class="card">
             <div class="card-body" style="padding: 0;">
-                <table style="width: 100%; border-collapse: collapse;">
+                <table class="table-fixed" style="width: 100%; border-collapse: collapse;">
                     <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                         <tr>
                             <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문명</th>
@@ -65,7 +65,7 @@ function renderFeedback() {
                                 onclick="openFeedbackViewer(${req.id})"
                                 onmouseover="this.style.backgroundColor='#F9FAFB'"
                                 onmouseout="this.style.backgroundColor='transparent'">
-                                <td style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;">${req.title}</td>
+                                <td class="td-truncate-long" style="padding: 0.75rem 1rem; font-weight: 500; color: #1F2937;" title="${req.title}">${req.title}</td>
                                 <td style="padding: 0.75rem 1rem;">
                                     <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${req.stage}</span>
                                 </td>

@@ -29,24 +29,30 @@ function switchView(viewName, param = null) {
         journalSubmission: '학술지 심사 신청 현황',
         guidanceProgress: '논문지도 진행 현황',
         scheduleManagement: '논문지도 일정 관리',
+        scheduleCreate: param ? '일정 수정' : '일정 등록',
         requirementManagement: '논문 제출 요건 관리',
         stageManagement: '논문지도 단계 관리',
-        typeManagement: '심사 단계 등록',
+        typeManagement: '지도 단계 등록',
         committeeAssignment: '심사위원 배정',
         evaluationCriteria: '심사 기준 등록',
         evaluationCriteriaEdit: '심사 기준 등록',
         advisorAssignment: '지도교수 배정',
-        workflowCreate: '워크플로우 등록',
-        workflowStageCompose: '워크플로우 단계 구성',
-        workflowCreateUnified: '심사 단계 등록',
+        workflowCreate: '지도 단계 등록',
+        workflowStageCompose: '지도 단계 구성',
+        workflowCreateUnified: '지도 단계 등록',
         userManagement: '사용자 관리',
         roleManagement: '역할 관리',
         permissionManagement: '권한 관리',
         rolePermissionMapping: '역할별 권한 설정',
         noticeManagement: '공지사항 관리',
+        noticeDetail: '공지사항 상세',
+        noticeEdit: param ? '공지사항 수정' : '공지사항 작성',
         ethicsGuide: '연구윤리',
         scheduleGuide: '논문일정',
-        processGuide: '논문지도절차'
+        processGuide: '논문지도절차',
+        guideEdit: param === 'ethics' ? '연구윤리 편집' :
+                   param === 'schedule' ? '논문일정 편집' :
+                   param === 'procedure' ? '논문지도절차 편집' : '안내문 편집'
     };
 
     document.getElementById('view-title').textContent = viewTitles[viewName] || '대시보드';
@@ -1298,14 +1304,14 @@ window.closeFeedbackRecordDetailModal = closeFeedbackRecordDetailModal;
 
 console.log('✅ ID 22-25: 온라인 피드백 현황 상세 기능 로드 완료');
 
-// ==================== ID 26-29: 워크플로우 관리 상세 기능 ====================
+// ==================== ID 26-29: 지도 단계 관리 상세 기능 ====================
 
-// ID 26: 워크플로우 상세보기
+// ID 26: 지도 단계 상세보기
 function viewStageDetail(stageId) {
     const stage = appData.stages.find(s => s.id === stageId);
     
     if (!stage) {
-        showNotification('워크플로우 정보를 찾을 수 없습니다.', 'error');
+        showNotification('지도 단계 정보를 찾을 수 없습니다.', 'error');
         return;
     }
     
@@ -1344,7 +1350,7 @@ function viewStageDetail(stageId) {
                 
                 <!-- 헤더 -->
                 <div class="bg-[#009DE8] text-white px-6 py-4 flex items-center justify-between">
-                    <h3 class="text-xl font-bold">워크플로우 상세</h3>
+                    <h3 class="text-xl font-bold">지도 단계 상세</h3>
                     <button onclick="closeStageDetailModal()" 
                             class="text-white hover:text-gray-200 text-2xl leading-none">
                         ×
@@ -1357,7 +1363,7 @@ function viewStageDetail(stageId) {
                         <h4 class="text-lg font-bold text-gray-800 mb-4">기본 정보</h4>
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
                             <div>
-                                <div class="text-xs text-gray-500 mb-1">워크플로우명</div>
+                                <div class="text-xs text-gray-500 mb-1">지도 단계명</div>
                                 <div class="font-semibold text-gray-800">${stage.name}</div>
                             </div>
                             <div>
@@ -1387,7 +1393,7 @@ function viewStageDetail(stageId) {
                     
                     <!-- ID 27, 29: 단계별 진행 현황 시각화 -->
                     <div class="mb-6">
-                        <h4 class="text-lg font-bold text-gray-800 mb-4">워크플로우 단계</h4>
+                        <h4 class="text-lg font-bold text-gray-800 mb-4">지도 단계 구성</h4>
                         <div class="relative flex items-center gap-8 overflow-x-auto pb-4">
                             ${stepsHtml}
                         </div>
@@ -1462,7 +1468,7 @@ window.viewStageDetail = viewStageDetail;
 window.viewEvaluationCriteria = viewEvaluationCriteria;
 window.closeStageDetailModal = closeStageDetailModal;
 
-console.log('✅ ID 26-29: 워크플로우 관리 상세 기능 로드 완료');
+console.log('✅ ID 26-29: 지도 단계 관리 상세 기능 로드 완료');
 
 // ==================== 학사일정 관리 검색 기능 ====================
 
@@ -1747,7 +1753,7 @@ function viewStudentAcademicHistory(studentId) {
                     <!-- 학기별 성적 -->
                     <div class="mb-6">
                         <h4 class="text-lg font-bold mb-4">학기별 성적</h4>
-                        <table class="min-w-full text-sm border">
+                        <table class="min-w-full text-sm border table-fixed">
                             <thead class="bg-gray-50">
                                 <tr>
                                     <th class="py-2 px-4 border">학기</th>
@@ -3618,28 +3624,25 @@ function renderStageManagementContent() {
         return;
     }
 
-    // 선택된 논문 심사 단계 확인
-    const selectedStageId = window.selectedThesisStageId || '';
+    // 필터링된 데이터 사용 (전체 학생 대상)
+    let data = window.filteredStageData || mockStudentStageAssignments;
 
-    // 필터링된 데이터 사용 (선택된 심사 단계 기준)
-    let data = [];
-    if (selectedStageId) {
-        data = window.filteredStageData || mockStudentStageAssignments.filter(s => s.thesisStageId === selectedStageId);
-    }
+    // 지도 단계별로 그룹핑하여 테이블 행 생성
+    const tableRows = renderStudentTableRows(data);
 
     container.innerHTML = `
         <!-- 검색 옵션 -->
         <div class="p-6 border-b">
             <div class="search-container">
                 <div class="search-grid">
-                    <!-- 1. 논문 심사 단계 (필수) -->
+                    <!-- 1. 학과/전공 -->
                     <div class="search-field">
                         <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                            논문 심사 단계 <span style="color: #dc2626;">*</span>
+                            학과/전공
                         </label>
-                        <select id="stage-search-thesis-stage" class="search-select" onchange="onThesisStageChange()">
-                            <option value="">선택하세요</option>
-                            ${mockThesisStages.map(stage => `<option value="${stage.id}" ${stage.id === selectedStageId ? 'selected' : ''}>${stage.name}</option>`).join('')}
+                        <select id="stage-search-department" class="search-select">
+                            <option value="">전체</option>
+                            ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
                         </select>
                     </div>
 
@@ -3648,7 +3651,7 @@ function renderStageManagementContent() {
                         <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                             학년도
                         </label>
-                        <select id="stage-search-year" class="search-select" ${!selectedStageId ? 'disabled' : ''}>
+                        <select id="stage-search-year" class="search-select">
                             <option value="">전체</option>
                             <option value="2025">2025</option>
                             <option value="2024">2024</option>
@@ -3656,116 +3659,84 @@ function renderStageManagementContent() {
                         </select>
                     </div>
 
-                    <!-- 3. 학기 -->
-                    <div class="search-field">
-                        <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                            학기
-                        </label>
-                        <select id="stage-search-semester" class="search-select" ${!selectedStageId ? 'disabled' : ''}>
-                            <option value="">전체</option>
-                            <option value="1">1학기</option>
-                            <option value="2">2학기</option>
-                        </select>
-                    </div>
-
-                    <!-- 4. 학기차 -->
+                    <!-- 3. 학기차 -->
                     <div class="search-field">
                         <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                             학기차
                         </label>
-                        <input type="text" id="stage-search-semester-count" placeholder="학기차 입력"
-                               class="search-input" ${!selectedStageId ? 'disabled' : ''}>
+                        <input type="text" id="stage-search-semester-count" placeholder="예: 1, 2, 3..."
+                               class="search-input">
                     </div>
 
-                    <!-- 5. 학과/전공 -->
-                    <div class="search-field">
-                        <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                            학과/전공
-                        </label>
-                        <select id="stage-search-department" class="search-select" ${!selectedStageId ? 'disabled' : ''}>
-                            <option value="">전체</option>
-                            ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                        </select>
-                    </div>
-
-                    <!-- 6. 학번 -->
+                    <!-- 4. 학번 -->
                     <div class="search-field">
                         <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                             학번
                         </label>
                         <input type="text" id="stage-search-student-id" placeholder="학번 입력"
-                               class="search-input" ${!selectedStageId ? 'disabled' : ''}>
+                               class="search-input">
                     </div>
 
-                    <!-- 7. 이름 -->
+                    <!-- 5. 이름 -->
                     <div class="search-field">
                         <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
                             이름
                         </label>
                         <input type="text" id="stage-search-student-name" placeholder="이름 입력"
-                               class="search-input" ${!selectedStageId ? 'disabled' : ''}>
-                    </div>
-
-                    <!-- 8. 현재 단계 -->
-                    <div class="search-field">
-                        <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                            현재 단계
-                        </label>
-                        <select id="stage-search-current-stage" class="search-select" ${!selectedStageId ? 'disabled' : ''}>
-                            <option value="">전체</option>
-                            ${selectedStageId ? getStageNamesByStageId(selectedStageId).map(stage => `<option value="${stage}">${stage}</option>`).join('') : ''}
-                        </select>
+                               class="search-input">
                     </div>
                 </div>
 
                 <!-- 검색/초기화 버튼 -->
                 <div class="search-buttons">
-                    <button onclick="searchStageManagement()" class="search-btn search-btn-primary" ${!selectedStageId ? 'disabled' : ''}>
+                    <button onclick="searchStageManagement()" class="search-btn search-btn-primary">
                         <i class="fas fa-search"></i>검색
                     </button>
-                    <button onclick="resetStageSearch()" class="search-btn search-btn-secondary" ${!selectedStageId ? 'disabled' : ''}>
+                    <button onclick="resetStageSearch()" class="search-btn search-btn-secondary">
                         <i class="fas fa-redo"></i>초기화
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- 학생 목록 테이블 -->
-        <div class="p-6">
-            ${!selectedStageId ? `
-                <div class="text-center py-16 text-gray-500">
-                    <i class="fas fa-info-circle text-4xl mb-4"></i>
-                    <p class="text-lg font-semibold">논문 심사 단계를 선택해주세요</p>
-                    <p class="text-sm mt-2">상단 검색 영역에서 논문 심사 단계를 먼저 선택하면 해당 단계의 학생 목록이 표시됩니다.</p>
-                </div>
-            ` : `
-            <!-- 일괄 처리 버튼 영역 -->
-            <div class="mb-4 flex justify-between items-center">
+        <!-- 일괄 처리 버튼 영역 -->
+        <div class="px-6 py-4 border-b bg-gray-50">
+            <div class="flex justify-between items-center">
                 <div class="text-sm text-gray-600">
                     총 <span class="font-semibold text-primary">${data.length}</span>명의 학생
                     <span id="selected-count" class="ml-2"></span>
                 </div>
-                <div class="space-x-2">
-                    <button onclick="bulkAssignStage()"
-                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed"
-                            id="bulk-assign-btn" disabled>
-                        <i class="fas fa-layer-group"></i> 일괄 단계 부여
+                <div class="flex gap-2">
+                    <!-- 신규: 지도 단계 배정 (미배정 학생 선택 시 활성화) -->
+                    <button onclick="bulkAssignThesisStage()"
+                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            id="bulk-assign-stage-btn"
+                            disabled>
+                        지도 단계 배정
                     </button>
-                    <button onclick="bulkMoveToPrevStage()"
-                            class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                            id="bulk-prev-btn" disabled>
-                        <i class="fas fa-arrow-left"></i> 이전 단계 이관
+
+                    <!-- 신규: 지도 단계 변경 (배정된 학생 선택 시 활성화) -->
+                    <button onclick="bulkChangeThesisStage()"
+                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            id="bulk-change-workflow-btn"
+                            disabled>
+                        지도 단계 변경
                     </button>
-                    <button onclick="bulkMoveToNextStage()"
-                            class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed"
-                            id="bulk-next-btn" disabled>
-                        <i class="fas fa-arrow-right"></i> 다음 단계 이관
+
+                    <!-- 기존: 단계 이동 -->
+                    <button onclick="bulkChangeStage()"
+                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            id="bulk-change-stage-btn"
+                            disabled>
+                        단계 이동
                     </button>
                 </div>
             </div>
+        </div>
 
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+        <!-- 학생 목록 테이블 -->
+        <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left">
@@ -3776,74 +3747,123 @@ function renderStageManagementContent() {
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">적용 논문 심사 단계</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">현재 단계</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">진행 상태</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">진행 단계</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">논문 지도 단계</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">진행상태</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">단계 이동</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        ${data.map(item => {
-                            const student = mockStudents.find(s => s.id === item.studentId);
-                            return `
-                            <tr class="hover:bg-gray-50" data-student-id="${item.studentId}">
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <input type="checkbox" class="stage-checkbox rounded border-gray-300 text-primary focus:ring-primary"
-                                           value="${item.studentId}"
-                                           onchange="updateStageSelectionButtons()">
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student?.academicYear || '-'}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${student?.semesterCount || '-'}학기</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    ${item.studentName}
-                                    <button onclick="showStudentInfo('${item.studentId}')"
-                                            class="ml-1 text-gray-400 hover:text-primary"
-                                            title="학생 상세정보">
-                                        <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
-                                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                        </svg>
-                                    </button>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                    <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                                        ${item.degreeType}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.thesisStageName}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                    <span class="font-semibold text-primary">${item.currentStageOrder}단계</span> - ${item.currentStageName}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                    ${item.canProceed
-                                        ? '<span class="px-2 py-1 text-xs rounded bg-green-100 text-green-800">이관 가능</span>'
-                                        : '<span class="px-2 py-1 text-xs rounded bg-yellow-100 text-yellow-800">진행 중</span>'
-                                    }
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-500">
-                                    <button onclick="changeStudentStage('${item.studentId}')"
-                                            class="text-xs px-3 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white">
-                                        단계 변경
-                                    </button>
-                                </td>
-                            </tr>
-                        `}).join('')}
+                        ${tableRows}
                     </tbody>
                 </table>
-            </div>
 
             ${data.length === 0 ? `
                 <div class="text-center py-8 text-gray-500">
                     ${window.filteredStageData ? '검색 결과가 없습니다.' : '등록된 학생이 없습니다.'}
                 </div>
             ` : ''}
-            `}
         </div>
     `;
+}
+
+// 테이블 행 렌더링 (단순 버전)
+function renderStudentTableRows(data) {
+    let rows = '';
+
+    data.forEach(item => {
+        const student = mockStudents.find(s => s.id === item.studentId);
+        const workflow = mockThesisStages.find(w => w.id === item.thesisStageId);
+
+        rows += `
+            <tr class="hover:bg-gray-50 transition-colors"
+                data-student-id="${item.studentId}"
+                data-workflow-id="${item.thesisStageId}">
+                <!-- 체크박스 -->
+                <td class="px-6 py-4 whitespace-nowrap">
+                    <input type="checkbox"
+                           class="stage-checkbox rounded border-gray-300 text-primary focus:ring-primary"
+                           value="${item.studentId}"
+                           data-workflow-id="${item.thesisStageId}"
+                           onchange="updateBulkStageChangeButton()">
+                </td>
+
+                <!-- 학년도 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${student?.academicYear || '-'}
+                </td>
+
+                <!-- 학기차 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${student?.semesterCount || '-'}학기
+                </td>
+
+                <!-- 학과 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${item.department}
+                </td>
+
+                <!-- 학위과정 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                        ${item.degreeType}
+                    </span>
+                </td>
+
+                <!-- 학번 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${item.studentNumber}
+                </td>
+
+                <!-- 이름 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    ${item.studentName}
+                </td>
+
+                <!-- 현재 단계 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${item.currentStageOrder
+                        ? `<span class="font-semibold text-primary">${item.currentStageOrder}단계</span> - ${item.currentStageName}`
+                        : '<span class="text-gray-400">-</span>'
+                    }
+                </td>
+
+                <!-- 논문 심사 단계명 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                    ${item.thesisStageId
+                        ? workflow?.name || '-'
+                        : '<span class="font-medium text-red-600">미배정</span>'
+                    }
+                </td>
+
+                <!-- 진행상태 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm">
+                    ${item.thesisStageId === null
+                        ? '<span class="text-gray-400">-</span>'
+                        : item.canProceed
+                            ? '<span class="text-gray-700">이관 가능</span>'
+                            : '<span class="text-gray-700">진행 중</span>'
+                    }
+                </td>
+
+                <!-- 단계변경 -->
+                <td class="px-6 py-4 text-sm">
+                    ${item.thesisStageId !== null
+                        ? `<button onclick="changeStudentStage('${item.studentId}')"
+                                class="text-xs px-3 py-1 border border-primary text-primary rounded hover:bg-primary hover:text-white transition-colors">
+                            단계 이동
+                        </button>`
+                        : '<span class="text-gray-400">-</span>'
+                    }
+                </td>
+            </tr>
+        `;
+    });
+
+    return rows;
 }
 
 // 고유한 단계 이름 목록 가져오기
@@ -3859,7 +3879,7 @@ function getUniqueStageNames() {
     return Array.from(stages);
 }
 
-// 특정 심사 단계 ID의 단계 이름 목록 가져오기
+// 특정 지도 단계 ID의 단계 이름 목록 가져오기
 function getStageNamesByStageId(stageId) {
     if (typeof mockThesisStages === 'undefined') return [];
 
@@ -3869,51 +3889,28 @@ function getStageNamesByStageId(stageId) {
     return template.stages.map(s => s.name);
 }
 
-// 논문 심사 단계 변경 이벤트 핸들러
-function onThesisStageChange() {
-    const stageSelect = document.getElementById('stage-search-thesis-stage');
-    const selectedStageId = stageSelect.value;
-
-    // 전역 변수에 저장
-    window.selectedThesisStageId = selectedStageId;
-    window.filteredStageData = null; // 검색 필터 초기화
-
-    // 화면 재렌더링
-    renderStageManagementContent();
-}
-
 // ==============================================
 // 단계 관리 검색 기능
 // ==============================================
 
 // 단계 관리 검색
 function searchStageManagement() {
-    const selectedStageId = window.selectedThesisStageId;
-    if (!selectedStageId) {
-        showNotification('논문 심사 단계를 먼저 선택해주세요.', 'warning');
-        return;
-    }
-
     const year = document.getElementById('stage-search-year').value;
-    const semester = document.getElementById('stage-search-semester').value;
     const semesterCount = document.getElementById('stage-search-semester-count').value.trim();
     const department = document.getElementById('stage-search-department').value;
     const studentId = document.getElementById('stage-search-student-id').value.trim();
     const studentName = document.getElementById('stage-search-student-name').value.trim();
-    const currentStage = document.getElementById('stage-search-current-stage').value;
 
-    // 선택된 심사 단계의 학생만 필터링
+    // 모든 학생 대상으로 검색 (논문 심사 단계 제약 없음)
     let filtered = mockStudentStageAssignments.filter(item => {
-        if (item.thesisStageId !== selectedStageId) return false;
-
         const student = mockStudents.find(s => s.id === item.studentId);
+
         if (year && student?.academicYear !== year) return false;
-        if (semester && !student?.academicYear.includes(semester)) return false; // 학기 정보는 academicYear에 포함
         if (semesterCount && student?.semesterCount !== parseInt(semesterCount)) return false;
         if (department && item.department !== department) return false;
         if (studentId && !item.studentNumber.includes(studentId)) return false;
         if (studentName && !item.studentName.includes(studentName)) return false;
-        if (currentStage && item.currentStageName !== currentStage) return false;
+
         return true;
     });
 
@@ -3926,12 +3923,10 @@ function searchStageManagement() {
 // 단계 관리 검색 초기화
 function resetStageSearch() {
     document.getElementById('stage-search-year').value = '';
-    document.getElementById('stage-search-semester').value = '';
     document.getElementById('stage-search-semester-count').value = '';
     document.getElementById('stage-search-department').value = '';
     document.getElementById('stage-search-student-id').value = '';
     document.getElementById('stage-search-student-name').value = '';
-    document.getElementById('stage-search-current-stage').value = '';
 
     window.filteredStageData = null;
     renderStageManagementContent();
@@ -3945,36 +3940,98 @@ function resetStageSearch() {
 
 // 전체 선택/해제
 function toggleAllStageSelection(checked) {
-    const checkboxes = document.querySelectorAll('.stage-checkbox');
-    checkboxes.forEach(cb => {
-        cb.checked = checked;
-    });
-    updateStageSelectionButtons();
+    if (!checked) {
+        // 전체 해제
+        const checkboxes = document.querySelectorAll('.stage-checkbox');
+        checkboxes.forEach(cb => cb.checked = false);
+        updateBulkStageChangeButton();
+        return;
+    }
+
+    // 전체 선택 - 활성화된 체크박스만 선택
+    const checkboxes = document.querySelectorAll('.stage-checkbox:not(:disabled)');
+    checkboxes.forEach(cb => cb.checked = true);
+    updateBulkStageChangeButton();
 }
 
-// 선택 상태에 따라 버튼 활성화/비활성화
-function updateStageSelectionButtons() {
-    const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
-    const count = checkboxes.length;
+// 선택 상태에 따라 일괄 처리 버튼 활성화/비활성화
+function updateBulkStageChangeButton() {
+    const checkedBoxes = document.querySelectorAll('.stage-checkbox:checked');
+    const count = checkedBoxes.length;
 
-    const bulkAssignBtn = document.getElementById('bulk-assign-btn');
-    const bulkPrevBtn = document.getElementById('bulk-prev-btn');
-    const bulkNextBtn = document.getElementById('bulk-next-btn');
+    const assignBtn = document.getElementById('bulk-assign-stage-btn');
+    const changeStageBtn = document.getElementById('bulk-change-stage-btn');
+    const changeThesisStageBtn = document.getElementById('bulk-change-workflow-btn');
     const selectedCount = document.getElementById('selected-count');
 
-    if (count > 0) {
-        if (bulkAssignBtn) bulkAssignBtn.disabled = false;
-        if (bulkPrevBtn) bulkPrevBtn.disabled = false;
-        if (bulkNextBtn) bulkNextBtn.disabled = false;
-        if (selectedCount) {
-            selectedCount.textContent = `(${count}명 선택됨)`;
-            selectedCount.className = 'ml-2 font-semibold text-primary';
-        }
-    } else {
-        if (bulkAssignBtn) bulkAssignBtn.disabled = true;
-        if (bulkPrevBtn) bulkPrevBtn.disabled = true;
-        if (bulkNextBtn) bulkNextBtn.disabled = true;
+    // 선택 없음 - 모든 버튼 비활성화
+    if (count === 0) {
+        if (assignBtn) assignBtn.disabled = true;
+        if (changeStageBtn) changeStageBtn.disabled = true;
+        if (changeThesisStageBtn) changeThesisStageBtn.disabled = true;
         if (selectedCount) selectedCount.textContent = '';
+        return;
+    }
+
+    // 선택된 학생들 분류
+    const selectedIds = Array.from(checkedBoxes).map(cb => cb.value);
+    const selectedStudents = selectedIds.map(id =>
+        mockStudentStageAssignments.find(s => s.studentId === id)
+    );
+
+    const unassigned = selectedStudents.filter(s => s.thesisStageId === null);
+    const assigned = selectedStudents.filter(s => s.thesisStageId !== null);
+
+    const unassignedCount = unassigned.length;
+    const assignedCount = assigned.length;
+
+    // 시나리오 1: 미배정 학생만 선택
+    if (unassignedCount > 0 && assignedCount === 0) {
+        if (assignBtn) assignBtn.disabled = false;
+        if (changeStageBtn) changeStageBtn.disabled = true;
+        if (changeThesisStageBtn) changeThesisStageBtn.disabled = true;
+        if (selectedCount) {
+            selectedCount.textContent = `(${count}명 선택됨 - 미배정)`;
+            selectedCount.className = 'ml-2 font-semibold text-gray-600';
+        }
+        return;
+    }
+
+    // 시나리오 2: 배정된 학생만 선택
+    if (unassignedCount === 0 && assignedCount > 0) {
+        if (assignBtn) assignBtn.disabled = true;
+
+        // 같은 지도 단계인지 확인
+        const thesisStageIds = [...new Set(assigned.map(s => s.thesisStageId))];
+
+        if (thesisStageIds.length > 1) {
+            // 다른 지도 단계 혼합
+            if (changeStageBtn) changeStageBtn.disabled = true;
+            if (changeThesisStageBtn) changeThesisStageBtn.disabled = false;
+            if (selectedCount) {
+                selectedCount.textContent = `(${count}명 선택됨 - 다른 지도 단계)`;
+                selectedCount.className = 'ml-2 font-semibold text-gray-600';
+            }
+        } else {
+            // 같은 지도 단계
+            const thesisStage = mockThesisStages.find(w => w.id === thesisStageIds[0]);
+            if (changeStageBtn) changeStageBtn.disabled = false;
+            if (changeThesisStageBtn) changeThesisStageBtn.disabled = false;
+            if (selectedCount) {
+                selectedCount.textContent = `(${count}명 선택됨 - ${thesisStage?.name || ''})`;
+                selectedCount.className = 'ml-2 font-semibold text-primary';
+            }
+        }
+        return;
+    }
+
+    // 시나리오 3: 혼합 선택 - 모든 버튼 비활성화
+    if (assignBtn) assignBtn.disabled = true;
+    if (changeStageBtn) changeStageBtn.disabled = true;
+    if (changeThesisStageBtn) changeThesisStageBtn.disabled = true;
+    if (selectedCount) {
+        selectedCount.textContent = `(${count}명 선택됨 - 혼합 선택 불가)`;
+        selectedCount.className = 'ml-2 font-semibold text-red-600';
     }
 }
 
@@ -4115,56 +4172,91 @@ function confirmStageChange(studentId) {
     showNotification(`${stageAssignment.studentName} 학생의 단계가 ${newStageOrder}단계로 변경되었습니다.`, 'success');
 }
 
-// 일괄 단계 부여
-function bulkAssignStage() {
+// 일괄 단계 변경
+function bulkChangeStage() {
     const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
-    const studentIds = Array.from(checkboxes).map(cb => cb.value);
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
 
-    if (studentIds.length === 0) {
-        showNotification('학생을 선택해주세요.', 'warning');
+    if (selectedIds.length === 0) {
+        showNotification('단계를 이동할 학생을 선택해주세요.', 'warning');
         return;
     }
 
-    // 첫 번째 학생의 학위과정 확인
-    const firstStudent = mockStudentStageAssignments.find(s => s.studentId === studentIds[0]);
-    const template = mockThesisStages.find(t => t.id === firstStudent.thesisStageId);
+    // 첫 번째 학생의 지도 단계 확인 (체크박스 제어 로직으로 이미 같은 지도 단계만 선택됨)
+    const firstId = selectedIds[0];
+    const firstStudent = mockStudentStageAssignments.find(s => s.studentId === firstId);
+    const workflow = mockThesisStages.find(w => w.id === firstStudent.thesisStageId);
 
-    // 단계 선택 모달 표시
-    const stageOptions = template.stages.map(stage => `
+    if (!workflow) {
+        showNotification('지도 단계 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // 일괄 변경 모달 표시
+    showBulkStageChangeModal(selectedIds, workflow);
+}
+
+// 일괄 단계 이동 모달 표시
+function showBulkStageChangeModal(selectedIds, workflow) {
+    const stageOptions = workflow.stages.map(stage => `
         <option value="${stage.order}">
             ${stage.order}단계 - ${stage.name}
         </option>
     `).join('');
 
     const modalHTML = `
-        <div class="admin-modal active" id="bulk-stage-modal" style="display: block;">
+        <div class="admin-modal active" id="bulk-stage-change-modal" style="display: block;">
             <div class="admin-modal-content">
                 <div class="admin-modal-header">
-                    <h2>일괄 단계 부여</h2>
-                    <button class="admin-modal-close" onclick="closeBulkStageModal()">&times;</button>
+                    <h2>일괄 단계 이동</h2>
+                    <button class="admin-modal-close" onclick="closeBulkStageChangeModal()">&times;</button>
                 </div>
                 <div class="admin-modal-body">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-2">
-                            선택한 <span class="font-semibold text-primary">${studentIds.length}명</span>의 학생에게 동일한 단계를 부여합니다.
-                        </p>
+                    <!-- 선택 정보 -->
+                    <div class="mb-6 p-4 bg-blue-50 rounded-lg">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-2">선택 정보</h3>
+                        <div class="text-sm space-y-1">
+                            <p><span class="text-gray-600">대상 학생:</span> <span class="font-semibold text-primary">${selectedIds.length}명</span></p>
+                            <p><span class="text-gray-600">논문 지도 단계:</span> <span class="font-semibold">${workflow.name}</span></p>
+                        </div>
                     </div>
 
+                    <!-- 단계 선택 -->
                     <div class="mb-4">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">부여할 단계</label>
-                        <select id="bulk-stage-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            이동할 단계 <span class="text-red-600">*</span>
+                        </label>
+                        <select id="bulk-new-stage-select"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-primary focus:border-primary">
+                            <option value="">-- 단계 선택 --</option>
                             ${stageOptions}
                         </select>
                     </div>
 
+                    <!-- 안내 메시지 -->
+                    <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-sm">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-amber-400 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-amber-800 font-medium">이동 안내</p>
+                                <p class="text-amber-700 mt-1">
+                                    선택한 모든 학생이 지정한 단계로 일괄 이동됩니다.<br>
+                                    이동 후에는 되돌릴 수 없으니 신중히 선택해주세요.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="flex justify-end space-x-2 mt-6">
-                        <button onclick="closeBulkStageModal()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                        <button onclick="closeBulkStageChangeModal()"
+                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
                             취소
                         </button>
-                        <button onclick="confirmBulkStageAssignment()"
-                                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark">
-                            부여
+                        <button onclick="confirmBulkStageChange()"
+                                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
+                            이동 실행
                         </button>
                     </div>
                 </div>
@@ -4175,96 +4267,384 @@ function bulkAssignStage() {
     document.body.insertAdjacentHTML('beforeend', modalHTML);
 }
 
-// 일괄 단계 부여 모달 닫기
-function closeBulkStageModal() {
-    const modal = document.getElementById('bulk-stage-modal');
+// 일괄 단계 이동 모달 닫기
+function closeBulkStageChangeModal() {
+    const modal = document.getElementById('bulk-stage-change-modal');
     if (modal) {
         modal.remove();
     }
 }
 
-// 일괄 단계 부여 확인
-function confirmBulkStageAssignment() {
+// 일괄 단계 변경 확인
+function confirmBulkStageChange() {
     const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
-    const studentIds = Array.from(checkboxes).map(cb => cb.value);
-    const newStageOrder = parseInt(document.getElementById('bulk-stage-select').value);
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+    const newStageOrder = document.getElementById('bulk-new-stage-select').value;
 
+    if (!newStageOrder) {
+        showNotification('변경할 단계를 선택해주세요.', 'warning');
+        return;
+    }
+
+    // 각 학생의 단계 업데이트
     let successCount = 0;
+    selectedIds.forEach(studentId => {
+        const assignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
+        if (assignment) {
+            const workflow = mockThesisStages.find(w => w.id === assignment.thesisStageId);
+            const newStage = workflow.stages.find(s => s.order === parseInt(newStageOrder));
 
-    studentIds.forEach(studentId => {
-        const stageAssignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
-        if (stageAssignment) {
-            const template = mockThesisStages.find(t => t.id === stageAssignment.thesisStageId);
-            const newStage = template.stages.find(s => s.order === newStageOrder);
+            if (newStage) {
+                assignment.currentStageOrder = newStage.order;
+                assignment.currentStageName = newStage.name;
+                assignment.canProceed = false; // 변경 후에는 진행 중으로 설정
+                assignment.lastUpdated = new Date().toISOString().split('T')[0];
+                successCount++;
+            }
+        }
+    });
 
-            stageAssignment.currentStageOrder = newStageOrder;
-            stageAssignment.currentStageName = newStage.name;
-            stageAssignment.currentStageType = newStage.type;
-            stageAssignment.lastUpdated = new Date().toISOString().split('T')[0];
+    closeBulkStageChangeModal();
+    renderStageManagementContent();
+
+    showNotification(`${successCount}명의 학생 단계가 변경되었습니다.`, 'success');
+}
+
+// ==============================================
+// 지도 단계 배정/변경 관련 함수
+// ==============================================
+
+/**
+ * 1. 지도 단계 배정 (미배정 학생 대상)
+ */
+function bulkAssignThesisStage() {
+    const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+
+    if (selectedIds.length === 0) {
+        showNotification('지도 단계를 배정할 학생을 선택해주세요.', 'warning');
+        return;
+    }
+
+    const selectedStudents = mockStudentStageAssignments.filter(s =>
+        selectedIds.includes(s.studentId)
+    );
+
+    // 미배정 학생만 필터링
+    const unassignedStudents = selectedStudents.filter(s => s.thesisStageId === null);
+
+    if (unassignedStudents.length === 0) {
+        showNotification('선택한 학생은 이미 지도 단계가 배정되어 있습니다.', 'warning');
+        return;
+    }
+
+    // 학위과정 확인
+    const degreeTypes = [...new Set(unassignedStudents.map(s => s.degreeType))];
+    if (degreeTypes.length > 1) {
+        showNotification('같은 학위과정의 학생만 선택해주세요. (석사/박사 혼합 불가)', 'warning');
+        return;
+    }
+
+    showThesisStageAssignmentModal(unassignedStudents, degreeTypes[0]);
+}
+
+/**
+ * 2. 지도 단계 배정 모달 표시 (간소화 버전)
+ */
+function showThesisStageAssignmentModal(students, degreeType) {
+    const degreeTypeEng = degreeType === '석사' ? 'master' : 'phd';
+    const thesisStages = mockThesisStages.filter(w => w.degreeType === degreeTypeEng);
+
+    const modalHTML = `
+        <div class="admin-modal active" id="thesis-stage-assignment-modal" style="display: block;">
+            <div class="admin-modal-content" style="max-width: 700px;">
+                <div class="admin-modal-header">
+                    <h2>지도 단계 배정</h2>
+                    <button class="admin-modal-close" onclick="closeThesisStageAssignmentModal()">&times;</button>
+                </div>
+                <div class="admin-modal-body">
+                    <!-- 안내 메시지 -->
+                    <div class="p-4 mb-6 border border-gray-200 rounded-lg">
+                        <p class="text-gray-700 text-sm">
+                            선택한 학생들에게 논문 지도 단계를 배정합니다.<br>
+                            배정 후 1단계부터 시작됩니다.
+                        </p>
+                    </div>
+
+                    <!-- 선택된 학생 정보 -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">선택된 학생 (${students.length}명)</h3>
+                        <div class="text-sm space-y-2 max-h-40 overflow-y-auto">
+                            ${students.map(s => `
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-gray-900">${s.studentName} (${s.studentNumber})</span>
+                                    <span class="text-gray-600">${s.degreeType} - ${s.department}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- 지도 단계 선택 (드롭다운) -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            배정할 지도 단계 <span class="text-red-600">*</span>
+                        </label>
+                        <select id="thesis-stage-select"
+                                onchange="handleThesisStageAssignmentSelection(this.value)"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                            <option value="">지도 단계를 선택하세요</option>
+                            ${thesisStages.map(stage => `
+                                <option value="${stage.id}">
+                                    ${stage.name} (${stage.degreeType === 'master' ? '석사' : '박사'} 과정, ${stage.stageCount}개 단계)
+                                </option>
+                            `).join('')}
+                        </select>
+
+                        <!-- 선택된 심사 단계 상세 정보 -->
+                        <div id="selected-stage-info" class="mt-3 p-3 bg-gray-50 rounded-lg hidden">
+                            <div class="text-sm text-gray-700">
+                                <div class="font-medium mb-2" id="stage-info-name"></div>
+                                <div class="text-xs text-gray-600" id="stage-info-details"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 하단 버튼 -->
+                    <div class="flex justify-end gap-3">
+                        <button onclick="closeThesisStageAssignmentModal()"
+                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
+                            취소
+                        </button>
+                        <button onclick="confirmThesisStageAssignment()"
+                                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors"
+                                id="confirm-thesis-stage-assignment-btn"
+                                disabled>
+                            배정 완료
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    window.selectedThesisStageForAssignment = null;
+}
+
+/**
+ * 3. 심사 단계 배정 모달 닫기
+ */
+function closeThesisStageAssignmentModal() {
+    const modal = document.getElementById('thesis-stage-assignment-modal');
+    if (modal) {
+        modal.remove();
+    }
+    window.selectedThesisStageForAssignment = null;
+}
+
+/**
+ * 4. 심사 단계 배정 드롭다운 선택 처리
+ */
+function handleThesisStageAssignmentSelection(stageId) {
+    window.selectedThesisStageForAssignment = stageId;
+
+    // 선택된 심사 단계 상세 정보 표시
+    const infoDiv = document.getElementById('selected-stage-info');
+    const nameDiv = document.getElementById('stage-info-name');
+    const detailsDiv = document.getElementById('stage-info-details');
+
+    if (stageId && infoDiv && nameDiv && detailsDiv) {
+        const stage = mockThesisStages.find(s => s.id === stageId);
+        if (stage) {
+            nameDiv.textContent = stage.name;
+            detailsDiv.textContent = `${stage.degreeType === 'master' ? '석사' : '박사'} 과정 - ${stage.stageCount}개 단계: ${stage.stages.slice(0, 3).map((s, i) => `${i + 1}. ${s.name}`).join(' → ')}${stage.stages.length > 3 ? ' ...' : ''}`;
+            infoDiv.classList.remove('hidden');
+        }
+    } else if (infoDiv) {
+        infoDiv.classList.add('hidden');
+    }
+
+    updateThesisStageAssignmentButton();
+}
+
+/**
+ * 5. 심사 단계 배정 버튼 활성화/비활성화
+ */
+function updateThesisStageAssignmentButton() {
+    const btn = document.getElementById('confirm-thesis-stage-assignment-btn');
+    if (btn) {
+        btn.disabled = !window.selectedThesisStageForAssignment;
+    }
+}
+
+/**
+ * 6. 지도 단계 배정 확인 및 실행
+ */
+function confirmThesisStageAssignment() {
+    if (!window.selectedThesisStageForAssignment) {
+        showNotification('배정할 지도 단계를 선택해주세요.', 'warning');
+        return;
+    }
+
+    const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+    const thesisStage = mockThesisStages.find(w => w.id === window.selectedThesisStageForAssignment);
+    const firstStage = thesisStage.stages.find(s => s.order === 1);
+
+    if (!confirm(`${selectedIds.length}명의 학생에게 "${thesisStage.name}" 지도 단계를 배정하시겠습니까?`)) {
+        return;
+    }
+
+    // 배정 처리
+    let successCount = 0;
+    selectedIds.forEach(studentId => {
+        const assignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
+        if (assignment && assignment.thesisStageId === null) {
+            // 지도 단계 배정 (1단계로 시작)
+            assignment.thesisStageId = thesisStage.id;
+            assignment.thesisStageName = thesisStage.name;
+            assignment.currentStageOrder = 1;
+            assignment.currentStageName = firstStage.name;
+            assignment.currentStageType = firstStage.type;
+            assignment.canProceed = false;
+            assignment.lastUpdated = new Date().toISOString().split('T')[0];
+            assignment.workflowAssignedDate = new Date().toISOString().split('T')[0];
+
             successCount++;
         }
     });
 
-    closeBulkStageModal();
+    closeThesisStageAssignmentModal();
     renderStageManagementContent();
 
-    showNotification(`${successCount}명의 학생에게 ${newStageOrder}단계가 부여되었습니다.`, 'success');
+    showNotification(`${successCount}명의 학생에게 지도 단계가 배정되었습니다.`, 'success');
 }
 
-// 다음 단계 이관
-function bulkMoveToNextStage() {
+// ==============================================
+// 지도 단계 변경 관련 함수
+// ==============================================
+
+/**
+ * 1. 지도 단계 일괄 변경 모달 열기
+ */
+function bulkChangeThesisStage() {
     const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
-    const studentIds = Array.from(checkboxes).map(cb => cb.value);
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
 
-    if (studentIds.length === 0) {
-        showNotification('학생을 선택해주세요.', 'warning');
+    if (selectedIds.length === 0) {
+        showNotification('지도 단계를 변경할 학생을 선택해주세요.', 'warning');
         return;
     }
 
-    // 이관 가능한 학생만 필터링
-    const eligibleStudents = studentIds.filter(studentId => {
-        const stageAssignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
-        return stageAssignment && stageAssignment.canProceed;
-    });
+    // 선택된 학생들 정보 가져오기
+    const selectedStudents = mockStudentStageAssignments.filter(s =>
+        selectedIds.includes(s.studentId)
+    );
 
-    if (eligibleStudents.length === 0) {
-        showNotification('선택한 학생 중 다음 단계로 이관 가능한 학생이 없습니다.', 'warning');
+    // 학위과정 확인 (모두 동일해야 함)
+    const degreeTypes = [...new Set(selectedStudents.map(s => s.degreeType))];
+    if (degreeTypes.length > 1) {
+        showNotification('같은 학위과정의 학생만 선택해주세요. (석사/박사 혼합 불가)', 'warning');
         return;
     }
 
-    if (eligibleStudents.length < studentIds.length) {
-        showNotification(
-            `${eligibleStudents.length}명만 이관 가능합니다. (${studentIds.length - eligibleStudents.length}명은 이관 불가)`,
-            'warning'
-        );
-    }
+    showThesisStageChangeModal(selectedStudents, degreeTypes[0]);
+}
 
-    // 확인 모달 표시
+/**
+ * 2. 지도 단계 변경 모달 표시
+ */
+function showThesisStageChangeModal(selectedStudents, degreeType) {
+    const degreeTypeEng = degreeType === '석사' ? 'master' : 'phd';
+    const thesisStages = mockThesisStages.filter(w => w.degreeType === degreeTypeEng);
+
     const modalHTML = `
-        <div class="admin-modal active" id="bulk-next-stage-modal" style="display: block;">
-            <div class="admin-modal-content">
+        <div class="admin-modal active" id="thesis-stage-change-modal" style="display: block;">
+            <div class="admin-modal-content" style="max-width: 800px;">
                 <div class="admin-modal-header">
-                    <h2>다음 단계 이관</h2>
-                    <button class="admin-modal-close" onclick="closeBulkNextStageModal()">&times;</button>
+                    <h2>지도 단계 변경</h2>
+                    <button class="admin-modal-close" onclick="closeThesisStageChangeModal()">&times;</button>
                 </div>
                 <div class="admin-modal-body">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-2">
-                            선택한 학생 중 <span class="font-semibold text-primary">${eligibleStudents.length}명</span>을 다음 단계로 이관합니다.
-                        </p>
-                        <p class="text-sm text-red-500 mt-2">
-                            ※ 이관 후에는 이전 단계로 되돌릴 수 없습니다.
-                        </p>
+                    <!-- 경고 메시지 -->
+                    <div class="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                        <div class="flex">
+                            <svg class="h-5 w-5 text-red-400 mr-2 flex-shrink-0" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <p class="text-red-800 font-medium">변경 주의사항</p>
+                                <ul class="text-red-700 mt-2 text-sm list-disc list-inside space-y-1">
+                                    <li>지도 단계 변경 시 현재 진행 단계가 <strong>1단계로 초기화</strong>됩니다.</li>
+                                    <li>초기화 후에는 관리자가 수동으로 단계를 이동해야 합니다.</li>
+                                    <li>이 작업은 되돌릴 수 없으니 신중히 선택해주세요.</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
 
-                    <div class="flex justify-end space-x-2 mt-6">
-                        <button onclick="closeBulkNextStageModal()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                    <!-- 선택된 학생 정보 -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">선택된 학생 (${selectedStudents.length}명)</h3>
+                        <div class="text-sm space-y-2 max-h-40 overflow-y-auto">
+                            ${selectedStudents.map(s => `
+                                <div class="flex justify-between items-center py-1">
+                                    <span class="text-gray-900">${s.studentName} (${s.studentNumber})</span>
+                                    <span class="text-gray-600">현재: ${s.thesisStageName} - ${s.currentStageOrder}단계</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- 지도 단계 선택 (드롭다운) -->
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            변경할 지도 단계 <span class="text-red-600">*</span>
+                        </label>
+                        <select id="thesis-stage-change-select"
+                                onchange="handleThesisStageChangeSelection(this.value)"
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-red-500">
+                            <option value="">지도 단계를 선택하세요</option>
+                            ${thesisStages.map(stage => `
+                                <option value="${stage.id}">
+                                    ${stage.name} (${stage.degreeType === 'master' ? '석사' : '박사'} 과정, ${stage.stageCount}개 단계)
+                                </option>
+                            `).join('')}
+                        </select>
+
+                        <!-- 선택된 심사 단계 상세 정보 -->
+                        <div id="selected-change-stage-info" class="mt-3 p-3 bg-gray-50 rounded-lg hidden">
+                            <div class="text-sm text-gray-700">
+                                <div class="font-medium mb-2" id="change-stage-info-name"></div>
+                                <div class="text-xs text-gray-600" id="change-stage-info-details"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 확인 체크박스 -->
+                    <div class="mb-6">
+                        <label class="flex items-start gap-2">
+                            <input type="checkbox"
+                                   id="confirm-thesis-stage-change-checkbox"
+                                   onchange="updateThesisStageChangeButton()"
+                                   class="mt-1 rounded border-gray-300 text-red-600 focus:ring-red-500">
+                            <span class="text-sm text-gray-700">
+                                위 주의사항을 확인했으며, 지도 단계 변경 시 <strong>현재 단계가 1단계로 초기화</strong>됨을 이해했습니다.
+                            </span>
+                        </label>
+                    </div>
+
+                    <!-- 하단 버튼 -->
+                    <div class="flex justify-end gap-3">
+                        <button onclick="closeThesisStageChangeModal()"
+                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
                             취소
                         </button>
-                        <button onclick="confirmBulkNextStage()"
-                                class="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700">
-                            이관
+                        <button onclick="confirmThesisStageChange()"
+                                class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
+                                id="confirm-thesis-stage-change-btn"
+                                disabled>
+                            변경 실행
                         </button>
                     </div>
                 </div>
@@ -4273,156 +4653,107 @@ function bulkMoveToNextStage() {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // 이관 가능한 학생 ID 저장
-    window.eligibleStudentsForNext = eligibleStudents;
+    window.selectedThesisStageForChange = null;
 }
 
-// 다음 단계 이관 모달 닫기
-function closeBulkNextStageModal() {
-    const modal = document.getElementById('bulk-next-stage-modal');
+/**
+ * 3. 심사 단계 변경 모달 닫기
+ */
+function closeThesisStageChangeModal() {
+    const modal = document.getElementById('thesis-stage-change-modal');
     if (modal) {
         modal.remove();
     }
-    window.eligibleStudentsForNext = null;
+    window.selectedThesisStageForChange = null;
 }
 
-// 다음 단계 이관 확인
-function confirmBulkNextStage() {
-    const studentIds = window.eligibleStudentsForNext || [];
-    let successCount = 0;
+/**
+ * 4. 심사 단계 변경 드롭다운 선택 처리
+ */
+function handleThesisStageChangeSelection(stageId) {
+    window.selectedThesisStageForChange = stageId;
 
-    studentIds.forEach(studentId => {
-        const stageAssignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
-        if (stageAssignment && stageAssignment.canProceed) {
-            const template = mockThesisStages.find(t => t.id === stageAssignment.thesisStageId);
-            const nextStageOrder = stageAssignment.currentStageOrder + 1;
+    // 선택된 심사 단계 상세 정보 표시
+    const infoDiv = document.getElementById('selected-change-stage-info');
+    const nameDiv = document.getElementById('change-stage-info-name');
+    const detailsDiv = document.getElementById('change-stage-info-details');
 
-            // 마지막 단계가 아닌 경우에만 이관
-            if (nextStageOrder <= template.stageCount) {
-                const nextStage = template.stages.find(s => s.order === nextStageOrder);
-
-                stageAssignment.currentStageOrder = nextStageOrder;
-                stageAssignment.currentStageName = nextStage.name;
-                stageAssignment.currentStageType = nextStage.type;
-                stageAssignment.canProceed = false; // 이관 후 다시 진행 중 상태로
-                stageAssignment.lastUpdated = new Date().toISOString().split('T')[0];
-                successCount++;
-            }
+    if (stageId && infoDiv && nameDiv && detailsDiv) {
+        const stage = mockThesisStages.find(s => s.id === stageId);
+        if (stage) {
+            nameDiv.textContent = stage.name;
+            detailsDiv.textContent = `${stage.degreeType === 'master' ? '석사' : '박사'} 과정 - ${stage.stageCount}개 단계: ${stage.stages.slice(0, 3).map((s, i) => `${i + 1}. ${s.name}`).join(' → ')}${stage.stages.length > 3 ? ' ...' : ''}`;
+            infoDiv.classList.remove('hidden');
         }
-    });
+    } else if (infoDiv) {
+        infoDiv.classList.add('hidden');
+    }
 
-    closeBulkNextStageModal();
-    renderStageManagementContent();
-
-    showNotification(`${successCount}명의 학생이 다음 단계로 이관되었습니다.`, 'success');
+    updateThesisStageChangeButton();
 }
 
-// 이전 단계 이관
-function bulkMoveToPrevStage() {
+/**
+ * 5. 심사 단계 변경 버튼 활성화/비활성화
+ */
+function updateThesisStageChangeButton() {
+    const checkbox = document.getElementById('confirm-thesis-stage-change-checkbox');
+    const btn = document.getElementById('confirm-thesis-stage-change-btn');
+
+    if (btn && checkbox) {
+        btn.disabled = !(checkbox.checked && window.selectedThesisStageForChange);
+    }
+}
+
+/**
+ * 6. 지도 단계 변경 확인 및 실행
+ */
+function confirmThesisStageChange() {
+    if (!window.selectedThesisStageForChange) {
+        showNotification('변경할 지도 단계를 선택해주세요.', 'warning');
+        return;
+    }
+
     const checkboxes = document.querySelectorAll('.stage-checkbox:checked');
-    const studentIds = Array.from(checkboxes).map(cb => cb.value);
+    const selectedIds = Array.from(checkboxes).map(cb => cb.value);
+    const newThesisStage = mockThesisStages.find(w => w.id === window.selectedThesisStageForChange);
+    const firstStage = newThesisStage.stages.find(s => s.order === 1);
 
-    if (studentIds.length === 0) {
-        showNotification('학생을 선택해주세요.', 'warning');
+    if (!confirm(`선택한 학생들의 지도 단계를 "${newThesisStage.name}"로 변경하시겠습니까?\n\n현재 단계가 1단계로 초기화됩니다.`)) {
         return;
     }
 
-    // 이전 단계로 이관 가능한 학생만 필터링 (1단계가 아닌 학생)
-    const eligibleStudents = studentIds.filter(studentId => {
-        const stageAssignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
-        return stageAssignment && stageAssignment.currentStageOrder > 1;
-    });
-
-    if (eligibleStudents.length === 0) {
-        showNotification('선택한 학생 중 이전 단계로 이관 가능한 학생이 없습니다. (1단계 학생은 이전 단계가 없습니다)', 'warning');
-        return;
-    }
-
-    if (eligibleStudents.length < studentIds.length) {
-        showNotification(
-            `${eligibleStudents.length}명만 이관 가능합니다. (${studentIds.length - eligibleStudents.length}명은 이관 불가)`,
-            'warning'
-        );
-    }
-
-    // 확인 모달 표시
-    const modalHTML = `
-        <div class="admin-modal active" id="bulk-prev-stage-modal" style="display: block;">
-            <div class="admin-modal-content">
-                <div class="admin-modal-header">
-                    <h2>이전 단계 이관</h2>
-                    <button class="admin-modal-close" onclick="closeBulkPrevStageModal()">&times;</button>
-                </div>
-                <div class="admin-modal-body">
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 mb-2">
-                            선택한 학생 중 <span class="font-semibold text-primary">${eligibleStudents.length}명</span>을 이전 단계로 이관합니다.
-                        </p>
-                        <p class="text-sm text-red-500 mt-2">
-                            ※ 주의: 이전 단계로 되돌리는 작업입니다.
-                        </p>
-                    </div>
-
-                    <div class="flex justify-end space-x-2 mt-6">
-                        <button onclick="closeBulkPrevStageModal()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
-                            취소
-                        </button>
-                        <button onclick="confirmBulkPrevStage()"
-                                class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700">
-                            이관
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-
-    // 이관 가능한 학생 ID 저장
-    window.eligibleStudentsForPrev = eligibleStudents;
-}
-
-// 이전 단계 이관 모달 닫기
-function closeBulkPrevStageModal() {
-    const modal = document.getElementById('bulk-prev-stage-modal');
-    if (modal) {
-        modal.remove();
-    }
-    window.eligibleStudentsForPrev = null;
-}
-
-// 이전 단계 이관 확인
-function confirmBulkPrevStage() {
-    const studentIds = window.eligibleStudentsForPrev || [];
+    // 변경 처리
     let successCount = 0;
+    selectedIds.forEach(studentId => {
+        const assignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
+        if (assignment) {
+            // 지도 단계 변경 및 1단계로 초기화
+            assignment.thesisStageId = newThesisStage.id;
+            assignment.thesisStageName = newThesisStage.name;
+            assignment.currentStageOrder = 1;
+            assignment.currentStageName = firstStage.name;
+            assignment.currentStageType = firstStage.type;
+            assignment.canProceed = false;
+            assignment.lastUpdated = new Date().toISOString().split('T')[0];
+            assignment.workflowLastChangedDate = new Date().toISOString().split('T')[0];
+            assignment.isWorkflowChanged = true;
 
-    studentIds.forEach(studentId => {
-        const stageAssignment = mockStudentStageAssignments.find(s => s.studentId === studentId);
-        if (stageAssignment && stageAssignment.currentStageOrder > 1) {
-            const template = mockThesisStages.find(t => t.id === stageAssignment.thesisStageId);
-            const prevStageOrder = stageAssignment.currentStageOrder - 1;
-
-            if (prevStageOrder >= 1) {
-                const prevStage = template.stages.find(s => s.order === prevStageOrder);
-
-                stageAssignment.currentStageOrder = prevStageOrder;
-                stageAssignment.currentStageName = prevStage.name;
-                stageAssignment.currentStageType = prevStage.type;
-                stageAssignment.canProceed = false; // 이전 단계로 되돌림
-                stageAssignment.lastUpdated = new Date().toISOString().split('T')[0];
-                successCount++;
-            }
+            successCount++;
         }
     });
 
-    closeBulkPrevStageModal();
+    closeThesisStageChangeModal();
     renderStageManagementContent();
 
-    showNotification(`${successCount}명의 학생이 이전 단계로 이관되었습니다.`, 'success');
+    showNotification(
+        `${successCount}명의 학생 지도 단계가 "${newThesisStage.name}"로 변경되었습니다. (1단계로 초기화)`,
+        'success'
+    );
 }
+
+// ==============================================
+// 지도교수 배정 관련 함수
+// ==============================================
 
 // 전역 변수로 선택된 교수들 저장
 let selectedMainAdvisor = null;

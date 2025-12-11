@@ -32,23 +32,34 @@
     <!-- 커스텀 스타일 -->
     <link rel="stylesheet" href="../common-style.css">
     <link rel="stylesheet" href="../common-search.css">
+    <link rel="stylesheet" href="../admin/assets/css/table-truncate.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/semester-guidance.css">
 </head>
 <body class="bg-gray-100">
     <div class="relative flex min-h-screen">
         <!-- 좌측 사이드바 -->
-        <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex-shrink-0 p-4 z-30 transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0">
+        <aside id="sidebar" class="fixed inset-y-0 left-0 w-64 bg-white shadow-lg flex-shrink-0 p-4 z-30 transition-transform duration-300 ease-in-out sm:relative sm:translate-x-0 expanded">
+            <!-- 토글 버튼 -->
+            <button onclick="toggleSidebar()" class="sidebar-toggle-btn">
+                <svg id="toggle-icon-left" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                <svg id="toggle-icon-right" class="w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+
             <!-- 로고 영역 -->
             <div class="mb-8">
                 <img src="https://i.ibb.co/271kh4Tt/HYCU-GS-SIGNATURE.png"
                      alt="한양사이버대학교 대학원 로고"
-                     class="w-full mb-2"
+                     class="w-full mb-2 logo-image"
                      onerror="this.style.display='none';">
-                <h1 class="text-xl font-bold text-gray-800 pl-4">논문 지도 시스템</h1>
+                <h1 class="text-xl font-bold text-gray-800 pl-4 sidebar-title">논문 지도 시스템</h1>
 
                 <!-- 역할 표시 -->
-                <div class="mt-2 pl-4">
+                <div class="mt-2 pl-4 role-badge">
                     <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -58,7 +69,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"></path>
                         </svg>
-                        대학원생
+                        <span class="sidebar-text">대학원생</span>
                     </span>
                 </div>
             </div>
@@ -70,7 +81,7 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    <span class="ml-4">대시보드</span>
+                    <span class="ml-4 sidebar-text">대시보드</span>
                 </a>
 
                 <!-- 논문 안내 (1depth) -->
@@ -81,33 +92,33 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
-                            <span class="ml-4">논문 안내</span>
+                            <span class="ml-4 sidebar-text">논문 안내</span>
                         </div>
-                        <svg class="w-4 h-4 transition-transform" id="guidance-info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 transition-transform submenu-arrow" id="guidance-info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <!-- 2depth 메뉴 -->
-                    <div id="guidance-info-submenu" class="pl-6 mt-1 space-y-1">
+                    <div id="guidance-info-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
                         <a href="#" onclick="showScreen('notice'); return false;" data-screen="notice"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">공지사항</span>
+                            <span class="ml-4 sidebar-text">공지사항</span>
                         </a>
                         <a href="#" onclick="showScreen('board'); return false;" data-screen="board"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">자료실</span>
+                            <span class="ml-4 sidebar-text">자료실</span>
                         </a>
                         <a href="#" onclick="showScreen('ethics'); return false;" data-screen="ethics"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">연구윤리</span>
+                            <span class="ml-4 sidebar-text">연구윤리</span>
                         </a>
                         <a href="#" onclick="showScreen('schedule'); return false;" data-screen="schedule"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">논문일정</span>
+                            <span class="ml-4 sidebar-text">논문일정</span>
                         </a>
                         <a href="#" onclick="showScreen('process'); return false;" data-screen="process"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">논문지도절차</span>
+                            <span class="ml-4 sidebar-text">논문지도절차</span>
                         </a>
                     </div>
                 </div>
@@ -120,25 +131,25 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                             </svg>
-                            <span class="ml-4">논문 제출</span>
+                            <span class="ml-4 sidebar-text">논문 제출</span>
                         </div>
-                        <svg class="w-4 h-4 transition-transform" id="thesis-submission-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 transition-transform submenu-arrow" id="thesis-submission-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <!-- 2depth 메뉴 -->
-                    <div id="thesis-submission-submenu" class="pl-6 mt-1 space-y-1">
+                    <div id="thesis-submission-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
                         <a href="#" onclick="showScreen('review'); return false;" data-screen="review"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">학위 논문 제출</span>
+                            <span class="ml-4 sidebar-text">학위 논문 제출</span>
                         </a>
                         <a href="#" onclick="showScreen('journal-submission'); return false;" data-screen="journal-submission"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">학술지 논문 제출</span>
+                            <span class="ml-4 sidebar-text">학술지 논문 제출</span>
                         </a>
                         <a href="#" onclick="showScreen('title-change'); return false;" data-screen="title-change"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">최종 논문 제목 수정</span>
+                            <span class="ml-4 sidebar-text">최종 논문 제목 수정</span>
                         </a>
                     </div>
                 </div>
@@ -151,29 +162,29 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                             </svg>
-                            <span class="ml-4">논문 지도</span>
+                            <span class="ml-4 sidebar-text">논문 지도</span>
                         </div>
-                        <svg class="w-4 h-4 transition-transform" id="thesis-guidance-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-4 h-4 transition-transform submenu-arrow" id="thesis-guidance-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
                         </svg>
                     </button>
                     <!-- 2depth 메뉴 -->
-                    <div id="thesis-guidance-submenu" class="pl-6 mt-1 space-y-1">
+                    <div id="thesis-guidance-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
                         <a href="#" onclick="showScreen('advisor-assignment'); return false;" data-screen="advisor-assignment"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">지도교수 배정</span>
+                            <span class="ml-4 sidebar-text">지도교수 배정</span>
                         </a>
                         <a href="#" onclick="showScreen('guidance'); return false;" data-screen="guidance"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">주차별 논문 지도 현황</span>
+                            <span class="ml-4 sidebar-text">주차별 논문 지도 현황</span>
                         </a>
                         <a href="#" onclick="showScreen('feedback'); return false;" data-screen="feedback"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">논문 지도 현황</span>
+                            <span class="ml-4 sidebar-text">논문 지도 현황</span>
                         </a>
                         <a href="#" onclick="showScreen('meeting'); return false;" data-screen="meeting"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">실시간 지도 예약</span>
+                            <span class="ml-4 sidebar-text">실시간 지도 예약</span>
                         </a>
                     </div>
                 </div>
@@ -284,21 +295,19 @@
 
             <!-- 콘텐츠 영역 -->
             <section id="advisor-assignment-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md">
-                    <!-- 헤더 -->
-                    <div class="p-6 border-b">
-                        <div class="flex items-center justify-between">
-                            <div>
-                                <h2 class="text-xl font-semibold text-gray-800">지도교수 배정 조회</h2>
-                                <p class="text-sm text-gray-600 mt-1">나의 연구계획서와 배정된 지도교수를 조회합니다.</p>
-                            </div>
-                            <button id="student-add-proposal-btn" onclick="showStudentProposalForm()"
-                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-                                    style="display: none;">
-                                <i class="fas fa-plus mr-2"></i>연구계획서 등록
-                            </button>
-                        </div>
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">지도교수 배정 조회</h2>
+                        <p class="text-sm text-gray-600 mt-2">나의 연구계획서와 배정된 지도교수를 조회합니다.</p>
                     </div>
+                    <button id="student-add-proposal-btn" onclick="showStudentProposalForm()"
+                            class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition-colors"
+                            style="display: none;">
+                        <i class="fas fa-plus mr-2"></i>연구계획서 등록
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-md">
 
                     <!-- 연구계획서 목록 테이블 -->
                     <div class="p-6">
@@ -387,10 +396,13 @@
     <script src="assets/js/journal-submission.js"></script>
     <script src="assets/js/modals-fix.js?v=20250127001"></script>
     <script src="assets/js/app.js"></script>
-    
+
     <!-- 공통 유틸리티 -->
     <script src="../common-utils.js"></script>
     <script src="../common-header-utils.js"></script>
+
+    <!-- 공지사항/안내문 렌더링 함수 (관리자 화면과 동일) -->
+    <script src="../admin/admin_views.js"></script>
 
 <!-- injected: i18n minimal handler -->
 <script data-i18n-ready>
@@ -429,6 +441,29 @@ document.addEventListener('DOMContentLoaded', function() {
         arrow.style.transform = 'rotate(180deg)';
     });
 });
+</script>
+
+<!-- 사이드바 토글 기능 -->
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const iconLeft = document.getElementById('toggle-icon-left');
+    const iconRight = document.getElementById('toggle-icon-right');
+
+    if (sidebar.classList.contains('expanded')) {
+        // 접기
+        sidebar.classList.remove('expanded');
+        sidebar.classList.add('collapsed');
+        iconLeft.classList.add('hidden');
+        iconRight.classList.remove('hidden');
+    } else {
+        // 펼치기
+        sidebar.classList.remove('collapsed');
+        sidebar.classList.add('expanded');
+        iconLeft.classList.remove('hidden');
+        iconRight.classList.add('hidden');
+    }
+}
 </script>
 
 

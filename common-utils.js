@@ -488,11 +488,13 @@ function renderNoticeList(userRole) {
             <!-- 검색 영역 -->
             <div class="p-6 border-b">
                 <div class="flex gap-3">
-                    <select id="notice-category-filter-${rolePrefix}" class="px-4 py-2 border border-gray-300 rounded-lg">
-                        <option value="">전체 카테고리</option>
-                        <option value="important">중요</option>
-                        <option value="general">일반</option>
-                    </select>
+                    ${userRole === 'admin' ? `
+                        <select id="notice-category-filter-${rolePrefix}" class="px-4 py-2 border border-gray-300 rounded-lg">
+                            <option value="">전체 카테고리</option>
+                            <option value="important">중요</option>
+                            <option value="general">일반</option>
+                        </select>
+                    ` : ''}
                     <input type="text" id="notice-search-${rolePrefix}" placeholder="제목 또는 내용 검색"
                            class="flex-1 px-4 py-2 border border-gray-300 rounded-lg">
                     <button onclick="${searchFunc}()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
@@ -504,12 +506,12 @@ function renderNoticeList(userRole) {
 
             <!-- 공지사항 목록 -->
             <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200">
+                <table class="min-w-full divide-y divide-gray-200 table-fixed">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">번호</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">카테고리</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">고정</th>
+                            ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">카테고리</th>' : ''}
+                            ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">고정</th>' : ''}
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">작성자</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">작성일</th>
@@ -521,15 +523,19 @@ function renderNoticeList(userRole) {
                         ${notices.map((notice, index) => `
                             <tr class="hover:bg-gray-50 cursor-pointer" onclick="${viewDetailFunc}('${notice.id}')">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notices.length - index}</td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span class="px-2 py-1 text-xs rounded ${notice.category === 'important' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
-                                        ${notice.category === 'important' ? '중요' : '일반'}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
-                                    ${notice.isPinned ? '<span class="text-blue-600">📌</span>' : ''}
-                                </td>
-                                <td class="px-6 py-4 text-sm text-gray-900 font-medium">${notice.title}</td>
+                                ${userRole === 'admin' ? `
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        <span class="px-2 py-1 text-xs rounded ${notice.category === 'important' ? 'bg-red-100 text-red-800' : 'bg-gray-100 text-gray-800'}">
+                                            ${notice.category === 'important' ? '중요' : '일반'}
+                                        </span>
+                                    </td>
+                                ` : ''}
+                                ${userRole === 'admin' ? `
+                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-center">
+                                        ${notice.isPinned ? '<span class="text-blue-600">📌</span>' : ''}
+                                    </td>
+                                ` : ''}
+                                <td class="px-6 py-4 text-sm text-gray-900 font-medium td-truncate-long" title="${notice.title}">${notice.title}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notice.authorName}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notice.createdAt}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">${notice.viewCount}</td>

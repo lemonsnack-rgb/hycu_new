@@ -77,7 +77,7 @@ function showGuidancePairsList() {
 
             <!-- 목록 -->
             <div class="overflow-x-auto">
-                <table class="min-w-full">
+                <table class="min-w-full table-fixed">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
@@ -86,9 +86,9 @@ function showGuidancePairsList() {
                                        class="rounded border-gray-300">
                             </th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부/대학원</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정구분</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심사위원 배정 - 관리자</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="assets/css/admin-common.css">
+    <link rel="stylesheet" href="assets/css/admin-modal.css">
+</head>
+<body class="bg-gray-50">
+    <!-- 사이드바 -->
+    <div id="sidebar"></div>
+
+    <!-- 메인 컨텐츠 -->
+    <div class="main-content">
+        <!-- 헤더 -->
+        <div id="header"></div>
+
+        <!-- 컨텐츠 영역 -->
+        <div class="content-area">
+            <div id="committee-assignment-content"></div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="assets/js/mockData.js"></script>
+    <script src="admin_sidebar.js"></script>
+    <script src="admin_header.js"></script>
+    <script src="admin_views.js"></script>
+    <script src="admin_main.js"></script>
+    <script src="assets/js/admin-committee-assignment.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            loadSidebar();
+            loadHeader();
+            renderCommitteeAssignmentContent();
+        });
+    </script>
+</body>
+</html>

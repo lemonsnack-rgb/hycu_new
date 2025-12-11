@@ -425,7 +425,7 @@ window.openBoardWriteModal = function() {
         <div class="modal-content" style="max-width: 80rem; width: 95%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">글쓰기</h3>
+                    <h3 class="text-lg font-bold text-gray-800">글쓰기</h3>
                     <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>

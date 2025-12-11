@@ -31,26 +31,26 @@ function renderFeedbackList() {
             <div class="p-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">지도 대상 논문 목록</h3>
                 <div class="overflow-x-auto">
-                    <table class="w-full">
+                    <table class="min-w-full table-fixed">
                         <thead class="bg-gray-50 border-b">
                             <tr>
-                                <th class="py-3 px-4 text-center text-sm font-semibold text-gray-700">
+                                <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">
                                     <input type="checkbox"
                                            id="select-all-feedbacks"
                                            onchange="toggleAllFeedbacks(this)"
                                            class="rounded">
                                 </th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">순번</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">대학원</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">전공</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학위과정</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학번</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">성명</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">학기차</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문명</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">논문 지도 단계</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">피드백상태</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-700">제출일</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">대학원</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학과</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학위과정</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학번</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">이름</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학기차</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">논문명</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">논문 지도 단계</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">피드백상태</th>
+                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">제출일</th>
                             </tr>
                         </thead>
                         <tbody id="feedback-list-body">
@@ -83,7 +83,7 @@ function renderFeedbackRow(request, idx) {
         statusClass = 'bg-blue-100 text-blue-700';
     } else {
         feedbackStatus = '대기';
-        statusClass = 'bg-gray-100 text-gray-700';
+        statusClass = 'bg-gray-100 text-gray-800';
     }
 
     return `
@@ -106,7 +106,7 @@ function renderFeedbackRow(request, idx) {
                 ${addStudentInfoIcon(request.studentName, request.studentNumber)}
             </td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.semester || '-'}학기</td>
-            <td class="py-3 px-4 text-gray-700 text-sm">${request.thesisTitle || request.file}</td>
+            <td class="py-3 px-4 text-gray-800 text-sm td-truncate-long" title="${request.thesisTitle || request.file}">${request.thesisTitle || request.file}</td>
             <td class="py-3 px-4 text-gray-600 text-sm">${request.guidanceStage || '연구계획서'}</td>
             <td class="py-3 px-4">
                 <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
@@ -143,13 +143,13 @@ function renderPlagiarismScore(copyScore, gptScore) {
 function getCopyScoreColor(score) {
     if (score >= 15) return 'text-red-600';
     if (score >= 10) return 'text-yellow-600';
-    return 'text-gray-700';
+    return 'text-gray-800';
 }
 
 function getGptScoreColor(score) {
     if (score >= 10) return 'text-red-600';
     if (score >= 7) return 'text-yellow-600';
-    return 'text-gray-700';
+    return 'text-gray-800';
 }
 
 // ==================== 표절 리포트 보기 ====================
@@ -303,7 +303,7 @@ function openNotificationModal(students, onSuccess) {
         <div class="modal-content" style="max-width: 600px; width: 90%;">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">알림 발송</h3>
+                    <h3 class="text-lg font-bold text-gray-800">알림 발송</h3>
                     <button onclick="closeNotificationModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
                 </div>
             </div>
@@ -311,34 +311,34 @@ function openNotificationModal(students, onSuccess) {
             <div class="p-6">
                 <!-- 발송 대상 -->
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-800 mb-2">
                         발송 대상 (${students.length}명)
                     </label>
                     <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 max-h-32 overflow-y-auto">
-                        <p class="text-sm text-gray-700">${studentList}</p>
+                        <p class="text-sm text-gray-800">${studentList}</p>
                     </div>
                 </div>
 
                 <!-- 발송 방법 선택 -->
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-800 mb-2">
                         발송 방법 *
                     </label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="notification-type" value="kakao" checked class="rounded-full">
-                            <span class="text-sm text-gray-700">카카오톡</span>
+                            <span class="text-sm text-gray-800">카카오톡</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="radio" name="notification-type" value="sms" class="rounded-full">
-                            <span class="text-sm text-gray-700">SMS</span>
+                            <span class="text-sm text-gray-800">SMS</span>
                         </label>
                     </div>
                 </div>
 
                 <!-- 메시지 내용 -->
                 <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                    <label class="block text-sm font-medium text-gray-800 mb-2">
                         메시지 내용 *
                     </label>
                     <textarea id="notification-message"

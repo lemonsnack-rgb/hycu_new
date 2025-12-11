@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>권한 관리 및 부여 - 한양사이버대학교 논문지도시스템</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary': '#009DE8',
+                        'primary-dark': '#0087c9',
+                        'hycu-navy': '#1e3a8a',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body { font-family: 'Pretendard Variable', 'Pretendard', 'Noto Sans KR', sans-serif; }
+
+        /* Custom Scrollbar */
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* Tree Structure Styles */
+        .tree-item { position: relative; }
+        .tree-item.depth-1 { padding-left: 0; }
+        .tree-item.depth-2 { padding-left: 2rem; }
+        .tree-item.depth-3 { padding-left: 4rem; }
+
+        .tree-item.depth-2::before {
+            content: '└';
+            position: absolute;
+            left: 0.5rem;
+            color: #cbd5e1;
+            font-weight: 300;
+        }
+
+        .tree-item.depth-3::before {
+            content: '└';
+            position: absolute;
+            left: 2.5rem;
+            color: #cbd5e1;
+            font-weight: 300;
+        }
+
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #cbd5e1;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #009DE8;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        input:disabled + .toggle-slider {
+            background-color: #e5e7eb;
+            cursor: not-allowed;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.125rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            border-radius: 9999px;
+        }
+
+        .status-active { background-color: #dcfce7; color: #166534; }
+        .status-leave { background-color: #fef3c7; color: #854d0e; }
+        .status-retired { background-color: #fee2e2; color: #991b1b; }
+
+        /* Checkbox Styles */
+        .custom-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #009DE8;
+        }
+
+        .custom-checkbox:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        /* Tab Styles */
+        .tab-button {
+            padding: 0.75rem 1.5rem;
+            font-weight: 500;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .tab-button:hover {
+            background-color: #f3f4f6;
+        }
+
+        .tab-button.active {
+            color: #009DE8;
+            border-bottom-color: #009DE8;
+        }
+
+        /* List Item Hover */
+        .list-item:hover {
+            background-color: #f9fafb;
+        }
+
+        .list-item.selected {
+            background-color: #e0f2fe;
+            border-left: 3px solid #009DE8;
+        }
+
+        /* ERP Sync Indicator */
+        .erp-sync-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.25rem 0.75rem;
+            background-color: #eff6ff;
+            color: #1e40af;
+            font-size: 0.75rem;
+            border-radius: 9999px;
+        }
+
+        /* Permission Matrix Table */
+        .permission-matrix th {
+            background-color: #f8fafc;
+            font-weight: 600;
+            font-size: 0.875rem;
+            padding: 0.75rem;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .permission-matrix td {
+            padding: 0.75rem;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .permission-matrix tr:hover {
+            background-color: #f8fafc;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm border-b sticky top-0 z-50">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <!-- Title -->
+                <div class="flex items-center space-x-4">
+                    <svg class="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                    </svg>
+                    <div>
+                        <h1 class="text-xl font-bold text-gray-800">권한 관리 및 부여</h1>
+                        <p class="text-sm text-gray-500">한양사이버대학교 논문지도시스템</p>
+                    </div>
+                </div>
+
+                <!-- User Permission Simulator -->
+                <div class="flex items-center space-x-4">
+                    <div class="flex items-center space-x-2">
+                        <span class="erp-sync-badge">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                            </svg>
+                            ERP 동기화: 2025-01-15 09:00
+                        </span>
+                    </div>
+                    <div class="relative">
+                        <input type="text"
+                               placeholder="사용자 권한 시뮬레이션 (이름/사번)"
+                               class="w-80 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                               id="user-simulator-search">
+                        <button onclick="simulateUserPermission()"
+                                class="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1 bg-primary text-white rounded-md text-sm hover:bg-primary-dark">
+                            조회
+                        </button>
+                    </div>
+                    <button onclick="syncERPData()"
+                            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 flex items-center space-x-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                        </svg>
+                        <span>ERP 동기화</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <div class="container mx-auto px-6 py-6">
+        <div class="grid grid-cols-12 gap-6">
+            <!-- Left Panel: Permission Target Selection -->
+            <div class="col-span-4">
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <!-- Tab Navigation -->
+                    <div class="border-b">
+                        <div class="flex">
+                            <button class="tab-button active" onclick="switchTargetTab('department')">부서별</button>
+                            <button class="tab-button" onclick="switchTargetTab('position')">신분별</button>
+                            <button class="tab-button" onclick="switchTargetTab('role')">역할그룹별</button>
+                            <button class="tab-button" onclick="switchTargetTab('individual')">개인별</button>
+                        </div>
+                    </div>
+
+                    <!-- Search & Filter -->
+                    <div class="p-4 border-b bg-gray-50">
+                        <div class="relative">
+                            <input type="text"
+                                   placeholder="검색..."
+                                   class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                                   id="target-search">
+                            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                        </div>
+                    </div>
+
+                    <!-- Target List -->
+                    <div id="target-list" class="custom-scrollbar" style="max-height: calc(100vh - 350px); overflow-y: auto;">
+                        <!-- Department Tab Content (Default) -->
+                        <div id="department-list">
+                            <div class="list-item px-4 py-3 border-b cursor-pointer selected" onclick="selectTarget(this, 'DEPT_001')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-gray-800">교무학사팀</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_001 | 소속: 12명</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'DEPT_002')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-gray-800">학생지원팀</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_002 | 소속: 8명</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'DEPT_003')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-gray-800">경영학과</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_003 | 소속: 45명</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'DEPT_004')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-gray-800">컴퓨터공학과</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_004 | 소속: 52명</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'DEPT_005')">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <div class="font-medium text-gray-800">입학관리팀</div>
+                                        <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_005 | 소속: 6명</div>
+                                    </div>
+                                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Panel: Permission Matrix -->
+            <div class="col-span-8">
+                <div class="bg-white rounded-lg shadow-sm border">
+                    <!-- Header -->
+                    <div class="p-6 border-b">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-800">권한 설정</h2>
+                                <p class="text-sm text-gray-500 mt-1" id="selected-target-name">교무학사팀 (DEPT_001)</p>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <button onclick="resetPermissions()"
+                                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm">
+                                    초기화
+                                </button>
+                                <button onclick="savePermissions()"
+                                        class="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark text-sm">
+                                    저장
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Permission Matrix Table -->
+                    <div class="custom-scrollbar" style="max-height: calc(100vh - 300px); overflow-y: auto;">
+                        <table class="permission-matrix w-full">
+                            <thead class="sticky top-0 bg-gray-50 z-10">
+                                <tr>
+                                    <th class="text-left w-1/3">메뉴명</th>
+                                    <th class="text-center w-20">접근</th>
+                                    <th class="text-center w-16">조회<br/>(R)</th>
+                                    <th class="text-center w-16">등록<br/>(C)</th>
+                                    <th class="text-center w-16">수정<br/>(U)</th>
+                                    <th class="text-center w-16">삭제<br/>(D)</th>
+                                    <th class="text-left">비고</th>
+                                </tr>
+                            </thead>
+                            <tbody id="permission-matrix-body">
+                                <!-- 1depth: 논문 안내 -->
+                                <tr class="tree-item depth-1 bg-blue-50">
+                                    <td class="font-semibold">
+                                        <button onclick="toggleMenuExpand(this)" class="mr-2">
+                                            <svg class="w-4 h-4 inline transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                        논문 안내
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_001')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_001">
+                                    </td>
+                                    <td class="text-sm text-gray-500">전체 권한</td>
+                                </tr>
+
+                                <!-- 2depth: 공지사항 -->
+                                <tr class="tree-item depth-2">
+                                    <td>공지사항</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_001_001')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_001_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_001_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_001_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_001_001">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 2depth: 자료실 -->
+                                <tr class="tree-item depth-2">
+                                    <td>자료실</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_001_002')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_001_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_001_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_001_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="D" data-menu="MENU_001_002">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 1depth: 논문 제출 -->
+                                <tr class="tree-item depth-1 bg-blue-50">
+                                    <td class="font-semibold">
+                                        <button onclick="toggleMenuExpand(this)" class="mr-2">
+                                            <svg class="w-4 h-4 inline transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                        논문 제출
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_002')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="C" data-menu="MENU_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="U" data-menu="MENU_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_002">
+                                    </td>
+                                    <td class="text-sm text-gray-500">조회만 가능</td>
+                                </tr>
+
+                                <!-- 2depth: 연구계획서 제출 -->
+                                <tr class="tree-item depth-2">
+                                    <td>연구계획서 제출</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_002_001')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_002_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="C" data-menu="MENU_002_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="U" data-menu="MENU_002_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_002_001">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 2depth: 중간논문 제출 -->
+                                <tr class="tree-item depth-2">
+                                    <td>중간논문 제출</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_002_002')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_002_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="C" data-menu="MENU_002_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="U" data-menu="MENU_002_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_002_002">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 1depth: 논문 지도 -->
+                                <tr class="tree-item depth-1 bg-blue-50">
+                                    <td class="font-semibold">
+                                        <button onclick="toggleMenuExpand(this)" class="mr-2">
+                                            <svg class="w-4 h-4 inline transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                        논문 지도
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_003')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_003">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_003">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_003">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_003">
+                                    </td>
+                                    <td class="text-sm text-gray-500">전체 권한</td>
+                                </tr>
+
+                                <!-- 2depth: 지도교수 배정 -->
+                                <tr class="tree-item depth-2">
+                                    <td>지도교수 배정</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_003_001')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_003_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_003_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_003_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_003_001">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 2depth: 논문 지도 현황 -->
+                                <tr class="tree-item depth-2">
+                                    <td>논문 지도 현황</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_003_002')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_003_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_003_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_003_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_003_002">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 1depth: 논문 심사 -->
+                                <tr class="tree-item depth-1 bg-blue-50">
+                                    <td class="font-semibold">
+                                        <button onclick="toggleMenuExpand(this)" class="mr-2">
+                                            <svg class="w-4 h-4 inline transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                        논문 심사
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_004')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_004">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_004">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_004">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_004">
+                                    </td>
+                                    <td class="text-sm text-gray-500">전체 권한</td>
+                                </tr>
+
+                                <!-- 2depth: 심사위원 배정 -->
+                                <tr class="tree-item depth-2">
+                                    <td>심사위원 배정</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_004_001')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_004_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_004_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_004_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_004_001">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 2depth: 학위 논문 심사 -->
+                                <tr class="tree-item depth-2">
+                                    <td>학위 논문 심사</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" checked onchange="toggleMenuAccess(this, 'MENU_004_002')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="R" data-menu="MENU_004_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="C" data-menu="MENU_004_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" checked data-permission="U" data-menu="MENU_004_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_004_002">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 1depth: 시스템 설정 -->
+                                <tr class="tree-item depth-1 bg-blue-50">
+                                    <td class="font-semibold">
+                                        <button onclick="toggleMenuExpand(this)" class="mr-2">
+                                            <svg class="w-4 h-4 inline transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                                            </svg>
+                                        </button>
+                                        시스템 설정
+                                    </td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" onchange="toggleMenuAccess(this, 'MENU_005')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="R" data-menu="MENU_005">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="C" data-menu="MENU_005">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="U" data-menu="MENU_005">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_005">
+                                    </td>
+                                    <td class="text-sm text-gray-500">관리자 전용</td>
+                                </tr>
+
+                                <!-- 2depth: 사용자 관리 -->
+                                <tr class="tree-item depth-2">
+                                    <td>사용자 관리</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" onchange="toggleMenuAccess(this, 'MENU_005_001')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="R" data-menu="MENU_005_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="C" data-menu="MENU_005_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="U" data-menu="MENU_005_001">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_005_001">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+
+                                <!-- 2depth: 권한 관리 -->
+                                <tr class="tree-item depth-2">
+                                    <td>권한 관리</td>
+                                    <td class="text-center">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" onchange="toggleMenuAccess(this, 'MENU_005_002')">
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="R" data-menu="MENU_005_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="C" data-menu="MENU_005_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="U" data-menu="MENU_005_002">
+                                    </td>
+                                    <td class="text-center">
+                                        <input type="checkbox" class="custom-checkbox" data-permission="D" data-menu="MENU_005_002">
+                                    </td>
+                                    <td class="text-sm text-gray-500">-</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- User Permission Simulation Modal -->
+    <div id="user-simulation-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-5xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-6 border-b">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">사용자 권한 시뮬레이션</h3>
+                    <p class="text-sm text-gray-500 mt-1">부서 + 신분 + 역할 + 개인 권한의 합집합 결과</p>
+                </div>
+                <button onclick="closeSimulationModal()" class="text-gray-500 hover:text-gray-800 text-3xl">&times;</button>
+            </div>
+            <div class="p-6 overflow-y-auto flex-grow">
+                <!-- User Info -->
+                <div class="bg-blue-50 rounded-lg p-4 mb-6">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm text-gray-600">이름</span>
+                            <div class="font-medium mt-1">홍길동</div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">사번</span>
+                            <div class="font-medium mt-1">2024001</div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">소속 부서</span>
+                            <div class="font-medium mt-1">교무학사팀 (DEPT_001)</div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">신분</span>
+                            <div class="flex items-center gap-2 mt-1">
+                                <span class="font-medium">직원</span>
+                                <span class="status-badge status-active">재직</span>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">역할 그룹</span>
+                            <div class="font-medium mt-1">졸업사정담당, 논문관리자</div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">개인 권한</span>
+                            <div class="font-medium mt-1">특별 권한 1건</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Permission Sources -->
+                <div class="mb-6">
+                    <h4 class="font-semibold mb-3">권한 출처</h4>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
+                                <span class="font-medium">부서별 권한</span>
+                            </div>
+                            <span class="text-sm text-gray-600">교무학사팀 (15개 메뉴)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                                <span class="font-medium">신분별 권한</span>
+                            </div>
+                            <span class="text-sm text-gray-600">직원 (8개 메뉴)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-purple-500 rounded-full"></div>
+                                <span class="font-medium">역할별 권한</span>
+                            </div>
+                            <span class="text-sm text-gray-600">졸업사정담당 (5개 메뉴), 논문관리자 (12개 메뉴)</span>
+                        </div>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-orange-500 rounded-full"></div>
+                                <span class="font-medium">개인별 권한</span>
+                            </div>
+                            <span class="text-sm text-gray-600">특별 권한 (1개 메뉴)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Final Permission Result -->
+                <div>
+                    <h4 class="font-semibold mb-3">최종 권한 결과 (합집합)</h4>
+                    <div class="border rounded-lg">
+                        <table class="w-full text-sm">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="text-left p-3 border-b">메뉴명</th>
+                                    <th class="text-center p-3 border-b w-16">조회</th>
+                                    <th class="text-center p-3 border-b w-16">등록</th>
+                                    <th class="text-center p-3 border-b w-16">수정</th>
+                                    <th class="text-center p-3 border-b w-16">삭제</th>
+                                    <th class="text-left p-3 border-b">출처</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b">
+                                    <td class="p-3">논문 안내 > 공지사항</td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="p-3 text-xs text-gray-600">부서 + 신분</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-3">논문 지도 > 지도교수 배정</td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="p-3 text-xs text-gray-600">부서 + 역할(논문관리자)</td>
+                                </tr>
+                                <tr>
+                                    <td class="p-3">시스템 설정 > 권한 관리</td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-green-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="text-center">
+                                        <svg class="w-5 h-5 text-red-500 mx-auto" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
+                                        </svg>
+                                    </td>
+                                    <td class="p-3 text-xs text-gray-600">개인(특별권한)</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="p-4 border-t bg-gray-50 flex justify-end">
+                <button onclick="closeSimulationModal()"
+                        class="px-6 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300">
+                    닫기
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== Tab Switching ==========
+        function switchTargetTab(tabName) {
+            // Update tab buttons
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Mock data for different tabs
+            const tabContent = {
+                department: `
+                    <div class="list-item px-4 py-3 border-b cursor-pointer selected" onclick="selectTarget(this, 'DEPT_001')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">교무학사팀</div>
+                                <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_001 | 소속: 12명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'DEPT_002')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">학생지원팀</div>
+                                <div class="text-xs text-gray-500 mt-0.5">코드: DEPT_002 | 소속: 8명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                `,
+                position: `
+                    <div class="list-item px-4 py-3 border-b cursor-pointer selected" onclick="selectTarget(this, 'POS_001')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">전임교원</div>
+                                <div class="text-xs text-gray-500 mt-0.5">대상: 교수/부교수/조교수 | 45명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'POS_002')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">비전임교원</div>
+                                <div class="text-xs text-gray-500 mt-0.5">대상: 겸임/초빙교수 | 23명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'POS_003')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">직원</div>
+                                <div class="text-xs text-gray-500 mt-0.5">대상: 행정직원 | 34명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'POS_004')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">학생</div>
+                                <div class="text-xs text-gray-500 mt-0.5">대상: 대학원생 | 1,234명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                `,
+                role: `
+                    <div class="list-item px-4 py-3 border-b cursor-pointer selected" onclick="selectTarget(this, 'ROLE_001')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">논문심사위원</div>
+                                <div class="text-xs text-gray-500 mt-0.5">조건: 교수 + 심사경력 | 대상: 38명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'ROLE_002')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">졸업사정담당</div>
+                                <div class="text-xs text-gray-500 mt-0.5">조건: 학사팀 + 담당자 | 대상: 3명</div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                `,
+                individual: `
+                    <div class="list-item px-4 py-3 border-b cursor-pointer selected" onclick="selectTarget(this, 'USER_001')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">홍길동 (2024001)</div>
+                                <div class="text-xs text-gray-500 mt-0.5">교무학사팀 | 직원 | <span class="status-badge status-active">재직</span></div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="list-item px-4 py-3 border-b cursor-pointer" onclick="selectTarget(this, 'USER_002')">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="font-medium text-gray-800">김교수 (2020123)</div>
+                                <div class="text-xs text-gray-500 mt-0.5">경영학과 | 교수 | <span class="status-badge status-leave">휴직</span></div>
+                            </div>
+                            <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                `
+            };
+
+            document.getElementById('target-list').innerHTML = `<div id="${tabName}-list">${tabContent[tabName]}</div>`;
+        }
+
+        // ========== Target Selection ==========
+        function selectTarget(element, targetId) {
+            // Update selected state
+            document.querySelectorAll('.list-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            element.classList.add('selected');
+
+            // Update header
+            const targetName = element.querySelector('.font-medium').textContent;
+            const targetCode = element.querySelector('.text-xs').textContent.split('|')[0].trim();
+            document.getElementById('selected-target-name').textContent = `${targetName} (${targetCode})`;
+
+            // Load permissions for this target
+            console.log('Loading permissions for:', targetId);
+        }
+
+        // ========== Menu Tree Toggle ==========
+        function toggleMenuExpand(button) {
+            const svg = button.querySelector('svg');
+            svg.classList.toggle('rotate-180');
+
+            // In a real implementation, this would show/hide child menu items
+            console.log('Toggle menu expand');
+        }
+
+        // ========== Menu Access Toggle ==========
+        function toggleMenuAccess(toggle, menuId) {
+            const row = toggle.closest('tr');
+            const checkboxes = row.querySelectorAll('.custom-checkbox');
+
+            if (toggle.checked) {
+                // Enable all checkboxes when access is granted
+                checkboxes.forEach(cb => {
+                    cb.disabled = false;
+                });
+            } else {
+                // Disable and uncheck all checkboxes when access is denied
+                checkboxes.forEach(cb => {
+                    cb.disabled = true;
+                    cb.checked = false;
+                });
+            }
+
+            console.log('Menu access toggled:', menuId, toggle.checked);
+        }
+
+        // ========== Permission Actions ==========
+        function resetPermissions() {
+            if (confirm('권한 설정을 초기화하시겠습니까?')) {
+                console.log('Permissions reset');
+                alert('권한 설정이 초기화되었습니다.');
+            }
+        }
+
+        function savePermissions() {
+            // Collect all permission data
+            const permissions = [];
+            document.querySelectorAll('.custom-checkbox:checked').forEach(cb => {
+                permissions.push({
+                    menu: cb.dataset.menu,
+                    permission: cb.dataset.permission
+                });
+            });
+
+            console.log('Saving permissions:', permissions);
+            alert('권한 설정이 저장되었습니다.');
+        }
+
+        // ========== ERP Sync ==========
+        function syncERPData() {
+            if (confirm('ERP 시스템과 동기화를 시작하시겠습니까?\n부서 및 사용자 정보가 업데이트됩니다.')) {
+                console.log('ERP sync started');
+                alert('ERP 동기화가 완료되었습니다.\n\n업데이트:\n- 부서 정보: 2건 변경\n- 사용자 정보: 15건 추가, 3건 변경');
+            }
+        }
+
+        // ========== User Permission Simulation ==========
+        function simulateUserPermission() {
+            const searchValue = document.getElementById('user-simulator-search').value;
+            if (!searchValue) {
+                alert('사용자 이름 또는 사번을 입력하세요.');
+                return;
+            }
+
+            // Show simulation modal
+            document.getElementById('user-simulation-modal').classList.remove('hidden');
+        }
+
+        function closeSimulationModal() {
+            document.getElementById('user-simulation-modal').classList.add('hidden');
+        }
+
+        // ========== Initialize ==========
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('권한 관리 시스템 초기화 완료');
+        });
+    </script>
+</body>
+</html>

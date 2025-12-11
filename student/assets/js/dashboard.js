@@ -15,6 +15,10 @@ function renderDashboard() {
     const completionRate = Math.round((completedCount / totalCount) * 100);
     
     content.innerHTML = `
+        <div class="flex items-center justify-between mb-8">
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">대시보드</h2>
+        </div>
+
         <!-- ID 58: 졸업 요건 충족 현황 -->
         <div class="card mb-6">
             <div class="card-header">
@@ -406,7 +410,7 @@ function showAcademicHistory() {
                                 <div style="font-weight: 600;">2024001</div>
                             </div>
                             <div>
-                                <div style="font-size: 0.75rem; color: #6B7280;">성명</div>
+                                <div style="font-size: 0.75rem; color: #6B7280;">이름</div>
                                 <div style="font-weight: 600;">홍길동</div>
                             </div>
                             <div>
@@ -448,7 +452,7 @@ function showAcademicHistory() {
                     <!-- 학기별 등록 -->
                     <div>
                         <h4 style="font-weight: 600; margin-bottom: 1rem;">학기별 등록 현황</h4>
-                        <table class="data-table">
+                        <table class="data-table table-fixed">
                             <thead>
                                 <tr>
                                     <th>학기</th>
@@ -590,7 +594,7 @@ function showDetailedGraduationRequirements() {
                     <!-- 이수 과목 상세 -->
                     <div style="margin-bottom: 1.5rem;">
                         <h4 style="font-weight: 600; margin-bottom: 1rem;">이수 과목 상세</h4>
-                        <table class="data-table">
+                        <table class="data-table table-fixed">
                             <thead>
                                 <tr>
                                     <th>학기</th>

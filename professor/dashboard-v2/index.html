@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>대시보드 - 논문지도시스템</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/css/dashboard-v2.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <h1>한양사이버대학교</h1>
+                <p>논문지도시스템</p>
+            </div>
+            <nav class="nav-menu">
+                <div class="nav-item active">대시보드</div>
+                <div class="nav-item">주차별 논문지도</div>
+                <div class="nav-item">심사관리</div>
+                <div class="nav-item">랩미팅관리</div>
+                <div class="nav-item">온라인피드백</div>
+                <div class="nav-item">설정</div>
+            </nav>
+
+            <!-- 사이드바 토글 버튼 -->
+            <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+                <span class="toggle-icon">◀</span>
+            </button>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <div class="header">
+                <div class="header-left">
+                    <h2>대시보드</h2>
+                    <div class="breadcrumb">
+                        홈 <span>›</span> 대시보드
+                    </div>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="user-name">김교수님</span>
+                        <div class="user-avatar">P</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Zone A: 프로세스 맵 -->
+            <div id="process-map-section" class="section-card">
+                <div class="section-header">
+                    <h3 class="section-title">지도 학생 프로세스 맵</h3>
+                </div>
+
+                <!-- 학위 과정 필터 -->
+                <div id="degree-filter" class="degree-filter">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+
+                <!-- 프로세스 단계 맵 -->
+                <div id="process-map" class="process-map">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+
+                <!-- 퀵 뷰 패널 (호버/클릭 시 표시) -->
+                <div id="quick-view-panel" class="quick-view-panel hidden">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+            </div>
+
+            <!-- Zone B & C: 2열 그리드 -->
+            <div class="dashboard-grid">
+
+                <!-- Zone B: 심사 및 피드백 -->
+                <div class="grid-column">
+                    <!-- 심사 관리 -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3 class="section-title">심사 관리</h3>
+                        </div>
+                        <div class="section-body">
+                            <div id="review-actions">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 피드백 관리 -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3 class="section-title">피드백 (첨삭)</h3>
+                        </div>
+                        <div class="section-body">
+                            <div id="feedback-actions">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Zone C: 일정 및 미팅 -->
+                <div class="grid-column">
+                    <!-- 학사 일정 -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3 class="section-title">주요 학사 일정</h3>
+                        </div>
+                        <div class="section-body">
+                            <div id="academic-schedule">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 미팅 일정 -->
+                    <div class="section-card">
+                        <div class="section-header">
+                            <h3 class="section-title">나의 지도 미팅</h3>
+                        </div>
+                        <div class="section-body">
+                            <div id="meeting-schedule">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <script src="assets/js/mock-data.js"></script>
+    <script src="assets/js/dashboard-v2.js"></script>
+</body>
+</html>

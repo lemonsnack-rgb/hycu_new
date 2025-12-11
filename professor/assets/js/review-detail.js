@@ -83,7 +83,7 @@ function renderThesisInfo(assignment) {
                         <div class="info-value">${assignment.graduateSchool || '일반대학원'}</div>
                     </div>
                     <div class="info-row">
-                        <div class="info-label">전공/학과</div>
+                        <div class="info-label">학과</div>
                         <div class="info-value">${assignment.major}</div>
                     </div>
                     <div class="info-row">

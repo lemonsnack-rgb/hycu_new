@@ -66,7 +66,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                             <div class="info-value">${journal.studentName} (${journal.studentId})</div>
                         </div>
                         <div class="info-row">
-                            <div class="info-label">전공 / 학위과정</div>
+                            <div class="info-label">학과 / 학위과정</div>
                             <div class="info-value">${journal.major} / ${journal.degree}</div>
                         </div>
                         <div class="info-row">

@@ -406,7 +406,7 @@ function returnToAdvisorAssignmentList() {
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더 -->
             <div class="p-6 border-b">
-                <h2 class="text-xl font-semibold text-gray-800">지도교수 배정</h2>
+                <h2 class="text-lg font-bold text-gray-800">지도교수 배정</h2>
                 <p class="text-sm text-gray-600 mt-1">나의 지도 학생 목록을 조회합니다.</p>
             </div>
 
@@ -448,10 +448,10 @@ function returnToAdvisorAssignmentList() {
                                    class="search-input">
                         </div>
 
-                        <!-- 4. 학과/전공 -->
+                        <!-- 4. 학과 -->
                         <div class="search-field">
                             <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학과/전공
+                                학과
                             </label>
                             <select id="prof-advisor-search-department" class="search-select">
                                 <option value="">전체</option>
@@ -499,7 +499,7 @@ function returnToAdvisorAssignmentList() {
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
                                 <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
@@ -681,6 +681,37 @@ function viewProfessorProposalDetail(proposalId) {
     }
 }
 
+// 안내문 콘텐츠 렌더링 함수 (로컬 버전)
+function renderGuideContentLocal(type) {
+    // mockGuides에서 해당 타입의 가이드 찾기
+    const guide = window.mockGuides ? window.mockGuides.find(g => g.type === type && g.isPublished) : null;
+
+    const titleMap = {
+        'ethics': '연구윤리',
+        'schedule': '논문일정',
+        'procedure': '논문지도절차'
+    };
+
+    return `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- Header -->
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">${titleMap[type]}</h2>
+                        <p class="text-sm text-gray-500 mt-1">최종 수정: ${guide?.lastUpdatedAt || '-'} (${guide?.lastUpdatedByName || '-'})</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="p-8">
+                ${guide?.content || '<p class="text-gray-500 text-center py-8">콘텐츠가 등록되지 않았습니다.</p>'}
+            </div>
+        </div>
+    `;
+}
+
 // 안내문 화면 렌더링 (연구윤리, 논문일정, 논문지도절차)
 function renderGuideScreen(screenId) {
     const typeMap = {
@@ -690,23 +721,32 @@ function renderGuideScreen(screenId) {
     };
 
     const type = typeMap[screenId];
-    if (!type) return;
+    if (!type) {
+        console.error('renderGuideScreen: Invalid screenId', screenId);
+        return;
+    }
 
     const targetScreen = document.getElementById(screenId + '-screen');
-    if (!targetScreen) return;
+    if (!targetScreen) {
+        console.error('renderGuideScreen: Target screen not found', screenId + '-screen');
+        return;
+    }
 
-    // 공통 렌더링 함수 사용 (isAdmin = false, 교수는 편집 권한 없음)
-    if (typeof window.renderGuideContent === 'function') {
-        targetScreen.innerHTML = window.renderGuideContent(type, false);
-    } else {
+    // mockGuides 확인
+    if (!window.mockGuides) {
+        console.error('mockGuides not found');
         targetScreen.innerHTML = `
             <div class="bg-white rounded-lg shadow-md p-8">
                 <div class="text-center text-gray-500">
-                    <p class="text-lg">콘텐츠를 불러올 수 없습니다.</p>
+                    <p class="text-lg">콘텐츠 데이터를 불러올 수 없습니다.</p>
                 </div>
             </div>
         `;
+        return;
     }
+
+    // 로컬 렌더링 함수 사용
+    targetScreen.innerHTML = renderGuideContentLocal(type);
 }
 
 // 공지사항 화면 렌더링 (공통 함수 사용)
