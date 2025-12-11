@@ -12,14 +12,11 @@ function renderReview() {
         <div class="card">
             <!-- 목록 화면 -->
             <div id="review-list-view">
-                <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <div class="card-header">
                     <div>
                         <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">학위 논문 제출</h2>
-                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문 심사를 신청하고 진행 상황을 확인하세요</p>
+                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">심사 단계별로 논문을 제출하고 진행 상황을 확인하세요</p>
                     </div>
-                    <button onclick="showReviewApplicationForm()" class="btn-primary">
-                        + 심사 신청하기
-                    </button>
                 </div>
 
                 <div class="card-body" style="padding: 0;">
@@ -27,27 +24,34 @@ function renderReview() {
                     <table style="width: 100%; border-collapse: collapse;">
                         <thead style="background: #F9FAFB; border-bottom: 1px solid #E5E7EB;">
                             <tr>
-                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">논문명</th>
-                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">심사 유형</th>
-                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">진행 상태</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">심사 단계</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출 기간</th>
+                                <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">제출 상태</th>
                                 <th style="padding: 0.75rem 1rem; text-align: left; font-size: 0.875rem; font-weight: 600; color: #374151;">심사 결과</th>
                             </tr>
                         </thead>
                         <tbody>
-                            ${reviews.length > 0 ? reviews.map(review => `
-                                <tr onclick="showReviewDetail(${review.id})" style="border-bottom: 1px solid #E5E7EB; cursor: pointer; transition: background 0.2s;"
-                                    onmouseover="this.style.background='#F9FAFB'"
-                                    onmouseout="this.style.background='white'">
+                            ${reviews.length > 0 ? reviews.map(review => {
+                                const statusBadge = getStatusBadge(review);
+                                const submissionButton = getSubmissionButton(review);
+                                return `
+                                <tr style="border-bottom: 1px solid #E5E7EB;">
                                     <td style="padding: 0.75rem 1rem;">
-                                        <div style="font-weight: 500; color: #1F2937;">${review.title || review.type}</div>
+                                        <div style="font-weight: 500; color: #1F2937;">${review.type}</div>
                                     </td>
                                     <td style="padding: 0.75rem 1rem;">
-                                        <span style="background: #DBEAFE; color: #1E40AF; padding: 0.25rem 0.5rem; border-radius: 9999px; font-size: 0.75rem; font-weight: 600;">${review.type}</span>
+                                        ${review.schedule ? `
+                                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                                <div style="font-size: 0.875rem;">
+                                                    <div style="color: #374151;">${review.schedule.submissionStartDate} ~</div>
+                                                    <div style="color: #374151;">${review.schedule.submissionEndDate}</div>
+                                                </div>
+                                                ${submissionButton}
+                                            </div>
+                                        ` : `<span style="color: #EF4444; font-size: 0.875rem; font-weight: 500;">일정 미등록</span>`}
                                     </td>
                                     <td style="padding: 0.75rem 1rem;">
-                                        <span class="badge ${review.status === '심사 진행중' ? 'badge-info' : review.status === '심사 완료' ? 'badge-success' : 'badge-warning'}">
-                                            ${review.status}
-                                        </span>
+                                        ${statusBadge}
                                     </td>
                                     <td style="padding: 0.75rem 1rem;">
                                         ${review.result ? `
@@ -60,10 +64,11 @@ function renderReview() {
                                         ` : '<span style="color: #9CA3AF;">-</span>'}
                                     </td>
                                 </tr>
-                            `).join('') : `
+                            `;
+                            }).join('') : `
                                 <tr>
                                     <td colspan="4" style="padding: 3rem; text-align: center; color: #9CA3AF;">
-                                        신청한 심사가 없습니다
+                                        심사 단계가 설정되지 않았습니다
                                     </td>
                                 </tr>
                             `}
@@ -533,11 +538,324 @@ function showReviewTimeline(reviewId) {
     document.getElementById('modal-container').innerHTML = modalContent;
 }
 
+// ==================== 제출 상태 및 액션 버튼 헬퍼 함수 ====================
+
+/**
+ * 제출 상태에 따른 배지 HTML 생성 (심사 진행 정보 제거)
+ */
+function getStatusBadge(review) {
+    if (!review.schedule) {
+        return '<span class="badge badge-danger">일정 미등록</span>';
+    }
+
+    const status = review.status;
+
+    // 상태별 배지 표시 (단순화)
+    if (status === '심사 진행중' || status === '심사 중') {
+        return '<span class="badge badge-info">심사 중</span>';
+    } else if (status === '심사 완료') {
+        return '<span class="badge badge-success">심사 완료</span>';
+    } else if (status === '미제출') {
+        return '<span class="badge badge-warning">미제출</span>';
+    } else if (status === '제출 불가') {
+        return '<span class="badge" style="background: #9CA3AF; color: white;">제출 불가</span>';
+    }
+
+    // submissionStatus 기반 상태 처리
+    const submissionStatus = review.submissionStatus;
+
+    switch (submissionStatus) {
+        case 'no_schedule':
+            return '<span class="badge badge-danger">일정 미등록</span>';
+        case 'not_available':
+            return '<span class="badge" style="background: #9CA3AF; color: white;">제출 불가</span>';
+        case 'not_submitted':
+            return '<span class="badge badge-warning">미제출</span>';
+        case 'overdue':
+            return '<span class="badge badge-danger">기한 경과</span>';
+        case 'waiting':
+            return '<span class="badge" style="background: #F59E0B; color: white;">심사 대기</span>';
+        case 'in_review':
+            return '<span class="badge badge-info">심사 중</span>';
+        case 'completed':
+            return '<span class="badge badge-success">심사 완료</span>';
+        default:
+            return '<span class="badge badge-warning">미제출</span>';
+    }
+}
+
+/**
+ * 제출 기간 컬럼 내 인라인 제출 버튼 생성
+ * 제출 가능 시점에만 버튼 표시
+ */
+function getSubmissionButton(review) {
+    if (!review.schedule) {
+        return '';
+    }
+
+    const submissionStatus = review.submissionStatus;
+
+    // 제출 가능 상태일 때만 버튼 표시
+    if (submissionStatus === 'not_submitted') {
+        return `
+            <button onclick="submitReview(${review.id})"
+                    class="btn-sm btn-primary"
+                    style="font-size: 0.75rem; padding: 0.375rem 0.75rem; white-space: nowrap;">
+                제출
+            </button>
+        `;
+    }
+
+    // 기한 경과했지만 제출 허용할 경우
+    if (submissionStatus === 'overdue') {
+        return `
+            <button onclick="submitReview(${review.id})"
+                    class="btn-sm btn-primary"
+                    style="font-size: 0.75rem; padding: 0.375rem 0.75rem; white-space: nowrap;">
+                제출
+            </button>
+        `;
+    }
+
+    // 제출 완료 후 심사 시작 전까지는 수정 버튼
+    if (review.submissionDate && review.schedule) {
+        const now = new Date();
+        const reviewStart = new Date(review.schedule.reviewStartDate);
+
+        if (now < reviewStart) {
+            return `
+                <button onclick="editReviewSubmission(${review.id})"
+                        class="btn-sm btn-secondary"
+                        style="font-size: 0.75rem; padding: 0.375rem 0.75rem; white-space: nowrap;">
+                    수정
+                </button>
+            `;
+        }
+    }
+
+    // 그 외의 경우 버튼 없음
+    return '';
+}
+
+/**
+ * 논문 제출 폼 표시 (페이지 전환)
+ */
+function submitReview(reviewId) {
+    const review = DataService.getReviews().find(r => r.id === reviewId);
+    if (!review) return;
+
+    // 제출 폼 화면으로 전환
+    showReviewSubmissionForm(review);
+}
+
+/**
+ * 논문 제출 폼 화면 표시 (페이지 전환)
+ */
+function showReviewSubmissionForm(review) {
+    // 목록 화면 숨기기
+    document.getElementById('review-list-view').style.display = 'none';
+
+    // 제출 폼 생성 및 표시
+    const formView = document.getElementById('review-form-view');
+    formView.innerHTML = `
+        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">${review.type} 제출</h2>
+                <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">논문 파일을 업로드하고 제출하세요</p>
+            </div>
+            <button onclick="hideReviewSubmissionForm()" class="btn-secondary">
+                ← 목록으로
+            </button>
+        </div>
+
+        <div class="card-body" style="padding: 2rem;">
+            <form id="review-submission-form" onsubmit="handleReviewSubmission(event, ${review.id})">
+                <!-- 심사 단계 (읽기 전용) -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                        심사 단계
+                    </label>
+                    <div style="padding: 0.75rem; background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 0.375rem;">
+                        <span style="font-weight: 500; color: #1F2937;">${review.type}</span>
+                    </div>
+                </div>
+
+                <!-- 논문 제목 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                        논문 제목 <span style="color: #EF4444;">*</span>
+                    </label>
+                    <input type="text" id="submission-title" required
+                           value="${review.title || ''}"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;"
+                           placeholder="논문 제목을 입력하세요">
+                </div>
+
+                <!-- 논문 파일 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                        논문 파일 <span style="color: #EF4444;">*</span>
+                    </label>
+                    <input type="file" id="submission-file" required accept=".pdf"
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                    <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.5rem;">
+                        <svg style="width: 0.875rem; height: 0.875rem; display: inline; margin-right: 0.25rem;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                        </svg>
+                        PDF 파일만 첨부 가능 (최대 30MB)
+                    </p>
+                </div>
+
+                <!-- 희망 심사 신청일 -->
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                        희망 심사 신청일 <span style="color: #EF4444;">*</span>
+                    </label>
+                    <input type="date" id="submission-desired-date" required
+                           style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                    <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.5rem;">
+                        심사 완료를 희망하는 날짜를 선택하세요
+                    </p>
+                </div>
+
+                <!-- 주의사항 -->
+                <div style="background: #FEF3C7; border-left: 4px solid #F59E0B; padding: 1rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items-start; gap: 0.5rem;">
+                        <svg style="width: 1.25rem; height: 1.25rem; color: #F59E0B; flex-shrink: 0; margin-top: 0.125rem;" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                        </svg>
+                        <div>
+                            <p style="font-weight: 600; color: #92400E; margin-bottom: 0.5rem;">주의사항</p>
+                            <ul style="font-size: 0.75rem; color: #92400E; margin-left: 1rem; line-height: 1.6;">
+                                <li>제출한 파일은 심사 시작 전까지만 수정 가능합니다</li>
+                                <li>PDF 파일 형식만 업로드 가능하며, 파일 크기는 30MB 이하로 제한됩니다</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+                    <button type="button" onclick="hideReviewSubmissionForm()" class="btn-secondary">
+                        취소
+                    </button>
+                    <button type="submit" class="btn-primary">
+                        제출하기
+                    </button>
+                </div>
+            </form>
+        </div>
+    `;
+
+    formView.style.display = 'block';
+}
+
+/**
+ * 제출 폼 숨기고 목록으로 복귀
+ */
+function hideReviewSubmissionForm() {
+    document.getElementById('review-form-view').style.display = 'none';
+    document.getElementById('review-list-view').style.display = 'block';
+}
+
+/**
+ * 논문 제출 처리
+ */
+function handleReviewSubmission(event, reviewId) {
+    event.preventDefault();
+
+    // 폼 데이터 수집
+    const title = document.getElementById('submission-title').value.trim();
+    const file = document.getElementById('submission-file').files[0];
+    const desiredDate = document.getElementById('submission-desired-date').value;
+
+    // 파일 유효성 검사
+    if (!file) {
+        showAlert('논문 파일을 선택해주세요.');
+        return;
+    }
+
+    // PDF 파일 형식 검사
+    if (file.type !== 'application/pdf') {
+        showAlert('PDF 파일만 업로드 가능합니다.');
+        return;
+    }
+
+    // 파일 크기 검사 (30MB = 30 * 1024 * 1024 bytes)
+    const maxSize = 30 * 1024 * 1024;
+    if (file.size > maxSize) {
+        showAlert('파일 크기는 30MB 이하로 제한됩니다.');
+        return;
+    }
+
+    // 날짜 유효성 검사
+    const review = DataService.getReviews().find(r => r.id === reviewId);
+    if (review && review.schedule) {
+        const selectedDate = new Date(desiredDate);
+        const submissionEnd = new Date(review.schedule.submissionEndDate);
+
+        if (selectedDate < submissionEnd) {
+            showAlert('희망 심사 신청일은 제출 마감일 이후로 선택해주세요.');
+            return;
+        }
+    }
+
+    // TODO: 실제 API 호출 (파일 업로드 및 데이터 저장)
+    // const formData = new FormData();
+    // formData.append('reviewId', reviewId);
+    // formData.append('title', title);
+    // formData.append('file', file);
+    // formData.append('desiredDate', desiredDate);
+    // await uploadReviewSubmission(formData);
+
+    // Mock 데이터 업데이트 (개발용)
+    if (review) {
+        review.title = title;
+        review.file = file.name;
+        review.submissionDate = new Date().toISOString().split('T')[0];
+        review.status = '심사 대기';
+        review.submissionStatus = 'waiting';
+    }
+
+    // 성공 메시지 및 목록으로 복귀
+    showAlert(`${review.type}이(가) 성공적으로 제출되었습니다.`);
+    hideReviewSubmissionForm();
+    renderReview(); // 목록 갱신
+}
+
+/**
+ * 제출 내용 수정
+ */
+function editReviewSubmission(reviewId) {
+    const review = DataService.getReviews().find(r => r.id === reviewId);
+    if (!review) return;
+
+    showAlert(`${review.type} 수정 기능은 준비 중입니다.`);
+    // TODO: 실제 수정 폼 구현
+}
+
+/**
+ * 제출 내용 조회
+ */
+function viewReviewSubmission(reviewId) {
+    const review = DataService.getReviews().find(r => r.id === reviewId);
+    if (!review) return;
+
+    showAlert(`${review.type} 조회 기능은 준비 중입니다.`);
+    // TODO: 실제 조회 화면 구현
+}
+
 // Export functions
 window.showReviewApplicationForm = showReviewApplicationForm;
 window.hideReviewApplicationForm = hideReviewApplicationForm;
 window.handleReviewApplication = handleReviewApplication;
 window.showReviewerFeedback = showReviewerFeedback;
 window.showReviewTimeline = showReviewTimeline;
+window.submitReview = submitReview;
+window.showReviewSubmissionForm = showReviewSubmissionForm;
+window.hideReviewSubmissionForm = hideReviewSubmissionForm;
+window.handleReviewSubmission = handleReviewSubmission;
+window.editReviewSubmission = editReviewSubmission;
+window.viewReviewSubmission = viewReviewSubmission;
 
 console.log('✅ 학생 심사 개선 기능 로드 완료');
