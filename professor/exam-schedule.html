@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>심사 일정 관리 - 한양사이버대학교</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="../common.css">
+    <style>
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: #009DE8;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #0077B6;
+        }
+
+        .btn-secondary {
+            background-color: #6B7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4B5563;
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <a href="professor-dashboard.html" class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-arrow-left"></i> 돌아가기
+                    </a>
+                    <h1 class="text-xl font-bold text-gray-900">심사 일정 관리</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-gray-600">박교수님</span>
+                    <button class="text-gray-600 hover:text-gray-900">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- List View -->
+        <div id="exam-schedule-list-view">
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">심사 일정 관리</h3>
+                    <p class="text-sm text-gray-600 mt-1">배정된 심사 일정을 조회합니다 (읽기 전용)</p>
+                </div>
+
+                <!-- 검색 메뉴 -->
+                <div class="p-6 border-b bg-gray-50">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <!-- 학년도/학기 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학년도/학기</label>
+                            <select id="filter-semester" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamSchedule()">
+                                <option value="">전체</option>
+                                <option value="2025-1" selected>2025학년도 1학기</option>
+                                <option value="2025-2">2025학년도 2학기</option>
+                                <option value="2024-2">2024학년도 2학기</option>
+                            </select>
+                        </div>
+
+                        <!-- 학과 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학과</label>
+                            <select id="filter-department" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamSchedule()">
+                                <option value="">전체</option>
+                                <option value="경영학과">경영학과</option>
+                                <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                <option value="교육학과">교육학과</option>
+                            </select>
+                        </div>
+
+                        <!-- 심사 단계 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">심사 단계</label>
+                            <select id="filter-stage" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamSchedule()">
+                                <option value="">전체</option>
+                            </select>
+                        </div>
+
+                        <!-- 일정 상태 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">일정 상태</label>
+                            <select id="filter-schedule-status" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamSchedule()">
+                                <option value="">전체</option>
+                                <option value="scheduled">등록 완료</option>
+                                <option value="unscheduled">미등록</option>
+                            </select>
+                        </div>
+
+                        <!-- 검색어 -->
+                        <div class="md:col-span-2 lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">검색어</label>
+                            <div class="flex gap-2">
+                                <select id="filter-search-type" class="px-3 py-2 border border-gray-300 rounded-md" style="flex: 0 0 120px;">
+                                    <option value="studentName">학생명</option>
+                                    <option value="studentNumber">학번</option>
+                                </select>
+                                <input type="text"
+                                       id="filter-search-keyword"
+                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md"
+                                       placeholder="검색어를 입력하세요"
+                                       onkeypress="if(event.key==='Enter') filterExamSchedule()">
+                            </div>
+                        </div>
+
+                        <!-- 검색 버튼 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
+                            <button onclick="filterExamSchedule()" class="btn btn-primary w-full">
+                                <i class="fas fa-search mr-1"></i> 검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 border-b">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학번</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학생명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학과</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학위</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">심사 단계</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">심사위원장</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">심사 일정</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">진행 방식</th>
+                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
+                            </tr>
+                        </thead>
+                        <tbody id="exam-schedule-table-body" class="bg-white divide-y divide-gray-200">
+                            <!-- JavaScript로 동적 렌더링 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Detail View (hidden initially) -->
+        <div id="exam-schedule-detail-view" style="display: none;">
+            <!-- JavaScript로 동적 렌더링 -->
+        </div>
+    </main>
+
+    <!-- Scripts -->
+    <script src="../common-utils.js"></script>
+    <script src="../admin/assets/js/mockData.js"></script>
+    <script src="../admin/assets/js/exam-schedule-data.js"></script>
+    <script src="../admin/assets/js/schedule-utils.js"></script>
+    <script src="assets/js/exam-schedule-professor.js"></script>
+
+    <script>
+        // 페이지 로드 시 초기화
+        document.addEventListener('DOMContentLoaded', function() {
+            renderExamScheduleList();
+        });
+    </script>
+</body>
+</html>

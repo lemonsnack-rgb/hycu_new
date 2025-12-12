@@ -130,9 +130,6 @@
                         <a href="#" data-view="noticeManagement" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">공지사항</span>
                         </a>
-                        <a href="#" data-view="board" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4 sidebar-text">자료실</span>
-                        </a>
                         <a href="#" data-view="ethicsGuide" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">연구윤리</span>
                         </a>
@@ -187,10 +184,13 @@
                     <!-- 2depth 메뉴 -->
                     <div id="thesis-guidance-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
                         <a href="#" data-view="stageManagement" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4 sidebar-text">논문 지도 단계 관리</span>
+                            <span class="ml-4 sidebar-text">학생별 지도 단계 관리</span>
                         </a>
                         <a href="#" data-view="typeManagement" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">지도 단계 등록</span>
+                        </a>
+                        <a href="#" data-view="stageTypeManagement" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4 sidebar-text">지도 단계 유형 관리</span>
                         </a>
                         <a href="#" data-view="advisorAssignment" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">지도교수 배정</span>
@@ -222,6 +222,9 @@
                     <div id="thesis-review-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
                         <a href="#" data-view="committeeAssignment" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">심사위원 배정</span>
+                        </a>
+                        <a href="#" data-view="examSchedule" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4 sidebar-text">심사 일정 관리</span>
                         </a>
                         <a href="#" data-view="evaluationCriteria" class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">심사 기준 등록</span>
@@ -422,6 +425,9 @@
     <script src="../common-permission.js"></script>
 
     <script src="assets/js/mockData.js"></script>
+    <script src="assets/js/exam-schedule-data.js"></script>
+    <script src="assets/js/zoom-api-simulator.js"></script>
+    <script src="assets/js/schedule-utils.js"></script>
     <script src="admin_data.js"></script>
     <script src="admin_modals.js"></script>
     <script src="admin_weekly_guidance.js"></script>
@@ -476,7 +482,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // 준비중 화면 설정
     const comingSoonViews = {
         'notice': '공지사항',
-        'board': '자료실',
         'ethics': '연구윤리',
         'schedule': '논문일정',
         'process': '논문지도절차'

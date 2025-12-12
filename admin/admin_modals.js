@@ -5180,73 +5180,107 @@ function savePassCriteria(criteriaId) {
 
 // ==================== 논문 제목 등록 현황 ====================
 
-function viewTitleChangeDetail(id) {
+// ========== 논문 제목 등록 관리 (페이지 전환 방식) ==========
+
+/**
+ * 목록에서 상세 화면으로 전환
+ */
+function showTitleChangeDetail(id) {
     const request = appData.titleChangeRequests.find(r => r.id === id);
     if (!request) {
         alert('정보를 찾을 수 없습니다.');
         return;
     }
 
-    const content = `
-        <div class="space-y-6">
-            <!-- 학생 정보 -->
-            <div class="bg-gray-50 rounded-lg p-4">
-                <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
-                <div class="grid grid-cols-2 gap-4">
+    // 목록 숨기고 상세 표시
+    document.getElementById('title-change-list-view').style.display = 'none';
+    document.getElementById('title-change-detail-view').style.display = 'block';
+
+    // 상세 화면 렌더링
+    renderTitleChangeDetail(request);
+}
+
+/**
+ * 상세 화면에서 목록으로 복귀
+ */
+function backToTitleChangeList() {
+    document.getElementById('title-change-detail-view').style.display = 'none';
+    document.getElementById('title-change-list-view').style.display = 'block';
+}
+
+/**
+ * 상세 화면 렌더링 (학생용 화면과 동일한 스타일)
+ */
+function renderTitleChangeDetail(request) {
+    const detailView = document.getElementById('title-change-detail-view');
+    if (!detailView) return;
+
+    detailView.innerHTML = `
+        <!-- 논문 제목 상세 -->
+        <div class="card">
+            <div class="card-header">
+                <div class="flex justify-between items-center">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">학번</label>
-                        <input type="text" value="${request.studentId}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">최종 논문 제목 수정</h2>
+                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">
+                            ${request.studentName} (${request.studentId}) - ${request.major} ${request.degree}
+                        </p>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">성명</label>
-                        <input type="text" value="${request.studentName}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">학과/전공</label>
-                        <input type="text" value="${request.major}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">학위과정</label>
-                        <input type="text" value="${request.degree}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                    </div>
+                    <button onclick="backToTitleChangeList()" class="btn btn-secondary">
+                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        목록으로
+                    </button>
                 </div>
             </div>
+            <div class="card-body">
+                <form id="admin-title-form" style="max-width: 800px;">
+                    <div style="margin-bottom: 1.5rem;">
+                        <label style="font-weight: 600; color: #374151; font-size: 0.875rem; display: block; margin-bottom: 0.5rem;">
+                            논문 제목 <span style="color: #DC2626;">*</span>
+                        </label>
+                        <input type="text"
+                               id="admin-title-input"
+                               value="${request.titleKo || request.currentTitle || request.newTitle || ''}"
+                               placeholder="논문 제목을 입력하세요"
+                               readonly
+                               style="width: 100%; padding: 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.5rem; font-size: 1rem; background-color: #F9FAFB; color: #374151;">
+                        <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                            예: 인공지능 기반 추천 시스템의 효율성 향상에 관한 연구
+                        </p>
+                    </div>
 
-            <!-- 논문 제목 정보 -->
-            <div class="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                <h4 class="font-bold text-blue-900 mb-3">논문 제목</h4>
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">논문 제목 (국문)</label>
-                        <input type="text" value="${request.titleKo || request.currentTitle || '-'}" readonly
-                               class="w-full px-3 py-2 border border-blue-300 rounded bg-blue-100 text-gray-900 font-medium">
+                    <div style="background: #EFF6FF; border: 1px solid #DBEAFE; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
+                        <div style="display: flex; align-items: start;">
+                            <svg style="width: 1.25rem; height: 1.25rem; color: #3B82F6; flex-shrink: 0; margin-right: 0.75rem; margin-top: 0.125rem;"
+                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <div style="font-size: 0.875rem; color: #1E40AF;">
+                                <p style="font-weight: 600; margin-bottom: 0.5rem;">등록 정보</p>
+                                <p>등록일: ${request.registeredDate || request.requestDate || '-'}</p>
+                                ${request.status ? `<p class="mt-1">상태: ${request.status}</p>` : ''}
+                            </div>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">논문 제목 (영문)</label>
-                        <input type="text" value="${request.titleEn || request.newTitle || '-'}" readonly
-                               class="w-full px-3 py-2 border border-blue-300 rounded bg-blue-100 text-gray-900 font-medium">
+
+                    <div style="display: flex; justify-content: center; gap: 1rem;">
+                        <button type="button" onclick="backToTitleChangeList()" class="btn btn-secondary" style="min-width: 120px;">
+                            목록으로
+                        </button>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">등록일</label>
-                        <input type="text" value="${request.registeredDate || request.requestDate || '-'}" readonly
-                               class="w-full px-3 py-2 border border-gray-300 rounded bg-gray-100 text-gray-700">
-                    </div>
-                </div>
+                </form>
             </div>
         </div>
     `;
+}
 
-    openModal(
-        '논문 제목 상세',
-        content,
-        '닫기',
-        closeModal,
-        true
-    );
+// 이전 모달 방식 함수 (하위 호환성 유지)
+function viewTitleChangeDetail(id) {
+    // 페이지 전환 방식으로 리다이렉트
+    showTitleChangeDetail(id);
 }
 
 function approveTitleChange(id) {
@@ -5586,6 +5620,9 @@ window.editPassCriteria = editPassCriteria;
 window.toggleFailThreshold = toggleFailThreshold;
 window.savePassCriteria = savePassCriteria;
 window.viewTitleChangeDetail = viewTitleChangeDetail;
+window.showTitleChangeDetail = showTitleChangeDetail;
+window.backToTitleChangeList = backToTitleChangeList;
+window.renderTitleChangeDetail = renderTitleChangeDetail;
 window.approveTitleChange = approveTitleChange;
 window.searchTitleChangeRequests = searchTitleChangeRequests;
 window.resetTitleChangeSearch = resetTitleChangeSearch;

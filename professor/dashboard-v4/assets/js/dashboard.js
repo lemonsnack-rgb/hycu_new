@@ -22,6 +22,9 @@ function initDashboard() {
     // 심사 관리
     renderExamList();
 
+    // 심사 일정
+    renderExamScheduleList();
+
     // 일정 관리
     renderUniversitySchedule();
     renderApprovalSummary();
@@ -193,6 +196,114 @@ function renderExamList() {
     `).join('');
 
     document.getElementById('examList').innerHTML = html;
+}
+
+// ===================================
+// 심사 일정
+// ===================================
+function renderExamScheduleList() {
+    // 현재 로그인한 교수 ID (실제로는 세션에서 가져옴)
+    const currentProfessorId = 'PROF003'; // 박교수
+
+    // mock 데이터가 있는지 확인
+    if (typeof mockExamSchedules === 'undefined' || typeof mockCommitteeAssignments === 'undefined') {
+        document.getElementById('examScheduleList').innerHTML = `
+            <div class="exam-schedule-empty">
+                심사 일정 데이터를 불러올 수 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+    // 내가 심사위원으로 배정된 일정만 필터링
+    const mySchedules = mockExamSchedules
+        .filter(schedule => {
+            if (schedule.status === 'cancelled') return false;
+
+            const assignment = mockCommitteeAssignments.find(a => a.id === schedule.assignmentId);
+            if (!assignment) return false;
+
+            // 내가 심사위원(위원장 포함)인지 확인
+            return assignment.members.some(m => m.professorId === currentProfessorId);
+        })
+        .sort((a, b) => {
+            // 날짜순 정렬
+            const dateA = new Date(`${a.examDate}T${a.examTime}`);
+            const dateB = new Date(`${b.examDate}T${b.examTime}`);
+            return dateA - dateB;
+        });
+
+    if (mySchedules.length === 0) {
+        document.getElementById('examScheduleList').innerHTML = `
+            <div class="exam-schedule-empty">
+                예정된 심사 일정이 없습니다.
+            </div>
+        `;
+        return;
+    }
+
+    const html = mySchedules.map(schedule => {
+        const assignment = mockCommitteeAssignments.find(a => a.id === schedule.assignmentId);
+        const myRole = assignment.members.find(m => m.professorId === currentProfessorId);
+
+        // 날짜 포맷팅
+        const examDateTime = formatDateTimeRange(schedule.examDate, schedule.examTime, schedule.duration);
+
+        // 진행 방식
+        const methodBadge = schedule.method === 'online'
+            ? '<span class="exam-schedule-method online">온라인</span>'
+            : '<span class="exam-schedule-method offline">오프라인</span>';
+
+        // 장소/URL 정보
+        let locationInfo = '';
+        if (schedule.method === 'online' && schedule.onlineInfo) {
+            locationInfo = `
+                <div class="exam-schedule-detail-row">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M17 10.5V7c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v10c0 .55.45 1 1 1h12c.55 0 1-.45 1-1v-3.5l4 4v-11l-4 4z"/>
+                    </svg>
+                    <span>Zoom 미팅</span>
+                </div>
+            `;
+        } else if (schedule.method === 'offline' && schedule.offlineInfo) {
+            locationInfo = `
+                <div class="exam-schedule-detail-row">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                    </svg>
+                    <span>${schedule.offlineInfo.location}</span>
+                </div>
+            `;
+        }
+
+        return `
+            <div class="exam-schedule-item">
+                <div class="exam-schedule-header">
+                    <div class="exam-schedule-student">
+                        ${schedule.studentName} (${schedule.studentNumber})
+                    </div>
+                    <div class="exam-schedule-stage">${schedule.stageName}</div>
+                </div>
+                <div class="exam-schedule-details">
+                    <div class="exam-schedule-detail-row">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                        <span>${examDateTime} (${schedule.duration}분)</span>
+                    </div>
+                    <div class="exam-schedule-detail-row">
+                        <svg viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                        </svg>
+                        <span>${myRole.role === 'chair' ? '심사위원장' : '심사위원'} ${methodBadge}</span>
+                    </div>
+                    ${locationInfo}
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    document.getElementById('examScheduleList').innerHTML = html;
 }
 
 // ===================================

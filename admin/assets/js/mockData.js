@@ -499,10 +499,18 @@ const mockCommitteeAssignments = [
         id: 'CA001',
         reviewTargetId: 'RT006',
         studentId: 'STU004',
+        studentNumber: '2024004',
         studentName: '최학생',
         department: '경영학과',
         degreeType: '석사',
         reviewType: 'final',
+
+        // 논문 지도 단계 정보
+        thesisStageId: 'TS001',
+        stageId: 'STAGE_TS001_005',
+        stageName: '본심사',
+        stageOrder: 5,
+
         chairId: 'PROF003', // 심사위원장 (지도교수)
         chairName: '박교수',
         members: [
@@ -518,10 +526,18 @@ const mockCommitteeAssignments = [
         id: 'CA002',
         reviewTargetId: 'RT007',
         studentId: 'STU006',
+        studentNumber: '2024006',
         studentName: '강학생',
         department: '교육학과',
         degreeType: '석사',
         reviewType: 'final',
+
+        // 논문 지도 단계 정보
+        thesisStageId: 'TS001',
+        stageId: 'STAGE_TS001_005',
+        stageName: '본심사',
+        stageOrder: 5,
+
         chairId: 'PROF005',
         chairName: '정교수',
         members: [
@@ -532,15 +548,23 @@ const mockCommitteeAssignments = [
         assignedDate: '2025-02-21',
         status: 'completed'
     },
-    // RT008 (윤학생 - 석사 최종논문) - 심사위원 배정 완료
+    // RT008 (윤학생 - 박사 최종논문) - 심사위원 배정 완료
     {
         id: 'CA003',
         reviewTargetId: 'RT008',
         studentId: 'STU008',
+        studentNumber: '2024008',
         studentName: '윤학생',
         department: '심리학과',
-        degreeType: '석사',
+        degreeType: '박사',
         reviewType: 'final',
+
+        // 논문 지도 단계 정보 (박사 - 예비심사)
+        thesisStageId: 'TS002',
+        stageId: 'STAGE_TS002_005',
+        stageName: '예비심사',
+        stageOrder: 5,
+
         chairId: 'PROF007',
         chairName: '조교수',
         members: [

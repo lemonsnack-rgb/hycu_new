@@ -177,6 +177,10 @@
                     </button>
                     <!-- 2depth 메뉴 -->
                     <div id="thesis-review-submenu" class="pl-6 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4 sidebar-text">심사 일정 관리</span>
+                        </a>
                         <a href="#" onclick="showScreen('review'); return false;" data-screen="review"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4">학위 논문 심사</span>
@@ -809,6 +813,15 @@
             </section>
             
             <!-- ===================================
+                 심사 일정 관리 화면 (읽기 전용)
+                 =================================== -->
+            <section id="exam-schedule-screen" class="content-screen">
+                <div id="exam-schedule-content">
+                    <!-- exam-schedule-professor-readonly.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+
+            <!-- ===================================
                  학술지 대체심사 화면 (ID 54-56)
                  =================================== -->
             <section id="journal-review-screen" class="content-screen">
@@ -947,7 +960,11 @@
     <!-- 공통 유틸리티 -->
     <script src="../common-utils.js"></script>
     <script src="../common-header-utils.js"></script>
-    
+
+    <!-- 심사 일정 관리 (교수용 - 읽기 전용) -->
+    <script src="../admin/assets/js/exam-schedule-data.js"></script>
+    <script src="../admin/assets/js/schedule-utils.js"></script>
+    <script src="assets/js/exam-schedule-professor-readonly.js"></script>
 
 <!-- injected: i18n minimal handler -->
 <script data-i18n-ready>

@@ -189,6 +189,29 @@
                     </div>
                 </div>
 
+                <!-- 논문 심사 (1depth) -->
+                <div class="mt-2">
+                    <button onclick="toggleSubmenu('thesis-review')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="ml-4 sidebar-text">논문 심사</span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform submenu-arrow" id="thesis-review-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <!-- 2depth 메뉴 -->
+                    <div id="thesis-review-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
+                        <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4 sidebar-text">심사 일정 관리</span>
+                        </a>
+                    </div>
+                </div>
+
 </nav>
         </aside>
 
@@ -344,6 +367,7 @@
             <div id="meeting-screen" class="content-screen"></div>
             <div id="feedback-screen" class="content-screen"></div>
             <div id="review-screen" class="content-screen"></div>
+            <div id="exam-schedule-screen" class="content-screen"></div>
             <div id="title-change-screen" class="content-screen"></div>
             <div id="board-screen" class="content-screen">
                 <div id="boardContainer"></div>
@@ -391,6 +415,10 @@
     <script src="assets/js/feedback.js"></script>
     <script src="assets/js/feedback-viewer-student.js"></script>
     <script src="assets/js/review.js?v=20250127001"></script>
+    <script src="../admin/assets/js/mockData.js"></script>
+    <script src="../admin/assets/js/exam-schedule-data.js"></script>
+    <script src="../admin/assets/js/schedule-utils.js"></script>
+    <script src="assets/js/exam-schedule-student.js"></script>
     <script src="assets/js/title-change.js"></script>
     <script src="assets/js/board.js"></script>
     <script src="assets/js/journal-submission.js"></script>

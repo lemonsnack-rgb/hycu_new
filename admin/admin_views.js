@@ -1436,7 +1436,7 @@ const views = {
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">일정명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">카테고리</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도 단계 유형</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출 기간</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 기간</th>
@@ -1489,10 +1489,10 @@ const views = {
                             <p class="mt-1 text-xs text-gray-500">대시보드에 표시될 일정 제목을 입력하세요</p>
                         </div>
 
-                        <!-- 카테고리 선택 -->
+                        <!-- 지도 단계 유형 선택 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">
-                                카테고리 (심사 단계) <span class="text-red-600">*</span>
+                                지도 단계 유형 <span class="text-red-600">*</span>
                             </label>
                             <select id="schedule-category"
                                     class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
@@ -1505,7 +1505,7 @@ const views = {
                             </select>
                             <p class="mt-1 text-xs text-gray-500">
                                 <i class="fas fa-info-circle"></i>
-                                이 카테고리는 모든 학위/전공의 동일 단계에 적용됩니다.
+                                이 지도 단계 유형은 모든 학위/전공의 동일 단계에 적용됩니다.
                             </p>
                         </div>
 
@@ -1864,7 +1864,7 @@ const views = {
                             <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                             </svg>
-                            ${isEdit ? '저장 후 단계 구성' : '저장 후 단계 구성하기'}
+                            저장
                         </button>
                         <button type="button" onclick="switchView('stageManagement')"
                                 class="px-6 py-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 font-medium">
@@ -2387,100 +2387,108 @@ const views = {
     titleChangeRequests: () => {
         const data = appData.titleChangeRequests;
         return `
-            <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">논문 제목 등록 현황</h3>
+            <!-- 목록 화면 -->
+            <div id="title-change-list-view">
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-bold text-gray-800 mb-4">논문 제목 등록 현황</h3>
 
-                    <!-- 검색 메뉴 -->
-                    <div class="search-container">
-                        <div class="search-grid">
-                            <!-- 1. 학년도 -->
-                            <div class="search-field">
-                                <label class="search-label">학년도</label>
-                                <select id="title-search-year" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="2025">2025</option>
-                                    <option value="2024">2024</option>
-                                    <option value="2023">2023</option>
-                                </select>
+                        <!-- 검색 메뉴 -->
+                        <div class="search-container">
+                            <div class="search-grid">
+                                <!-- 1. 학년도 -->
+                                <div class="search-field">
+                                    <label class="search-label">학년도</label>
+                                    <select id="title-search-year" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+
+                                <!-- 2. 학기 -->
+                                <div class="search-field">
+                                    <label class="search-label">학기</label>
+                                    <select id="title-search-semester" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="1">1학기</option>
+                                        <option value="2">2학기</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. 학번 -->
+                                <div class="search-field">
+                                    <label class="search-label">학번</label>
+                                    <input type="text" id="title-search-student-id" placeholder="학번 입력"
+                                           class="search-input">
+                                </div>
+
+                                <!-- 4. 성명 -->
+                                <div class="search-field">
+                                    <label class="search-label">성명</label>
+                                    <input type="text" id="title-search-student-name" placeholder="성명 입력"
+                                           class="search-input">
+                                </div>
                             </div>
 
-                            <!-- 2. 학기 -->
-                            <div class="search-field">
-                                <label class="search-label">학기</label>
-                                <select id="title-search-semester" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="1">1학기</option>
-                                    <option value="2">2학기</option>
-                                </select>
+                            <!-- 검색/초기화 버튼 -->
+                            <div class="search-buttons">
+                                <button onclick="searchTitleChangeRequests()" class="search-btn search-btn-primary">
+                                    <i class="fas fa-search"></i>검색
+                                </button>
+                                <button onclick="resetTitleChangeSearch()" class="search-btn search-btn-secondary">
+                                    <i class="fas fa-redo"></i>초기화
+                                </button>
                             </div>
-
-                            <!-- 3. 학번 -->
-                            <div class="search-field">
-                                <label class="search-label">학번</label>
-                                <input type="text" id="title-search-student-id" placeholder="학번 입력"
-                                       class="search-input">
-                            </div>
-
-                            <!-- 4. 성명 -->
-                            <div class="search-field">
-                                <label class="search-label">성명</label>
-                                <input type="text" id="title-search-student-name" placeholder="성명 입력"
-                                       class="search-input">
-                            </div>
-                        </div>
-
-                        <!-- 검색/초기화 버튼 -->
-                        <div class="search-buttons">
-                            <button onclick="searchTitleChangeRequests()" class="search-btn search-btn-primary">
-                                <i class="fas fa-search"></i>검색
-                            </button>
-                            <button onclick="resetTitleChangeSearch()" class="search-btn search-btn-secondary">
-                                <i class="fas fa-redo"></i>초기화
-                            </button>
                         </div>
                     </div>
-                </div>
 
-                <!-- 테이블 -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일(수정일)</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            ${data.length > 0 ? data.map((item, idx) => `
-                                <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewTitleChangeDetail(${item.id})">
-                                    <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600 td-truncate-extra-long" title="${item.titleKo || item.currentTitle || '-'}">
-                                        ${item.titleKo || item.currentTitle || '-'}
-                                    </td>
-                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
-                                </tr>
-                            `).join('') : `
+                    <!-- 테이블 -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full table-fixed">
+                            <thead class="bg-gray-50">
                                 <tr>
-                                    <td colspan="9" class="py-8 text-center text-gray-500">
-                                        논문 제목 등록 내역이 없습니다.
-                                    </td>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일(수정일)</th>
                                 </tr>
-                            `}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                ${data.length > 0 ? data.map((item, idx) => `
+                                    <tr class="hover:bg-gray-50 cursor-pointer" onclick="showTitleChangeDetail(${item.id})">
+                                        <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
+                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600 td-truncate-extra-long" title="${item.titleKo || item.currentTitle || '-'}">
+                                            ${item.titleKo || item.currentTitle || '-'}
+                                        </td>
+                                        <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
+                                    </tr>
+                                `).join('') : `
+                                    <tr>
+                                        <td colspan="9" class="py-8 text-center text-gray-500">
+                                            논문 제목 등록 내역이 없습니다.
+                                        </td>
+                                    </tr>
+                                `}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </div>
+
+            <!-- 상세 화면 -->
+            <div id="title-change-detail-view" style="display: none;">
+                <!-- JavaScript로 동적 렌더링 -->
             </div>
         `;
     },
@@ -2947,7 +2955,7 @@ const views = {
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800">논문 지도 단계 관리</h2>
+                    <h2 class="text-xl font-bold text-gray-800">학생별 지도 단계 관리</h2>
                     <p class="text-sm text-gray-600 mt-1">학생들의 논문 지도 단계를 관리하고 일괄 이관을 수행합니다.</p>
                 </div>
 
@@ -3073,10 +3081,11 @@ const views = {
         window.composedStages = isEdit ? JSON.parse(JSON.stringify(item.stages)) : [{
             id: 'STAGE_NEW_' + Date.now(),
             order: 1,
-            categoryId: '',
+            stageTypeId: '',  // 신규: 단계 유형 ID
+            stepTypeId: '',   // 하위 호환
+            categoryId: '',   // 하위 호환 (deprecated)
             name: '',
-            requiresDocument: false,
-            requiresPresentation: false,
+            // requiresDocument, requiresPresentation는 stageType에서 자동 상속되므로 제거
             submissionStartDate: '',
             submissionEndDate: '',
             evaluationTemplateId: '',
@@ -3103,8 +3112,8 @@ const views = {
             // 단계 유효성 검사
             for (let i = 0; i < window.composedStages.length; i++) {
                 const stage = window.composedStages[i];
-                if (!stage.categoryId) {
-                    alert(`단계 ${i + 1}: 카테고리를 선택해주세요.`);
+                if (!stage.stageTypeId && !stage.stepTypeId && !stage.categoryId) {
+                    alert(`단계 ${i + 1}: 단계 유형을 선택해주세요.`);
                     return;
                 }
                 if (!stage.name.trim()) {
@@ -4116,6 +4125,153 @@ const views = {
             </div>
         `;
     },
+
+    // ========== 심사 일정 관리 ==========
+    examSchedule: () => {
+        // Mock 데이터 로드 확인
+        if (typeof mockCommitteeAssignments === 'undefined' || typeof mockExamSchedules === 'undefined') {
+            return `
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-red-500">
+                        <p class="text-lg">Mock 데이터가 로드되지 않았습니다.</p>
+                        <p class="text-sm mt-2">admin/assets/js/exam-schedule-data.js 파일을 확인하세요.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // JavaScript 파일 동적 로드
+        const existingScript = document.querySelector('script[src="assets/js/exam-schedule.js"]');
+
+        if (!existingScript) {
+            const script = document.createElement('script');
+            script.src = 'assets/js/exam-schedule.js';
+            script.onload = () => {
+                if (typeof renderExamScheduleList === 'function') {
+                    renderExamScheduleList();
+                }
+            };
+            document.body.appendChild(script);
+        } else {
+            setTimeout(() => {
+                if (typeof renderExamScheduleList === 'function') {
+                    renderExamScheduleList();
+                }
+            }, 0);
+        }
+
+        return `
+            <!-- List View -->
+            <div id="exam-schedule-list-view">
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="p-6 border-b">
+                        <h3 class="text-lg font-bold text-gray-800">심사 일정 관리</h3>
+                        <p class="text-sm text-gray-600 mt-1">심사위원 배정이 완료된 심사 일정을 등록하고 관리합니다.</p>
+                    </div>
+
+                    <!-- 검색 메뉴 (표준화) -->
+                    <div class="p-6 border-b bg-gray-50">
+                        <div class="search-container">
+                            <div class="search-grid">
+                                <!-- 1. 학년도/학기 -->
+                                <div class="search-field">
+                                    <label class="search-label">학년도/학기</label>
+                                    <select id="filter-semester" class="search-input" onchange="filterExamSchedule()">
+                                        <option value="">전체</option>
+                                        <option value="2025-1" selected>2025학년도 1학기</option>
+                                        <option value="2025-2">2025학년도 2학기</option>
+                                        <option value="2024-2">2024학년도 2학기</option>
+                                    </select>
+                                </div>
+
+                                <!-- 2. 학과 -->
+                                <div class="search-field">
+                                    <label class="search-label">학과</label>
+                                    <select id="filter-department" class="search-input" onchange="filterExamSchedule()">
+                                        <option value="">전체</option>
+                                        <option value="경영학과">경영학과</option>
+                                        <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                        <option value="교육학과">교육학과</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. 심사 단계 -->
+                                <div class="search-field">
+                                    <label class="search-label">심사 단계</label>
+                                    <select id="filter-stage" class="search-input" onchange="filterExamSchedule()">
+                                        <option value="">전체</option>
+                                        <!-- 동적 로드 -->
+                                    </select>
+                                </div>
+
+                                <!-- 4. 일정 상태 -->
+                                <div class="search-field">
+                                    <label class="search-label">일정 상태</label>
+                                    <select id="filter-schedule-status" class="search-input" onchange="filterExamSchedule()">
+                                        <option value="">전체</option>
+                                        <option value="scheduled">등록 완료</option>
+                                        <option value="unscheduled">미등록</option>
+                                    </select>
+                                </div>
+
+                                <!-- 5. 검색어 -->
+                                <div class="search-field search-field-wide">
+                                    <label class="search-label">검색어</label>
+                                    <div class="flex gap-2">
+                                        <select id="filter-search-type" class="search-input" style="flex: 0 0 120px;">
+                                            <option value="studentName">학생명</option>
+                                            <option value="studentNumber">학번</option>
+                                        </select>
+                                        <input type="text"
+                                               id="filter-search-keyword"
+                                               class="search-input"
+                                               placeholder="검색어를 입력하세요"
+                                               onkeypress="if(event.key==='Enter') filterExamSchedule()">
+                                    </div>
+                                </div>
+
+                                <!-- 6. 검색 버튼 -->
+                                <div class="search-field">
+                                    <label class="search-label">&nbsp;</label>
+                                    <button onclick="filterExamSchedule()" class="btn btn-primary w-full">
+                                        <i class="fas fa-search mr-1"></i> 검색
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 테이블 -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full">
+                            <thead class="bg-gray-50 border-b">
+                                <tr>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학생명</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">심사 단계</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">심사위원장</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">심사 일정</th>
+                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">진행 방식</th>
+                                    <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exam-schedule-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- JavaScript로 동적 렌더링 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detail View (hidden initially) -->
+            <div id="exam-schedule-detail-view" style="display: none;">
+                <!-- JavaScript로 동적 렌더링 -->
+            </div>
+        `;
+    },
 };
 
 // ========================================
@@ -4166,3 +4322,195 @@ function renderGuideContent(type, isAdmin = false) {
 if (typeof window !== 'undefined') {
     window.renderGuideContent = renderGuideContent;
 }
+
+// ========================================
+// 논문 지도 단계 유형 관리 (신규)
+// ========================================
+
+/**
+ * 단계 유형 목록 화면
+ */
+views.stageTypeManagement = () => {
+    const data = mockStepTypes;
+    return `
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">지도 단계 유형 관리</h3>
+                    <button onclick="switchView('stageTypeCreate')"
+                            class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                        등록
+                    </button>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                    <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-2"></i>
+                        논문 지도 단계의 유형을 등록하고, 유형별 제출 요건(문서/발표)을 설정합니다. 행을 클릭하여 상세 내용을 확인하세요.
+                    </p>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-fixed">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 80px;">번호</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유형명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">문서 제출</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">발표 필요</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">설명</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                        ${data.map((item, idx) => `
+                            <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('stageTypeEdit', '${item.id}')">
+                                <td class="py-3 px-4 text-sm text-gray-600 text-center">${idx + 1}</td>
+                                <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
+                                <td class="py-3 px-4 text-center">
+                                    ${item.requiresDocument
+                                        ? '<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">필요</span>'
+                                        : '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">불필요</span>'
+                                    }
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    ${item.requiresPresentation
+                                        ? '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">필요</span>'
+                                        : '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">불필요</span>'
+                                    }
+                                </td>
+                                <td class="py-3 px-4 text-sm text-gray-600">${item.description || '-'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+};
+
+/**
+ * 단계 유형 등록/수정 화면
+ */
+views.stageTypeCreate = (id = null) => {
+    const isEdit = id !== null;
+    const item = isEdit ? mockStepTypes.find(t => t.id === id) : {
+        name: '',
+        requiresDocument: false,
+        requiresPresentation: false,
+        description: ''
+    };
+
+    return `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 헤더 -->
+            <div class="p-6 border-b flex items-center">
+                <button onclick="switchView('stageTypeManagement')"
+                        class="text-gray-600 hover:text-gray-800 mr-4 flex items-center">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    뒤로가기
+                </button>
+                <h3 class="text-lg font-bold text-gray-800">
+                    ${isEdit ? '단계 유형 수정' : '단계 유형 등록'}
+                </h3>
+            </div>
+
+            <!-- 안내 메시지 -->
+            <div class="p-6 bg-blue-50 border-b">
+                <div class="flex">
+                    <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div class="text-sm text-blue-700">
+                        <p class="font-medium">논문 지도 단계 유형을 ${isEdit ? '수정' : '등록'}합니다</p>
+                        <p class="mt-1">등록된 유형은 지도 단계 등록 시 선택하여 사용할 수 있습니다.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 폼 -->
+            <form onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="p-6 space-y-6">
+                <!-- 유형명 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        유형명 <span class="text-red-600">*</span>
+                    </label>
+                    <input type="text"
+                           id="stage-type-name"
+                           value="${item.name}"
+                           placeholder="예: 연구계획서 제출, 예비심사, 본심사"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                           required>
+                </div>
+
+                <!-- 제출 요건 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-3">
+                        제출 요건 <span class="text-red-600">*</span>
+                    </label>
+                    <div class="space-y-3">
+                        <label class="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                            <input type="checkbox"
+                                   id="requires-document"
+                                   ${item.requiresDocument ? 'checked' : ''}
+                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <div class="ml-3">
+                                <span class="text-sm font-medium text-gray-900">문서 제출 필요</span>
+                                <p class="text-xs text-gray-500 mt-1">이 단계에서 학생이 문서를 제출해야 합니다</p>
+                            </div>
+                        </label>
+
+                        <label class="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                            <input type="checkbox"
+                                   id="requires-presentation"
+                                   ${item.requiresPresentation ? 'checked' : ''}
+                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <div class="ml-3">
+                                <span class="text-sm font-medium text-gray-900">발표 필요</span>
+                                <p class="text-xs text-gray-500 mt-1">이 단계에서 학생이 발표를 진행해야 합니다</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- 설명 -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        설명
+                    </label>
+                    <textarea id="stage-type-description"
+                              rows="3"
+                              placeholder="이 단계 유형에 대한 설명을 입력하세요"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">${item.description || ''}</textarea>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="flex justify-between pt-4 border-t">
+                    <div>
+                        ${isEdit ? `
+                            <button type="button"
+                                    onclick="deleteStageType('${id}')"
+                                    class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                                삭제
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="flex gap-3">
+                        <button type="button"
+                                onclick="switchView('stageTypeManagement')"
+                                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                            취소
+                        </button>
+                        <button type="submit"
+                                class="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                            ${isEdit ? '수정' : '등록'}
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    `;
+};
+
+// 별칭 추가
+views.stageTypeEdit = (id) => views.stageTypeCreate(id);

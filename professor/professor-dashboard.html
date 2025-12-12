@@ -212,6 +212,10 @@
                     </button>
                     <!-- 2depth 메뉴 -->
                     <div id="thesis-review-submenu" class="pl-6 mt-1 space-y-1 submenu-container">
+                        <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4 sidebar-text">심사 일정 관리</span>
+                        </a>
                         <a href="#" onclick="showScreen('evaluation-criteria'); return false;" data-screen="evaluation-criteria"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
                             <span class="ml-4 sidebar-text">심사 기준 등록</span>
@@ -575,7 +579,16 @@
                     </div>
                 </div>
             </section>
-            
+
+            <!-- ===================================
+                 심사 일정 관리 화면 (교수용 - 읽기 전용)
+                 =================================== -->
+            <section id="exam-schedule-screen" class="content-screen">
+                <div id="exam-schedule-content">
+                    <!-- exam-schedule-professor-readonly.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+
             <!-- ===================================
                  학술지 대체심사 화면 (ID 54-56)
                  =================================== -->
@@ -680,6 +693,18 @@
     <!-- 공지사항/안내문 데이터 및 렌더링 함수 (관리자 화면과 동일) -->
     <script src="../admin/assets/js/mockData.js"></script>
     <script src="../admin/admin_views.js"></script>
+
+    <!-- 심사 일정 관리 (교수용 - 읽기 전용) -->
+    <script>
+        console.log('🔍 스크립트 로드 테스트 시작');
+        console.log('mockCommitteeAssignments 존재 여부:', typeof mockCommitteeAssignments !== 'undefined');
+    </script>
+    <script src="../admin/assets/js/exam-schedule-data.js"></script>
+    <script>console.log('📋 exam-schedule-data.js 로드 후');</script>
+    <script src="../admin/assets/js/schedule-utils.js"></script>
+    <script>console.log('🛠️ schedule-utils.js 로드 후');</script>
+    <script src="assets/js/exam-schedule-professor-readonly.js"></script>
+    <script>console.log('👨‍🏫 exam-schedule-professor-readonly.js 로드 후');</script>
 
 
 <!-- injected: i18n minimal handler -->

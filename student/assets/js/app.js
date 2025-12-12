@@ -35,6 +35,7 @@ function showScreen(screenName) {
         'meeting': '미팅관리',
         'feedback': '온라인 피드백',
         'review': '심사 신청',
+        'exam-schedule': '심사 일정',
         'title-change': '논문제목 변경',
         'board': '자료실',
         'journal-submission': '학술지 대체 심사 신청'
@@ -53,6 +54,7 @@ function showScreen(screenName) {
         'meeting': renderMeeting,
         'feedback': renderFeedback,
         'review': renderReview,
+        'exam-schedule': renderExamSchedule,
         'title-change': renderTitleChange,
         'board': () => initBoard('student'),
         'journal-submission': initJournalSubmission,

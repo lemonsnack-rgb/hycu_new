@@ -54,6 +54,16 @@ function showScreen(screenId) {
             if (typeof initAdvisorAssignment === 'function') {
                 initAdvisorAssignment();
             }
+        } else if (screenId === 'exam-schedule') {
+            // 심사 일정 관리 초기화 (읽기 전용)
+            console.log('📋 exam-schedule 화면 전환 시도');
+            console.log('renderExamScheduleScreen 타입:', typeof renderExamScheduleScreen);
+            if (typeof renderExamScheduleScreen === 'function') {
+                console.log('✅ renderExamScheduleScreen 함수 호출');
+                renderExamScheduleScreen();
+            } else {
+                console.error('❌ renderExamScheduleScreen 함수를 찾을 수 없습니다');
+            }
         } else if (screenId === 'ethics' || screenId === 'schedule' || screenId === 'process') {
             // 안내문 화면 렌더링 (공통 함수 사용)
             renderGuideScreen(screenId);
