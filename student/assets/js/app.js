@@ -36,9 +36,9 @@ function showScreen(screenName) {
         'feedback': '논문 지도 현황',
         'review': '학위 논문 제출',
         'exam-schedule': '심사 일정 관리',
-        'title-change': '논문제목 변경',
+        'title-change': '최종 논문 제목 수정',
         'board': '자료실',
-        'journal-submission': '학술지 대체 심사 신청'
+        'journal-submission': '학술지 논문 제출'
     };
 
     const titleElement = document.getElementById('page-title');
