@@ -36,15 +36,24 @@ function renderExamScheduleScreen() {
 
                 <!-- 검색 메뉴 -->
                 <div class="p-6 border-b bg-gray-50">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                        <!-- 학년도/학기 -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+                        <!-- 학년도 -->
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학년도/학기</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학년도</label>
+                            <select id="exam-filter-year" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
+                                <option value="">전체</option>
+                                <option value="2025" selected>2025</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        </div>
+
+                        <!-- 학기 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">학기</label>
                             <select id="exam-filter-semester" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
                                 <option value="">전체</option>
-                                <option value="2025-1" selected>2025학년도 1학기</option>
-                                <option value="2025-2">2025학년도 2학기</option>
-                                <option value="2024-2">2024학년도 2학기</option>
+                                <option value="1" selected>1학기</option>
+                                <option value="2">2학기</option>
                             </select>
                         </div>
 

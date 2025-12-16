@@ -34,13 +34,21 @@ function showGuidancePairsList() {
                 </div>
 
                 <!-- 필터 -->
-                <div class="grid grid-cols-4 gap-4 mb-4">
+                <div class="grid grid-cols-5 gap-4 mb-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">학년도</label>
+                        <select id="yearFilter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option value="">전체</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">학기</label>
                         <select id="semesterFilter" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                             <option value="">전체</option>
-                            <option value="2024-2학기">2024-2학기</option>
-                            <option value="2024-1학기">2024-1학기</option>
+                            <option value="1" selected>1학기</option>
+                            <option value="2">2학기</option>
                         </select>
                     </div>
                     <div>
@@ -159,6 +167,28 @@ function showGuidancePairDetail(pairId) {
         <!-- 헤더 -->
         <div class="flex items-center mb-8">
             <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">학기별 논문 지도 현황</h2>
+        </div>
+
+        <!-- 학기 선택 카드 -->
+        <div class="bg-blue-50 rounded-lg p-6 mb-6">
+            <div class="flex items-center gap-4 mb-4">
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">학년도</label>
+                    <select id="admin-select-year" onchange="changeAdminSemesterView()"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                        <option value="2025" selected>2025학년도</option>
+                        <option value="2024">2024학년도</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">학기</label>
+                    <select id="admin-select-semester" onchange="changeAdminSemesterView()"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                        <option value="1" selected>1학기</option>
+                        <option value="2">2학기</option>
+                    </select>
+                </div>
+            </div>
         </div>
 
         <!-- 학생 정보 카드 -->
@@ -722,6 +752,25 @@ function sendNotificationToSelectedPairs() {
     }
 }
 
+// 학기 변경 함수
+function changeAdminSemesterView() {
+    const year = document.getElementById('admin-select-year')?.value;
+    const semester = document.getElementById('admin-select-semester')?.value;
+
+    if (!year || !semester) return;
+
+    console.log(`학기 변경: ${year}학년도 ${semester}학기`);
+
+    // 선택된 학기에 따라 데이터 다시 로드
+    // 실제 구현 시에는 서버에서 해당 학기 데이터를 가져와서 화면을 갱신해야 함
+    showAlert(`${year}학년도 ${semester}학기 데이터를 조회합니다.`);
+
+    // 현재는 상세 화면을 다시 렌더링
+    if (currentPairId) {
+        showGuidancePairDetail(currentPairId);
+    }
+}
+
 // 전역으로 export
 window.initWeeklyGuidance = initWeeklyGuidance;
 window.showGuidancePairsList = showGuidancePairsList;
@@ -735,3 +784,4 @@ window.filterGuidancePairs = filterGuidancePairs;
 window.resetGuidancePairsFilter = resetGuidancePairsFilter;
 window.toggleSelectAllPairs = toggleSelectAllPairs;
 window.sendNotificationToSelectedPairs = sendNotificationToSelectedPairs;
+window.changeAdminSemesterView = changeAdminSemesterView;

@@ -25,6 +25,28 @@ function renderGuidanceDetail() {
             <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문 지도 현황</h2>
         </div>
 
+        <!-- 학기 선택 카드 -->
+        <div class="bg-blue-50 rounded-lg p-6 mb-6">
+            <div class="flex items-center gap-4">
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">학년도</label>
+                    <select id="student-select-year" onchange="changeStudentSemesterView()"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                        <option value="2025" selected>2025학년도</option>
+                        <option value="2024">2024학년도</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">학기</label>
+                    <select id="student-select-semester" onchange="changeStudentSemesterView()"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                        <option value="1" selected>1학기</option>
+                        <option value="2">2학기</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
         <!-- 주차별 지도 내역 -->
         <div>
             <div class="flex justify-between items-center mb-4">
@@ -426,6 +448,23 @@ function deletePlan(planId) {
     }
 }
 
+// 학기 변경 함수
+function changeStudentSemesterView() {
+    const year = document.getElementById('student-select-year')?.value;
+    const semester = document.getElementById('student-select-semester')?.value;
+
+    if (!year || !semester) return;
+
+    console.log(`학기 변경: ${year}학년도 ${semester}학기`);
+
+    // 선택된 학기에 따라 데이터 다시 로드
+    // 실제 구현 시에는 서버에서 해당 학기 데이터를 가져와서 화면을 갱신해야 함
+    showToast(`${year}학년도 ${semester}학기 데이터를 조회합니다.`, 'info');
+
+    // 현재는 화면을 다시 렌더링
+    renderGuidanceDetail();
+}
+
 // 전역으로 export
 window.initGuidance = initGuidance;
 window.renderGuidanceDetail = renderGuidanceDetail;
@@ -434,3 +473,4 @@ window.openEditPlanModal = openEditPlanModal;
 window.savePlan = savePlan;
 window.updatePlan = updatePlan;
 window.deletePlan = deletePlan;
+window.changeStudentSemesterView = changeStudentSemesterView;

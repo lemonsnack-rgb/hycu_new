@@ -4173,18 +4173,27 @@ const views = {
                     <div class="p-6 border-b bg-gray-50">
                         <div class="search-container">
                             <div class="search-grid">
-                                <!-- 1. 학년도/학기 -->
+                                <!-- 1. 학년도 -->
                                 <div class="search-field">
-                                    <label class="search-label">학년도/학기</label>
-                                    <select id="filter-semester" class="search-input" onchange="filterExamSchedule()">
+                                    <label class="search-label">학년도</label>
+                                    <select id="filter-year" class="search-input" onchange="filterExamSchedule()">
                                         <option value="">전체</option>
-                                        <option value="2025-1" selected>2025학년도 1학기</option>
-                                        <option value="2025-2">2025학년도 2학기</option>
-                                        <option value="2024-2">2024학년도 2학기</option>
+                                        <option value="2025" selected>2025</option>
+                                        <option value="2024">2024</option>
                                     </select>
                                 </div>
 
-                                <!-- 2. 학과 -->
+                                <!-- 2. 학기 -->
+                                <div class="search-field">
+                                    <label class="search-label">학기</label>
+                                    <select id="filter-semester" class="search-input" onchange="filterExamSchedule()">
+                                        <option value="">전체</option>
+                                        <option value="1" selected>1학기</option>
+                                        <option value="2">2학기</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. 학과 -->
                                 <div class="search-field">
                                     <label class="search-label">학과</label>
                                     <select id="filter-department" class="search-input" onchange="filterExamSchedule()">

@@ -24,7 +24,8 @@
       "Bash(del nul)",
       "Bash(node:*)",
       "Bash(rm -f admin/admin-committee-assignment.html.bak nul)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(done)"
     ],
     "deny": [],
     "ask": []
