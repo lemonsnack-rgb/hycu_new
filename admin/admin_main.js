@@ -31,6 +31,7 @@ function switchView(viewName, param = null) {
         scheduleManagement: '논문지도 일정 관리',
         scheduleCreate: param ? '일정 수정' : '일정 등록',
         requirementManagement: '논문 제출 요건 관리',
+        titleChangeRequests: '최종 논문 제목 등록',
         stageManagement: '학생별 지도 단계 관리',
         typeManagement: '지도 단계 등록',
         stageTypeManagement: '지도 단계 유형 관리',
