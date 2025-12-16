@@ -166,7 +166,7 @@ function showGuidancePairDetail(pairId) {
 
         <!-- 헤더 -->
         <div class="flex items-center mb-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">학기별 논문 지도 현황</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문지도 현황</h2>
         </div>
 
         <!-- 학기 선택 카드 -->
