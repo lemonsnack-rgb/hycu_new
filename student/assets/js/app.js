@@ -30,12 +30,12 @@ function showScreen(screenName) {
     // 페이지 타이틀 업데이트
     const titles = {
         'dashboard': '대시보드',
-        'advisor-assignment': '지도교수 배정 조회',
+        'advisor-assignment': '지도교수 배정',
         'guidance': '주차별 논문지도 현황',
-        'meeting': '미팅관리',
-        'feedback': '온라인 피드백',
-        'review': '심사 신청',
-        'exam-schedule': '심사 일정',
+        'meeting': '실시간 지도 예약',
+        'feedback': '논문 지도 현황',
+        'review': '학위 논문 제출',
+        'exam-schedule': '심사 일정 관리',
         'title-change': '논문제목 변경',
         'board': '자료실',
         'journal-submission': '학술지 대체 심사 신청'
