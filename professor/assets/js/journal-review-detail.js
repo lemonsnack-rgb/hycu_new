@@ -142,7 +142,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                                     <p style="font-size: 0.875rem; color: #4b5563;">${getItemDescription(item.name)}</p>
                                 </div>
                                 <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${item.maxScore}</span>
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${item.maxScore}</span>
                                     <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
@@ -207,7 +207,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                         임시 저장
                     </button>
                     <button onclick="submitJournalEvaluation(${journalId})"
-                            class="flex-1 bg-[#009DE8] hover:bg-[#0087c9] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                            class="flex-1 bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                         평가 제출
                     </button>
                 </div>
@@ -296,7 +296,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                     </div>
 
                     <button onclick="submitJournalChairDecision(${journalId})"
-                            class="w-full bg-[#009DE8] hover:bg-[#0087c9] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
+                            class="w-full bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-3 rounded-lg font-semibold transition-colors">
                         최종 결정 제출
                     </button>
                 </div>

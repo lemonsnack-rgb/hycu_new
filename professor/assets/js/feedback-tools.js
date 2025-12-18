@@ -1016,7 +1016,7 @@ function renderCommentCard(comment, pageNum) {
                         </div>
                         <div class="flex gap-2 mt-2">
                             <button onclick="saveMainCommentEdit('${comment.id}')" 
-                                    class="text-xs bg-[#009DE8] text-white px-3 py-1.5 rounded-md hover:bg-[#0087c9] flex items-center gap-1">
+                                    class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
                                 <i class="fas fa-save"></i>
                                 <span>저장</span>
                             </button>
@@ -1054,7 +1054,7 @@ function renderCommentCard(comment, pageNum) {
                             <div class="flex gap-2 flex-wrap mt-2">
                                 <!-- 등록 버튼만 표시 (완료는 모달 헤더로 이동) -->
                                 <button onclick="addMainComment('${comment.id}')" 
-                                        class="text-xs bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#0087c9] flex items-center gap-1 font-semibold">
+                                        class="text-xs bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-1 font-semibold">
                                     <i class="fas fa-check"></i>
                                     <span>등록</span>
                                 </button>
@@ -1087,7 +1087,7 @@ function renderCommentCard(comment, pageNum) {
                                   placeholder="댓글을 입력하세요..."></textarea>
                         <div class="flex gap-2 flex-wrap">
                             <button onclick="addCommentReply('${comment.id}')" 
-                                    class="text-xs bg-[#009DE8] text-white px-3 py-1.5 rounded-md hover:bg-[#0087c9] flex items-center gap-1">
+                                    class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
                                 <i class="fas fa-paper-plane"></i>
                                 <span>댓글 등록</span>
                             </button>
@@ -1155,7 +1155,7 @@ function renderCommentBubble(comment, parentCommentId) {
                           rows="2">${comment.text}</textarea>
                 <div class="flex gap-2 mt-2">
                     <button onclick="saveReplyEdit('${parentCommentId}', '${comment.id}')" 
-                            class="text-xs bg-[#009DE8] text-white px-3 py-1 rounded-md hover:bg-[#0087c9] flex items-center gap-1">
+                            class="text-xs bg-[#6A0028] text-white px-3 py-1 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
                         <i class="fas fa-save"></i>
                         <span>저장</span>
                     </button>
@@ -1516,7 +1516,7 @@ function renderGeneralFeedback(feedbackData) {
                               class="w-full p-2 border rounded-md text-xs resize-none" 
                               rows="3">${myFeedback.text}</textarea>
                     <button onclick="updateGeneralFeedback()" 
-                            class="text-xs bg-[#009DE8] text-white px-3 py-1 rounded-md hover:bg-[#0087c9] mt-2 flex items-center gap-1">
+                            class="text-xs bg-[#6A0028] text-white px-3 py-1 rounded-md hover:bg-[#8A0034] mt-2 flex items-center gap-1">
                         <i class="fas fa-save"></i>
                         <span>수정</span>
                     </button>
@@ -1711,7 +1711,7 @@ function editQuickMark(id) {
                       class="w-full p-2 border rounded-md text-xs" placeholder="내용">${mark.content}</textarea>
             <div class="flex gap-2">
                 <button onclick="saveEditQuickMark('${id}')" 
-                        class="text-xs bg-[#009DE8] text-white px-3 py-1 rounded-md hover:bg-[#0087c9]">
+                        class="text-xs bg-[#6A0028] text-white px-3 py-1 rounded-md hover:bg-[#8A0034]">
                     저장
                 </button>
                 <button onclick="renderQuickMarkList()" 

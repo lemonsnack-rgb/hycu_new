@@ -176,7 +176,7 @@ function renderSemesterPlanEditorScreen(student, existingPlan) {
                     취소
                 </button>
                 <button type="button" onclick="saveSemesterPlan()"
-                        class="px-6 py-2 bg-[#009DE8] text-white rounded-md hover:bg-[#0087c9] font-semibold">
+                        class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold">
                     ${isEditMode ? '수정 완료' : '등록'}
                 </button>
             </div>
@@ -396,7 +396,7 @@ function viewSemesterPlanDetail(year, semester) {
                     </p>
                 </div>
                 <button onclick="openSemesterPlanEditor()"
-                        class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
+                        class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034]">
                     계획 수정
                 </button>
             </div>

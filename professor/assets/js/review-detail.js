@@ -41,7 +41,7 @@ function renderReviewDetail(assignmentId, viewType) {
                 html += `<div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
                     <p class="text-yellow-800 font-semibold">⚠️ 위원장 승인 전에 먼저 위원 역할로 평가를 완료해주세요.</p>
                     <button onclick="openReviewDetail('${assignmentId}', 'member')"
-                            class="mt-3 bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
+                            class="mt-3 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034]">
                         위원 평가 화면으로 이동
                     </button>
                 </div>`;
@@ -140,7 +140,7 @@ function renderThesisInfo(assignment) {
                 <div class="flex items-center space-x-3 bg-white rounded-lg p-3 border border-gray-300">
                     <a href="${assignment.thesisFile}" class="text-blue-600 hover:underline flex-1">${assignment.thesisFile}</a>
                     <button onclick="downloadThesis('${assignment.thesisFile}')"
-                            class="bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">
+                            class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034]">
                         다운로드
                     </button>
                 </div>
@@ -202,11 +202,11 @@ function renderEvaluationForm(template, existingEvaluation) {
                 </h4>
                 <div class="space-y-2 text-sm text-blue-900">
                     <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
+                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
                         <span>${passCriteria.description || '평가 기준이 설정되지 않았습니다.'}</span>
                     </p>
                     <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#009DE8] rounded-full mr-2"></span>
+                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
                         <span>총점 ${totalScore}점 만점</span>
                     </p>
                 </div>
@@ -231,7 +231,7 @@ function renderEvaluationForm(template, existingEvaluation) {
                                     ${item.description ? `<p style="font-size: 0.875rem; color: #4b5563;">${item.description}</p>` : ''}
                                 </div>
                                 <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${maxScore}</span>
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${maxScore}</span>
                                     <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
@@ -280,7 +280,7 @@ function renderEvaluationForm(template, existingEvaluation) {
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-lg hover:bg-[#0087c9] font-medium">
+                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#8A0034] font-medium">
                     최종 제출
                 </button>
             </div>
@@ -392,7 +392,7 @@ function renderPassFailForm(template, savedData) {
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-lg hover:bg-[#0087c9] font-medium">
+                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#8A0034] font-medium">
                     최종 제출
                 </button>
             </div>
@@ -501,7 +501,7 @@ function renderGradeForm(template, savedData) {
                 <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#009DE8] text-white px-6 py-3 rounded-lg hover:bg-[#0087c9] font-medium">
+                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#8A0034] font-medium">
                     최종 제출
                 </button>
             </div>
@@ -648,7 +648,7 @@ function renderSubmittedEvaluation(template, evaluation) {
                                     <p style="font-size: 0.875rem; color: #4b5563;">${category.description}</p>
                                 </div>
                                 <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${category.maxScore}</span>
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${category.maxScore}</span>
                                     <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
@@ -817,7 +817,7 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                                     <p style="font-size: 0.875rem; color: #4b5563;">${category.description}</p>
                                 </div>
                                 <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #009DE8;">${category.maxScore}</span>
+                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${category.maxScore}</span>
                                     <span style="font-size: 0.875rem; color: #4b5563;">점</span>
                                 </div>
                             </div>
@@ -1011,7 +1011,7 @@ function calculateTotalScore() {
 
         // 색상 업데이트
         if (total > 0) {
-            totalEl.className = 'text-3xl font-bold text-[#009DE8]';
+            totalEl.className = 'text-3xl font-bold text-[#6A0028]';
         } else {
             totalEl.className = 'text-3xl font-bold text-gray-400';
         }
@@ -1381,7 +1381,7 @@ function renderChairApprovalScreen(detail, allSubmitted) {
                     </div>
 
                     <button onclick="submitChairDecision()"
-                            class="w-full bg-[#009DE8] hover:bg-[#0087c9] text-white px-6 py-3 rounded-lg font-semibold">
+                            class="w-full bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-3 rounded-lg font-semibold">
                         최종 결정 제출
                     </button>
                 </div>

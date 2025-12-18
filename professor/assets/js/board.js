@@ -63,7 +63,7 @@ function renderBoardList() {
     const html = `
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b flex justify-end">
-                <button onclick="openBoardWriteModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#0087c9] text-sm font-semibold">
+                <button onclick="openBoardWriteModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm font-semibold">
                     + 글쓰기
                 </button>
             </div>

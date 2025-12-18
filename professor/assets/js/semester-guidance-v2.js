@@ -316,7 +316,7 @@ function renderExecutionInputForm(weekNumber, currentProf) {
                     </div>
                     <div class="flex justify-end">
                         <button onclick="addExecutionV2(${weekNumber})"
-                                class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] font-semibold flex items-center gap-1">
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
                             <i class="fas fa-plus-circle"></i>
                             실적 추가
                         </button>
@@ -357,7 +357,7 @@ function renderWeekPlanInputForm(weekNumber) {
                 </div>
                 <div class="flex justify-end gap-2">
                     <button onclick="saveWeekPlan(${weekNumber})"
-                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] font-semibold flex items-center gap-1">
+                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
                         <i class="fas fa-save"></i>
                         계획 저장
                     </button>

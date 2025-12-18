@@ -95,7 +95,7 @@ function showStudentList() {
             <!-- 알림 발송 버튼 -->
             <div class="p-6 border-b flex justify-end">
                 <button onclick="sendNotificationToSelected()"
-                        class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-[#0087c9] text-sm font-semibold flex items-center gap-2">
+                        class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm font-semibold flex items-center gap-2">
                     <i class="fas fa-bell"></i>
                     선택 학생에게 알림 발송
                 </button>
@@ -237,7 +237,7 @@ function renderStudentDetail() {
                         학기별 계획 관리
                     </button>
                     <button onclick="openSemesterPlanEditor()"
-                            class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] flex items-center gap-2">
+                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] flex items-center gap-2">
                         <i class="fas fa-calendar-alt"></i>
                         ${renderSemesterPlanButtonText()}
                     </button>
@@ -341,7 +341,7 @@ function renderStudentDetail() {
                     </svg>
                     <p class="mt-4 text-sm text-gray-600">등록된 지도 계획이 없습니다</p>
                     <button onclick="openAddPlanModal()" 
-                            class="mt-4 bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9]">
+                            class="mt-4 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034]">
                         첫 지도 계획 추가하기
                     </button>
                 </div>
