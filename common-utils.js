@@ -479,12 +479,6 @@ function renderNoticeList(userRole) {
 
     return `
         <div class="bg-white rounded-lg shadow-md">
-            <!-- 헤더 -->
-            <div class="p-6 border-b">
-                <h2 class="text-xl font-semibold text-gray-800">공지사항</h2>
-                <p class="text-sm text-gray-600 mt-1">${userRole === 'admin' ? '공지사항을 등록하고 관리합니다.' : '관리자가 등록한 공지사항을 조회합니다.'}</p>
-            </div>
-
             <!-- 검색 영역 -->
             <div class="p-6 border-b">
                 <div class="flex gap-3">
