@@ -1,0 +1,2262 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컴포넌트 가이드 - Crimson Theme (한양사이버대학교 대학원)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 40px 60px;
+        }
+
+        /* =============================================
+           Color Palette
+           ============================================= */
+        :root {
+            /* Primary - Crimson */
+            --primary: #6A0028;
+            --primary-dark: #4A001C;
+            --primary-light: #8A0034;
+            --primary-tint: #FCE4EC;
+            
+            /* Accent */
+            --accent-warm: #FAF6F1;
+            --accent-gold: #C5A065;
+            
+            /* Status Colors */
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --info: #0288D1;
+            --info-bg: #E3F2FD;
+            
+            /* Neutrals */
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --bg-light: #f8fafc;
+        }
+
+        .guide-header {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .guide-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .guide-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        /* Color Palette Display */
+        .color-palette {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .color-item {
+            text-align: center;
+        }
+
+        .color-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .color-code {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+
+        .section {
+            background: white;
+            padding: 32px;
+            border-radius: 4px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 5px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .component-group {
+            margin-bottom: 32px;
+        }
+
+        .component-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .component-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .component-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .component-note {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        /* =============================================
+           Flat Design Icons
+           ============================================= */
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 20px;
+            height: 20px;
+            color: currentColor;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        .icon-sm { width: 16px; height: 16px; }
+        .icon-md { width: 20px; height: 20px; }
+        .icon-lg { width: 24px; height: 24px; }
+
+        .icon-primary { color: var(--primary); }
+        .icon-success { color: var(--success); }
+        .icon-info { color: var(--info); }
+        .icon-muted { color: var(--text-muted); }
+        .icon-white { color: white; }
+
+        /* 배경 있는 아이콘 */
+        .icon-box {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 4px;
+            background: var(--primary-tint);
+        }
+
+        .icon-box.primary { background: var(--primary-tint); }
+        .icon-box.success { background: var(--success-bg); }
+        .icon-box.info { background: var(--info-bg); }
+        .icon-box.neutral { background: var(--bg-light); }
+
+        .icon-box-sm { width: 32px; height: 32px; }
+        .icon-box-lg { width: 48px; height: 48px; }
+
+        /* =============================================
+           Avatar
+           ============================================= */
+        .avatar {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .avatar-sm { width: 32px; height: 32px; font-size: 14px; }
+        .avatar-lg { width: 48px; height: 48px; font-size: 18px; }
+        .avatar-xl { width: 64px; height: 64px; font-size: 24px; }
+
+        .avatar-outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .avatar-group {
+            display: flex;
+        }
+
+        .avatar-group .avatar {
+            margin-left: -8px;
+            border: 2px solid white;
+        }
+
+        .avatar-group .avatar:first-child {
+            margin-left: 0;
+        }
+
+        /* =============================================
+           Buttons (border-radius 유지)
+           ============================================= */
+        .btn {
+            padding: 11px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Pretendard', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 0, 40, 0.3);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-text {
+            background: transparent;
+            color: var(--primary);
+            padding: 8px 16px;
+        }
+
+        .btn-text:hover {
+            background: var(--primary-tint);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* 아이콘 전용 버튼 (상하좌우 동일 패딩) */
+        .btn-icon-only {
+            padding: 11px;
+            min-width: 44px;
+            height: 44px;
+            justify-content: center;
+        }
+
+        .btn-icon-only.btn-sm {
+            padding: 7px;
+            min-width: 32px;
+            height: 32px;
+        }
+
+        .btn-icon-only.btn-lg {
+            padding: 14px;
+            min-width: 52px;
+            height: 52px;
+        }
+
+        .btn-sm {
+            padding: 7px 16px;
+            font-size: 13px;
+        }
+
+        .btn-lg {
+            padding: 14px 36px;
+            font-size: 17px;
+        }
+
+        /* 아이콘 전용 버튼 (상하좌우 동일 패딩) */
+        .btn-icon-only {
+            padding: 11px;
+            min-width: 44px;
+            justify-content: center;
+        }
+
+        .btn-icon-only.btn-sm {
+            padding: 7px;
+            min-width: 32px;
+        }
+
+        .btn-icon-only.btn-lg {
+            padding: 14px;
+            min-width: 52px;
+        }
+
+        /* =============================================
+           Collapse/Expand Button (시안4 스타일)
+           ============================================= */
+        .collapse-btn {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(106, 0, 40, 0.4);
+            transition: all 0.2s;
+        }
+
+        .collapse-btn:hover {
+            background: var(--primary-light);
+            transform: scale(1.1);
+        }
+
+        .collapse-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: white;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* =============================================
+           Form Controls
+           ============================================= */
+        .form-control {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: 'Pretendard', sans-serif;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(106, 0, 40, 0.1);
+        }
+
+        .form-control:disabled {
+            background: #f3f4f6;
+            color: var(--text-muted);
+            cursor: not-allowed;
+        }
+
+        select.form-control {
+            cursor: pointer;
+            background-color: white;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        /* =============================================
+           Search Box
+           ============================================= */
+        .search-box {
+            position: relative;
+            max-width: 300px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            transition: all 0.2s;
+            font-family: 'Pretendard', sans-serif;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(106, 0, 40, 0.1);
+        }
+
+        .search-box .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+        }
+
+        /* =============================================
+           Checkbox
+           ============================================= */
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .checkbox.checked {
+            background: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .checkbox.checked svg {
+            stroke: white;
+        }
+
+        .checkbox svg {
+            width: 12px;
+            height: 12px;
+            stroke: transparent;
+            stroke-width: 3;
+            fill: none;
+        }
+
+        .checkbox-label {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        /* =============================================
+           Radio
+           ============================================= */
+        .radio-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            background: white;
+        }
+
+        .radio.checked {
+            border-color: var(--primary);
+        }
+
+        .radio.checked::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            background: var(--primary);
+            border-radius: 50%;
+        }
+
+        .radio-label {
+            font-size: 14px;
+            color: var(--text-primary);
+        }
+
+        /* =============================================
+           Switch
+           ============================================= */
+        .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .switch.active {
+            background: var(--primary);
+        }
+
+        .switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+
+        .switch.active::after {
+            left: 22px;
+        }
+
+        /* =============================================
+           Filter Chips
+           ============================================= */
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid var(--border-color);
+            background: white;
+            color: var(--text-secondary);
+        }
+
+        .filter-chip:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .filter-chip.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* =============================================
+           Status Badges (동일 너비, Square)
+           ============================================= */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            min-width: 64px;
+            text-align: center;
+        }
+
+        .status-primary {
+            background: var(--primary-tint);
+            color: var(--primary);
+        }
+
+        .status-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .status-info {
+            background: var(--info-bg);
+            color: var(--info);
+        }
+
+        .status-urgent {
+            background: var(--primary-tint);
+            color: var(--primary);
+            border: 1px solid #F8BBD9;
+        }
+
+        .status-pending {
+            background: #F5F5F5;
+            color: #616161;
+        }
+
+        /* =============================================
+           Count Badge
+           ============================================= */
+        .count-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 24px;
+            height: 24px;
+            padding: 0 8px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+        }
+
+        .count-badge.outline {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        /* =============================================
+           D-Day Badge
+           ============================================= */
+        .dday-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 52px;
+            height: 28px;
+            padding: 0 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 700;
+            background: var(--primary);
+            color: white;
+        }
+
+        /* =============================================
+           Tag Badge
+           ============================================= */
+        .tag-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            background: var(--primary);
+            color: white;
+            min-width: 64px;
+            text-align: center;
+        }
+
+        /* =============================================
+           Stat Card
+           ============================================= */
+        .stat-card {
+            background: white;
+            border-radius: 4px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary-tint);
+        }
+
+        .stat-card-content {
+            flex: 1;
+        }
+
+        .stat-card-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .stat-card-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-card-value span {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+
+        .stat-card-sub {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        /* =============================================
+           Cards (Square 형태)
+           ============================================= */
+        .card {
+            background: white;
+            border-radius: 4px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+        }
+
+        .card-header {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid var(--primary);
+        }
+
+        .card-body {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        /* 일정 카드 */
+        .schedule-card {
+            background: var(--accent-warm);
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid #E8E0D8;
+        }
+
+        .schedule-card-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .schedule-card-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .schedule-card-detail {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* =============================================
+           Process Flow (시안1 스타일)
+           ============================================= */
+        .process-container {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .process-step {
+            flex: 1;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 16px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: 100px;
+        }
+
+        .process-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            right: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--border-color);
+            border-radius: 50%;
+        }
+
+        .process-step:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+            border-color: var(--primary);
+        }
+
+        .process-step.active {
+            border-color: var(--primary);
+            background: var(--primary-tint);
+        }
+
+        .process-step.urgent {
+            border-color: var(--primary);
+            background: var(--primary-tint);
+        }
+
+        .step-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .step-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .process-step.urgent .step-value {
+            color: var(--primary);
+        }
+
+        /* =============================================
+           Tables (Square 형태)
+           ============================================= */
+        .table-container {
+            background: white;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background: var(--bg-light);
+            border-bottom: 2px solid var(--primary);
+        }
+
+        th {
+            padding: 16px 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        td {
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        tbody tr {
+            transition: all 0.2s;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-light);
+        }
+
+        /* =============================================
+           Dropdown
+           ============================================= */
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .dropdown-toggle {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: white;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+            justify-content: space-between;
+        }
+
+        .dropdown-toggle:hover {
+            border-color: var(--primary);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-top: 4px;
+            z-index: 100;
+            display: none;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 14px;
+            font-size: 14px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .dropdown-item:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .dropdown-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 4px 0;
+        }
+
+        /* =============================================
+           Section Header with Link
+           ============================================= */
+        .section-header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .section-header-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-header-link {
+            font-size: 13px;
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .section-header-link:hover {
+            text-decoration: underline;
+        }
+
+        /* =============================================
+           Alerts (Square 형태)
+           ============================================= */
+        .alert {
+            padding: 16px 20px;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .alert-success {
+            background: var(--success-bg);
+            color: var(--success);
+            border: 1px solid #A5D6A7;
+        }
+
+        .alert-info {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid #90CAF9;
+        }
+
+        .alert-warning {
+            background: var(--primary-tint);
+            color: var(--primary);
+            border: 1px solid #F8BBD9;
+        }
+
+        /* =============================================
+           Tabs
+           ============================================= */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--border-color);
+            margin-bottom: 24px;
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab:hover {
+            color: var(--primary);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        /* =============================================
+           Pagination
+           ============================================= */
+        .pagination {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn {
+            min-width: 36px;
+            height: 36px;
+            padding: 0 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .page-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* =============================================
+           Progress Bar
+           ============================================= */
+        .progress {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: var(--primary);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        /* =============================================
+           Tooltip
+           ============================================= */
+        .tooltip-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 8px 12px;
+            background: var(--text-primary);
+            color: white;
+            font-size: 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+            margin-bottom: 8px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+
+        .tooltip::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-top-color: var(--text-primary);
+        }
+
+        .tooltip-wrapper:hover .tooltip {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* =============================================
+           Empty State
+           ============================================= */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            color: var(--border-color);
+        }
+
+        .empty-state-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state-desc {
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        /* =============================================
+           Divider
+           ============================================= */
+        .divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 24px 0;
+        }
+
+        .divider-text {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .divider-text::before,
+        .divider-text::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        /* =============================================
+           Header (미리보기용)
+           ============================================= */
+        .header-preview {
+            background: white;
+            border-radius: 4px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid var(--border-color);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            background: transparent;
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .header-icon-btn:hover {
+            background: var(--bg-light);
+            color: var(--primary);
+        }
+
+        .header-icon-btn .badge-dot {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            width: 8px;
+            height: 8px;
+            background: var(--primary);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        /* =============================================
+           Modal (Square 형태)
+           ============================================= */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 4px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h3 {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--text-muted);
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            color: var(--primary);
+        }
+
+        .modal-body {
+            padding: 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            padding: 16px 24px;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="guide-header">
+        <h1>컴포넌트 가이드</h1>
+        <p>한양사이버대학교 대학원 논문지도시스템 - Crimson Theme</p>
+
+        <div class="color-palette">
+            <div class="color-item">
+                <div class="color-box" style="background: #6A0028;"></div>
+                <div class="color-label">Primary</div>
+                <div class="color-code">#6A0028</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #4A001C;"></div>
+                <div class="color-label">Primary Dark</div>
+                <div class="color-code">#4A001C</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #8A0034;"></div>
+                <div class="color-label">Primary Light</div>
+                <div class="color-code">#8A0034</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #FCE4EC;"></div>
+                <div class="color-label">Primary Tint</div>
+                <div class="color-code">#FCE4EC</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #FAF6F1;"></div>
+                <div class="color-label">Accent Warm</div>
+                <div class="color-code">#FAF6F1</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #2E7D32;"></div>
+                <div class="color-label">Success</div>
+                <div class="color-code">#2E7D32</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #0288D1;"></div>
+                <div class="color-label">Info</div>
+                <div class="color-code">#0288D1</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Icons -->
+    <section class="section">
+        <h2 class="section-title">Icons (Flat Design)</h2>
+        
+        <div class="component-group">
+            <span class="component-label">아이콘 라이브러리</span>
+            <p style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">
+                <strong>Lucide Icons</strong> 사용 - <a href="https://lucide.dev/icons/" target="_blank" style="color: var(--primary);">https://lucide.dev/icons/</a>
+            </p>
+            <p class="component-note" style="margin-top: 0;">stroke-width: 2, fill: none, stroke-linecap: round 스타일 적용</p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">배경 없는 아이콘 (Stroke 기반)</span>
+            <div class="component-row">
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </span>
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                </span>
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                </span>
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                </span>
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                </span>
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                </span>
+                <span class="icon icon-success icon-lg">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span class="icon icon-primary icon-lg">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+                <span class="icon icon-muted icon-lg">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </span>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">배경 있는 아이콘 (Icon Box)</span>
+            <div class="component-row">
+                <span class="icon-box primary">
+                    <span class="icon icon-primary">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    </span>
+                </span>
+                <span class="icon-box success">
+                    <span class="icon icon-success">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                </span>
+                <span class="icon-box info">
+                    <span class="icon icon-info">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    </span>
+                </span>
+                <span class="icon-box neutral">
+                    <span class="icon icon-muted">
+                        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                    </span>
+                </span>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">아이콘 크기</span>
+            <div class="component-row">
+                <span class="icon icon-sm icon-primary">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                </span>
+                <span class="icon icon-md icon-primary">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                </span>
+                <span class="icon icon-lg icon-primary">
+                    <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+                </span>
+                <span style="margin-left: 16px; font-size: 13px; color: var(--text-muted);">16px / 20px / 24px</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Avatar -->
+    <section class="section">
+        <h2 class="section-title">Avatar</h2>
+        
+        <div class="component-group">
+            <span class="component-label">크기</span>
+            <div class="component-row">
+                <span class="avatar avatar-sm">박</span>
+                <span class="avatar">박</span>
+                <span class="avatar avatar-lg">박</span>
+                <span class="avatar avatar-xl">박</span>
+                <span style="margin-left: 16px; font-size: 13px; color: var(--text-muted);">32px / 40px / 48px / 64px</span>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">스타일</span>
+            <div class="component-row">
+                <span class="avatar">박</span>
+                <span class="avatar avatar-outline">박</span>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">그룹</span>
+            <div class="component-row">
+                <div class="avatar-group">
+                    <span class="avatar">김</span>
+                    <span class="avatar">이</span>
+                    <span class="avatar">박</span>
+                    <span class="avatar avatar-outline">+2</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Buttons -->
+    <section class="section">
+        <h2 class="section-title">Buttons</h2>
+        
+        <div class="component-group">
+            <span class="component-label">기본 버튼</span>
+            <div class="component-row">
+                <button class="btn btn-primary">Primary</button>
+                <button class="btn btn-secondary">Secondary</button>
+                <button class="btn btn-outline">Outline</button>
+                <button class="btn btn-text">Text</button>
+            </div>
+            <p class="component-note">버튼은 border-radius: 6px 유지 (Square 형태 제외). 기본 패딩: 11px 28px (좌우 > 상하)</p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">아이콘 + 텍스트 버튼</span>
+            <div class="component-row">
+                <button class="btn btn-primary">
+                    <span class="icon icon-sm icon-white">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </span>
+                    추가
+                </button>
+                <button class="btn btn-outline">
+                    <span class="icon icon-sm icon-primary">
+                        <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    </span>
+                    다운로드
+                </button>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">아이콘 전용 버튼 (상하좌우 동일 패딩)</span>
+            <div class="component-row">
+                <button class="btn btn-primary btn-icon-only btn-sm">
+                    <span class="icon icon-sm icon-white">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </span>
+                </button>
+                <button class="btn btn-primary btn-icon-only">
+                    <span class="icon icon-sm icon-white">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </span>
+                </button>
+                <button class="btn btn-primary btn-icon-only btn-lg">
+                    <span class="icon icon-white">
+                        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    </span>
+                </button>
+                <button class="btn btn-outline btn-icon-only">
+                    <span class="icon icon-sm icon-primary">
+                        <svg viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </span>
+                </button>
+                <button class="btn btn-outline btn-icon-only">
+                    <span class="icon icon-sm icon-primary">
+                        <svg viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </span>
+                </button>
+            </div>
+            <p class="component-note">아이콘 단독 사용 시 정사각형 형태 유지</p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">버튼 크기</span>
+            <div class="component-row">
+                <button class="btn btn-primary btn-sm">Small</button>
+                <button class="btn btn-primary">Medium</button>
+                <button class="btn btn-primary btn-lg">Large</button>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">비활성화</span>
+            <div class="component-row">
+                <button class="btn btn-primary" disabled>Disabled</button>
+                <button class="btn btn-outline" disabled>Disabled</button>
+            </div>
+            <p class="component-note">비활성화 상태에서는 Hover 효과 없음 (pointer-events: none)</p>
+        </div>
+    </section>
+
+    <!-- Collapse/Expand Button -->
+    <section class="section">
+        <h2 class="section-title">Collapse/Expand Button</h2>
+        
+        <div class="component-group">
+            <span class="component-label">사이드바 토글 버튼 (시안4 스타일)</span>
+            <div class="component-row">
+                <button class="collapse-btn">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <button class="collapse-btn">
+                    <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <p class="component-note">메뉴 버튼과 구분되도록 원형 디자인 적용</p>
+        </div>
+    </section>
+
+    <!-- Form Controls -->
+    <section class="section">
+        <h2 class="section-title">Form Controls</h2>
+        
+        <div class="component-group">
+            <span class="component-label">입력 필드</span>
+            <div class="component-row">
+                <input type="text" class="form-control" placeholder="입력하세요">
+                <input type="text" class="form-control" value="입력된 값" disabled>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">셀렉트 박스</span>
+            <div class="component-row">
+                <select class="form-control">
+                    <option>전체</option>
+                    <option>석사</option>
+                    <option>박사</option>
+                    <option>통합</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">텍스트 영역</span>
+            <div>
+                <textarea class="form-control" placeholder="내용을 입력하세요" style="max-width: 400px;"></textarea>
+            </div>
+        </div>
+    </section>
+
+    <!-- Search Box -->
+    <section class="section">
+        <h2 class="section-title">Search Box</h2>
+        
+        <div class="component-group">
+            <div class="search-box">
+                <span class="search-icon icon icon-sm">
+                    <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </span>
+                <input type="text" placeholder="검색어를 입력하세요">
+            </div>
+        </div>
+    </section>
+
+    <!-- Checkbox & Radio -->
+    <section class="section">
+        <h2 class="section-title">Checkbox & Radio</h2>
+        
+        <div class="component-group">
+            <span class="component-label">체크박스</span>
+            <div class="component-row">
+                <label class="checkbox-wrapper">
+                    <span class="checkbox">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    <span class="checkbox-label">선택 안됨</span>
+                </label>
+                <label class="checkbox-wrapper">
+                    <span class="checkbox checked">
+                        <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </span>
+                    <span class="checkbox-label">선택됨</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">라디오</span>
+            <div class="component-row">
+                <label class="radio-wrapper">
+                    <span class="radio"></span>
+                    <span class="radio-label">선택 안됨</span>
+                </label>
+                <label class="radio-wrapper">
+                    <span class="radio checked"></span>
+                    <span class="radio-label">선택됨</span>
+                </label>
+            </div>
+        </div>
+    </section>
+
+    <!-- Switch -->
+    <section class="section">
+        <h2 class="section-title">Switch</h2>
+        
+        <div class="component-group">
+            <div class="component-row">
+                <span class="switch"></span>
+                <span class="switch active"></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filter Chips -->
+    <section class="section">
+        <h2 class="section-title">Filter Chips</h2>
+        
+        <div class="component-group">
+            <div class="filter-chips">
+                <span class="filter-chip active">전체 15명</span>
+                <span class="filter-chip">석사 8명</span>
+                <span class="filter-chip">박사 5명</span>
+                <span class="filter-chip">통합 2명</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Dropdown -->
+    <section class="section">
+        <h2 class="section-title">Dropdown</h2>
+        
+        <div class="component-group">
+            <div class="dropdown">
+                <button class="dropdown-toggle" onclick="this.nextElementSibling.classList.toggle('show')">
+                    <span>선택하세요</span>
+                    <span class="icon icon-sm">
+                        <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+                    </span>
+                </button>
+                <div class="dropdown-menu show">
+                    <div class="dropdown-item">편집</div>
+                    <div class="dropdown-item">복사</div>
+                    <div class="dropdown-divider"></div>
+                    <div class="dropdown-item" style="color: var(--primary);">삭제</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Status Badges -->
+    <section class="section">
+        <h2 class="section-title">Status Badges</h2>
+        
+        <div class="component-group">
+            <span class="component-label">상태 뱃지 (동일 너비: min-width 64px)</span>
+            <div class="component-row">
+                <span class="status-badge status-primary">심사중</span>
+                <span class="status-badge status-primary">제출완료</span>
+                <span class="status-badge status-success">통과</span>
+                <span class="status-badge status-urgent">보완요청</span>
+                <span class="status-badge status-info">지도요청</span>
+                <span class="status-badge status-pending">대기</span>
+            </div>
+            <p class="component-note">테이블 내 시각적 정렬을 위해 동일 너비 적용</p>
+        </div>
+    </section>
+
+    <!-- Count Badges -->
+    <section class="section">
+        <h2 class="section-title">Count Badges</h2>
+        
+        <div class="component-group">
+            <span class="component-label">심사 관리 숫자 뱃지</span>
+            <div class="component-row">
+                <span class="count-badge">0</span>
+                <span class="count-badge">1</span>
+                <span class="count-badge">3</span>
+                <span class="count-badge">33</span>
+                <span class="count-badge outline">5</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- D-Day & Tag Badges -->
+    <section class="section">
+        <h2 class="section-title">D-Day & Tag Badges</h2>
+        
+        <div class="component-group">
+            <span class="component-label">일정 D-Day</span>
+            <div class="component-row">
+                <span class="dday-badge">D-3</span>
+                <span class="dday-badge">D-12</span>
+                <span class="dday-badge">D-Day</span>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">태그 (온라인/오프라인 - 색상 통일)</span>
+            <div class="component-row">
+                <span class="tag-badge">온라인</span>
+                <span class="tag-badge">오프라인</span>
+            </div>
+            <p class="component-note">색상으로 구분하지 않고 텍스트로만 구분</p>
+        </div>
+    </section>
+
+    <!-- Stat Cards -->
+    <section class="section">
+        <h2 class="section-title">Stat Cards</h2>
+        
+        <div class="component-group">
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;">
+                <div class="stat-card">
+                    <div class="stat-card-icon">
+                        <span class="icon icon-primary">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+                        </span>
+                    </div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">총 지도학생</div>
+                        <div class="stat-card-value">15<span>명</span></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon" style="background: var(--success-bg);">
+                        <span class="icon icon-success">
+                            <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        </span>
+                    </div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">심사 완료</div>
+                        <div class="stat-card-value">8<span>건</span></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon" style="background: var(--info-bg);">
+                        <span class="icon icon-info">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </span>
+                    </div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">진행중</div>
+                        <div class="stat-card-value">5<span>건</span></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-icon">
+                        <span class="icon icon-primary">
+                            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                        </span>
+                    </div>
+                    <div class="stat-card-content">
+                        <div class="stat-card-label">다음 일정</div>
+                        <div class="stat-card-value">D-3</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Process Flow -->
+    <section class="section">
+        <h2 class="section-title">Process Flow (시안1 스타일)</h2>
+        
+        <div class="component-group">
+            <span class="component-label">논문 진행 단계</span>
+            <div class="process-container">
+                <div class="process-step">
+                    <div class="step-label">논문작성계획서</div>
+                    <div class="step-value">2명 진행중</div>
+                </div>
+                <div class="process-step">
+                    <div class="step-label">예비심사</div>
+                    <div class="step-value">1명 대기중</div>
+                </div>
+                <div class="process-step urgent">
+                    <div class="step-label">본심사</div>
+                    <div class="step-value">
+                        3명 진행중
+                        <span class="icon icon-sm icon-primary">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                        </span>
+                    </div>
+                </div>
+                <div class="process-step">
+                    <div class="step-label">최종제출</div>
+                    <div class="step-value">1명 완료</div>
+                </div>
+            </div>
+            <p class="component-note">Step 인식이 용이하고 정보 확장에 유리한 구조</p>
+        </div>
+    </section>
+
+    <!-- Schedule Card -->
+    <section class="section">
+        <h2 class="section-title">Schedule Card</h2>
+        
+        <div class="component-group">
+            <span class="component-label">일정 카드 (배경색 통일)</span>
+            <div style="max-width: 400px;">
+                <div class="schedule-card" style="margin-bottom: 12px;">
+                    <div class="schedule-card-header">
+                        <span class="tag-badge">온라인</span>
+                        <span class="schedule-card-title">[박사] 이영희</span>
+                    </div>
+                    <div class="schedule-card-detail">11월 28일(목) 14:00 ~ 15:00<br>본심사 준비 상담</div>
+                </div>
+                <div class="schedule-card">
+                    <div class="schedule-card-header">
+                        <span class="tag-badge">오프라인</span>
+                        <span class="schedule-card-title">[석사] 정수아</span>
+                    </div>
+                    <div class="schedule-card-detail">11월 30일(토) 10:00 ~ 11:00<br>논문 방향성 논의</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section Header -->
+    <section class="section">
+        <h2 class="section-title">Section Header</h2>
+        
+        <div class="component-group">
+            <span class="component-label">공지사항 헤더 (링크 우측 상단)</span>
+            <div style="background: #f8fafc; padding: 16px; border-radius: 4px;">
+                <div class="section-header-row">
+                    <span class="section-header-title">
+                        <span class="icon icon-sm icon-primary">
+                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </span>
+                        공지사항
+                    </span>
+                    <a href="#" class="section-header-link">전체 공지 보기 &gt;</a>
+                </div>
+                <p style="color: var(--text-secondary); font-size: 14px;">2025-1학기 본심사 일정 안내</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Cards -->
+    <section class="section">
+        <h2 class="section-title">Cards (Square 형태)</h2>
+        
+        <div class="component-group">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px;">
+                <div class="card">
+                    <div class="card-header">카드 제목</div>
+                    <div class="card-body">
+                        Module Box는 Square 형태(border-radius: 4px)로 통일하여 
+                        불필요한 시각적 장식을 최소화합니다.
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">통계 정보</div>
+                    <div class="card-body">
+                        <div style="margin-bottom: 12px;"><strong>전체 학생:</strong> 15명</div>
+                        <div style="margin-bottom: 12px;"><strong>진행 중:</strong> 8명</div>
+                        <div><strong>완료:</strong> 5명</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tables -->
+    <section class="section">
+        <h2 class="section-title">Tables</h2>
+        
+        <div class="component-group">
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>학생명</th>
+                            <th>과정</th>
+                            <th>학기</th>
+                            <th>현재단계</th>
+                            <th>진행상태</th>
+                            <th>최근활동</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>김철수</td>
+                            <td>통합</td>
+                            <td>7학기</td>
+                            <td>본심사</td>
+                            <td><span class="status-badge status-urgent">보완요청</span></td>
+                            <td>2024-11-18 14:30</td>
+                        </tr>
+                        <tr>
+                            <td>이영희</td>
+                            <td>석사</td>
+                            <td>3학기</td>
+                            <td>논문계획서</td>
+                            <td><span class="status-badge status-primary">심사중</span></td>
+                            <td>2024-11-20 09:15</td>
+                        </tr>
+                        <tr>
+                            <td>박민수</td>
+                            <td>박사</td>
+                            <td>5학기</td>
+                            <td>예비심사</td>
+                            <td><span class="status-badge status-success">통과</span></td>
+                            <td>2024-11-15 16:20</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabs -->
+    <section class="section">
+        <h2 class="section-title">Tabs</h2>
+        
+        <div class="component-group">
+            <div class="tabs">
+                <button class="tab active">전체 15명</button>
+                <button class="tab">석사 8명</button>
+                <button class="tab">박사 5명</button>
+                <button class="tab">통합 2명</button>
+            </div>
+            <div style="padding: 20px; background: #f9fafb; border-radius: 4px;">
+                탭 컨텐츠 영역
+            </div>
+        </div>
+    </section>
+
+    <!-- Alerts -->
+    <section class="section">
+        <h2 class="section-title">Alerts</h2>
+        
+        <div class="component-group">
+            <div class="alert alert-success">
+                <span class="icon icon-success">
+                    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                </span>
+                <span>성공적으로 저장되었습니다.</span>
+            </div>
+            <div class="alert alert-warning">
+                <span class="icon icon-primary">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+                <span>주의가 필요한 항목이 있습니다.</span>
+            </div>
+            <div class="alert alert-info">
+                <span class="icon icon-info">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                </span>
+                <span>새로운 공지사항이 등록되었습니다.</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pagination -->
+    <section class="section">
+        <h2 class="section-title">Pagination</h2>
+        
+        <div class="component-group">
+            <div class="pagination">
+                <button class="page-btn">이전</button>
+                <button class="page-btn active">1</button>
+                <button class="page-btn">2</button>
+                <button class="page-btn">3</button>
+                <button class="page-btn">4</button>
+                <button class="page-btn">5</button>
+                <button class="page-btn">다음</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Progress Bar -->
+    <section class="section">
+        <h2 class="section-title">Progress Bar</h2>
+        
+        <div class="component-group">
+            <div style="margin-bottom: 16px;">
+                <div style="margin-bottom: 8px; font-size: 13px; color: var(--text-secondary);">25% 완료</div>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 25%;"></div>
+                </div>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <div style="margin-bottom: 8px; font-size: 13px; color: var(--text-secondary);">50% 완료</div>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 50%;"></div>
+                </div>
+            </div>
+            <div>
+                <div style="margin-bottom: 8px; font-size: 13px; color: var(--text-secondary);">75% 완료</div>
+                <div class="progress">
+                    <div class="progress-bar" style="width: 75%;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tooltip -->
+    <section class="section">
+        <h2 class="section-title">Tooltip</h2>
+        
+        <div class="component-group">
+            <span class="component-label">아이콘 툴팁</span>
+            <div class="component-row">
+                <span class="tooltip-wrapper">
+                    <span class="icon icon-muted" style="cursor: help;">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </span>
+                    <span class="tooltip">도움말 툴팁입니다</span>
+                </span>
+                <span class="tooltip-wrapper">
+                    <span class="icon icon-muted" style="cursor: help;">
+                        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </span>
+                    <span class="tooltip">물음표 툴팁입니다</span>
+                </span>
+            </div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">텍스트 툴팁</span>
+            <div class="component-row">
+                <span class="tooltip-wrapper">
+                    <span style="border-bottom: 1px dashed var(--text-muted); cursor: help;">마우스를 올려보세요</span>
+                    <span class="tooltip">추가 설명이 표시됩니다</span>
+                </span>
+            </div>
+        </div>
+    </section>
+
+    <!-- Divider -->
+    <section class="section">
+        <h2 class="section-title">Divider</h2>
+        
+        <div class="component-group">
+            <span class="component-label">기본 구분선</span>
+            <div class="divider"></div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">텍스트 포함 구분선</span>
+            <div class="divider-text">또는</div>
+        </div>
+    </section>
+
+    <!-- Empty State -->
+    <section class="section">
+        <h2 class="section-title">Empty State</h2>
+        
+        <div class="component-group">
+            <div class="empty-state" style="background: var(--bg-light); border-radius: 4px;">
+                <div class="empty-state-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                </div>
+                <div class="empty-state-title">데이터가 없습니다</div>
+                <div class="empty-state-desc">아직 등록된 항목이 없습니다.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Header Preview -->
+    <section class="section">
+        <h2 class="section-title">Header</h2>
+        
+        <div class="component-group">
+            <div class="header-preview">
+                <div class="header-title">논문지도시스템</div>
+                <div class="header-actions">
+                    <button class="header-icon-btn">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+                        </span>
+                        <span class="badge-dot"></span>
+                    </button>
+                    <div class="header-user">
+                        <span>박교수님</span>
+                        <span class="avatar avatar-sm">박</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <section class="section">
+        <h2 class="section-title">Modal</h2>
+        
+        <div class="component-group">
+            <p style="margin-bottom: 16px; color: var(--text-secondary);">클릭하여 모달 미리보기</p>
+            <button class="btn btn-primary" onclick="openModal()">모달 열기</button>
+        </div>
+    </section>
+
+    <!-- Modal Overlay -->
+    <div class="modal-overlay" id="modalDemo">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>모달 제목</h3>
+                <button class="modal-close" onclick="closeModal()">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    </span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>모달 컴포넌트는 Square 형태(border-radius: 4px)가 적용됩니다.</p>
+                <p style="margin-top: 12px;">배경을 클릭하거나 X 버튼을 클릭하여 닫을 수 있습니다.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">취소</button>
+                <button class="btn btn-primary" onclick="closeModal()">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('modalDemo').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modalDemo').classList.remove('show');
+        }
+
+        document.getElementById('modalDemo').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
+
+</body>
+</html>

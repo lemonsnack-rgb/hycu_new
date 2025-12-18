@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>레이아웃 가이드 v3 - 논문 지도 시스템</title>
+    
+    <!-- Pretendard 폰트 -->
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+    <style>
+        /* =============================================
+           DESIGN TOKENS (CSS Variables) - 디자인시스템 v3
+           ============================================= */
+        :root {
+            /* ===== COLORS ===== */
+            --color-primary: #6A0028;
+            --color-primary-dark: #4A001C;
+            --color-primary-light: #8A0034;
+            --color-primary-tint: #FCE4EC;
+            
+            --color-secondary: #6B7280;
+            --color-success: #2E7D32;
+            --color-warning: #F59E0B;
+            --color-danger: #EF4444;
+            --color-info: #0288D1;
+            
+            /* Status Backgrounds */
+            --color-success-bg: #E8F5E9;
+            --color-warning-bg: #FEF3C7;
+            --color-danger-bg: #FEE2E2;
+            --color-info-bg: #E3F2FD;
+            
+            /* Grayscale */
+            --color-gray-0: #1A1A1A;
+            --color-gray-1: #6B7280;
+            --color-gray-2: #9CA3AF;
+            --color-gray-3: #E5E7EB;
+            --color-gray-4: #F8FAFC;
+            
+            /* Semantic Colors */
+            --color-text-primary: var(--color-gray-0);
+            --color-text-secondary: var(--color-gray-1);
+            --color-text-muted: var(--color-gray-2);
+            --color-border: var(--color-gray-3);
+            --color-background: var(--color-gray-4);
+            
+            /* ===== TYPOGRAPHY ===== */
+            --font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-weight-regular: 400;
+            --font-weight-medium: 500;
+            --font-weight-semibold: 600;
+            --font-weight-bold: 700;
+            
+            /* ===== LAYOUT ===== */
+            --sidebar-width: 240px;
+            --utility-header-height: 48px;
+            --page-header-height: 72px;
+            --content-padding: 24px;
+            
+            /* ===== BREAKPOINTS ===== */
+            --breakpoint-desktop: 1260px;
+            --breakpoint-tablet: 768px;
+            --breakpoint-mobile: 480px;
+            
+            /* ===== BORDERS ===== */
+            --border-radius-sm: 4px;
+            --border-radius-md: 6px;
+            --border-radius-full: 9999px;
+            
+            /* ===== SHADOWS ===== */
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+            
+            /* ===== TRANSITIONS ===== */
+            --transition-fast: 0.15s ease;
+            --transition-normal: 0.2s ease;
+            --transition-slow: 0.3s ease;
+        }
+
+        /* =============================================
+           BASE STYLES
+           ============================================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: 16px;
+            line-height: 1.5;
+            color: var(--color-text-primary);
+            background-color: #f5f7fa;
+        }
+
+        /* 공통 아이콘 스타일 */
+        .icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
+        }
+
+        /* =============================================
+           1. 전체 레이아웃 구조
+           ============================================= */
+        .layout-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* =============================================
+           2. 사이드바 (Sidebar) - 240px
+           ============================================= */
+        .sidebar {
+            width: var(--sidebar-width);
+            min-width: var(--sidebar-width);
+            background: #ffffff;
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            z-index: 400;
+            transition: all var(--transition-slow);
+            overflow: hidden;
+        }
+
+        .sidebar.collapsed {
+            width: 0;
+            min-width: 0;
+            border-right: none;
+        }
+
+        .sidebar.collapsed .sidebar-header,
+        .sidebar.collapsed .sidebar-nav,
+        .sidebar.collapsed .sidebar-footer {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        /* 사이드바 헤더 */
+        .sidebar-header {
+            height: 64px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--color-border);
+            flex-shrink: 0;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+        }
+
+        .sidebar-logo-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            overflow: hidden;
+        }
+
+        .sidebar-logo {
+            width: 32px;
+            height: 32px;
+            flex-shrink: 0;
+            background: var(--color-primary);
+            border-radius: var(--border-radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: var(--font-weight-bold);
+        }
+
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            white-space: nowrap;
+        }
+
+        /* 사이드바 토글 버튼 */
+        .sidebar-toggle {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--border-radius-full);
+            background: var(--color-primary);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 8px rgba(106, 0, 40, 0.3);
+            transition: all var(--transition-normal);
+            flex-shrink: 0;
+            color: white;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--color-primary-light);
+            transform: scale(1.05);
+        }
+
+        .sidebar-toggle .icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* 사이드바 네비게이션 */
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 12px 0;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+        }
+
+        /* 메뉴 스타일 */
+        .nav-section {
+            margin-bottom: 8px;
+        }
+
+        .nav-section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            font-size: 14px;
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+
+        .nav-section-title .icon {
+            width: 18px;
+            height: 18px;
+            color: var(--color-text-secondary);
+        }
+
+        .nav-submenu {
+            margin-left: 44px;
+            border-left: 2px solid var(--color-border);
+        }
+
+        .nav-submenu-item {
+            display: block;
+            padding: 10px 16px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .nav-submenu-item:hover {
+            color: var(--color-primary);
+            background: var(--color-primary-tint);
+        }
+
+        .nav-submenu-item.active {
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+            background: var(--color-primary-tint);
+            border-left: 2px solid var(--color-primary);
+            margin-left: -2px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px;
+            font-size: 14px;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            color: var(--color-primary);
+            background: var(--color-primary-tint);
+        }
+
+        .nav-item.active {
+            color: var(--color-primary);
+            font-weight: var(--font-weight-semibold);
+            background: var(--color-primary-tint);
+        }
+
+        .nav-item .icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* 사이드바 하단 */
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--color-border);
+            flex-shrink: 0;
+            transition: opacity var(--transition-normal), visibility var(--transition-normal);
+        }
+
+        .sidebar-logout {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            padding: 8px;
+            border-radius: var(--border-radius-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .sidebar-logout:hover {
+            color: var(--color-primary);
+            background: var(--color-primary-tint);
+        }
+
+        .sidebar-logout .icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* =============================================
+           3. 메인 콘텐츠 영역
+           ============================================= */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: #f5f7fa;
+            transition: margin-left var(--transition-slow);
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* =============================================
+           4. 유틸리티 헤더 (48px)
+           ============================================= */
+        .utility-header {
+            height: var(--utility-header-height);
+            background: var(--color-background);
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            position: sticky;
+            top: 0;
+            z-index: 300;
+        }
+
+        .utility-left {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* 사이드바 열기 버튼 */
+        .sidebar-open-btn {
+            display: none;
+            width: 32px;
+            height: 32px;
+            border: none;
+            background: transparent;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            transition: all var(--transition-normal);
+        }
+
+        .sidebar-open-btn:hover {
+            background: var(--color-gray-3);
+            color: var(--color-primary);
+        }
+
+        .sidebar-open-btn.visible {
+            display: flex;
+        }
+
+        .sidebar-open-btn .icon {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* 브레드크럼 */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--color-text-secondary);
+            text-decoration: none;
+            transition: color var(--transition-fast);
+        }
+
+        .breadcrumb a:hover {
+            color: var(--color-primary);
+        }
+
+        .breadcrumb-separator {
+            color: var(--color-text-muted);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .breadcrumb-current {
+            color: var(--color-text-primary);
+            font-weight: var(--font-weight-medium);
+        }
+
+        .utility-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* 아이콘 버튼 */
+        .utility-icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--color-border);
+            background: white;
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            position: relative;
+            transition: all var(--transition-normal);
+        }
+
+        .utility-icon-btn:hover {
+            background: var(--color-gray-3);
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+
+        .utility-icon-btn .icon {
+            width: 18px;
+            height: 18px;
+        }
+
+        .utility-icon-btn .badge-dot {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            width: 8px;
+            height: 8px;
+            background: var(--color-danger);
+            border-radius: var(--border-radius-full);
+            border: 2px solid white;
+        }
+
+        /* 사용자 정보: 역할 │ 이름 (버튼 스타일 제거, 아바타 제거) */
+        .utility-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--color-text-primary);
+        }
+
+        .user-role {
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+        }
+
+        .user-divider {
+            color: var(--color-gray-3);
+        }
+
+        .user-name {
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+        }
+
+        /* =============================================
+           5. 페이지 타이틀 영역 (72px)
+           ============================================= */
+        .page-header {
+            height: var(--page-header-height);
+            background: #ffffff;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+        }
+
+        .page-header-left {
+            display: flex;
+            align-items: flex-end; /* 하단 정렬 */
+            gap: 16px;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            flex-shrink: 0;
+            line-height: 1.2;
+        }
+
+        /* 도움말 텍스트 (툴팁 제거, 직접 노출 / 타이틀 하단 정렬) */
+        .page-help-text {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 400px;
+            line-height: 1.2;
+            padding-bottom: 2px; /* 미세 조정 */
+        }
+
+        /* =============================================
+           6. 콘텐츠 영역
+           ============================================= */
+        .content-area {
+            flex: 1;
+            padding: var(--content-padding);
+        }
+
+        /* =============================================
+           7. 탭 (언더라인 스타일)
+           ============================================= */
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid var(--color-border);
+            margin-bottom: 24px;
+            overflow-x: auto;
+            /* 스크롤바 숨김 */
+            -ms-overflow-style: none;  /* IE, Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        
+        .tabs::-webkit-scrollbar {
+            display: none;  /* Chrome, Safari */
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            font-family: var(--font-family);
+            font-size: 15px;
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px;
+            white-space: nowrap;
+        }
+
+        .tab:hover {
+            color: var(--color-primary);
+        }
+
+        .tab.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+
+        /* =============================================
+           8. 검색/필터 영역
+           ============================================= */
+        .search-container {
+            background: #ffffff;
+            border-radius: var(--border-radius-sm);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .search-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-label {
+            font-size: 14px;
+            font-weight: var(--font-weight-semibold);
+            color: var(--color-text-primary);
+            margin-bottom: 8px;
+        }
+
+        .search-input,
+        .search-select {
+            padding: 10px 14px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-family);
+            font-size: 14px;
+            color: var(--color-text-primary);
+            transition: all var(--transition-normal);
+        }
+
+        .search-input:focus,
+        .search-select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(106, 0, 40, 0.1);
+        }
+
+        .search-input::placeholder {
+            color: var(--color-text-muted);
+        }
+
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        /* =============================================
+           9. 버튼
+           ============================================= */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 11px 28px;
+            border: none;
+            border-radius: var(--border-radius-md);
+            font-family: var(--font-family);
+            font-size: 15px;
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            white-space: nowrap;
+        }
+
+        .btn .icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .btn-primary {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--color-primary-light);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 0, 40, 0.3);
+        }
+
+        .btn-secondary {
+            background: var(--color-secondary);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #4b5563;
+        }
+
+        .btn-outline {
+            background: white;
+            color: var(--color-primary);
+            border: 2px solid var(--color-primary);
+        }
+
+        .btn-outline:hover {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 7px 16px;
+            font-size: 13px;
+        }
+
+        /* =============================================
+           10. 테이블
+           ============================================= */
+        .table-container {
+            background: #ffffff;
+            border-radius: var(--border-radius-sm);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+        }
+
+        /* 테이블 헤더: 타이틀 + 건수 + 액션버튼 */
+        .table-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .table-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+        }
+
+        .table-count {
+            font-size: 14px;
+            color: var(--color-text-secondary);
+        }
+
+        .table-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* 테이블 스크롤 (가로스크롤 허용) */
+        .table-scroll {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px; /* 최소 너비 설정으로 가로스크롤 허용 */
+        }
+
+        thead {
+            background: var(--color-gray-4);
+            border-bottom: 2px solid var(--color-primary);
+        }
+
+        th {
+            padding: 16px 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: var(--font-weight-bold);
+            color: var(--color-text-primary);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 16px 12px;
+            text-align: center;
+            border-bottom: 1px solid var(--color-border);
+            font-size: 14px;
+            color: var(--color-text-secondary);
+            white-space: nowrap;
+        }
+
+        tbody tr {
+            transition: background var(--transition-normal);
+        }
+
+        tbody tr:hover {
+            background: var(--color-gray-4);
+        }
+
+        .cell-truncate {
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* 관리 버튼 영역 - 가로 배치 */
+        .action-buttons {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: nowrap;
+        }
+
+        /* =============================================
+           11. 배지
+           ============================================= */
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: var(--border-radius-sm);
+            font-size: 12px;
+            font-weight: var(--font-weight-semibold);
+            min-width: 64px;
+            text-align: center;
+        }
+
+        .status-primary {
+            background: var(--color-primary-tint);
+            color: var(--color-primary);
+        }
+
+        .status-success {
+            background: var(--color-success-bg);
+            color: var(--color-success);
+        }
+
+        .status-warning {
+            background: var(--color-warning-bg);
+            color: #92400E;
+        }
+
+        .status-danger {
+            background: var(--color-danger-bg);
+            color: var(--color-danger);
+        }
+
+        .status-info {
+            background: var(--color-info-bg);
+            color: var(--color-info);
+        }
+
+        .status-pending {
+            background: #F5F5F5;
+            color: #616161;
+        }
+
+        /* =============================================
+           12. 페이지네이션
+           ============================================= */
+        .pagination-wrapper {
+            padding: 16px 20px;
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .page-btn {
+            min-width: 32px;
+            height: 32px;
+            padding: 0 8px;
+            border: 1px solid var(--color-border);
+            background: white;
+            border-radius: var(--border-radius-sm);
+            font-family: var(--font-family);
+            font-size: 14px;
+            font-weight: var(--font-weight-medium);
+            color: var(--color-text-secondary);
+            cursor: pointer;
+            transition: all var(--transition-normal);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .page-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        .page-btn.active {
+            background: var(--color-primary);
+            border-color: var(--color-primary);
+            color: white;
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-btn .icon {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* =============================================
+           13. 반응형 브레이크포인트
+           ============================================= */
+        
+        /* Tablet: 768px ~ 1259px */
+        @media (max-width: 1259px) {
+            .search-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            
+            .page-help-text {
+                max-width: 250px;
+            }
+        }
+
+        /* Mobile Large: 480px ~ 767px */
+        @media (max-width: 767px) {
+            :root {
+                --content-padding: 16px;
+            }
+            
+            .sidebar {
+                position: fixed;
+                z-index: 500;
+            }
+            
+            .sidebar:not(.collapsed) ~ .main-content {
+                margin-left: 0;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .sidebar-open-btn {
+                display: flex;
+            }
+            
+            .sidebar.collapsed + .sidebar-overlay {
+                display: none;
+            }
+            
+            .utility-header {
+                padding: 0 16px;
+            }
+            
+            .breadcrumb {
+                font-size: 13px;
+            }
+            
+            .page-header {
+                height: auto;
+                min-height: var(--page-header-height);
+                padding: 16px;
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .page-title {
+                font-size: 20px;
+            }
+            
+            .page-help-text {
+                max-width: 100%;
+                white-space: normal;
+                font-size: 13px;
+            }
+            
+            .search-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .search-container {
+                padding: 16px;
+            }
+            
+            .tabs {
+                gap: 0;
+            }
+            
+            .tab {
+                padding: 10px 16px;
+                font-size: 14px;
+            }
+            
+            .table-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .table-header-right {
+                width: 100%;
+                justify-content: flex-end;
+            }
+        }
+
+        /* Mobile Small: ~ 479px */
+        @media (max-width: 479px) {
+            .search-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .utility-right {
+                gap: 8px;
+            }
+            
+            .utility-icon-btn {
+                width: 28px;
+                height: 28px;
+            }
+            
+            .utility-icon-btn .icon {
+                width: 16px;
+                height: 16px;
+            }
+            
+            .user-role {
+                display: none;
+            }
+            
+            .user-divider {
+                display: none;
+            }
+            
+            .btn {
+                padding: 9px 16px;
+                font-size: 14px;
+            }
+            
+            .btn-sm {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* =============================================
+           14. 레이아웃 가이드 시각화
+           ============================================= */
+        .guide-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: 9999;
+            display: none;
+        }
+
+        .guide-overlay.visible {
+            display: block;
+        }
+
+        .guide-label {
+            position: absolute;
+            background: rgba(106, 0, 40, 0.9);
+            color: white;
+            padding: 4px 8px;
+            font-size: 11px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .guide-box {
+            position: absolute;
+            border: 2px dashed var(--color-primary);
+            background: rgba(106, 0, 40, 0.05);
+        }
+
+        .guide-toggle-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--color-primary);
+            color: white;
+            padding: 12px 20px;
+            border-radius: var(--border-radius-md);
+            border: none;
+            font-family: var(--font-family);
+            font-size: 14px;
+            font-weight: var(--font-weight-semibold);
+            cursor: pointer;
+            z-index: 10001;
+            box-shadow: 0 4px 12px rgba(106, 0, 40, 0.3);
+            transition: all var(--transition-normal);
+        }
+
+        .guide-toggle-btn:hover {
+            background: var(--color-primary-light);
+            transform: translateY(-2px);
+        }
+        
+        /* 사이드바 오버레이 (모바일) */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 450;
+        }
+        
+        .sidebar-overlay.visible {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 레이아웃 가이드 오버레이 -->
+    <div class="guide-overlay" id="guideOverlay">
+        <div class="guide-label" style="top: 10px; left: 10px;">① 사이드바 (240px)</div>
+        <div class="guide-box" style="top: 0; left: 0; width: 240px; height: 100%;"></div>
+        
+        <div class="guide-label" style="top: 10px; left: 260px;">② 유틸리티 헤더 (48px)</div>
+        <div class="guide-box" style="top: 0; left: 240px; right: 0; height: 48px;"></div>
+        
+        <div class="guide-label" style="top: 58px; left: 260px;">③ 페이지 타이틀 (72px)</div>
+        <div class="guide-box" style="top: 48px; left: 240px; right: 0; height: 72px;"></div>
+        
+        <div class="guide-label" style="top: 130px; left: 260px;">④ 콘텐츠 영역</div>
+        <div class="guide-box" style="top: 120px; left: 240px; right: 0; bottom: 0;"></div>
+    </div>
+    
+    <!-- 사이드바 오버레이 (모바일용) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="layout-container">
+        
+        <!-- ========================================
+             ① 사이드바 (240px)
+             ======================================== -->
+        <aside class="sidebar" id="sidebar">
+            
+            <div class="sidebar-header">
+                <div class="sidebar-logo-area">
+                    <div class="sidebar-logo">H</div>
+                    <span class="sidebar-title">논문지도시스템</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle" title="사이드바 접기">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                    </span>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                
+                <div class="nav-item active">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                    </span>
+                    <span>대시보드</span>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        </span>
+                        <span>논문 안내</span>
+                    </div>
+                    <div class="nav-submenu">
+                        <div class="nav-submenu-item">공지사항</div>
+                        <div class="nav-submenu-item">자료실</div>
+                        <div class="nav-submenu-item">연구윤리</div>
+                        <div class="nav-submenu-item">논문일정</div>
+                        <div class="nav-submenu-item">논문지도절차</div>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </span>
+                        <span>논문지도</span>
+                    </div>
+                    <div class="nav-submenu">
+                        <div class="nav-submenu-item">지도교수 배정</div>
+                        <div class="nav-submenu-item">주차별 논문지도 현황</div>
+                        <div class="nav-submenu-item">논문 지도 현황</div>
+                        <div class="nav-submenu-item">실시간 지도 예약</div>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                        </span>
+                        <span>논문심사</span>
+                    </div>
+                    <div class="nav-submenu">
+                        <div class="nav-submenu-item active">심사 관리</div>
+                        <div class="nav-submenu-item">심사 결과 조회</div>
+                    </div>
+                </div>
+
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="sidebar-logout">
+                    <span class="icon">
+                        <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path><polyline points="16 17 21 12 16 7"></polyline><line x1="21" y1="12" x2="9" y2="12"></line></svg>
+                    </span>
+                    <span>로그아웃</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ========================================
+             메인 콘텐츠 영역
+             ======================================== -->
+        <main class="main-content" id="mainContent">
+
+            <!-- ② 유틸리티 헤더 (48px) -->
+            <header class="utility-header">
+                <div class="utility-left">
+                    <button class="sidebar-open-btn" id="sidebarOpenBtn" title="사이드바 열기">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+                        </span>
+                    </button>
+                    
+                    <!-- 브레드크럼: > 표시 -->
+                    <nav class="breadcrumb">
+                        <a href="#">홈</a>
+                        <span class="breadcrumb-separator">&gt;</span>
+                        <a href="#">논문심사</a>
+                        <span class="breadcrumb-separator">&gt;</span>
+                        <span class="breadcrumb-current">심사 관리</span>
+                    </nav>
+                </div>
+
+                <div class="utility-right">
+                    <!-- 알림 -->
+                    <button class="utility-icon-btn" title="알림">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+                        </span>
+                        <span class="badge-dot"></span>
+                    </button>
+                    
+                    <!-- 다국어 -->
+                    <button class="utility-icon-btn" title="다국어 설정">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+                        </span>
+                    </button>
+                    
+                    <!-- 사용자 정보: 역할 │ 이름 (아바타/버튼 스타일 제거) -->
+                    <div class="utility-user">
+                        <span class="user-role">교수</span>
+                        <span class="user-divider">│</span>
+                        <span class="user-name">김교수님</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- ③ 페이지 타이틀 영역 (72px) -->
+            <section class="page-header">
+                <div class="page-header-left">
+                    <h1 class="page-title">심사 관리</h1>
+                    <!-- 도움말 텍스트 (툴팁 제거, 직접 노출 / 최대 50자 권장) -->
+                    <span class="page-help-text">배정된 논문 심사를 진행하고 평가를 등록합니다.</span>
+                </div>
+            </section>
+
+            <!-- ④ 콘텐츠 영역 -->
+            <div class="content-area">
+
+                <!-- 탭 -->
+                <div class="tabs">
+                    <button class="tab active">전체</button>
+                    <button class="tab">연구계획서</button>
+                    <button class="tab">중간논문</button>
+                    <button class="tab">최종논문</button>
+                </div>
+
+                <!-- 검색 필터 -->
+                <div class="search-container">
+                    <div class="search-grid">
+                        <div class="search-field">
+                            <label class="search-label">대학원</label>
+                            <select class="search-select">
+                                <option>전체</option>
+                                <option>일반대학원</option>
+                                <option>특수대학원</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학과</label>
+                            <select class="search-select">
+                                <option>전체</option>
+                                <option>컴퓨터공학과</option>
+                                <option>인공지능학과</option>
+                                <option>데이터사이언스학과</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학위과정</label>
+                            <select class="search-select">
+                                <option>전체</option>
+                                <option>석사</option>
+                                <option>박사</option>
+                            </select>
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">학번</label>
+                            <input type="text" class="search-input" placeholder="학번 입력">
+                        </div>
+                        <div class="search-field">
+                            <label class="search-label">성명</label>
+                            <input type="text" class="search-input" placeholder="이름 검색">
+                        </div>
+                    </div>
+                    <div class="search-buttons">
+                        <button class="btn btn-secondary">초기화</button>
+                        <button class="btn btn-primary">
+                            <span class="icon">
+                                <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                            </span>
+                            검색
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="table-container">
+                    <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">심사 대상 논문 목록</h3>
+                            <span class="table-count">(총 4건)</span>
+                        </div>
+                        <div class="table-header-right">
+                            <!-- 필요시 등록/다운로드 등 버튼 배치 -->
+                            <button class="btn btn-outline btn-sm">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                </span>
+                                다운로드
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- 테이블 본문 (가로스크롤 허용) -->
+                    <div class="table-scroll">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 50px;"><input type="checkbox"></th>
+                                    <th style="width: 60px;">번호</th>
+                                    <th style="width: 100px;">대학원</th>
+                                    <th style="width: 140px;">학과</th>
+                                    <th style="width: 70px;">학위</th>
+                                    <th style="width: 100px;">학번</th>
+                                    <th style="width: 80px;">이름</th>
+                                    <th style="width: 280px;">논문명</th>
+                                    <th style="width: 100px;">심사단계</th>
+                                    <th style="width: 80px;">진행상태</th>
+                                    <th style="width: 160px;">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>1</td>
+                                    <td>일반대학원</td>
+                                    <td>컴퓨터공학과</td>
+                                    <td>석사</td>
+                                    <td>2024001</td>
+                                    <td>김철수</td>
+                                    <td class="cell-truncate" style="text-align: left;">딥러닝 기반 자연어 처리 모델의 성능 개선 연구</td>
+                                    <td><span class="status-badge status-info">연구계획서</span></td>
+                                    <td><span class="status-badge status-warning">1/3</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-outline btn-sm">심사</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>2</td>
+                                    <td>일반대학원</td>
+                                    <td>데이터사이언스학과</td>
+                                    <td>석사</td>
+                                    <td>2023005</td>
+                                    <td>이영희</td>
+                                    <td class="cell-truncate" style="text-align: left;">시계열 데이터 기반 주가 예측 모델 개발</td>
+                                    <td><span class="status-badge status-primary">중간논문</span></td>
+                                    <td><span class="status-badge status-success">3/3</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-outline btn-sm">심사</button>
+                                            <button class="btn btn-primary btn-sm">승인</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>3</td>
+                                    <td>일반대학원</td>
+                                    <td>인공지능학과</td>
+                                    <td>박사</td>
+                                    <td>2022010</td>
+                                    <td>박민수</td>
+                                    <td class="cell-truncate" style="text-align: left;">강화학습 기반 자율주행 시스템 최적화 연구</td>
+                                    <td><span class="status-badge status-danger">최종논문</span></td>
+                                    <td><span class="status-badge status-warning">2/3</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-outline btn-sm">심사</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox"></td>
+                                    <td>4</td>
+                                    <td>특수대학원</td>
+                                    <td>소프트웨어학과</td>
+                                    <td>석사</td>
+                                    <td>2024015</td>
+                                    <td>최지훈</td>
+                                    <td class="cell-truncate" style="text-align: left;">마이크로서비스 아키텍처 기반 클라우드 시스템 설계</td>
+                                    <td><span class="status-badge status-info">연구계획서</span></td>
+                                    <td><span class="status-badge status-pending">0/3</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-outline btn-sm">심사</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- 페이지네이션 -->
+                    <div class="pagination-wrapper">
+                        <div class="pagination">
+                            <button class="page-btn" title="처음">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24"><polyline points="11 17 6 12 11 7"></polyline><polyline points="18 17 13 12 18 7"></polyline></svg>
+                                </span>
+                            </button>
+                            <button class="page-btn" title="이전">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                </span>
+                            </button>
+                            <button class="page-btn active">1</button>
+                            <button class="page-btn">2</button>
+                            <button class="page-btn">3</button>
+                            <button class="page-btn">4</button>
+                            <button class="page-btn">5</button>
+                            <button class="page-btn" title="다음">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                </span>
+                            </button>
+                            <button class="page-btn" title="마지막">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24"><polyline points="13 17 18 12 13 7"></polyline><polyline points="6 17 11 12 6 7"></polyline></svg>
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- 가이드 토글 버튼 -->
+    <button class="guide-toggle-btn" id="guideToggle">
+        레이아웃 가이드 ON/OFF
+    </button>
+
+    <script>
+        // 사이드바 토글 기능
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const sidebarOpenBtn = document.getElementById('sidebarOpenBtn');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        // 사이드바 접기
+        sidebarToggle.addEventListener('click', function() {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            sidebarOpenBtn.classList.add('visible');
+            sidebarOverlay.classList.remove('visible');
+        });
+
+        // 사이드바 펼치기
+        sidebarOpenBtn.addEventListener('click', function() {
+            sidebar.classList.remove('collapsed');
+            mainContent.classList.remove('expanded');
+            sidebarOpenBtn.classList.remove('visible');
+            
+            // 모바일에서는 오버레이 표시
+            if (window.innerWidth <= 767) {
+                sidebarOverlay.classList.add('visible');
+            }
+        });
+        
+        // 오버레이 클릭 시 사이드바 닫기
+        sidebarOverlay.addEventListener('click', function() {
+            sidebar.classList.add('collapsed');
+            mainContent.classList.add('expanded');
+            sidebarOpenBtn.classList.add('visible');
+            sidebarOverlay.classList.remove('visible');
+        });
+        
+        // 화면 리사이즈 대응
+        window.addEventListener('resize', function() {
+            if (window.innerWidth > 767) {
+                sidebarOverlay.classList.remove('visible');
+                if (!sidebar.classList.contains('collapsed')) {
+                    mainContent.classList.remove('expanded');
+                }
+            }
+        });
+
+        // 레이아웃 가이드 토글
+        const guideOverlay = document.getElementById('guideOverlay');
+        const guideToggle = document.getElementById('guideToggle');
+
+        guideToggle.addEventListener('click', function() {
+            guideOverlay.classList.toggle('visible');
+        });
+
+        // 탭 클릭
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        // 메뉴 클릭
+        document.querySelectorAll('.nav-submenu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-submenu-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.nav-submenu-item').forEach(i => i.classList.remove('active'));
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+</body>
+</html>
