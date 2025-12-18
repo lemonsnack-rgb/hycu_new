@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>논문 지도 시스템 - 교수용 (Design System v3)</title>
+
+    <!-- Pretendard Variable Font -->
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+
+    <!-- Tailwind CSS (임시 유지 - 기존 레이아웃 동작용) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Design System v3 (NEW) - Crimson Theme -->
+    <link rel="stylesheet" href="assets/css/design-system-v3.css">
+    <link rel="stylesheet" href="assets/css/components-v3.css?v=20251219003">
+    <link rel="stylesheet" href="assets/css/table-standard.css">
+
+    <!-- Layout System v3 (NEW) - Crimson Layout -->
+    <link rel="stylesheet" href="assets/css/layout-v3.css">
+
+    <!-- 기존 기능 유지를 위한 CSS (특수 기능용) -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/guidance.css">
+    <link rel="stylesheet" href="assets/css/semester-guidance.css">
+    <link rel="stylesheet" href="assets/css/semester-guidance-v2.css">
+    <link rel="stylesheet" href="assets/css/meeting-v2.css?v=20251219003">
+    <link rel="stylesheet" href="assets/css/feedback.css?v=20251219005">
+    <link rel="stylesheet" href="assets/css/review.css?v=20251219007">
+
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.css" rel="stylesheet">
+
+    <!-- Video.js CSS -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet">
+
+    <!-- Font Awesome (기존 기능 호환용) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Crimson Color Override -->
+    <style>
+        /* 전역 CSS 변수 오버라이드 */
+        :root {
+            --primary: #6A0028 !important;
+            --primary-dark: #4A001C !important;
+            --primary-light: #8A0034 !important;
+        }
+
+        /* Tailwind Blue → Crimson 전체 오버라이드 */
+        .bg-blue-50 { background-color: #FCE4EC !important; }
+        .bg-blue-100 { background-color: #FCE4EC !important; }
+        .bg-blue-200 { background-color: #F8BBD9 !important; }
+        .bg-blue-300 { background-color: #F48FB1 !important; }
+        .bg-blue-400 { background-color: #F06292 !important; }
+        .bg-blue-500 { background-color: #6A0028 !important; }
+        .bg-blue-600 { background-color: #8A0034 !important; }
+        .bg-blue-700 { background-color: #4A001C !important; }
+        .bg-blue-800 { background-color: #4A001C !important; }
+        .bg-blue-900 { background-color: #4A001C !important; }
+
+        .text-blue-50 { color: #FCE4EC !important; }
+        .text-blue-100 { color: #F8BBD9 !important; }
+        .text-blue-200 { color: #F48FB1 !important; }
+        .text-blue-300 { color: #F06292 !important; }
+        .text-blue-400 { color: #8A0034 !important; }
+        .text-blue-500 { color: #6A0028 !important; }
+        .text-blue-600 { color: #6A0028 !important; }
+        .text-blue-700 { color: #4A001C !important; }
+        .text-blue-800 { color: #6A0028 !important; }
+        .text-blue-900 { color: #4A001C !important; }
+
+        .border-blue-50 { border-color: #FCE4EC !important; }
+        .border-blue-100 { border-color: #FCE4EC !important; }
+        .border-blue-200 { border-color: #F8BBD9 !important; }
+        .border-blue-300 { border-color: #F8BBD9 !important; }
+        .border-blue-400 { border-color: #F06292 !important; }
+        .border-blue-500 { border-color: #6A0028 !important; }
+        .border-blue-600 { border-color: #8A0034 !important; }
+        .border-blue-700 { border-color: #4A001C !important; }
+        .border-blue-800 { border-color: #4A001C !important; }
+        .border-blue-900 { border-color: #4A001C !important; }
+
+        /* Hover 상태 */
+        .hover\:bg-blue-50:hover { background-color: #FCE4EC !important; }
+        .hover\:bg-blue-100:hover { background-color: #FCE4EC !important; }
+        .hover\:bg-blue-500:hover { background-color: #6A0028 !important; }
+        .hover\:bg-blue-600:hover { background-color: #8A0034 !important; }
+        .hover\:bg-blue-700:hover { background-color: #4A001C !important; }
+
+        .hover\:text-blue-500:hover { color: #6A0028 !important; }
+        .hover\:text-blue-600:hover { color: #6A0028 !important; }
+        .hover\:text-blue-700:hover { color: #4A001C !important; }
+        .hover\:text-blue-800:hover { color: #8A0034 !important; }
+
+        .hover\:border-blue-500:hover { border-color: #6A0028 !important; }
+        .hover\:border-blue-600:hover { border-color: #8A0034 !important; }
+
+        /* Focus 상태 */
+        .focus\:ring-blue-500:focus { --tw-ring-color: #6A0028 !important; }
+        .focus\:border-blue-500:focus { border-color: #6A0028 !important; }
+        .focus\:ring-blue-300:focus { --tw-ring-color: #F8BBD9 !important; }
+
+        /* 인라인 스타일 색상 오버라이드 */
+        [style*="background:#009DE8"],
+        [style*="background: #009DE8"],
+        [style*="background-color:#009DE8"],
+        [style*="background-color: #009DE8"] {
+            background-color: #6A0028 !important;
+        }
+
+        [style*="color:#009DE8"],
+        [style*="color: #009DE8"] {
+            color: #6A0028 !important;
+        }
+
+        /* 기존 primary 색상 (#009DE8) 오버라이드 */
+        .bg-\[\#009DE8\] { background-color: #6A0028 !important; }
+        .hover\:bg-\[\#0087c9\]:hover { background-color: #8A0034 !important; }
+        .text-\[\#009DE8\] { color: #6A0028 !important; }
+        .border-\[\#009DE8\] { border-color: #6A0028 !important; }
+
+        /* 사이드바 active 상태 Crimson 적용 */
+        .sidebar-link.active {
+            background-color: #FCE4EC !important;
+            color: #6A0028 !important;
+        }
+
+        .sidebar-link:hover {
+            background-color: #FCE4EC !important;
+            color: #6A0028 !important;
+        }
+
+        /* 버튼 클릭 가능하도록 보장 */
+        button {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        button:disabled {
+            pointer-events: none !important;
+            opacity: 0.5 !important;
+        }
+
+        /* 모달 표시 보장 */
+        .modal-backdrop {
+            z-index: 9999 !important;
+        }
+
+        .modal-backdrop.active {
+            display: flex !important;
+        }
+
+        #modal-container .modal-backdrop {
+            display: none;
+        }
+
+        #modal-container .modal-backdrop.active {
+            display: flex !important;
+        }
+
+        /* 검색 버튼 스타일 */
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .search-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn-primary {
+            background: #6A0028;
+            color: white;
+        }
+
+        .search-btn-primary:hover {
+            background: #8A0034;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 0, 40, 0.3);
+        }
+
+        .search-btn-secondary {
+            background: #6B7280;
+            color: white;
+        }
+
+        .search-btn-secondary:hover {
+            background: #4B5563;
+        }
+    </style>
+    
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
+    
+    <!-- Video.js JS -->
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    
+    <!-- PDF.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+    
+    <!-- Fabric.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+</head>
+<body class="layout-v3 bg-gray-100">
+    
+    <!-- ===================================
+         메인 레이아웃 v3 - Crimson Design System
+         ⚠️ 주의: SSO 인증은 외부 시스템에서 처리됨
+         =================================== -->
+    <div class="layout-v3-container">
+
+        <!-- 좌측 사이드바 v3 -->
+        <aside id="sidebar" class="layout-v3-sidebar">
+            <!-- 사이드바 헤더 -->
+            <div class="layout-v3-sidebar-header">
+                <div class="layout-v3-sidebar-logo-area">
+                    <div class="layout-v3-sidebar-logo">H</div>
+                    <span class="layout-v3-sidebar-title">논문 지도 시스템</span>
+                </div>
+                <button class="layout-v3-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기">
+                    <div class="icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                    </div>
+                </button>
+            </div>
+
+            <!-- 사이드바 네비게이션 -->
+            <nav class="layout-v3-sidebar-nav">
+                <!-- 대시보드 -->
+                <a href="#" onclick="showScreen('dashboard'); return false;" data-screen="dashboard"
+                   class="sidebar-link layout-v3-nav-item active">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                    <span class="ml-4">대시보드</span>
+                </a>
+
+                <!-- 논문 안내 (1depth) -->
+                <div class="mt-2">
+                    <button onclick="toggleSubmenu('guidance-info')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="ml-4">논문 안내</span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform" id="guidance-info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <!-- 2depth 메뉴 -->
+                    <div id="guidance-info-submenu" class="pl-6 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('notice'); return false;" data-screen="notice"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">공지사항</span>
+                        </a>
+                        <a href="#" onclick="showScreen('board'); return false;" data-screen="board"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">자료실</span>
+                        </a>
+                        <a href="#" onclick="showScreen('ethics'); return false;" data-screen="ethics"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">연구윤리</span>
+                        </a>
+                        <a href="#" onclick="showScreen('schedule'); return false;" data-screen="schedule"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">논문일정</span>
+                        </a>
+                        <a href="#" onclick="showScreen('process'); return false;" data-screen="process"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">논문지도절차</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 논문지도 (1depth) -->
+                <div class="mt-2">
+                    <button onclick="toggleSubmenu('thesis-guidance')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <span class="ml-4">논문지도</span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform" id="thesis-guidance-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <!-- 2depth 메뉴 -->
+                    <div id="thesis-guidance-submenu" class="pl-6 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('advisor-assignment'); return false;" data-screen="advisor-assignment"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">지도교수 배정</span>
+                        </a>
+                        <a href="#" onclick="showScreen('guidance'); return false;" data-screen="guidance"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">주차별 논문지도 현황</span>
+                        </a>
+                        <a href="#" onclick="showScreen('feedback'); return false;" data-screen="feedback"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">논문 지도 현황</span>
+                        </a>
+                        <a href="#" onclick="showScreen('meeting'); return false;" data-screen="meeting"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">실시간 지도 예약</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 논문심사 (1depth) -->
+                <div class="mt-2">
+                    <button onclick="toggleSubmenu('thesis-review')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
+                        <div class="flex items-center">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                            </svg>
+                            <span class="ml-4">논문 심사</span>
+                        </div>
+                        <svg class="w-4 h-4 transition-transform" id="thesis-review-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                    </button>
+                    <!-- 2depth 메뉴 -->
+                    <div id="thesis-review-submenu" class="pl-6 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4 sidebar-text">심사 일정 관리</span>
+                        </a>
+                        <a href="#" onclick="showScreen('review'); return false;" data-screen="review"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">학위 논문 심사</span>
+                        </a>
+                        <a href="#" onclick="showScreen('journal-review'); return false;" data-screen="journal-review"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
+                            <span class="ml-4">학술지 논문 심사</span>
+                        </a>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- 사이드바 하단 -->
+            <div class="layout-v3-sidebar-footer">
+                <button class="layout-v3-sidebar-logout" onclick="logout()">
+                    <div class="icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                        </svg>
+                    </div>
+                    로그아웃
+                </button>
+            </div>
+        </aside>
+
+        <!-- 메인 콘텐츠 영역 -->
+        <div class="layout-v3-main-content">
+
+        <!-- 유틸리티 헤더 -->
+        <header class="layout-v3-utility-header">
+            <div class="layout-v3-utility-left">
+                <!-- 햄버거 메뉴 (사이드바 접힘 상태에서 표시) -->
+                <button id="sidebarToggle" class="layout-v3-sidebar-open-btn" onclick="toggleSidebar()" title="사이드바 열기">
+                    <div class="icon">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M4 6h16M4 12h16M4 18h16"></path>
+                        </svg>
+                    </div>
+                </button>
+
+                <!-- 브레드크럼 -->
+                <div class="layout-v3-breadcrumb">
+                    <a href="#">홈</a>
+                    <span class="layout-v3-breadcrumb-separator">></span>
+                    <span class="layout-v3-breadcrumb-current">대시보드</span>
+                </div>
+            </div>
+
+            <!-- 유틸리티 메뉴 -->
+            <div class="layout-v3-utility-right">
+                <div class="layout-v3-utility-menu">
+                    <!-- 알림 -->
+                    <button onclick="toggleNotifications()" class="layout-v3-utility-icon-btn" title="알림">
+                        <div class="icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
+                            </svg>
+                        </div>
+                        <span id="notificationBadge" class="badge-count">12</span>
+                    </button>
+
+                    <!-- 알림 드롭다운 -->
+                    <div id="notificationDropdown"
+                         class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border z-50"
+                         style="top: 60px;">
+                        <div class="p-4 border-b flex items-center justify-between">
+                            <h3 class="font-semibold text-[#1A1A1A]">알림</h3>
+                            <span class="inline-flex items-center justify-center min-w-[24px] h-6 px-2 text-xs font-bold text-white bg-[#6A0028] rounded-full">12</span>
+                        </div>
+                        <div id="notificationList" class="max-h-96 overflow-y-auto">
+                            <div class="border-b hover:bg-[#F8FAFC] p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-[#1A1A1A]">학생의 논문 제출이 완료되었습니다</p>
+                                        <p class="text-xs text-[#6B7280] mt-1">홍길동(2024001) 학생이 중간논문을 제출했습니다.</p>
+                                        <p class="text-xs text-[#9CA3AF] mt-1">1시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-b hover:bg-[#F8FAFC] p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-green-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-[#1A1A1A]">새로운 미팅 요청이 있습니다</p>
+                                        <p class="text-xs text-[#6B7280] mt-1">김영희(2024002) 학생이 논문 상담을 요청했습니다.</p>
+                                        <p class="text-xs text-[#9CA3AF] mt-1">3시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="border-b hover:bg-[#F8FAFC] p-4 cursor-pointer">
+                                <div class="flex items-start gap-3">
+                                    <div class="flex-shrink-0 w-2 h-2 bg-red-500 rounded-full mt-2"></div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium text-[#1A1A1A]">피드백 작성 기한이 임박했습니다</p>
+                                        <p class="text-xs text-[#6B7280] mt-1">이철수(2024003) 학생의 주차별 실적 피드백을 작성해주세요.</p>
+                                        <p class="text-xs text-[#9CA3AF] mt-1">6시간 전</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 영문버전 전환 -->
+                    <button onclick="switchLanguage()"
+                            class="flex items-center justify-center w-10 h-10 hover:bg-gray-100 rounded-lg transition-colors"
+                            title="Switch to English">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"></path>
+                        </svg>
+                    </button>
+
+                </div>
+
+                <!-- 사용자 정보 -->
+                <div class="layout-v3-user-info">
+                    <span class="layout-v3-user-role">지도교수</span>
+                    <span class="layout-v3-user-divider">│</span>
+                    <span id="userName" class="layout-v3-user-name">김교수</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- 페이지 헤더 -->
+        <div class="layout-v3-page-header">
+            <div class="layout-v3-page-header-left">
+                <h1 class="layout-v3-page-title">대시보드</h1>
+                <p class="layout-v3-page-help-text">논문 지도 현황을 한눈에 확인하세요</p>
+            </div>
+        </div>
+
+        <!-- 콘텐츠 영역 -->
+        <main class="layout-v3-content-area">
+            
+            <!-- ===================================
+                 지도교수 배정 화면
+                 =================================== -->
+            <section id="advisor-assignment-screen" class="content-screen">
+                <!-- 검색 영역 -->
+                <div class="bg-white rounded-lg shadow-md mb-6">
+                    <div class="p-6">
+                        <div class="search-container">
+                            <div class="search-grid">
+                                <!-- 1. 학년도 -->
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학년도
+                                    </label>
+                                    <select id="prof-advisor-search-year" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="2025">2025</option>
+                                        <option value="2024">2024</option>
+                                        <option value="2023">2023</option>
+                                    </select>
+                                </div>
+
+                                <!-- 2. 학기 -->
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학기
+                                    </label>
+                                    <select id="prof-advisor-search-semester" class="search-select">
+                                        <option value="">전체</option>
+                                        <option value="1">1학기</option>
+                                        <option value="2">2학기</option>
+                                    </select>
+                                </div>
+
+                                <!-- 3. 학기차 -->
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학기차
+                                    </label>
+                                    <input type="text" id="prof-advisor-search-semester-count" placeholder="학기차 입력"
+                                           class="search-input">
+                                </div>
+
+                                <!-- 4. 학과/전공 -->
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학과/전공
+                                    </label>
+                                    <select id="prof-advisor-search-department" class="search-select">
+                                        <option value="">전체</option>
+                                    </select>
+                                </div>
+
+                                <!-- 5. 학번 -->
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        학번
+                                    </label>
+                                    <input type="text" id="prof-advisor-search-student-id" placeholder="학번 입력"
+                                           class="search-input">
+                                </div>
+
+                                <!-- 6. 이름 -->
+                                <div class="search-field">
+                                    <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
+                                        이름
+                                    </label>
+                                    <input type="text" id="prof-advisor-search-student-name" placeholder="이름 입력"
+                                           class="search-input">
+                                </div>
+                            </div>
+
+                            <!-- 검색/초기화 버튼 -->
+                            <div class="search-buttons">
+                                <button onclick="resetProfessorAdvisorSearch()" class="btn btn-secondary">
+                                    <i class="fas fa-redo"></i> 초기화
+                                </button>
+                                <button onclick="searchProfessorAdvisorAssignment()" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> 검색
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 테이블 영역 -->
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="table-container">
+                        <div class="table-header">
+                            <div class="table-header-left">
+                                <h3 class="table-title">지도교수 배정 목록</h3>
+                                <span class="table-count" id="professor-student-count">(총 0건)</span>
+                            </div>
+                        </div>
+                        <div class="table-scroll">
+                            <table class="min-w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="professor-student-list" class="bg-white divide-y divide-gray-200">
+                                    <!-- JavaScript로 동적 생성 -->
+                                </tbody>
+                            </table>
+
+                            <div id="professor-no-students" class="text-center py-8 text-gray-500" style="display: none;">
+                                <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                <p>지도 학생이 없습니다.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================
+                 대시보드 화면
+                 =================================== -->
+            <section id="dashboard-screen" class="content-screen active">
+                <!-- 콘텐츠 -->
+                <div id="content-area">
+                    <!-- 요약 카드 -->
+                    <div id="summary-cards" class="summary-cards">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+                    
+                    <!-- 메인 콘텐츠 그리드 -->
+                    <div class="dashboard-grid">
+                        
+                        <!-- 좌측: To-Do 목록 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>처리 승인대기 사항</h2>
+                                <span class="badge badge-danger" id="todo-count">5</span>
+                            </div>
+                            <div class="card-body">
+                                <div id="todo-list">
+                                    <!-- JavaScript로 동적 생성 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 우측: 최근 활동 -->
+                        <div class="card">
+                            <div class="card-header">
+                                <h2>최근 활동</h2>
+                            </div>
+                            <div class="card-body">
+                                <div id="activity-timeline">
+                                    <!-- JavaScript로 동적 생성 -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    
+                    <!-- 단계별 현황 차트 -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h2>학생 단계별 현황</h2>
+                        </div>
+                        <div class="card-body">
+                            <div id="stage-chart">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- ===================================
+                 지도학생관리 화면
+                 =================================== -->
+            <section id="guidance-screen" class="content-screen">
+                <!-- 콘텐츠 영역 (JavaScript로 동적 생성) -->
+                <div id="guidance-content-area">
+                    <!-- 목록 or 상세 화면이 여기에 렌더링됨 -->
+                </div>
+            </section>
+            
+            <!-- ===================================
+                 랩미팅관리 화면
+                 =================================== -->
+            <section id="meeting-screen" class="content-screen">
+                <!-- 콘텐츠 영역 (JavaScript로 동적 생성) -->
+                <div id="meeting-content-area">
+                    <!-- 랩미팅 관리 화면이 여기에 렌더링됨 -->
+                </div>
+            </section>
+            
+            <!-- ===================================
+                 온라인피드백 화면
+                 =================================== -->
+            <section id="feedback-screen" class="content-screen">
+                <!-- 논문지도 단계 선택 (태그 버튼) -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">논문 지도 단계 선택</h3>
+                    <div class="filter-chips-container">
+                        <div class="filter-chips">
+                            <button id="feedback-stage-all" class="filter-chip active" onclick="toggleFeedbackStage('all')">
+                                전체
+                            </button>
+                            <button id="feedback-stage-proposal" class="filter-chip" onclick="toggleFeedbackStage('proposal')">
+                                연구계획서
+                            </button>
+                            <button id="feedback-stage-interim" class="filter-chip" onclick="toggleFeedbackStage('interim')">
+                                1차 보고서
+                            </button>
+                            <button id="feedback-stage-final" class="filter-chip" onclick="toggleFeedbackStage('final')">
+                                최종논문
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 검색 영역 -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                    <div class="search-container">
+                        <div class="search-grid">
+                            <div class="search-field">
+                                <label class="search-label">대학원</label>
+                                <select id="feedback-filter-graduate" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="일반대학원">일반대학원</option>
+                                    <option value="디자인대학원">디자인대학원</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">전공/학과</label>
+                                <select id="feedback-filter-major" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                    <option value="경영학과">경영학과</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학위과정</label>
+                                <select id="feedback-filter-degree" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학년도</label>
+                                <select id="feedback-filter-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025학년도</option>
+                                    <option value="2024">2024학년도</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학기차</label>
+                                <select id="feedback-filter-semester-count" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기차</option>
+                                    <option value="2">2학기차</option>
+                                    <option value="3">3학기차</option>
+                                    <option value="4">4학기차</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학번</label>
+                                <input type="text" id="feedback-filter-student-id" placeholder="학번 입력" class="search-input">
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">성명</label>
+                                <input type="text" id="feedback-filter-name" placeholder="성명 입력" class="search-input">
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">논문명</label>
+                                <input type="text" id="feedback-filter-thesis" placeholder="논문명 입력" class="search-input">
+                            </div>
+                        </div>
+                        <div class="search-buttons">
+                            <button onclick="resetFeedbackSearch()" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> 초기화
+                            </button>
+                            <button onclick="searchFeedback()" class="btn btn-primary">
+                                <i class="fas fa-search"></i> 검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 콘텐츠 -->
+                <div id="online-feedback-content">
+                    <!-- feedback-list.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+            
+            <!-- ===================================
+                 심사관리 화면
+                 =================================== -->
+            <section id="review-screen" class="content-screen">
+
+                <!-- 심사 유형 선택 (태그 버튼) -->
+                <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-3">심사 유형 선택</h3>
+                    <div class="filter-chips-container">
+                        <div class="filter-chips">
+                            <button id="review-type-all" class="filter-chip active" onclick="toggleReviewType('all')">
+                                전체
+                            </button>
+                            <button id="review-type-preliminary" class="filter-chip" onclick="toggleReviewType('preliminary')">
+                                예비심사
+                            </button>
+                            <button id="review-type-main" class="filter-chip" onclick="toggleReviewType('main')">
+                                본심사
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 검색 영역 -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                    <div class="search-container">
+                        <div class="search-grid">
+                            <div class="search-field">
+                                <label class="search-label">대학원</label>
+                                <select id="filter-graduate" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="일반대학원">일반대학원</option>
+                                    <option value="디자인대학원">디자인대학원</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">전공/학과</label>
+                                <select id="filter-major" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                    <option value="경영학과">경영학과</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학위과정</label>
+                                <select id="filter-degree" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학년도</label>
+                                <select id="filter-year" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025학년도</option>
+                                    <option value="2024">2024학년도</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학기차</label>
+                                <select id="filter-semester-count" class="search-select">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기차</option>
+                                    <option value="2">2학기차</option>
+                                    <option value="3">3학기차</option>
+                                    <option value="4">4학기차</option>
+                                </select>
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">학번</label>
+                                <input type="text" id="filter-student-id" placeholder="학번 입력" class="search-input">
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">성명</label>
+                                <input type="text" id="filter-name" placeholder="성명 입력" class="search-input">
+                            </div>
+                            <div class="search-field">
+                                <label class="search-label">논문명</label>
+                                <input type="text" id="filter-thesis" placeholder="논문명 입력" class="search-input">
+                            </div>
+                        </div>
+                        <div class="search-buttons">
+                            <button onclick="resetReviewSearch()" class="btn btn-secondary">
+                                <i class="fas fa-redo"></i> 초기화
+                            </button>
+                            <button onclick="searchReviews()" class="btn btn-primary">
+                                <i class="fas fa-search"></i> 검색
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 심사 목록 -->
+                <div id="review-list">
+                    <!-- review-list.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+            
+            <!-- ===================================
+                 심사 일정 관리 화면 (읽기 전용)
+                 =================================== -->
+            <section id="exam-schedule-screen" class="content-screen">
+                <div id="exam-schedule-content">
+                    <!-- exam-schedule-professor-readonly.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+
+            <!-- ===================================
+                 학술지 대체심사 화면 (ID 54-56)
+                 =================================== -->
+            <section id="journal-review-screen" class="content-screen">
+
+                <!-- 콘텐츠 영역 -->
+                <div id="journal-review-content">
+                    <!-- journal-review.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+
+            <!-- ===================================
+                 자료실 게시판 (ID 32)
+                 =================================== -->
+            <section id="board-screen" class="content-screen">
+                <div id="boardContainer">
+                    <!-- board.js에서 동적으로 렌더링 -->
+                </div>
+            </section>
+
+            <!-- ===================================
+                 논문 안내 - 공지사항
+                 =================================== -->
+            <section id="notice-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ===================================
+                 논문 안내 - 연구윤리
+                 =================================== -->
+            <section id="ethics-screen" class="content-screen">
+                <!-- JavaScript로 동적 렌더링 -->
+            </section>
+
+            <!-- ===================================
+                 논문 안내 - 논문일정
+                 =================================== -->
+            <section id="schedule-screen" class="content-screen">
+                <!-- JavaScript로 동적 렌더링 -->
+            </section>
+
+            <!-- ===================================
+                 논문 안내 - 논문지도절차
+                 =================================== -->
+            <section id="process-screen" class="content-screen">
+                <!-- JavaScript로 동적 렌더링 -->
+            </section>
+
+            <!-- 심사 상세 화면은 review-list.js에서 동적으로 생성됨 (페이지 전환 방식) -->
+
+        </main>
+        </div> <!-- /layout-v3-main-content -->
+    </div> <!-- /layout-v3-container -->
+
+    <!-- 사이드바 오버레이 (모바일용) -->
+    <div id="mobile-menu-overlay" class="layout-v3-sidebar-overlay" onclick="toggleMobileMenu()"></div>
+    
+    <!-- 모달 컨테이너 -->
+    <div id="modal-container"></div>
+
+    <!-- Layout v3 JavaScript -->
+    <script>
+        // 사이드바 토글 함수
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.querySelector('.layout-v3-main-content');
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        }
+
+        // 모바일 메뉴 토글 함수 (기존 함수 오버라이드)
+        window.toggleMobileMenu = function() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobile-menu-overlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        };
+
+        // 페이지 타이틀 업데이트 함수
+        function updatePageTitle(screenId) {
+            const pageTitleElement = document.querySelector('.layout-v3-page-title');
+            if (!pageTitleElement) return;
+
+            // 화면 ID별 메뉴명 매핑 (사이드바 메뉴 텍스트와 동일)
+            const titleMap = {
+                'dashboard': '대시보드',
+                'notice': '공지사항',
+                'board': '자료실',
+                'ethics': '연구윤리',
+                'schedule': '논문일정',
+                'process': '논문지도절차',
+                'advisor-assignment': '지도교수 배정',
+                'guidance': '주차별 논문지도 현황',
+                'feedback': '논문 지도 현황',
+                'meeting': '실시간 지도 예약',
+                'exam-schedule': '심사 일정 관리',
+                'review': '학위 논문 심사',
+                'journal-review': '학술지 논문 심사'
+            };
+
+            const title = titleMap[screenId] || '대시보드';
+            pageTitleElement.textContent = title;
+        }
+
+        // 모든 스크립트 로드 후 showScreen 함수 후킹
+        window.addEventListener('load', function() {
+            const originalShowScreen = window.showScreen;
+            if (originalShowScreen) {
+                window.showScreen = function(screenId) {
+                    // 원래 함수 실행
+                    const result = originalShowScreen.apply(this, arguments);
+                    // 타이틀 업데이트
+                    updatePageTitle(screenId);
+                    return result;
+                };
+            }
+
+            // 초기 타이틀 설정
+            const activeScreen = document.querySelector('.content-screen.active');
+            if (activeScreen) {
+                const screenId = activeScreen.id.replace('-screen', '');
+                updatePageTitle(screenId);
+            }
+        });
+    </script>
+
+    <!-- JavaScript 파일들 -->
+    <script src="assets/js/mock-data.js"></script>
+    <script src="assets/js/mock-data-extension.js?v=1764318008989"></script>
+    <script src="assets/js/meeting-data-v2.js"></script>
+    <!-- Mock 데이터 -->
+    <script src="../admin/assets/js/mockData.js"></script>
+
+    <script src="assets/js/zoom-api.js?v=20251218002"></script>
+    <script src="assets/js/review-data.js?v=20251218002"></script>
+    <script src="assets/js/common.js?v=20251218002"></script>
+    <script src="assets/js/app.js?v=20251219008"></script>
+    <script src="assets/js/dashboard.js?v=20251218002"></script>
+    <script src="assets/js/journal-review.js?v=20251218003"></script>
+    <script src="assets/js/guidance.js?v=20251218003"></script>
+    <script src="assets/js/meeting-v2.js?v=20251218020"></script>
+    <script src="assets/js/meeting-v2-part2.js?v=20251219001"></script>
+    <script src="assets/js/feedback-data.js?v=20251218002"></script>
+    <script src="assets/js/feedback-list.js?v=20251219004"></script>
+    <script src="assets/js/feedback-viewer.js?v=20251218002"></script>
+    <script src="assets/js/feedback-tools.js?v=20251218002"></script>
+    <script src="assets/js/feedback-detail-screen.js?v=20251219005"></script>
+    <script src="assets/js/review-list.js?v=20251219012"></script>
+    <script src="assets/js/review-detail.js?v=20251219013"></script>
+    <script src="assets/js/board.js?v=20251218003"></script>
+    <script src="assets/js/journal-review-detail.js?v=20251218002"></script>
+    <script src="assets/js/semester-guidance.js?v=20251218002"></script>
+    <script src="assets/js/semester-guidance-v2.js?v=20251218002"></script>
+
+    <!-- 공통 유틸리티 -->
+    <script src="../common-utils.js"></script>
+    <script src="../common-header-utils.js"></script>
+
+    <!-- 심사 일정 관리 (교수용 - 읽기 전용) -->
+    <script src="../admin/assets/js/exam-schedule-data.js"></script>
+    <script src="../admin/assets/js/schedule-utils.js"></script>
+    <script src="assets/js/exam-schedule-professor-readonly.js"></script>
+
+<!-- injected: i18n minimal handler -->
+<script data-i18n-ready>
+(function(){
+  function getParam(n){ return new URLSearchParams(location.search).get(n); }
+  var lang = getParam('lang') || 'ko';
+  document.documentElement.setAttribute('lang', lang);
+  // Placeholder for future dictionary binding.
+})();
+</script>
+
+
+<!-- injected: similarity badge placeholder -->
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  var cards = document.querySelectorAll('.submission-card, .paper-card, .review-item');
+  cards.forEach(function(card){
+    if (card.querySelector('[data-similarity-badge]')) return;
+    var badge = document.createElement('span');
+    badge.setAttribute('data-similarity-badge','');
+    badge.className = 'badge';
+    badge.style.marginLeft = '8px';
+    badge.textContent = '유사도: —';
+    var header = card.querySelector('.title, h3, h4') || card;
+    header.appendChild(badge);
+  });
+});
+</script>
+
+<!-- 시안용 커스텀 JavaScript -->
+<script>
+// 서브메뉴 토글 함수
+function toggleSubmenu(menuId) {
+    const submenu = document.getElementById(menuId + '-submenu');
+    const arrow = document.getElementById(menuId + '-arrow');
+
+    if (submenu && arrow) {
+        const isHidden = submenu.classList.contains('hidden');
+
+        if (isHidden) {
+            submenu.classList.remove('hidden');
+            arrow.style.transform = 'rotate(180deg)';
+        } else {
+            submenu.classList.add('hidden');
+            arrow.style.transform = 'rotate(0deg)';
+        }
+    }
+}
+
+// 논문심사 단계 선택 함수 (라디오 버튼처럼 동작 - 한 번에 하나만 선택)
+let selectedReviewStage = 'all'; // 기본값: 전체
+
+function toggleReviewStage(stageType) {
+    const allBtn = document.getElementById('stage-all');
+    const proposalBtn = document.getElementById('stage-proposal');
+    const interimBtn = document.getElementById('stage-interim');
+    const finalBtn = document.getElementById('stage-final');
+
+    // 모든 버튼의 active 클래스 제거
+    [allBtn, proposalBtn, interimBtn, finalBtn].forEach(b => {
+        if (b) b.classList.remove('active');
+    });
+
+    // 선택된 버튼만 active 클래스 추가
+    const selectedBtn = document.getElementById('stage-' + stageType);
+    if (selectedBtn) {
+        selectedBtn.classList.add('active');
+        selectedReviewStage = stageType;
+    }
+
+    // 실제로는 여기서 선택된 단계에 맞는 데이터를 필터링하여 표시
+    console.log('선택된 심사 단계:', selectedReviewStage);
+
+    // 검색 함수가 있다면 호출
+    if (typeof searchReviews === 'function') {
+        searchReviews();
+    }
+}
+
+// 논문지도현황 단계 선택 함수 (라디오 버튼처럼 동작 - 한 번에 하나만 선택)
+let selectedFeedbackStage = 'all'; // 기본값: 전체
+
+function toggleFeedbackStage(stageType) {
+    const allBtn = document.getElementById('feedback-stage-all');
+    const proposalBtn = document.getElementById('feedback-stage-proposal');
+    const interimBtn = document.getElementById('feedback-stage-interim');
+    const finalBtn = document.getElementById('feedback-stage-final');
+
+    // 모든 버튼의 active 클래스 제거
+    [allBtn, proposalBtn, interimBtn, finalBtn].forEach(b => {
+        if (b) b.classList.remove('active');
+    });
+
+    // 선택된 버튼만 active 클래스 추가
+    const selectedBtn = document.getElementById('feedback-stage-' + stageType);
+    if (selectedBtn) {
+        selectedBtn.classList.add('active');
+        selectedFeedbackStage = stageType;
+    }
+
+    // 실제로는 여기서 선택된 단계에 맞는 데이터를 필터링하여 표시
+    console.log('선택된 논문지도 단계:', selectedFeedbackStage);
+}
+
+// 페이지 로드 시 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    // 서브메뉴 화살표 초기 상태 (펼쳐진 상태)
+    document.querySelectorAll('[id$="-arrow"]').forEach(arrow => {
+        arrow.style.transform = 'rotate(180deg)';
+    });
+});
+
+// 사이드바 서브링크 클릭 시 active 처리
+document.addEventListener('DOMContentLoaded', function() {
+    const sublinks = document.querySelectorAll('.sidebar-sublink');
+    sublinks.forEach(link => {
+        link.addEventListener('click', function() {
+            // 모든 서브링크의 active 제거
+            sublinks.forEach(l => l.classList.remove('bg-blue-50', 'text-blue-600'));
+            // 클릭된 링크에 active 추가
+            this.classList.add('bg-blue-50', 'text-blue-600');
+        });
+    });
+});
+</script>
+
+<!-- 시안용 CSS 추가 -->
+<style>
+.sidebar-sublink.active,
+.sidebar-sublink:hover {
+    background-color: #eff6ff;
+    color: #2563eb;
+}
+
+/* 버튼 형태의 단계 선택 스타일 */
+.review-stage-btn,
+.feedback-stage-btn {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.review-stage-btn:active,
+.feedback-stage-btn:active {
+    transform: scale(0.98);
+}
+
+/* 선택 해제 상태 스타일 */
+.review-stage-btn.bg-gray-300,
+.feedback-stage-btn.bg-gray-300 {
+    opacity: 0.6;
+}
+
+/* 자료실 테이블 스타일 개선 */
+#boardContainer table {
+    width: 100%;
+    table-layout: fixed;
+}
+
+#boardContainer table th:nth-child(1),
+#boardContainer table td:nth-child(1) {
+    width: 80px;
+}
+
+#boardContainer table th:nth-child(2),
+#boardContainer table td:nth-child(2) {
+    width: auto;
+    min-width: 200px;
+}
+
+#boardContainer table th:nth-child(3),
+#boardContainer table td:nth-child(3) {
+    width: 120px;
+}
+
+#boardContainer table th:nth-child(4),
+#boardContainer table td:nth-child(4) {
+    width: 120px;
+}
+
+#boardContainer table th:nth-child(5),
+#boardContainer table td:nth-child(5) {
+    width: 80px;
+    text-align: center;
+}
+
+#boardContainer .overflow-x-auto {
+    overflow-x: visible;
+}
+</style>
+
+</body>
+</html>

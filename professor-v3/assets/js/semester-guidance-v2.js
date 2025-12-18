@@ -1,0 +1,535 @@
+// ===================================
+// 학기별 논문지도 계획 관리 V2 (댓글 방식 실적 입력)
+// ===================================
+
+let currentStudentIdV2 = null; // 현재 선택된 학생 ID (V2)
+let currentSemesterView = { year: 2025, semester: 1 };
+let availableSemesters = []; // 조회 가능한 학기 목록
+
+// ==================== 학기별 상세 화면 (통합) ====================
+function showSemesterGuidanceDetail(studentId) {
+    currentStudentIdV2 = studentId;
+
+    const student = DataService.getStudentDetail(studentId);
+    if (!student) return;
+
+    // 학생의 모든 학기 계획 조회
+    const allPlans = DataService.getAllSemesterPlans(studentId);
+
+    // 사용 가능한 학기 목록 생성 (최근 5년)
+    availableSemesters = generateAvailableSemesters(allPlans);
+
+    // 현재 선택된 학기 (기본값: 가장 최근 학기 또는 현재 학기)
+    if (allPlans.length > 0) {
+        const latestPlan = allPlans.sort((a, b) => {
+            if (a.year !== b.year) return b.year - a.year;
+            return b.semester - a.semester;
+        })[0];
+        currentSemesterView = { year: latestPlan.year, semester: latestPlan.semester };
+    } else {
+        // 계획이 없으면 현재 학기로 설정
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1; // 1-12
+        const currentSemester = (currentMonth >= 3 && currentMonth <= 8) ? 1 : 2;
+        currentSemesterView = { year: currentYear, semester: currentSemester };
+    }
+
+    const contentArea = document.getElementById('guidance-content-area');
+    if (!contentArea) return;
+
+    contentArea.innerHTML = renderSemesterDetailScreen(student, allPlans);
+}
+
+// 사용 가능한 학기 목록 생성 (최근 5년)
+function generateAvailableSemesters(existingPlans) {
+    const currentYear = new Date().getFullYear();
+    const semesters = [];
+
+    for (let y = currentYear; y >= currentYear - 4; y--) {
+        for (let s = 1; s <= 2; s++) {
+            const hasPlan = existingPlans.some(p => p.year === y && p.semester === s);
+            semesters.push({
+                year: y,
+                semester: s,
+                hasPlan: hasPlan,
+                label: `${y}학년도 ${s}학기${hasPlan ? ' ✓' : ''}`
+            });
+        }
+    }
+
+    return semesters;
+}
+
+// ==================== 통합 화면 렌더링 ====================
+function renderSemesterDetailScreen(student, allPlans) {
+    const currentPlan = allPlans.find(p =>
+        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
+    );
+
+    const advisors = DataService.getStudentAdvisors(currentStudentIdV2);
+    const currentProf = DataService.getCurrentProfessor();
+
+    // 계획이 없으면 빈 15주차 생성
+    const weeks = currentPlan ? currentPlan.weeks : generateEmptyWeeks(15);
+
+    return `
+        <!-- 뒤로가기 -->
+        <div class="mb-4">
+            <button onclick="showStudentList()"
+                    class="flex items-center text-gray-600 hover:text-gray-800 transition-colors">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                <span class="text-sm font-medium">목록으로 돌아가기</span>
+            </button>
+        </div>
+
+        <!-- 학생 정보 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4">${student.name} (${student.studentId})</h2>
+            <div class="grid grid-cols-4 gap-4 text-sm">
+                <div>
+                    <span class="text-gray-600">전공:</span>
+                    <span class="font-semibold text-gray-800 ml-2">${student.major}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">학위과정:</span>
+                    <span class="font-semibold text-gray-800 ml-2">${getDegreeText(student.degree)}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">현재 단계:</span>
+                    <span class="font-semibold text-gray-800 ml-2">${getStageText(student.stage)}</span>
+                </div>
+                <div>
+                    <span class="text-gray-600">지도교수:</span>
+                    <span class="font-semibold text-gray-800 ml-2">${advisors.map(a => a.name).join(', ')}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 학기 선택 카드 -->
+        <div class="bg-[#FCE4EC] rounded-lg p-6 mb-6">
+            <div class="flex items-center gap-4 mb-4">
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">학년도</label>
+                    <select id="select-year" onchange="changeSemesterView()"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                        ${Array.from(new Set(availableSemesters.map(s => s.year)))
+                            .map(y => `<option value="${y}" ${y === currentSemesterView.year ? 'selected' : ''}>${y}학년도</option>`)
+                            .join('')}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">학기</label>
+                    <select id="select-semester" onchange="changeSemesterView()"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                        ${availableSemesters
+                            .filter(s => s.year === currentSemesterView.year)
+                            .map(s => `<option value="${s.semester}" ${s.semester === currentSemesterView.semester ? 'selected' : ''}>${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
+                            .join('')}
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- 주차별 지도 계획 및 실적 (항상 15주차 표시) -->
+        ${renderWeeklyCards(weeks, advisors, currentProf, currentPlan)}
+    `;
+}
+
+// 빈 15주차 구조 생성
+function generateEmptyWeeks(count) {
+    const weeks = [];
+    for (let i = 1; i <= count; i++) {
+        weeks.push({
+            week: i,
+            plannedDate: null,  // 학사시스템에서 조회
+            plannedTopic: '',
+            plannedContent: '',
+            plannedMethod: 'meeting',
+            executions: []
+        });
+    }
+    return weeks;
+}
+
+// 학기 선택 변경
+function changeSemesterView() {
+    const year = parseInt(document.getElementById('select-year').value);
+    const semester = parseInt(document.getElementById('select-semester').value);
+
+    currentSemesterView = { year, semester };
+
+    // 화면 새로고침
+    showSemesterGuidanceDetail(currentStudentIdV2);
+}
+
+// ==================== 주차별 카드 렌더링 (계획 유무 무관) ====================
+function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
+    return `
+        <div class="space-y-4">
+            <div class="mb-4">
+                <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
+            </div>
+
+            ${weeks.map(week => renderWeekCard(week, advisors, currentProf, existingPlan, currentStudentIdV2)).join('')}
+        </div>
+    `;
+}
+
+// 개별 주차 카드 (댓글 방식)
+function renderWeekCard(week, advisors, currentProf, plan, studentId) {
+    const hasExecutions = week.executions && week.executions.length > 0;
+    const hasPlan = week.plannedTopic && week.plannedTopic.trim() !== '';
+
+    return `
+        <div class="week-card-v2 bg-white border border-gray-200 rounded-lg">
+                ${hasPlan ? `
+                    <!-- 계획 표시 영역 -->
+                    <div class="p-4 bg-gray-50 border-b border-gray-200">
+                        <div class="mb-3">
+                            <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
+                            <span class="text-gray-400 mx-2">-</span>
+                            <span class="text-base font-medium text-gray-800">${week.plannedTopic}</span>
+                            <span class="text-xs px-2 py-1 rounded ${getMethodBadgeClass(week.plannedMethod)} ml-2">
+                                ${getMethodText(week.plannedMethod)}
+                            </span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="text-sm font-semibold text-gray-700">계획 내용:</span>
+                            <p class="text-sm text-gray-700 mt-1">${week.plannedContent}</p>
+                        </div>
+                        <div class="text-xs text-gray-500">
+                            계획일: ${formatDate(week.plannedDate)}
+                        </div>
+                    </div>
+                ` : `
+                    <!-- 계획 입력 폼 -->
+                    ${renderWeekPlanInputForm(week.week)}
+                `}
+
+                <!-- 실적 목록 (댓글 형태) -->
+                <div class="p-4">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">
+                        실적 및 교수의견 (${week.executions.length}건)
+                    </h4>
+
+                    <!-- 기존 실적 목록 -->
+                    ${week.executions.length > 0 ? `
+                        <div class="space-y-3 mb-4">
+                            ${week.executions.map(exec => renderExecutionComment(exec, currentProf, week.week, studentId)).join('')}
+                        </div>
+                    ` : ''}
+
+                    <!-- 실적 추가 폼 (인라인) -->
+                    ${renderExecutionInputForm(week.week, currentProf)}
+                </div>
+        </div>
+    `;
+}
+
+// 실적 댓글 렌더링
+function renderExecutionComment(execution, currentProf, weekNumber, studentId) {
+    const isMyExecution = execution.professorId === currentProf.id;
+
+    return `
+        <div class="execution-comment ${isMyExecution ? 'bg-[#FCE4EC] border-[#F8BBD9]' : 'bg-gray-50 border-gray-200'} border rounded-lg p-4">
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <div class="text-sm font-semibold ${isMyExecution ? 'text-[#6A0028]' : 'text-gray-800'}">
+                        ${execution.professorName} ${isMyExecution ? '(나)' : ''}
+                    </div>
+                    <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
+                        <span>${formatDateWithTime(execution.executionDate)}</span>
+                        <span>•</span>
+                        <span class="px-2 py-0.5 rounded ${getMethodBadgeClass(execution.method)}">
+                            ${getMethodText(execution.method)}
+                        </span>
+                    </div>
+                </div>
+                ${isMyExecution ? `
+                    <div class="flex gap-2">
+                        <button onclick="editExecutionInlineV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
+                                class="text-xs text-[#6A0028] hover:text-[#6A0028]">
+                            수정
+                        </button>
+                        <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
+                                class="text-xs text-red-600 hover:text-red-800">
+                            삭제
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="space-y-2 mt-3">
+                <div>
+                    <span class="text-xs font-semibold text-gray-600">실행 내용:</span>
+                    <p class="text-sm text-gray-800 mt-1">${execution.executionContent}</p>
+                </div>
+                <div>
+                    <span class="text-xs font-semibold text-gray-600">교수 의견:</span>
+                    <p class="text-sm text-gray-800 mt-1">${execution.comment}</p>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 실적 추가 인라인 폼
+function renderExecutionInputForm(weekNumber, currentProf) {
+    const today = getTodayDate();
+
+    return `
+        <div class="execution-input-form bg-white border-2 border-dashed border-gray-300 rounded-lg p-4">
+            <div class="mb-2">
+                <span class="text-sm font-semibold text-gray-700">${currentProf.name} 교수 - 실적 추가</span>
+            </div>
+            <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-600 mb-1">실행일 *</label>
+                            <input type="date" id="exec-date-${weekNumber}" value="${today}"
+                                   class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm">
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-xs text-gray-600 mb-1">지도 방식 *</label>
+                            <select id="exec-method-${weekNumber}" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm">
+                                <option value="meeting">대면</option>
+                                <option value="online">온라인</option>
+                                <option value="zoom">Zoom</option>
+                                <option value="email">이메일</option>
+                                <option value="phone">전화</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">실행 내용 *</label>
+                        <textarea id="exec-content-${weekNumber}" rows="2"
+                                  placeholder="실제로 지도한 내용을 입력하세요"
+                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">교수 의견 *</label>
+                        <textarea id="exec-comment-${weekNumber}" rows="2"
+                                  placeholder="학생의 이해도, 진행 상황 등에 대한 의견을 입력하세요"
+                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                    </div>
+                    <div class="flex justify-end">
+                        <button onclick="addExecutionV2(${weekNumber})"
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
+                            <i class="fas fa-plus-circle"></i>
+                            실적 추가
+                        </button>
+                    </div>
+                </div>
+        </div>
+    `;
+}
+
+// 주차별 계획 입력 폼 (인라인)
+function renderWeekPlanInputForm(weekNumber) {
+    return `
+        <div class="p-4 bg-yellow-50 border-b border-yellow-200">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">${weekNumber}주차 계획</h4>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
+                    <input type="text" id="plan-topic-${weekNumber}"
+                           placeholder="예: 연구방법론 개요"
+                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
+                    <textarea id="plan-content-${weekNumber}" rows="3"
+                              placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
+                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
+                    <select id="plan-method-${weekNumber}"
+                            class="border border-gray-300 rounded px-3 py-2 text-sm">
+                        <option value="meeting">대면</option>
+                        <option value="online">온라인</option>
+                        <option value="zoom" selected>Zoom</option>
+                        <option value="email">이메일</option>
+                        <option value="phone">전화</option>
+                    </select>
+                </div>
+                <div class="flex justify-end gap-2">
+                    <button onclick="saveWeekPlan(${weekNumber})"
+                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
+                        <i class="fas fa-save"></i>
+                        계획 저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ==================== 실적 추가 (인라인) ====================
+function addExecutionV2(weekNumber) {
+    const executionDate = document.getElementById(`exec-date-${weekNumber}`).value;
+    const method = document.getElementById(`exec-method-${weekNumber}`).value;
+    const content = document.getElementById(`exec-content-${weekNumber}`).value.trim();
+    const comment = document.getElementById(`exec-comment-${weekNumber}`).value.trim();
+
+    if (!executionDate || !content || !comment) {
+        showToast('모든 필수 항목을 입력해주세요.', 'warning');
+        return;
+    }
+
+    const currentProf = DataService.getCurrentProfessor();
+
+    const executionData = {
+        professorId: currentProf.id,
+        professorName: currentProf.name,
+        executionDate,
+        executionContent: content,
+        comment: comment,
+        method: method
+    };
+
+    try {
+        DataService.addExecution(
+            currentStudentIdV2,
+            currentSemesterView.year,
+            currentSemesterView.semester,
+            weekNumber,
+            executionData
+        );
+
+        showToast(`${weekNumber}주차 실적이 추가되었습니다.`, 'success');
+
+        // 화면 새로고침
+        setTimeout(() => {
+            showSemesterGuidanceDetail(currentStudentIdV2);
+        }, 300);
+
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// 실적 삭제
+function deleteExecutionV2(studentId, year, semester, week, executionId) {
+    if (!confirm(`${week}주차 실적을 삭제하시겠습니까?`)) return;
+
+    try {
+        DataService.deleteExecution(studentId, year, semester, week, executionId);
+        showToast(`${week}주차 실적이 삭제되었습니다.`, 'success');
+
+        setTimeout(() => {
+            showSemesterGuidanceDetail(studentId);
+        }, 300);
+
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// ==================== 주차별 계획 저장 (인라인) ====================
+function saveWeekPlan(weekNumber) {
+    const topic = document.getElementById(`plan-topic-${weekNumber}`).value.trim();
+    const content = document.getElementById(`plan-content-${weekNumber}`).value.trim();
+    const method = document.getElementById(`plan-method-${weekNumber}`).value;
+
+    if (!topic || !content) {
+        showToast('지도 주제와 계획 내용을 모두 입력해주세요.', 'warning');
+        return;
+    }
+
+    const planData = {
+        plannedTopic: topic,
+        plannedContent: content,
+        plannedMethod: method,
+        plannedDate: null  // 학사시스템에서 자동 설정
+    };
+
+    try {
+        DataService.updateWeekPlan(
+            currentStudentIdV2,
+            currentSemesterView.year,
+            currentSemesterView.semester,
+            weekNumber,
+            planData
+        );
+
+        showToast(`${weekNumber}주차 계획이 저장되었습니다.`, 'success');
+
+        // 화면 새로고침
+        setTimeout(() => {
+            showSemesterGuidanceDetail(currentStudentIdV2);
+        }, 300);
+
+    } catch (error) {
+        showToast(error.message, 'error');
+    }
+}
+
+// ==================== 유틸리티 ====================
+function getTodayDate() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}.${day}`;
+}
+
+function formatDateWithTime(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}월 ${day}일`;
+}
+
+function getDegreeText(degree) {
+    const map = { 'master': '석사', 'doctor': '박사' };
+    return map[degree] || degree;
+}
+
+function getStageText(stage) {
+    const map = {
+        'plan': '연구계획서',
+        'mid': '중간논문',
+        'final': '최종논문'
+    };
+    return map[stage] || stage;
+}
+
+function getMethodBadgeClass(method) {
+    const classes = {
+        'meeting': 'bg-green-100 text-green-700',
+        'zoom': 'bg-purple-100 text-purple-700',
+        'online': 'bg-[#FCE4EC] text-[#6A0028]',
+        'email': 'bg-yellow-100 text-yellow-700',
+        'phone': 'bg-pink-100 text-pink-700'
+    };
+    return classes[method] || 'bg-gray-100 text-gray-700';
+}
+
+function getMethodText(method) {
+    const texts = {
+        'meeting': '대면',
+        'zoom': 'Zoom',
+        'online': '온라인',
+        'email': '이메일',
+        'phone': '전화'
+    };
+    return texts[method] || method;
+}
+
+// Export
+window.showSemesterGuidanceDetail = showSemesterGuidanceDetail;
+window.changeSemesterView = changeSemesterView;
+window.addExecutionV2 = addExecutionV2;
+window.deleteExecutionV2 = deleteExecutionV2;
+window.saveWeekPlan = saveWeekPlan;
+
+console.log('✅ 학기별 논문지도 계획 V2 모듈 로드 완료 (댓글 방식)');
