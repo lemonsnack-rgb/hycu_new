@@ -1,0 +1,1023 @@
+/* Phase 5: 심사 관리 - 스타일 */
+
+/* ==================== 심사 목록 ==================== */
+.review-list-container {
+    padding: 20px;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.review-header h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #1a1a1a;
+}
+
+.review-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-group label {
+    font-size: 14px;
+    color: #666;
+}
+
+/* filter-group select 스타일은 common-style.css에서 처리 */
+
+.search-group {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+    max-width: 400px;
+}
+
+.search-group input {
+    flex: 1;
+}
+
+.search-group button {
+    padding: 8px 16px;
+    background: #009DE8;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.search-group button:hover {
+    background: #0087c9;
+}
+
+/* 테이블 스타일 */
+.review-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.review-row {
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.review-row:hover {
+    background: #F9FAFB;
+}
+
+/* 학생 정보 */
+.student-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.student-name {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.student-number {
+    font-size: 12px;
+    color: #666;
+}
+
+/* 논문 제목 */
+.thesis-title {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 역할 배지 */
+.role-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.role-badge.chair {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.role-badge.member {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+/* 진행상황 */
+.progress-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.progress-text {
+    font-size: 13px;
+    color: #666;
+}
+
+.progress-bar {
+    width: 80px;
+    height: 6px;
+    background: #e9ecef;
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #009DE8;
+    transition: width 0.3s;
+}
+
+/* 마감일 */
+.due-date {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.due-date.normal {
+    color: #333333;
+}
+
+.due-date.warning {
+    color: #fd7e14;
+}
+
+.due-date.urgent {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.due-date.overdue {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.due-badge {
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.due-badge.urgent {
+    background: #dc3545;
+    color: white;
+}
+
+.due-badge.overdue {
+    background: #6c757d;
+    color: white;
+}
+
+/* 상태 배지 */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-badge.status-progress {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-badge.status-completed {
+    background: #cfe2ff;
+    color: #084298;
+}
+
+.status-badge.status-approved {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.status-badge.status-hold {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.status-badge.status-rejected {
+    background: #f8d7da;
+    color: #842029;
+}
+
+/* 제출 단계 배지 */
+.badge-type-proposal {
+    background: #e7f3ff;
+    color: #0066cc;
+}
+
+.badge-type-midterm {
+    background: #fff4e6;
+    color: #cc7a00;
+}
+
+.badge-type-final {
+    background: #ffe6f0;
+    color: #cc0066;
+}
+
+/* Empty State */
+.empty-state {
+    padding: 60px 20px;
+    text-align: center;
+}
+
+.empty-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.empty-state h3 {
+    margin: 0 0 10px 0;
+    color: #333333;
+}
+
+.empty-state p {
+    margin: 0;
+    color: #6c757d;
+}
+
+/* ==================== 심사 상세 모달 ==================== */
+.review-detail-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10000;
+    overflow-y: auto;
+}
+
+.review-detail-modal.active {
+    display: block;
+}
+
+.modal-content {
+    max-width: 1200px;
+    margin: 40px auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    border-bottom: 1px solid #E5E5E5;
+}
+
+.modal-header h2 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.modal-close {
+    background: none;
+    border: none;
+    font-size: 28px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close:hover {
+    color: #333333;
+}
+
+.modal-body {
+    padding: 30px;
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
+}
+
+/* 논문 정보 섹션 */
+.thesis-info-section {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #F9FAFB;
+    border-radius: 8px;
+}
+
+.thesis-info-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+    color: #1a1a1a;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.info-item label {
+    font-size: 13px;
+    color: #6c757d;
+    font-weight: 500;
+}
+
+.info-item > div {
+    font-size: 14px;
+    color: #1a1a1a;
+}
+
+.thesis-title-full {
+    font-weight: 600;
+    line-height: 1.5;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.committee-info {
+    margin-top: 20px;
+}
+
+.committee-info h4 {
+    margin: 0 0 10px 0;
+    font-size: 15px;
+    color: #333333;
+}
+
+.committee-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.committee-list li {
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+}
+
+.eval-status {
+    margin-left: auto;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+/* 평가표 폼 섹션 */
+.evaluation-form-section {
+    margin-bottom: 30px;
+}
+
+.evaluation-form-section h3 {
+    margin: 0 0 10px 0;
+    font-size: 18px;
+}
+
+.template-name {
+    margin: 0 0 20px 0;
+    color: #6c757d;
+    font-size: 14px;
+}
+
+.evaluation-item {
+    margin-bottom: 30px;
+    padding: 20px;
+    background: #F9FAFB;
+    border-radius: 8px;
+}
+
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.category-header h4 {
+    margin: 0;
+    font-size: 16px;
+    color: #1a1a1a;
+}
+
+.weight-badge {
+    padding: 4px 10px;
+    background: #e9ecef;
+    color: #333333;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.category-description {
+    margin: 10px 0;
+    color: #6c757d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.criteria-list {
+    margin: 10px 0;
+    padding-left: 20px;
+    color: #333333;
+    font-size: 13px;
+}
+
+.criteria-list li {
+    margin: 5px 0;
+}
+
+.score-input-group {
+    margin: 15px 0;
+}
+
+.score-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333333;
+}
+
+.score-slider-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.score-slider {
+    flex: 1;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #E5E5E5;
+    border-radius: 3px;
+    outline: none;
+}
+
+.score-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background: #009DE8;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.score-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: #009DE8;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+}
+
+.score-display {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+    min-width: 60px;
+}
+
+.current-score {
+    font-size: 20px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.max-score {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.comment-input-group {
+    margin-top: 15px;
+}
+
+.comment-input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333333;
+}
+
+.category-comment {
+    width: 100%;
+}
+
+/* 총점 섹션 */
+.total-score-section {
+    margin: 30px 0;
+    padding: 20px;
+    background: #fff;
+    border: 2px solid #009DE8;
+    border-radius: 8px;
+}
+
+.score-summary {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+}
+
+.score-item {
+    text-align: center;
+}
+
+.score-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.total-score {
+    font-size: 32px;
+    font-weight: 700;
+    color: #009DE8;
+}
+
+.expected-result {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.result-pass {
+    color: #009DE8;
+}
+
+.result-fail {
+    color: #dc3545;
+}
+
+/* 총평 섹션 */
+.overall-comment-section {
+    margin: 30px 0;
+}
+
+.overall-comment-section h3 {
+    margin: 0 0 20px 0;
+    font-size: 18px;
+}
+
+.comment-group {
+    margin-bottom: 20px;
+}
+
+.comment-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333333;
+}
+
+.comment-group textarea {
+    width: 100%;
+}
+
+/* 폼 액션 */
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+/* 제출된 평가 */
+.submitted-evaluation-section {
+    margin-bottom: 30px;
+}
+
+.submitted-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid #E5E5E5;
+}
+
+.submitted-header h3 {
+    margin: 0;
+    font-size: 18px;
+    color: #28a745;
+}
+
+.submitted-date {
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.evaluation-summary {
+    margin-bottom: 20px;
+}
+
+.score-item-readonly {
+    margin-bottom: 20px;
+    padding: 15px;
+    background: #F9FAFB;
+    border-radius: 8px;
+}
+
+.score-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.score-header h4 {
+    margin: 0;
+    font-size: 15px;
+}
+
+.score-value {
+    font-weight: 600;
+    color: #009DE8;
+}
+
+.score-comment {
+    margin: 8px 0 0 0;
+    color: #333333;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.total-score-readonly {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    background: #F9FAFB;
+    border-radius: 8px;
+    margin: 20px 0;
+}
+
+.score-large {
+    font-size: 36px;
+    font-weight: 700;
+    color: #009DE8;
+}
+
+.result-badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.result-badge.pass {
+    background: #d1e7dd;
+    color: #0f5132;
+}
+
+.result-badge.fail {
+    background: #f8d7da;
+    color: #842029;
+}
+
+.overall-comment-readonly {
+    margin-top: 20px;
+    padding: 20px;
+    background: #fff;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+}
+
+.overall-comment-readonly h4 {
+    margin: 0 0 15px 0;
+    font-size: 16px;
+}
+
+.comment-section {
+    margin-bottom: 15px;
+}
+
+.comment-section:last-child {
+    margin-bottom: 0;
+}
+
+.comment-section strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #333333;
+    font-size: 14px;
+}
+
+.comment-section p {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+/* 심사위원장 종합 평가 */
+.chair-summary-section {
+    margin-top: 40px;
+    padding: 30px;
+    background: #fffbf0;
+    border: 2px solid #ffc107;
+    border-radius: 8px;
+}
+
+.chair-summary-section h3 {
+    margin: 0 0 25px 0;
+    font-size: 20px;
+    color: #856404;
+}
+
+.chair-summary-section h4 {
+    margin: 20px 0 15px 0;
+    font-size: 16px;
+    color: #333333;
+}
+
+.evaluation-status {
+    margin-bottom: 30px;
+}
+
+.status-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.status-list li {
+    padding: 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.status-complete {
+    margin-left: auto;
+    color: #28a745;
+    font-size: 13px;
+}
+
+/* 점수 비교 테이블 */
+.score-comparison {
+    margin-bottom: 30px;
+}
+
+.comparison-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.comparison-table th,
+.comparison-table td {
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #E5E5E5;
+    font-size: 13px;
+}
+
+.comparison-table th {
+    background: #F9FAFB;
+    font-weight: 600;
+}
+
+.comparison-table th:first-child,
+.comparison-table td:first-child {
+    text-align: left;
+}
+
+.comparison-table .total-row {
+    background: #F9FAFB;
+    font-weight: 600;
+}
+
+/* 총평 카드 */
+.overall-comments {
+    margin-bottom: 30px;
+}
+
+.comment-card {
+    margin-bottom: 15px;
+    padding: 15px;
+    background: white;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.comment-card p {
+    margin: 5px 0;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.no-comment {
+    color: #6c757d;
+    font-style: italic;
+}
+
+/* 시스템 판정 */
+.system-decision {
+    margin-bottom: 30px;
+}
+
+.decision-box {
+    display: flex;
+    justify-content: space-around;
+    padding: 20px;
+    background: white;
+    border: 1px solid #E5E5E5;
+    border-radius: 8px;
+}
+
+.decision-item {
+    text-align: center;
+}
+
+.decision-item.full-width {
+    flex: 1;
+    text-align: left;
+}
+
+.decision-item label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    color: #6c757d;
+}
+
+.decision-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+/* 심사위원장 최종 결정 폼 */
+.chair-decision-form {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+}
+
+.chair-decision-form h4 {
+    margin: 0 0 20px 0;
+    font-size: 16px;
+    color: #333333;
+}
+
+.decision-options {
+    margin-bottom: 20px;
+}
+
+.decision-radio {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: white;
+    border: 2px solid #E5E5E5;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.decision-radio:hover {
+    border-color: #009DE8;
+    background: #F9FAFB;
+}
+
+.decision-radio input[type="radio"] {
+    margin-right: 10px;
+}
+
+.decision-radio input[type="radio"]:checked + span {
+    font-weight: 600;
+    color: #009DE8;
+}
+
+.decision-comment-group {
+    margin-bottom: 20px;
+}
+
+.decision-comment-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.required {
+    color: #dc3545;
+}
+
+.decision-comment-group textarea {
+    width: 100%;
+}
+
+.chair-decision-readonly {
+    padding: 20px;
+    background: #d1e7dd;
+    border-radius: 8px;
+}
+
+.chair-decision-readonly h4 {
+    margin: 0 0 15px 0;
+    color: #0f5132;
+}
+
+/* 버튼 스타일 */
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-lg {
+    padding: 12px 30px;
+    font-size: 16px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .score-summary {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .decision-box {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+}

@@ -1,0 +1,60 @@
+/* ===================================
+   학기별 논문지도 계획 스타일
+   =================================== */
+
+/* 주차별 아코디언 */
+.week-accordion {
+    transition: all 0.2s ease;
+}
+
+.week-accordion-header {
+    user-select: none;
+}
+
+.week-accordion-header i {
+    transition: transform 0.3s ease;
+}
+
+.week-accordion.open .week-accordion-header i {
+    transform: rotate(180deg);
+}
+
+.week-accordion-content {
+    display: none;
+}
+
+.week-accordion.open .week-accordion-content {
+    display: block;
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 1000px;
+    }
+}
+
+/* 실적 입력 영역 강조 */
+.execution-area {
+    transition: background-color 0.2s ease;
+}
+
+.execution-area:hover {
+    background-color: #f9fafb;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .week-accordion-header {
+        padding: 0.75rem;
+    }
+
+    .week-accordion-header span {
+        font-size: 0.875rem;
+    }
+}
