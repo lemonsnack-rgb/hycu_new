@@ -36,18 +36,85 @@
 
     <!-- Crimson Color Override -->
     <style>
-        /* Tailwind의 Blue 계열을 Crimson으로 오버라이드 */
+        /* 전역 CSS 변수 오버라이드 */
+        :root {
+            --primary: #6A0028 !important;
+            --primary-dark: #4A001C !important;
+            --primary-light: #8A0034 !important;
+        }
+
+        /* Tailwind Blue → Crimson 전체 오버라이드 */
+        .bg-blue-50 { background-color: #FCE4EC !important; }
         .bg-blue-100 { background-color: #FCE4EC !important; }
-        .text-blue-800 { color: #6A0028 !important; }
-        .hover\:bg-blue-50:hover { background-color: #FCE4EC !important; }
-        .text-blue-600 { color: #6A0028 !important; }
-        .hover\:text-blue-800:hover { color: #8A0034 !important; }
-        .border-blue-500 { border-color: #6A0028 !important; }
-        .border-blue-300 { border-color: #F8BBD9 !important; }
+        .bg-blue-200 { background-color: #F8BBD9 !important; }
+        .bg-blue-300 { background-color: #F48FB1 !important; }
+        .bg-blue-400 { background-color: #F06292 !important; }
         .bg-blue-500 { background-color: #6A0028 !important; }
+        .bg-blue-600 { background-color: #8A0034 !important; }
+        .bg-blue-700 { background-color: #4A001C !important; }
+        .bg-blue-800 { background-color: #4A001C !important; }
+        .bg-blue-900 { background-color: #4A001C !important; }
+
+        .text-blue-50 { color: #FCE4EC !important; }
+        .text-blue-100 { color: #F8BBD9 !important; }
+        .text-blue-200 { color: #F48FB1 !important; }
+        .text-blue-300 { color: #F06292 !important; }
+        .text-blue-400 { color: #8A0034 !important; }
+        .text-blue-500 { color: #6A0028 !important; }
+        .text-blue-600 { color: #6A0028 !important; }
+        .text-blue-700 { color: #4A001C !important; }
+        .text-blue-800 { color: #6A0028 !important; }
+        .text-blue-900 { color: #4A001C !important; }
+
+        .border-blue-50 { border-color: #FCE4EC !important; }
+        .border-blue-100 { border-color: #FCE4EC !important; }
+        .border-blue-200 { border-color: #F8BBD9 !important; }
+        .border-blue-300 { border-color: #F8BBD9 !important; }
+        .border-blue-400 { border-color: #F06292 !important; }
+        .border-blue-500 { border-color: #6A0028 !important; }
+        .border-blue-600 { border-color: #8A0034 !important; }
+        .border-blue-700 { border-color: #4A001C !important; }
+        .border-blue-800 { border-color: #4A001C !important; }
+        .border-blue-900 { border-color: #4A001C !important; }
+
+        /* Hover 상태 */
+        .hover\:bg-blue-50:hover { background-color: #FCE4EC !important; }
+        .hover\:bg-blue-100:hover { background-color: #FCE4EC !important; }
+        .hover\:bg-blue-500:hover { background-color: #6A0028 !important; }
         .hover\:bg-blue-600:hover { background-color: #8A0034 !important; }
+        .hover\:bg-blue-700:hover { background-color: #4A001C !important; }
+
+        .hover\:text-blue-500:hover { color: #6A0028 !important; }
+        .hover\:text-blue-600:hover { color: #6A0028 !important; }
+        .hover\:text-blue-700:hover { color: #4A001C !important; }
+        .hover\:text-blue-800:hover { color: #8A0034 !important; }
+
+        .hover\:border-blue-500:hover { border-color: #6A0028 !important; }
+        .hover\:border-blue-600:hover { border-color: #8A0034 !important; }
+
+        /* Focus 상태 */
         .focus\:ring-blue-500:focus { --tw-ring-color: #6A0028 !important; }
         .focus\:border-blue-500:focus { border-color: #6A0028 !important; }
+        .focus\:ring-blue-300:focus { --tw-ring-color: #F8BBD9 !important; }
+
+        /* 인라인 스타일 색상 오버라이드 */
+        [style*="background:#009DE8"],
+        [style*="background: #009DE8"],
+        [style*="background-color:#009DE8"],
+        [style*="background-color: #009DE8"] {
+            background-color: #6A0028 !important;
+        }
+
+        [style*="color:#009DE8"],
+        [style*="color: #009DE8"] {
+            color: #6A0028 !important;
+        }
+
+        /* 기존 primary 색상 (#009DE8) 오버라이드 */
+        .bg-\[\#009DE8\] { background-color: #6A0028 !important; }
+        .hover\:bg-\[\#0087c9\]:hover { background-color: #8A0034 !important; }
+        .text-\[\#009DE8\] { color: #6A0028 !important; }
+        .border-\[\#009DE8\] { border-color: #6A0028 !important; }
 
         /* 사이드바 active 상태 Crimson 적용 */
         .sidebar-link.active {
