@@ -507,20 +507,21 @@ body.layout-v3 {
 
 .layout-v3-utility-icon-btn .badge-count {
     position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
+    top: -6px;
+    right: -6px;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--color-danger, #EF4444);
+    background: var(--color-primary, #6A0028);
     color: white;
     font-size: 11px;
     font-weight: var(--font-weight-bold, 700);
     border-radius: var(--border-radius-full);
     border: 2px solid white;
+    box-sizing: border-box;
 }
 
 /* 사용자 정보 */
