@@ -1,39 +1,36 @@
 /* Phase 3 재설계: 랩미팅관리 스타일 */
 
-/* 탭 버튼 */
+/* 탭 버튼 - Underline Style (Crimson v3 가이드라인) */
 .meeting-tabs {
     display: flex;
-    gap: 0.5rem;
-    background: white;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    gap: 4px;
+    border-bottom: 2px solid #E5E7EB;
+    margin-bottom: 24px;
     overflow-x: auto;
 }
 
 .tab-btn {
-    padding: 0.75rem 1.5rem;
-    border: 2px solid #E5E5E5;
-    border-radius: 0.5rem;
-    background: white;
-    color: #999999;
-    font-size: 0.875rem;
-    font-weight: 500;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    font-size: 15px;
+    font-weight: 600;
+    color: #6B7280;
     cursor: pointer;
     transition: all 0.2s;
     white-space: nowrap;
     flex-shrink: 0;
+    margin-bottom: -2px;
 }
 
 .tab-btn:hover {
-    border-color: #6A0028;
     color: #6A0028;
 }
 
 .tab-btn.active {
-    background: #6A0028;
-    border-color: #6A0028;
-    color: white;
+    color: #6A0028;
+    border-bottom-color: #6A0028;
 }
 
 /* 배지 */
@@ -260,13 +257,12 @@
 /* 반응형 */
 @media (max-width: 768px) {
     .meeting-tabs {
-        padding: 0.75rem;
-        gap: 0.25rem;
+        margin-bottom: 16px;
     }
-    
+
     .tab-btn {
-        padding: 0.5rem 1rem;
-        font-size: 0.75rem;
+        padding: 10px 16px;
+        font-size: 13px;
     }
     
     .slot-card,
