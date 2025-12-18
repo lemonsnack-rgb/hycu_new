@@ -5,16 +5,25 @@ let currentEvaluationData = null;
 
 // ==================== 심사 상세 렌더링 ====================
 function renderReviewDetail(assignmentId, viewType) {
+    console.log('🎯 renderReviewDetail START - assignmentId:', assignmentId, 'viewType:', viewType);
+
     currentAssignmentId = assignmentId;
     const detail = ReviewService.getReviewDetail(assignmentId);
+    console.log('🎯 ReviewService.getReviewDetail result:', detail);
 
     if (!detail) {
+        console.error('❌ detail is null/undefined');
         showToast('심사 정보를 찾을 수 없습니다', 'error');
         return;
     }
 
     const container = document.getElementById('review-detail-content');
-    if (!container) return;
+    console.log('🎯 Container element:', container);
+
+    if (!container) {
+        console.error('❌ Container #review-detail-content not found!');
+        return;
+    }
 
     // viewType에 따라 화면 분리
     const isChairView = viewType === 'chair';
@@ -59,10 +68,14 @@ function renderReviewDetail(assignmentId, viewType) {
         }
     }
 
+    console.log('🎯 Setting container.innerHTML with html length:', html.length);
     container.innerHTML = html;
+    console.log('🎯 Container innerHTML set successfully');
 
     // 이벤트 바인딩
+    console.log('🎯 Binding events...');
     bindEvaluationEvents(detail, isSubmitted, isChairView, allSubmitted);
+    console.log('✅ renderReviewDetail COMPLETED');
 }
 
 // ==================== 논문 정보 (관리자 페이지 스타일) ====================
@@ -1486,8 +1499,10 @@ function submitChairDecision() {
     }, 1000);
 }
 
+window.renderReviewDetail = renderReviewDetail;
 window.selectDecision = selectDecision;
 window.submitChairDecision = submitChairDecision;
 
 console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-19-002');
 console.log('   renderEvaluationForm:', typeof renderEvaluationForm);
+console.log('   renderReviewDetail:', typeof renderReviewDetail);

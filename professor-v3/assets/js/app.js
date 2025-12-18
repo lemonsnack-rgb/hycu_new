@@ -29,6 +29,18 @@ const breadcrumbMap = {
 
 // 화면 전환 함수
 function showScreen(screenId) {
+    // 피드백 상세 화면이 열려있으면 닫기
+    const feedbackDetailScreen = document.getElementById('feedback-detail-screen');
+    if (feedbackDetailScreen && typeof closeFeedbackDetailScreen === 'function') {
+        closeFeedbackDetailScreen();
+    }
+
+    // 심사 상세 화면이 열려있으면 닫기
+    const reviewDetailScreen = document.getElementById('review-detail-screen');
+    if (reviewDetailScreen && typeof closeReviewDetailScreen === 'function') {
+        closeReviewDetailScreen();
+    }
+
     // 모든 content-screen 숨기기
     document.querySelectorAll('.content-screen').forEach(screen => {
         screen.classList.remove('active');
@@ -335,6 +347,12 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
     if (!tableBody || !noStudentsDiv) {
         console.warn('필요한 DOM 요소를 찾을 수 없습니다.');
         return;
+    }
+
+    // 총 건수 업데이트
+    const countElement = document.getElementById('professor-student-count');
+    if (countElement) {
+        countElement.textContent = `(총 ${data.length}건)`;
     }
 
     if (data.length === 0) {

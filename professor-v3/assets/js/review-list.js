@@ -334,30 +334,87 @@ function formatDate(dateStr) {
 
 // ==================== 심사 상세 열기 ====================
 function openReviewDetail(assignmentId, viewType) {
-    const modal = document.getElementById('review-detail-modal');
-    if (!modal) {
-        console.error('심사 상세 모달을 찾을 수 없습니다');
-        return;
+    // 목록 화면 숨기기
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.style.display = 'none';
     }
 
-    // 모달 데이터 설정
-    modal.dataset.assignmentId = assignmentId;
-    modal.dataset.viewType = viewType || 'member';
+    // 상세 화면 생성
+    const detailScreen = document.createElement('div');
+    detailScreen.id = 'review-detail-screen';
+    detailScreen.className = 'review-detail-screen';
+    detailScreen.dataset.assignmentId = assignmentId;
+    detailScreen.dataset.viewType = viewType || 'member';
+
+    detailScreen.innerHTML = `
+        <div class="review-detail-content-wrapper">
+            <!-- 헤더 -->
+            <div class="review-detail-header">
+                <button onclick="closeReviewDetailScreen()" class="review-detail-back-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    <span>목록으로</span>
+                </button>
+                <h2 class="review-detail-title">${viewType === 'chair' ? '위원장 승인' : '심사 평가'}</h2>
+            </div>
+
+            <!-- 상세 내용 -->
+            <div id="review-detail-content" class="review-detail-body"></div>
+        </div>
+    `;
+
+    document.body.appendChild(detailScreen);
 
     // 상세 정보 렌더링
-    renderReviewDetail(assignmentId, viewType);
+    setTimeout(() => {
+        console.log('🔍 openReviewDetail - assignmentId:', assignmentId, 'viewType:', viewType);
+        console.log('🔍 renderReviewDetail function:', typeof window.renderReviewDetail);
+        console.log('🔍 review-detail-screen exists:', !!document.getElementById('review-detail-screen'));
+        console.log('🔍 review-detail-content exists:', !!document.getElementById('review-detail-content'));
 
-    // 모달 열기
-    modal.classList.add('active');
-    document.body.style.overflow = 'hidden';
+        const contentContainer = document.getElementById('review-detail-content');
+        console.log('🔍 Content container:', contentContainer);
+
+        if (typeof window.renderReviewDetail === 'function') {
+            console.log('✅ Calling renderReviewDetail...');
+            window.renderReviewDetail(assignmentId, viewType);
+            console.log('✅ renderReviewDetail called');
+        } else {
+            console.error('❌ renderReviewDetail is not a function!');
+            // Fallback: 직접 호출 시도
+            if (typeof renderReviewDetail === 'function') {
+                console.log('⚠️ Using direct renderReviewDetail call');
+                renderReviewDetail(assignmentId, viewType);
+            } else {
+                alert('심사 상세 렌더링 함수를 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+            }
+        }
+    }, 50);
 }
 
-function closeReviewDetail() {
-    const modal = document.getElementById('review-detail-modal');
-    if (modal) {
-        modal.classList.remove('active');
-        document.body.style.overflow = '';
+function closeReviewDetailScreen() {
+    const detailScreen = document.getElementById('review-detail-screen');
+    if (detailScreen) {
+        detailScreen.remove();
     }
+
+    // 목록 화면 다시 표시
+    const mainContent = document.getElementById('main-content');
+    if (mainContent) {
+        mainContent.style.display = 'block';
+    }
+
+    // 목록 재렌더링 (변경사항 반영)
+    if (typeof renderReviewList === 'function') {
+        renderReviewList();
+    }
+}
+
+// Legacy 모달 함수 (호환성 유지)
+function closeReviewDetail() {
+    closeReviewDetailScreen();
 }
 
 // ==================== 초기화 ====================
@@ -372,6 +429,7 @@ window.searchReviews = searchReviews;
 window.resetReviewSearch = resetReviewSearch;
 window.openReviewDetail = openReviewDetail;
 window.closeReviewDetail = closeReviewDetail;
+window.closeReviewDetailScreen = closeReviewDetailScreen;
 
 // ID 50: 평가 진행도 색상 클래스
 function getProgressColorClass(progress) {
