@@ -75,7 +75,7 @@ function renderBoardList() {
                         <thead>
                             <tr>
                                 <th style="width: 80px;">번호</th>
-                                <th>제목</th>
+                                <th style="min-width: 300px;">제목</th>
                                 <th style="width: 120px;">작성자</th>
                                 <th style="width: 120px;">작성일</th>
                                 <th style="width: 80px;">첨부</th>
