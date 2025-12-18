@@ -1079,8 +1079,8 @@
             pageTitleElement.textContent = title;
         }
 
-        // 기존 showScreen 함수에 후킹하여 타이틀 업데이트
-        (function() {
+        // 모든 스크립트 로드 후 showScreen 함수 후킹
+        window.addEventListener('load', function() {
             const originalShowScreen = window.showScreen;
             if (originalShowScreen) {
                 window.showScreen = function(screenId) {
@@ -1091,11 +1091,8 @@
                     return result;
                 };
             }
-        })();
 
-        // 페이지 로드 시 초기 타이틀 설정
-        document.addEventListener('DOMContentLoaded', function() {
-            // 활성화된 화면 찾기
+            // 초기 타이틀 설정
             const activeScreen = document.querySelector('.content-screen.active');
             if (activeScreen) {
                 const screenId = activeScreen.id.replace('-screen', '');
