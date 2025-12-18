@@ -113,23 +113,23 @@ function renderExamScheduleScreen() {
                 </div>
 
                 <!-- 테이블 -->
-                <div class="overflow-x-auto">
-                    <table class="w-full">
-                        <thead class="bg-gray-50 border-b">
+                <div class="table-scroll">
+                    <table class="min-w-full">
+                        <thead>
                             <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">No</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학번</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학생명</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학과</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">학위</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">심사 단계</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">심사위원장</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">심사 일정</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">진행 방식</th>
-                                <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase">상태</th>
+                                <th>No</th>
+                                <th>학번</th>
+                                <th>학생명</th>
+                                <th>학과</th>
+                                <th>학위</th>
+                                <th>심사 단계</th>
+                                <th>심사위원장</th>
+                                <th>심사 일정</th>
+                                <th>진행 방식</th>
+                                <th>상태</th>
                             </tr>
                         </thead>
-                        <tbody id="exam-schedule-table-body" class="bg-white divide-y divide-gray-200">
+                        <tbody id="exam-schedule-table-body">
                             <!-- JavaScript로 동적 렌더링 -->
                         </tbody>
                     </table>
@@ -225,7 +225,7 @@ function renderExamScheduleTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="10" class="px-6 py-8 text-center text-gray-500">
+                <td colspan="10" style="text-align: center; padding: 32px;">
                     배정된 심사 일정이 없습니다.
                 </td>
             </tr>
@@ -249,18 +249,17 @@ function renderExamScheduleTable(data) {
             : '<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">미등록</span>';
 
         return `
-            <tr class="hover:bg-gray-50 cursor-pointer transition-colors"
-                onclick="showExamScheduleDetailReadonly('${item.assignmentId}')">
-                <td class="px-6 py-4 text-sm text-gray-900">${index + 1}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${item.studentNumber}</td>
-                <td class="px-6 py-4 text-sm font-medium text-gray-900">${item.studentName}</td>
-                <td class="px-6 py-4 text-sm text-gray-600">${item.department}</td>
-                <td class="px-6 py-4 text-sm text-gray-600">${item.degreeType === 'master' ? '석사' : '박사'}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${item.stageName}</td>
-                <td class="px-6 py-4 text-sm text-gray-600">${item.chairName}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${scheduleText}</td>
-                <td class="px-6 py-4 text-sm">${methodText}</td>
-                <td class="px-6 py-4 text-center">${statusBadge}</td>
+            <tr class="cursor-pointer" onclick="showExamScheduleDetailReadonly('${item.assignmentId}')">
+                <td>${index + 1}</td>
+                <td>${item.studentNumber}</td>
+                <td>${item.studentName}</td>
+                <td>${item.department}</td>
+                <td>${item.degreeType === 'master' ? '석사' : '박사'}</td>
+                <td>${item.stageName}</td>
+                <td>${item.chairName}</td>
+                <td>${scheduleText}</td>
+                <td>${methodText}</td>
+                <td>${statusBadge}</td>
             </tr>
         `;
     }).join('');
