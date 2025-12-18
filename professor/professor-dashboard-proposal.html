@@ -41,7 +41,9 @@
         .text-blue-800 { color: #6A0028 !important; }
         .hover\:bg-blue-50:hover { background-color: #FCE4EC !important; }
         .text-blue-600 { color: #6A0028 !important; }
+        .hover\:text-blue-800:hover { color: #8A0034 !important; }
         .border-blue-500 { border-color: #6A0028 !important; }
+        .border-blue-300 { border-color: #F8BBD9 !important; }
         .bg-blue-500 { background-color: #6A0028 !important; }
         .hover\:bg-blue-600:hover { background-color: #8A0034 !important; }
         .focus\:ring-blue-500:focus { --tw-ring-color: #6A0028 !important; }
@@ -56,6 +58,17 @@
         .sidebar-link:hover {
             background-color: #FCE4EC !important;
             color: #6A0028 !important;
+        }
+
+        /* 버튼 클릭 가능하도록 보장 */
+        button {
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+
+        button:disabled {
+            pointer-events: none !important;
+            opacity: 0.5 !important;
         }
     </style>
     
