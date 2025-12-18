@@ -1054,6 +1054,54 @@
             sidebar.classList.toggle('mobile-open');
             overlay.classList.toggle('active');
         };
+
+        // 페이지 타이틀 업데이트 함수
+        function updatePageTitle(screenId) {
+            const pageTitleElement = document.querySelector('.layout-v3-page-title');
+            if (!pageTitleElement) return;
+
+            // 화면 ID별 메뉴명 매핑 (사이드바 메뉴 텍스트와 동일)
+            const titleMap = {
+                'dashboard': '대시보드',
+                'notice': '공지사항',
+                'board': '자료실',
+                'ethics': '연구윤리',
+                'schedule': '논문일정',
+                'process': '논문지도절차',
+                'advisor-assignment': '지도교수 배정',
+                'guidance': '주차별 논문지도 현황',
+                'feedback': '논문 지도 현황',
+                'meeting': '실시간 지도 예약',
+                'journal-review': '학술지 논문 심사'
+            };
+
+            const title = titleMap[screenId] || '대시보드';
+            pageTitleElement.textContent = title;
+        }
+
+        // 기존 showScreen 함수에 후킹하여 타이틀 업데이트
+        (function() {
+            const originalShowScreen = window.showScreen;
+            if (originalShowScreen) {
+                window.showScreen = function(screenId) {
+                    // 원래 함수 실행
+                    const result = originalShowScreen.apply(this, arguments);
+                    // 타이틀 업데이트
+                    updatePageTitle(screenId);
+                    return result;
+                };
+            }
+        })();
+
+        // 페이지 로드 시 초기 타이틀 설정
+        document.addEventListener('DOMContentLoaded', function() {
+            // 활성화된 화면 찾기
+            const activeScreen = document.querySelector('.content-screen.active');
+            if (activeScreen) {
+                const screenId = activeScreen.id.replace('-screen', '');
+                updatePageTitle(screenId);
+            }
+        });
     </script>
 
     <!-- JavaScript 파일들 -->
