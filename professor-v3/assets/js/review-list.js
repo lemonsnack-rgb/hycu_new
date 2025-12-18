@@ -84,6 +84,7 @@ function renderReviewList() {
                             <th style="width: 90px;">학번</th>
                             <th style="width: 80px;">이름</th>
                             <th style="width: 80px;">학적상태</th>
+                            <th style="width: 100px;">심사유형</th>
                             <th style="min-width: 200px;">논문명</th>
                             <th style="width: 100px;">심사일</th>
                             <th style="width: 120px;">심사진행상태</th>
@@ -106,13 +107,18 @@ function renderReviewList() {
                                 <td>${assignment.studentNumber}</td>
                                 <td>${assignment.studentName}</td>
                                 <td>${assignment.academicStatus || '재학'}</td>
+                                <td>
+                                    <span class="text-xs font-semibold px-2 py-1 rounded ${getReviewTypeBadgeClass(assignment.reviewType)}">
+                                        ${assignment.reviewType || '예비심사'}
+                                    </span>
+                                </td>
                                 <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}
                                 </td>
                                 <td>${assignment.reviewDate || '-'}</td>
                                 <td>
-                                    <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
-                                        ${assignment.evaluationProgress}
+                                    <span class="text-xs font-semibold px-2 py-1 rounded ${getProgressBadgeClass(assignment.evaluationProgress)}">
+                                        ${getProgressStatusText(assignment.evaluationProgress)}
                                     </span>
                                 </td>
                                 <td onclick="event.stopPropagation()">
@@ -140,9 +146,29 @@ function renderReviewList() {
     listContainer.innerHTML = html;
 }
 
-// ==================== 필터링 (논문지도현황과 동일한 8개 필드) ====================
+// ==================== 심사유형 필터 전역 변수 ====================
+let currentReviewTypeFilter = 'all';
+
+// 심사유형 필터 토글
+function toggleReviewType(type) {
+    currentReviewTypeFilter = type;
+
+    // 버튼 활성화 상태 변경
+    document.querySelectorAll('[id^="review-type-"]').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    document.getElementById(`review-type-${type}`).classList.add('active');
+
+    // 목록 재렌더링
+    renderReviewList();
+}
+
+window.toggleReviewType = toggleReviewType;
+
+// ==================== 필터링 (논문지도현황과 동일한 8개 필드 + 심사유형) ====================
 function getCurrentFilters() {
     return {
+        reviewType: currentReviewTypeFilter,
         graduate: document.getElementById('filter-graduate')?.value || '',
         major: document.getElementById('filter-major')?.value || '',
         degree: document.getElementById('filter-degree')?.value || '',
@@ -156,6 +182,17 @@ function getCurrentFilters() {
 
 function filterAssignments(assignments, filters) {
     return assignments.filter(assignment => {
+        // 심사유형 필터
+        if (filters.reviewType && filters.reviewType !== 'all') {
+            const reviewType = assignment.reviewType || '예비심사';
+            if (filters.reviewType === 'preliminary' && reviewType !== '예비심사') {
+                return false;
+            }
+            if (filters.reviewType === 'main' && reviewType !== '본심사') {
+                return false;
+            }
+        }
+
         // 대학원 필터
         if (filters.graduate && assignment.graduate !== filters.graduate) {
             return false;
@@ -345,10 +382,10 @@ function getProgressColorClass(progress) {
 
 // ID 49-50: 심사진행상태 배지 클래스
 function getProgressBadgeClass(progress) {
-    if (progress === '완료' || progress === '3/3' || progress === '심사완료') {
+    if (progress === '완료' || progress === '3/3' || progress === '심사완료' || progress === '승인완료') {
         return 'bg-green-100 text-green-700';
     }
-    if (progress === '진행중' || (progress && progress.includes('/'))) {
+    if (progress === '진행중' || progress === '진행 중' || (progress && progress.includes('/'))) {
         return 'bg-[#FCE4EC] text-[#6A0028]';
     }
     if (progress === '대기' || progress === '0/3') {
@@ -357,8 +394,46 @@ function getProgressBadgeClass(progress) {
     return 'bg-gray-100 text-gray-700';
 }
 
+// 심사진행상태 텍스트 변환 (숫자 제거)
+function getProgressStatusText(progress) {
+    // "1/3", "2/3", "3/3" 등의 형태를 "진행 중", "심사완료", "승인완료"로 변환
+    if (!progress) return '대기';
+
+    if (progress === '3/3' || progress === '완료') {
+        return '심사완료';
+    }
+
+    if (progress.includes('/')) {
+        const [completed, total] = progress.split('/').map(Number);
+        if (completed === 0) return '대기';
+        if (completed === total) return '심사완료';
+        return '진행 중';
+    }
+
+    // 이미 텍스트인 경우 그대로 반환
+    if (progress === '진행중' || progress === '진행 중') return '진행 중';
+    if (progress === '심사완료') return '심사완료';
+    if (progress === '승인완료') return '승인완료';
+    if (progress === '대기') return '대기';
+
+    return progress;
+}
+
+// 심사유형 배지 클래스
+function getReviewTypeBadgeClass(reviewType) {
+    if (reviewType === '예비심사') {
+        return 'bg-blue-100 text-blue-700';
+    }
+    if (reviewType === '본심사') {
+        return 'bg-purple-100 text-purple-700';
+    }
+    return 'bg-gray-100 text-gray-700';
+}
+
 window.getProgressColorClass = getProgressColorClass;
 window.getProgressBadgeClass = getProgressBadgeClass;
+window.getProgressStatusText = getProgressStatusText;
+window.getReviewTypeBadgeClass = getReviewTypeBadgeClass;
 
 // ==================== 체크박스 관련 기능 ====================
 function toggleSelectAllReviews(checked) {
