@@ -9,6 +9,9 @@
     <link rel="stylesheet" as="style" crossorigin
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
 
+    <!-- Tailwind CSS (임시 유지 - 기존 레이아웃 동작용) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
     <!-- Design System v3 (NEW) - Crimson Theme -->
     <link rel="stylesheet" href="assets/css/design-system-v3.css">
     <link rel="stylesheet" href="assets/css/components-v3.css">
@@ -30,6 +33,31 @@
 
     <!-- Font Awesome (기존 기능 호환용) -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Crimson Color Override -->
+    <style>
+        /* Tailwind의 Blue 계열을 Crimson으로 오버라이드 */
+        .bg-blue-100 { background-color: #FCE4EC !important; }
+        .text-blue-800 { color: #6A0028 !important; }
+        .hover\:bg-blue-50:hover { background-color: #FCE4EC !important; }
+        .text-blue-600 { color: #6A0028 !important; }
+        .border-blue-500 { border-color: #6A0028 !important; }
+        .bg-blue-500 { background-color: #6A0028 !important; }
+        .hover\:bg-blue-600:hover { background-color: #8A0034 !important; }
+        .focus\:ring-blue-500:focus { --tw-ring-color: #6A0028 !important; }
+        .focus\:border-blue-500:focus { border-color: #6A0028 !important; }
+
+        /* 사이드바 active 상태 Crimson 적용 */
+        .sidebar-link.active {
+            background-color: #FCE4EC !important;
+            color: #6A0028 !important;
+        }
+
+        .sidebar-link:hover {
+            background-color: #FCE4EC !important;
+            color: #6A0028 !important;
+        }
+    </style>
     
     <!-- FullCalendar JS -->
     <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.10/index.global.min.js"></script>
