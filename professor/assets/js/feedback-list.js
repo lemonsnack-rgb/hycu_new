@@ -28,35 +28,34 @@ function renderFeedbackList() {
                 </button>
             </div>
 
-            <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">지도 대상 논문 목록</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50 border-b">
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table class="min-w-full">
+                        <thead>
                             <tr>
-                                <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">
+                                <th style="width: 50px;">
                                     <input type="checkbox"
                                            id="select-all-feedbacks"
                                            onchange="toggleAllFeedbacks(this)"
                                            class="rounded">
                                 </th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">대학원</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학과</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학위과정</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학번</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">이름</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학기차</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">논문명</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">논문 지도 단계</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">피드백상태</th>
-                                <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">제출일</th>
+                                <th style="width: 60px;">번호</th>
+                                <th style="width: 100px;">대학원</th>
+                                <th style="width: 150px;">학과</th>
+                                <th style="width: 80px;">학위과정</th>
+                                <th style="width: 90px;">학번</th>
+                                <th style="width: 80px;">이름</th>
+                                <th style="width: 80px;">학기차</th>
+                                <th style="min-width: 250px;">논문명</th>
+                                <th style="width: 120px;">논문 지도 단계</th>
+                                <th style="width: 100px;">피드백상태</th>
+                                <th style="width: 100px;">제출일</th>
                             </tr>
                         </thead>
                         <tbody id="feedback-list-body">
                             ${filteredRequests.length > 0
                                 ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                                : '<tr><td colspan="12" class="py-12 text-center text-gray-500">검색 결과가 없습니다</td></tr>'
+                                : '<tr><td colspan="12" style="text-align: center; padding: 48px;">검색 결과가 없습니다</td></tr>'
                             }
                         </tbody>
                     </table>
@@ -87,33 +86,37 @@ function renderFeedbackRow(request, idx) {
     }
 
     return `
-        <tr class="feedback-row border-b hover:bg-gray-50 transition-colors cursor-pointer"
+        <tr class="feedback-row cursor-pointer"
             data-feedback-id="${request.id}"
             onclick="openFeedbackViewer('${request.id}')">
-            <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+            <td onclick="event.stopPropagation()">
                 <input type="checkbox"
                        class="feedback-checkbox rounded"
                        data-feedback-id="${request.id}"
                        data-student-name="${request.studentName}"
                        data-student-number="${request.studentNumber}">
             </td>
-            <td class="py-3 px-4 text-gray-800">${idx}</td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.graduate || '일반대학원'}</td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.major}</td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.program}</td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.studentNumber}</td>
-            <td class="py-3 px-4 font-medium text-gray-800">
+            <td>${idx}</td>
+            <td>${request.graduate || '일반대학원'}</td>
+            <td>${request.major}</td>
+            <td>${request.program}</td>
+            <td>${request.studentNumber}</td>
+            <td>
                 ${addStudentInfoIcon(request.studentName, request.studentNumber)}
             </td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.semester || '-'}학기</td>
-            <td class="py-3 px-4 text-gray-800 text-sm td-truncate-long" title="${request.thesisTitle || request.file}">${request.thesisTitle || request.file}</td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.guidanceStage || '연구계획서'}</td>
-            <td class="py-3 px-4">
+            <td>${request.semester || '-'}학기</td>
+            <td>
+                <div class="cell-truncate" title="${request.thesisTitle || request.file}">
+                    ${request.thesisTitle || request.file}
+                </div>
+            </td>
+            <td>${request.guidanceStage || '연구계획서'}</td>
+            <td>
                 <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
                     ${feedbackStatus}
                 </span>
             </td>
-            <td class="py-3 px-4 text-gray-600 text-sm">${request.uploadDate || '-'}</td>
+            <td>${request.uploadDate || '-'}</td>
         </tr>
     `;
 }

@@ -127,64 +127,65 @@ function renderJournalReviewRows(journals) {
     }
 
     return `
-        <div class="overflow-x-auto">
-            <table class="min-w-full table-fixed">
-                <thead class="bg-gray-50 border-b">
-                    <tr>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">
-                            <input type="checkbox" id="select-all-journals"
-                                   onchange="toggleSelectAllJournals(this.checked)"
-                                   class="rounded border-gray-300">
-                        </th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">대학원</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학과</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학위과정</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학번</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">이름</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">논문제목</th>
-                        <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학술지명</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">제출일</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">심사진행상태</th>
-                        <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">관리</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                    ${journals.map((journal, index) => {
-                        const statusClass = getJournalStatusBadgeClass(journal.status);
+        <div class="table-container">
+            <div class="table-scroll">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">
+                                <input type="checkbox" id="select-all-journals"
+                                       onchange="toggleSelectAllJournals(this.checked)"
+                                       class="rounded border-gray-300">
+                            </th>
+                            <th style="width: 60px;">번호</th>
+                            <th style="width: 100px;">대학원</th>
+                            <th style="width: 150px;">학과</th>
+                            <th style="width: 80px;">학위과정</th>
+                            <th style="width: 90px;">학번</th>
+                            <th style="width: 80px;">이름</th>
+                            <th style="min-width: 250px;">논문제목</th>
+                            <th style="min-width: 180px;">학술지명</th>
+                            <th style="width: 100px;">제출일</th>
+                            <th style="width: 120px;">심사진행상태</th>
+                            <th style="width: 100px;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${journals.map((journal, index) => {
+                            const statusClass = getJournalStatusBadgeClass(journal.status);
 
-                        return `
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-3 px-4 text-center">
-                                    <input type="checkbox" class="journal-checkbox rounded border-gray-300"
-                                           value="${journal.id}"
-                                           data-name="${journal.studentName}"
-                                           data-student-id="${journal.studentId}">
-                                </td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">일반대학원</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${journal.major || '-'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${journal.degree || '석사'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${journal.studentId}</td>
-                                <td class="py-3 px-4 text-sm font-medium text-gray-800">${journal.studentName}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 350px;">
-                                    <div class="truncate" title="${journal.paperTitle}">
-                                        ${journal.paperTitle}
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-sm text-gray-600" style="max-width: 200px;">
-                                    <div class="truncate" title="${journal.journalName}">
-                                        ${journal.journalName}
-                                    </div>
-                                </td>
-                                <td class="py-3 px-4 text-center text-sm text-gray-600">${journal.submissionDate || '-'}</td>
-                                <td class="py-3 px-4 text-center">
-                                    <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
-                                        ${journal.status}
-                                    </span>
-                                </td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex gap-2 justify-center">
+                            return `
+                                <tr>
+                                        <td>
+                                        <input type="checkbox" class="journal-checkbox rounded border-gray-300"
+                                               value="${journal.id}"
+                                               data-name="${journal.studentName}"
+                                               data-student-id="${journal.studentId}">
+                                    </td>
+                                    <td>${index + 1}</td>
+                                    <td>일반대학원</td>
+                                    <td>${journal.major || '-'}</td>
+                                    <td>${journal.degree || '석사'}</td>
+                                    <td>${journal.studentId}</td>
+                                    <td>${journal.studentName}</td>
+                                    <td>
+                                        <div class="cell-truncate" title="${journal.paperTitle}">
+                                            ${journal.paperTitle}
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="cell-truncate" title="${journal.journalName}">
+                                            ${journal.journalName}
+                                        </div>
+                                    </td>
+                                    <td>${journal.submissionDate || '-'}</td>
+                                    <td>
+                                        <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
+                                            ${journal.status}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="action-buttons">
                                         <button onclick="viewJournalReviewDetail(${journal.id}, 'member')"
                                                 class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
                                             심사
@@ -195,13 +196,14 @@ function renderJournalReviewRows(journals) {
                                                 승인
                                             </button>
                                         ` : ''}
-                                    </div>
-                                </td>
-                            </tr>
-                        `;
-                    }).join('')}
-                </tbody>
-            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                        }).join('')}
+                    </tbody>
+                </table>
+            </div>
         </div>
     `;
 }

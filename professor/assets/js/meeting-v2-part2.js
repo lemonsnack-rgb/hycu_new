@@ -194,24 +194,26 @@ function renderCompletedTab() {
             </div>
 
             ${completed.length > 0 ? `
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200 table-fixed">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">번호</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">완료일</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">학생명</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-28">학번</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">주제</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">유형</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">일시</th>
-                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">실제시간</th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white divide-y divide-gray-200">
-                            ${completed.map((req, index) => renderCompletedRow(req, index + 1)).join('')}
-                        </tbody>
-                    </table>
+                <div class="table-container">
+                    <div class="table-scroll">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th style="width: 60px;">번호</th>
+                                    <th style="width: 100px;">완료일</th>
+                                    <th style="width: 80px;">학생명</th>
+                                    <th style="width: 100px;">학번</th>
+                                    <th style="min-width: 200px;">주제</th>
+                                    <th style="width: 80px;">유형</th>
+                                    <th style="width: 120px;">일시</th>
+                                    <th style="width: 100px;">실제시간</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${completed.map((req, index) => renderCompletedRow(req, index + 1)).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             ` : `
                 <div class="text-center py-12 text-gray-500">
@@ -226,23 +228,23 @@ function renderCompletedRow(req, index) {
     const typeText = req.meetingType === 'online' ? '온라인' : '대면';
 
     return `
-        <tr class="hover:bg-gray-50">
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${index}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.completedDate}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${req.studentName}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.studentNumber}</td>
-            <td class="px-6 py-4 text-sm text-[#6A0028] hover:text-[#6A0028] td-truncate-long cursor-pointer"
+        <tr>
+            <td>${index}</td>
+            <td>${req.completedDate}</td>
+            <td>${req.studentName}</td>
+            <td>${req.studentNumber}</td>
+            <td class="cursor-pointer" style="color: #6A0028;"
                 title="${req.topic}"
                 onclick="viewCompletedMeetingDetail('${req.id}')">
-                ${req.topic}
+                <div class="cell-truncate">${req.topic}</div>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm">
+            <td>
                 <span class="px-2 py-1 text-xs rounded ${req.meetingType === 'online' ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'}">
                     ${typeText}
                 </span>
             </td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.selectedDate} ${req.selectedTime}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.actualDuration}분</td>
+            <td>${req.selectedDate} ${req.selectedTime}</td>
+            <td>${req.actualDuration}분</td>
         </tr>
     `;
 }
@@ -746,14 +748,14 @@ function openCreateGroupMeetingModal() {
                             <h4 class="text-sm font-semibold text-gray-700 mb-2">학생 선택</h4>
                             <div id="student-list" class="border rounded-lg overflow-hidden bg-gray-50">
                                 <div class="max-h-80 overflow-y-auto">
-                                    <table class="w-full table-fixed text-sm">
+                                    <table class="w-full text-sm">
                                         <thead class="bg-gray-50 border-b sticky top-0">
                                             <tr>
-                                                <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 40px;"></th>
-                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700" style="width: 140px;">학과</th>
-                                                <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 80px;">학기차</th>
-                                                <th class="px-3 py-2 text-center text-sm font-semibold text-gray-700" style="width: 100px;">학번</th>
-                                                <th class="px-3 py-2 text-left text-sm font-semibold text-gray-700">이름</th>
+                                                <th style="width: 40px; padding: 8px; text-align: center;"></th>
+                                                <th style="width: 140px; padding: 8px; text-align: left;">학과</th>
+                                                <th style="width: 80px; padding: 8px; text-align: center;">학기차</th>
+                                                <th style="width: 100px; padding: 8px; text-align: center;">학번</th>
+                                                <th style="padding: 8px; text-align: left;">이름</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y">
@@ -761,14 +763,14 @@ function openCreateGroupMeetingModal() {
                                                 <tr class="hover:bg-white cursor-pointer student-row" data-student-id="${s.id}"
                                                     data-name="${s.name}" data-number="${s.studentNumber}" data-major="${s.major || ''}" data-semester="${s.semester || ''}"
                                                     onclick="toggleStudentCheckbox(event, '${s.id}')">
-                                                    <td class="px-3 py-2 text-center" onclick="event.stopPropagation()">
+                                                    <td style="padding: 8px; text-align: center;" onclick="event.stopPropagation()">
                                                         <input type="checkbox" name="students" value="${s.id}"
                                                                onchange="updateSelectedCount()" />
                                                     </td>
-                                                    <td class="px-3 py-2">${s.major || '-'}</td>
-                                                    <td class="px-3 py-2 text-center">${s.semester || '-'}</td>
-                                                    <td class="px-3 py-2 text-center">${s.studentNumber}</td>
-                                                    <td class="px-3 py-2 font-semibold">${s.name}</td>
+                                                    <td style="padding: 8px;">${s.major || '-'}</td>
+                                                    <td style="padding: 8px; text-align: center;">${s.semester || '-'}</td>
+                                                    <td style="padding: 8px; text-align: center;">${s.studentNumber}</td>
+                                                    <td style="padding: 8px; font-weight: 600;">${s.name}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
