@@ -101,45 +101,43 @@ function showStudentList() {
                 </button>
             </div>
 
-            <!-- 테이블 -->
-            <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">지도 학생 목록</h3>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50 border-b">
+            <!-- 테이블 컨테이너 -->
+            <div class="table-container">
+                <div class="table-scroll">
+                    <table class="min-w-full">
+                        <thead>
                         <tr>
-                            <th class="py-3 px-4 text-center text-sm font-semibold text-gray-800">
+                            <th style="width: 50px;">
                                 <input type="checkbox" id="select-all-students"
                                        onchange="toggleSelectAllStudents(this.checked)"
                                        class="rounded">
                             </th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">번호</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">대학원</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학과</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학위과정</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학년도</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학기차</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">학번</th>
-                            <th class="py-3 px-4 text-left text-sm font-semibold text-gray-800">이름</th>
+                            <th style="width: 60px;">번호</th>
+                            <th style="width: 100px;">대학원</th>
+                            <th style="width: 150px;">학과</th>
+                            <th style="width: 80px;">학위과정</th>
+                            <th style="width: 80px;">학년도</th>
+                            <th style="width: 80px;">학기차</th>
+                            <th style="width: 100px;">학번</th>
+                            <th style="width: 100px;">이름</th>
                         </tr>
                     </thead>
                     <tbody id="guidance-list-body">
                         ${students.map((student, idx) => {
                             return `
-                                <tr class="border-b hover:bg-gray-50 transition-colors cursor-pointer"
-                                    onclick="showSemesterGuidanceDetail('${student.studentId}')">
-                                    <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                <tr class="cursor-pointer" onclick="showSemesterGuidanceDetail('${student.studentId}')">
+                                    <td onclick="event.stopPropagation()">
                                         <input type="checkbox" class="student-checkbox rounded"
                                                value="${student.studentId}" data-name="${student.name}">
                                     </td>
-                                    <td class="py-3 px-4 text-gray-800">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-gray-600 text-sm">일반대학원</td>
-                                    <td class="py-3 px-4 text-gray-600 text-sm">${student.major || '-'}</td>
-                                    <td class="py-3 px-4 text-gray-600 text-sm">${getDegreeText(student.degree)}</td>
-                                    <td class="py-3 px-4 text-gray-600 text-sm">2024</td>
-                                    <td class="py-3 px-4 text-gray-600 text-sm">${student.semester || '-'}학기</td>
-                                    <td class="py-3 px-4 text-gray-600 text-sm">${student.studentId}</td>
-                                    <td class="py-3 px-4 font-medium text-gray-800">${student.name}</td>
+                                    <td>${idx + 1}</td>
+                                    <td>일반대학원</td>
+                                    <td>${student.major || '-'}</td>
+                                    <td>${getDegreeText(student.degree)}</td>
+                                    <td>2024</td>
+                                    <td>${student.semester || '-'}학기</td>
+                                    <td>${student.studentId}</td>
+                                    <td>${student.name}</td>
                                 </tr>
                             `;
                         }).join('')}
