@@ -1,0 +1,202 @@
+/* ==========================================
+   표준 테이블 스타일 - Crimson v3
+   가이드: layout-guide-v3.html 기준
+   ========================================== */
+
+/* 테이블 컨테이너 */
+.table-container {
+    background: #ffffff;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-bottom: 24px;
+}
+
+/* 테이블 헤더 섹션 (타이틀 + 액션버튼) */
+.table-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.table-header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.table-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.table-count {
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.table-header-right {
+    display: flex;
+    gap: 8px;
+}
+
+/* 테이블 스크롤 래퍼 */
+.table-scroll {
+    overflow-x: auto;
+}
+
+/* 기본 테이블 스타일 */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* 테이블 헤더 (thead) */
+thead {
+    background: #f8fafc;
+    border-bottom: 2px solid #6A0028;  /* Crimson 강조 라인 */
+}
+
+/* 헤더 셀 (th) */
+th {
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    white-space: nowrap;
+}
+
+th:first-child {
+    text-align: left;
+    padding-left: 20px;
+}
+
+th:last-child {
+    padding-right: 20px;
+}
+
+/* 데이터 셀 (td) */
+td {
+    padding: 16px 12px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+td:first-child {
+    text-align: left;
+    padding-left: 20px;
+    color: #1a1a1a;
+    font-weight: 600;
+}
+
+td:last-child {
+    padding-right: 20px;
+}
+
+/* 행 Hover 효과 */
+tbody tr {
+    transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+    background: #f8fafc;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* 테이블 내 액션 버튼 */
+.action-buttons {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    flex-wrap: nowrap;
+}
+
+/* 셀 텍스트 자르기 */
+.cell-truncate {
+    max-width: 250px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* 페이지네이션 래퍼 */
+.pagination-wrapper {
+    padding: 16px 20px;
+    border-top: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}
+
+/* Tailwind 테이블 클래스 오버라이드 */
+.min-w-full {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.min-w-full thead {
+    background: #f8fafc;
+    border-bottom: 2px solid #6A0028;
+}
+
+.min-w-full th {
+    padding: 16px 12px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+}
+
+.min-w-full td {
+    padding: 16px 12px;
+    text-align: center;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 14px;
+    color: #6b7280;
+}
+
+.min-w-full tbody tr:hover {
+    background: #f8fafc;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+    .table-header {
+        padding: 12px 16px;
+    }
+
+    .table-title {
+        font-size: 14px;
+    }
+
+    .table-count {
+        font-size: 12px;
+    }
+
+    th, td {
+        padding: 12px 8px;
+        font-size: 13px;
+    }
+
+    th:first-child,
+    td:first-child {
+        padding-left: 16px;
+    }
+
+    th:last-child,
+    td:last-child {
+        padding-right: 16px;
+    }
+}
