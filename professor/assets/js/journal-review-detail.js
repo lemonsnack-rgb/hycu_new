@@ -99,7 +99,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                                         <p class="text-sm text-gray-600">${reviewer.department || '-'} / ${reviewer.role === '주심' ? '심사위원장' : '심사위원'}</p>
                                     </div>
                                     <div>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${reviewer.status === '완료' ? 'bg-green-100 text-green-800' : reviewer.status === '진행중' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${reviewer.status === '완료' ? 'bg-green-100 text-green-800' : reviewer.status === '진행중' ? 'bg-[#FCE4EC] text-[#6A0028]' : 'bg-yellow-100 text-yellow-800'}">
                                             ${reviewer.status || '평가 대기'}
                                         </span>
                                         ${reviewer.score !== null && reviewer.score !== undefined ? `
@@ -121,12 +121,12 @@ function viewJournalReviewDetail(journalId, viewType) {
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h3 class="text-lg font-bold text-gray-800 mb-4">평가표</h3>
 
-                <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
-                    <h4 class="font-bold text-blue-900 mb-3 flex items-center">
+                <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
+                    <h4 class="font-bold text-[#4A001C] mb-3 flex items-center">
                         <i class="fas fa-info-circle mr-2"></i>
                         평가 기준 안내
                     </h4>
-                    <p class="text-sm text-blue-900">
+                    <p class="text-sm text-[#4A001C]">
                         <strong>안내:</strong> 각 항목별로 점수를 입력해주세요. 입력하신 점수가 합산되어 총점이 계산됩니다.
                     </p>
                 </div>
@@ -171,10 +171,10 @@ function viewJournalReviewDetail(journalId, viewType) {
                 </div>
 
                 <!-- 총점 표시 -->
-                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 my-6 border-2 border-blue-300">
+                <div class="bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg p-6 my-6 border-2 border-[#F8BBD9]">
                     <div class="flex justify-between items-center">
                         <span class="text-lg font-bold text-gray-800">총점</span>
-                        <span class="text-3xl font-bold text-blue-600" id="journal-total-score">0.0 / 100점</span>
+                        <span class="text-3xl font-bold text-[#6A0028]" id="journal-total-score">0.0 / 100점</span>
                     </div>
                 </div>
 
@@ -187,10 +187,10 @@ function viewJournalReviewDetail(journalId, viewType) {
 
                 <!-- PDF 다운로드 -->
                 ${journal.pdfUrl ? `
-                    <div class="bg-blue-50 border border-blue-300 rounded-lg p-4 mb-6">
-                        <h4 class="font-bold text-blue-800 mb-2">첨부 파일</h4>
+                    <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-6">
+                        <h4 class="font-bold text-[#6A0028] mb-2">첨부 파일</h4>
                         <a href="${journal.pdfUrl}" target="_blank"
-                           class="text-blue-600 hover:underline flex items-center gap-2">
+                           class="text-[#6A0028] hover:underline flex items-center gap-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -231,7 +231,7 @@ function viewJournalReviewDetail(journalId, viewType) {
                                     </div>
                                     <div class="text-right">
                                         ${reviewer.score !== undefined && reviewer.score !== null ? `
-                                            <p class="text-lg font-bold text-blue-600">${reviewer.score}점</p>
+                                            <p class="text-lg font-bold text-[#6A0028]">${reviewer.score}점</p>
                                             <p class="text-xs text-gray-500">총점</p>
                                         ` : `
                                             <span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">평가 대기</span>
@@ -249,10 +249,10 @@ function viewJournalReviewDetail(journalId, viewType) {
                     </div>
 
                     <!-- 평균 점수 -->
-                    <div class="bg-blue-50 border-2 border-blue-300 rounded-lg p-4 mb-6">
+                    <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
                         <div class="flex justify-between items-center">
-                            <p class="font-bold text-blue-900">전체 평균 점수</p>
-                            <p class="text-2xl font-bold text-blue-600">
+                            <p class="font-bold text-[#4A001C]">전체 평균 점수</p>
+                            <p class="text-2xl font-bold text-[#6A0028]">
                                 ${calculateAverageScore(journal.reviewers)}점
                             </p>
                         </div>

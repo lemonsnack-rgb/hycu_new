@@ -93,11 +93,11 @@ function renderBoardList() {
                                     <td class="py-3 px-4 text-sm text-gray-800">${posts.length - idx}</td>
                                     <td class="py-3 px-4 text-sm text-gray-800">
                                         ${post.title}
-                                        ${post.comments.length > 0 ? `<span class="text-blue-600 ml-2">[${post.comments.length}]</span>` : ''}
+                                        ${post.comments.length > 0 ? `<span class="text-[#6A0028] ml-2">[${post.comments.length}]</span>` : ''}
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-800">
                                         ${post.authorName}
-                                        ${post.authorRole === 'professor' ? '<span class="text-xs text-blue-600 ml-1">[교수]</span>' : '<span class="text-xs text-green-600 ml-1">[학생]</span>'}
+                                        ${post.authorRole === 'professor' ? '<span class="text-xs text-[#6A0028] ml-1">[교수]</span>' : '<span class="text-xs text-green-600 ml-1">[학생]</span>'}
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${formatDateTime(post.createdAt)}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">
@@ -146,7 +146,7 @@ function viewBoardPost(postId) {
                         </div>
                     </div>
                     <div class="flex items-center gap-2">
-                        ${canEdit ? `<button onclick="openBoardEditModal(${post.id})" class="text-sm text-blue-600 hover:text-blue-800">수정</button>` : ''}
+                        ${canEdit ? `<button onclick="openBoardEditModal(${post.id})" class="text-sm text-[#6A0028] hover:text-[#6A0028]">수정</button>` : ''}
                         ${canDelete ? `<button onclick="deleteBoardPost(${post.id})" class="text-sm text-red-600 hover:text-red-800">삭제</button>` : ''}
                         <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl ml-2">&times;</button>
                     </div>
@@ -165,7 +165,7 @@ function viewBoardPost(postId) {
                         <p class="text-sm font-semibold text-gray-800 mb-2">첨부파일 (${post.files.length})</p>
                         <div class="space-y-2">
                             ${post.files.map(file => `
-                                <div class="flex items-center gap-2 text-sm text-gray-600 hover:text-blue-600 cursor-pointer p-2 rounded hover:bg-gray-50">
+                                <div class="flex items-center gap-2 text-sm text-gray-600 hover:text-[#6A0028] cursor-pointer p-2 rounded hover:bg-gray-50">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
                                     </svg>

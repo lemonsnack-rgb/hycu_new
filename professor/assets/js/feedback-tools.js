@@ -898,13 +898,13 @@ function renderCommentCard(comment, pageNum) {
         
         if (linkedItems.length > 0) {
             linkedCommentsHtml = `
-                <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs">
-                    <i class="fas fa-link text-blue-600"></i>
-                    <span class="text-blue-800 font-semibold">연결된 코멘트:</span>
+                <div class="mt-2 p-2 bg-[#FCE4EC] border border-[#F8BBD9] rounded text-xs">
+                    <i class="fas fa-link text-[#6A0028]"></i>
+                    <span class="text-[#6A0028] font-semibold">연결된 코멘트:</span>
                     ${linkedItems.map(item => `
                         <button 
                             onclick="goToLinkedComment('${item.id}', ${item.page})" 
-                            class="inline-block bg-blue-100 hover:bg-blue-200 px-2 py-0.5 rounded ml-1 cursor-pointer transition-colors"
+                            class="inline-block bg-[#FCE4EC] hover:bg-[#F8BBD9] px-2 py-0.5 rounded ml-1 cursor-pointer transition-colors"
                             title="${item.page}페이지로 이동">
                             💬 ${item.number}
                         </button>
@@ -921,12 +921,12 @@ function renderCommentCard(comment, pageNum) {
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold text-gray-700">${pageNum}페이지 💬 ${commentNumber}</span>
                     ${author ? `
-                        <span class="text-xs px-2 py-0.5 rounded-full ${author.role === 'main' ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'}">
+                        <span class="text-xs px-2 py-0.5 rounded-full ${author.role === 'main' ? 'bg-red-100 text-red-700' : 'bg-[#FCE4EC] text-[#6A0028]'}">
                             ${author.name} (${roleText})
                         </span>
                     ` : ''}
                 </div>
-                <button onclick="goToPage(${pageNum})" class="text-xs text-blue-600 hover:text-blue-800">
+                <button onclick="goToPage(${pageNum})" class="text-xs text-[#6A0028] hover:text-[#6A0028]">
                     이동 →
                 </button>
             </div>
@@ -958,13 +958,13 @@ function renderCommentCard(comment, pageNum) {
                         return '';
                     })()}
                     ${comment.linkedComments && comment.linkedComments.length > 0 ? `
-                        <span class="text-xs text-blue-700">
+                        <span class="text-xs text-[#6A0028]">
                             → 연결된: ${comment.linkedComments.map(linkedId => {
                                 const linkedNum = getCommentNumber(linkedId);
                                 const linkedPage = findCommentPage(linkedId);
                                 return linkedNum ? `<button 
                                     onclick="goToLinkedComment('${linkedId}', ${linkedPage})" 
-                                    class="inline-block bg-blue-100 hover:bg-blue-200 px-2 py-0.5 rounded ml-1 cursor-pointer"
+                                    class="inline-block bg-[#FCE4EC] hover:bg-[#F8BBD9] px-2 py-0.5 rounded ml-1 cursor-pointer"
                                     title="${linkedPage}페이지로 이동">💬${linkedNum}</button>` : '';
                             }).join('')}
                         </span>
@@ -1136,7 +1136,7 @@ function renderCommentBubble(comment, parentCommentId) {
                     ${isOwner ? `
                         <div class="flex gap-2">
                             <button onclick="event.stopPropagation(); editReply('${parentCommentId}', '${comment.id}')"
-                                    class="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                                    class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
                                 <i class="fas fa-edit"></i>
                                 <span>수정</span>
                             </button>
@@ -1174,11 +1174,11 @@ function renderCommentBubble(comment, parentCommentId) {
 function renderPageMarker(pageNum, count) {
     return `
         <div class="page-marker-card" onclick="goToPage(${pageNum})">
-            <p class="text-sm font-semibold text-blue-800">
+            <p class="text-sm font-semibold text-[#6A0028]">
                 <i class="fas fa-paint-brush mr-2"></i>
                 ${pageNum}페이지에 판서/하이라이트가 있습니다
             </p>
-            <span class="text-xs text-blue-600 font-bold">이동하기 &rarr;</span>
+            <span class="text-xs text-[#6A0028] font-bold">이동하기 &rarr;</span>
         </div>
     `;
 }
@@ -1600,7 +1600,7 @@ function showToast(message, type = 'info') {
         type === 'success' ? 'bg-green-500 text-white' :
         type === 'error' ? 'bg-red-500 text-white' :
         type === 'warning' ? 'bg-yellow-500 text-white' :
-        'bg-blue-500 text-white'
+        'bg-[#FCE4EC]0 text-white'
     }`;
     toast.textContent = message;
     
@@ -1680,7 +1680,7 @@ function renderQuickMarkList() {
                     <p class="text-xs text-gray-600 truncate">${qm.content}</p>
                 </div>
                 <div class="flex gap-1">
-                    <button class="text-blue-500 hover:text-blue-700 p-1" 
+                    <button class="text-[#6A0028] hover:text-[#6A0028] p-1" 
                             onclick="event.stopPropagation(); editQuickMark('${qm.id}')" title="수정">
                         <i class="fas fa-edit"></i>
                     </button>

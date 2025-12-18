@@ -38,7 +38,7 @@ function renderApprovedCard(req) {
             <div class="flex justify-between items-start mb-3">
                 <div class="flex-1">
                     <div class="flex items-center gap-2 mb-2">
-                        <i class="fas fa-user-graduate text-blue-600" style="font-size: 1.25rem;"></i>
+                        <i class="fas fa-user-graduate text-[#6A0028]" style="font-size: 1.25rem;"></i>
                         <span class="font-semibold text-lg">${req.studentName}</span>
                         <span class="text-sm text-gray-500">(${req.studentNumber})</span>
                     </div>
@@ -83,7 +83,7 @@ function renderApprovedCard(req) {
                         </div>
                         <div>
                             <span class="text-purple-700">참가 링크:</span>
-                            <a href="${req.zoomJoinUrl}" target="_blank" class="text-blue-600 hover:underline ml-2 break-all">
+                            <a href="${req.zoomJoinUrl}" target="_blank" class="text-[#6A0028] hover:underline ml-2 break-all">
                                 ${req.zoomJoinUrl}
                             </a>
                         </div>
@@ -95,7 +95,7 @@ function renderApprovedCard(req) {
                         ` : ''}
                         <div class="pt-2 border-t border-purple-200">
                             <span class="text-purple-700">교수 시작 링크:</span>
-                            <a href="${req.zoomStartUrl}" target="_blank" class="text-blue-600 hover:underline ml-2 break-all">
+                            <a href="${req.zoomStartUrl}" target="_blank" class="text-[#6A0028] hover:underline ml-2 break-all">
                                 미팅 시작하기
                             </a>
                         </div>
@@ -231,7 +231,7 @@ function renderCompletedRow(req, index) {
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.completedDate}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${req.studentName}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${req.studentNumber}</td>
-            <td class="px-6 py-4 text-sm text-blue-600 hover:text-blue-800 td-truncate-long cursor-pointer"
+            <td class="px-6 py-4 text-sm text-[#6A0028] hover:text-[#6A0028] td-truncate-long cursor-pointer"
                 title="${req.topic}"
                 onclick="viewCompletedMeetingDetail('${req.id}')">
                 ${req.topic}
@@ -288,7 +288,7 @@ function openRecordingModal(reqId) {
                     </div>
 
                     <div class="mt-4 flex justify-between items-center">
-                        <a href="${req.recordingUrl}" target="_blank" download class="text-sm text-blue-600 hover:text-blue-800">
+                        <a href="${req.recordingUrl}" target="_blank" download class="text-sm text-[#6A0028] hover:text-[#6A0028]">
                             다운로드
                         </a>
                         <button onclick="closeRecordingModal()" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm">
@@ -431,7 +431,7 @@ function renderCompletedMeetingDetailPage(req) {
                         </div>
 
                         <div class="flex justify-start">
-                            <a href="${req.recordingUrl}" target="_blank" download class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded text-sm">
+                            <a href="${req.recordingUrl}" target="_blank" download class="px-4 py-2 bg-[#8A0034] hover:bg-[#4A001C] text-white rounded text-sm">
                                 <i class="fas fa-download mr-2"></i>다운로드
                             </a>
                         </div>
@@ -589,8 +589,8 @@ function openSetAvailableTimeModal() {
                             </select>
                         </div>
 
-                        <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                            <p class="text-sm text-blue-800">
+                        <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-4">
+                            <p class="text-sm text-[#6A0028]">
                                 <strong>ℹ️ 안내</strong><br>
                                 설정한 시간은 학생들이 예약 신청할 수 있는 시간으로 등록됩니다.
                             </p>
@@ -599,7 +599,7 @@ function openSetAvailableTimeModal() {
                         <div class="flex gap-3">
                             <button type="button" onclick="closeModal('modal-set-time')"
                                     class="flex-1 px-6 py-3 border rounded-lg" style="background: white; cursor: pointer;">취소</button>
-                            <button type="submit" class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg" style="border: none; cursor: pointer;">설정 완료</button>
+                            <button type="submit" class="flex-1 px-6 py-3 bg-[#FCE4EC]0 text-white rounded-lg" style="border: none; cursor: pointer;">설정 완료</button>
                         </div>
                     </form>
                 </div>
@@ -777,7 +777,7 @@ function openCreateGroupMeetingModal() {
                             </div>
 
                             <div id="selected-count" class="mt-3 text-sm text-gray-600">
-                                선택된 학생: <span class="font-bold text-blue-600">0명</span>
+                                선택된 학생: <span class="font-bold text-[#6A0028]">0명</span>
                             </div>
                         </div>
 
@@ -810,7 +810,7 @@ function openCreateGroupMeetingModal() {
 function updateSelectedCount() {
     const count = document.querySelectorAll('input[name="students"]:checked').length;
     document.getElementById('selected-count').innerHTML =
-        `선택된 학생: <span class="font-bold text-blue-600">${count}명</span>`;
+        `선택된 학생: <span class="font-bold text-[#6A0028]">${count}명</span>`;
 }
 
 function toggleStudentCheckbox(event, studentId) {
@@ -911,8 +911,8 @@ function approveRequest(requestId) {
                         <div><strong>내용:</strong> ${request.description}</div>
                     </div>
 
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-                        <p class="text-sm text-blue-800">
+                    <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-4">
+                        <p class="text-sm text-[#6A0028]">
                             <strong>승인하면 자동으로:</strong><br>
                             • Zoom 링크 생성<br>
                             • 학생에게 알림 발송
@@ -923,7 +923,7 @@ function approveRequest(requestId) {
                         <button onclick="closeModal('modal-approve')"
                                 class="flex-1 px-6 py-3 border rounded-lg" style="background: white; cursor: pointer;">취소</button>
                         <button onclick="confirmApprove('${requestId}')"
-                                class="flex-1 px-6 py-3 bg-blue-500 text-white rounded-lg" style="border: none; cursor: pointer;">승인</button>
+                                class="flex-1 px-6 py-3 bg-[#FCE4EC]0 text-white rounded-lg" style="border: none; cursor: pointer;">승인</button>
                     </div>
                 </div>
             </div>

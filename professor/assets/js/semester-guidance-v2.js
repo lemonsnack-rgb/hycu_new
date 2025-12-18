@@ -109,7 +109,7 @@ function renderSemesterDetailScreen(student, allPlans) {
         </div>
 
         <!-- 학기 선택 카드 -->
-        <div class="bg-blue-50 rounded-lg p-6 mb-6">
+        <div class="bg-[#FCE4EC] rounded-lg p-6 mb-6">
             <div class="flex items-center gap-4 mb-4">
                 <div>
                     <label class="block text-xs text-gray-600 mb-1">학년도</label>
@@ -234,10 +234,10 @@ function renderExecutionComment(execution, currentProf, weekNumber, studentId) {
     const isMyExecution = execution.professorId === currentProf.id;
 
     return `
-        <div class="execution-comment ${isMyExecution ? 'bg-blue-50 border-blue-200' : 'bg-gray-50 border-gray-200'} border rounded-lg p-4">
+        <div class="execution-comment ${isMyExecution ? 'bg-[#FCE4EC] border-[#F8BBD9]' : 'bg-gray-50 border-gray-200'} border rounded-lg p-4">
             <div class="flex justify-between items-start mb-2">
                 <div>
-                    <div class="text-sm font-semibold ${isMyExecution ? 'text-blue-800' : 'text-gray-800'}">
+                    <div class="text-sm font-semibold ${isMyExecution ? 'text-[#6A0028]' : 'text-gray-800'}">
                         ${execution.professorName} ${isMyExecution ? '(나)' : ''}
                     </div>
                     <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
@@ -251,7 +251,7 @@ function renderExecutionComment(execution, currentProf, weekNumber, studentId) {
                 ${isMyExecution ? `
                     <div class="flex gap-2">
                         <button onclick="editExecutionInlineV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
-                                class="text-xs text-blue-600 hover:text-blue-800">
+                                class="text-xs text-[#6A0028] hover:text-[#6A0028]">
                             수정
                         </button>
                         <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
@@ -507,7 +507,7 @@ function getMethodBadgeClass(method) {
     const classes = {
         'meeting': 'bg-green-100 text-green-700',
         'zoom': 'bg-purple-100 text-purple-700',
-        'online': 'bg-blue-100 text-blue-700',
+        'online': 'bg-[#FCE4EC] text-[#6A0028]',
         'email': 'bg-yellow-100 text-yellow-700',
         'phone': 'bg-pink-100 text-pink-700'
     };

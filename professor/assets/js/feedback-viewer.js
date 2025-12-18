@@ -115,7 +115,7 @@ function createFeedbackModal(request, feedbackData) {
                     <!-- ID 47: CopyKiller/GPT Killer 결과보고서 링크 -->
                     <div class="text-sm text-gray-600">
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-blue-600 hover:underline text-xs">결과보고서(통합)</a>
+                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-[#6A0028] hover:underline text-xs">결과보고서(통합)</a>
                         </a>
                     </div>
                 </div>
@@ -142,9 +142,9 @@ function createFeedbackModal(request, feedbackData) {
                 <div class="history-panel">
                     <h4 class="text-sm font-bold text-gray-700 mb-3">제출 이력</h4>
                     <div class="space-y-2">
-                        <div class="bg-white p-3 rounded border-l-4 border-blue-500">
+                        <div class="bg-white p-3 rounded border-l-4 border-[#6A0028]">
                             <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+                                <span class="w-2 h-2 bg-[#FCE4EC]0 rounded-full"></span>
                                 <span class="text-xs font-bold text-gray-700">v${feedbackData ? feedbackData.version : 1} (현재)</span>
                             </div>
                             <p class="text-xs text-gray-600">${request.date}</p>
@@ -553,20 +553,20 @@ function renderGeneralThread(feedbackId){
   
   const isOwner = mainFeedback.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
   const att = (mainFeedback.attach && mainFeedback.attach.length) ? 
-              mainFeedback.attach.map(a=>'<a class="text-blue-600 underline mr-2" href="#">'+a.name+'</a>').join('') : '';
+              mainFeedback.attach.map(a=>'<a class="text-[#6A0028] underline mr-2" href="#">'+a.name+'</a>').join('') : '';
   
   listEl.innerHTML = `
     <!-- 메인 평가 -->
     <div class="general-main-feedback">
       <div id="general-main-display">
-        <div class="p-3 border-2 border-blue-200 rounded-lg bg-blue-50">
+        <div class="p-3 border-2 border-[#F8BBD9] rounded-lg bg-[#FCE4EC]">
           <div class="mb-2 text-gray-800 whitespace-pre-wrap">${escapeHtml(mainFeedback.text)}</div>
           ${att ? '<div class="text-xs text-gray-600 mb-2">'+att+'</div>' : ''}
           <div class="flex items-center justify-between">
             <div class="text-[11px] text-gray-500">${new Date(mainFeedback.ts).toLocaleString()}</div>
             ${isOwner ? `
               <button onclick="editGeneralMain()" 
-                      class="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                      class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
                 <i class="fas fa-edit"></i>
                 <span>수정</span>
               </button>
@@ -613,7 +613,7 @@ function renderGeneralThread(feedbackId){
           ${replies.map((reply, idx) => {
             const replyOwner = reply.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
             const replyAtt = (reply.attach && reply.attach.length) ? 
-                            reply.attach.map(a=>'<a class="text-blue-600 underline mr-2" href="#">'+a.name+'</a>').join('') : '';
+                            reply.attach.map(a=>'<a class="text-[#6A0028] underline mr-2" href="#">'+a.name+'</a>').join('') : '';
             return `
               <div class="general-reply-bubble p-2 border rounded-lg bg-gray-50" data-reply-index="${idx+1}">
                 <div id="general-reply-display-${idx+1}">
@@ -623,7 +623,7 @@ function renderGeneralThread(feedbackId){
                     <div class="text-[11px] text-gray-400">${new Date(reply.ts).toLocaleString()}</div>
                     ${replyOwner ? `
                       <button onclick="editGeneralReply(${idx+1})" 
-                              class="text-xs text-blue-600 hover:text-blue-800 flex items-center gap-1">
+                              class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
                         <i class="fas fa-edit"></i>
                         <span>수정</span>
                       </button>

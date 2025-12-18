@@ -105,7 +105,7 @@ function renderExamScheduleScreen() {
                         <!-- 검색 버튼 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                            <button onclick="filterExamScheduleList()" class="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                            <button onclick="filterExamScheduleList()" class="w-full px-4 py-2 bg-[#8A0034] text-white rounded hover:bg-[#4A001C]">
                                 <i class="fas fa-search mr-1"></i> 검색
                             </button>
                         </div>
@@ -239,7 +239,7 @@ function renderExamScheduleTable(data) {
             : '<span class="text-gray-400">미등록</span>';
 
         const methodText = item.method === 'online'
-            ? '<span class="text-blue-600">온라인</span>'
+            ? '<span class="text-[#6A0028]">온라인</span>'
             : item.method === 'offline'
             ? '<span class="text-green-600">오프라인</span>'
             : '<span class="text-gray-400">-</span>';
@@ -344,7 +344,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
             </div>
             <span class="text-xs px-2 py-1 rounded-full ${
                 m.role === 'chair'
-                    ? 'bg-blue-100 text-blue-800'
+                    ? 'bg-[#FCE4EC] text-[#6A0028]'
                     : 'bg-gray-100 text-gray-600'
             }">
                 ${m.role === 'chair' ? '위원장' : '위원'}
@@ -435,7 +435,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                     <div class="mb-4">
                         <span class="px-3 py-1 rounded-full text-sm font-medium ${
                             schedule.method === 'online'
-                                ? 'bg-blue-100 text-blue-800'
+                                ? 'bg-[#FCE4EC] text-[#6A0028]'
                                 : 'bg-green-100 text-green-800'
                         }">
                             ${schedule.method === 'online' ? '온라인 (Zoom)' : '오프라인'}
@@ -443,7 +443,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                     </div>
 
                     ${schedule.method === 'online' && schedule.onlineInfo ? `
-                        <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="p-4 bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg">
                             <h5 class="font-medium text-gray-800 mb-3">Zoom 미팅 정보</h5>
                             <div class="space-y-2 text-sm">
                                 <div class="grid grid-cols-2 gap-4">
@@ -463,7 +463,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                                 <div>
                                     <span class="text-gray-600">참가 URL:</span>
                                     <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
-                                        <a href="${schedule.onlineInfo.meetingUrl}" target="_blank" class="text-blue-600 hover:underline">
+                                        <a href="${schedule.onlineInfo.meetingUrl}" target="_blank" class="text-[#6A0028] hover:underline">
                                             ${schedule.onlineInfo.meetingUrl}
                                         </a>
                                     </div>
@@ -471,7 +471,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                                 <div>
                                     <span class="text-gray-600">호스트 URL:</span>
                                     <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
-                                        <a href="${schedule.onlineInfo.hostUrl}" target="_blank" class="text-blue-600 hover:underline">
+                                        <a href="${schedule.onlineInfo.hostUrl}" target="_blank" class="text-[#6A0028] hover:underline">
                                             ${schedule.onlineInfo.hostUrl}
                                         </a>
                                     </div>

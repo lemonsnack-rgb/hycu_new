@@ -206,7 +206,7 @@ function renderStudentDetail() {
                     <div class="info-label">지도교수</div>
                     <div class="info-value">
                         ${student.advisors.map(advisor => `
-                            <div class="${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-600'}">
+                            <div class="${advisor.id === currentProf.id ? 'font-semibold text-[#6A0028]' : 'text-gray-600'}">
                                 ${advisor.name} ${advisor.role === 'primary' ? '(주지도교수)' : '(부지도교수)'}
                             </div>
                         `).join('')}
@@ -216,7 +216,7 @@ function renderStudentDetail() {
                     <div class="info-label">지도 현황</div>
                     <div class="info-value">
                         <span class="text-gray-600">전체 계획: ${student.totalGuidanceCount}회</span>
-                        <span class="font-semibold text-blue-600 ml-3">지도 횟수: ${myStats.count}회</span>
+                        <span class="font-semibold text-[#6A0028] ml-3">지도 횟수: ${myStats.count}회</span>
                     </div>
                 </div>
                 <div class="info-row">
@@ -251,11 +251,11 @@ function renderStudentDetail() {
                     ${sortedPlans.map(plan => {
                         const isMyPlan = plan.advisor.id === currentProf.id;
                         return `
-                            <div class="border ${isMyPlan ? 'border-blue-200 bg-blue-50' : 'border-gray-200 bg-white'} rounded-lg p-4 hover:shadow-md transition-shadow">
+                            <div class="border ${isMyPlan ? 'border-[#F8BBD9] bg-[#FCE4EC]' : 'border-gray-200 bg-white'} rounded-lg p-4 hover:shadow-md transition-shadow">
                                 <!-- 헤더 -->
                                 <div class="flex justify-between items-start mb-3">
                                     <div>
-                                        <span class="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2 py-1 rounded">
+                                        <span class="inline-block bg-[#FCE4EC] text-[#6A0028] text-xs font-semibold px-2 py-1 rounded">
                                             ${plan.week}주차
                                         </span>
                                         <span class="ml-2 text-sm text-gray-600">${formatDate(plan.plannedDate)}</span>
@@ -277,7 +277,7 @@ function renderStudentDetail() {
                                         </span>
                                         ${isMyPlan && !plan.executionDate ? `
                                             <button onclick="openEditPlanModal(${plan.id})"
-                                                    class="text-blue-600 hover:underline text-xs font-medium">
+                                                    class="text-[#6A0028] hover:underline text-xs font-medium">
                                                 수정
                                             </button>
                                             <button onclick="deletePlan(${plan.id})"
@@ -298,7 +298,7 @@ function renderStudentDetail() {
                                 <div class="space-y-2">
                                     <div>
                                         <span class="text-xs font-semibold text-gray-500">담당교수:</span>
-                                        <span class="text-sm ${isMyPlan ? 'text-blue-600 font-semibold' : 'text-gray-800'} ml-2">
+                                        <span class="text-sm ${isMyPlan ? 'text-[#6A0028] font-semibold' : 'text-gray-800'} ml-2">
                                             ${plan.advisor.name}
                                         </span>
                                     </div>
@@ -360,7 +360,7 @@ function toggleMyGuidanceFilter(checked) {
 function getStatusBadge(status) {
     const badges = {
         'planned': '<span class="text-xs px-2 py-1 rounded bg-yellow-100 text-yellow-700">계획중</span>',
-        'in_progress': '<span class="text-xs px-2 py-1 rounded bg-blue-100 text-blue-700">진행중</span>',
+        'in_progress': '<span class="text-xs px-2 py-1 rounded bg-[#FCE4EC] text-[#6A0028]">진행중</span>',
         'completed': '<span class="text-xs px-2 py-1 rounded bg-green-100 text-green-700">완료</span>'
     };
     return badges[status] || badges['planned'];
@@ -400,7 +400,7 @@ function openAddPlanModal() {
                             <input type="checkbox" name="advisors" value="${advisor.id}"
                                    ${advisor.id === currentProf.id ? 'checked' : ''}
                                    class="rounded border-gray-300 mr-2">
-                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-800'}">
+                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-[#6A0028]' : 'text-gray-800'}">
                                 ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
                             </span>
                         </label>
@@ -433,8 +433,8 @@ function openAddPlanModal() {
                 </select>
             </div>
 
-            <div class="bg-blue-50 p-3 rounded-lg">
-                <p class="text-xs text-blue-800">
+            <div class="bg-[#FCE4EC] p-3 rounded-lg">
+                <p class="text-xs text-[#6A0028]">
                     💡 계획을 저장한 후, 실제 지도를 진행하면 '실적입력' 버튼을 클릭하여 실행 내용을 기록하세요.
                 </p>
             </div>
@@ -636,7 +636,7 @@ function sendNotificationToSelected() {
                 <p class="text-sm font-medium text-gray-800 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
                 <div class="flex flex-wrap gap-2">
                     ${selectedStudents.map(s => `
-                        <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                        <span class="inline-block bg-[#FCE4EC] text-[#6A0028] px-2 py-1 rounded text-xs">
                             ${s.name}
                         </span>
                     `).join('')}
@@ -745,7 +745,7 @@ function openEditPlanModal(planId) {
                             <input type="checkbox" name="advisors" value="${advisor.id}"
                                    ${advisor.id === plan.advisor.id ? 'checked' : ''}
                                    class="rounded border-gray-300 mr-2">
-                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-blue-600' : 'text-gray-800'}">
+                            <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-[#6A0028]' : 'text-gray-800'}">
                                 ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
                             </span>
                         </label>

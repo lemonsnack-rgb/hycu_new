@@ -99,7 +99,7 @@ function renderReviewList() {
                                 <td class="py-3 px-4 text-center">
                                     <div class="flex gap-2 justify-center">
                                         <button onclick="openReviewDetail('${assignment.id}', 'member')"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                                class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
                                             심사
                                         </button>
                                         ${assignment.myRole === 'chair' ? `
@@ -206,7 +206,7 @@ function resetReviewSearch() {
 // ==================== 유틸리티 함수 ====================
 function getTypeBadgeClass(type) {
     const typeMap = {
-        '연구계획서': 'bg-blue-100 text-blue-800',
+        '연구계획서': 'bg-[#FCE4EC] text-[#6A0028]',
         '중간논문': 'bg-yellow-100 text-yellow-800',
         '최종논문': 'bg-purple-100 text-purple-800'
     };
@@ -222,7 +222,7 @@ function getRoleBadgeClass(role) {
 function getStatusBadgeClass(status) {
     const statusMap = {
         '진행중': 'bg-yellow-100 text-yellow-800',
-        '심사완료': 'bg-blue-100 text-blue-800',
+        '심사완료': 'bg-[#FCE4EC] text-[#6A0028]',
         '승인': 'bg-green-100 text-green-800',
         '보류': 'bg-orange-100 text-orange-800',
         '반려': 'bg-red-100 text-red-800'
@@ -321,7 +321,7 @@ window.closeReviewDetail = closeReviewDetail;
 function getProgressColorClass(progress) {
     if (progress === '3/3' || progress === '완료') return 'text-green-600';
     if (progress.startsWith('0/')) return 'text-gray-500';
-    return 'text-blue-600';
+    return 'text-[#6A0028]';
 }
 
 // ID 49-50: 심사진행상태 배지 클래스
@@ -330,7 +330,7 @@ function getProgressBadgeClass(progress) {
         return 'bg-green-100 text-green-700';
     }
     if (progress === '진행중' || (progress && progress.includes('/'))) {
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-[#FCE4EC] text-[#6A0028]';
     }
     if (progress === '대기' || progress === '0/3') {
         return 'bg-gray-100 text-gray-700';
@@ -366,7 +366,7 @@ function sendNotificationToSelectedReviews() {
                 <p class="text-sm font-medium text-gray-700 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
                 <div class="flex flex-wrap gap-2">
                     ${selectedStudents.map(s => `
-                        <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                        <span class="inline-block bg-[#FCE4EC] text-[#6A0028] px-2 py-1 rounded text-xs">
                             ${s.name}
                         </span>
                     `).join('')}

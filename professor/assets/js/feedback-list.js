@@ -80,7 +80,7 @@ function renderFeedbackRow(request, idx) {
         statusClass = 'bg-green-100 text-green-700';
     } else if (commentCount > 0) {
         feedbackStatus = '진행중';
-        statusClass = 'bg-blue-100 text-blue-700';
+        statusClass = 'bg-[#FCE4EC] text-[#6A0028]';
     } else {
         feedbackStatus = '대기';
         statusClass = 'bg-gray-100 text-gray-800';
@@ -133,7 +133,7 @@ function renderPlagiarismScore(copyScore, gptScore) {
                 <span class="text-gray-400 mx-1">/</span>
                 <span class="${gptColor} font-semibold">GPT Killer: ${gptScore}</span>
             </div>
-            <a href="#" onclick="showPlagiarismReport('통합', event)" class="text-blue-600 hover:underline text-xs">
+            <a href="#" onclick="showPlagiarismReport('통합', event)" class="text-[#6A0028] hover:underline text-xs">
                 결과보고서 보기 <i class="fas fa-external-link-alt"></i>
             </a>
         </div>
@@ -169,7 +169,7 @@ function addStudentInfoIcon(studentName, studentNumber) {
     return `
         ${studentName}
         <button onclick="showStudentInfo('${studentNumber}'); event.stopPropagation();" 
-                class="ml-1 text-blue-600 hover:text-blue-800" 
+                class="ml-1 text-[#6A0028] hover:text-[#6A0028]" 
                 title="학생 정보 보기">
             <i class="fas fa-info-circle text-xs"></i>
         </button>

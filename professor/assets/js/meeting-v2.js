@@ -82,11 +82,11 @@ function renderScheduleTab() {
                     <div class="space-y-3">
                         <!-- 1:1 미팅 시간 설정 -->
                         <button onclick="openSetAvailableTimeModal()"
-                                class="w-full bg-blue-500 hover:bg-blue-600 text-white p-4 rounded-lg text-left transition-colors"
+                                class="w-full bg-[#FCE4EC]0 hover:bg-[#8A0034] text-white p-4 rounded-lg text-left transition-colors"
                                 style="display: flex; align-items: center; justify-content: space-between; border: none; cursor: pointer;">
                             <div>
                                 <div class="font-bold text-lg mb-1">미팅 가능 시간 설정</div>
-                                <div class="text-sm text-blue-100">학생들이 예약 신청할 수 있습니다</div>
+                                <div class="text-sm text-[#F8BBD9]">학생들이 예약 신청할 수 있습니다</div>
                             </div>
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
@@ -107,8 +107,8 @@ function renderScheduleTab() {
                         </button>
                     </div>
 
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mt-4">
-                        <p class="text-sm text-blue-800">
+                    <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mt-4">
+                        <p class="text-sm text-[#6A0028]">
                             <strong>💡 안내</strong><br>
                             • 1:1 미팅: 학생이 신청하면 승인 후 자동으로 Zoom 생성<br>
                             • 그룹 미팅: 생성 즉시 Zoom 생성 및 학생에게 알림
@@ -488,11 +488,11 @@ function renderRequestCard(req) {
                 <span class="badge-yellow">승인 대기</span>
             </div>
             
-            <div class="bg-blue-50 p-4 rounded-lg mb-3">
-                <h4 class="font-semibold text-blue-900 mb-3">${req.topic}</h4>
+            <div class="bg-[#FCE4EC] p-4 rounded-lg mb-3">
+                <h4 class="font-semibold text-[#4A001C] mb-3">${req.topic}</h4>
                 <div class="grid grid-cols-2 gap-2 text-sm">
-                    <div class="text-blue-700">희망일: <span class="font-medium">${req.selectedDate}</span></div>
-                    <div class="text-blue-700">시간: <span class="font-medium">${req.selectedTime} (${req.duration}분)</span></div>
+                    <div class="text-[#6A0028]">희망일: <span class="font-medium">${req.selectedDate}</span></div>
+                    <div class="text-[#6A0028]">시간: <span class="font-medium">${req.selectedTime} (${req.duration}분)</span></div>
                 </div>
             </div>
 
@@ -642,7 +642,7 @@ function renderWaitingTab() {
 
                             <div class="flex gap-3">
                                 <button onclick="approveRequest('${req.id}')"
-                                        class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
+                                        class="flex-1 bg-[#FCE4EC]0 hover:bg-[#8A0034] text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
                                     승인 (자동 Zoom 생성)
                                 </button>
                                 <button onclick="rejectRequest('${req.id}')"
@@ -724,17 +724,17 @@ function renderConfirmedTab() {
                                     `}
                                 </div>
 
-                                <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                                <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-4">
                                     <div class="flex justify-between mb-2">
-                                        <div class="text-sm font-semibold text-blue-800">Zoom 링크</div>
+                                        <div class="text-sm font-semibold text-[#6A0028]">Zoom 링크</div>
                                         <button onclick="copyToClipboard('${meeting.zoomJoinUrl}')"
-                                                class="text-xs bg-blue-500 text-white px-3 py-1 rounded" style="border: none; cursor: pointer;">
+                                                class="text-xs bg-[#FCE4EC]0 text-white px-3 py-1 rounded" style="border: none; cursor: pointer;">
                                             복사
                                         </button>
                                     </div>
-                                    <div class="text-sm text-blue-800 break-all">${meeting.zoomJoinUrl}</div>
+                                    <div class="text-sm text-[#6A0028] break-all">${meeting.zoomJoinUrl}</div>
                                     ${meeting.zoomPassword ? `
-                                        <div class="mt-2 text-xs text-blue-700">
+                                        <div class="mt-2 text-xs text-[#6A0028]">
                                             비밀번호: <span class="font-bold">${meeting.zoomPassword}</span>
                                         </div>
                                     ` : ''}
@@ -742,7 +742,7 @@ function renderConfirmedTab() {
 
                                 <div class="flex gap-3">
                                     <button onclick="openZoomMeeting('${meeting.zoomStartUrl}')"
-                                            class="flex-1 bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
+                                            class="flex-1 bg-[#FCE4EC]0 hover:bg-[#8A0034] text-white px-6 py-3 rounded-lg font-semibold" style="border: none; cursor: pointer;">
                                         Zoom 시작하기
                                     </button>
                                     <button onclick="cancelMeeting('${meeting.id}')"

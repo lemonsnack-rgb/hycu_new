@@ -45,7 +45,7 @@ function renderSemesterPlanCard(plan) {
                     </p>
                 </div>
                 <button onclick="viewSemesterPlanDetail(${plan.year}, ${plan.semester})"
-                        class="text-blue-600 hover:text-blue-800 text-sm font-medium flex items-center gap-1">
+                        class="text-[#6A0028] hover:text-[#6A0028] text-sm font-medium flex items-center gap-1">
                     <span>상세보기</span>
                     <i class="fas fa-chevron-right text-xs"></i>
                 </button>
@@ -58,7 +58,7 @@ function renderSemesterPlanCard(plan) {
                 </div>
                 <div class="flex justify-between items-center text-sm">
                     <span class="text-gray-600">실적 입력 완료</span>
-                    <span class="font-semibold text-blue-600">${weeksWithExecutions}주차</span>
+                    <span class="font-semibold text-[#6A0028]">${weeksWithExecutions}주차</span>
                 </div>
                 <div>
                     <div class="flex justify-between items-center text-sm mb-1">
@@ -66,7 +66,7 @@ function renderSemesterPlanCard(plan) {
                         <span class="font-semibold text-gray-800">${progressPercent}%</span>
                     </div>
                     <div class="w-full bg-gray-200 rounded-full h-2">
-                        <div class="bg-blue-600 h-2 rounded-full transition-all" style="width: ${progressPercent}%"></div>
+                        <div class="bg-[#8A0034] h-2 rounded-full transition-all" style="width: ${progressPercent}%"></div>
                     </div>
                 </div>
             </div>
@@ -120,18 +120,18 @@ function renderSemesterPlanEditorScreen(student, existingPlan) {
         </div>
 
         <!-- 학기 정보 카드 -->
-        <div class="bg-blue-50 rounded-lg p-6 mb-6">
+        <div class="bg-[#FCE4EC] rounded-lg p-6 mb-6">
             <div class="flex items-start justify-between">
                 <div>
                     <h2 class="text-2xl font-bold text-gray-800">${currentSemester.year}학년도 ${currentSemester.semester}학기 지도 계획</h2>
                     <p class="text-sm text-gray-600 mt-2">학생: ${student.name} (${student.studentId})</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button onclick="toggleAllWeeks(true)" class="text-sm text-blue-600 hover:underline">
+                    <button onclick="toggleAllWeeks(true)" class="text-sm text-[#6A0028] hover:underline">
                         전체 펼치기
                     </button>
                     <span class="text-gray-400">|</span>
-                    <button onclick="toggleAllWeeks(false)" class="text-sm text-blue-600 hover:underline">
+                    <button onclick="toggleAllWeeks(false)" class="text-sm text-[#6A0028] hover:underline">
                         전체 접기
                     </button>
                 </div>
@@ -203,7 +203,7 @@ function renderWeekForm(weekNumber, existingData, advisors) {
             <div class="week-accordion-header flex justify-between items-center p-4 cursor-pointer hover:bg-gray-50"
                  onclick="toggleWeekAccordion(${weekNumber})">
                 <div class="flex items-center gap-3">
-                    <span class="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded">
+                    <span class="inline-block bg-[#FCE4EC] text-[#6A0028] text-sm font-semibold px-3 py-1 rounded">
                         ${weekNumber}주차
                     </span>
                     ${hasData ? `
@@ -275,7 +275,7 @@ function renderExecutionItem(execution, weekNumber, advisors) {
                 ${isMyExecution ? `
                     <div class="flex gap-2">
                         <button onclick="openEditExecutionModal(${currentStudentId}, ${currentSemester.year}, ${currentSemester.semester}, ${weekNumber}, '${execution.executionId}')"
-                                class="text-xs text-blue-600 hover:underline">수정</button>
+                                class="text-xs text-[#6A0028] hover:underline">수정</button>
                         <button onclick="deleteExecutionConfirm(${currentStudentId}, ${currentSemester.year}, ${currentSemester.semester}, ${weekNumber}, '${execution.executionId}')"
                                 class="text-xs text-red-600 hover:underline">삭제</button>
                     </div>
@@ -406,9 +406,9 @@ function viewSemesterPlanDetail(year, semester) {
                     <p class="text-sm text-gray-600 mb-1">등록된 주차</p>
                     <p class="text-2xl font-bold text-gray-800">${plan.weeks.length}주차</p>
                 </div>
-                <div class="bg-blue-50 rounded-lg p-4">
+                <div class="bg-[#FCE4EC] rounded-lg p-4">
                     <p class="text-sm text-gray-600 mb-1">실적 입력 완료</p>
-                    <p class="text-2xl font-bold text-blue-600">${plan.weeks.filter(w => w.executions.length > 0).length}주차</p>
+                    <p class="text-2xl font-bold text-[#6A0028]">${plan.weeks.filter(w => w.executions.length > 0).length}주차</p>
                 </div>
                 <div class="bg-green-50 rounded-lg p-4">
                     <p class="text-sm text-gray-600 mb-1">총 실적 건수</p>
@@ -430,7 +430,7 @@ function renderWeekDetailCard(week, advisors, currentProf) {
         <div class="bg-white border border-gray-200 rounded-lg p-5">
             <div class="flex justify-between items-start mb-4">
                 <div>
-                    <span class="inline-block bg-blue-100 text-blue-800 text-sm font-semibold px-3 py-1 rounded">
+                    <span class="inline-block bg-[#FCE4EC] text-[#6A0028] text-sm font-semibold px-3 py-1 rounded">
                         ${week.week}주차
                     </span>
                     <span class="text-sm text-gray-600 ml-2">${formatDate(week.plannedDate)}</span>
@@ -439,7 +439,7 @@ function renderWeekDetailCard(week, advisors, currentProf) {
                     </span>
                 </div>
                 <button onclick="openAddExecutionModal(${currentStudentId}, ${currentSemester.year}, ${currentSemester.semester}, ${week.week})"
-                        class="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                        class="text-sm text-[#6A0028] hover:text-[#6A0028] font-medium flex items-center gap-1">
                     <i class="fas fa-plus-circle"></i>
                     <span>실적 추가</span>
                 </button>
@@ -464,14 +464,14 @@ function renderWeekDetailCard(week, advisors, currentProf) {
                     const isMyArea = advisor.id === currentProf.id;
 
                     return `
-                        <div class="mb-4 last:mb-0 ${isMyArea ? 'bg-blue-50' : 'bg-gray-50'} rounded-lg p-4">
+                        <div class="mb-4 last:mb-0 ${isMyArea ? 'bg-[#FCE4EC]' : 'bg-gray-50'} rounded-lg p-4">
                             <div class="flex justify-between items-center mb-3">
-                                <h5 class="text-sm font-semibold ${isMyArea ? 'text-blue-800' : 'text-gray-800'}">
+                                <h5 class="text-sm font-semibold ${isMyArea ? 'text-[#6A0028]' : 'text-gray-800'}">
                                     ${advisor.name} ${advisor.role === 'primary' ? '(주지도)' : '(부지도)'}
                                 </h5>
                                 ${isMyArea && professorExecutions.length === 0 ? `
                                     <button onclick="openAddExecutionModal(${currentStudentId}, ${currentSemester.year}, ${currentSemester.semester}, ${week.week})"
-                                            class="text-xs text-blue-600 hover:underline">+ 실적 추가</button>
+                                            class="text-xs text-[#6A0028] hover:underline">+ 실적 추가</button>
                                 ` : ''}
                             </div>
 
@@ -484,7 +484,7 @@ function renderWeekDetailCard(week, advisors, currentProf) {
                                                 ${isMyArea ? `
                                                     <div class="flex gap-2">
                                                         <button onclick="openEditExecutionModal(${currentStudentId}, ${currentSemester.year}, ${currentSemester.semester}, ${week.week}, '${exec.executionId}')"
-                                                                class="text-xs text-blue-600 hover:underline">수정</button>
+                                                                class="text-xs text-[#6A0028] hover:underline">수정</button>
                                                         <button onclick="deleteExecutionConfirm(${currentStudentId}, ${currentSemester.year}, ${currentSemester.semester}, ${week.week}, '${exec.executionId}')"
                                                                 class="text-xs text-red-600 hover:underline">삭제</button>
                                                     </div>
@@ -719,7 +719,7 @@ function getMethodBadgeClass(method) {
     const classes = {
         'meeting': 'bg-green-100 text-green-700',
         'zoom': 'bg-purple-100 text-purple-700',
-        'online': 'bg-blue-100 text-blue-700',
+        'online': 'bg-[#FCE4EC] text-[#6A0028]',
         'email': 'bg-yellow-100 text-yellow-700',
         'phone': 'bg-pink-100 text-pink-700'
     };

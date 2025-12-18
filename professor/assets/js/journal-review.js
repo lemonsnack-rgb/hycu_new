@@ -15,7 +15,7 @@ function renderJournalReviewList() {
                 <div class="flex justify-between items-center mb-4">
                     <h3 class="text-lg font-bold text-gray-800">학술지 대체심사 목록</h3>
                     <div class="text-sm text-gray-600">
-                        <span class="font-semibold text-blue-600" id="journal-review-count">총 ${journals.length}건</span>
+                        <span class="font-semibold text-[#6A0028]" id="journal-review-count">총 ${journals.length}건</span>
                     </div>
                 </div>
 
@@ -186,7 +186,7 @@ function renderJournalReviewRows(journals) {
                                 <td class="py-3 px-4 text-center">
                                     <div class="flex gap-2 justify-center">
                                         <button onclick="viewJournalReviewDetail(${journal.id}, 'member')"
-                                                class="text-blue-600 hover:text-blue-800 text-xs font-medium px-2 py-1 border border-blue-300 rounded hover:bg-blue-50">
+                                                class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
                                             심사
                                         </button>
                                         ${journal.myRole === 'chair' ? `
@@ -209,7 +209,7 @@ function renderJournalReviewRows(journals) {
 function getJournalStatusBadgeClass(status) {
     const classes = {
         '심사대기': 'bg-yellow-100 text-yellow-800',
-        '심사중': 'bg-blue-100 text-blue-800',
+        '심사중': 'bg-[#FCE4EC] text-[#6A0028]',
         '심사완료': 'bg-green-100 text-green-800'
     };
     return classes[status] || 'bg-gray-100 text-gray-800';
@@ -286,7 +286,7 @@ function sendNotificationToSelectedJournals() {
                 <p class="text-sm font-medium text-gray-800 mb-2">선택된 학생 (${selectedStudents.length}명)</p>
                 <div class="flex flex-wrap gap-2">
                     ${selectedStudents.map(s => `
-                        <span class="inline-block bg-blue-100 text-blue-800 px-2 py-1 rounded text-xs">
+                        <span class="inline-block bg-[#FCE4EC] text-[#6A0028] px-2 py-1 rounded text-xs">
                             ${s.name}
                         </span>
                     `).join('')}
