@@ -29,11 +29,6 @@ function renderExamScheduleScreen() {
         <!-- 목록 화면 -->
         <div id="exam-schedule-list-view">
             <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800">심사 일정 관리</h3>
-                    <p class="text-sm text-gray-600 mt-1">배정된 심사 일정을 조회합니다 (읽기 전용)</p>
-                </div>
-
                 <!-- 검색 메뉴 -->
                 <div class="p-6 border-b bg-gray-50">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">

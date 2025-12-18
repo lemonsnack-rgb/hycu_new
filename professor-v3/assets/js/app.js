@@ -704,16 +704,6 @@ function renderGuideContentLocal(type) {
 
     return `
         <div class="bg-white rounded-lg shadow-md">
-            <!-- Header -->
-            <div class="p-6 border-b">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">${titleMap[type]}</h2>
-                        <p class="text-sm text-gray-500 mt-1">최종 수정: ${guide?.lastUpdatedAt || '-'} (${guide?.lastUpdatedByName || '-'})</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- Content -->
             <div class="p-8">
                 ${guide?.content || '<p class="text-gray-500 text-center py-8">콘텐츠가 등록되지 않았습니다.</p>'}
