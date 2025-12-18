@@ -7,19 +7,44 @@
 // 현재 활성화된 화면
 let currentScreen = 'dashboard';
 
+// 화면별 브레드크럼 매핑
+const breadcrumbMap = {
+    'dashboard': [{ label: '홈', url: '#' }, { label: '대시보드' }],
+    'notice': [{ label: '홈', url: '#' }, { label: '안내정보' }, { label: '공지사항' }],
+    'board': [{ label: '홈', url: '#' }, { label: '안내정보' }, { label: '게시판' }],
+    'ethics': [{ label: '홈', url: '#' }, { label: '안내정보' }, { label: '연구윤리' }],
+    'schedule': [{ label: '홈', url: '#' }, { label: '안내정보' }, { label: '학사일정' }],
+    'process': [{ label: '홈', url: '#' }, { label: '안내정보' }, { label: '학위수여절차' }],
+    'advisor-assignment': [{ label: '홈', url: '#' }, { label: '논문 지도' }, { label: '지도교수 배정' }],
+    'guidance': [{ label: '홈', url: '#' }, { label: '논문 지도' }, { label: '논문 지도 현황' }],
+    'exam-schedule': [{ label: '홈', url: '#' }, { label: '논문 지도' }, { label: '심사 일정 관리' }],
+    'meeting': [{ label: '홈', url: '#' }, { label: '논문 지도' }, { label: '랩미팅관리' }],
+    'feedback': [{ label: '홈', url: '#' }, { label: '논문 지도' }, { label: '온라인피드백' }],
+    'thesis-submission': [{ label: '홈', url: '#' }, { label: '논문 관리' }, { label: '논문 제출 현황' }],
+    'thesis-format': [{ label: '홈', url: '#' }, { label: '논문 관리' }, { label: '논문 형식 검사' }],
+    'journal-review': [{ label: '홈', url: '#' }, { label: '논문 관리' }, { label: '학술지 심사' }],
+    'review': [{ label: '홈', url: '#' }, { label: '심사 관리' }, { label: '학위 논문 심사' }],
+    'committee-assignment': [{ label: '홈', url: '#' }, { label: '심사 관리' }, { label: '심사위원 배정' }]
+};
+
 // 화면 전환 함수
 function showScreen(screenId) {
     // 모든 content-screen 숨기기
     document.querySelectorAll('.content-screen').forEach(screen => {
         screen.classList.remove('active');
     });
-    
+
     // 선택한 화면만 표시
     const targetScreen = document.getElementById(screenId + '-screen');
     if (targetScreen) {
         targetScreen.classList.add('active');
         currentScreen = screenId;
-        
+
+        // 브레드크럼 업데이트
+        if (breadcrumbMap[screenId] && typeof updateBreadcrumb === 'function') {
+            updateBreadcrumb(breadcrumbMap[screenId]);
+        }
+
         // 사이드바 메뉴 활성화 표시
         updateActiveMenu(screenId);
         

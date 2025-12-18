@@ -264,11 +264,11 @@ function markAllAsRead() {
 
 function updateNotificationBadge() {
     const unreadCount = DataService.getUnreadNotificationCount();
-    const badge = document.querySelector('.notification-bell .badge');
+    const badge = document.getElementById('notificationBadge');
     if (badge) {
         if (unreadCount > 0) {
-            badge.textContent = unreadCount;
-            badge.style.display = 'inline-block';
+            badge.textContent = unreadCount > 99 ? '99+' : unreadCount;
+            badge.style.display = 'flex';
         } else {
             badge.style.display = 'none';
         }
@@ -512,3 +512,31 @@ window.getMethodText = getMethodText;
 window.Storage = Storage;
 window.debounce = debounce;
 window.toggleUserMenu = toggleUserMenu;
+
+// 브레드크럼 업데이트
+function updateBreadcrumb(items) {
+    const breadcrumb = document.querySelector('.layout-v3-breadcrumb');
+    if (!breadcrumb) return;
+
+    const html = items.map((item, index) => {
+        if (index === items.length - 1) {
+            // 마지막 항목 (현재 페이지)
+            return `<span class="layout-v3-breadcrumb-current">${item.label}</span>`;
+        } else {
+            // 링크 항목
+            return `
+                <a href="${item.url || '#'}">${item.label}</a>
+                <span class="layout-v3-breadcrumb-separator">></span>
+            `;
+        }
+    }).join('');
+
+    breadcrumb.innerHTML = html;
+}
+
+window.updateBreadcrumb = updateBreadcrumb;
+
+// 페이지 로드 시 알림 뱃지 초기화
+document.addEventListener('DOMContentLoaded', function() {
+    updateNotificationBadge();
+});
