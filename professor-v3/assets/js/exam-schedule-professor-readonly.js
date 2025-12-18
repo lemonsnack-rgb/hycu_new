@@ -28,9 +28,9 @@ function renderExamScheduleScreen() {
     container.innerHTML = `
         <!-- 목록 화면 -->
         <div id="exam-schedule-list-view">
-            <div class="bg-white rounded-lg shadow-md">
-                <!-- 검색 메뉴 -->
-                <div class="p-6 border-b bg-gray-50">
+            <!-- 검색 영역 -->
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="p-6">
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
                         <!-- 학년도 -->
                         <div>
@@ -97,37 +97,52 @@ function renderExamScheduleScreen() {
                             </div>
                         </div>
 
-                        <!-- 검색 버튼 -->
+                        <!-- 검색/초기화 버튼 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                            <button onclick="filterExamScheduleList()" class="w-full px-4 py-2 bg-[#8A0034] text-white rounded hover:bg-[#4A001C]">
-                                <i class="fas fa-search mr-1"></i> 검색
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="resetExamScheduleFilters()" class="btn btn-secondary flex-1">
+                                    <i class="fas fa-redo"></i> 초기화
+                                </button>
+                                <button onclick="filterExamScheduleList()" class="btn btn-primary flex-1">
+                                    <i class="fas fa-search"></i> 검색
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 테이블 -->
-                <div class="table-scroll">
-                    <table class="min-w-full">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>학번</th>
-                                <th>학생명</th>
-                                <th>학과</th>
-                                <th>학위</th>
-                                <th>심사 단계</th>
-                                <th>심사위원장</th>
-                                <th>심사 일정</th>
-                                <th>진행 방식</th>
-                                <th>상태</th>
-                            </tr>
-                        </thead>
-                        <tbody id="exam-schedule-table-body">
-                            <!-- JavaScript로 동적 렌더링 -->
-                        </tbody>
-                    </table>
+            <!-- 테이블 영역 -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">심사 일정 목록</h3>
+                            <span class="table-count" id="exam-schedule-count">(총 0건)</span>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>학번</th>
+                                    <th>학생명</th>
+                                    <th>학과</th>
+                                    <th>학위</th>
+                                    <th>심사 단계</th>
+                                    <th>심사위원장</th>
+                                    <th>심사 일정</th>
+                                    <th>진행 방식</th>
+                                    <th>상태</th>
+                                </tr>
+                            </thead>
+                            <tbody id="exam-schedule-table-body">
+                                <!-- JavaScript로 동적 렌더링 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
@@ -167,6 +182,19 @@ function loadExamStageFilterOptions() {
 /**
  * 필터링 및 테이블 렌더링
  */
+// 검색 필터 초기화
+function resetExamScheduleFilters() {
+    document.getElementById('exam-filter-year').value = '2025';
+    document.getElementById('exam-filter-semester').value = '1';
+    document.getElementById('exam-filter-department').value = '';
+    document.getElementById('exam-filter-stage').value = '';
+    document.getElementById('exam-filter-schedule-status').value = '';
+    document.getElementById('exam-filter-search-type').value = 'studentName';
+    document.getElementById('exam-filter-search-keyword').value = '';
+
+    filterExamScheduleList();
+}
+
 function filterExamScheduleList() {
     currentExamFilters.semester = document.getElementById('exam-filter-semester')?.value || '';
     currentExamFilters.department = document.getElementById('exam-filter-department')?.value || '';
@@ -216,6 +244,12 @@ function filterExamScheduleList() {
 function renderExamScheduleTable(data) {
     const tbody = document.getElementById('exam-schedule-table-body');
     if (!tbody) return;
+
+    // 총 건수 업데이트
+    const countElement = document.getElementById('exam-schedule-count');
+    if (countElement) {
+        countElement.textContent = `(총 ${data.length}건)`;
+    }
 
     if (data.length === 0) {
         tbody.innerHTML = `
@@ -492,6 +526,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
 // window 객체에 노출
 if (typeof window !== 'undefined') {
     window.renderExamScheduleScreen = renderExamScheduleScreen;
+    window.resetExamScheduleFilters = resetExamScheduleFilters;
     window.filterExamScheduleList = filterExamScheduleList;
     window.showExamScheduleDetailReadonly = showExamScheduleDetailReadonly;
     window.backToExamScheduleListReadonly = backToExamScheduleListReadonly;

@@ -97,7 +97,7 @@ function renderFeedbackRow(request, idx) {
     return `
         <tr class="feedback-row cursor-pointer"
             data-feedback-id="${request.id}"
-            onclick="openFeedbackViewer('${request.id}')">
+            onclick="openFeedbackDetailScreen('${request.id}')">
             <td onclick="event.stopPropagation()">
                 <input type="checkbox"
                        class="feedback-checkbox rounded"

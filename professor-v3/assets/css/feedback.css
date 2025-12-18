@@ -10,7 +10,7 @@
     transform: translateX(2px);
 }
 
-/* ==================== 피드백 뷰어 모달 ==================== */
+/* ==================== 피드백 뷰어 모달 (Legacy - 호환성 유지) ==================== */
 .feedback-modal {
     position: fixed;
     inset: 0;
@@ -33,6 +33,34 @@
     display: flex;
     flex-direction: column;
     overflow: hidden;
+}
+
+/* ==================== 피드백 상세 화면 (페이지 전환 방식) ==================== */
+.feedback-detail-screen {
+    position: fixed;
+    top: 48px; /* 유틸리티 헤더 높이 (--utility-header-height) */
+    left: 240px; /* 사이드바 너비 (--sidebar-width) */
+    right: 0;
+    bottom: 0;
+    background: #F3F4F6;
+    z-index: 50; /* 유틸리티 헤더(z-index: 300)보다 낮게, 일반 콘텐츠보다는 높게 */
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 사이드바가 접힌 경우 */
+body:has(.layout-v3-sidebar.collapsed) .feedback-detail-screen {
+    left: 0;
+}
+
+.feedback-detail-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    background: white;
 }
 
 /* ==================== 3단 레이아웃 ==================== */
@@ -711,11 +739,33 @@ canvas.upper-canvas {
 
 /* === injected: left submission history sidebar === */
 .viewer-wrap { display:flex; gap:16px; }
-.submission-history{ width:220px; border-right:1px solid #E5E5E5; padding:8px 8px 8px 0; }
-.submission-history .sh-header{ font-weight:600; margin:4px 0 8px 8px; color:#111827; }
+.submission-history{
+    width:220px;
+    border-right:1px solid #E5E5E5;
+    padding:16px 8px 8px 0; /* 상단 패딩 증가 */
+    position: fixed;
+    top: 48px; /* 유틸리티 헤더 아래 */
+    left: 240px; /* 메인 사이드바 옆에 위치 */
+    bottom: 0;
+    overflow-y: auto;
+    background: white;
+    z-index: 40; /* 상세 화면보다 낮게 */
+}
+
+/* 사이드바가 접힌 경우 */
+body:has(.layout-v3-sidebar.collapsed) .submission-history {
+    left: 0;
+}
+.submission-history .sh-header{ font-weight:600; margin:0 0 8px 8px; color:#111827; }
 .submission-history .sh-list{ list-style:none; margin:0; padding:0 8px; }
 .submission-history .sh-list li{ padding:8px 10px; border-radius:8px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; }
 .submission-history .sh-list li .sh-meta{ font-size:11px; color:#999999; margin-left:10px; }
 .submission-history .sh-list li.active{ background:#eff6ff; color:#1d4ed8; }
+
+/* PDF 뷰어 영역은 제출 이력 옆에 배치 */
+.feedback-detail-screen .viewer-wrap {
+    margin-left: 220px; /* 제출이력 너비만큼 여백 */
+}
+
 /* disable text select on pdf text layer (defensive) */
 #text-layer { user-select:none !important; pointer-events:none !important; }

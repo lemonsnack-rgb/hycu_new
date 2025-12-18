@@ -25,9 +25,9 @@ function showStudentList() {
     if (!contentArea) return;
     
     contentArea.innerHTML = `
-        <div class="bg-white rounded-lg shadow-md">
-            <!-- 검색 영역 -->
-            <div class="p-6 border-b">
+        <!-- 검색 영역 -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-6">
                 <div class="search-container">
                     <div class="search-grid">
                         <div class="search-field">
@@ -82,17 +82,19 @@ function showStudentList() {
                         </div>
                     </div>
                     <div class="search-buttons">
-                        <button onclick="searchStudents()" class="btn-primary">
-                            <i class="fas fa-search"></i> 검색
-                        </button>
-                        <button onclick="resetStudentSearch()" class="btn-secondary">
+                        <button onclick="resetStudentSearch()" class="btn btn-secondary">
                             <i class="fas fa-redo"></i> 초기화
+                        </button>
+                        <button onclick="searchStudents()" class="btn btn-primary">
+                            <i class="fas fa-search"></i> 검색
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 테이블 컨테이너 -->
+        <!-- 테이블 영역 -->
+        <div class="bg-white rounded-lg shadow-md">
             <div class="table-container">
                 <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
                 <div class="table-header">
@@ -153,6 +155,7 @@ function showStudentList() {
                         }).join('')}
                     </tbody>
                 </table>
+                </div>
             </div>
         </div>
     `;

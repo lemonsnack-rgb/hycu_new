@@ -43,12 +43,12 @@
 }
 
 .btn-secondary {
-    background: var(--color-secondary, #6B7280);
-    color: white;
+    background: #E5E5E5;
+    color: #333333;
 }
 
 .btn-secondary:hover {
-    background: #4b5563;
+    background: #D1D5DB;
 }
 
 .btn-outline {
@@ -544,18 +544,19 @@ textarea.form-control {
     overflow-x: auto;
 }
 
-table {
+/* 데이터 테이블 스타일 (캘린더, 모달 테이블 제외) */
+.table-scroll table {
     width: 100%;
     border-collapse: collapse;
     min-width: 1100px;
 }
 
-thead {
+.table-scroll thead {
     background: var(--color-gray-4, #F8FAFC);
     border-bottom: 2px solid var(--color-primary, #6A0028);
 }
 
-th {
+.table-scroll th {
     padding: 16px 12px;
     text-align: center;
     font-size: 14px;
@@ -564,7 +565,7 @@ th {
     white-space: nowrap;
 }
 
-td {
+.table-scroll td {
     padding: 16px 12px;
     text-align: center;
     border-bottom: 1px solid var(--color-border, #E5E7EB);
@@ -573,11 +574,11 @@ td {
     white-space: nowrap;
 }
 
-tbody tr {
+.table-scroll tbody tr {
     transition: background var(--transition-normal, 0.2s ease);
 }
 
-tbody tr:hover {
+.table-scroll tbody tr:hover {
     background: var(--color-gray-4, #F8FAFC);
 }
 

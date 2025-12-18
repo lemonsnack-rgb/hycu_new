@@ -298,6 +298,20 @@
     font-size: 0.875rem;
 }
 
+/* FullCalendar 테이블 스타일 초기화 (전역 스타일 오버라이드) */
+.fc table {
+    min-width: auto !important;
+    width: 100% !important;
+}
+
+.fc tbody tr {
+    transition: none !important;
+}
+
+.fc tbody tr:hover {
+    background: transparent !important;
+}
+
 .fc {
     border-radius: 0.5rem;
     overflow: hidden;

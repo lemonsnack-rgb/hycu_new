@@ -7,8 +7,6 @@ function renderApprovedTab() {
     
     tabContent.innerHTML = `
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-bold mb-4">예정된 미팅</h3>
-            
             ${approved.length > 0 ? `
                 <div class="space-y-4">
                     ${approved.map(req => renderApprovedCard(req)).join('')}
@@ -188,11 +186,6 @@ function renderCompletedTab() {
 
     tabContent.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6 border-b">
-                <h3 class="text-lg font-bold">완료된 미팅 (${completed.length}건)</h3>
-                <p class="text-sm text-gray-600 mt-1">완료된 미팅 이력을 조회합니다</p>
-            </div>
-
             ${completed.length > 0 ? `
                 <div class="table-container">
                     <div class="table-scroll">
@@ -494,6 +487,34 @@ function backToCompletedList() {
 
 // ==================== 모달 함수들 ====================
 
+// === 헬퍼 함수들 ===
+function getTodayDate() {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function closeModal(modalId) {
+    const modal = document.getElementById(modalId);
+    if (modal) {
+        modal.remove();
+    }
+}
+
+function generateTimeOptions() {
+    const times = [];
+    for (let hour = 9; hour <= 21; hour++) {
+        for (let min = 0; min < 60; min += 30) {
+            const h = String(hour).padStart(2, '0');
+            const m = String(min).padStart(2, '0');
+            times.push(`<option value="${h}:${m}">${h}:${m}</option>`);
+        }
+    }
+    return times.join('');
+}
+
 // === 미팅 가능 시간 설정 모달 ===
 function openSetAvailableTimeModal() {
     const today = getTodayDate();
@@ -501,9 +522,9 @@ function openSetAvailableTimeModal() {
 
     const html = `
         <div id="modal-set-time" class="modal-overlay" onclick="closeModal('modal-set-time')">
-            <div class="modal-container" onclick="event.stopPropagation()">
+            <div class="modal-content" style="max-width: 600px;" onclick="event.stopPropagation()">
                 <div class="modal-header">
-                    <h3 class="modal-title">미팅 가능 시간 설정</h3>
+                    <h3>미팅 가능 시간 설정</h3>
                     <button onclick="closeModal('modal-set-time')" class="modal-close">&times;</button>
                 </div>
 
@@ -557,29 +578,30 @@ function openSetAvailableTimeModal() {
                             </div>
                         </div>
 
-                        <div style="margin-bottom: 1rem;">
-                            <label class="block text-sm font-semibold mb-2">시작 시간 *</label>
-                            <select id="input-time" class="form-input w-full" required>
-                                <option value="">선택하세요</option>
-                                ${generateTimeOptions()}
-                            </select>
-                        </div>
-
-                        <div style="margin-bottom: 1rem;">
-                            <label class="block text-sm font-semibold mb-2">소요 시간 *</label>
-                            <div style="display: flex; gap: 1.5rem; align-items: center;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
-                                    <input type="radio" name="duration" value="30" />
-                                    <span>30분</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
-                                    <input type="radio" name="duration" value="60" checked />
-                                    <span>60분</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
-                                    <input type="radio" name="duration" value="90" />
-                                    <span>90분</span>
-                                </label>
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">시작 시간 *</label>
+                                <select id="input-time" class="form-input w-full" required>
+                                    <option value="">선택하세요</option>
+                                    ${generateTimeOptions()}
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">소요 시간 *</label>
+                                <div style="display: flex; gap: 1rem; align-items: center; height: 42px;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
+                                        <input type="radio" name="duration" value="30" />
+                                        <span>30분</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
+                                        <input type="radio" name="duration" value="60" checked />
+                                        <span>60분</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
+                                        <input type="radio" name="duration" value="90" />
+                                        <span>90분</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -591,9 +613,9 @@ function openSetAvailableTimeModal() {
                             </select>
                         </div>
 
-                        <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-4">
+                        <div class="bg-[#FAF6F1] border border-[#F8BBD9] rounded-lg p-4 mb-4">
                             <p class="text-sm text-[#6A0028]">
-                                <strong>ℹ️ 안내</strong><br>
+                                <strong>안내</strong><br>
                                 설정한 시간은 학생들이 예약 신청할 수 있는 시간으로 등록됩니다.
                             </p>
                         </div>
@@ -601,7 +623,7 @@ function openSetAvailableTimeModal() {
                         <div class="flex gap-3">
                             <button type="button" onclick="closeModal('modal-set-time')"
                                     class="flex-1 px-6 py-3 border rounded-lg" style="background: white; cursor: pointer;">취소</button>
-                            <button type="submit" class="flex-1 px-6 py-3 bg-[#FCE4EC]0 text-white rounded-lg" style="border: none; cursor: pointer;">설정 완료</button>
+                            <button type="submit" class="flex-1 px-6 py-3 bg-[#6A0028] text-white rounded-lg" style="border: none; cursor: pointer;">설정 완료</button>
                         </div>
                     </form>
                 </div>
@@ -609,6 +631,14 @@ function openSetAvailableTimeModal() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', html);
+
+    // 모달 표시를 위해 show 클래스 추가
+    setTimeout(() => {
+        const modal = document.getElementById('modal-set-time');
+        if (modal) {
+            modal.classList.add('show');
+        }
+    }, 10);
 }
 
 function toggleScheduleType() {
@@ -700,19 +730,20 @@ function openCreateGroupMeetingModal() {
 
     const html = `
         <div id="modal-group" class="modal-overlay" onclick="closeModal('modal-group')">
-            <div class="modal-container" style="max-width: 600px;" onclick="event.stopPropagation()">
+            <div class="modal-content" style="max-width: 600px;" onclick="event.stopPropagation()">
                 <div class="modal-header">
-                    <h3 class="modal-title">그룹 미팅 생성</h3>
+                    <h3>그룹 미팅 생성</h3>
                     <button onclick="closeModal('modal-group')" class="modal-close">&times;</button>
                 </div>
 
                 <div class="modal-body">
                     <form id="form-group" onsubmit="submitCreateGroupMeeting(event)">
+                        <div style="margin-bottom: 1rem;">
+                            <label class="block text-sm font-semibold mb-2">날짜 *</label>
+                            <input type="date" id="group-date" class="form-input w-full" required min="${getTodayDate()}" />
+                        </div>
+
                         <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-semibold mb-2">날짜 *</label>
-                                <input type="date" id="group-date" class="form-input w-full" required min="${getTodayDate()}" />
-                            </div>
                             <div>
                                 <label class="block text-sm font-semibold mb-2">시간 *</label>
                                 <select id="group-time" class="form-input w-full" required>
@@ -720,42 +751,40 @@ function openCreateGroupMeetingModal() {
                                     ${generateTimeOptions()}
                                 </select>
                             </div>
-                        </div>
-
-                        <div style="margin-bottom: 1rem;">
-                            <label class="block text-sm font-semibold mb-2">소요 시간 *</label>
-                            <div style="display: flex; gap: 1.5rem; align-items: center;">
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
-                                    <input type="radio" name="group-duration" value="30" />
-                                    <span>30분</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
-                                    <input type="radio" name="group-duration" value="60" />
-                                    <span>60분</span>
-                                </label>
-                                <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
-                                    <input type="radio" name="group-duration" value="90" checked />
-                                    <span>90분</span>
-                                </label>
+                            <div>
+                                <label class="block text-sm font-semibold mb-2">소요 시간 *</label>
+                                <div style="display: flex; gap: 1rem; align-items: center; height: 42px;">
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
+                                        <input type="radio" name="group-duration" value="30" />
+                                        <span>30분</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
+                                        <input type="radio" name="group-duration" value="60" />
+                                        <span>60분</span>
+                                    </label>
+                                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; white-space: nowrap;">
+                                        <input type="radio" name="group-duration" value="90" checked />
+                                        <span>90분</span>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
                         <div style="margin-bottom: 1rem;">
                             <label class="block text-sm font-semibold mb-2">참여 학생 선택 (최소 2명) *</label>
                             <input type="text" id="student-search" class="form-input w-full mb-3"
-                                   placeholder="🔍 학생 검색..." oninput="filterStudents(this.value)" />
+                                   placeholder="학생 검색..." oninput="filterStudents(this.value)" />
 
                             <h4 class="text-sm font-semibold text-gray-700 mb-2">학생 선택</h4>
-                            <div id="student-list" class="border rounded-lg overflow-hidden bg-gray-50">
+                            <div id="student-list" class="border rounded-lg bg-gray-50">
                                 <div class="max-h-80 overflow-y-auto">
-                                    <table class="w-full text-sm">
+                                    <table class="text-sm" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                                         <thead class="bg-gray-50 border-b sticky top-0">
                                             <tr>
-                                                <th style="width: 40px; padding: 8px; text-align: center;"></th>
-                                                <th style="width: 140px; padding: 8px; text-align: left;">학과</th>
-                                                <th style="width: 80px; padding: 8px; text-align: center;">학기차</th>
-                                                <th style="width: 100px; padding: 8px; text-align: center;">학번</th>
-                                                <th style="padding: 8px; text-align: left;">이름</th>
+                                                <th style="width: 12%; padding: 8px 4px; text-align: center;"></th>
+                                                <th style="width: 23%; padding: 8px 4px; text-align: center;">학번</th>
+                                                <th style="width: 45%; padding: 8px 4px; text-align: left;">학과</th>
+                                                <th style="width: 20%; padding: 8px 4px; text-align: center;">이름</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y">
@@ -763,14 +792,13 @@ function openCreateGroupMeetingModal() {
                                                 <tr class="hover:bg-white cursor-pointer student-row" data-student-id="${s.id}"
                                                     data-name="${s.name}" data-number="${s.studentNumber}" data-major="${s.major || ''}" data-semester="${s.semester || ''}"
                                                     onclick="toggleStudentCheckbox(event, '${s.id}')">
-                                                    <td style="padding: 8px; text-align: center;" onclick="event.stopPropagation()">
+                                                    <td style="width: 12%; padding: 8px 4px; text-align: center;" onclick="event.stopPropagation()">
                                                         <input type="checkbox" name="students" value="${s.id}"
                                                                onchange="updateSelectedCount()" />
                                                     </td>
-                                                    <td style="padding: 8px;">${s.major || '-'}</td>
-                                                    <td style="padding: 8px; text-align: center;">${s.semester || '-'}</td>
-                                                    <td style="padding: 8px; text-align: center;">${s.studentNumber}</td>
-                                                    <td style="padding: 8px; font-weight: 600;">${s.name}</td>
+                                                    <td style="width: 23%; padding: 8px 4px; text-align: center;">${s.studentNumber}</td>
+                                                    <td style="width: 45%; padding: 8px 4px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${s.major || '-'}">${s.major || '-'}</td>
+                                                    <td style="width: 20%; padding: 8px 4px; text-align: center; font-weight: 600;">${s.name}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>
@@ -791,7 +819,7 @@ function openCreateGroupMeetingModal() {
 
                         <div class="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
                             <p class="text-sm text-green-800">
-                                <strong>ℹ️ 안내</strong><br>
+                                <strong>안내</strong><br>
                                 생성 즉시 Zoom 링크가 발송됩니다
                             </p>
                         </div>
@@ -807,6 +835,14 @@ function openCreateGroupMeetingModal() {
         </div>
     `;
     document.body.insertAdjacentHTML('beforeend', html);
+
+    // 모달 표시를 위해 show 클래스 추가
+    setTimeout(() => {
+        const modal = document.getElementById('modal-group');
+        if (modal) {
+            modal.classList.add('show');
+        }
+    }, 10);
 }
 
 function updateSelectedCount() {
@@ -913,7 +949,7 @@ function approveRequest(requestId) {
                         <div><strong>내용:</strong> ${request.description}</div>
                     </div>
 
-                    <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-4">
+                    <div class="bg-[#FAF6F1] border border-[#F8BBD9] rounded-lg p-4 mb-4">
                         <p class="text-sm text-[#6A0028]">
                             <strong>승인하면 자동으로:</strong><br>
                             • Zoom 링크 생성<br>
@@ -925,7 +961,7 @@ function approveRequest(requestId) {
                         <button onclick="closeModal('modal-approve')"
                                 class="flex-1 px-6 py-3 border rounded-lg" style="background: white; cursor: pointer;">취소</button>
                         <button onclick="confirmApprove('${requestId}')"
-                                class="flex-1 px-6 py-3 bg-[#FCE4EC]0 text-white rounded-lg" style="border: none; cursor: pointer;">승인</button>
+                                class="flex-1 px-6 py-3 bg-[#6A0028] text-white rounded-lg" style="border: none; cursor: pointer;">승인</button>
                     </div>
                 </div>
             </div>
@@ -1106,9 +1142,11 @@ window.completeMeetingV2 = completeMeetingV2;
 window.confirmCompleteV2 = confirmCompleteV2;
 window.openSetAvailableTimeModal = openSetAvailableTimeModal;
 window.submitSetAvailableTime = submitSetAvailableTime;
+window.toggleScheduleType = toggleScheduleType;
 window.openCreateGroupMeetingModal = openCreateGroupMeetingModal;
 window.submitCreateGroupMeeting = submitCreateGroupMeeting;
 window.updateSelectedCount = updateSelectedCount;
+window.toggleStudentCheckbox = toggleStudentCheckbox;
 window.filterStudents = filterStudents;
 window.approveRequest = approveRequest;
 window.confirmApprove = confirmApprove;
@@ -1116,3 +1154,6 @@ window.rejectRequest = rejectRequest;
 window.confirmReject = confirmReject;
 window.cancelMeeting = cancelMeeting;
 window.confirmCancel = confirmCancel;
+window.closeModal = closeModal;
+window.getTodayDate = getTodayDate;
+window.generateTimeOptions = generateTimeOptions;

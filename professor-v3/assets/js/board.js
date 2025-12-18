@@ -62,14 +62,19 @@ function renderBoardList() {
 
     const html = `
         <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6 border-b flex justify-end">
-                <button onclick="openBoardWriteModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm font-semibold">
-                    + 글쓰기
-                </button>
-            </div>
-
             <!-- 테이블 컨테이너 -->
             <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">자료실 목록</h3>
+                        <span class="table-count">(총 ${posts.length}건)</span>
+                    </div>
+                    <div class="table-header-right">
+                        <button onclick="openBoardWriteModal()" class="btn btn-primary btn-sm">
+                            + 글쓰기
+                        </button>
+                    </div>
+                </div>
                 <div class="table-scroll">
                     <table class="min-w-full">
                         <thead>

@@ -479,41 +479,36 @@ function renderNoticeList(userRole) {
 
     return `
         <div class="bg-white rounded-lg shadow-md">
-            <!-- 검색 영역 -->
-            <div class="p-6 border-b">
-                <div class="flex gap-3">
+            <!-- 테이블 컨테이너 -->
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">공지사항 목록</h3>
+                        <span class="table-count">(총 ${notices.length}건)</span>
+                    </div>
                     ${userRole === 'admin' ? `
-                        <select id="notice-category-filter-${rolePrefix}" class="px-4 py-2 border border-gray-300 rounded-lg">
-                            <option value="">전체 카테고리</option>
-                            <option value="important">중요</option>
-                            <option value="general">일반</option>
-                        </select>
+                        <div class="table-header-right">
+                            <button onclick="openNoticeModal()" class="btn btn-primary btn-sm">
+                                + 등록
+                            </button>
+                        </div>
                     ` : ''}
-                    <input type="text" id="notice-search-${rolePrefix}" placeholder="제목 또는 내용 검색"
-                           class="flex-1 px-4 py-2 border border-gray-300 rounded-lg">
-                    <button onclick="${searchFunc}()" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
-                        검색
-                    </button>
-                    ${userRole === 'admin' ? '<button onclick="openNoticeModal()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700">+ 등록</button>' : ''}
                 </div>
-            </div>
-
-            <!-- 공지사항 목록 -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">번호</th>
-                            ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">카테고리</th>' : ''}
-                            ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">고정</th>' : ''}
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">작성자</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">작성일</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">조회수</th>
-                            ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">관리</th>' : ''}
-                        </tr>
-                    </thead>
-                    <tbody id="notice-list-${rolePrefix}" class="bg-white divide-y divide-gray-200">
+                <div class="table-scroll">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">번호</th>
+                                ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">카테고리</th>' : ''}
+                                ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-16">고정</th>' : ''}
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">작성자</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-40">작성일</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-20">조회수</th>
+                                ${userRole === 'admin' ? '<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">관리</th>' : ''}
+                            </tr>
+                        </thead>
+                        <tbody id="notice-list-${rolePrefix}" class="bg-white divide-y divide-gray-200">
                         ${notices.map((notice, index) => `
                             <tr class="hover:bg-gray-50 cursor-pointer" onclick="${viewDetailFunc}('${notice.id}')">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${notices.length - index}</td>
@@ -541,15 +536,17 @@ function renderNoticeList(userRole) {
                                 ` : ''}
                             </tr>
                         `).join('')}
+                        ${notices.length === 0 ? `
+                            <tr>
+                                <td colspan="${userRole === 'admin' ? '8' : '5'}" class="text-center py-12 text-gray-500">
+                                    등록된 공지사항이 없습니다.
+                                </td>
+                            </tr>
+                        ` : ''}
                     </tbody>
                 </table>
-            </div>
-
-            ${notices.length === 0 ? `
-                <div class="text-center py-12 text-gray-500">
-                    <p>등록된 공지사항이 없습니다.</p>
                 </div>
-            ` : ''}
+            </div>
         </div>
     `;
 }

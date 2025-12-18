@@ -10,9 +10,9 @@ function renderJournalReviewList() {
     const journals = getJournalReviews();
 
     const contentHtml = `
-        <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6 border-b">
-                <!-- 검색 영역 (심사관리와 동일하게 변경) -->
+        <!-- 검색 영역 -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-6">
                 <div class="search-container">
                     <div class="search-grid">
                         <div class="search-field">
@@ -74,17 +74,19 @@ function renderJournalReviewList() {
                         </div>
                     </div>
                     <div class="search-buttons">
-                        <button onclick="searchJournalReviews()" class="search-btn search-btn-primary" style="height: 38px;">
-                            <i class="fas fa-search"></i>검색
+                        <button onclick="resetJournalSearch()" class="btn btn-secondary">
+                            <i class="fas fa-redo"></i> 초기화
                         </button>
-                        <button onclick="resetJournalSearch()" class="search-btn search-btn-secondary" style="height: 38px;">
-                            <i class="fas fa-redo"></i>초기화
+                        <button onclick="searchJournalReviews()" class="btn btn-primary">
+                            <i class="fas fa-search"></i> 검색
                         </button>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- 학술지 목록 -->
+        <!-- 테이블 영역 -->
+        <div class="bg-white rounded-lg shadow-md">
             <div id="journal-review-list">
                 ${renderJournalReviewRows(journals)}
             </div>
