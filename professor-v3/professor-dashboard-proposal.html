@@ -229,10 +229,10 @@
                     <div class="layout-v3-sidebar-logo">H</div>
                     <span class="layout-v3-sidebar-title">논문 지도 시스템</span>
                 </div>
-                <button class="layout-v3-sidebar-toggle" onclick="toggleSidebar()">
+                <button class="layout-v3-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기">
                     <div class="icon">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
                         </svg>
                     </div>
                 </button>
@@ -385,6 +385,15 @@
 
         <!-- 메인 콘텐츠 영역 -->
         <div class="layout-v3-main-content">
+
+        <!-- 사이드바 열기 버튼 (데스크톱) -->
+        <button class="layout-v3-sidebar-open-desktop" onclick="toggleSidebar()" title="사이드바 열기">
+            <div class="icon">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+                </svg>
+            </div>
+        </button>
 
         <!-- 유틸리티 헤더 -->
         <header class="layout-v3-utility-header">
