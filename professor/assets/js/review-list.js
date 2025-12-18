@@ -47,56 +47,56 @@ function renderReviewList() {
     
     // ID 49-50: 테이블 컬럼 변경 + 체크박스 추가
     const html = `
-        <div class="p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">심사 대상 논문 목록</h3>
-            <div class="overflow-x-auto">
-                <table class="min-w-full table-fixed">
-                    <thead class="bg-gray-50">
+        <!-- 테이블 컨테이너 -->
+        <div class="table-container">
+            <div class="table-scroll">
+                <table class="min-w-full">
+                    <thead>
                         <tr>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">
+                            <th style="width: 50px;">
                                 <input type="checkbox" id="select-all-reviews"
                                        onchange="toggleSelectAllReviews(this.checked)"
                                        class="rounded border-gray-300">
                             </th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사일</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">심사진행상태</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">관리</th>
+                            <th style="width: 60px;">번호</th>
+                            <th style="width: 100px;">대학원</th>
+                            <th style="width: 150px;">학과</th>
+                            <th style="width: 80px;">학위과정</th>
+                            <th style="width: 90px;">학번</th>
+                            <th style="width: 80px;">이름</th>
+                            <th style="width: 80px;">학적상태</th>
+                            <th style="min-width: 200px;">논문명</th>
+                            <th style="width: 100px;">심사일</th>
+                            <th style="width: 120px;">심사진행상태</th>
+                            <th style="width: 100px;">관리</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-200">
+                    <tbody>
                         ${filteredAssignments.map((assignment, index) => `
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-3 px-4 text-center">
+                            <tr class="cursor-pointer" onclick="openReviewDetail('${assignment.id}', 'member')">
+                                <td onclick="event.stopPropagation()">
                                     <input type="checkbox" class="review-checkbox rounded border-gray-300"
                                            value="${assignment.id}"
                                            data-name="${assignment.studentName}"
                                            data-student-id="${assignment.studentNumber}">
                                 </td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${index + 1}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.graduate || '일반대학원'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.major || '-'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.degree || '석사'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.studentNumber}</td>
-                                <td class="py-3 px-4 text-sm font-medium text-gray-800">${assignment.studentName}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600">${assignment.academicStatus || '재학'}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600 td-truncate-long" title="${assignment.thesisTitle}">
+                                <td>${index + 1}</td>
+                                <td>${assignment.graduate || '일반대학원'}</td>
+                                <td>${assignment.major || '-'}</td>
+                                <td>${assignment.degree || '석사'}</td>
+                                <td>${assignment.studentNumber}</td>
+                                <td>${assignment.studentName}</td>
+                                <td>${assignment.academicStatus || '재학'}</td>
+                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}
                                 </td>
-                                <td class="py-3 px-4 text-center text-sm text-gray-600">${assignment.reviewDate || '-'}</td>
-                                <td class="py-3 px-4 text-center">
+                                <td>${assignment.reviewDate || '-'}</td>
+                                <td>
                                     <span class="text-xs font-semibold px-2 py-1 rounded-full ${getProgressBadgeClass(assignment.evaluationProgress)}">
                                         ${assignment.evaluationProgress}
                                     </span>
                                 </td>
-                                <td class="py-3 px-4 text-center">
+                                <td onclick="event.stopPropagation()">
                                     <div class="flex gap-2 justify-center">
                                         <button onclick="openReviewDetail('${assignment.id}', 'member')"
                                                 class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
