@@ -19,17 +19,27 @@ function renderFeedbackList() {
     
     // ID 38: 테이블 컬럼 순서 변경 (제출일 추가)
     contentArea.innerHTML = `
-        <div class="bg-white rounded-lg shadow-md">
-            <div class="p-6 border-b flex justify-end">
-                <button onclick="sendNotificationToSelected()"
-                        class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm font-semibold flex items-center gap-2">
-                    <i class="fas fa-bell"></i>
-                    선택한 학생에게 알림 발송
-                </button>
+        <div class="table-container">
+            <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 class="table-title">논문 지도 현황</h3>
+                    <span class="table-count">(총 ${filteredRequests.length}건)</span>
+                </div>
+                <div class="table-header-right">
+                    <button onclick="sendNotificationToSelected()"
+                            class="btn btn-primary btn-sm">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        </span>
+                        선택한 학생에게 알림 발송
+                    </button>
+                </div>
             </div>
-
-            <div class="table-container">
-                <div class="table-scroll">
+            <div class="table-scroll">
                     <table class="min-w-full">
                         <thead>
                             <tr>
@@ -61,7 +71,6 @@ function renderFeedbackList() {
                     </table>
                 </div>
             </div>
-        </div>
     `;
 }
 

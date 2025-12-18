@@ -12,21 +12,6 @@ function renderJournalReviewList() {
     const contentHtml = `
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">학술지 대체심사 목록</h3>
-                    <div class="text-sm text-gray-600">
-                        <span class="font-semibold text-[#6A0028]" id="journal-review-count">총 ${journals.length}건</span>
-                    </div>
-                </div>
-
-                <!-- 알림 발송 버튼 -->
-                <div class="flex justify-end mb-4">
-                    <button onclick="sendNotificationToSelectedJournals()"
-                            class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium">
-                        선택 학생에게 알림 발송
-                    </button>
-                </div>
-
                 <!-- 검색 영역 (심사관리와 동일하게 변경) -->
                 <div class="search-container">
                     <div class="search-grid">
@@ -100,11 +85,8 @@ function renderJournalReviewList() {
             </div>
 
             <!-- 학술지 목록 -->
-            <div class="p-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">학술지 심사 목록</h3>
-                <div id="journal-review-list">
-                    ${renderJournalReviewRows(journals)}
-                </div>
+            <div id="journal-review-list">
+                ${renderJournalReviewRows(journals)}
             </div>
         </div>
     `;
@@ -128,6 +110,25 @@ function renderJournalReviewRows(journals) {
 
     return `
         <div class="table-container">
+            <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 class="table-title">학술지 심사 목록</h3>
+                    <span class="table-count">(총 ${journals.length}건)</span>
+                </div>
+                <div class="table-header-right">
+                    <button onclick="sendNotificationToSelectedJournals()"
+                            class="btn btn-primary btn-sm">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        </span>
+                        선택 학생에게 알림 발송
+                    </button>
+                </div>
+            </div>
             <div class="table-scroll">
                 <table class="min-w-full">
                     <thead>

@@ -49,6 +49,25 @@ function renderReviewList() {
     const html = `
         <!-- 테이블 컨테이너 -->
         <div class="table-container">
+            <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 class="table-title">심사 대상 논문 목록</h3>
+                    <span class="table-count">(총 ${assignments.length}건)</span>
+                </div>
+                <div class="table-header-right">
+                    <button onclick="sendNotificationToSelectedReviews()"
+                            class="btn btn-primary btn-sm">
+                        <span class="icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                        </span>
+                        선택한 학생에게 알림 발송
+                    </button>
+                </div>
+            </div>
             <div class="table-scroll">
                 <table class="min-w-full">
                     <thead>
