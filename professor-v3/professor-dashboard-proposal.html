@@ -232,7 +232,7 @@
                 <button class="layout-v3-sidebar-toggle" onclick="toggleSidebar()" title="사이드바 접기">
                     <div class="icon">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                         </svg>
                     </div>
                 </button>
@@ -386,20 +386,11 @@
         <!-- 메인 콘텐츠 영역 -->
         <div class="layout-v3-main-content">
 
-        <!-- 사이드바 열기 버튼 (데스크톱) -->
-        <button class="layout-v3-sidebar-open-desktop" onclick="toggleSidebar()" title="사이드바 열기">
-            <div class="icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
-                </svg>
-            </div>
-        </button>
-
         <!-- 유틸리티 헤더 -->
         <header class="layout-v3-utility-header">
             <div class="layout-v3-utility-left">
-                <!-- 모바일 메뉴 -->
-                <button id="sidebarToggle" class="layout-v3-sidebar-open-btn" onclick="toggleMobileMenu()">
+                <!-- 햄버거 메뉴 (사이드바 접힘 상태에서 표시) -->
+                <button id="sidebarToggle" class="layout-v3-sidebar-open-btn" onclick="toggleSidebar()" title="사이드바 열기">
                     <div class="icon">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -173,67 +173,31 @@ body.layout-v3 {
     white-space: nowrap;
 }
 
-/* 사이드바 토글 버튼 (접기) */
+/* 사이드바 토글 버튼 (접기) - Crimson 원형 */
 .layout-v3-sidebar-toggle {
-    width: 32px;
-    height: 32px;
-    border-radius: var(--border-radius-sm);
-    background: transparent;
-    border: 1px solid var(--color-border);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all var(--transition-normal);
-    flex-shrink: 0;
-    color: var(--color-text-secondary);
-}
-
-.layout-v3-sidebar-toggle:hover {
-    background: var(--color-gray-4);
-    color: var(--color-primary);
-    border-color: var(--color-primary);
-}
-
-.layout-v3-sidebar-toggle .icon {
-    width: 18px;
-    height: 18px;
-}
-
-/* 사이드바 열기 버튼 (데스크톱용) */
-.layout-v3-sidebar-open-desktop {
-    position: fixed;
-    left: 16px;
-    top: 16px;
-    width: 40px;
-    height: 40px;
-    border-radius: var(--border-radius-sm);
+    width: 28px;
+    height: 28px;
+    border-radius: var(--border-radius-full);
     background: var(--color-primary);
     border: none;
     cursor: pointer;
-    display: none;
+    display: flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 8px rgba(106, 0, 40, 0.3);
     transition: all var(--transition-normal);
-    z-index: 500;
+    flex-shrink: 0;
     color: white;
 }
 
-.layout-v3-sidebar-open-desktop:hover {
+.layout-v3-sidebar-toggle:hover {
     background: var(--color-primary-light);
     transform: scale(1.05);
 }
 
-.layout-v3-sidebar-open-desktop .icon {
-    width: 20px;
-    height: 20px;
-}
-
-/* 사이드바가 접혔을 때 열기 버튼 표시 */
-.layout-v3-sidebar.collapsed ~ .layout-v3-main-content .layout-v3-sidebar-open-desktop,
-.layout-v3-container:has(.layout-v3-sidebar.collapsed) .layout-v3-sidebar-open-desktop {
-    display: flex;
+.layout-v3-sidebar-toggle .icon {
+    width: 14px;
+    height: 14px;
 }
 
 /* 사이드바 역할 영역 */
@@ -411,7 +375,7 @@ body.layout-v3 {
     gap: 16px;
 }
 
-/* 사이드바 열기 버튼 */
+/* 사이드바 열기 버튼 (햄버거 메뉴) */
 .layout-v3-sidebar-open-btn {
     display: none;
     width: 32px;
@@ -431,7 +395,8 @@ body.layout-v3 {
     color: var(--color-primary);
 }
 
-.layout-v3-sidebar-open-btn.visible {
+/* 사이드바가 접혔을 때 햄버거 버튼 표시 */
+.layout-v3-sidebar.collapsed ~ .layout-v3-main-content .layout-v3-sidebar-open-btn {
     display: flex;
 }
 
