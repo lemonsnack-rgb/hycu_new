@@ -306,29 +306,33 @@ function viewJournalReviewDetail(journalId, viewType) {
 
     content += `</div>`;
 
-    if (typeof createModal === 'function') {
-        createModal(
-            `${roleText} 평가 - 학술지 대체심사`,
-            content,
-            [
-                {
-                    text: '닫기',
-                    className: 'btn-secondary',
-                    onclick: 'return;'
-                }
-            ]
-        );
+    // 모달 대신 페이지 전환 방식으로 변경
+    const container = document.getElementById('journal-review-content');
+    if (container) {
+        // 뒤로가기 버튼 추가
+        const backButton = `
+            <div class="mb-6">
+                <button onclick="initJournalReview()" class="flex items-center gap-2 text-gray-600 hover:text-[#6A0028] transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    <span class="font-medium">목록으로 돌아가기</span>
+                </button>
+            </div>
+        `;
 
-        // 모달 크기를 large로 변경
-        setTimeout(() => {
-            const modal = document.querySelector('.modal-backdrop .modal');
-            if (modal) {
-                modal.classList.add('modal-large');
-            }
-        }, 0);
+        container.innerHTML = backButton + `
+            <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-2">${roleText} 평가 - 학술지 대체심사</h2>
+                <p class="text-sm text-gray-600">학생: ${journal.studentName} (${journal.studentId})</p>
+            </div>
+        ` + content;
+
+        // 페이지 맨 위로 스크롤
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     } else {
-        console.error('createModal function not found');
-        alert('모달을 열 수 없습니다. 페이지를 새로고침해주세요.');
+        console.error('journal-review-content container not found');
+        alert('화면을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
     }
 }
 

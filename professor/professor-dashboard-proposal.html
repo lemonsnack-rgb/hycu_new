@@ -87,6 +87,47 @@
         #modal-container .modal-backdrop.active {
             display: flex !important;
         }
+
+        /* 검색 버튼 스타일 */
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        .search-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .search-btn-primary {
+            background: #6A0028;
+            color: white;
+        }
+
+        .search-btn-primary:hover {
+            background: #8A0034;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(106, 0, 40, 0.3);
+        }
+
+        .search-btn-secondary {
+            background: #6B7280;
+            color: white;
+        }
+
+        .search-btn-secondary:hover {
+            background: #4B5563;
+        }
     </style>
     
     <!-- FullCalendar JS -->
