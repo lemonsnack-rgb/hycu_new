@@ -26,13 +26,13 @@
 }
 
 .tab-btn:hover {
-    border-color: #009DE8;
-    color: #009DE8;
+    border-color: #6A0028;
+    color: #6A0028;
 }
 
 .tab-btn.active {
-    background: #009DE8;
-    border-color: #009DE8;
+    background: #6A0028;
+    border-color: #6A0028;
     color: white;
 }
 
@@ -97,7 +97,7 @@
 }
 
 .slot-card:hover {
-    border-color: #009DE8;
+    border-color: #6A0028;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -195,7 +195,7 @@
 
 /* 버튼 */
 .btn-primary {
-    background: #009DE8;
+    background: #6A0028;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
@@ -207,7 +207,7 @@
 }
 
 .btn-primary:hover {
-    background: #0087c9;
+    background: #8A0034;
 }
 
 .btn-secondary {
@@ -253,7 +253,7 @@
 
 .input:focus {
     outline: none;
-    border-color: #009DE8;
+    border-color: #6A0028;
     box-shadow: 0 0 0 3px rgba(106, 0, 40, 0.1);
 }
 
@@ -333,8 +333,8 @@
 }
 
 .fc-button-active {
-    background: #009DE8 !important;
-    border-color: #009DE8 !important;
+    background: #6A0028 !important;
+    border-color: #6A0028 !important;
     color: white !important;
 }
 
@@ -392,11 +392,11 @@
 }
 
 .video-js .vjs-play-progress {
-    background-color: #009DE8;
+    background-color: #6A0028;
 }
 
 .video-js .vjs-volume-level {
-    background-color: #009DE8;
+    background-color: #6A0028;
 }
 
 .video-js .vjs-slider {
@@ -406,6 +406,6 @@
 /* 재생 속도 버튼 커스터마이징 */
 #speed-label {
     font-weight: 600;
-    color: #009DE8;
+    color: #6A0028;
 }
 

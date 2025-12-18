@@ -167,7 +167,7 @@
 
 /* 내 지도 강조 */
 .my-guidance-highlight {
-    border-left: 4px solid #009DE8;
+    border-left: 4px solid #6A0028;
 }
 
 /* 계획 정보 박스 */
@@ -281,7 +281,7 @@
 
 /* 공통 버튼 스타일 */
 .btn-primary {
-    background-color: #009DE8;
+    background-color: #6A0028;
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.375rem;
@@ -293,7 +293,7 @@
 }
 
 .btn-primary:hover {
-    background-color: #0087c9;
+    background-color: #8A0034;
 }
 
 .btn-secondary {

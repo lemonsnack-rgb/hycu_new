@@ -200,7 +200,7 @@
 .comment-marker.highlight {
     transform: scale(1.3);
     background-color: #C9BC9C;
-    color: #009DE8;
+    color: #6A0028;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
@@ -231,7 +231,7 @@
 
 .pdf-toolbar-btn.active {
     background: #F5F1E9;
-    color: #009DE8;
+    color: #6A0028;
 }
 
 .pdf-toolbar-btn:disabled {
@@ -381,7 +381,7 @@ canvas.upper-canvas {
 /* 주지도교수 */
 .professor-main {
     background-color: #F5F1E9;
-    border-left: 3px solid #009DE8;
+    border-left: 3px solid #6A0028;
     align-self: flex-end;
 }
 
@@ -555,7 +555,7 @@ canvas.upper-canvas {
 
 .attachment-item:hover {
     background: #E5E5E5;
-    color: #009DE8;
+    color: #6A0028;
 }
 
 /* ==================== 동시 편집 경고 ==================== */
@@ -578,7 +578,7 @@ canvas.upper-canvas {
     width: 20px;
     height: 20px;
     border: 3px solid #F3F4F6;
-    border-top-color: #009DE8;
+    border-top-color: #6A0028;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
