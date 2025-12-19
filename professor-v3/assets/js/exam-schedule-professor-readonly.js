@@ -29,87 +29,84 @@ function renderExamScheduleScreen() {
         <!-- 목록 화면 -->
         <div id="exam-schedule-list-view">
             <!-- 검색 영역 -->
-            <div class="bg-white rounded-lg shadow-md mb-6">
-                <div class="p-6">
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-                        <!-- 학년도 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학년도</label>
-                            <select id="exam-filter-year" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
-                                <option value="">전체</option>
-                                <option value="2025" selected>2025</option>
-                                <option value="2024">2024</option>
+            <div class="search-container">
+                <div class="search-grid">
+                    <!-- 학년도 -->
+                    <div class="search-field">
+                        <label class="search-label">학년도</label>
+                        <select id="exam-filter-year" class="search-select" onchange="filterExamScheduleList()">
+                            <option value="">전체</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2024">2024</option>
+                        </select>
+                    </div>
+
+                    <!-- 학기 -->
+                    <div class="search-field">
+                        <label class="search-label">학기</label>
+                        <select id="exam-filter-semester" class="search-select" onchange="filterExamScheduleList()">
+                            <option value="">전체</option>
+                            <option value="1" selected>1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
+                    </div>
+
+                    <!-- 학과 -->
+                    <div class="search-field">
+                        <label class="search-label">학과</label>
+                        <select id="exam-filter-department" class="search-select" onchange="filterExamScheduleList()">
+                            <option value="">전체</option>
+                            <option value="경영학과">경영학과</option>
+                            <option value="컴퓨터공학과">컴퓨터공학과</option>
+                            <option value="교육학과">교육학과</option>
+                        </select>
+                    </div>
+
+                    <!-- 심사 단계 -->
+                    <div class="search-field">
+                        <label class="search-label">심사 단계</label>
+                        <select id="exam-filter-stage" class="search-select" onchange="filterExamScheduleList()">
+                            <option value="">전체</option>
+                        </select>
+                    </div>
+
+                    <!-- 일정 상태 -->
+                    <div class="search-field">
+                        <label class="search-label">일정 상태</label>
+                        <select id="exam-filter-schedule-status" class="search-select" onchange="filterExamScheduleList()">
+                            <option value="">전체</option>
+                            <option value="scheduled">등록 완료</option>
+                            <option value="unscheduled">미등록</option>
+                        </select>
+                    </div>
+
+                    <!-- 검색어 -->
+                    <div class="search-field" style="grid-column: span 2;">
+                        <label class="search-label">검색어</label>
+                        <div style="display: flex; gap: 8px;">
+                            <select id="exam-filter-search-type" class="search-select" style="flex: 0 0 120px;">
+                                <option value="studentName">학생명</option>
+                                <option value="studentNumber">학번</option>
                             </select>
-                        </div>
-
-                        <!-- 학기 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학기</label>
-                            <select id="exam-filter-semester" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
-                                <option value="">전체</option>
-                                <option value="1" selected>1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
-                        </div>
-
-                        <!-- 학과 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">학과</label>
-                            <select id="exam-filter-department" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
-                                <option value="">전체</option>
-                                <option value="경영학과">경영학과</option>
-                                <option value="컴퓨터공학과">컴퓨터공학과</option>
-                                <option value="교육학과">교육학과</option>
-                            </select>
-                        </div>
-
-                        <!-- 심사 단계 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">심사 단계</label>
-                            <select id="exam-filter-stage" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
-                                <option value="">전체</option>
-                            </select>
-                        </div>
-
-                        <!-- 일정 상태 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">일정 상태</label>
-                            <select id="exam-filter-schedule-status" class="w-full px-3 py-2 border border-gray-300 rounded-md" onchange="filterExamScheduleList()">
-                                <option value="">전체</option>
-                                <option value="scheduled">등록 완료</option>
-                                <option value="unscheduled">미등록</option>
-                            </select>
-                        </div>
-
-                        <!-- 검색어 -->
-                        <div class="md:col-span-2 lg:col-span-2">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">검색어</label>
-                            <div class="flex gap-2">
-                                <select id="exam-filter-search-type" class="px-3 py-2 border border-gray-300 rounded-md" style="flex: 0 0 120px;">
-                                    <option value="studentName">학생명</option>
-                                    <option value="studentNumber">학번</option>
-                                </select>
-                                <input type="text"
-                                       id="exam-filter-search-keyword"
-                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md"
-                                       placeholder="검색어를 입력하세요"
-                                       onkeypress="if(event.key==='Enter') filterExamScheduleList()">
-                            </div>
-                        </div>
-
-                        <!-- 검색/초기화 버튼 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">&nbsp;</label>
-                            <div class="flex gap-2">
-                                <button onclick="resetExamScheduleFilters()" class="btn btn-secondary flex-1">
-                                    <i class="fas fa-redo"></i> 초기화
-                                </button>
-                                <button onclick="filterExamScheduleList()" class="btn btn-primary flex-1">
-                                    <i class="fas fa-search"></i> 검색
-                                </button>
-                            </div>
+                            <input type="text"
+                                   id="exam-filter-search-keyword"
+                                   class="search-input"
+                                   style="flex: 1;"
+                                   placeholder="검색어를 입력하세요"
+                                   onkeypress="if(event.key==='Enter') filterExamScheduleList()">
                         </div>
                     </div>
+                </div>
+
+                <div class="search-buttons">
+                    <button onclick="resetExamScheduleFilters()" class="btn btn-secondary">
+                        <i class="fas fa-redo"></i>
+                        초기화
+                    </button>
+                    <button onclick="filterExamScheduleList()" class="btn btn-primary">
+                        <i class="fas fa-search"></i>
+                        검색
+                    </button>
                 </div>
             </div>
 
