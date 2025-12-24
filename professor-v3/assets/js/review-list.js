@@ -86,7 +86,7 @@ function renderReviewList() {
                             <th style="width: 80px;">학적상태</th>
                             <th style="width: 100px;">심사유형</th>
                             <th style="min-width: 200px;">논문명</th>
-                            <th style="width: 100px;">심사일</th>
+                            <th style="width: 100px;">심사일</th> <!-- 관리자 > 심사 일정 관리에서 지정한 심사 예정일 -->
                             <th style="width: 120px;">심사진행상태</th>
                             <th style="width: 100px;">관리</th>
                         </tr>
@@ -111,7 +111,7 @@ function renderReviewList() {
                                 <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}
                                 </td>
-                                <td>${assignment.reviewDate || '-'}</td>
+                                <td>${assignment.reviewDate || '-'}</td> <!-- reviewDate: 관리자가 심사 일정 관리에서 지정한 값 -->
                                 <td>
                                     <span class="status-badge ${getProgressBadgeClass(assignment.evaluationProgress)}">
                                         ${getProgressStatusText(assignment.evaluationProgress)}

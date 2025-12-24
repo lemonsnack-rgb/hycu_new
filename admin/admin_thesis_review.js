@@ -119,136 +119,76 @@ function viewThesisReviewDetail(submissionId, viewType, submissionType) {
                 <div class="space-y-4" id="evaluation-categories">
                     <!-- 평가 항목 1 -->
                     <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                        <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-1">1. 연구 주제의 독창성</h4>
-                                <p class="text-sm text-gray-600">연구 주제의 새로움과 독창성 평가</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-gray-500">가중치</div>
-                                <div class="text-lg font-bold text-blue-600">20%</div>
-                            </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-1">1. 연구 주제의 독창성</h4>
+                            <p class="text-sm text-gray-600">연구 주제의 새로움과 독창성 평가</p>
                         </div>
-                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
+                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center">
                             <label class="text-sm font-medium text-gray-700">점수:</label>
                             <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                    min="0" max="20" step="0.5" value="0">
                             <span class="text-sm text-gray-600">/ 20점</span>
                             <span></span>
-                        </div>
-                        <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
-                            <span></span>
-                            <div class="text-sm text-gray-500">
-                                → 가중 점수: <span class="weighted-score text-base font-bold text-blue-600">0.0점</span>
-                            </div>
                         </div>
                     </div>
 
                     <!-- 평가 항목 2 -->
                     <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                        <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-1">2. 연구 방법의 적절성</h4>
-                                <p class="text-sm text-gray-600">연구 방법론의 적절성과 타당성</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-gray-500">가중치</div>
-                                <div class="text-lg font-bold text-blue-600">20%</div>
-                            </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-1">2. 연구 방법의 적절성</h4>
+                            <p class="text-sm text-gray-600">연구 방법론의 적절성과 타당성</p>
                         </div>
-                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
+                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center">
                             <label class="text-sm font-medium text-gray-700">점수:</label>
                             <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                    min="0" max="20" step="0.5" value="0">
                             <span class="text-sm text-gray-600">/ 20점</span>
                             <span></span>
-                        </div>
-                        <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
-                            <span></span>
-                            <div class="text-sm text-gray-500">
-                                → 가중 점수: <span class="weighted-score text-base font-bold text-blue-600">0.0점</span>
-                            </div>
                         </div>
                     </div>
 
                     <!-- 평가 항목 3 -->
                     <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                        <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-1">3. 연구 결과의 타당성</h4>
-                                <p class="text-sm text-gray-600">연구 결과의 신뢰성과 타당성</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-gray-500">가중치</div>
-                                <div class="text-lg font-bold text-blue-600">20%</div>
-                            </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-1">3. 연구 결과의 타당성</h4>
+                            <p class="text-sm text-gray-600">연구 결과의 신뢰성과 타당성</p>
                         </div>
-                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
+                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center">
                             <label class="text-sm font-medium text-gray-700">점수:</label>
                             <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                    min="0" max="20" step="0.5" value="0">
                             <span class="text-sm text-gray-600">/ 20점</span>
                             <span></span>
-                        </div>
-                        <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
-                            <span></span>
-                            <div class="text-sm text-gray-500">
-                                → 가중 점수: <span class="weighted-score text-base font-bold text-blue-600">0.0점</span>
-                            </div>
                         </div>
                     </div>
 
                     <!-- 평가 항목 4 -->
                     <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                        <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-1">4. 논문 구성의 체계성</h4>
-                                <p class="text-sm text-gray-600">논문의 논리적 구성과 체계성</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-gray-500">가중치</div>
-                                <div class="text-lg font-bold text-blue-600">20%</div>
-                            </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-1">4. 논문 구성의 체계성</h4>
+                            <p class="text-sm text-gray-600">논문의 논리적 구성과 체계성</p>
                         </div>
-                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
+                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center">
                             <label class="text-sm font-medium text-gray-700">점수:</label>
                             <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                    min="0" max="20" step="0.5" value="0">
                             <span class="text-sm text-gray-600">/ 20점</span>
                             <span></span>
-                        </div>
-                        <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
-                            <span></span>
-                            <div class="text-sm text-gray-500">
-                                → 가중 점수: <span class="weighted-score text-base font-bold text-blue-600">0.0점</span>
-                            </div>
                         </div>
                     </div>
 
                     <!-- 평가 항목 5 -->
                     <div class="evaluation-item bg-white border border-gray-300 rounded-lg p-4">
-                        <div class="grid grid-cols-[1fr_80px] gap-4 mb-4">
-                            <div>
-                                <h4 class="font-bold text-gray-800 mb-1">5. 학문적 기여도</h4>
-                                <p class="text-sm text-gray-600">해당 분야에 대한 학문적 기여</p>
-                            </div>
-                            <div class="text-right">
-                                <div class="text-xs text-gray-500">가중치</div>
-                                <div class="text-lg font-bold text-blue-600">20%</div>
-                            </div>
+                        <div class="mb-4">
+                            <h4 class="font-bold text-gray-800 mb-1">5. 학문적 기여도</h4>
+                            <p class="text-sm text-gray-600">해당 분야에 대한 학문적 기여</p>
                         </div>
-                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center mb-2">
+                        <div class="grid grid-cols-[60px_100px_80px_1fr] gap-3 items-center">
                             <label class="text-sm font-medium text-gray-700">점수:</label>
                             <input type="number" class="score-input w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                    min="0" max="20" step="0.5" value="0">
                             <span class="text-sm text-gray-600">/ 20점</span>
                             <span></span>
-                        </div>
-                        <div class="grid grid-cols-[60px_1fr] gap-3 items-center">
-                            <span></span>
-                            <div class="text-sm text-gray-500">
-                                → 가중 점수: <span class="weighted-score text-base font-bold text-blue-600">0.0점</span>
-                            </div>
                         </div>
                     </div>
                 </div>

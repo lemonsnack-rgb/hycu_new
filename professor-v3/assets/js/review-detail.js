@@ -1323,6 +1323,10 @@ function renderChairApprovalScreen(detail, allSubmitted) {
             const committee = detail.assignment.committee.find(c => c.id === evaluation.committeeId);
             const totalScore = evaluation.scores ? evaluation.scores.reduce((sum, s) => sum + s.weightedScore, 0) : 0;
 
+            // 통과 기준 점수 (60점 이상)
+            const PASS_THRESHOLD = 60;
+            const isPassed = totalScore >= PASS_THRESHOLD;
+
             html += `
                 <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
                     <div class="flex justify-between items-start mb-2">
@@ -1332,7 +1336,11 @@ function renderChairApprovalScreen(detail, allSubmitted) {
                         </div>
                         <div class="text-right">
                             <p class="text-lg font-bold text-[#6A0028]">${totalScore.toFixed(1)}점</p>
-                            <p class="text-xs text-gray-500">총점</p>
+                            <span class="inline-block mt-1 px-3 py-1 text-xs font-semibold rounded ${
+                                isPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                            }">
+                                ${isPassed ? '✓ 통과' : '✗ 불통과'}
+                            </span>
                         </div>
                     </div>
                     ${evaluation.overallComment ? `
@@ -1347,17 +1355,40 @@ function renderChairApprovalScreen(detail, allSubmitted) {
 
         html += `</div>`;
 
-        // 평균 점수 계산
+        // 평균 점수 계산 및 시스템 판정
+        const PASS_THRESHOLD = 60;
         const avgScore = detail.allEvaluations.reduce((sum, e) => {
             const totalScore = e.scores ? e.scores.reduce((s, sc) => s + sc.weightedScore, 0) : 0;
             return sum + totalScore;
         }, 0) / detail.allEvaluations.length;
 
+        // 각 심사위원의 통과 여부 확인
+        const passedCount = detail.allEvaluations.filter(e => {
+            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + sc.weightedScore, 0) : 0;
+            return totalScore >= PASS_THRESHOLD;
+        }).length;
+
+        const allPassed = passedCount === detail.allEvaluations.length;
+        const systemDecision = allPassed ? '통과' : '불통과';
+
         html += `
             <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center mb-3">
                     <p class="font-bold text-[#4A001C]">전체 평균 점수</p>
                     <p class="text-2xl font-bold text-[#6A0028]">${avgScore.toFixed(1)}점</p>
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t border-[#F8BBD9]">
+                    <p class="font-bold text-[#4A001C]">시스템 판정 결과</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">(${passedCount}/${detail.allEvaluations.length}명 통과)</span>
+                        <span class="inline-block px-4 py-2 rounded-lg font-bold ${
+                            systemDecision === '통과'
+                                ? 'bg-green-100 text-green-700 border border-green-300'
+                                : 'bg-red-100 text-red-700 border border-red-300'
+                        }">
+                            ${systemDecision === '통과' ? '✓ 통과' : '✗ 불통과'}
+                        </span>
+                    </div>
                 </div>
             </div>
         `;
