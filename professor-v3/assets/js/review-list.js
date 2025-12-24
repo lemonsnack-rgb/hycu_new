@@ -107,17 +107,13 @@ function renderReviewList() {
                                 <td>${assignment.studentNumber}</td>
                                 <td>${assignment.studentName}</td>
                                 <td>${assignment.academicStatus || '재학'}</td>
-                                <td>
-                                    <span class="text-xs font-semibold px-2 py-1 rounded ${getReviewTypeBadgeClass(assignment.reviewType)}">
-                                        ${assignment.reviewType || '예비심사'}
-                                    </span>
-                                </td>
+                                <td>${assignment.reviewType || '예비심사'}</td>
                                 <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${assignment.thesisTitle}">
                                     ${assignment.thesisTitle}
                                 </td>
                                 <td>${assignment.reviewDate || '-'}</td>
                                 <td>
-                                    <span class="text-xs font-semibold px-2 py-1 rounded ${getProgressBadgeClass(assignment.evaluationProgress)}">
+                                    <span class="status-badge ${getProgressBadgeClass(assignment.evaluationProgress)}">
                                         ${getProgressStatusText(assignment.evaluationProgress)}
                                     </span>
                                 </td>

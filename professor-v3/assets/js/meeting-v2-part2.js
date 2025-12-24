@@ -199,7 +199,6 @@ function renderCompletedTab() {
                                     <th style="min-width: 200px;">주제</th>
                                     <th style="width: 80px;">유형</th>
                                     <th style="width: 120px;">일시</th>
-                                    <th style="width: 100px;">실제시간</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -237,7 +236,6 @@ function renderCompletedRow(req, index) {
                 </span>
             </td>
             <td>${req.selectedDate} ${req.selectedTime}</td>
-            <td>${req.actualDuration}분</td>
         </tr>
     `;
 }

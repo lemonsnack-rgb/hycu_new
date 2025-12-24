@@ -180,16 +180,20 @@ window.showPlagiarismReport = showPlagiarismReport;
 function addStudentInfoIcon(studentName, studentNumber) {
     return `
         ${studentName}
-        <button onclick="showStudentInfo('${studentNumber}'); event.stopPropagation();" 
-                class="ml-1 text-[#6A0028] hover:text-[#6A0028]" 
+        <button onclick="showStudentInfo('${studentNumber}'); event.stopPropagation();"
+                class="icon-btn-info"
                 title="학생 정보 보기">
-            <i class="fas fa-info-circle text-xs"></i>
+            <i class="fas fa-info-circle"></i>
         </button>
     `;
 }
 
 function showStudentInfo(studentNumber) {
-    alert(`학생 정보\n학번: ${studentNumber}\n(실제 구현 시 상세 모달 표시)`);
+    // API 호출 예시
+    console.log('API 호출: /api/student/info/' + studentNumber);
+
+    // 임시 얼럿 처리
+    alert(`학생 정보 조회\n\n학번: ${studentNumber}\n\n※ 실제 구현 시 API 연동 및 상세 정보 표시`);
 }
 
 window.addStudentInfoIcon = addStudentInfoIcon;

@@ -304,12 +304,14 @@ textarea.form-control {
 
 /* Status Badges */
 .status-badge {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     padding: 4px 8px;
     border-radius: var(--border-radius-sm, 4px);
     font-size: 12px;
     font-weight: var(--font-weight-semibold, 600);
-    min-width: 64px;
+    min-width: 80px;
     text-align: center;
 }
 
@@ -1135,4 +1137,35 @@ textarea.form-control {
         padding: 6px 12px;
         font-size: 12px;
     }
+}
+
+/* =============================================
+   ICON BUTTONS
+   ============================================= */
+
+/* Info Icon Button - 학생 정보 아이콘 */
+.icon-btn-info {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    margin-left: 4px;
+    padding: 0;
+    border: none;
+    background: transparent;
+    color: var(--color-primary, #6A0028);
+    cursor: pointer;
+    transition: all var(--transition-fast, 0.15s ease);
+    vertical-align: middle;
+}
+
+.icon-btn-info:hover {
+    color: var(--color-primary-light, #8A0034);
+    transform: scale(1.1);
+}
+
+.icon-btn-info .icon {
+    width: 14px;
+    height: 14px;
 }
