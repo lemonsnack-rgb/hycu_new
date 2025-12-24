@@ -78,6 +78,79 @@ function closeModal() {
     document.getElementById('modal-backdrop').classList.add('hidden');
 }
 
+// 평가표 유형 변경 경고 모달
+function showEvaluationTypeChangeWarning(onConfirm, onCancel) {
+    const content = `
+        <div class="text-center py-6">
+            <div class="mb-4">
+                <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl"></i>
+            </div>
+            <p class="text-lg font-semibold text-gray-800 mb-3">평가표 유형 변경 경고</p>
+            <p class="text-gray-700 leading-relaxed">
+                평가표 유형을 변경하면<br>
+                <strong class="text-red-600">기존에 입력한 평가 항목이 모두 삭제</strong>됩니다.
+            </p>
+            <p class="text-gray-600 mt-2">
+                계속하시겠습니까?
+            </p>
+        </div>
+    `;
+
+    openModal('평가표 유형 변경', content, '확인', () => {
+        closeModal();
+        if (onConfirm) onConfirm();
+    });
+
+    // 취소 버튼에 커스텀 동작 추가
+    const cancelBtn = document.getElementById('modal-cancel');
+    if (cancelBtn && onCancel) {
+        cancelBtn.onclick = () => {
+            closeModal();
+            onCancel();
+        };
+    }
+}
+
+// 평가표 유형 변경 이벤트 리스너 초기화 (뷰 렌더링 후 호출)
+function initEvaluationTypeChangeListener() {
+    setTimeout(() => {
+        const typeSelect = document.getElementById('edit-criteria-type');
+        if (typeSelect && !typeSelect.disabled) {
+            let initialType = typeSelect.value;
+
+            // 기존 리스너 제거 (중복 방지)
+            const newSelect = typeSelect.cloneNode(true);
+            typeSelect.parentNode.replaceChild(newSelect, typeSelect);
+
+            newSelect.addEventListener('change', function(e) {
+                const container = document.getElementById('evaluation-items-container');
+                const existingItems = container.querySelectorAll('.evaluation-item');
+
+                if (existingItems.length > 0) {
+                    // 경고 모달 표시
+                    showEvaluationTypeChangeWarning(
+                        () => {
+                            // 확인 - 항목 초기화
+                            container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">평가 항목을 추가해주세요.</p>';
+                            if (typeof updateTotalScore === 'function') {
+                                updateTotalScore();
+                            }
+                            initialType = e.target.value;
+                        },
+                        () => {
+                            // 취소 - 이전 값으로 복원
+                            e.target.value = initialType;
+                        }
+                    );
+                } else {
+                    // 항목이 없으면 그냥 변경
+                    initialType = e.target.value;
+                }
+            });
+        }
+    }, 100);
+}
+
 // ========== 상세보기 모달 함수들 ==========
 
 function viewSubmissionDetail(id, type) {

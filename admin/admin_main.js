@@ -77,6 +77,13 @@ function switchView(viewName, param = null) {
             renderStageManagementContent();
         }, 0);
     }
+
+    if (viewName === 'evaluationCriteriaEdit') {
+        // 평가표 편집 화면 렌더링 후 이벤트 리스너 초기화
+        if (typeof initEvaluationTypeChangeListener === 'function') {
+            initEvaluationTypeChangeListener();
+        }
+    }
 }
 
 // ========== 이벤트 리스너 초기화 ==========
