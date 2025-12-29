@@ -101,6 +101,11 @@ function showScreen(screenId) {
             } else {
                 console.error('❌ renderExamScheduleScreen 함수를 찾을 수 없습니다');
             }
+        } else if (screenId === 'guidance') {
+            // 주차별 논문지도 현황 초기화
+            if (typeof initWeeklyGuidance === 'function') {
+                initWeeklyGuidance();
+            }
         } else if (screenId === 'ethics' || screenId === 'schedule' || screenId === 'process') {
             // 안내문 화면 렌더링 (공통 함수 사용)
             renderGuideScreen(screenId);
@@ -729,6 +734,83 @@ function searchNoticesProfessor() {
     alert('검색 기능은 추후 구현 예정입니다.');
 }
 
+// 주차별 논문지도 현황 목 데이터
+const mockWeeklyGuidance = [
+    {
+        id: 1,
+        academicYear: '2025',
+        semester: '1',
+        week: '1',
+        collegeType: '일반대학원',
+        graduate: '일반대학원',
+        majorCategory: '공과대학',
+        department: '컴퓨터공학과',
+        degreeType: '석사',
+        status: '재학',
+        studentNumber: '20251001',
+        studentName: '김철수',
+        advisorName: '김교수',
+        guidanceContent: '연구주제 설정 및 문헌조사 방법론 논의',
+        guidanceDate: '2025-03-05 14:00'
+    },
+    {
+        id: 2,
+        academicYear: '2025',
+        semester: '1',
+        week: '2',
+        collegeType: '일반대학원',
+        graduate: '일반대학원',
+        majorCategory: '공과대학',
+        department: '컴퓨터공학과',
+        degreeType: '석사',
+        status: '재학',
+        studentNumber: '20251001',
+        studentName: '김철수',
+        advisorName: '김교수',
+        guidanceContent: '선행연구 분석 및 연구방향 수정',
+        guidanceDate: '2025-03-12 14:00'
+    },
+    {
+        id: 3,
+        academicYear: '2025',
+        semester: '1',
+        week: '1',
+        collegeType: '일반대학원',
+        graduate: '일반대학원',
+        majorCategory: '사범대학',
+        department: '교육학과',
+        degreeType: '박사',
+        status: '재학',
+        studentNumber: '20241002',
+        studentName: '이영희',
+        advisorName: '김교수',
+        guidanceContent: '연구설계 및 데이터 수집 계획 수립',
+        guidanceDate: '2025-03-06 15:00'
+    },
+    {
+        id: 4,
+        academicYear: '2025',
+        semester: '1',
+        week: '3',
+        collegeType: '특수대학원',
+        graduate: '교육대학원',
+        majorCategory: '인문대학',
+        department: '영어교육학과',
+        degreeType: '석사',
+        status: '재학',
+        studentNumber: '20251003',
+        studentName: '박민수',
+        advisorName: '김교수',
+        guidanceContent: '이론적 배경 검토 및 연구가설 설정',
+        guidanceDate: '2025-03-19 16:00'
+    }
+];
+
+// 주차별 논문지도 현황 초기화
+function initWeeklyGuidance() {
+    renderWeeklyGuidanceTable(mockWeeklyGuidance);
+}
+
 // 주차별 논문지도 현황 검색
 function searchWeeklyGuidance() {
     const year = document.getElementById('guidance-search-year')?.value || '';
@@ -744,8 +826,22 @@ function searchWeeklyGuidance() {
     const advisorName = document.getElementById('guidance-search-advisor')?.value || '';
     const week = document.getElementById('guidance-search-week')?.value || '';
 
-    // TODO: 실제 데이터로 필터링 (현재는 빈 배열)
-    const filteredData = [];
+    // 필터링
+    const filteredData = mockWeeklyGuidance.filter(item => {
+        if (year && item.academicYear !== year) return false;
+        if (semester && item.semester !== semester) return false;
+        if (week && item.week !== week) return false;
+        if (collegeType && item.collegeType !== collegeType) return false;
+        if (graduate && item.graduate !== graduate) return false;
+        if (majorCategory && item.majorCategory !== majorCategory) return false;
+        if (department && item.department !== department) return false;
+        if (degree && item.degreeType !== degree) return false;
+        if (status && item.status !== status) return false;
+        if (studentId && !item.studentNumber.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        if (advisorName && !item.advisorName.includes(advisorName)) return false;
+        return true;
+    });
 
     renderWeeklyGuidanceTable(filteredData);
     alert(`검색 결과: ${filteredData.length}건`);
@@ -822,6 +918,7 @@ window.initAdvisorAssignment = initAdvisorAssignment;
 window.searchProfessorAdvisorAssignment = searchProfessorAdvisorAssignment;
 window.viewProfessorProposalDetail = viewProfessorProposalDetail;
 window.returnToAdvisorAssignmentList = returnToAdvisorAssignmentList;
+window.initWeeklyGuidance = initWeeklyGuidance;
 window.searchWeeklyGuidance = searchWeeklyGuidance;
 window.renderWeeklyGuidanceTable = renderWeeklyGuidanceTable;
 window.renderGuideScreen = renderGuideScreen;
