@@ -364,19 +364,40 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
     noStudentsDiv.style.display = 'none';
 
     // 학생 목록 렌더링 (관리자와 동일한 구조, 행 클릭 시 상세 화면, 읽기 전용)
-    tableBody.innerHTML = data.map(item => `
+    tableBody.innerHTML = data.map(item => {
+        const student = mockStudents.find(s => s.id === item.studentId);
+        const studentStatus = student ? student.status : '-';
+        const assignmentStatus = (item.assignment && item.assignment.mainAdvisor) ? '배정완료' : '미배정';
+
+        return `
         <tr class="hover:bg-gray-50 cursor-pointer"
             onclick="viewProfessorProposalDetail('${item.id}')">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semesterCount}학기</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
                     ${item.degreeType}
                 </span>
             </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span class="px-2 py-1 text-xs rounded ${
+                    studentStatus === '재학' ? 'bg-blue-100 text-blue-800' :
+                    studentStatus === '휴학' ? 'bg-yellow-100 text-yellow-800' :
+                    studentStatus === '수료' ? 'bg-green-100 text-green-800' :
+                    studentStatus === '졸업' ? 'bg-gray-100 text-gray-800' :
+                    'bg-gray-100 text-gray-800'
+                }">
+                    ${studentStatus}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span class="px-2 py-1 text-xs rounded ${assignmentStatus === '배정완료' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                    ${assignmentStatus}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
             <td class="px-6 py-4 text-sm text-gray-900">
                 ${item.assignment && item.assignment.mainAdvisor
                     ? item.assignment.mainAdvisor.name
@@ -388,7 +409,8 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
                     : '-'}
             </td>
         </tr>
-    `).join('');
+        `;
+    }).join('');
 }
 
 // 교수용 검색 기능
