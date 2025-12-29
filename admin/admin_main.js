@@ -3646,107 +3646,99 @@ function renderStageManagementContent() {
     container.innerHTML = `
         <!-- 검색 옵션 -->
         <div class="p-4 border-b bg-gray-50">
-            <div class="space-y-2">
-                <!-- 1줄: 학년도/학기 + 학과 4단계 시작 -->
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학년도/학기</label>
-                        <select id="stage-search-year" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 90px;">
-                            <option value="">전체</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                        </select>
-                        <select id="stage-search-semester" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 90px;">
-                            <option value="">전체</option>
-                            <option value="1">1학기</option>
-                            <option value="2">2학기</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">대학구분</label>
-                        <select id="stage-search-college-type" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
-                            <option value="">전체</option>
-                            <option value="일반대학원">일반대학원</option>
-                            <option value="특수대학원">특수대학원</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">계열/대학원</label>
-                        <select id="stage-search-graduate" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 130px;">
-                            <option value="">전체</option>
-                            <option value="일반대학원">일반대학원</option>
-                            <option value="교육대학원">교육대학원</option>
-                            <option value="산업정보대학원">산업정보대학원</option>
-                        </select>
-                    </div>
+            <div class="grid grid-cols-4 gap-4">
+                <!-- 1행 -->
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학년도/학기</label>
+                    <select id="stage-search-year" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 90px;">
+                        <option value="">전체</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                    </select>
+                    <select id="stage-search-semester" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 90px;">
+                        <option value="">전체</option>
+                        <option value="1">1학기</option>
+                        <option value="2">2학기</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">대학구분</label>
+                    <select id="stage-search-college-type" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
+                        <option value="">전체</option>
+                        <option value="일반대학원">일반대학원</option>
+                        <option value="특수대학원">특수대학원</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">계열/대학원</label>
+                    <select id="stage-search-graduate" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 130px;">
+                        <option value="">전체</option>
+                        <option value="일반대학원">일반대학원</option>
+                        <option value="교육대학원">교육대학원</option>
+                        <option value="산업정보대학원">산업정보대학원</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학부(과)전공</label>
+                    <select id="stage-search-major-category" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
+                        <option value="">전체</option>
+                        <option value="공과대학">공과대학</option>
+                        <option value="사범대학">사범대학</option>
+                        <option value="인문대학">인문대학</option>
+                        <option value="사회과학대학">사회과학대학</option>
+                    </select>
                 </div>
 
-                <!-- 2줄: 학과 4단계 나머지 + 학위과정 + 학적상태 -->
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학부(과)전공</label>
-                        <select id="stage-search-major-category" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
-                            <option value="">전체</option>
-                            <option value="공과대학">공과대학</option>
-                            <option value="사범대학">사범대학</option>
-                            <option value="인문대학">인문대학</option>
-                            <option value="사회과학대학">사회과학대학</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학과/전공</label>
-                        <select id="stage-search-department" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 130px;">
-                            <option value="">전체</option>
-                            ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학위과정</label>
-                        <select id="stage-search-degree" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 100px;">
-                            <option value="">전체</option>
-                            <option value="석사">석사</option>
-                            <option value="박사">박사</option>
-                            <option value="석박통합">석박통합</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학적상태</label>
-                        <select id="stage-search-status" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 100px;">
-                            <option value="">전체</option>
-                            <option value="재학">재학</option>
-                            <option value="휴학">휴학</option>
-                            <option value="수료">수료</option>
-                            <option value="졸업">졸업</option>
-                        </select>
-                    </div>
+                <!-- 2행 -->
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학과/전공</label>
+                    <select id="stage-search-department" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 130px;">
+                        <option value="">전체</option>
+                        ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학위과정</label>
+                    <select id="stage-search-degree" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 100px;">
+                        <option value="">전체</option>
+                        <option value="석사">석사</option>
+                        <option value="박사">박사</option>
+                        <option value="석박통합">석박통합</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학적상태</label>
+                    <select id="stage-search-status" class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 100px;">
+                        <option value="">전체</option>
+                        <option value="재학">재학</option>
+                        <option value="휴학">휴학</option>
+                        <option value="수료">수료</option>
+                        <option value="졸업">졸업</option>
+                    </select>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학번</label>
+                    <input type="text" id="stage-search-student-id" placeholder="학번"
+                           class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
                 </div>
 
-                <!-- 3줄: 텍스트 검색 + 지도교수 + 검색버튼 -->
-                <div class="flex items-center gap-4">
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학번</label>
-                        <input type="text" id="stage-search-student-id" placeholder="학번"
-                               class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">성명</label>
-                        <input type="text" id="stage-search-student-name" placeholder="성명"
-                               class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">지도교수명</label>
-                        <input type="text" id="stage-search-advisor" placeholder="지도교수명"
-                               class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
-                    </div>
-                    <div class="flex items-center gap-2 ml-auto">
-                        <button onclick="searchStageManagement()" class="px-3 py-1 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-xs font-medium">
-                            <i class="fas fa-search mr-1"></i>검색
-                        </button>
-                        <button onclick="resetStageSearch()" class="px-3 py-1 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 text-xs font-medium">
-                            <i class="fas fa-redo mr-1"></i>초기화
-                        </button>
-                    </div>
+                <!-- 3행 -->
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">성명</label>
+                    <input type="text" id="stage-search-student-name" placeholder="성명"
+                           class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap">지도교수명</label>
+                    <input type="text" id="stage-search-advisor" placeholder="지도교수명"
+                           class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
+                </div>
+                <div></div>
+                <div class="flex items-center justify-end">
+                    <button onclick="searchStageManagement()" class="px-3 py-1 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-xs font-medium">
+                        <i class="fas fa-search mr-1"></i>조회
+                    </button>
                 </div>
             </div>
         </div>
@@ -4017,25 +4009,6 @@ function searchStageManagement() {
     renderStageManagementContent();
 
     showNotification(`${filtered.length}명의 학생을 찾았습니다.`, 'success');
-}
-
-// 단계 관리 검색 초기화
-function resetStageSearch() {
-    document.getElementById('stage-search-year').value = '';
-    document.getElementById('stage-search-semester').value = '';
-    document.getElementById('stage-search-college-type').value = '';
-    document.getElementById('stage-search-graduate').value = '';
-    document.getElementById('stage-search-major-category').value = '';
-    document.getElementById('stage-search-department').value = '';
-    document.getElementById('stage-search-degree').value = '';
-    document.getElementById('stage-search-status').value = '';
-    document.getElementById('stage-search-keyword').value = '';
-    document.getElementById('stage-search-advisor').value = '';
-
-    window.filteredStageData = null;
-    renderStageManagementContent();
-
-    showNotification('검색 조건이 초기화되었습니다.', 'success');
 }
 
 // ==============================================
