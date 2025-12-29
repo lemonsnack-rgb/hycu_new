@@ -581,6 +581,38 @@ const mockCommitteeAssignments = [
 // 단계 유형 데이터 (Step Types - 레고 블록)
 // =============================================================================
 
+// 신규: 심사 유형 (Exam Types - 대시보드 집계용)
+const mockExamTypes = [
+    {
+        id: 'EXAM_TYPE_001',
+        code: 'research_proposal',
+        name: '논문 작성 계획서',
+        description: '연구계획서 심사',
+        order: 1
+    },
+    {
+        id: 'EXAM_TYPE_002',
+        code: 'mid_exam',
+        name: '중간논문',
+        description: '중간 단계 논문 심사',
+        order: 2
+    },
+    {
+        id: 'EXAM_TYPE_003',
+        code: 'final_exam',
+        name: '최종논문',
+        description: '최종 학위논문 심사',
+        order: 3
+    },
+    {
+        id: 'EXAM_TYPE_NONE',
+        code: 'none',
+        name: '평가 없음',
+        description: '심사가 필요하지 않은 단계',
+        order: 99
+    }
+];
+
 // 신규: 단계 카테고리 (단순 분류자 - 설정 상속 없음)
 const mockStageCategories = [
     { id: 'CAT_001', name: '연구계획서 제출' },

@@ -5058,96 +5058,131 @@ function renderStageCard(stage, index) {
     // stageTypeId로 지도 단계 유형 찾기 (하위 호환성: stepTypeId, categoryId도 지원)
     const stageTypeId = stage.stageTypeId || stage.stepTypeId || stage.categoryId;
     const stageType = mockStepTypes.find(t => t.id === stageTypeId);
-    const stageTypeName = stageType ? stageType.name : '선택해주세요';
+
+    // 심사 유형
+    const examTypeId = stage.examTypeId || '';
+    const examType = mockExamTypes.find(t => t.id === examTypeId);
 
     const isFirst = index === 0;
     const isLast = index === window.composedStages.length - 1;
 
-    // 평가표 선택 여부에 따라 심사 기간 활성화/비활성화
-    const reviewDisabled = !stage.evaluationTemplateId;
+    // 비활성화 조건
+    const examTypeDisabled = !stageTypeId;  // 지도단계유형 먼저 선택
+    const isExamTypeNone = examTypeId === 'EXAM_TYPE_NONE';
+    const evaluationDisabled = isExamTypeNone;  // 평가없음 선택 시 평가표 비활성화
+    const reviewDisabled = !stage.evaluationTemplateId || isExamTypeNone;  // 평가표 미선택 또는 평가없음 시 심사기간 비활성화
 
     return `
-        <div class="border border-gray-300 rounded-lg p-4 bg-white shadow-sm" data-stage-index="${index}">
+        <div class="border border-gray-300 rounded-lg p-3 bg-white shadow-sm" data-stage-index="${index}">
+            <style>
+                .stage-field-row {
+                    display: grid;
+                    grid-template-columns: 120px 1fr;
+                    gap: 12px;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+                .stage-field-row-dual {
+                    display: grid;
+                    grid-template-columns: 120px 1fr 110px 0.8fr;
+                    gap: 12px;
+                    align-items: center;
+                    margin-bottom: 10px;
+                }
+                .stage-field-label {
+                    font-size: 13px;
+                    font-weight: 500;
+                    color: #374151;
+                    white-space: nowrap;
+                    text-align: right;
+                    padding-right: 8px;
+                }
+                .stage-input {
+                    height: 32px;
+                    padding: 0 10px;
+                    font-size: 13px;
+                    border: 1px solid #D1D5DB;
+                    border-radius: 4px;
+                }
+                .stage-input:focus {
+                    outline: none;
+                    border-color: #3B82F6;
+                    box-shadow: 0 0 0 1px #3B82F6;
+                }
+                .stage-input:disabled {
+                    background-color: #F3F4F6;
+                    color: #9CA3AF;
+                    cursor: not-allowed;
+                }
+                .date-range-input {
+                    display: grid;
+                    grid-template-columns: 1fr auto 1fr;
+                    gap: 8px;
+                    align-items: center;
+                }
+            </style>
             <!-- 카드 헤더 -->
-            <div class="flex items-center justify-between mb-4 pb-3 border-b">
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-lg text-gray-800">단계 ${index + 1}</span>
-                    ${stageType ? `<span class="text-xs px-2 py-1 rounded" style="background-color: ${stageType.requiresDocument ? '#DBEAFE' : '#F3F4F6'}; color: ${stageType.requiresDocument ? '#1E40AF' : '#6B7280'};">
-                        ${stageType.requiresDocument ? '문서' : ''} ${stageType.requiresPresentation ? '발표' : ''}
-                    </span>` : ''}
-                </div>
-                <div class="flex items-center gap-2">
+            <div class="flex items-center justify-between mb-3 pb-2 border-b">
+                <span class="font-bold text-base text-gray-800">단계 ${index + 1}</span>
+                <div class="flex items-center gap-1">
                     <button onclick="deleteStageCard(${index})"
-                            class="text-red-600 hover:text-red-800 text-sm px-2 py-1">
+                            class="text-red-600 hover:text-red-800 text-xs px-2 py-1">
                         삭제
                     </button>
                     <button onclick="moveStageUp(${index})"
                             ${isFirst ? 'disabled' : ''}
-                            class="text-gray-600 hover:text-gray-800 text-sm px-2 py-1 ${isFirst ? 'opacity-30 cursor-not-allowed' : ''}">
+                            class="text-gray-600 hover:text-gray-800 text-xs px-1 ${isFirst ? 'opacity-30 cursor-not-allowed' : ''}">
                         ↑
                     </button>
                     <button onclick="moveStageDown(${index})"
                             ${isLast ? 'disabled' : ''}
-                            class="text-gray-600 hover:text-gray-800 text-sm px-2 py-1 ${isLast ? 'opacity-30 cursor-not-allowed' : ''}">
+                            class="text-gray-600 hover:text-gray-800 text-xs px-1 ${isLast ? 'opacity-30 cursor-not-allowed' : ''}">
                         ↓
                     </button>
                 </div>
             </div>
 
-            <!-- 지도 단계 유형 선택 -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">지도 단계 유형 *</label>
-                <select onchange="updateStageType(${index}, this.value)"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    <option value="">선택해주세요</option>
+            <!-- (1) 단계 이름 -->
+            <div class="stage-field-row">
+                <label class="stage-field-label">단계 이름 <span class="text-red-500">*</span></label>
+                <input type="text"
+                       value="${stage.name || ''}"
+                       onchange="updateStageField(${index}, 'name', this.value)"
+                       placeholder="예: 1차 예비심사"
+                       class="stage-input">
+            </div>
+
+            <!-- (2) 지도 단계 유형 + 심사 유형 -->
+            <div class="stage-field-row-dual">
+                <label class="stage-field-label">지도단계유형 <span class="text-red-500">*</span></label>
+                <select onchange="updateStageType(${index}, this.value)" class="stage-input">
+                    <option value="">선택</option>
                     ${mockStepTypes.map(type => `
                         <option value="${type.id}" ${stageTypeId === type.id ? 'selected' : ''}>
-                            ${type.name} ${type.requiresDocument ? '[문서]' : ''} ${type.requiresPresentation ? '[발표]' : ''}
+                            ${type.name}
                         </option>
                     `).join('')}
                 </select>
-                <p class="mt-1 text-xs text-gray-500">
-                    <i class="fas fa-info-circle"></i>
-                    유형에 설정된 제출 요건(문서/발표)이 자동으로 적용됩니다.
-                </p>
+
+                <label class="stage-field-label">심사유형 <span class="text-red-500">*</span></label>
+                <select onchange="updateStageExamType(${index}, this.value)"
+                        class="stage-input"
+                        ${examTypeDisabled ? 'disabled' : ''}>
+                    <option value="">선택</option>
+                    ${mockExamTypes.map(type => `
+                        <option value="${type.id}" ${examTypeId === type.id ? 'selected' : ''}>
+                            ${type.name}
+                        </option>
+                    `).join('')}
+                </select>
             </div>
 
-            <!-- 단계 이름 -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">단계 이름 *</label>
-                <input type="text"
-                       value="${stage.name}"
-                       onchange="updateStageField(${index}, 'name', this.value)"
-                       placeholder="예: 1차 예비심사"
-                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-            </div>
-
-            <!-- 제출 기간 -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">제출 기간</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs text-gray-500 mb-1 block">시작일</label>
-                        <input type="date"
-                               value="${stage.submissionStartDate}"
-                               onchange="updateStageField(${index}, 'submissionStartDate', this.value)"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 mb-1 block">마감일</label>
-                        <input type="date"
-                               value="${stage.submissionEndDate}"
-                               onchange="updateStageField(${index}, 'submissionEndDate', this.value)"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-                </div>
-            </div>
-
-            <!-- 평가표 선택 -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">평가표</label>
+            <!-- (3) 평가표 -->
+            <div class="stage-field-row">
+                <label class="stage-field-label">평가표</label>
                 <select onchange="updateStageEvaluationTemplate(${index}, this.value)"
-                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        class="stage-input"
+                        ${evaluationDisabled ? 'disabled' : ''}>
                     <option value="">평가 없음</option>
                     ${mockEvaluationTemplates.map(template => `
                         <option value="${template.id}" ${stage.evaluationTemplateId === template.id ? 'selected' : ''}>
@@ -5157,36 +5192,48 @@ function renderStageCard(stage, index) {
                 </select>
             </div>
 
-            <!-- 심사 기간 (평가표 선택 시에만 활성화) -->
-            <div class="mb-4">
-                <label class="block text-sm font-medium text-gray-700 mb-2">심사 기간</label>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="text-xs text-gray-500 mb-1 block">시작일</label>
-                        <input type="date"
-                               value="${stage.reviewStartDate}"
-                               ${reviewDisabled ? 'disabled' : ''}
-                               onchange="updateStageField(${index}, 'reviewStartDate', this.value)"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${reviewDisabled ? 'bg-gray-100 cursor-not-allowed' : ''}">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 mb-1 block">마감일</label>
-                        <input type="date"
-                               value="${stage.reviewEndDate}"
-                               ${reviewDisabled ? 'disabled' : ''}
-                               onchange="updateStageField(${index}, 'reviewEndDate', this.value)"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${reviewDisabled ? 'bg-gray-100 cursor-not-allowed' : ''}">
-                    </div>
+            <!-- (4) 제출 기간 -->
+            <div class="stage-field-row">
+                <label class="stage-field-label">제출기간</label>
+                <div class="date-range-input">
+                    <input type="date"
+                           value="${stage.submissionStartDate || ''}"
+                           onchange="updateStageField(${index}, 'submissionStartDate', this.value)"
+                           class="stage-input">
+                    <span class="text-gray-400 text-sm">~</span>
+                    <input type="date"
+                           value="${stage.submissionEndDate || ''}"
+                           onchange="updateStageField(${index}, 'submissionEndDate', this.value)"
+                           class="stage-input">
                 </div>
             </div>
 
-            <!-- 설명 (선택사항) -->
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">설명 (선택사항)</label>
+            <!-- (5) 심사 기간 -->
+            <div class="stage-field-row">
+                <label class="stage-field-label">심사기간</label>
+                <div class="date-range-input">
+                    <input type="date"
+                           value="${stage.reviewStartDate || ''}"
+                           ${reviewDisabled ? 'disabled' : ''}
+                           onchange="updateStageField(${index}, 'reviewStartDate', this.value)"
+                           class="stage-input">
+                    <span class="text-gray-400 text-sm">~</span>
+                    <input type="date"
+                           value="${stage.reviewEndDate || ''}"
+                           ${reviewDisabled ? 'disabled' : ''}
+                           onchange="updateStageField(${index}, 'reviewEndDate', this.value)"
+                           class="stage-input">
+                </div>
+            </div>
+
+            <!-- (6) 설명 -->
+            <div class="stage-field-row" style="align-items: start;">
+                <label class="stage-field-label" style="margin-top: 6px;">설명</label>
                 <textarea onchange="updateStageField(${index}, 'description', this.value)"
-                          placeholder="단계에 대한 추가 설명"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                          rows="2">${stage.description || ''}</textarea>
+                          placeholder="단계에 대한 추가 설명 (선택)"
+                          class="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+                          rows="2"
+                          style="font-size: 13px; resize: vertical;">${stage.description || ''}</textarea>
             </div>
         </div>
     `;
@@ -5201,6 +5248,7 @@ function addNewStageCard() {
         stageTypeId: '',        // 새로운 필드
         stepTypeId: '',         // 하위 호환성
         categoryId: '',         // 하위 호환성 (deprecated)
+        examTypeId: '',         // 신규: 심사 유형
         name: '',
         requiresDocument: false,  // 유형 선택 시 자동 설정됨
         requiresPresentation: false,  // 유형 선택 시 자동 설정됨
@@ -5299,29 +5347,79 @@ function refreshStageCards() {
     }
 }
 
-// 지도 단계 유형 선택 시 처리
+// 지도 단계 유형 선택 시 처리 (심사 유형 초기화 추가)
 function updateStageType(index, typeId) {
     if (!window.composedStages || !window.composedStages[index]) return;
+
+    const stage = window.composedStages[index];
+    const oldStageTypeId = stage.stageTypeId;
 
     const stageType = mockStepTypes.find(t => t.id === typeId);
     if (stageType) {
         // 유형 ID 저장 (하위 호환성 위해 모두 저장)
-        window.composedStages[index].stageTypeId = typeId;
-        window.composedStages[index].stepTypeId = typeId;
-        window.composedStages[index].categoryId = typeId;
+        stage.stageTypeId = typeId;
+        stage.stepTypeId = typeId;
+        stage.categoryId = typeId;
 
         // 제출 요건 자동 설정
-        window.composedStages[index].requiresDocument = stageType.requiresDocument;
-        window.composedStages[index].requiresPresentation = stageType.requiresPresentation;
+        stage.requiresDocument = stageType.requiresDocument;
+        stage.requiresPresentation = stageType.requiresPresentation;
 
-        console.log(`✅ 단계 ${index + 1}: 유형 "${stageType.name}" 선택 (문서: ${stageType.requiresDocument}, 발표: ${stageType.requiresPresentation})`);
+        // 지도 단계 유형 변경 시 심사 유형 초기화 (선택 순서 강제)
+        if (oldStageTypeId !== typeId) {
+            stage.examTypeId = '';
+        }
+
+        console.log(`✅ 단계 ${index + 1}: 유형 "${stageType.name}" 선택`);
     } else {
         // 선택 해제
-        window.composedStages[index].stageTypeId = '';
-        window.composedStages[index].stepTypeId = '';
-        window.composedStages[index].categoryId = '';
-        window.composedStages[index].requiresDocument = false;
-        window.composedStages[index].requiresPresentation = false;
+        stage.stageTypeId = '';
+        stage.stepTypeId = '';
+        stage.categoryId = '';
+        stage.examTypeId = '';  // 심사 유형도 초기화
+        stage.requiresDocument = false;
+        stage.requiresPresentation = false;
+    }
+
+    refreshStageCards();
+}
+
+// 심사 유형 선택 시 처리 (신규)
+function updateStageExamType(index, examTypeId) {
+    if (!window.composedStages || !window.composedStages[index]) return;
+
+    const stage = window.composedStages[index];
+    stage.examTypeId = examTypeId;
+
+    // "평가 없음" 선택 시 평가표 및 심사기간 초기화
+    if (examTypeId === 'EXAM_TYPE_NONE') {
+        stage.evaluationTemplateId = '';
+        stage.reviewStartDate = '';
+        stage.reviewEndDate = '';
+        console.log(`⚠️  단계 ${index + 1}: 평가 없음 선택 - 평가표 및 심사기간 초기화`);
+    }
+
+    refreshStageCards();
+}
+
+// 평가표 업데이트 확장 (심사 유형에 따른 제약 추가)
+function updateStageEvaluationTemplate(index, templateId) {
+    if (!window.composedStages || !window.composedStages[index]) return;
+
+    const stage = window.composedStages[index];
+
+    // 평가 없음 선택 시 평가표 선택 불가 (추가 안전장치)
+    if (stage.examTypeId === 'EXAM_TYPE_NONE' && templateId) {
+        console.warn('⚠️  평가 없음 선택 시 평가표를 선택할 수 없습니다.');
+        return;
+    }
+
+    stage.evaluationTemplateId = templateId;
+
+    // 평가표가 없으면 심사 기간 초기화
+    if (!templateId) {
+        stage.reviewStartDate = '';
+        stage.reviewEndDate = '';
     }
 
     refreshStageCards();
@@ -5336,6 +5434,7 @@ window.moveStageUp = moveStageUp;
 window.moveStageDown = moveStageDown;
 window.updateStageField = updateStageField;
 window.updateStageType = updateStageType;
+window.updateStageExamType = updateStageExamType;  // 신규 추가
 window.updateStageEvaluationTemplate = updateStageEvaluationTemplate;
 window.refreshStageCards = refreshStageCards;
 

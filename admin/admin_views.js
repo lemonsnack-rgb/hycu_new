@@ -3084,6 +3084,7 @@ const views = {
             stageTypeId: '',  // 신규: 단계 유형 ID
             stepTypeId: '',   // 하위 호환
             categoryId: '',   // 하위 호환 (deprecated)
+            examTypeId: '',   // 신규: 심사 유형 ID
             name: '',
             // requiresDocument, requiresPresentation는 stageType에서 자동 상속되므로 제거
             submissionStartDate: '',
