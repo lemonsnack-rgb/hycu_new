@@ -354,10 +354,16 @@ function searchProfessorAdvisorAssignment() {
 
     const year = document.getElementById('prof-advisor-search-year')?.value || '';
     const semester = document.getElementById('prof-advisor-search-semester')?.value || '';
-    const semesterCount = document.getElementById('prof-advisor-search-semester-count')?.value || '';
+    const collegeType = document.getElementById('prof-advisor-search-college-type')?.value || '';
+    const graduate = document.getElementById('prof-advisor-search-graduate')?.value || '';
+    const majorCategory = document.getElementById('prof-advisor-search-major-category')?.value || '';
     const department = document.getElementById('prof-advisor-search-department')?.value || '';
+    const degree = document.getElementById('prof-advisor-search-degree')?.value || '';
+    const status = document.getElementById('prof-advisor-search-status')?.value || '';
+    const assignment = document.getElementById('prof-advisor-search-assignment')?.value || '';
     const studentId = document.getElementById('prof-advisor-search-student-id')?.value || '';
     const studentName = document.getElementById('prof-advisor-search-student-name')?.value || '';
+    const advisorName = document.getElementById('prof-advisor-search-advisor')?.value || '';
 
     // 현재 교수가 지도하는 학생의 연구계획서
     const myAssignments = mockAdvisorAssignments.filter(a =>
@@ -366,8 +372,8 @@ function searchProfessorAdvisorAssignment() {
     );
 
     const proposalsWithAssignment = mockResearchProposals.map(proposal => {
-        const assignment = myAssignments.find(a => a.studentId === proposal.studentId);
-        if (!assignment) return null;
+        const assignmentData = myAssignments.find(a => a.studentId === proposal.studentId);
+        if (!assignmentData) return null;
 
         const student = mockStudents.find(s => s.id === proposal.studentId);
         if (!student) return null;
@@ -376,34 +382,32 @@ function searchProfessorAdvisorAssignment() {
             ...proposal,
             academicYear: student.academicYear,
             semesterCount: student.semesterCount,
-            assignment: assignment
+            assignment: assignmentData,
+            student: student
         };
     }).filter(item => item !== null);
 
     const filteredData = proposalsWithAssignment.filter(item => {
         if (year && item.academicYear !== year) return false;
-        if (semesterCount && item.semesterCount.toString() !== semesterCount) return false;
+        if (semester && item.student?.currentSemester !== parseInt(semester)) return false;
         if (department && item.department !== department) return false;
+        if (degree && item.degreeType !== degree) return false;
+        if (status && item.student?.status !== status) return false;
+        if (assignment) {
+            const isAssigned = item.assignment?.mainAdvisor ? '배정완료' : '미배정';
+            if (assignment !== isAssigned) return false;
+        }
         if (studentId && !item.studentNumber.includes(studentId)) return false;
         if (studentName && !item.studentName.includes(studentName)) return false;
+        if (advisorName) {
+            const mainAdvisorName = item.assignment?.mainAdvisor?.name || '';
+            if (!mainAdvisorName.includes(advisorName)) return false;
+        }
         return true;
     });
 
     renderProfessorAdvisorAssignmentTable(filteredData);
     alert(`검색 결과: ${filteredData.length}건`);
-}
-
-// 교수용 검색 초기화
-function resetProfessorAdvisorSearch() {
-    document.querySelectorAll('input[id^="prof-advisor-search"], select[id^="prof-advisor-search"]').forEach(field => {
-        if (field.tagName === 'SELECT') {
-            field.selectedIndex = 0;
-        } else {
-            field.value = '';
-        }
-    });
-    renderProfessorAdvisorAssignmentTable();
-    alert('검색 조건이 초기화되었습니다.');
 }
 
 // 목록으로 돌아가기 (HTML 구조 복원)
@@ -420,80 +424,106 @@ function returnToAdvisorAssignmentList() {
                 <p class="text-sm text-gray-600 mt-1">나의 지도 학생 목록을 조회합니다.</p>
             </div>
 
-            <!-- 검색 옵션 (관리자 화면과 동일) -->
-            <div class="p-6 border-b">
-                <div class="search-container">
-                    <div class="search-grid">
-                        <!-- 1. 학년도 -->
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학년도
-                            </label>
-                            <select id="prof-advisor-search-year" class="search-select">
-                                <option value="">전체</option>
-                                <option value="2025">2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
-                        </div>
-
-                        <!-- 2. 학기 -->
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학기
-                            </label>
-                            <select id="prof-advisor-search-semester" class="search-select">
-                                <option value="">전체</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
-                        </div>
-
-                        <!-- 3. 학기차 -->
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학기차
-                            </label>
-                            <input type="text" id="prof-advisor-search-semester-count" placeholder="학기차 입력"
-                                   class="search-input">
-                        </div>
-
-                        <!-- 4. 학과 -->
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학과
-                            </label>
-                            <select id="prof-advisor-search-department" class="search-select">
-                                <option value="">전체</option>
-                            </select>
-                        </div>
-
-                        <!-- 5. 학번 -->
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학번
-                            </label>
-                            <input type="text" id="prof-advisor-search-student-id" placeholder="학번 입력"
-                                   class="search-input">
-                        </div>
-
-                        <!-- 6. 이름 -->
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                이름
-                            </label>
-                            <input type="text" id="prof-advisor-search-student-name" placeholder="이름 입력"
-                                   class="search-input">
-                        </div>
+            <!-- 검색 옵션 -->
+            <div class="p-4 border-b bg-gray-50">
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- 1행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
+                        <select id="prof-advisor-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <select id="prof-advisor-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="1">1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                        <select id="prof-advisor-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="특수대학원">특수대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                        <select id="prof-advisor-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="교육대학원">교육대학원</option>
+                            <option value="산업정보대학원">산업정보대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                        <select id="prof-advisor-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="공과대학">공과대학</option>
+                            <option value="사범대학">사범대학</option>
+                            <option value="인문대학">인문대학</option>
+                            <option value="사회과학대학">사회과학대학</option>
+                        </select>
                     </div>
 
-                    <!-- 검색/초기화 버튼 -->
-                    <div class="search-buttons">
-                        <button onclick="searchProfessorAdvisorAssignment()" class="search-btn search-btn-primary">
-                            <i class="fas fa-search"></i>검색
-                        </button>
-                        <button onclick="resetProfessorAdvisorSearch()" class="search-btn search-btn-secondary">
-                            <i class="fas fa-redo"></i>초기화
+                    <!-- 2행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                        <select id="prof-advisor-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                        <select id="prof-advisor-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="석사">석사</option>
+                            <option value="박사">박사</option>
+                            <option value="석박통합">석박통합</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                        <select id="prof-advisor-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="재학">재학</option>
+                            <option value="휴학">휴학</option>
+                            <option value="수료">수료</option>
+                            <option value="졸업">졸업</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">배정상태</label>
+                        <select id="prof-advisor-search-assignment" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                            <option value="">전체</option>
+                            <option value="배정완료">배정완료</option>
+                            <option value="미배정">미배정</option>
+                        </select>
+                    </div>
+
+                    <!-- 3행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                        <input type="text" id="prof-advisor-search-student-id" placeholder="학번"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                        <input type="text" id="prof-advisor-search-student-name" placeholder="성명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                        <input type="text" id="prof-advisor-search-advisor" placeholder="지도교수명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    </div>
+                    <div class="flex items-center justify-end">
+                        <button onclick="searchProfessorAdvisorAssignment()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 27px;">
+                            <i class="fas fa-search mr-1"></i>조회
                         </button>
                     </div>
                 </div>
