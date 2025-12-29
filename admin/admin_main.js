@@ -3775,6 +3775,11 @@ function renderStageManagementContent() {
                 <table class="min-w-full divide-y divide-gray-200 table-fixed">
                     <thead class="bg-gray-50">
                         <tr>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 50px;">
+                                <input type="checkbox"
+                                       onchange="toggleAllStageSelection(this.checked)"
+                                       class="rounded border-gray-300 text-primary focus:ring-primary">
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 50px;">No</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학년도</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학기</th>
@@ -3826,6 +3831,14 @@ function renderStudentTableRows(data) {
             <tr class="hover:bg-gray-50 transition-colors"
                 data-student-id="${item.studentId}"
                 data-workflow-id="${item.thesisStageId}">
+                <!-- 선택 체크박스 -->
+                <td class="px-6 py-4 whitespace-nowrap text-center">
+                    <input type="checkbox"
+                           class="stage-checkbox rounded border-gray-300 text-primary focus:ring-primary"
+                           value="${item.studentId}"
+                           onchange="updateBulkStageChangeButton()">
+                </td>
+
                 <!-- No -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     ${index + 1}

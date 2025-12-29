@@ -39,7 +39,7 @@
 }
 
 .min-w-full th {
-    padding: 16px 12px;
+    padding: 12px 12px;
     text-align: center;
     font-weight: 700;
     font-size: 14px;
@@ -47,7 +47,7 @@
 }
 
 .min-w-full td {
-    padding: 16px 12px;
+    padding: 12px 12px;
     text-align: center;
     border-bottom: 1px solid #e5e7eb;
     font-size: 14px;
@@ -323,7 +323,7 @@
 @media (max-width: 768px) {
     .min-w-full th,
     .min-w-full td {
-        padding: 12px 8px;
+        padding: 10px 8px;
         font-size: 13px;
     }
     

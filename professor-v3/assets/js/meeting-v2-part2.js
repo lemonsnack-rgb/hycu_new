@@ -779,10 +779,10 @@ function openCreateGroupMeetingModal() {
                                     <table class="text-sm" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                                         <thead class="bg-gray-50 border-b sticky top-0">
                                             <tr>
-                                                <th style="width: 12%; padding: 8px 4px; text-align: center;"></th>
-                                                <th style="width: 23%; padding: 8px 4px; text-align: center;">학번</th>
-                                                <th style="width: 45%; padding: 8px 4px; text-align: left;">학과</th>
-                                                <th style="width: 20%; padding: 8px 4px; text-align: center;">이름</th>
+                                                <th style="width: 12%; padding: 12px 12px; text-align: center;"></th>
+                                                <th style="width: 23%; padding: 12px 12px; text-align: center;">학번</th>
+                                                <th style="width: 45%; padding: 12px 12px; text-align: left;">학과</th>
+                                                <th style="width: 20%; padding: 12px 12px; text-align: center;">이름</th>
                                             </tr>
                                         </thead>
                                         <tbody class="divide-y">
@@ -790,13 +790,13 @@ function openCreateGroupMeetingModal() {
                                                 <tr class="hover:bg-white cursor-pointer student-row" data-student-id="${s.id}"
                                                     data-name="${s.name}" data-number="${s.studentNumber}" data-major="${s.major || ''}" data-semester="${s.semester || ''}"
                                                     onclick="toggleStudentCheckbox(event, '${s.id}')">
-                                                    <td style="width: 12%; padding: 8px 4px; text-align: center;" onclick="event.stopPropagation()">
+                                                    <td style="width: 12%; padding: 12px 12px; text-align: center;" onclick="event.stopPropagation()">
                                                         <input type="checkbox" name="students" value="${s.id}"
                                                                onchange="updateSelectedCount()" />
                                                     </td>
-                                                    <td style="width: 23%; padding: 8px 4px; text-align: center;">${s.studentNumber}</td>
-                                                    <td style="width: 45%; padding: 8px 4px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${s.major || '-'}">${s.major || '-'}</td>
-                                                    <td style="width: 20%; padding: 8px 4px; text-align: center; font-weight: 600;">${s.name}</td>
+                                                    <td style="width: 23%; padding: 12px 12px; text-align: center;">${s.studentNumber}</td>
+                                                    <td style="width: 45%; padding: 12px 12px; text-align: left; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${s.major || '-'}">${s.major || '-'}</td>
+                                                    <td style="width: 20%; padding: 12px 12px; text-align: center; font-weight: 600;">${s.name}</td>
                                                 </tr>
                                             `).join('')}
                                         </tbody>

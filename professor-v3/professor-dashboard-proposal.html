@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="assets/css/table-standard.css">
 
     <!-- Layout System v3 (NEW) - Crimson Layout -->
-    <link rel="stylesheet" href="assets/css/layout-v3.css">
+    <link rel="stylesheet" href="assets/css/layout-v3.css?v=20241229001">
 
     <!-- 기존 기능 유지를 위한 CSS (특수 기능용) -->
     <link rel="stylesheet" href="assets/css/style.css">
@@ -45,6 +45,73 @@
             --primary: #6A0028 !important;
             --primary-dark: #4A001C !important;
             --primary-light: #8A0034 !important;
+        }
+
+        /* 사이드바 검정 배경 + Active만 크림슨 */
+        .layout-v3-sidebar {
+            background: #1A1A1A !important;
+            border-right: 1px solid #333333 !important;
+        }
+
+        .layout-v3-sidebar-header {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e5e7eb !important;
+        }
+
+        .layout-v3-sidebar-logo {
+            background: #6A0028 !important;
+            color: #ffffff !important;
+        }
+
+        .layout-v3-sidebar-title {
+            color: #1A1A1A !important;
+        }
+
+        .layout-v3-sidebar-toggle {
+            background: #6A0028 !important;
+            color: #ffffff !important;
+        }
+
+        .layout-v3-sidebar-toggle:hover {
+            background: #8A0034 !important;
+        }
+
+        .layout-v3-nav-item {
+            display: flex !important;
+            align-items: center !important;
+            gap: 10px !important;
+            padding: 12px 16px !important;
+            color: rgba(255, 255, 255, 0.8) !important;
+            font-size: 14px !important;
+        }
+
+        .layout-v3-nav-item:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+        }
+
+        .layout-v3-nav-item.active {
+            color: #ffffff !important;
+            background: #6A0028 !important;
+        }
+
+        .layout-v3-nav-item svg {
+            width: 18px !important;
+            height: 18px !important;
+            flex-shrink: 0 !important;
+        }
+
+        .layout-v3-sidebar-footer {
+            border-top: 1px solid #333333 !important;
+        }
+
+        .layout-v3-sidebar-logout {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
+        .layout-v3-sidebar-logout:hover {
+            color: #ffffff !important;
+            background: rgba(255, 255, 255, 0.05) !important;
         }
 
         /* Tailwind Blue → Crimson 전체 오버라이드 */
@@ -120,15 +187,91 @@
         .text-\[\#009DE8\] { color: #6A0028 !important; }
         .border-\[\#009DE8\] { border-color: #6A0028 !important; }
 
-        /* 사이드바 active 상태 Crimson 적용 */
+        /* 사이드바 링크 - Active만 크림슨 */
+        .sidebar-link {
+            color: rgba(255, 255, 255, 0.8) !important;
+        }
+
         .sidebar-link.active {
-            background-color: #FCE4EC !important;
-            color: #6A0028 !important;
+            background-color: #6A0028 !important;
+            color: #ffffff !important;
         }
 
         .sidebar-link:hover {
-            background-color: #FCE4EC !important;
-            color: #6A0028 !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: #ffffff !important;
+        }
+
+        .sidebar-sublink {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+
+        .sidebar-sublink.active {
+            background-color: #6A0028 !important;
+            color: #ffffff !important;
+        }
+
+        .sidebar-sublink:hover {
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            color: #ffffff !important;
+        }
+
+        /* 테이블 헤더 높이 통일 */
+        .table-header {
+            height: 60px !important;
+            padding: 12px 20px !important;
+            flex-wrap: nowrap !important;
+        }
+
+        /* 테이블 행 높이 통일 */
+        table th,
+        table td,
+        .table-scroll th,
+        .table-scroll td,
+        .min-w-full th,
+        .min-w-full td {
+            padding: 12px 12px !important;
+        }
+
+        /* Tailwind padding 클래스 오버라이드 */
+        table th.px-6,
+        table td.px-6 {
+            padding-left: 12px !important;
+            padding-right: 12px !important;
+        }
+
+        table th.py-3,
+        table td.py-3,
+        table th.py-4,
+        table td.py-4 {
+            padding-top: 12px !important;
+            padding-bottom: 12px !important;
+        }
+
+        /* 모바일 테이블 행 높이 */
+        @media (max-width: 768px) {
+            table th,
+            table td,
+            .table-scroll th,
+            .table-scroll td,
+            .min-w-full th,
+            .min-w-full td {
+                padding: 10px 8px !important;
+            }
+
+            table th.px-6,
+            table td.px-6 {
+                padding-left: 8px !important;
+                padding-right: 8px !important;
+            }
+
+            table th.py-3,
+            table td.py-3,
+            table th.py-4,
+            table td.py-4 {
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
         }
 
         /* 버튼 클릭 가능하도록 보장 */
@@ -247,110 +390,95 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                               d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    <span class="ml-4">대시보드</span>
+                    <span>대시보드</span>
                 </a>
 
                 <!-- 논문 안내 (1depth) -->
                 <div class="mt-2">
-                    <button onclick="toggleSubmenu('guidance-info')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <span class="ml-4">논문 안내</span>
-                        </div>
-                        <svg class="w-4 h-4 transition-transform" id="guidance-info-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    <div class="layout-v3-nav-item" style="cursor: default;">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
-                    </button>
-                    <!-- 2depth 메뉴 -->
-                    <div id="guidance-info-submenu" class="pl-6 mt-1 space-y-1">
+                        <span>논문 안내</span>
+                    </div>
+                    <!-- 2depth 메뉴 - 항상 펼침 -->
+                    <div id="guidance-info-submenu" class="pl-12 mt-1 space-y-1">
                         <a href="#" onclick="showScreen('notice'); return false;" data-screen="notice"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">공지사항</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>공지사항</span>
                         </a>
                         <a href="#" onclick="showScreen('board'); return false;" data-screen="board"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">자료실</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>자료실</span>
                         </a>
                         <a href="#" onclick="showScreen('ethics'); return false;" data-screen="ethics"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">연구윤리</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>연구윤리</span>
                         </a>
                         <a href="#" onclick="showScreen('schedule'); return false;" data-screen="schedule"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">논문일정</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문일정</span>
                         </a>
                         <a href="#" onclick="showScreen('process'); return false;" data-screen="process"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">논문지도절차</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문지도절차</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- 논문지도 (1depth) -->
                 <div class="mt-2">
-                    <button onclick="toggleSubmenu('thesis-guidance')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                            </svg>
-                            <span class="ml-4">논문지도</span>
-                        </div>
-                        <svg class="w-4 h-4 transition-transform" id="thesis-guidance-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    <div class="layout-v3-nav-item" style="cursor: default;">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                    </button>
-                    <!-- 2depth 메뉴 -->
-                    <div id="thesis-guidance-submenu" class="pl-6 mt-1 space-y-1">
+                        <span>논문지도</span>
+                    </div>
+                    <!-- 2depth 메뉴 - 항상 펼침 -->
+                    <div id="thesis-guidance-submenu" class="pl-12 mt-1 space-y-1">
                         <a href="#" onclick="showScreen('advisor-assignment'); return false;" data-screen="advisor-assignment"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">지도교수 배정</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>지도교수 배정</span>
                         </a>
                         <a href="#" onclick="showScreen('guidance'); return false;" data-screen="guidance"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">주차별 논문지도 현황</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>주차별 논문지도 현황</span>
                         </a>
                         <a href="#" onclick="showScreen('feedback'); return false;" data-screen="feedback"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">논문 지도 현황</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문 지도 현황</span>
                         </a>
                         <a href="#" onclick="showScreen('meeting'); return false;" data-screen="meeting"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">실시간 지도 예약</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>실시간 지도 예약</span>
                         </a>
                     </div>
                 </div>
 
                 <!-- 논문심사 (1depth) -->
                 <div class="mt-2">
-                    <button onclick="toggleSubmenu('thesis-review')" class="sidebar-link flex items-center justify-between w-full p-3 rounded-lg text-gray-700 transition-colors duration-200">
-                        <div class="flex items-center">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
-                            </svg>
-                            <span class="ml-4">논문 심사</span>
-                        </div>
-                        <svg class="w-4 h-4 transition-transform" id="thesis-review-arrow" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    <div class="layout-v3-nav-item" style="cursor: default;">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
                         </svg>
-                    </button>
-                    <!-- 2depth 메뉴 -->
-                    <div id="thesis-review-submenu" class="pl-6 mt-1 space-y-1">
+                        <span>논문 심사</span>
+                    </div>
+                    <!-- 2depth 메뉴 - 항상 펼침 -->
+                    <div id="thesis-review-submenu" class="pl-12 mt-1 space-y-1">
                         <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4 sidebar-text">심사 일정 관리</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span class="sidebar-text">심사 일정 관리</span>
                         </a>
                         <a href="#" onclick="showScreen('review'); return false;" data-screen="review"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">학위 논문 심사</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>학위 논문 심사</span>
                         </a>
                         <a href="#" onclick="showScreen('journal-review'); return false;" data-screen="journal-review"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-100 transition-colors duration-200">
-                            <span class="ml-4">학술지 논문 심사</span>
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>학술지 논문 심사</span>
                         </a>
                     </div>
                 </div>
@@ -1197,21 +1325,17 @@ document.addEventListener('DOMContentLoaded', function() {
     sublinks.forEach(link => {
         link.addEventListener('click', function() {
             // 모든 서브링크의 active 제거
-            sublinks.forEach(l => l.classList.remove('bg-blue-50', 'text-blue-600'));
+            sublinks.forEach(l => l.classList.remove('active'));
             // 클릭된 링크에 active 추가
-            this.classList.add('bg-blue-50', 'text-blue-600');
+            this.classList.add('active');
         });
     });
 });
 </script>
 
-<!-- 시안용 CSS 추가 -->
+<!-- 시안용 CSS 제거 - layout-v3.css에서 관리 -->
 <style>
-.sidebar-sublink.active,
-.sidebar-sublink:hover {
-    background-color: #eff6ff;
-    color: #2563eb;
-}
+/* 사이드바 스타일은 layout-v3.css에서 관리 */
 
 /* 버튼 형태의 단계 선택 스타일 */
 .review-stage-btn,

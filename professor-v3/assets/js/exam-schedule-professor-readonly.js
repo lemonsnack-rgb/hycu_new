@@ -251,7 +251,7 @@ function renderExamScheduleTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="10" style="text-align: center; padding: 32px;">
+                <td colspan="10" style="text-align: center; padding: 24px 12px;">
                     배정된 심사 일정이 없습니다.
                 </td>
             </tr>

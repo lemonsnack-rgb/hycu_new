@@ -510,13 +510,14 @@ textarea.form-control {
 }
 
 .table-header {
-    padding: 16px 20px;
+    padding: 12px 20px;
     border-bottom: 1px solid var(--color-border, #E5E7EB);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 12px;
+    height: 60px;
 }
 
 .table-header-left {
@@ -559,7 +560,7 @@ textarea.form-control {
 }
 
 .table-scroll th {
-    padding: 16px 12px;
+    padding: 12px 12px;
     text-align: center;
     font-size: 14px;
     font-weight: var(--font-weight-bold, 700);
@@ -568,7 +569,7 @@ textarea.form-control {
 }
 
 .table-scroll td {
-    padding: 16px 12px;
+    padding: 12px 12px;
     text-align: center;
     border-bottom: 1px solid var(--color-border, #E5E7EB);
     font-size: 14px;

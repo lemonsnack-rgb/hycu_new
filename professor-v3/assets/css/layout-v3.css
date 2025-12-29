@@ -117,8 +117,8 @@ body.layout-v3 {
 .layout-v3-sidebar {
     width: var(--sidebar-width);
     min-width: var(--sidebar-width);
-    background: #ffffff;
-    border-right: 1px solid var(--color-border);
+    background: #6A0028;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     position: fixed;
@@ -141,7 +141,7 @@ body.layout-v3 {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
 }
 
@@ -156,12 +156,12 @@ body.layout-v3 {
     width: 32px;
     height: 32px;
     flex-shrink: 0;
-    background: var(--color-primary);
+    background: #ffffff;
     border-radius: var(--border-radius-sm);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: white;
+    color: #6A0028;
     font-size: 14px;
     font-weight: var(--font-weight-bold);
 }
@@ -169,7 +169,7 @@ body.layout-v3 {
 .layout-v3-sidebar-title {
     font-size: 15px;
     font-weight: var(--font-weight-bold);
-    color: var(--color-text-primary);
+    color: #ffffff;
     white-space: nowrap;
 }
 
@@ -178,20 +178,20 @@ body.layout-v3 {
     width: 28px;
     height: 28px;
     border-radius: var(--border-radius-full);
-    background: var(--color-primary);
+    background: #ffffff;
     border: none;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(106, 0, 40, 0.3);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     transition: all var(--transition-normal);
     flex-shrink: 0;
-    color: white;
+    color: #6A0028;
 }
 
 .layout-v3-sidebar-toggle:hover {
-    background: var(--color-primary-light);
+    background: #f5f5f5;
     transform: scale(1.05);
 }
 
@@ -238,40 +238,40 @@ body.layout-v3 {
     padding: 10px 16px;
     font-size: 14px;
     font-weight: var(--font-weight-semibold);
-    color: var(--color-text-primary);
+    color: rgba(255, 255, 255, 0.5);
 }
 
 .layout-v3-nav-section-title .icon {
     width: 18px;
     height: 18px;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.4);
 }
 
 .layout-v3-nav-submenu {
     margin-left: 44px;
-    border-left: 2px solid var(--color-border);
+    border-left: 2px solid rgba(255, 255, 255, 0.2);
 }
 
 .layout-v3-nav-submenu-item {
     display: block;
     padding: 10px 16px;
     font-size: 14px;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.6);
     text-decoration: none;
     transition: all var(--transition-fast);
     cursor: pointer;
 }
 
 .layout-v3-nav-submenu-item:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-tint);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .layout-v3-nav-submenu-item.active {
-    color: var(--color-primary);
+    color: #ffffff;
     font-weight: var(--font-weight-semibold);
-    background: var(--color-primary-tint);
-    border-left: 2px solid var(--color-primary);
+    background: #8A0034;
+    border-left: 2px solid #ffffff;
     margin-left: -2px;
 }
 
@@ -282,21 +282,21 @@ body.layout-v3 {
     padding: 12px 16px;
     font-size: 14px;
     font-weight: var(--font-weight-medium);
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.7);
     text-decoration: none;
     transition: all var(--transition-fast);
     cursor: pointer;
 }
 
 .layout-v3-nav-item:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-tint);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .layout-v3-nav-item.active {
-    color: var(--color-primary);
+    color: #ffffff;
     font-weight: var(--font-weight-semibold);
-    background: var(--color-primary-tint);
+    background: #8A0034;
 }
 
 .layout-v3-nav-item .icon {
@@ -307,7 +307,7 @@ body.layout-v3 {
 /* 사이드바 하단 */
 .layout-v3-sidebar-footer {
     padding: 16px;
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
 }
 
@@ -316,7 +316,7 @@ body.layout-v3 {
     align-items: center;
     gap: 8px;
     font-size: 14px;
-    color: var(--color-text-secondary);
+    color: rgba(255, 255, 255, 0.7);
     cursor: pointer;
     padding: 8px;
     border-radius: var(--border-radius-sm);
@@ -327,8 +327,8 @@ body.layout-v3 {
 }
 
 .layout-v3-sidebar-logout:hover {
-    color: var(--color-primary);
-    background: var(--color-primary-tint);
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .layout-v3-sidebar-logout .icon {

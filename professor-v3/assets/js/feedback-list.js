@@ -65,7 +65,7 @@ function renderFeedbackList() {
                         <tbody id="feedback-list-body">
                             ${filteredRequests.length > 0
                                 ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                                : '<tr><td colspan="12" style="text-align: center; padding: 48px;">검색 결과가 없습니다</td></tr>'
+                                : '<tr><td colspan="12" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
                             }
                         </tbody>
                     </table>

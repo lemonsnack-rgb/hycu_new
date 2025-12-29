@@ -89,7 +89,7 @@ function renderBoardList() {
                         <tbody>
                             ${posts.length === 0 ? `
                                 <tr>
-                                    <td colspan="5" style="text-align: center; padding: 32px;">
+                                    <td colspan="5" style="text-align: center; padding: 24px 12px;">
                                         게시글이 없습니다.
                                     </td>
                                 </tr>
