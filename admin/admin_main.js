@@ -3650,13 +3650,13 @@ function renderStageManagementContent() {
                 <!-- 1행 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
-                    <select id="stage-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
                     </select>
-                    <select id="stage-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="1">1학기</option>
                         <option value="2">2학기</option>
@@ -3664,7 +3664,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
-                    <select id="stage-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="일반대학원">일반대학원</option>
                         <option value="특수대학원">특수대학원</option>
@@ -3672,7 +3672,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
-                    <select id="stage-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="일반대학원">일반대학원</option>
                         <option value="교육대학원">교육대학원</option>
@@ -3681,7 +3681,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
-                    <select id="stage-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="공과대학">공과대학</option>
                         <option value="사범대학">사범대학</option>
@@ -3693,14 +3693,14 @@ function renderStageManagementContent() {
                 <!-- 2행 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
-                    <select id="stage-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
                     </select>
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
-                    <select id="stage-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="석사">석사</option>
                         <option value="박사">박사</option>
@@ -3709,7 +3709,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
-                    <select id="stage-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                    <select id="stage-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                         <option value="">전체</option>
                         <option value="재학">재학</option>
                         <option value="휴학">휴학</option>
@@ -3720,23 +3720,23 @@ function renderStageManagementContent() {
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
                     <input type="text" id="stage-search-student-id" placeholder="학번"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                 </div>
 
                 <!-- 3행 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
                     <input type="text" id="stage-search-student-name" placeholder="성명"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
                     <input type="text" id="stage-search-advisor" placeholder="지도교수명"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 26px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
                 </div>
                 <div></div>
                 <div class="flex items-center justify-end">
-                    <button onclick="searchStageManagement()" class="px-3 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-xs font-medium" style="height: 26px;">
+                    <button onclick="searchStageManagement()" class="px-3 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-xs font-medium" style="height: 27px;">
                         <i class="fas fa-search mr-1"></i>조회
                     </button>
                 </div>
