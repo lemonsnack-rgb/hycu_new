@@ -729,6 +729,92 @@ function searchNoticesProfessor() {
     alert('검색 기능은 추후 구현 예정입니다.');
 }
 
+// 주차별 논문지도 현황 검색
+function searchWeeklyGuidance() {
+    const year = document.getElementById('guidance-search-year')?.value || '';
+    const semester = document.getElementById('guidance-search-semester')?.value || '';
+    const collegeType = document.getElementById('guidance-search-college-type')?.value || '';
+    const graduate = document.getElementById('guidance-search-graduate')?.value || '';
+    const majorCategory = document.getElementById('guidance-search-major-category')?.value || '';
+    const department = document.getElementById('guidance-search-department')?.value || '';
+    const degree = document.getElementById('guidance-search-degree')?.value || '';
+    const status = document.getElementById('guidance-search-status')?.value || '';
+    const studentId = document.getElementById('guidance-search-student-id')?.value || '';
+    const studentName = document.getElementById('guidance-search-student-name')?.value || '';
+    const advisorName = document.getElementById('guidance-search-advisor')?.value || '';
+    const week = document.getElementById('guidance-search-week')?.value || '';
+
+    // TODO: 실제 데이터로 필터링 (현재는 빈 배열)
+    const filteredData = [];
+
+    renderWeeklyGuidanceTable(filteredData);
+    alert(`검색 결과: ${filteredData.length}건`);
+}
+
+// 주차별 논문지도 현황 테이블 렌더링
+function renderWeeklyGuidanceTable(data = []) {
+    const tableBody = document.getElementById('guidance-list');
+    const noDataDiv = document.getElementById('guidance-no-data');
+    const countElement = document.getElementById('guidance-count');
+
+    if (!tableBody || !noDataDiv) {
+        console.warn('필요한 DOM 요소를 찾을 수 없습니다.');
+        return;
+    }
+
+    if (countElement) {
+        countElement.textContent = `(총 ${data.length}건)`;
+    }
+
+    if (data.length === 0) {
+        tableBody.innerHTML = '';
+        noDataDiv.style.display = 'block';
+        return;
+    }
+
+    noDataDiv.style.display = 'none';
+
+    tableBody.innerHTML = data.map(item => {
+        const collegeType = item.collegeType || '-';
+        const graduate = item.graduate || '-';
+        const majorCategory = item.majorCategory || '-';
+        const studentStatus = item.status || '-';
+
+        return `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semester || '-'}학기</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.week || '-'}주차</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${collegeType}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${graduate}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${majorCategory}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
+                    ${item.degreeType || '-'}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <span class="px-2 py-1 text-xs rounded ${
+                    studentStatus === '재학' ? 'bg-blue-100 text-blue-800' :
+                    studentStatus === '휴학' ? 'bg-yellow-100 text-yellow-800' :
+                    studentStatus === '수료' ? 'bg-green-100 text-green-800' :
+                    studentStatus === '졸업' ? 'bg-gray-100 text-gray-800' :
+                    'bg-gray-100 text-gray-800'
+                }">
+                    ${studentStatus}
+                </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName || '-'}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">${item.advisorName || '-'}</td>
+            <td class="px-6 py-4 text-sm text-gray-900">${item.guidanceContent || '-'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.guidanceDate || '-'}</td>
+        </tr>
+        `;
+    }).join('');
+}
+
 // 전역으로 export
 window.showScreen = showScreen;
 window.handleLogout = handleLogout;
@@ -736,6 +822,8 @@ window.initAdvisorAssignment = initAdvisorAssignment;
 window.searchProfessorAdvisorAssignment = searchProfessorAdvisorAssignment;
 window.viewProfessorProposalDetail = viewProfessorProposalDetail;
 window.returnToAdvisorAssignmentList = returnToAdvisorAssignmentList;
+window.searchWeeklyGuidance = searchWeeklyGuidance;
+window.renderWeeklyGuidanceTable = renderWeeklyGuidanceTable;
 window.renderGuideScreen = renderGuideScreen;
 window.renderNoticeScreen = renderNoticeScreen;
 window.viewNoticeDetailProfessor = viewNoticeDetailProfessor;
