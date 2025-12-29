@@ -27,66 +27,99 @@ function showStudentList() {
     contentArea.innerHTML = `
         <!-- 검색 영역 -->
         <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="p-6">
-                <div class="search-container">
-                    <div class="search-grid">
-                        <div class="search-field">
-                            <label class="search-label">대학원</label>
-                            <select id="filter-graduate" class="search-select">
-                                <option value="">전체</option>
-                                <option value="일반대학원">일반대학원</option>
-                                <option value="디자인대학원">디자인대학원</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label">학과</label>
-                            <select id="filter-major" class="search-select">
-                                <option value="">전체</option>
-                                <option value="컴퓨터공학과">컴퓨터공학과</option>
-                                <option value="경영학과">경영학과</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label">학위과정</label>
-                            <select id="filter-degree" class="search-select">
-                                <option value="">전체</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label">학년도</label>
-                            <select id="filter-year" class="search-select">
-                                <option value="">전체</option>
-                                <option value="2025">2025학년도</option>
-                                <option value="2024">2024학년도</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label">학기차</label>
-                            <select id="filter-semester" class="search-select">
-                                <option value="">전체</option>
-                                <option value="1">1학기차</option>
-                                <option value="2">2학기차</option>
-                                <option value="3">3학기차</option>
-                                <option value="4">4학기차</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label">학번</label>
-                            <input type="text" id="filter-student-id" placeholder="학번 입력" class="search-input">
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label">성명</label>
-                            <input type="text" id="filter-name" placeholder="성명 입력" class="search-input">
-                        </div>
+            <div class="p-4 bg-gray-50">
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- 1행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
+                        <select id="filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <select id="filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="1">1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
                     </div>
-                    <div class="search-buttons">
-                        <button onclick="resetStudentSearch()" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> 초기화
-                        </button>
-                        <button onclick="searchStudents()" class="btn btn-primary">
-                            <i class="fas fa-search"></i> 검색
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                        <select id="filter-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="특수대학원">특수대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                        <select id="filter-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="교육대학원">교육대학원</option>
+                            <option value="산업정보대학원">산업정보대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                        <select id="filter-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="공과대학">공과대학</option>
+                            <option value="사범대학">사범대학</option>
+                            <option value="인문대학">인문대학</option>
+                            <option value="사회과학대학">사회과학대학</option>
+                        </select>
+                    </div>
+
+                    <!-- 2행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                        <select id="filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="컴퓨터공학과">컴퓨터공학과</option>
+                            <option value="경영학과">경영학과</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                        <select id="filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="석사">석사</option>
+                            <option value="박사">박사</option>
+                            <option value="석박통합">석박통합</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                        <select id="filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="재학">재학</option>
+                            <option value="휴학">휴학</option>
+                            <option value="수료">수료</option>
+                            <option value="졸업">졸업</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                        <input type="text" id="filter-student-id" placeholder="학번"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+
+                    <!-- 3행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                        <input type="text" id="filter-name" placeholder="성명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                        <input type="text" id="filter-advisor" placeholder="지도교수명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+                    <div class="col-span-2 flex items-center justify-end">
+                        <button onclick="searchStudents()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                            <i class="fas fa-search mr-1"></i>조회
                         </button>
                     </div>
                 </div>
@@ -96,7 +129,6 @@ function showStudentList() {
         <!-- 테이블 영역 -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="table-container">
-                <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
                 <div class="table-header">
                     <div class="table-header-left">
                         <h3 class="table-title">학기별 지도 목록</h3>
@@ -125,13 +157,17 @@ function showStudentList() {
                                        class="rounded">
                             </th>
                             <th style="width: 60px;">번호</th>
-                            <th style="width: 100px;">대학원</th>
-                            <th style="width: 150px;">학과</th>
-                            <th style="width: 80px;">학위과정</th>
                             <th style="width: 80px;">학년도</th>
-                            <th style="width: 80px;">학기차</th>
+                            <th style="width: 80px;">학기</th>
+                            <th style="width: 100px;">대학구분</th>
+                            <th style="width: 100px;">계열/대학원</th>
+                            <th style="width: 120px;">학부(과)전공</th>
+                            <th style="width: 150px;">학과/전공</th>
+                            <th style="width: 80px;">학위과정</th>
+                            <th style="width: 80px;">학적상태</th>
                             <th style="width: 100px;">학번</th>
-                            <th style="width: 100px;">이름</th>
+                            <th style="width: 100px;">성명</th>
+                            <th style="width: 100px;">지도교수</th>
                         </tr>
                     </thead>
                     <tbody id="guidance-list-body">
@@ -143,13 +179,17 @@ function showStudentList() {
                                                value="${student.studentId}" data-name="${student.name}">
                                     </td>
                                     <td>${idx + 1}</td>
-                                    <td>일반대학원</td>
-                                    <td>${student.major || '-'}</td>
-                                    <td>${getDegreeText(student.degree)}</td>
                                     <td>2024</td>
                                     <td>${student.semester || '-'}학기</td>
+                                    <td>일반대학원</td>
+                                    <td>일반대학원</td>
+                                    <td>-</td>
+                                    <td>${student.major || '-'}</td>
+                                    <td>${getDegreeText(student.degree)}</td>
+                                    <td>재학</td>
                                     <td>${student.studentId}</td>
                                     <td>${student.name}</td>
+                                    <td>${currentProf.name}</td>
                                 </tr>
                             `;
                         }).join('')}
