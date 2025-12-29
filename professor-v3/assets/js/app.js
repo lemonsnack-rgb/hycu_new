@@ -369,11 +369,19 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
         const studentStatus = student ? student.status : '-';
         const assignmentStatus = (item.assignment && item.assignment.mainAdvisor) ? '배정완료' : '미배정';
 
+        // 대학구분, 계열/대학원, 학부(과)전공은 임시로 '-' 처리 (추후 데이터 모델에 추가 필요)
+        const collegeType = item.collegeType || '-';
+        const graduate = item.graduate || '-';
+        const majorCategory = item.majorCategory || '-';
+
         return `
         <tr class="hover:bg-gray-50 cursor-pointer"
             onclick="viewProfessorProposalDetail('${item.id}')">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semesterCount}학기</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${collegeType}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${graduate}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${majorCategory}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                 <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
