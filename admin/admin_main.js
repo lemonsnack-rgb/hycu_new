@@ -3725,9 +3725,14 @@ function renderStageManagementContent() {
                 <!-- 3줄: 텍스트 검색 + 지도교수 + 검색버튼 -->
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학번/성명</label>
-                        <input type="text" id="stage-search-keyword" placeholder="학번 또는 성명"
-                               class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 150px;">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">학번</label>
+                        <input type="text" id="stage-search-student-id" placeholder="학번"
+                               class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap">성명</label>
+                        <input type="text" id="stage-search-student-name" placeholder="성명"
+                               class="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="width: 120px;">
                     </div>
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap">지도교수명</label>
@@ -3960,7 +3965,8 @@ function searchStageManagement() {
     const department = document.getElementById('stage-search-department').value;
     const degree = document.getElementById('stage-search-degree').value;
     const status = document.getElementById('stage-search-status').value;
-    const keyword = document.getElementById('stage-search-keyword').value.trim();
+    const studentId = document.getElementById('stage-search-student-id').value.trim();
+    const studentName = document.getElementById('stage-search-student-name').value.trim();
     const advisor = document.getElementById('stage-search-advisor').value.trim();
 
     // 모든 학생 대상으로 검색 (논문 심사 단계 제약 없음)
@@ -3991,12 +3997,11 @@ function searchStageManagement() {
         // 학적상태 필터
         if (status && student?.status !== status) return false;
 
-        // 학번/성명 통합 검색
-        if (keyword) {
-            const matchesNumber = item.studentNumber.includes(keyword);
-            const matchesName = item.studentName.includes(keyword);
-            if (!matchesNumber && !matchesName) return false;
-        }
+        // 학번 검색
+        if (studentId && !item.studentNumber.includes(studentId)) return false;
+
+        // 성명 검색
+        if (studentName && !item.studentName.includes(studentName)) return false;
 
         // 지도교수명 필터
         if (advisor) {
