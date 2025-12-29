@@ -192,10 +192,12 @@ function renderCompletedTab() {
                         <table class="min-w-full">
                             <thead>
                                 <tr>
-                                    <th style="width: 60px;">번호</th>
-                                    <th style="width: 100px;">완료일</th>
-                                    <th style="width: 80px;">학생명</th>
+                                    <th style="width: 60px;">순번</th>
+                                    <th style="width: 100px;">계열/대학원</th>
+                                    <th style="width: 120px;">학부(과)전공</th>
+                                    <th style="width: 120px;">학과/전공</th>
                                     <th style="width: 100px;">학번</th>
+                                    <th style="width: 80px;">성명</th>
                                     <th style="min-width: 200px;">주제</th>
                                     <th style="width: 80px;">유형</th>
                                     <th style="width: 120px;">일시</th>
@@ -218,13 +220,21 @@ function renderCompletedTab() {
 
 function renderCompletedRow(req, index) {
     const typeText = req.meetingType === 'online' ? '온라인' : '대면';
+    const student = DataService.getStudentById(req.studentId);
+
+    const graduate = student?.graduate || '일반대학원';
+    const college = student?.college || '-';
+    const undergraduate = student?.undergraduate || '-';
+    const major = student?.major || '-';
 
     return `
         <tr>
             <td>${index}</td>
-            <td>${req.completedDate}</td>
-            <td>${req.studentName}</td>
+            <td>${college}</td>
+            <td>${undergraduate}</td>
+            <td>${major}</td>
             <td>${req.studentNumber}</td>
+            <td>${req.studentName}</td>
             <td class="cursor-pointer" style="color: #6A0028;"
                 title="${req.topic}"
                 onclick="viewCompletedMeetingDetail('${req.id}')">
@@ -357,8 +367,11 @@ function renderCompletedMeetingDetailPage(req) {
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더: 뒤로가기 버튼 -->
             <div class="p-6 border-b flex items-center gap-4">
-                <button onclick="backToCompletedList()" class="text-gray-600 hover:text-gray-800">
-                    <i class="fas fa-arrow-left text-xl"></i>
+                <button onclick="backToCompletedList()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
                 </button>
                 <h3 class="text-lg font-bold">완료된 미팅 상세정보</h3>
             </div>
@@ -434,12 +447,6 @@ function renderCompletedMeetingDetailPage(req) {
                         <p class="text-sm text-gray-600">녹화본이 없습니다</p>
                     </div>
                 ` : ''}
-
-                <div class="flex justify-end border-t pt-6">
-                    <button onclick="backToCompletedList()" class="px-6 py-2 bg-gray-200 hover:bg-gray-300 rounded text-sm font-medium">
-                        목록으로
-                    </button>
-                </div>
             </div>
         </div>
     `;

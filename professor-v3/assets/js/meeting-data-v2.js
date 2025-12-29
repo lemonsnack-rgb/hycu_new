@@ -378,9 +378,11 @@ if (typeof DataService !== 'undefined') {
     // 학생 정보 가져오기 (mock)
     DataService.getStudentById = function(studentId) {
         const students = {
-            'S001': { id: 'S001', name: '김철수', studentNumber: '2024001', thesisTopic: 'AI 윤리 연구' },
-            'S002': { id: 'S002', name: '이영희', studentNumber: '2024002', thesisTopic: '블록체인 보안' },
-            'S003': { id: 'S003', name: '박민수', studentNumber: '2024003', thesisTopic: '메타버스 플랫폼' }
+            'S001': { id: 'S001', name: '김철수', studentNumber: '2024001', thesisTopic: 'AI 윤리 연구', graduate: '일반대학원', college: '공학계열', undergraduate: '컴퓨터공학부', major: '컴퓨터공학' },
+            'S002': { id: 'S002', name: '이영희', studentNumber: '2024002', thesisTopic: '블록체인 보안', graduate: '일반대학원', college: '공학계열', undergraduate: '소프트웨어학부', major: '소프트웨어공학' },
+            'S003': { id: 'S003', name: '박민수', studentNumber: '2024003', thesisTopic: '메타버스 플랫폼', graduate: '일반대학원', college: '공학계열', undergraduate: '컴퓨터공학부', major: '컴퓨터공학' },
+            'S004': { id: 'S004', name: '최수진', studentNumber: '2024004', thesisTopic: '네트워크 보안', graduate: '일반대학원', college: '공학계열', undergraduate: '정보보안학과', major: '정보보안학' },
+            'S005': { id: 'S005', name: '정민호', studentNumber: '2024005', thesisTopic: '빅데이터 분석', graduate: '일반대학원', college: '공학계열', undergraduate: '데이터사이언스학과', major: '데이터사이언스' }
         };
         return students[studentId];
     };
@@ -388,11 +390,11 @@ if (typeof DataService !== 'undefined') {
     // 전체 학생 목록 (mock)
     DataService.getAllStudents = function() {
         return [
-            { id: 'S001', name: '김철수', studentNumber: '2024001', major: '컴퓨터공학', semester: '1학기', thesisTopic: 'AI 윤리 연구' },
-            { id: 'S002', name: '이영희', studentNumber: '2024002', major: '소프트웨어공학', semester: '2학기', thesisTopic: '블록체인 보안' },
-            { id: 'S003', name: '박민수', studentNumber: '2024003', major: '컴퓨터공학', semester: '1학기', thesisTopic: '메타버스 플랫폼' },
-            { id: 'S004', name: '최수진', studentNumber: '2024004', major: '정보보안학', semester: '3학기', thesisTopic: '네트워크 보안' },
-            { id: 'S005', name: '정민호', studentNumber: '2024005', major: '데이터사이언스', semester: '1학기', thesisTopic: '빅데이터 분석' }
+            { id: 'S001', name: '김철수', studentNumber: '2024001', major: '컴퓨터공학', semester: '1학기', thesisTopic: 'AI 윤리 연구', graduate: '일반대학원', college: '공학계열', undergraduate: '컴퓨터공학부' },
+            { id: 'S002', name: '이영희', studentNumber: '2024002', major: '소프트웨어공학', semester: '2학기', thesisTopic: '블록체인 보안', graduate: '일반대학원', college: '공학계열', undergraduate: '소프트웨어학부' },
+            { id: 'S003', name: '박민수', studentNumber: '2024003', major: '컴퓨터공학', semester: '1학기', thesisTopic: '메타버스 플랫폼', graduate: '일반대학원', college: '공학계열', undergraduate: '컴퓨터공학부' },
+            { id: 'S004', name: '최수진', studentNumber: '2024004', major: '정보보안학', semester: '3학기', thesisTopic: '네트워크 보안', graduate: '일반대학원', college: '공학계열', undergraduate: '정보보안학과' },
+            { id: 'S005', name: '정민호', studentNumber: '2024005', major: '데이터사이언스', semester: '1학기', thesisTopic: '빅데이터 분석', graduate: '일반대학원', college: '공학계열', undergraduate: '데이터사이언스학과' }
         ];
     };
 

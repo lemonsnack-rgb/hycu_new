@@ -149,6 +149,17 @@ function getExamScheduleListData() {
             department: assignment.department,
             degreeType: assignment.degreeType,
 
+            // 추가 학생 정보 (교수용 검색 필터)
+            year: '2025',
+            semester: '1',
+            collegeType: '일반대학원',
+            graduate: '일반대학원',
+            undergraduate: assignment.department.includes('경영') ? '경영대학' :
+                          assignment.department.includes('컴퓨터') ? '공과대학' :
+                          assignment.department.includes('교육') ? '사범대학' : '공과대학',
+            status: '재학',
+            advisorName: assignment.chairName || '-',
+
             // 심사 단계
             stageName: assignment.stageName,
             stageOrder: assignment.stageOrder,

@@ -2,12 +2,19 @@
 
 // 전역 변수
 let currentExamFilters = {
-    semester: '2025-1',
-    department: '',
+    year: '2025',
+    semester: '1',
+    collegeType: '',
+    graduate: '',
+    undergraduate: '',
+    major: '',
+    degree: '',
+    status: '',
+    studentNumber: '',
+    studentName: '',
+    advisor: '',
     stage: '',
-    scheduleStatus: '',
-    searchType: 'studentName',
-    searchKeyword: ''
+    scheduleStatus: ''
 };
 
 let currentExamAssignmentId = null;
@@ -29,84 +36,122 @@ function renderExamScheduleScreen() {
         <!-- 목록 화면 -->
         <div id="exam-schedule-list-view">
             <!-- 검색 영역 -->
-            <div class="search-container">
-                <div class="search-grid">
-                    <!-- 학년도 -->
-                    <div class="search-field">
-                        <label class="search-label">학년도</label>
-                        <select id="exam-filter-year" class="search-select" onchange="filterExamScheduleList()">
-                            <option value="">전체</option>
-                            <option value="2025" selected>2025</option>
-                            <option value="2024">2024</option>
-                        </select>
-                    </div>
-
-                    <!-- 학기 -->
-                    <div class="search-field">
-                        <label class="search-label">학기</label>
-                        <select id="exam-filter-semester" class="search-select" onchange="filterExamScheduleList()">
-                            <option value="">전체</option>
-                            <option value="1" selected>1학기</option>
-                            <option value="2">2학기</option>
-                        </select>
-                    </div>
-
-                    <!-- 학과 -->
-                    <div class="search-field">
-                        <label class="search-label">학과</label>
-                        <select id="exam-filter-department" class="search-select" onchange="filterExamScheduleList()">
-                            <option value="">전체</option>
-                            <option value="경영학과">경영학과</option>
-                            <option value="컴퓨터공학과">컴퓨터공학과</option>
-                            <option value="교육학과">교육학과</option>
-                        </select>
-                    </div>
-
-                    <!-- 심사 단계 -->
-                    <div class="search-field">
-                        <label class="search-label">심사 단계</label>
-                        <select id="exam-filter-stage" class="search-select" onchange="filterExamScheduleList()">
-                            <option value="">전체</option>
-                        </select>
-                    </div>
-
-                    <!-- 일정 상태 -->
-                    <div class="search-field">
-                        <label class="search-label">일정 상태</label>
-                        <select id="exam-filter-schedule-status" class="search-select" onchange="filterExamScheduleList()">
-                            <option value="">전체</option>
-                            <option value="scheduled">등록 완료</option>
-                            <option value="unscheduled">미등록</option>
-                        </select>
-                    </div>
-
-                    <!-- 검색어 -->
-                    <div class="search-field" style="grid-column: span 2;">
-                        <label class="search-label">검색어</label>
-                        <div style="display: flex; gap: 8px;">
-                            <select id="exam-filter-search-type" class="search-select" style="flex: 0 0 120px;">
-                                <option value="studentName">학생명</option>
-                                <option value="studentNumber">학번</option>
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="p-4 bg-gray-50">
+                    <div class="grid grid-cols-4 gap-4">
+                        <!-- 1행 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
+                            <select id="exam-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="2025" selected>2025</option>
+                                <option value="2024">2024</option>
                             </select>
-                            <input type="text"
-                                   id="exam-filter-search-keyword"
-                                   class="search-input"
-                                   style="flex: 1;"
-                                   placeholder="검색어를 입력하세요"
+                            <select id="exam-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="1" selected>1학기</option>
+                                <option value="2">2학기</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                            <select id="exam-filter-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="특수대학원">특수대학원</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                            <select id="exam-filter-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="교육대학원">교육대학원</option>
+                                <option value="산업정보대학원">산업정보대학원</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                            <select id="exam-filter-undergraduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="공과대학">공과대학</option>
+                                <option value="사범대학">사범대학</option>
+                                <option value="인문대학">인문대학</option>
+                                <option value="사회과학대학">사회과학대학</option>
+                            </select>
+                        </div>
+
+                        <!-- 2행 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                            <select id="exam-filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="경영학과">경영학과</option>
+                                <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                <option value="교육학과">교육학과</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                            <select id="exam-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                                <option value="석박통합">석박통합</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                            <select id="exam-filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="재학">재학</option>
+                                <option value="휴학">휴학</option>
+                                <option value="수료">수료</option>
+                                <option value="졸업">졸업</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                            <input type="text" id="exam-filter-student-number" placeholder="학번"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
                                    onkeypress="if(event.key==='Enter') filterExamScheduleList()">
                         </div>
-                    </div>
-                </div>
 
-                <div class="search-buttons">
-                    <button onclick="resetExamScheduleFilters()" class="btn btn-secondary">
-                        <i class="fas fa-redo"></i>
-                        초기화
-                    </button>
-                    <button onclick="filterExamScheduleList()" class="btn btn-primary">
-                        <i class="fas fa-search"></i>
-                        검색
-                    </button>
+                        <!-- 3행 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                            <input type="text" id="exam-filter-student-name" placeholder="성명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                   onkeypress="if(event.key==='Enter') filterExamScheduleList()">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                            <input type="text" id="exam-filter-advisor" placeholder="지도교수명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                   onkeypress="if(event.key==='Enter') filterExamScheduleList()">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사단계</label>
+                            <select id="exam-filter-stage" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">등록상태</label>
+                            <select id="exam-filter-schedule-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="scheduled">등록 완료</option>
+                                <option value="unscheduled">미등록</option>
+                            </select>
+                        </div>
+
+                        <!-- 4행 - 조회 버튼 -->
+                        <div class="col-span-4 flex items-center justify-end">
+                            <button onclick="filterExamScheduleList()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                                <i class="fas fa-search mr-1"></i>조회
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -183,22 +228,35 @@ function loadExamStageFilterOptions() {
 function resetExamScheduleFilters() {
     document.getElementById('exam-filter-year').value = '2025';
     document.getElementById('exam-filter-semester').value = '1';
-    document.getElementById('exam-filter-department').value = '';
+    document.getElementById('exam-filter-college-type').value = '';
+    document.getElementById('exam-filter-graduate').value = '';
+    document.getElementById('exam-filter-undergraduate').value = '';
+    document.getElementById('exam-filter-major').value = '';
+    document.getElementById('exam-filter-degree').value = '';
+    document.getElementById('exam-filter-status').value = '';
+    document.getElementById('exam-filter-student-number').value = '';
+    document.getElementById('exam-filter-student-name').value = '';
+    document.getElementById('exam-filter-advisor').value = '';
     document.getElementById('exam-filter-stage').value = '';
     document.getElementById('exam-filter-schedule-status').value = '';
-    document.getElementById('exam-filter-search-type').value = 'studentName';
-    document.getElementById('exam-filter-search-keyword').value = '';
 
     filterExamScheduleList();
 }
 
 function filterExamScheduleList() {
+    currentExamFilters.year = document.getElementById('exam-filter-year')?.value || '';
     currentExamFilters.semester = document.getElementById('exam-filter-semester')?.value || '';
-    currentExamFilters.department = document.getElementById('exam-filter-department')?.value || '';
+    currentExamFilters.collegeType = document.getElementById('exam-filter-college-type')?.value || '';
+    currentExamFilters.graduate = document.getElementById('exam-filter-graduate')?.value || '';
+    currentExamFilters.undergraduate = document.getElementById('exam-filter-undergraduate')?.value || '';
+    currentExamFilters.major = document.getElementById('exam-filter-major')?.value || '';
+    currentExamFilters.degree = document.getElementById('exam-filter-degree')?.value || '';
+    currentExamFilters.status = document.getElementById('exam-filter-status')?.value || '';
+    currentExamFilters.studentNumber = document.getElementById('exam-filter-student-number')?.value.trim() || '';
+    currentExamFilters.studentName = document.getElementById('exam-filter-student-name')?.value.trim() || '';
+    currentExamFilters.advisor = document.getElementById('exam-filter-advisor')?.value.trim() || '';
     currentExamFilters.stage = document.getElementById('exam-filter-stage')?.value || '';
     currentExamFilters.scheduleStatus = document.getElementById('exam-filter-schedule-status')?.value || '';
-    currentExamFilters.searchType = document.getElementById('exam-filter-search-type')?.value || 'studentName';
-    currentExamFilters.searchKeyword = document.getElementById('exam-filter-search-keyword')?.value.trim() || '';
 
     // 내가 심사위원으로 배정된 건만 조회
     let data = getExamScheduleListData().filter(item => {
@@ -208,8 +266,59 @@ function filterExamScheduleList() {
     });
 
     // 필터 적용
-    if (currentExamFilters.department) {
-        data = data.filter(item => item.department === currentExamFilters.department);
+    if (currentExamFilters.year) {
+        data = data.filter(item => item.year === currentExamFilters.year);
+    }
+
+    if (currentExamFilters.semester) {
+        data = data.filter(item => item.semester === currentExamFilters.semester);
+    }
+
+    if (currentExamFilters.collegeType) {
+        data = data.filter(item => item.collegeType === currentExamFilters.collegeType);
+    }
+
+    if (currentExamFilters.graduate) {
+        data = data.filter(item => item.graduate === currentExamFilters.graduate);
+    }
+
+    if (currentExamFilters.undergraduate) {
+        data = data.filter(item => item.undergraduate === currentExamFilters.undergraduate);
+    }
+
+    if (currentExamFilters.major) {
+        data = data.filter(item => item.department === currentExamFilters.major);
+    }
+
+    if (currentExamFilters.degree) {
+        const degreeMap = {
+            '석사': 'master',
+            '박사': 'doctor',
+            '석박통합': 'combined'
+        };
+        const degreeValue = degreeMap[currentExamFilters.degree];
+        if (degreeValue) {
+            data = data.filter(item => item.degreeType === degreeValue);
+        }
+    }
+
+    if (currentExamFilters.status) {
+        data = data.filter(item => item.status === currentExamFilters.status);
+    }
+
+    if (currentExamFilters.studentNumber) {
+        data = data.filter(item => item.studentNumber.includes(currentExamFilters.studentNumber));
+    }
+
+    if (currentExamFilters.studentName) {
+        data = data.filter(item => item.studentName.includes(currentExamFilters.studentName));
+    }
+
+    if (currentExamFilters.advisor) {
+        data = data.filter(item => {
+            const advisorName = item.advisorName || '';
+            return advisorName.includes(currentExamFilters.advisor);
+        });
     }
 
     if (currentExamFilters.stage) {
@@ -218,18 +327,6 @@ function filterExamScheduleList() {
 
     if (currentExamFilters.scheduleStatus) {
         data = data.filter(item => item.scheduleStatus === currentExamFilters.scheduleStatus);
-    }
-
-    if (currentExamFilters.searchKeyword) {
-        data = data.filter(item => {
-            const keyword = currentExamFilters.searchKeyword.toLowerCase();
-            if (currentExamFilters.searchType === 'studentName') {
-                return item.studentName.toLowerCase().includes(keyword);
-            } else if (currentExamFilters.searchType === 'studentNumber') {
-                return item.studentNumber.includes(keyword);
-            }
-            return true;
-        });
     }
 
     renderExamScheduleTable(data);
@@ -270,9 +367,7 @@ function renderExamScheduleTable(data) {
             ? '<span class="text-green-600">오프라인</span>'
             : '<span class="text-gray-400">-</span>';
 
-        const statusBadge = item.hasSchedule
-            ? '<span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">등록 완료</span>'
-            : '<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">미등록</span>';
+        const statusText = item.hasSchedule ? '등록 완료' : '미등록';
 
         return `
             <tr class="cursor-pointer" onclick="showExamScheduleDetailReadonly('${item.assignmentId}')">
@@ -285,7 +380,7 @@ function renderExamScheduleTable(data) {
                 <td>${item.chairName}</td>
                 <td>${scheduleText}</td>
                 <td>${methodText}</td>
-                <td>${statusBadge}</td>
+                <td>${statusText}</td>
             </tr>
         `;
     }).join('');
@@ -333,17 +428,58 @@ function renderExamScheduleDetailReadonly(assignmentId) {
         // 일정 미등록
         document.getElementById('exam-schedule-detail-view').innerHTML = `
             <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800">심사 일정 조회</h3>
-                            <p class="text-sm text-gray-600 mt-1">${assignment.studentName} (${assignment.studentNumber}) - ${assignment.stageName}</p>
+                <div class="px-6 py-3 border-b">
+                    <button onclick="backToExamScheduleListReadonly()" class="back-to-list-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        목록으로 돌아가기
+                    </button>
+                </div>
+
+                <!-- 학생 정보 -->
+                <div class="px-6 py-4 border-b bg-gray-50">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                            <span class="text-gray-900 font-medium">일반대학원</span>
                         </div>
-                        <button onclick="backToExamScheduleListReadonly()" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
-                            <i class="fas fa-list mr-1"></i> 목록으로
-                        </button>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                            <span class="text-gray-900 font-medium">일반대학원</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                            <span class="text-gray-900 font-medium">${assignment.department}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                            <span class="text-gray-900 font-medium">${assignment.department}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                            <span class="text-gray-900 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                            <span class="text-gray-900 font-medium">재학</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학번:</span>
+                            <span class="text-gray-900 font-medium">${assignment.studentNumber}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">성명:</span>
+                            <span class="text-gray-900 font-medium">${assignment.studentName}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                            <span class="text-gray-900 font-medium">-</span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="p-6">
                     <div class="text-center py-12 text-gray-500">
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -380,46 +516,82 @@ function renderExamScheduleDetailReadonly(assignmentId) {
     detailView.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <!-- Header -->
-            <div class="p-6 border-b">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">심사 일정 조회</h3>
-                        <p class="text-sm text-gray-600 mt-1">${assignment.studentName} (${assignment.studentNumber}) - ${assignment.stageName}</p>
+            <div class="px-6 py-3 border-b">
+                <button onclick="backToExamScheduleListReadonly()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+            </div>
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <p class="text-sm text-gray-600">${assignment.studentName} (${assignment.studentNumber}) - ${assignment.stageName}</p>
+            </div>
+
+            <!-- 학생 정보 -->
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">일반대학원</span>
                     </div>
-                    <button onclick="backToExamScheduleListReadonly()" class="px-4 py-2 border border-gray-300 rounded hover:bg-gray-50">
-                        <i class="fas fa-list mr-1"></i> 목록으로
-                    </button>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">일반대학원</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${assignment.department}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${assignment.department}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">재학</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${assignment.studentNumber}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${assignment.studentName}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 논문 정보 -->
+            <div class="px-6 py-4 border-b bg-white">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">논문 정보</h4>
+                <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+                    <div class="col-span-3 flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
+                        <span class="text-gray-900 font-medium">${thesisTitle}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">제출일:</span>
+                        <span class="text-gray-900 font-medium">-</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">심사 마감일:</span>
+                        <span class="text-gray-900 font-medium">-</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Content (읽기 전용) -->
             <div class="p-6">
-                <!-- 학생 정보 -->
-                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <span class="text-gray-600">학번:</span>
-                            <span class="ml-2 font-medium">${assignment.studentNumber}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">학생명:</span>
-                            <span class="ml-2 font-medium">${assignment.studentName}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">학과:</span>
-                            <span class="ml-2 font-medium">${assignment.department}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">학위:</span>
-                            <span class="ml-2 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-gray-600">논문 제목:</span>
-                            <span class="ml-2 font-medium">${thesisTitle}</span>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- 심사위원 정보 -->
                 <div class="mb-6">
