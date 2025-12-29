@@ -5066,8 +5066,7 @@ function renderStageCard(stage, index) {
     const isFirst = index === 0;
     const isLast = index === window.composedStages.length - 1;
 
-    // 비활성화 조건
-    const examTypeDisabled = !stageTypeId;  // 지도단계유형 먼저 선택
+    // 비활성화 조건 (심사 유형은 유형관리에서 설정하므로 더 이상 사용 안 함)
     const isExamTypeNone = examTypeId === 'EXAM_TYPE_NONE';
     const evaluationDisabled = isExamTypeNone;  // 평가없음 선택 시 평가표 비활성화
     const reviewDisabled = !stage.evaluationTemplateId || isExamTypeNone;  // 평가표 미선택 또는 평가없음 시 심사기간 비활성화
@@ -5075,17 +5074,17 @@ function renderStageCard(stage, index) {
     return `
         <div class="border border-gray-300 rounded-lg p-3 bg-white shadow-sm" data-stage-index="${index}">
             <style>
-                .stage-field-row {
+                .stage-field-row-triple {
                     display: grid;
-                    grid-template-columns: 120px 1fr;
-                    gap: 12px;
+                    grid-template-columns: 90px 1fr 100px 1fr 70px 1fr;
+                    gap: 10px;
                     align-items: center;
                     margin-bottom: 10px;
                 }
-                .stage-field-row-dual {
+                .stage-field-row-dates {
                     display: grid;
-                    grid-template-columns: 120px 1fr 110px 0.8fr;
-                    gap: 12px;
+                    grid-template-columns: 90px 1fr 90px 1fr;
+                    gap: 10px;
                     align-items: center;
                     margin-bottom: 10px;
                 }
@@ -5095,7 +5094,7 @@ function renderStageCard(stage, index) {
                     color: #374151;
                     white-space: nowrap;
                     text-align: right;
-                    padding-right: 8px;
+                    padding-right: 6px;
                 }
                 .stage-input {
                     height: 32px;
@@ -5114,11 +5113,22 @@ function renderStageCard(stage, index) {
                     color: #9CA3AF;
                     cursor: not-allowed;
                 }
-                .date-range-input {
-                    display: grid;
-                    grid-template-columns: 1fr auto 1fr;
-                    gap: 8px;
+                .date-range-compact {
+                    display: flex;
+                    gap: 6px;
                     align-items: center;
+                    width: 100%;
+                }
+                .date-range-compact input[type="date"] {
+                    flex: 1;
+                    min-width: 0;
+                }
+                .stage-field-row {
+                    display: grid;
+                    grid-template-columns: 90px 1fr;
+                    gap: 10px;
+                    align-items: start;
+                    margin-bottom: 10px;
                 }
             </style>
             <!-- 카드 헤더 -->
@@ -5142,18 +5152,15 @@ function renderStageCard(stage, index) {
                 </div>
             </div>
 
-            <!-- (1) 단계 이름 -->
-            <div class="stage-field-row">
-                <label class="stage-field-label">단계 이름 <span class="text-red-500">*</span></label>
+            <!-- (1) 단계 이름 + 지도단계유형 + 평가표 -->
+            <div class="stage-field-row-triple">
+                <label class="stage-field-label">단계이름 <span class="text-red-500">*</span></label>
                 <input type="text"
                        value="${stage.name || ''}"
                        onchange="updateStageField(${index}, 'name', this.value)"
                        placeholder="예: 1차 예비심사"
                        class="stage-input">
-            </div>
 
-            <!-- (2) 지도 단계 유형 + 심사 유형 -->
-            <div class="stage-field-row-dual">
                 <label class="stage-field-label">지도단계유형 <span class="text-red-500">*</span></label>
                 <select onchange="updateStageType(${index}, this.value)" class="stage-input">
                     <option value="">선택</option>
@@ -5164,21 +5171,6 @@ function renderStageCard(stage, index) {
                     `).join('')}
                 </select>
 
-                <label class="stage-field-label">심사유형 <span class="text-red-500">*</span></label>
-                <select onchange="updateStageExamType(${index}, this.value)"
-                        class="stage-input"
-                        ${examTypeDisabled ? 'disabled' : ''}>
-                    <option value="">선택</option>
-                    ${mockExamTypes.map(type => `
-                        <option value="${type.id}" ${examTypeId === type.id ? 'selected' : ''}>
-                            ${type.name}
-                        </option>
-                    `).join('')}
-                </select>
-            </div>
-
-            <!-- (3) 평가표 -->
-            <div class="stage-field-row">
                 <label class="stage-field-label">평가표</label>
                 <select onchange="updateStageEvaluationTemplate(${index}, this.value)"
                         class="stage-input"
@@ -5192,10 +5184,10 @@ function renderStageCard(stage, index) {
                 </select>
             </div>
 
-            <!-- (4) 제출 기간 -->
-            <div class="stage-field-row">
+            <!-- (2) 제출 기간 + 심사 기간 -->
+            <div class="stage-field-row-dates">
                 <label class="stage-field-label">제출기간</label>
-                <div class="date-range-input">
+                <div class="date-range-compact">
                     <input type="date"
                            value="${stage.submissionStartDate || ''}"
                            onchange="updateStageField(${index}, 'submissionStartDate', this.value)"
@@ -5206,12 +5198,9 @@ function renderStageCard(stage, index) {
                            onchange="updateStageField(${index}, 'submissionEndDate', this.value)"
                            class="stage-input">
                 </div>
-            </div>
 
-            <!-- (5) 심사 기간 -->
-            <div class="stage-field-row">
                 <label class="stage-field-label">심사기간</label>
-                <div class="date-range-input">
+                <div class="date-range-compact">
                     <input type="date"
                            value="${stage.reviewStartDate || ''}"
                            ${reviewDisabled ? 'disabled' : ''}
@@ -5347,12 +5336,11 @@ function refreshStageCards() {
     }
 }
 
-// 지도 단계 유형 선택 시 처리 (심사 유형 초기화 추가)
+// 지도 단계 유형 선택 시 처리 (심사 유형 자동 설정)
 function updateStageType(index, typeId) {
     if (!window.composedStages || !window.composedStages[index]) return;
 
     const stage = window.composedStages[index];
-    const oldStageTypeId = stage.stageTypeId;
 
     const stageType = mockStepTypes.find(t => t.id === typeId);
     if (stageType) {
@@ -5365,12 +5353,10 @@ function updateStageType(index, typeId) {
         stage.requiresDocument = stageType.requiresDocument;
         stage.requiresPresentation = stageType.requiresPresentation;
 
-        // 지도 단계 유형 변경 시 심사 유형 초기화 (선택 순서 강제)
-        if (oldStageTypeId !== typeId) {
-            stage.examTypeId = '';
-        }
+        // 심사 유형 자동 설정 (유형관리에서 설정한 값 복사)
+        stage.examTypeId = stageType.examTypeId || '';
 
-        console.log(`✅ 단계 ${index + 1}: 유형 "${stageType.name}" 선택`);
+        console.log(`✅ 단계 ${index + 1}: 유형 "${stageType.name}" 선택, 심사유형 "${stage.examTypeId}" 자동 설정`);
     } else {
         // 선택 해제
         stage.stageTypeId = '';
@@ -5384,23 +5370,23 @@ function updateStageType(index, typeId) {
     refreshStageCards();
 }
 
-// 심사 유형 선택 시 처리 (신규)
-function updateStageExamType(index, examTypeId) {
-    if (!window.composedStages || !window.composedStages[index]) return;
-
-    const stage = window.composedStages[index];
-    stage.examTypeId = examTypeId;
-
-    // "평가 없음" 선택 시 평가표 및 심사기간 초기화
-    if (examTypeId === 'EXAM_TYPE_NONE') {
-        stage.evaluationTemplateId = '';
-        stage.reviewStartDate = '';
-        stage.reviewEndDate = '';
-        console.log(`⚠️  단계 ${index + 1}: 평가 없음 선택 - 평가표 및 심사기간 초기화`);
-    }
-
-    refreshStageCards();
-}
+// 심사 유형 선택 시 처리 (DEPRECATED - 더 이상 사용 안 함, 유형관리에서 설정)
+// function updateStageExamType(index, examTypeId) {
+//     if (!window.composedStages || !window.composedStages[index]) return;
+//
+//     const stage = window.composedStages[index];
+//     stage.examTypeId = examTypeId;
+//
+//     // "평가 없음" 선택 시 평가표 및 심사기간 초기화
+//     if (examTypeId === 'EXAM_TYPE_NONE') {
+//         stage.evaluationTemplateId = '';
+//         stage.reviewStartDate = '';
+//         stage.reviewEndDate = '';
+//         console.log(`⚠️  단계 ${index + 1}: 평가 없음 선택 - 평가표 및 심사기간 초기화`);
+//     }
+//
+//     refreshStageCards();
+// }
 
 // 평가표 업데이트 확장 (심사 유형에 따른 제약 추가)
 function updateStageEvaluationTemplate(index, templateId) {
@@ -5434,7 +5420,7 @@ window.moveStageUp = moveStageUp;
 window.moveStageDown = moveStageDown;
 window.updateStageField = updateStageField;
 window.updateStageType = updateStageType;
-window.updateStageExamType = updateStageExamType;  // 신규 추가
+// window.updateStageExamType = updateStageExamType;  // DEPRECATED - 제거됨
 window.updateStageEvaluationTemplate = updateStageEvaluationTemplate;
 window.refreshStageCards = refreshStageCards;
 
@@ -5504,6 +5490,7 @@ window.saveStageType = (event, id) => {
     const name = document.getElementById('stage-type-name').value.trim();
     const requiresDocument = document.getElementById('requires-document').checked;
     const requiresPresentation = document.getElementById('requires-presentation').checked;
+    const examTypeId = document.getElementById('exam-type-id').value;
     const description = document.getElementById('stage-type-description').value.trim();
 
     // 유효성 검사
@@ -5524,6 +5511,7 @@ window.saveStageType = (event, id) => {
             stageType.name = name;
             stageType.requiresDocument = requiresDocument;
             stageType.requiresPresentation = requiresPresentation;
+            stageType.examTypeId = examTypeId;  // 심사 유형 저장
             stageType.description = description;
         }
         alert('단계 유형이 수정되었습니다.');
@@ -5536,6 +5524,7 @@ window.saveStageType = (event, id) => {
             type: requiresPresentation ? 'review' : 'submission', // 발표가 필요하면 심사, 아니면 제출
             requiresDocument: requiresDocument,
             requiresPresentation: requiresPresentation,
+            examTypeId: examTypeId,  // 심사 유형 저장
             evaluationTemplateId: requiresPresentation ? null : null, // 추후 설정 가능
             description: description,
             createdDate: new Date().toISOString().split('T')[0]

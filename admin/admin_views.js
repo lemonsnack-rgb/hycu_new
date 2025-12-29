@@ -3183,11 +3183,6 @@ const views = {
 
                 <!-- Main Content: Single Panel with Stage Cards -->
                 <div class="p-6">
-                    <div class="mb-4">
-                        <h4 class="font-bold text-gray-800 mb-2">단계 구성 (${window.composedStages.length}개)</h4>
-                        <p class="text-xs text-gray-500">각 단계의 정보를 직접 입력하세요. 제출/심사 일정은 안내용 메타데이터입니다.</p>
-                    </div>
-
                     <div id="stage-cards-container" class="space-y-4">
                         ${renderStageCards()}
                     </div>
@@ -4345,18 +4340,12 @@ views.stageTypeManagement = () => {
     return `
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
-                <div class="flex justify-between items-center mb-4">
+                <div class="flex justify-between items-center">
                     <h3 class="text-lg font-bold text-gray-800">지도 단계 유형 관리</h3>
                     <button onclick="switchView('stageTypeCreate')"
                             class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                         등록
                     </button>
-                </div>
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                    <p class="text-sm text-blue-800">
-                        <i class="fas fa-info-circle mr-2"></i>
-                        논문 지도 단계의 유형을 등록하고, 유형별 제출 요건(문서/발표)을 설정합니다. 행을 클릭하여 상세 내용을 확인하세요.
-                    </p>
                 </div>
             </div>
             <div class="overflow-x-auto">
@@ -4425,19 +4414,6 @@ views.stageTypeCreate = (id = null) => {
                 </h3>
             </div>
 
-            <!-- 안내 메시지 -->
-            <div class="p-6 bg-blue-50 border-b">
-                <div class="flex">
-                    <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                    </svg>
-                    <div class="text-sm text-blue-700">
-                        <p class="font-medium">논문 지도 단계 유형을 ${isEdit ? '수정' : '등록'}합니다</p>
-                        <p class="mt-1">등록된 유형은 지도 단계 등록 시 선택하여 사용할 수 있습니다.</p>
-                    </div>
-                </div>
-            </div>
-
             <!-- 폼 -->
             <form onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="p-6 space-y-6">
                 <!-- 유형명 -->
@@ -4456,30 +4432,44 @@ views.stageTypeCreate = (id = null) => {
                 <!-- 제출 요건 -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-3">
-                        제출 요건 <span class="text-red-600">*</span>
+                        제출 요건
                     </label>
-                    <div class="space-y-3">
-                        <label class="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                    <div style="display: flex; align-items: center; gap: 24px;">
+                        <label class="flex items-center cursor-pointer">
                             <input type="checkbox"
                                    id="requires-document"
                                    ${item.requiresDocument ? 'checked' : ''}
-                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <div class="ml-3">
-                                <span class="text-sm font-medium text-gray-900">문서 제출 필요</span>
-                                <p class="text-xs text-gray-500 mt-1">이 단계에서 학생이 문서를 제출해야 합니다</p>
-                            </div>
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm font-medium text-gray-900">문서 제출 필요</span>
                         </label>
 
-                        <label class="flex items-center p-3 border border-gray-300 rounded-md hover:bg-gray-50 cursor-pointer">
+                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
                             <input type="checkbox"
                                    id="requires-presentation"
                                    ${item.requiresPresentation ? 'checked' : ''}
-                                   class="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <div class="ml-3">
-                                <span class="text-sm font-medium text-gray-900">발표 필요</span>
-                                <p class="text-xs text-gray-500 mt-1">이 단계에서 학생이 발표를 진행해야 합니다</p>
-                            </div>
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm font-medium text-gray-900">발표 필요</span>
                         </label>
+
+                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <label class="text-sm font-medium text-gray-900">심사 유형</label>
+                            <select id="exam-type-id"
+                                    class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    style="width: 200px;">
+                                ${mockExamTypes.sort((a, b) => {
+                                    const order = { 'EXAM_TYPE_NONE': 0, 'EXAM_TYPE_001': 1, 'EXAM_TYPE_002': 2, 'EXAM_TYPE_003': 3 };
+                                    return (order[a.id] || 99) - (order[b.id] || 99);
+                                }).map(type => `
+                                    <option value="${type.id}" ${item.examTypeId === type.id ? 'selected' : ''}>
+                                        ${type.name}
+                                    </option>
+                                `).join('')}
+                            </select>
+                        </div>
                     </div>
                 </div>
 

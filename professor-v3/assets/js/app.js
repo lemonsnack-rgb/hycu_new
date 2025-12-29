@@ -523,12 +523,10 @@ function viewProfessorProposalDetail(proposalId) {
                         ${proposal.degreeType}
                     </span>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900">${proposal.title}</h1>
             </div>
 
             <!-- 학생 정보 -->
             <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">학생 정보</h2>
                 <div class="grid grid-cols-2 gap-4">
                     <div class="flex">
                         <span class="w-24 text-gray-600 font-medium">학번:</span>
@@ -551,42 +549,40 @@ function viewProfessorProposalDetail(proposalId) {
 
             <!-- 연구계획서 내용 -->
             <div class="px-8 py-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서</h2>
-
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
                             연구 목적
                         </label>
-                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                        <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
                             연구 필요성
                         </label>
-                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                        <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
                             연구 문제 및 연구 방법
                         </label>
-                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                        <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
                         </div>
                     </div>
 
                     ${proposal.desiredAdvisor ? `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
                                 희망 지도교수 (참고용)
                             </label>
-                            <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
                                 <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
                             </div>
                         </div>
@@ -596,10 +592,6 @@ function viewProfessorProposalDetail(proposalId) {
 
             <!-- 지도교수 배정 현황 (읽기 전용) -->
             <div class="px-8 py-6">
-                <div class="flex items-center justify-between mb-4">
-                    <h2 class="text-lg font-semibold text-gray-900">지도교수 배정 현황</h2>
-                </div>
-
                 ${assignment ? `
                     <div class="space-y-3">
                         <div class="flex items-center">
@@ -625,19 +617,6 @@ function viewProfessorProposalDetail(proposalId) {
                 ` : `
                     <p class="text-gray-500 text-center py-8">지도교수가 배정되지 않았습니다.</p>
                 `}
-
-                <!-- 읽기 전용 안내 -->
-                <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                    <div class="flex items-start">
-                        <svg class="w-5 h-5 text-yellow-600 mt-0.5 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
-                        </svg>
-                        <div class="flex-1">
-                            <p class="text-sm font-medium text-yellow-800">읽기 전용 모드</p>
-                            <p class="text-xs text-yellow-700 mt-1">이 화면은 학생의 연구계획서를 조회하기 위한 읽기 전용 화면입니다.</p>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     `;

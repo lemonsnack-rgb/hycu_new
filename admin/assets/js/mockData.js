@@ -630,6 +630,7 @@ const mockStepTypes = [
         type: 'submission', // 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: false,
+        examTypeId: 'EXAM_TYPE_001',  // 심사 유형
         evaluationTemplateId: null,
         description: '연구 주제 및 연구 방법을 문서로 제출하는 단계',
         createdDate: '2025-01-01'
@@ -640,6 +641,7 @@ const mockStepTypes = [
         type: 'review',
         requiresDocument: true,
         requiresPresentation: true,
+        examTypeId: 'EXAM_TYPE_002',  // 심사 유형
         evaluationTemplateId: 'EVAL001',
         description: '논문 초안에 대한 예비 심사 진행',
         createdDate: '2025-01-01'
@@ -650,6 +652,7 @@ const mockStepTypes = [
         type: 'review',
         requiresDocument: true,
         requiresPresentation: true,
+        examTypeId: 'EXAM_TYPE_003',  // 심사 유형
         evaluationTemplateId: 'EVAL002',
         description: '최종 논문에 대한 본심사 진행',
         createdDate: '2025-01-01'
@@ -660,6 +663,7 @@ const mockStepTypes = [
         type: 'submission',
         requiresDocument: true,
         requiresPresentation: false,
+        examTypeId: 'EXAM_TYPE_NONE',  // 심사 유형
         evaluationTemplateId: null,
         description: '관련 선행연구를 검토하고 요약 보고서 제출',
         createdDate: '2025-01-01'
@@ -670,6 +674,7 @@ const mockStepTypes = [
         type: 'submission',
         requiresDocument: true,
         requiresPresentation: false,
+        examTypeId: 'EXAM_TYPE_NONE',  // 심사 유형
         evaluationTemplateId: null,
         description: '실제 연구를 수행하고 데이터 수집',
         createdDate: '2025-01-01'
@@ -680,6 +685,7 @@ const mockStepTypes = [
         type: 'submission',
         requiresDocument: true,
         requiresPresentation: false,
+        examTypeId: 'EXAM_TYPE_NONE',  // 심사 유형
         evaluationTemplateId: null,
         description: '연구 결과를 바탕으로 논문 작성',
         createdDate: '2025-01-01'
@@ -690,6 +696,7 @@ const mockStepTypes = [
         type: 'review',
         requiresDocument: true,
         requiresPresentation: true,
+        examTypeId: 'EXAM_TYPE_001',  // 심사 유형
         evaluationTemplateId: 'EVAL003',
         description: '박사과정 연구제안서에 대한 심사',
         createdDate: '2025-01-01'
