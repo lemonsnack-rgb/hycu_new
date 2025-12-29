@@ -704,7 +704,6 @@ window.showScreen = showScreen;
 window.handleLogout = handleLogout;
 window.initAdvisorAssignment = initAdvisorAssignment;
 window.searchProfessorAdvisorAssignment = searchProfessorAdvisorAssignment;
-window.resetProfessorAdvisorSearch = resetProfessorAdvisorSearch;
 window.viewProfessorProposalDetail = viewProfessorProposalDetail;
 window.returnToAdvisorAssignmentList = returnToAdvisorAssignmentList;
 window.renderGuideScreen = renderGuideScreen;
