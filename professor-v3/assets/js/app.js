@@ -808,6 +808,176 @@ const mockWeeklyGuidance = [
 
 // 주차별 논문지도 현황 초기화
 function initWeeklyGuidance() {
+    const contentArea = document.getElementById('guidance-content-area');
+    if (!contentArea) return;
+
+    contentArea.innerHTML = `
+        <!-- 검색 영역 -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-4 bg-gray-50">
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- 1행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
+                        <select id="guidance-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <select id="guidance-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="1">1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                        <select id="guidance-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="특수대학원">특수대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                        <select id="guidance-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="교육대학원">교육대학원</option>
+                            <option value="산업정보대학원">산업정보대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                        <select id="guidance-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="공과대학">공과대학</option>
+                            <option value="사범대학">사범대학</option>
+                            <option value="인문대학">인문대학</option>
+                            <option value="사회과학대학">사회과학대학</option>
+                        </select>
+                    </div>
+
+                    <!-- 2행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                        <select id="guidance-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                        <select id="guidance-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="석사">석사</option>
+                            <option value="박사">박사</option>
+                            <option value="석박통합">석박통합</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                        <select id="guidance-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="재학">재학</option>
+                            <option value="휴학">휴학</option>
+                            <option value="수료">수료</option>
+                            <option value="졸업">졸업</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                        <input type="text" id="guidance-search-student-id" placeholder="학번"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+
+                    <!-- 3행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                        <input type="text" id="guidance-search-student-name" placeholder="성명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                        <input type="text" id="guidance-search-advisor" placeholder="지도교수명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">주차</label>
+                        <select id="guidance-search-week" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="1">1주차</option>
+                            <option value="2">2주차</option>
+                            <option value="3">3주차</option>
+                            <option value="4">4주차</option>
+                            <option value="5">5주차</option>
+                            <option value="6">6주차</option>
+                            <option value="7">7주차</option>
+                            <option value="8">8주차</option>
+                            <option value="9">9주차</option>
+                            <option value="10">10주차</option>
+                            <option value="11">11주차</option>
+                            <option value="12">12주차</option>
+                            <option value="13">13주차</option>
+                            <option value="14">14주차</option>
+                            <option value="15">15주차</option>
+                            <option value="16">16주차</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center justify-end">
+                        <button onclick="searchWeeklyGuidance()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                            <i class="fas fa-search mr-1"></i>조회
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 테이블 영역 -->
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">주차별 논문지도 현황</h3>
+                        <span class="table-count" id="guidance-count">(총 0건)</span>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">주차</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">대학구분</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">계열/대학원</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학부(과)전공</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과/전공</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학적상태</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도내용</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도일시</th>
+                            </tr>
+                        </thead>
+                        <tbody id="guidance-list" class="bg-white divide-y divide-gray-200">
+                            <!-- JavaScript로 동적 생성 -->
+                        </tbody>
+                    </table>
+
+                    <div id="guidance-no-data" class="text-center py-8 text-gray-500" style="display: none;">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>주차별 지도 현황이 없습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
     renderWeeklyGuidanceTable(mockWeeklyGuidance);
 }
 
