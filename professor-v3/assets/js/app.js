@@ -397,10 +397,16 @@ function searchProfessorAdvisorAssignment() {
 
     const year = document.getElementById('prof-advisor-search-year')?.value || '';
     const semester = document.getElementById('prof-advisor-search-semester')?.value || '';
-    const semesterCount = document.getElementById('prof-advisor-search-semester-count')?.value || '';
+    const collegeType = document.getElementById('prof-advisor-search-college-type')?.value || '';
+    const graduate = document.getElementById('prof-advisor-search-graduate')?.value || '';
+    const majorCategory = document.getElementById('prof-advisor-search-major-category')?.value || '';
     const department = document.getElementById('prof-advisor-search-department')?.value || '';
+    const degree = document.getElementById('prof-advisor-search-degree')?.value || '';
+    const status = document.getElementById('prof-advisor-search-status')?.value || '';
+    const assignment = document.getElementById('prof-advisor-search-assignment')?.value || '';
     const studentId = document.getElementById('prof-advisor-search-student-id')?.value || '';
     const studentName = document.getElementById('prof-advisor-search-student-name')?.value || '';
+    const advisorName = document.getElementById('prof-advisor-search-advisor')?.value || '';
 
     // 현재 교수가 지도하는 학생의 연구계획서
     const myAssignments = mockAdvisorAssignments.filter(a =>
@@ -409,8 +415,8 @@ function searchProfessorAdvisorAssignment() {
     );
 
     const proposalsWithAssignment = mockResearchProposals.map(proposal => {
-        const assignment = myAssignments.find(a => a.studentId === proposal.studentId);
-        if (!assignment) return null;
+        const assignmentData = myAssignments.find(a => a.studentId === proposal.studentId);
+        if (!assignmentData) return null;
 
         const student = mockStudents.find(s => s.id === proposal.studentId);
         if (!student) return null;
@@ -419,34 +425,32 @@ function searchProfessorAdvisorAssignment() {
             ...proposal,
             academicYear: student.academicYear,
             semesterCount: student.semesterCount,
-            assignment: assignment
+            assignment: assignmentData,
+            student: student
         };
     }).filter(item => item !== null);
 
     const filteredData = proposalsWithAssignment.filter(item => {
         if (year && item.academicYear !== year) return false;
-        if (semesterCount && item.semesterCount.toString() !== semesterCount) return false;
+        if (semester && item.student?.currentSemester !== parseInt(semester)) return false;
         if (department && item.department !== department) return false;
+        if (degree && item.degreeType !== degree) return false;
+        if (status && item.student?.status !== status) return false;
+        if (assignment) {
+            const isAssigned = item.assignment?.mainAdvisor ? '배정완료' : '미배정';
+            if (assignment !== isAssigned) return false;
+        }
         if (studentId && !item.studentNumber.includes(studentId)) return false;
         if (studentName && !item.studentName.includes(studentName)) return false;
+        if (advisorName) {
+            const mainAdvisorName = item.assignment?.mainAdvisor?.name || '';
+            if (!mainAdvisorName.includes(advisorName)) return false;
+        }
         return true;
     });
 
     renderProfessorAdvisorAssignmentTable(filteredData);
     alert(`검색 결과: ${filteredData.length}건`);
-}
-
-// 교수용 검색 초기화
-function resetProfessorAdvisorSearch() {
-    document.querySelectorAll('input[id^="prof-advisor-search"], select[id^="prof-advisor-search"]').forEach(field => {
-        if (field.tagName === 'SELECT') {
-            field.selectedIndex = 0;
-        } else {
-            field.value = '';
-        }
-    });
-    renderProfessorAdvisorAssignmentTable();
-    alert('검색 조건이 초기화되었습니다.');
 }
 
 // 목록으로 돌아가기 (HTML 구조 복원)
