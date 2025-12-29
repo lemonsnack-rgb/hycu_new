@@ -877,7 +877,8 @@ function renderWeeklyGuidanceTable(data = []) {
         const studentStatus = item.status || '-';
 
         return `
-        <tr class="hover:bg-gray-50">
+        <tr class="hover:bg-gray-50 cursor-pointer"
+            onclick="viewWeeklyGuidanceDetail(${item.id})">
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear || '-'}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semester || '-'}학기</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.week || '-'}주차</td>
@@ -911,6 +912,38 @@ function renderWeeklyGuidanceTable(data = []) {
     }).join('');
 }
 
+// 주차별 논문지도 현황 상세 보기
+function viewWeeklyGuidanceDetail(id) {
+    const item = mockWeeklyGuidance.find(g => g.id === id);
+    if (!item) {
+        alert('지도 현황 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 상세 화면 렌더링 (간단한 alert로 임시 구현)
+    alert(`
+주차별 논문지도 상세 정보
+
+학생명: ${item.studentName}
+학번: ${item.studentNumber}
+학과: ${item.department}
+학위과정: ${item.degreeType}
+
+학년도/학기: ${item.academicYear}년 ${item.semester}학기
+주차: ${item.week}주차
+
+지도교수: ${item.advisorName}
+지도일시: ${item.guidanceDate}
+
+지도내용:
+${item.guidanceContent}
+    `);
+
+    // TODO: 실제 상세 화면 구현 시 아래와 같이 처리
+    // const guidanceScreen = document.getElementById('guidance-screen');
+    // guidanceScreen.innerHTML = renderWeeklyGuidanceDetailView(item);
+}
+
 // 전역으로 export
 window.showScreen = showScreen;
 window.handleLogout = handleLogout;
@@ -921,6 +954,7 @@ window.returnToAdvisorAssignmentList = returnToAdvisorAssignmentList;
 window.initWeeklyGuidance = initWeeklyGuidance;
 window.searchWeeklyGuidance = searchWeeklyGuidance;
 window.renderWeeklyGuidanceTable = renderWeeklyGuidanceTable;
+window.viewWeeklyGuidanceDetail = viewWeeklyGuidanceDetail;
 window.renderGuideScreen = renderGuideScreen;
 window.renderNoticeScreen = renderNoticeScreen;
 window.viewNoticeDetailProfessor = viewNoticeDetailProfessor;
