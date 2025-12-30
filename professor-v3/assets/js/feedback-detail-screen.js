@@ -65,41 +65,32 @@ function createFeedbackDetailScreen(request, feedbackData) {
 
     screen.innerHTML = `
         <div class="feedback-detail-content">
-            <!-- 헤더 -->
-            <div class="flex items-center justify-between p-4 border-b bg-white">
-                <div class="flex items-center gap-4">
-                    <!-- 뒤로가기 버튼 -->
-                    <button onclick="closeFeedbackDetailScreen()"
-                            class="text-gray-600 hover:text-gray-900 transition-colors p-2 hover:bg-gray-100 rounded-md">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                    </button>
+            <!-- 헤더: 목록으로 돌아가기 -->
+            <div class="px-6 py-3 border-b bg-white flex items-center justify-between">
+                <button onclick="closeFeedbackDetailScreen()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+                <button onclick="completeFeedbackDetail()"
+                        class="text-sm bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-2 font-semibold transition-colors">
+                    <i class="fas fa-check-double"></i>
+                    <span>피드백 완료</span>
+                </button>
+            </div>
 
-                    <!-- ID 39: 논문명 표시 -->
-                    <div class="flex flex-col">
-                        <span class="text-xs text-gray-500">${request.thesisTitle || '논문명'}</span>
-                        <h3 class="text-lg font-bold text-gray-800">
-                            ${request.studentName} - ${request.file}
-                        </h3>
-                    </div>
-                    <span class="text-xs px-2 py-1 rounded-full bg-gray-100 text-gray-600">
-                        v${feedbackData ? feedbackData.version : 1}
+            <!-- 논문 정보 영역 -->
+            <div class="px-6 py-3 border-b bg-gray-50">
+                <div class="flex items-center justify-between gap-4">
+                    <span class="text-sm font-medium text-gray-900 truncate" style="max-width: 50ch;">
+                        ${request.thesisTitle || '논문명'}
                     </span>
-                    <!-- ID 47: CopyKiller/GPT Killer 결과보고서 링크 -->
-                    <div class="text-sm text-gray-600">
+                    <div class="text-sm text-gray-600 flex-shrink-0">
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
                             CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-[#6A0028] hover:underline text-xs">결과보고서(통합)</a>
                         </span>
                     </div>
-                </div>
-                <div class="flex items-center gap-2">
-                    <!-- 피드백 완료 버튼 추가 -->
-                    <button onclick="completeFeedbackDetail()"
-                            class="text-sm bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-2 font-semibold transition-colors">
-                        <i class="fas fa-check-double"></i>
-                        <span>피드백 완료</span>
-                    </button>
                 </div>
             </div>
 

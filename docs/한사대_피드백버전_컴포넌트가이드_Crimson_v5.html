@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>컴포넌트 가이드 v5 - Crimson Theme (한양사이버대학교 대학원)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <!-- Pretendard Variable Font -->
+    <link rel="stylesheet" as="style" crossorigin
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            padding: 40px 60px;
+        }
+
+        /* =============================================
+           Color Palette
+           ============================================= */
+        :root {
+            /* Primary - Crimson */
+            --primary: #6A0028;
+            --primary-dark: #4A001C;
+            --primary-light: #8A0034;
+            --primary-tint: #FCE4EC;
+
+            /* Accent */
+            --accent-warm: #FAF6F1;
+            --accent-gold: #C5A065;
+
+            /* Status Colors */
+            --success: #2E7D32;
+            --success-bg: #E8F5E9;
+            --info: #0288D1;
+            --info-bg: #E3F2FD;
+
+            /* Neutrals */
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --bg-light: #f8fafc;
+
+            /* Layout */
+            --sidebar-width: 240px;
+            --utility-header-height: 48px;
+            --page-header-height: 72px;
+        }
+
+        .guide-header {
+            margin-bottom: 48px;
+            padding-bottom: 24px;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        .guide-header h1 {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .guide-header p {
+            font-size: 16px;
+            color: var(--text-secondary);
+        }
+
+        .guide-version {
+            display: inline-block;
+            padding: 4px 12px;
+            background: var(--primary);
+            color: white;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-top: 12px;
+        }
+
+        /* Color Palette Display */
+        .color-palette {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .color-item {
+            text-align: center;
+        }
+
+        .color-box {
+            width: 100px;
+            height: 100px;
+            border-radius: 4px;
+            margin-bottom: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .color-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .color-code {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-family: 'Courier New', monospace;
+        }
+
+        .section {
+            background: white;
+            padding: 32px;
+            border-radius: 4px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .section-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .section-title::before {
+            content: '';
+            width: 5px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 3px;
+        }
+
+        .component-group {
+            margin-bottom: 32px;
+        }
+
+        .component-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .component-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .component-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .component-note {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            margin-top: 12px;
+        }
+
+        .code-block .tag { color: #569cd6; }
+        .code-block .class { color: #4ec9b0; }
+        .code-block .string { color: #ce9178; }
+
+        /* =============================================
+           Layout Preview Styles
+           ============================================= */
+        .layout-preview {
+            border: 2px solid var(--border-color);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 16px;
+        }
+
+        .layout-v3-container-preview {
+            display: flex;
+            height: 400px;
+            background: #f5f7fa;
+        }
+
+        .sidebar-preview {
+            width: 240px;
+            background: white;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header-preview {
+            height: 64px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-logo-preview {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-box-preview {
+            width: 32px;
+            height: 32px;
+            background: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .sidebar-title-preview {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .sidebar-toggle-preview {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+        }
+
+        .sidebar-nav-preview {
+            flex: 1;
+            padding: 12px 0;
+            overflow-y: auto;
+        }
+
+        .nav-item-preview {
+            padding: 12px 16px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-item-preview.active {
+            background: var(--primary-tint);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .main-content-preview {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .utility-header-preview {
+            height: 48px;
+            background: var(--bg-light);
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .breadcrumb-preview {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .user-info-preview {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .page-header-preview {
+            height: 72px;
+            background: white;
+            border-bottom: 1px solid var(--border-color);
+            padding: 0 24px;
+            display: flex;
+            align-items: flex-end;
+            gap: 16px;
+            padding-bottom: 20px;
+        }
+
+        .page-title-preview {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .page-help-text-preview {
+            font-size: 14px;
+            color: var(--text-secondary);
+            padding-bottom: 2px;
+        }
+
+        .content-area-preview {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 4px;
+            padding: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 12px;
+        }
+
+        /* Table Components */
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .table-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .table-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Search Components */
+        .search-container {
+            background: white;
+            padding: 24px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .search-field {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .search-label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .search-select, .search-input {
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Pretendard Variable', sans-serif;
+        }
+
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 16px;
+        }
+
+        /* Badges */
+        .badge-count {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--primary);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            border-radius: 10px;
+            border: 2px solid white;
+        }
+
+        .utility-icon-btn {
+            width: 32px;
+            height: 32px;
+            border: 1px solid var(--border-color);
+            background: white;
+            border-radius: 4px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 11px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Pretendard Variable', sans-serif;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="guide-header">
+        <h1>컴포넌트 가이드 v5</h1>
+        <p>한양사이버대학교 대학원 논문지도시스템 - Crimson Theme</p>
+        <span class="guide-version">v5.0 - Layout System 추가</span>
+
+        <div class="color-palette">
+            <div class="color-item">
+                <div class="color-box" style="background: #6A0028;"></div>
+                <div class="color-label">Primary</div>
+                <div class="color-code">#6A0028</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #4A001C;"></div>
+                <div class="color-label">Primary Dark</div>
+                <div class="color-code">#4A001C</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #8A0034;"></div>
+                <div class="color-label">Primary Light</div>
+                <div class="color-code">#8A0034</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #FCE4EC;"></div>
+                <div class="color-label">Primary Tint</div>
+                <div class="color-code">#FCE4EC</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #FAF6F1;"></div>
+                <div class="color-label">Accent Warm</div>
+                <div class="color-code">#FAF6F1</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #2E7D32;"></div>
+                <div class="color-label">Success</div>
+                <div class="color-code">#2E7D32</div>
+            </div>
+            <div class="color-item">
+                <div class="color-box" style="background: #0288D1;"></div>
+                <div class="color-label">Info</div>
+                <div class="color-code">#0288D1</div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Typography -->
+    <section class="section">
+        <h2 class="section-title">Typography</h2>
+
+        <div class="component-group">
+            <span class="component-label">Pretendard Variable Font</span>
+            <p class="component-note">시스템 전체에 Pretendard Variable 폰트 사용 (CDN: jsdelivr)</p>
+            <div class="code-block">&lt;link rel="stylesheet" as="style" crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.min.css" /&gt;</div>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">Font Weights</span>
+            <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 12px;">
+                <div style="font-weight: 400; font-size: 16px;">Regular (400) - 본문 텍스트</div>
+                <div style="font-weight: 500; font-size: 16px;">Medium (500) - 강조 텍스트</div>
+                <div style="font-weight: 600; font-size: 16px;">Semibold (600) - 라벨, 버튼</div>
+                <div style="font-weight: 700; font-size: 16px;">Bold (700) - 제목, 타이틀</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- =============================================
+         NEW: Layout System v3
+         ============================================= -->
+    <section class="section">
+        <h2 class="section-title">Layout System v3 - 전체 레이아웃 구조</h2>
+
+        <div class="component-group">
+            <span class="component-label">3-Part Layout: Sidebar + Utility Header + Page Header</span>
+            <p class="component-note">
+                교수용 화면에서 실제 사용되는 레이아웃 시스템입니다.<br>
+                - 사이드바: 240px 고정 너비, 접기/펼치기 기능<br>
+                - 유틸리티 헤더: 48px 고정 높이 (브레드크럼 + 알림 + 사용자 정보)<br>
+                - 페이지 헤더: 72px 고정 높이 (페이지 제목 + 도움말 텍스트)
+            </p>
+
+            <div class="layout-preview">
+                <div class="layout-v3-container-preview">
+                    <!-- Sidebar -->
+                    <div class="sidebar-preview">
+                        <div class="sidebar-header-preview">
+                            <div class="sidebar-logo-preview">
+                                <div class="logo-box-preview">H</div>
+                                <span class="sidebar-title-preview">논문 지도 시스템</span>
+                            </div>
+                            <div class="sidebar-toggle-preview">&lt;</div>
+                        </div>
+                        <div class="sidebar-nav-preview">
+                            <div class="nav-item-preview active">🏠 대시보드</div>
+                            <div class="nav-item-preview">ℹ️ 논문 안내</div>
+                            <div class="nav-item-preview">👥 논문지도</div>
+                            <div class="nav-item-preview">📋 논문 심사</div>
+                        </div>
+                    </div>
+
+                    <!-- Main Content Area -->
+                    <div class="main-content-preview">
+                        <!-- Utility Header (48px) -->
+                        <div class="utility-header-preview">
+                            <div class="breadcrumb-preview">홈 &gt; 대시보드</div>
+                            <div class="user-info-preview">
+                                <span style="color: var(--text-secondary);">지도교수</span>
+                                <span>│</span>
+                                <span style="font-weight: 600;">김교수</span>
+                            </div>
+                        </div>
+
+                        <!-- Page Header (72px) -->
+                        <div class="page-header-preview">
+                            <div class="page-title-preview">대시보드</div>
+                            <div class="page-help-text-preview">논문 지도 현황을 한눈에 확인하세요</div>
+                        </div>
+
+                        <!-- Content Area -->
+                        <div class="content-area-preview">
+                            <div class="preview-card">콘텐츠 영역</div>
+                            <div class="preview-card">메인 콘텐츠가 여기에 표시됩니다</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block" style="margin-top: 16px;">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-container"</span>&gt;
+    &lt;<span class="tag">aside</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar"</span>&gt;
+        &lt;!-- 사이드바 헤더 (64px) --&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-header"</span>&gt;...&lt;/<span class="tag">div</span>&gt;
+        &lt;!-- 사이드바 네비게이션 --&gt;
+        &lt;<span class="tag">nav</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-nav"</span>&gt;...&lt;/<span class="tag">nav</span>&gt;
+        &lt;!-- 사이드바 하단 --&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-footer"</span>&gt;...&lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="tag">aside</span>&gt;
+
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-main-content"</span>&gt;
+        &lt;!-- 유틸리티 헤더 (48px) --&gt;
+        &lt;<span class="tag">header</span> <span class="class">class</span>=<span class="string">"layout-v3-utility-header"</span>&gt;...&lt;/<span class="tag">header</span>&gt;
+        &lt;!-- 페이지 헤더 (72px) --&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-page-header"</span>&gt;...&lt;/<span class="tag">div</span>&gt;
+        &lt;!-- 콘텐츠 영역 --&gt;
+        &lt;<span class="tag">main</span> <span class="class">class</span>=<span class="string">"layout-v3-content-area"</span>&gt;...&lt;/<span class="tag">main</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+        </div>
+    </section>
+
+    <!-- Sidebar Components -->
+    <section class="section">
+        <h2 class="section-title">Sidebar 컴포넌트</h2>
+
+        <div class="component-group">
+            <span class="component-label">사이드바 헤더 (64px 고정 높이)</span>
+            <div class="code-block">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-header"</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-logo-area"</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-logo"</span>&gt;H&lt;/<span class="tag">div</span>&gt;
+        &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-title"</span>&gt;논문 지도 시스템&lt;/<span class="tag">span</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+    &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-toggle"</span>&gt;...&lt;/<span class="tag">button</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+            <p class="component-note">
+                - <strong>.layout-v3-sidebar-logo</strong>: 32x32px, Crimson 배경, 흰색 텍스트<br>
+                - <strong>.layout-v3-sidebar-toggle</strong>: 28px 원형, Crimson 배경 (접기 버튼)
+            </p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">사이드바 메뉴 구조</span>
+            <div class="code-block">&lt;<span class="tag">nav</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-nav"</span>&gt;
+    &lt;!-- 1depth 메뉴 --&gt;
+    &lt;<span class="tag">a</span> <span class="class">class</span>=<span class="string">"layout-v3-nav-item active"</span>&gt;
+        &lt;<span class="tag">svg</span>&gt;...&lt;/<span class="tag">svg</span>&gt;
+        &lt;<span class="tag">span</span>&gt;대시보드&lt;/<span class="tag">span</span>&gt;
+    &lt;/<span class="tag">a</span>&gt;
+
+    &lt;!-- 2depth 메뉴 (접기/펼치기) --&gt;
+    &lt;<span class="tag">div</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">onclick</span>=<span class="string">"toggleSubmenu('id')"</span>&gt;논문 안내&lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">id</span>=<span class="string">"submenu"</span>&gt;
+            &lt;<span class="tag">a</span> <span class="class">class</span>=<span class="string">"sidebar-sublink"</span>&gt;공지사항&lt;/<span class="tag">a</span>&gt;
+            &lt;<span class="tag">a</span> <span class="class">class</span>=<span class="string">"sidebar-sublink"</span>&gt;자료실&lt;/<span class="tag">a</span>&gt;
+        &lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">nav</span>&gt;</div>
+            <p class="component-note">
+                - 1depth: <strong>.layout-v3-nav-item</strong> (아이콘 + 텍스트)<br>
+                - 2depth: <strong>.sidebar-sublink</strong> (텍스트만, 좌측 들여쓰기)<br>
+                - Active 상태: Crimson 배경 tint + Crimson 텍스트 색상
+            </p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">사이드바 하단 (로그아웃)</span>
+            <div class="code-block">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-footer"</span>&gt;
+    &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-logout"</span>&gt;
+        &lt;<span class="tag">svg</span>&gt;...&lt;/<span class="tag">svg</span>&gt;
+        로그아웃
+    &lt;/<span class="tag">button</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+        </div>
+    </section>
+
+    <!-- Utility Header Components -->
+    <section class="section">
+        <h2 class="section-title">Utility Header 컴포넌트 (48px)</h2>
+
+        <div class="component-group">
+            <span class="component-label">유틸리티 헤더 구조</span>
+            <div class="code-block">&lt;<span class="tag">header</span> <span class="class">class</span>=<span class="string">"layout-v3-utility-header"</span>&gt;
+    &lt;!-- 좌측: 햄버거 메뉴 + 브레드크럼 --&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-utility-left"</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-open-btn"</span>&gt;...&lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-breadcrumb"</span>&gt;
+            &lt;<span class="tag">a</span>&gt;홈&lt;/<span class="tag">a</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"layout-v3-breadcrumb-separator"</span>&gt;&gt;&lt;/<span class="tag">span</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"layout-v3-breadcrumb-current"</span>&gt;대시보드&lt;/<span class="tag">span</span>&gt;
+        &lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+
+    &lt;!-- 우측: 알림 + 사용자 정보 --&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-utility-right"</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"layout-v3-utility-icon-btn"</span>&gt;
+            &lt;<span class="tag">svg</span>&gt;알림 아이콘&lt;/<span class="tag">svg</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"badge-count"</span>&gt;12&lt;/<span class="tag">span</span>&gt;
+        &lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-user-info"</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"layout-v3-user-role"</span>&gt;지도교수&lt;/<span class="tag">span</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"layout-v3-user-divider"</span>&gt;│&lt;/<span class="tag">span</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"layout-v3-user-name"</span>&gt;김교수&lt;/<span class="tag">span</span>&gt;
+        &lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">header</span>&gt;</div>
+            <p class="component-note">
+                - 햄버거 메뉴: 사이드바 접힘 상태에서만 표시<br>
+                - 브레드크럼: 현재 페이지 위치 표시 (홈 &gt; 대시보드)<br>
+                - 알림 버튼: 32x32px, 우측 상단에 <strong>.badge-count</strong> 배지<br>
+                - 사용자 정보: 역할 + 이름 + Avatar (선택)
+            </p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">알림 배지 (Badge Count)</span>
+            <div style="position: relative; display: inline-block; margin: 20px;">
+                <div class="utility-icon-btn">
+                    🔔
+                    <span class="badge-count">12</span>
+                </div>
+            </div>
+            <div class="code-block">&lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"layout-v3-utility-icon-btn"</span>&gt;
+    &lt;<span class="tag">svg</span>&gt;아이콘&lt;/<span class="tag">svg</span>&gt;
+    &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"badge-count"</span>&gt;12&lt;/<span class="tag">span</span>&gt;
+&lt;/<span class="tag">button</span>&gt;</div>
+            <p class="component-note">
+                <strong>.badge-count</strong>: 20px 높이, Crimson 배경, 흰색 텍스트, 11px 폰트, 굵게 (700)<br>
+                버튼 우측 상단 절대 위치 (-6px, -6px), 흰색 테두리 2px
+            </p>
+        </div>
+    </section>
+
+    <!-- Page Header Components -->
+    <section class="section">
+        <h2 class="section-title">Page Header 컴포넌트 (72px)</h2>
+
+        <div class="component-group">
+            <span class="component-label">페이지 타이틀 + 도움말 텍스트</span>
+            <div class="code-block">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-page-header"</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-page-header-left"</span>&gt;
+        &lt;<span class="tag">h1</span> <span class="class">class</span>=<span class="string">"layout-v3-page-title"</span>&gt;대시보드&lt;/<span class="tag">h1</span>&gt;
+        &lt;<span class="tag">p</span> <span class="class">class</span>=<span class="string">"layout-v3-page-help-text"</span>&gt;논문 지도 현황을 한눈에 확인하세요&lt;/<span class="tag">p</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+            <p class="component-note">
+                - <strong>.layout-v3-page-title</strong>: 24px, Bold (700), 제목 텍스트<br>
+                - <strong>.layout-v3-page-help-text</strong>: 14px, Secondary 색상, 도움말 텍스트<br>
+                - 두 요소는 하단 정렬 (align-items: flex-end), 16px gap
+            </p>
+        </div>
+    </section>
+
+    <!-- Search Container Components -->
+    <section class="section">
+        <h2 class="section-title">Search Container 컴포넌트</h2>
+
+        <div class="component-group">
+            <span class="component-label">검색 영역 구조</span>
+            <div class="search-container">
+                <div class="search-grid">
+                    <div class="search-field">
+                        <label class="search-label">학년도</label>
+                        <select class="search-select">
+                            <option>전체</option>
+                            <option>2025</option>
+                            <option>2024</option>
+                        </select>
+                    </div>
+                    <div class="search-field">
+                        <label class="search-label">학기</label>
+                        <select class="search-select">
+                            <option>전체</option>
+                            <option>1학기</option>
+                            <option>2학기</option>
+                        </select>
+                    </div>
+                    <div class="search-field">
+                        <label class="search-label">학번</label>
+                        <input type="text" class="search-input" placeholder="학번 입력">
+                    </div>
+                    <div class="search-field">
+                        <label class="search-label">이름</label>
+                        <input type="text" class="search-input" placeholder="이름 입력">
+                    </div>
+                </div>
+                <div class="search-buttons">
+                    <button class="btn btn-secondary">초기화</button>
+                    <button class="btn btn-primary">검색</button>
+                </div>
+            </div>
+
+            <div class="code-block" style="margin-top: 16px;">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"search-container"</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"search-grid"</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"search-field"</span>&gt;
+            &lt;<span class="tag">label</span> <span class="class">class</span>=<span class="string">"search-label"</span>&gt;학년도&lt;/<span class="tag">label</span>&gt;
+            &lt;<span class="tag">select</span> <span class="class">class</span>=<span class="string">"search-select"</span>&gt;...&lt;/<span class="tag">select</span>&gt;
+        &lt;/<span class="tag">div</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"search-field"</span>&gt;
+            &lt;<span class="tag">label</span> <span class="class">class</span>=<span class="string">"search-label"</span>&gt;학번&lt;/<span class="tag">label</span>&gt;
+            &lt;<span class="tag">input</span> <span class="class">class</span>=<span class="string">"search-input"</span> <span class="class">placeholder</span>=<span class="string">"학번 입력"</span>&gt;
+        &lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"search-buttons"</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"btn btn-secondary"</span>&gt;초기화&lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"btn btn-primary"</span>&gt;검색&lt;/<span class="tag">button</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+            <p class="component-note">
+                - <strong>.search-container</strong>: 흰색 배경, 24px 패딩, border-radius 4px<br>
+                - <strong>.search-grid</strong>: CSS Grid 레이아웃 (auto-fit, minmax(200px, 1fr)), 16px gap<br>
+                - <strong>.search-field</strong>: 라벨 + 입력 필드 세로 배치<br>
+                - <strong>.search-buttons</strong>: 중앙 정렬, 12px gap, 상단 마진 16px
+            </p>
+        </div>
+    </section>
+
+    <!-- Table Header Components -->
+    <section class="section">
+        <h2 class="section-title">Table Header 컴포넌트</h2>
+
+        <div class="component-group">
+            <span class="component-label">테이블 헤더 (제목 + 건수)</span>
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: 4px; overflow: hidden;">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">지도교수 배정 목록</h3>
+                        <span class="table-count">(총 24건)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="code-block" style="margin-top: 16px;">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"table-container"</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"table-header"</span>&gt;
+        &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"table-header-left"</span>&gt;
+            &lt;<span class="tag">h3</span> <span class="class">class</span>=<span class="string">"table-title"</span>&gt;지도교수 배정 목록&lt;/<span class="tag">h3</span>&gt;
+            &lt;<span class="tag">span</span> <span class="class">class</span>=<span class="string">"table-count"</span>&gt;(총 24건)&lt;/<span class="tag">span</span>&gt;
+        &lt;/<span class="tag">div</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"table-scroll"</span>&gt;
+        &lt;<span class="tag">table</span>&gt;...&lt;/<span class="tag">table</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+            <p class="component-note">
+                - <strong>.table-header</strong>: 테이블 상단 타이틀 영역 (16-20px 패딩)<br>
+                - <strong>.table-title</strong>: 16px, Bold (700), Primary 텍스트<br>
+                - <strong>.table-count</strong>: 14px, Secondary 색상, 괄호로 감싼 건수<br>
+                - 우측에 버튼 배치 가능 (.table-header-right)
+            </p>
+        </div>
+    </section>
+
+    <!-- Filter Chips Container -->
+    <section class="section">
+        <h2 class="section-title">Filter Chips Container</h2>
+
+        <div class="component-group">
+            <span class="component-label">필터 칩 컨테이너 (흰색 배경)</span>
+            <div style="background: white; border: 1px solid var(--border-color); border-radius: 4px; padding: 16px;">
+                <h3 style="font-size: 14px; font-weight: 600; color: var(--text-secondary); margin-bottom: 12px;">논문 지도 단계 선택</h3>
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: var(--primary); color: white; cursor: pointer; font-size: 14px; font-weight: 500;">전체</button>
+                    <button style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-secondary); cursor: pointer; font-size: 14px; font-weight: 500;">연구계획서</button>
+                    <button style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-secondary); cursor: pointer; font-size: 14px; font-weight: 500;">1차 보고서</button>
+                    <button style="padding: 8px 16px; border-radius: 20px; border: 1px solid var(--border-color); background: white; color: var(--text-secondary); cursor: pointer; font-size: 14px; font-weight: 500;">최종논문</button>
+                </div>
+            </div>
+
+            <div class="code-block" style="margin-top: 16px;">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"filter-chips-container"</span>&gt;
+    &lt;<span class="tag">h3</span>&gt;논문 지도 단계 선택&lt;/<span class="tag">h3</span>&gt;
+    &lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"filter-chips"</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"filter-chip active"</span>&gt;전체&lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"filter-chip"</span>&gt;연구계획서&lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"filter-chip"</span>&gt;1차 보고서&lt;/<span class="tag">button</span>&gt;
+        &lt;<span class="tag">button</span> <span class="class">class</span>=<span class="string">"filter-chip"</span>&gt;최종논문&lt;/<span class="tag">button</span>&gt;
+    &lt;/<span class="tag">div</span>&gt;
+&lt;/<span class="tag">div</span>&gt;</div>
+            <p class="component-note">
+                검색 영역 위에 배치되는 필터 칩 영역입니다. 흰색 배경, 패딩 포함한 컨테이너를 제공합니다.
+            </p>
+        </div>
+    </section>
+
+    <!-- Mobile Responsive -->
+    <section class="section">
+        <h2 class="section-title">모바일 반응형</h2>
+
+        <div class="component-group">
+            <span class="component-label">사이드바 오버레이 (모바일용)</span>
+            <div class="code-block">&lt;<span class="tag">div</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar-overlay"</span> <span class="class">onclick</span>=<span class="string">"toggleMobileMenu()"</span>&gt;&lt;/<span class="tag">div</span>&gt;</div>
+            <p class="component-note">
+                - 모바일에서 사이드바 열림 시 배경 오버레이 (반투명 검정)<br>
+                - z-index: 350 (사이드바보다 낮음)<br>
+                - <strong>.active</strong> 클래스로 표시/숨김 제어
+            </p>
+        </div>
+
+        <div class="component-group">
+            <span class="component-label">사이드바 모바일 제어</span>
+            <div class="code-block">&lt;!-- 기본 상태: 숨김 (translateX(-100%)) --&gt;
+&lt;<span class="tag">aside</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar"</span>&gt;...&lt;/<span class="tag">aside</span>&gt;
+
+&lt;!-- 모바일 열림: .mobile-open 클래스 추가 --&gt;
+&lt;<span class="tag">aside</span> <span class="class">class</span>=<span class="string">"layout-v3-sidebar mobile-open"</span>&gt;...&lt;/<span class="tag">aside</span>&gt;</div>
+            <p class="component-note">
+                - 768px 이하에서 사이드바 기본 숨김<br>
+                - 햄버거 메뉴 클릭 시 <strong>.mobile-open</strong> 클래스 추가/제거<br>
+                - 오버레이 클릭 시 사이드바 닫힘
+            </p>
+        </div>
+    </section>
+
+    <!-- Summary -->
+    <section class="section">
+        <h2 class="section-title">v5 업데이트 요약</h2>
+
+        <div style="background: var(--bg-light); padding: 20px; border-radius: 4px; border-left: 4px solid var(--primary);">
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">신규 추가된 컴포넌트</h3>
+            <ul style="list-style-position: inside; color: var(--text-secondary); line-height: 1.8;">
+                <li><strong>Layout System v3</strong>: 전체 3-Part 레이아웃 구조 (Sidebar + Utility Header + Page Header)</li>
+                <li><strong>Sidebar 컴포넌트</strong>: 240px 고정 너비, 접기/펼치기, 로고, 네비게이션, 로그아웃</li>
+                <li><strong>Utility Header</strong>: 48px 고정 높이, 브레드크럼, 알림, 사용자 정보</li>
+                <li><strong>Page Header</strong>: 72px 고정 높이, 페이지 제목 + 도움말 텍스트</li>
+                <li><strong>Search Container</strong>: 검색 영역 그리드 레이아웃, 검색 버튼</li>
+                <li><strong>Table Header</strong>: 테이블 제목 + 건수 표시</li>
+                <li><strong>Filter Chips Container</strong>: 필터 칩 래퍼 (흰색 배경)</li>
+                <li><strong>Badge Count</strong>: 알림 개수 표시용 원형 배지</li>
+                <li><strong>Mobile Responsive</strong>: 사이드바 오버레이, 모바일 메뉴 제어</li>
+                <li><strong>Pretendard Variable Font</strong>: 시스템 폰트 명시 (CDN)</li>
+            </ul>
+        </div>
+
+        <div style="margin-top: 20px; background: #FFF9E6; padding: 20px; border-radius: 4px; border-left: 4px solid var(--accent-gold);">
+            <h3 style="font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 12px;">참고 사항</h3>
+            <p style="color: var(--text-secondary); line-height: 1.6;">
+                이 가이드는 <code>professor-v3/professor-dashboard-proposal.html</code>에서 실제 구현된 컴포넌트를 기반으로 작성되었습니다.<br>
+                모든 클래스명과 CSS 속성은 <code>professor-v3/assets/css/layout-v3.css</code>와 동일합니다.
+            </p>
+        </div>
+    </section>
+
+</body>
+</html>

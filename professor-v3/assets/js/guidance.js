@@ -156,7 +156,7 @@ function showStudentList() {
                                        onchange="toggleSelectAllStudents(this.checked)"
                                        class="rounded">
                             </th>
-                            <th style="width: 60px;">번호</th>
+                            <th style="width: 60px;">순번</th>
                             <th style="width: 80px;">학년도</th>
                             <th style="width: 80px;">학기</th>
                             <th style="width: 100px;">대학구분</th>
@@ -228,51 +228,53 @@ function renderStudentDetail() {
     contentArea.innerHTML = `
         <!-- 뒤로가기 버튼 -->
         <div class="mb-4">
-            <button onclick="showStudentList()" 
-                    class="flex items-center text-gray-600 hover:text-gray-800 transition-colors">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <button onclick="showStudentList()" class="back-to-list-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                <span class="text-sm font-medium">목록으로 돌아가기</span>
+                목록으로 돌아가기
             </button>
         </div>
         
-        <!-- 학생 정보 카드 (Phase 2 스타일 - 상세) -->
-        <div class="bg-gray-50 rounded-lg p-6 mb-6">
-            <h4 class="font-bold text-gray-800 mb-4">학생 정보</h4>
-            <div class="grid grid-cols-2 gap-4">
-                <div class="info-row">
-                    <div class="info-label">학생명</div>
-                    <div class="info-value">${student.name} (${student.studentId})</div>
+        <!-- 학생 정보 -->
+        <div class="px-6 py-4 border-b bg-gray-50 rounded-lg mb-6">
+            <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+            <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                    <span class="text-gray-900 font-medium">일반대학원</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">학과 / 학위</div>
-                    <div class="info-value">${student.major} / ${getDegreeText(student.degree)}</div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                    <span class="text-gray-900 font-medium">일반대학원</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">현재 단계</div>
-                    <div class="info-value">${getStageText(student.stage)}</div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                    <span class="text-gray-900 font-medium">${student.major || '-'}</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">지도교수</div>
-                    <div class="info-value">
-                        ${student.advisors.map(advisor => `
-                            <div class="${advisor.id === currentProf.id ? 'font-semibold text-[#6A0028]' : 'text-gray-600'}">
-                                ${advisor.name} ${advisor.role === 'primary' ? '(주지도교수)' : '(부지도교수)'}
-                            </div>
-                        `).join('')}
-                    </div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                    <span class="text-gray-900 font-medium">${student.major || '-'}</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">지도 현황</div>
-                    <div class="info-value">
-                        <span class="text-gray-600">전체 계획: ${student.totalGuidanceCount}회</span>
-                        <span class="font-semibold text-[#6A0028] ml-3">지도 횟수: ${myStats.count}회</span>
-                    </div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                    <span class="text-gray-900 font-medium">${getDegreeText(student.degree)}</span>
                 </div>
-                <div class="info-row">
-                    <div class="info-label">최근 지도일</div>
-                    <div class="info-value">${myStats.lastDate || '-'}</div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                    <span class="text-gray-900 font-medium">재학</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">학번:</span>
+                    <span class="text-gray-900 font-medium">${student.studentId}</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">성명:</span>
+                    <span class="text-gray-900 font-medium">${student.name}</span>
+                </div>
+                <div class="flex gap-2">
+                    <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                    <span class="text-gray-900 font-medium">${student.advisors.find(a => a.role === 'primary')?.name || '-'}</span>
                 </div>
             </div>
         </div>
@@ -280,7 +282,6 @@ function renderStudentDetail() {
         <!-- 학기별 지도 계획 -->
         <div>
             <div class="flex justify-between items-center mb-4">
-                <h4 class="font-bold text-gray-800">학기별 논문지도 계획</h4>
                 <div class="flex items-center gap-3">
                     <button onclick="showSemesterGuidanceDetail('${student.id}')"
                             class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-2">

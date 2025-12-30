@@ -65,6 +65,16 @@ Crimson(크림슨) 컬러를 기반으로 한 통합 디자인 시스템입니�
 --color-gray-4: #F8FAFC;  /* 배경, 테이블 헤더 */
 ```
 
+### Accent Colors
+```css
+--color-accent-warm: #FAF6F1;  /* 따뜻한 배경색 (일정 카드 등) */
+--color-accent-gold: #C5A065;  /* 골드 악센트 (선택적 사용) */
+```
+
+**사용처:**
+- `accent-warm`: 일정 카드 배경, 강조 섹션 배경
+- `accent-gold`: 특별 배지, VIP 표시 (선택적)
+
 ---
 
 ## 타이포그래피 (Typography)

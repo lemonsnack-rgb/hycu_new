@@ -377,12 +377,11 @@ function viewSemesterPlanDetail(year, semester) {
     contentArea.innerHTML = `
         <!-- 뒤로가기 -->
         <div class="mb-4">
-            <button onclick="renderStudentDetail()"
-                    class="flex items-center text-gray-600 hover:text-gray-800 transition-colors">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <button onclick="renderStudentDetail()" class="back-to-list-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                <span class="text-sm font-medium">뒤로가기</span>
+                목록으로 돌아가기
             </button>
         </div>
 
@@ -390,7 +389,6 @@ function viewSemesterPlanDetail(year, semester) {
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex justify-between items-start mb-4">
                 <div>
-                    <h2 class="text-2xl font-bold text-gray-800">${year}학년도 ${semester}학기 지도 계획</h2>
                     <p class="text-sm text-gray-600 mt-2">
                         ${formatDate(plan.semesterStartDate)} ~ ${formatDate(plan.semesterEndDate)}
                     </p>

@@ -119,9 +119,7 @@ function renderExamScheduleTable(data) {
             ? '<span class="text-green-600">오프라인</span>'
             : '<span class="text-gray-400">-</span>';
 
-        const statusBadge = item.hasSchedule
-            ? '<span class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">등록 완료</span>'
-            : '<span class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-600">미등록</span>';
+        const statusText = item.hasSchedule ? '등록 완료' : '미등록';
 
         return `
             <tr class="hover:bg-gray-50 cursor-pointer transition-colors"
@@ -135,7 +133,7 @@ function renderExamScheduleTable(data) {
                 <td class="px-6 py-4 text-sm text-gray-600">${item.chairName}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${scheduleText}</td>
                 <td class="px-6 py-4 text-sm">${methodText}</td>
-                <td class="px-6 py-4 text-center">${statusBadge}</td>
+                <td class="px-6 py-4 text-center">${statusText}</td>
             </tr>
         `;
     }).join('');
@@ -183,17 +181,58 @@ function renderExamScheduleDetail(assignmentId) {
         // 일정 미등록
         document.getElementById('exam-schedule-detail-view').innerHTML = `
             <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <h3 class="text-lg font-bold text-gray-800">심사 일정 조회</h3>
-                            <p class="text-sm text-gray-600 mt-1">${assignment.studentName} (${assignment.studentNumber}) - ${assignment.stageName}</p>
+                <div class="px-6 py-3 border-b">
+                    <button onclick="backToExamScheduleList()" class="back-to-list-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        목록으로 돌아가기
+                    </button>
+                </div>
+
+                <!-- 학생 정보 -->
+                <div class="px-6 py-4 border-b bg-gray-50">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                            <span class="text-gray-900 font-medium">일반대학원</span>
                         </div>
-                        <button onclick="backToExamScheduleList()" class="btn btn-secondary">
-                            <i class="fas fa-list mr-1"></i> 목록으로
-                        </button>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                            <span class="text-gray-900 font-medium">일반대학원</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                            <span class="text-gray-900 font-medium">${assignment.department}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                            <span class="text-gray-900 font-medium">${assignment.department}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                            <span class="text-gray-900 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                            <span class="text-gray-900 font-medium">재학</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학번:</span>
+                            <span class="text-gray-900 font-medium">${assignment.studentNumber}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">성명:</span>
+                            <span class="text-gray-900 font-medium">${assignment.studentName}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                            <span class="text-gray-900 font-medium">-</span>
+                        </div>
                     </div>
                 </div>
+
                 <div class="p-6">
                     <div class="text-center py-12 text-gray-500">
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -230,46 +269,82 @@ function renderExamScheduleDetail(assignmentId) {
     detailView.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <!-- Header -->
-            <div class="p-6 border-b">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">심사 일정 조회</h3>
-                        <p class="text-sm text-gray-600 mt-1">${assignment.studentName} (${assignment.studentNumber}) - ${assignment.stageName}</p>
+            <div class="px-6 py-3 border-b">
+                <button onclick="backToExamScheduleList()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+            </div>
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <p class="text-sm text-gray-600">${assignment.studentName} (${assignment.studentNumber}) - ${assignment.stageName}</p>
+            </div>
+
+            <!-- 학생 정보 -->
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">일반대학원</span>
                     </div>
-                    <button onclick="backToExamScheduleList()" class="btn btn-secondary">
-                        <i class="fas fa-list mr-1"></i> 목록으로
-                    </button>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">일반대학원</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${assignment.department}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${assignment.department}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">재학</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${assignment.studentNumber}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${assignment.studentName}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 논문 정보 -->
+            <div class="px-6 py-4 border-b bg-white">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">논문 정보</h4>
+                <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+                    <div class="col-span-3 flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
+                        <span class="text-gray-900 font-medium">${thesisTitle}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">제출일:</span>
+                        <span class="text-gray-900 font-medium">-</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">심사 마감일:</span>
+                        <span class="text-gray-900 font-medium">-</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Content (읽기 전용) -->
             <div class="p-6">
-                <!-- 학생 정보 -->
-                <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                    <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
-                    <div class="grid grid-cols-2 gap-4 text-sm">
-                        <div>
-                            <span class="text-gray-600">학번:</span>
-                            <span class="ml-2 font-medium">${assignment.studentNumber}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">학생명:</span>
-                            <span class="ml-2 font-medium">${assignment.studentName}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">학과:</span>
-                            <span class="ml-2 font-medium">${assignment.department}</span>
-                        </div>
-                        <div>
-                            <span class="text-gray-600">학위:</span>
-                            <span class="ml-2 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
-                        </div>
-                        <div class="col-span-2">
-                            <span class="text-gray-600">논문 제목:</span>
-                            <span class="ml-2 font-medium">${thesisTitle}</span>
-                        </div>
-                    </div>
-                </div>
 
                 <!-- 심사위원 정보 -->
                 <div class="mb-6">

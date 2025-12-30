@@ -54,63 +54,98 @@ function viewJournalReviewDetail(journalId, viewType) {
     // 논문 정보 섹션 (관리자 화면과 동일)
     let content = `
         <div class="space-y-6">
-            <!-- 논문 정보 -->
-            <div class="bg-white rounded-lg shadow-md p-6">
-                <h3 class="text-lg font-bold text-gray-800 mb-4">📄 논문 정보</h3>
-
-                <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                    <h4 class="font-bold text-gray-800 mb-3">기본 정보</h4>
-                    <div class="space-y-3">
-                        <div class="info-row">
-                            <div class="info-label">학생명</div>
-                            <div class="info-value">${journal.studentName} (${journal.studentId})</div>
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- 학생 정보 -->
+                <div class="px-6 py-4 border-b bg-gray-50">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                    <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                            <span class="text-gray-900 font-medium">일반대학원</span>
                         </div>
-                        <div class="info-row">
-                            <div class="info-label">학과 / 학위과정</div>
-                            <div class="info-value">${journal.major} / ${journal.degree}</div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                            <span class="text-gray-900 font-medium">일반대학원</span>
                         </div>
-                        <div class="info-row">
-                            <div class="info-label">지도교수</div>
-                            <div class="info-value">${journal.advisor || '-'}</div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                            <span class="text-gray-900 font-medium">${journal.major}</span>
                         </div>
-                        <div class="info-row">
-                            <div class="info-label">제출일</div>
-                            <div class="info-value">${journal.submissionDate}</div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                            <span class="text-gray-900 font-medium">${journal.major}</span>
                         </div>
-                        <div class="info-row">
-                            <div class="info-label">논문제목</div>
-                            <div class="info-value font-medium">${journal.paperTitle}</div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                            <span class="text-gray-900 font-medium">${journal.degree}</span>
                         </div>
-                        <div class="info-row">
-                            <div class="info-label">학술지명</div>
-                            <div class="info-value font-medium">${journal.journalName}</div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                            <span class="text-gray-900 font-medium">재학</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학번:</span>
+                            <span class="text-gray-900 font-medium">${journal.studentId}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">성명:</span>
+                            <span class="text-gray-900 font-medium">${journal.studentName}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                            <span class="text-gray-900 font-medium">${journal.advisor || '-'}</span>
                         </div>
                     </div>
                 </div>
 
-                ${journal.reviewers && journal.reviewers.length > 0 ? `
-                    <div class="bg-gray-50 rounded-lg p-4 border border-gray-300">
-                        <h4 class="font-bold text-gray-800 mb-3">심사위원회</h4>
-                        <div class="space-y-2">
-                            ${journal.reviewers.map(reviewer => `
-                                <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-300">
-                                    <div>
-                                        <p class="font-medium">${reviewer.professorName}</p>
-                                        <p class="text-sm text-gray-600">${reviewer.department || '-'} / ${reviewer.role === '주심' ? '심사위원장' : '심사위원'}</p>
-                                    </div>
-                                    <div>
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${reviewer.status === '완료' ? 'bg-green-100 text-green-800' : reviewer.status === '진행중' ? 'bg-[#FCE4EC] text-[#6A0028]' : 'bg-yellow-100 text-yellow-800'}">
-                                            ${reviewer.status || '평가 대기'}
-                                        </span>
-                                        ${reviewer.score !== null && reviewer.score !== undefined ? `
-                                            <span class="ml-2 text-sm font-semibold text-gray-700">${reviewer.score}점</span>
-                                        ` : ''}
-                                    </div>
-                                </div>
-                            `).join('')}
+                <!-- 논문 정보 -->
+                <div class="px-6 py-4 border-b bg-white">
+                    <h4 class="text-sm font-semibold text-gray-700 mb-3">논문 정보</h4>
+                    <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+                        <div class="col-span-3 flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
+                            <span class="text-gray-900 font-medium">${journal.paperTitle}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">제출일:</span>
+                            <span class="text-gray-900 font-medium">${journal.submissionDate}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">심사 마감일:</span>
+                            <span class="text-gray-900 font-medium">-</span>
+                        </div>
+                        <div class="col-span-3 flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">학술지명:</span>
+                            <span class="text-gray-900 font-medium">${journal.journalName}</span>
                         </div>
                     </div>
-                ` : ''}
+                </div>
+
+                <div class="p-6">
+
+                    ${journal.reviewers && journal.reviewers.length > 0 ? `
+                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-300">
+                            <div class="space-y-2">
+                                ${journal.reviewers.map(reviewer => `
+                                    <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-300">
+                                        <div>
+                                            <p class="font-medium">${reviewer.professorName}</p>
+                                            <p class="text-sm text-gray-600">${reviewer.department || '-'} / ${reviewer.role === '주심' ? '심사위원장' : '심사위원'}</p>
+                                        </div>
+                                        <div>
+                                            <span class="text-sm">
+                                                ${reviewer.status || '평가 대기'}
+                                            </span>
+                                            ${reviewer.score !== null && reviewer.score !== undefined ? `
+                                                <span class="ml-2 text-sm font-semibold text-gray-700">${reviewer.score}점</span>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : ''}
+                </div>
             </div>
     `;
 
@@ -312,11 +347,11 @@ function viewJournalReviewDetail(journalId, viewType) {
         // 뒤로가기 버튼 추가
         const backButton = `
             <div class="mb-6">
-                <button onclick="initJournalReview()" class="flex items-center gap-2 text-gray-600 hover:text-[#6A0028] transition-colors">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                <button onclick="initJournalReview()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
-                    <span class="font-medium">목록으로 돌아가기</span>
+                    목록으로 돌아가기
                 </button>
             </div>
         `;

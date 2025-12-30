@@ -566,6 +566,8 @@ textarea.form-control {
     font-weight: var(--font-weight-bold, 700);
     color: var(--color-text-primary, #1A1A1A);
     white-space: nowrap;
+    height: 48px;
+    vertical-align: middle;
 }
 
 .table-scroll td {
@@ -1169,4 +1171,29 @@ textarea.form-control {
 .icon-btn-info .icon {
     width: 14px;
     height: 14px;
+}
+
+/* =============================================
+   BACK TO LIST BUTTON
+   ============================================= */
+.back-to-list-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #6B7280;
+    font-size: 14px;
+    padding: 8px 0;
+    transition: color 0.2s;
+    background: none;
+    border: none;
+    cursor: pointer;
+}
+
+.back-to-list-btn:hover {
+    color: #6A0028;
+}
+
+.back-to-list-btn svg {
+    width: 20px;
+    height: 20px;
 }

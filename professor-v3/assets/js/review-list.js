@@ -93,7 +93,7 @@ function renderReviewList() {
                     </thead>
                     <tbody>
                         ${filteredAssignments.map((assignment, index) => `
-                            <tr class="cursor-pointer" onclick="openReviewDetail('${assignment.id}', 'member')">
+                            <tr>
                                 <td onclick="event.stopPropagation()">
                                     <input type="checkbox" class="review-checkbox rounded border-gray-300"
                                            value="${assignment.id}"
@@ -113,9 +113,7 @@ function renderReviewList() {
                                 </td>
                                 <td>${assignment.reviewDate || '-'}</td> <!-- reviewDate: 관리자가 심사 일정 관리에서 지정한 값 -->
                                 <td>
-                                    <span class="status-badge ${getProgressBadgeClass(assignment.evaluationProgress)}">
-                                        ${getProgressStatusText(assignment.evaluationProgress)}
-                                    </span>
+                                    ${getProgressStatusText(assignment.evaluationProgress)}
                                 </td>
                                 <td onclick="event.stopPropagation()">
                                     <div class="flex gap-2 justify-center">
@@ -346,14 +344,13 @@ function openReviewDetail(assignmentId, viewType) {
     detailScreen.innerHTML = `
         <div class="review-detail-content-wrapper">
             <!-- 헤더 -->
-            <div class="review-detail-header">
-                <button onclick="closeReviewDetailScreen()" class="review-detail-back-btn">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            <div class="review-detail-header" style="padding: 12px 24px;">
+                <button onclick="closeReviewDetailScreen()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                     </svg>
-                    <span>목록으로</span>
+                    목록으로 돌아가기
                 </button>
-                <h2 class="review-detail-title">${viewType === 'chair' ? '위원장 승인' : '심사 평가'}</h2>
             </div>
 
             <!-- 상세 내용 -->

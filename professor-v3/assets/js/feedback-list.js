@@ -39,33 +39,38 @@ function renderFeedbackList() {
                     </button>
                 </div>
             </div>
-            <div class="table-scroll">
+            <div class="table-scroll" style="overflow-x: auto;">
                     <table class="min-w-full">
                         <thead>
                             <tr>
-                                <th style="width: 50px;">
+                                <th style="width: 50px; text-align: center;">
                                     <input type="checkbox"
                                            id="select-all-feedbacks"
                                            onchange="toggleAllFeedbacks(this)"
                                            class="rounded">
                                 </th>
-                                <th style="width: 60px;">번호</th>
-                                <th style="width: 100px;">대학원</th>
-                                <th style="width: 150px;">학과</th>
-                                <th style="width: 80px;">학위과정</th>
-                                <th style="width: 90px;">학번</th>
-                                <th style="width: 80px;">이름</th>
-                                <th style="width: 80px;">학기차</th>
-                                <th style="min-width: 250px;">논문명</th>
-                                <th style="width: 120px;">논문 지도 단계</th>
-                                <th style="width: 100px;">피드백상태</th>
-                                <th style="width: 100px;">제출일</th>
+                                <th style="width: 60px; text-align: center;">순번</th>
+                                <th style="width: 80px; text-align: center;">학년도</th>
+                                <th style="width: 60px; text-align: center;">학기</th>
+                                <th style="width: 100px; text-align: center;">대학구분</th>
+                                <th style="width: 100px; text-align: center;">계열/대학원</th>
+                                <th style="width: 120px; text-align: center;">학부(과)전공</th>
+                                <th style="width: 150px; text-align: center;">학과/전공</th>
+                                <th style="width: 80px; text-align: center;">학위과정</th>
+                                <th style="width: 80px; text-align: center;">학적상태</th>
+                                <th style="width: 90px; text-align: center;">학번</th>
+                                <th style="width: 80px; text-align: center;">성명</th>
+                                <th style="min-width: 250px; text-align: center;">논문명</th>
+                                <th style="width: 100px; text-align: center;">지도교수명</th>
+                                <th style="width: 120px; text-align: center;">제출일시</th>
+                                <th style="width: 120px; text-align: center;">지도단계</th>
+                                <th style="width: 100px; text-align: center;">피드백상태</th>
                             </tr>
                         </thead>
                         <tbody id="feedback-list-body">
                             ${filteredRequests.length > 0
                                 ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                                : '<tr><td colspan="12" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
+                                : '<tr><td colspan="17" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
                             }
                         </tbody>
                     </table>
@@ -94,38 +99,47 @@ function renderFeedbackRow(request, idx) {
         statusClass = 'bg-gray-100 text-gray-800';
     }
 
+    // 학적상태 텍스트 변환
+    const statusText = request.status === 'active' ? '재학' :
+                       request.status === 'leave' ? '휴학' :
+                       request.status === 'completed' ? '수료' :
+                       request.status === 'graduated' ? '졸업' : '재학';
+
     return `
         <tr class="feedback-row cursor-pointer"
             data-feedback-id="${request.id}"
             onclick="openFeedbackDetailScreen('${request.id}')">
-            <td onclick="event.stopPropagation()">
+            <td onclick="event.stopPropagation()" style="text-align: center;">
                 <input type="checkbox"
                        class="feedback-checkbox rounded"
                        data-feedback-id="${request.id}"
                        data-student-name="${request.studentName}"
                        data-student-number="${request.studentNumber}">
             </td>
-            <td>${idx}</td>
-            <td>${request.graduate || '일반대학원'}</td>
-            <td>${request.major}</td>
-            <td>${request.program}</td>
-            <td>${request.studentNumber}</td>
-            <td>
+            <td style="text-align: center;">${idx}</td>
+            <td style="text-align: center;">${request.year || '2025'}</td>
+            <td style="text-align: center;">${request.semester || '1'}</td>
+            <td style="text-align: center;">${request.graduate || '일반대학원'}</td>
+            <td style="text-align: center;">${request.college || '공학계열'}</td>
+            <td style="text-align: center;">${request.undergraduate || request.major || '-'}</td>
+            <td style="text-align: center;">${request.major}</td>
+            <td style="text-align: center;">${request.program}</td>
+            <td style="text-align: center;">${statusText}</td>
+            <td style="text-align: center;">${request.studentNumber}</td>
+            <td style="text-align: center;">
                 ${addStudentInfoIcon(request.studentName, request.studentNumber)}
             </td>
-            <td>${request.semester || '-'}학기</td>
-            <td>
+            <td style="text-align: left; padding-left: 12px;">
                 <div class="cell-truncate" title="${request.thesisTitle || request.file}">
                     ${request.thesisTitle || request.file}
                 </div>
             </td>
-            <td>${request.guidanceStage || '연구계획서'}</td>
-            <td>
-                <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
-                    ${feedbackStatus}
-                </span>
+            <td style="text-align: center;">${request.professorName || '-'}</td>
+            <td style="text-align: center;">${request.uploadDate || '-'}</td>
+            <td style="text-align: center;">${request.guidanceStage || '연구계획서'}</td>
+            <td style="text-align: center;">
+                ${feedbackStatus}
             </td>
-            <td>${request.uploadDate || '-'}</td>
         </tr>
     `;
 }
@@ -202,27 +216,92 @@ window.showStudentInfo = showStudentInfo;
 // ==================== 검색 기능 ====================
 function getCurrentFeedbackFilters() {
     return {
-        graduate: document.getElementById('feedback-filter-graduate')?.value || '',
+        year: document.getElementById('feedback-filter-year')?.value || '',
+        semester: document.getElementById('feedback-filter-semester')?.value || '',
+        universityType: document.getElementById('feedback-filter-university-type')?.value || '',
+        college: document.getElementById('feedback-filter-college')?.value || '',
+        undergraduate: document.getElementById('feedback-filter-undergraduate')?.value || '',
+        major: document.getElementById('feedback-filter-major')?.value || '',
         program: document.getElementById('feedback-filter-program')?.value || '',
-        status: document.getElementById('feedback-filter-status')?.value || '',
-        keyword: document.getElementById('feedback-filter-keyword')?.value || ''
+        academicStatus: document.getElementById('feedback-filter-academic-status')?.value || '',
+        studentSearch: document.getElementById('feedback-filter-student-search')?.value || '',
+        professor: document.getElementById('feedback-filter-professor')?.value || '',
+        feedbackStatus: document.getElementById('feedback-filter-feedback-status')?.value || ''
     };
 }
 
 function filterFeedbackRequests(requests, filters) {
     return requests.filter(req => {
-        // 대학원 필터
-        if (filters.graduate && req.graduate !== filters.graduate) {
+        // 학년도 필터
+        if (filters.year && req.year !== filters.year) {
             return false;
         }
-        
+
+        // 학기 필터
+        if (filters.semester && req.semester !== filters.semester) {
+            return false;
+        }
+
+        // 대학구분 필터
+        if (filters.universityType && req.graduate !== filters.universityType) {
+            return false;
+        }
+
+        // 계열/대학원 필터
+        if (filters.college && req.college !== filters.college) {
+            return false;
+        }
+
+        // 학부(과)전공 필터
+        if (filters.undergraduate && req.undergraduate !== filters.undergraduate) {
+            return false;
+        }
+
+        // 학과/전공 필터
+        if (filters.major && req.major !== filters.major) {
+            return false;
+        }
+
         // 학위과정 필터
         if (filters.program && req.program !== filters.program) {
             return false;
         }
-        
-        // 상태 필터
-        if (filters.status) {
+
+        // 학적상태 필터
+        if (filters.academicStatus) {
+            const statusText = req.status === 'active' ? '재학' :
+                             req.status === 'leave' ? '휴학' :
+                             req.status === 'completed' ? '수료' :
+                             req.status === 'graduated' ? '졸업' : '재학';
+
+            if (statusText !== filters.academicStatus) {
+                return false;
+            }
+        }
+
+        // 학번/성명 통합 검색
+        if (filters.studentSearch) {
+            const keyword = filters.studentSearch.toLowerCase();
+            const searchText = [
+                req.studentNumber,
+                req.studentName
+            ].join(' ').toLowerCase();
+
+            if (!searchText.includes(keyword)) {
+                return false;
+            }
+        }
+
+        // 지도교수명 필터
+        if (filters.professor) {
+            const professorName = req.professorName || '';
+            if (!professorName.includes(filters.professor)) {
+                return false;
+            }
+        }
+
+        // 피드백상태 필터
+        if (filters.feedbackStatus) {
             const commentCount = req.commentCount || 0;
             let currentStatus;
             if (req.isCompleted) {
@@ -232,27 +311,12 @@ function filterFeedbackRequests(requests, filters) {
             } else {
                 currentStatus = '대기';
             }
-            
-            if (currentStatus !== filters.status) {
+
+            if (currentStatus !== filters.feedbackStatus) {
                 return false;
             }
         }
-        
-        // 키워드 검색
-        if (filters.keyword) {
-            const keyword = filters.keyword.toLowerCase();
-            const searchText = [
-                req.studentNumber,
-                req.studentName,
-                req.thesisTitle || '',
-                req.file
-            ].join(' ').toLowerCase();
-            
-            if (!searchText.includes(keyword)) {
-                return false;
-            }
-        }
-        
+
         return true;
     });
 }
@@ -262,10 +326,28 @@ function searchFeedback() {
 }
 
 function resetFeedbackSearch() {
-    document.getElementById('feedback-filter-graduate').value = '';
-    document.getElementById('feedback-filter-program').value = '';
-    document.getElementById('feedback-filter-status').value = '';
-    document.getElementById('feedback-filter-keyword').value = '';
+    // 모든 검색 필터 초기화
+    const filterIds = [
+        'feedback-filter-year',
+        'feedback-filter-semester',
+        'feedback-filter-university-type',
+        'feedback-filter-college',
+        'feedback-filter-undergraduate',
+        'feedback-filter-major',
+        'feedback-filter-program',
+        'feedback-filter-academic-status',
+        'feedback-filter-student-search',
+        'feedback-filter-professor',
+        'feedback-filter-feedback-status'
+    ];
+
+    filterIds.forEach(id => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.value = '';
+        }
+    });
+
     renderFeedbackList();
 }
 

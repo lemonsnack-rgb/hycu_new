@@ -76,43 +76,64 @@ function renderSemesterDetailScreen(student, allPlans) {
     return `
         <!-- 뒤로가기 -->
         <div class="mb-4">
-            <button onclick="showStudentList()"
-                    class="flex items-center text-gray-600 hover:text-gray-800 transition-colors">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+            <button onclick="showStudentList()" class="back-to-list-btn">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
                 </svg>
-                <span class="text-sm font-medium">목록으로 돌아가기</span>
+                목록으로 돌아가기
             </button>
         </div>
 
         <!-- 학생 정보 -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h2 class="text-2xl font-bold text-gray-800 mb-4">${student.name} (${student.studentId})</h2>
-            <div class="grid grid-cols-4 gap-4 text-sm">
-                <div>
-                    <span class="text-gray-600">전공:</span>
-                    <span class="font-semibold text-gray-800 ml-2">${student.major}</span>
-                </div>
-                <div>
-                    <span class="text-gray-600">학위과정:</span>
-                    <span class="font-semibold text-gray-800 ml-2">${getDegreeText(student.degree)}</span>
-                </div>
-                <div>
-                    <span class="text-gray-600">현재 단계:</span>
-                    <span class="font-semibold text-gray-800 ml-2">${getStageText(student.stage)}</span>
-                </div>
-                <div>
-                    <span class="text-gray-600">지도교수:</span>
-                    <span class="font-semibold text-gray-800 ml-2">${advisors.map(a => a.name).join(', ')}</span>
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">${student.universityType || '일반대학원'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">${student.college || '공학계열'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${student.undergraduate || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${student.major}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${getDegreeText(student.degree)}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">${student.status || '재학'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${student.studentId}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${student.name}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">${advisors.map(a => a.name).join(', ')}</span>
+                    </div>
                 </div>
             </div>
         </div>
 
         <!-- 학기 선택 카드 -->
-        <div class="bg-[#FCE4EC] rounded-lg p-6 mb-6">
-            <div class="flex items-center gap-4 mb-4">
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">학년도</label>
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center gap-6">
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
                     <select id="select-year" onchange="changeSemesterView()"
                             class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
                         ${Array.from(new Set(availableSemesters.map(s => s.year)))
@@ -120,8 +141,8 @@ function renderSemesterDetailScreen(student, allPlans) {
                             .join('')}
                     </select>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">학기</label>
+                <div class="flex items-center gap-2">
+                    <label class="text-sm text-gray-600 min-w-[60px]">학기:</label>
                     <select id="select-semester" onchange="changeSemesterView()"
                             class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
                         ${availableSemesters
@@ -169,10 +190,6 @@ function changeSemesterView() {
 function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
     return `
         <div class="space-y-4">
-            <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
-            </div>
-
             ${weeks.map(week => renderWeekCard(week, advisors, currentProf, existingPlan, currentStudentIdV2)).join('')}
         </div>
     `;
@@ -280,12 +297,12 @@ function renderExecutionInputForm(weekNumber, currentProf) {
     const today = getTodayDate();
 
     return `
-        <div class="execution-input-form bg-white border-2 border-dashed border-gray-300 rounded-lg p-4">
+        <div class="execution-input-form bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div class="mb-2">
                 <span class="text-sm font-semibold text-gray-700">${currentProf.name} 교수 - 실적 추가</span>
             </div>
             <div class="space-y-3">
-                    <div class="flex gap-2">
+                    <div class="flex items-end gap-2">
                         <div class="flex-1">
                             <label class="block text-xs text-gray-600 mb-1">실행일 *</label>
                             <input type="date" id="exec-date-${weekNumber}" value="${today}"
@@ -301,6 +318,11 @@ function renderExecutionInputForm(weekNumber, currentProf) {
                                 <option value="phone">전화</option>
                             </select>
                         </div>
+                        <button onclick="addExecutionV2(${weekNumber})"
+                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1 whitespace-nowrap">
+                            <i class="fas fa-plus-circle"></i>
+                            실적 추가
+                        </button>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-600 mb-1">실행 내용 *</label>
@@ -313,13 +335,6 @@ function renderExecutionInputForm(weekNumber, currentProf) {
                         <textarea id="exec-comment-${weekNumber}" rows="2"
                                   placeholder="학생의 이해도, 진행 상황 등에 대한 의견을 입력하세요"
                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
-                    </div>
-                    <div class="flex justify-end">
-                        <button onclick="addExecutionV2(${weekNumber})"
-                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
-                            <i class="fas fa-plus-circle"></i>
-                            실적 추가
-                        </button>
                     </div>
                 </div>
         </div>
@@ -344,18 +359,18 @@ function renderWeekPlanInputForm(weekNumber) {
                               placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
-                    <select id="plan-method-${weekNumber}"
-                            class="border border-gray-300 rounded px-3 py-2 text-sm">
-                        <option value="meeting">대면</option>
-                        <option value="online">온라인</option>
-                        <option value="zoom" selected>Zoom</option>
-                        <option value="email">이메일</option>
-                        <option value="phone">전화</option>
-                    </select>
-                </div>
-                <div class="flex justify-end gap-2">
+                <div class="flex justify-between items-end gap-4">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 min-w-[100px]">예정 지도 방식:</label>
+                        <select id="plan-method-${weekNumber}"
+                                class="border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option value="meeting">대면</option>
+                            <option value="online">온라인</option>
+                            <option value="zoom" selected>Zoom</option>
+                            <option value="email">이메일</option>
+                            <option value="phone">전화</option>
+                        </select>
+                    </div>
                     <button onclick="saveWeekPlan(${weekNumber})"
                             class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
                         <i class="fas fa-save"></i>

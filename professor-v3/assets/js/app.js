@@ -369,7 +369,7 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
     noStudentsDiv.style.display = 'none';
 
     // 학생 목록 렌더링 (관리자와 동일한 구조, 행 클릭 시 상세 화면, 읽기 전용)
-    tableBody.innerHTML = data.map(item => {
+    tableBody.innerHTML = data.map((item, index) => {
         const student = mockStudents.find(s => s.id === item.studentId);
         const studentStatus = student ? student.status : '-';
         const assignmentStatus = (item.assignment && item.assignment.mainAdvisor) ? '배정완료' : '미배정';
@@ -382,6 +382,7 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
         return `
         <tr class="hover:bg-gray-50 cursor-pointer"
             onclick="viewProfessorProposalDetail('${item.id}')">
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 text-center">${index + 1}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semesterCount}학기</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${collegeType}</td>
@@ -389,25 +390,13 @@ function renderProfessorAdvisorAssignmentTable(filteredData = null) {
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${majorCategory}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                    ${item.degreeType}
-                </span>
+                ${item.degreeType}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <span class="px-2 py-1 text-xs rounded ${
-                    studentStatus === '재학' ? 'bg-blue-100 text-blue-800' :
-                    studentStatus === '휴학' ? 'bg-yellow-100 text-yellow-800' :
-                    studentStatus === '수료' ? 'bg-green-100 text-green-800' :
-                    studentStatus === '졸업' ? 'bg-gray-100 text-gray-800' :
-                    'bg-gray-100 text-gray-800'
-                }">
-                    ${studentStatus}
-                </span>
+                ${studentStatus}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                <span class="px-2 py-1 text-xs rounded ${assignmentStatus === '배정완료' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
-                    ${assignmentStatus}
-                </span>
+                ${assignmentStatus}
             </td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
@@ -488,9 +477,11 @@ function searchProfessorAdvisorAssignment() {
     alert(`검색 결과: ${filteredData.length}건`);
 }
 
-// 목록으로 돌아가기 (화면 전환)
+// 목록으로 돌아가기
 function returnToAdvisorAssignmentList() {
-    showScreen('advisor-assignment');
+    // 목록 뷰 표시, 상세 뷰 숨김
+    document.getElementById('advisor-assignment-list-view').style.display = 'block';
+    document.getElementById('advisor-assignment-detail-view').style.display = 'none';
 }
 
 // 교수용 연구계획서 상세 보기 (읽기 전용 - 페이지 전환)
@@ -506,50 +497,70 @@ function viewProfessorProposalDetail(proposalId) {
     const student = mockStudents.find(s => s.id === proposal.studentId);
     const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
 
+    // 목록 뷰 숨김, 상세 뷰 표시
+    document.getElementById('advisor-assignment-list-view').style.display = 'none';
+    document.getElementById('advisor-assignment-detail-view').style.display = 'block';
+
     // 상세 뷰 렌더링 (관리자 화면과 동일, 읽기 전용)
     const detailView = `
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더 -->
-            <div class="px-8 py-6 border-b border-gray-200">
-                <div class="flex items-center justify-between mb-4">
-                    <button onclick="returnToAdvisorAssignmentList(); return false;"
-                            class="flex items-center text-gray-600 hover:text-gray-900">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        목록으로
-                    </button>
-                    <span class="px-3 py-1 rounded text-sm font-medium ${proposal.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                        ${proposal.degreeType}
-                    </span>
-                </div>
+            <div class="px-6 py-3 border-b border-gray-200">
+                <button onclick="returnToAdvisorAssignmentList(); return false;" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
             </div>
 
             <!-- 학생 정보 -->
-            <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학번:</span>
-                        <span class="text-gray-900">${student?.studentNumber}</span>
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">일반대학원</span>
                     </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">성명:</span>
-                        <span class="text-gray-900">${student?.name}</span>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">${student?.department ? (student.department.includes('공학') ? '공학계열' : student.department.includes('경영') ? '인문사회계열' : '공학계열') : '-'}</span>
                     </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학과:</span>
-                        <span class="text-gray-900">${student?.department}</span>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${student?.department || '-'}</span>
                     </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학년:</span>
-                        <span class="text-gray-900">${student?.grade}</span>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${student?.department || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${proposal?.degreeType || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">${student?.status === 'active' ? '재학' : student?.status === 'leave' ? '휴학' : student?.status === 'completed' ? '수료' : student?.status === 'graduated' ? '졸업' : (student?.status || '-')}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${student?.studentNumber || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${student?.name || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">${assignment?.mainAdvisor ? assignment.mainAdvisor.name : '-'}</span>
                     </div>
                 </div>
             </div>
 
             <!-- 연구계획서 내용 -->
-            <div class="px-8 py-6 border-b border-gray-200">
-                <div class="space-y-4">
+            <div class="px-6 py-4 border-b bg-white">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">연구계획서</h4>
+                <div class="px-2 space-y-4">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
                             연구 목적
@@ -588,43 +599,43 @@ function viewProfessorProposalDetail(proposalId) {
                         </div>
                     ` : ''}
                 </div>
+                </div>
             </div>
 
-            <!-- 지도교수 배정 현황 (읽기 전용) -->
-            <div class="px-8 py-6">
+            <!-- 지도교수 정보 -->
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">지도교수</h4>
                 ${assignment ? `
-                    <div class="space-y-3">
-                        <div class="flex items-center">
-                            <span class="text-gray-600 font-medium" style="min-width: 100px;">지도교수:</span>
-                            <span class="text-gray-900">
+                    <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">주지도교수:</span>
+                            <span class="text-gray-900 font-medium">
                                 ${assignment.mainAdvisor
-                                    ? `${assignment.mainAdvisor.name} ${assignment.mainAdvisor.department}`
+                                    ? `${assignment.mainAdvisor.name} (${assignment.mainAdvisor.department})`
                                     : `<span class="text-gray-500">미배정</span>`
                                 }
                             </span>
                         </div>
-
-                        <div class="flex items-center">
-                            <span class="text-gray-600 font-medium" style="min-width: 100px;">부지도교수:</span>
-                            <span class="text-gray-900">
-                                ${assignment.coAdvisors && assignment.coAdvisors.length > 0
-                                    ? assignment.coAdvisors.map(c => `${c.name} ${c.department}`).join(', ')
-                                    : `<span class="text-gray-500">미배정</span>`
-                                }
-                            </span>
-                        </div>
+                        ${assignment.coAdvisors && assignment.coAdvisors.length > 0 ? `
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">부지도교수:</span>
+                                <span class="text-gray-900 font-medium">
+                                    ${assignment.coAdvisors.map(c => `${c.name} (${c.department})`).join(', ')}
+                                </span>
+                            </div>
+                        ` : ''}
                     </div>
                 ` : `
-                    <p class="text-gray-500 text-center py-8">지도교수가 배정되지 않았습니다.</p>
+                    <p class="text-sm text-gray-500">지도교수가 배정되지 않았습니다.</p>
                 `}
             </div>
         </div>
     `;
 
-    // advisor-assignment-screen 영역 업데이트 (페이지 전환)
-    const screen = document.getElementById('advisor-assignment-screen');
-    if (screen) {
-        screen.innerHTML = detailView;
+    // advisor-assignment-detail-view 영역 업데이트
+    const detailContainer = document.getElementById('advisor-assignment-detail-view');
+    if (detailContainer) {
+        detailContainer.innerHTML = detailView;
     }
 }
 

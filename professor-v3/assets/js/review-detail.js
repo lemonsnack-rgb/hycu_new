@@ -85,68 +85,84 @@ function renderThesisInfo(assignment) {
     const gptKiller = assignment.gptKiller || Math.floor(Math.random() * 15) + 2;
 
     return `
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">📄 논문 정보</h3>
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <!-- 학생 정보 -->
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">일반대학원</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">${assignment.graduateSchool || '일반대학원'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${assignment.major}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${assignment.major}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${assignment.degree || '석사'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">재학</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${assignment.studentNumber}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${assignment.studentName}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">${assignment.advisorName}</span>
+                    </div>
+                </div>
+            </div>
 
-            <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                <h4 class="font-bold text-gray-800 mb-3">기본 정보</h4>
-                <div class="space-y-3">
-                    <div class="info-row">
-                        <div class="info-label">대학원</div>
-                        <div class="info-value">${assignment.graduateSchool || '일반대학원'}</div>
+            <!-- 논문 정보 -->
+            <div class="px-6 py-4 border-b bg-white">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">논문 정보</h4>
+                <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+                    <div class="col-span-3 flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
+                        <span class="text-gray-900 font-medium">${assignment.thesisTitle}</span>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">학과</div>
-                        <div class="info-value">${assignment.major}</div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">제출일:</span>
+                        <span class="text-gray-900 font-medium">${formatDateFull(assignment.submissionDate)}</span>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">학위과정</div>
-                        <div class="info-value">${assignment.degree || '석사'}</div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">심사 마감일:</span>
+                        <span class="text-gray-900 font-medium ${getDueDateColorClass(assignment.dueDate)}">
+                            ${formatDateFull(assignment.dueDate)} ${getDueDateBadge(assignment.dueDate)}
+                        </span>
                     </div>
-                    <div class="info-row">
-                        <div class="info-label">학번</div>
-                        <div class="info-value">${assignment.studentNumber}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">학생명</div>
-                        <div class="info-value">${assignment.studentName}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">논문제목</div>
-                        <div class="info-value font-medium">${assignment.thesisTitle}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">지도교수</div>
-                        <div class="info-value">${assignment.advisorName}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">제출 단계</div>
-                        <div class="info-value">
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${getTypeBadgeClass(assignment.submissionType)}">
-                                ${assignment.submissionType}
-                            </span>
-                        </div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">제출일</div>
-                        <div class="info-value">${formatDateFull(assignment.submissionDate)}</div>
-                    </div>
-                    <div class="info-row">
-                        <div class="info-label">심사 마감일</div>
-                        <div class="info-value">
-                            <span class="${getDueDateColorClass(assignment.dueDate)}">
-                                ${formatDateFull(assignment.dueDate)} ${getDueDateBadge(assignment.dueDate)}
-                            </span>
-                        </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">제출 단계:</span>
+                        <span class="text-gray-900 font-medium">
+                            ${assignment.submissionType}
+                        </span>
                     </div>
                     ${(assignment.submissionType === '중간논문' || assignment.submissionType === '최종논문') ? `
-                    <div class="info-row">
-                        <div class="info-label">표절/AI 검사</div>
-                        <div class="info-value">CopyKiller: ${copyKiller}% / GPT Killer: ${gptKiller}%</div>
+                    <div class="col-span-3 flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">표절/AI 검사:</span>
+                        <span class="text-gray-900 font-medium">CopyKiller: ${copyKiller}% / GPT Killer: ${gptKiller}%</span>
                     </div>
                     ` : ''}
                 </div>
             </div>
+
+            <div class="p-6">
 
             <div class="bg-gray-50 rounded-lg p-4 mb-4">
                 <h4 class="font-bold text-gray-800 mb-3">첨부 파일</h4>
@@ -172,7 +188,7 @@ function renderThesisInfo(assignment) {
                                     <p class="text-sm text-gray-600">${member.department} / ${member.role === 'chair' ? '심사위원장' : '심사위원'}</p>
                                 </div>
                                 <div>
-                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${status ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                                    <span class="text-sm">
                                         ${status ? '평가 완료' : '평가 진행중'}
                                     </span>
                                 </div>
@@ -530,7 +546,7 @@ function renderSubmittedEvaluation(template, evaluation) {
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-lg font-bold text-gray-800">${template.name}</h3>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <span class="text-sm text-gray-600">
                         제출 완료 (${formatDateTime(evaluation.submittedAt)})
                     </span>
                 </div>
@@ -631,7 +647,7 @@ function renderSubmittedEvaluation(template, evaluation) {
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center justify-between mb-4">
                 <h3 class="text-lg font-bold text-gray-800">${template.name}</h3>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <span class="text-sm text-gray-600">
                     제출 완료 (${formatDateTime(evaluation.submittedAt)})
                 </span>
             </div>
@@ -723,7 +739,7 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                         <h3 class="text-lg font-bold text-gray-800">${evaluation.professorName} (${evaluation.role === 'chair' ? '심사위원장' : '심사위원'})</h3>
                         <p class="text-sm text-gray-600">${template.name}</p>
                     </div>
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                    <span class="text-sm text-gray-600">
                         제출 완료 (${formatDateTime(evaluation.submittedAt)})
                     </span>
                 </div>
@@ -802,7 +818,7 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                     <h3 class="text-lg font-bold text-gray-800">${evaluation.professorName} (${evaluation.role === 'chair' ? '심사위원장' : '심사위원'})</h3>
                     <p class="text-sm text-gray-600">${template.name}</p>
                 </div>
-                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
+                <span class="text-sm text-gray-600">
                     제출 완료 (${formatDateTime(evaluation.submittedAt)})
                 </span>
             </div>
@@ -1436,11 +1452,7 @@ function renderChairApprovalScreen(detail, allSubmitted) {
                     <h4 class="font-bold text-green-800 mb-3">✓ 최종 심사 완료</h4>
                     <div class="space-y-2 text-sm">
                         <p><span class="font-semibold">결정:</span>
-                            <span class="inline-block px-3 py-1 rounded-full ${
-                                result.finalDecision === '승인' ? 'bg-green-100 text-green-800' :
-                                result.finalDecision === '보류' ? 'bg-yellow-100 text-yellow-800' :
-                                'bg-red-100 text-red-800'
-                            } font-semibold">${result.finalDecision}</span>
+                            <span class="font-semibold">${result.finalDecision}</span>
                         </p>
                         ${result.chairComment ? `
                             <p class="mt-2"><span class="font-semibold">의견:</span> ${result.chairComment}</p>

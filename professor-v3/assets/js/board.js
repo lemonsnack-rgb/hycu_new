@@ -137,24 +137,28 @@ function viewBoardPost(postId) {
     modal.id = 'boardPostModal';
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 80rem; width: 95%;">
-            <div class="p-6 border-b">
-                <div class="flex justify-between items-start">
-                    <div class="flex-1">
-                        <h3 class="text-xl font-bold text-gray-800 mb-2">${post.title}</h3>
-                        <div class="flex items-center gap-4 text-sm text-gray-600">
-                            <span>${post.authorName} ${post.authorRole === 'professor' ? '[교수]' : '[학생]'}</span>
-                            <span>|</span>
-                            <span>${formatDateTime(post.createdAt)}</span>
-                            ${post.updatedAt !== post.createdAt ? `<span class="text-xs text-gray-500">(수정됨: ${formatDateTime(post.updatedAt)})</span>` : ''}
-                            <span>|</span>
-                            <span>조회 ${post.views}</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        ${canEdit ? `<button onclick="openBoardEditModal(${post.id})" class="text-sm text-[#6A0028] hover:text-[#6A0028]">수정</button>` : ''}
-                        ${canDelete ? `<button onclick="deleteBoardPost(${post.id})" class="text-sm text-red-600 hover:text-red-800">삭제</button>` : ''}
-                        <button onclick="closeBoardModal()" class="text-gray-400 hover:text-gray-600 text-2xl ml-2">&times;</button>
-                    </div>
+            <div class="px-6 py-3 border-b flex items-center justify-between">
+                <button onclick="closeBoardModal()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+                <div class="flex items-center gap-2">
+                    ${canEdit ? `<button onclick="openBoardEditModal(${post.id})" class="text-sm text-[#6A0028] hover:text-[#6A0028]">수정</button>` : ''}
+                    ${canDelete ? `<button onclick="deleteBoardPost(${post.id})" class="text-sm text-red-600 hover:text-red-800">삭제</button>` : ''}
+                </div>
+            </div>
+
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h3 class="text-lg font-bold text-gray-800 mb-2">${post.title}</h3>
+                <div class="flex items-center gap-4 text-sm text-gray-600">
+                    <span>${post.authorName}</span>
+                    <span>|</span>
+                    <span>${formatDateTime(post.createdAt)}</span>
+                    ${post.updatedAt !== post.createdAt ? `<span class="text-xs text-gray-500">(수정됨: ${formatDateTime(post.updatedAt)})</span>` : ''}
+                    <span>|</span>
+                    <span>조회 ${post.views}</span>
                 </div>
             </div>
 

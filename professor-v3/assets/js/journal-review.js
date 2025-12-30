@@ -183,9 +183,7 @@ function renderJournalReviewRows(journals) {
                                     </td>
                                     <td>${journal.submissionDate || '-'}</td>
                                     <td>
-                                        <span class="text-xs font-semibold px-2 py-1 rounded-full ${statusClass}">
-                                            ${journal.status}
-                                        </span>
+                                        ${journal.status}
                                     </td>
                                     <td>
                                         <div class="action-buttons">
