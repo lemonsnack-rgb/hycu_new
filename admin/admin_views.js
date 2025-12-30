@@ -1064,13 +1064,13 @@ const views = {
         `;
     },
 
-    // ========== 주차별 논문지도 현황 ==========
+    // ========== 학기별 지도 계획 ==========
     weeklyGuidance: () => {
         const data = appData.weeklyGuidanceStudents;
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">주차별 논문지도 현황</h3>
+                    <h3 class="text-lg font-bold text-gray-800 mb-4">학기별 지도 계획</h3>
 
                     <!-- 검색 영역 (Task 1-4: ID 18 기준 간소화) -->
                     <div class="search-container">

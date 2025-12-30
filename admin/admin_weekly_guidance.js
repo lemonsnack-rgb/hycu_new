@@ -1,5 +1,5 @@
 // ===================================
-// 관리자용 주차별 논문지도 현황 (교수용과 동일한 UI/UX)
+// 관리자용 학기별 지도 계획 (교수용과 동일한 UI/UX)
 // ===================================
 
 let currentGuidanceView = 'list';  // 'list' or 'detail'
@@ -24,7 +24,7 @@ function showGuidancePairsList() {
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
                 <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-2xl font-bold text-gray-800">주차별 논문지도 현황</h2>
+                    <h2 class="text-2xl font-bold text-gray-800">학기별 지도 계획</h2>
                     <div class="flex items-center gap-3">
                         <button onclick="sendNotificationToSelectedPairs()"
                                 class="bg-[#009DE8] hover:bg-[#0087c9] text-white px-4 py-2 rounded text-sm font-medium">
@@ -166,7 +166,7 @@ function showGuidancePairDetail(pairId) {
 
         <!-- 헤더 -->
         <div class="flex items-center mb-8">
-            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">주차별 논문지도 현황</h2>
+            <h2 class="text-2xl sm:text-3xl font-bold text-gray-800">학기별 지도 계획</h2>
         </div>
 
         <!-- 학기 선택 카드 -->

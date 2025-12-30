@@ -31,7 +31,7 @@ function showScreen(screenName) {
     const titles = {
         'dashboard': '대시보드',
         'advisor-assignment': '지도교수 배정',
-        'guidance': '주차별 논문지도 현황',
+        'guidance': '학기별 지도 계획',
         'meeting': '실시간 지도 예약',
         'feedback': '논문 지도 현황',
         'review': '학위 논문 제출',

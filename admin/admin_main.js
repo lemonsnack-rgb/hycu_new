@@ -39,7 +39,7 @@ function switchView(viewName, param = null) {
         evaluationCriteria: '심사 기준 등록',
         evaluationCriteriaEdit: '심사 기준 등록',
         advisorAssignment: '지도교수 배정',
-        weeklyGuidance: '주차별 논문지도 현황',
+        weeklyGuidance: '학기별 지도 계획',
         examSchedule: '심사 일정 관리',
         workflowCreate: '지도 단계 등록',
         workflowStageCompose: '지도 단계 구성',
