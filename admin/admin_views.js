@@ -2233,8 +2233,8 @@ const views = {
                         </div>
                     </div>
 
-                    <!-- 통과 기준 (점수형만) -->
-                    ${evaluationType === 'score' ? `
+                    <!-- 통과 기준 -->
+                    ${evaluationType === 'score' || evaluationType === 'passfail' ? `
                         <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                             <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
                             <div class="grid grid-cols-1 gap-4">
@@ -2255,7 +2255,8 @@ const views = {
                                         <input type="number" id="pass-required-committee"
                                                value="${isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2}"
                                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                               min="1" placeholder="예: 2">
+                                               min="1" placeholder="예: 2"
+                                               ${evaluationType === 'passfail' ? 'disabled' : ''}>
                                     </div>
                                     <div>
                                         <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -2264,14 +2265,9 @@ const views = {
                                         <input type="number" id="pass-min-score"
                                                value="${isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70}"
                                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                               min="0" max="100" placeholder="예: 70">
+                                               min="0" max="100" placeholder="예: 70"
+                                               ${evaluationType === 'passfail' ? 'disabled' : ''}>
                                     </div>
-                                </div>
-                                <div class="bg-blue-50 border border-blue-200 rounded p-3">
-                                    <p class="text-sm text-blue-800">
-                                        <i class="fas fa-info-circle mr-2"></i>
-                                        예시: 총 심사위원 3명 중 2명 이상이 70점 이상을 줘야 통과
-                                    </p>
                                 </div>
                             </div>
                         </div>

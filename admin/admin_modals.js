@@ -3973,7 +3973,7 @@ function saveEvaluationCriteria(criteriaId) {
             return;
         }
 
-        // 통과 기준 검증 (점수형만)
+        // 통과 기준 검증 (점수형)
         const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
         const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
         const minScore = parseInt(document.getElementById('pass-min-score')?.value);
@@ -3995,6 +3995,16 @@ function saveEvaluationCriteria(criteriaId) {
 
         if (!minScore || minScore < 0 || minScore > 100) {
             showAlert('최소 점수를 0-100 사이로 입력하세요.');
+            return;
+        }
+    }
+
+    // Pass/Fail형일 때 통과 기준 검증
+    if (evaluationType === 'passfail') {
+        const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
+
+        if (!totalCommittee || totalCommittee <= 0) {
+            showAlert('총 심사위원 수를 입력하세요.');
             return;
         }
     }
@@ -4025,6 +4035,17 @@ function saveEvaluationCriteria(criteriaId) {
                     passScore: minScore,
                     description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
                 };
+            } else if (evaluationType === 'passfail') {
+                // Pass/Fail형 통과 기준 저장
+                const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
+
+                criteria.passCriteria = {
+                    type: 'committee',
+                    totalCommittee: totalCommittee,
+                    requiredCommittee: null,
+                    passScore: null,
+                    description: `총 심사위원 ${totalCommittee}명`
+                };
             }
         }
         showToast('평가표가 수정되었습니다.', 'success');
@@ -4045,6 +4066,16 @@ function saveEvaluationCriteria(criteriaId) {
                 requiredCommittee: requiredCommittee,
                 passScore: minScore,
                 description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
+            };
+        } else if (evaluationType === 'passfail') {
+            const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
+
+            passCriteria = {
+                type: 'committee',
+                totalCommittee: totalCommittee,
+                requiredCommittee: null,
+                passScore: null,
+                description: `총 심사위원 ${totalCommittee}명`
             };
         } else {
             passCriteria = {
