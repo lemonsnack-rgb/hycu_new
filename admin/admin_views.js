@@ -2253,7 +2253,7 @@ const views = {
                                             통과 필요 인원 <span class="text-red-600">*</span>
                                         </label>
                                         <input type="number" id="pass-required-committee"
-                                               value="${isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2}"
+                                               value="${evaluationType === 'passfail' ? '' : (isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2)}"
                                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                                min="1" placeholder="예: 2"
                                                ${evaluationType === 'passfail' ? 'disabled' : ''}>
@@ -2263,7 +2263,7 @@ const views = {
                                             최소 점수 <span class="text-red-600">*</span>
                                         </label>
                                         <input type="number" id="pass-min-score"
-                                               value="${isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70}"
+                                               value="${evaluationType === 'passfail' ? '' : (isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70)}"
                                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
                                                min="0" max="100" placeholder="예: 70"
                                                ${evaluationType === 'passfail' ? 'disabled' : ''}>

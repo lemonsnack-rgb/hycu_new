@@ -291,8 +291,11 @@ const appData = {
             ],
             totalScore: null,
             passCriteria: {
-                passRequired: true,
-                description: '모든 항목에서 Pass를 받아야 합격'
+                type: 'committee',
+                totalCommittee: 3,
+                requiredCommittee: null,
+                passScore: null,
+                description: '총 심사위원 3명'
             }
         },
         {
@@ -322,8 +325,11 @@ const appData = {
             ],
             totalScore: null,
             passCriteria: {
-                passRequired: true,
-                description: '모든 항목에서 Pass를 받아야 합격'
+                type: 'committee',
+                totalCommittee: 3,
+                requiredCommittee: null,
+                passScore: null,
+                description: '총 심사위원 3명'
             }
         }
     ],
