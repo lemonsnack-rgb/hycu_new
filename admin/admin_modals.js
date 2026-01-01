@@ -125,6 +125,29 @@ function initEvaluationTypeChangeListener() {
             newSelect.addEventListener('change', function(e) {
                 const container = document.getElementById('evaluation-items-container');
                 const existingItems = container.querySelectorAll('.evaluation-item');
+                const newType = e.target.value;
+
+                // 통과 기준 입력 필드 업데이트
+                const updatePassCriteriaFields = () => {
+                    const requiredCommitteeInput = document.getElementById('pass-required-committee');
+                    const minScoreInput = document.getElementById('pass-min-score');
+
+                    if (requiredCommitteeInput && minScoreInput) {
+                        if (newType === 'passfail') {
+                            // Pass/Fail형으로 변경 시 비활성화 및 빈 값
+                            requiredCommitteeInput.value = '';
+                            requiredCommitteeInput.disabled = true;
+                            minScoreInput.value = '';
+                            minScoreInput.disabled = true;
+                        } else if (newType === 'score') {
+                            // 점수형으로 변경 시 활성화 및 기본값
+                            requiredCommitteeInput.value = '2';
+                            requiredCommitteeInput.disabled = false;
+                            minScoreInput.value = '70';
+                            minScoreInput.disabled = false;
+                        }
+                    }
+                };
 
                 if (existingItems.length > 0) {
                     // 경고 모달 표시
@@ -135,6 +158,7 @@ function initEvaluationTypeChangeListener() {
                             if (typeof updateTotalScore === 'function') {
                                 updateTotalScore();
                             }
+                            updatePassCriteriaFields();
                             initialType = e.target.value;
                         },
                         () => {
@@ -144,6 +168,7 @@ function initEvaluationTypeChangeListener() {
                     );
                 } else {
                     // 항목이 없으면 그냥 변경
+                    updatePassCriteriaFields();
                     initialType = e.target.value;
                 }
             });
