@@ -147,30 +147,74 @@ function initEvaluationTypeChangeListener() {
             const newSelect = typeSelect.cloneNode(true);
             typeSelect.parentNode.replaceChild(newSelect, typeSelect);
 
+            // 테이블 헤더 업데이트 함수
+            const updateTableHeader = (type, container) => {
+                const thead = container.closest('table')?.querySelector('thead');
+                if (!thead) return;
+
+                if (type === 'score') {
+                    thead.innerHTML = `
+                        <tr>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-16">순번</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목명 <span class="text-red-600">*</span></th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-24">배점 <span class="text-red-600">*</span></th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-24">과락점수</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목설명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 w-20">관리</th>
+                        </tr>
+                    `;
+                } else {
+                    thead.innerHTML = `
+                        <tr>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-16">순번</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목명 <span class="text-red-600">*</span></th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목설명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 w-20">관리</th>
+                        </tr>
+                    `;
+                }
+            };
+
             newSelect.addEventListener('change', function(e) {
                 const container = document.getElementById('evaluation-items-container');
                 const existingItems = container.querySelectorAll('.evaluation-item');
                 const newType = e.target.value;
 
                 if (existingItems.length > 0) {
-                    // 경고 모달 표시
-                    showEvaluationTypeChangeWarning(
-                        () => {
-                            // 확인 - 항목 초기화 및 통과 기준 필드 업데이트
-                            container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">평가 항목을 추가해주세요.</p>';
-                            if (typeof updateTotalScore === 'function') {
-                                updateTotalScore();
-                            }
-                            updatePassCriteriaFields(newType);
-                            initialType = newType;
-                        },
-                        () => {
-                            // 취소 - 이전 값으로 복원
-                            e.target.value = initialType;
+                    // 기존 항목이 있을 경우 확인 알림
+                    if (confirm('평가표 유형을 변경하면 입력된 모든 평가 항목이 삭제됩니다.\n\n계속하시겠습니까?')) {
+                        // 확인 - 테이블 헤더 업데이트, 항목 초기화 및 통과 기준 필드 업데이트
+                        updateTableHeader(newType, container);
+
+                        const colspan = newType === 'score' ? '6' : '4';
+                        container.innerHTML = `
+                            <tr>
+                                <td colspan="${colspan}" class="py-8 text-center text-sm text-gray-500">
+                                    평가 항목을 추가해주세요.
+                                </td>
+                            </tr>
+                        `;
+                        if (typeof updateTotalScore === 'function') {
+                            updateTotalScore();
                         }
-                    );
+                        updatePassCriteriaFields(newType);
+                        initialType = newType;
+                    } else {
+                        // 취소 - 이전 값으로 복원
+                        e.target.value = initialType;
+                    }
                 } else {
-                    // 항목이 없으면 그냥 변경하고 통과 기준 필드 업데이트
+                    // 항목이 없으면 테이블 헤더 업데이트하고 통과 기준 필드 업데이트
+                    updateTableHeader(newType, container);
+
+                    const colspan = newType === 'score' ? '6' : '4';
+                    container.innerHTML = `
+                        <tr>
+                            <td colspan="${colspan}" class="py-8 text-center text-sm text-gray-500">
+                                    평가 항목을 추가해주세요.
+                            </td>
+                        </tr>
+                    `;
                     updatePassCriteriaFields(newType);
                     initialType = newType;
                 }
@@ -3783,65 +3827,50 @@ function addEvaluationItem() {
     let itemHtml = '';
     if (evaluationType === 'score') {
         itemHtml = `
-            <div class="evaluation-item mb-3 p-4 bg-white border border-gray-200 rounded-lg">
-                <div class="flex justify-between items-start mb-3">
-                    <h5 class="text-sm font-semibold text-gray-700">항목 ${itemCount}</h5>
-                    <button onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm">
-                        <i class="fas fa-trash"></i> 삭제
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">항목명 <span class="text-red-600">*</span></label>
-                        <input type="text" class="item-name w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="평가 항목명" required>
-                    </div>
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">배점 <span class="text-red-600">*</span></label>
-                            <input type="number" class="item-score w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="점수" min="0" required onchange="updateTotalScore()">
-                        </div>
-                        <div>
-                            <div class="flex items-center mb-1">
-                                <input type="checkbox" class="item-fail-enabled mr-2" onchange="toggleFailScore(this)">
-                                <label class="text-xs font-medium text-gray-700">과락기준 설정</label>
-                            </div>
-                            <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-2 py-1 text-sm bg-gray-100" placeholder="최소 점수" min="0" disabled>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">설명 <span class="text-red-600">*</span></label>
-                        <textarea class="item-description w-full border border-gray-300 rounded px-2 py-1 text-sm" rows="2" placeholder="항목 설명" required></textarea>
-                    </div>
-                </div>
-            </div>
+            <tr class="evaluation-item hover:bg-gray-50">
+                <td class="py-3 px-4 text-center text-sm text-gray-600 border-r border-gray-300">${itemCount}</td>
+                <td class="py-3 px-4 border-r border-gray-300">
+                    <input type="text" class="item-name w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 명확성" required>
+                </td>
+                <td class="py-3 px-4 border-r border-gray-300">
+                    <input type="number" class="item-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" placeholder="0" min="0" required onchange="updateTotalScore()">
+                </td>
+                <td class="py-3 px-4 border-r border-gray-300">
+                    <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" placeholder="0" min="0" value="0">
+                </td>
+                <td class="py-3 px-4 border-r border-gray-300">
+                    <input type="text" class="item-description w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 타당성과 명확성을 평가">
+                </td>
+                <td class="py-3 px-4 text-center">
+                    <span onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm cursor-pointer">
+                        삭제
+                    </span>
+                </td>
+            </tr>
         `;
     } else {
         itemHtml = `
-            <div class="evaluation-item mb-3 p-4 bg-white border border-gray-200 rounded-lg">
-                <div class="flex justify-between items-start mb-3">
-                    <h5 class="text-sm font-semibold text-gray-700">항목 ${itemCount}</h5>
-                    <button onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm">
-                        <i class="fas fa-trash"></i> 삭제
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 gap-3">
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">항목명 <span class="text-red-600">*</span></label>
-                        <input type="text" class="item-name w-full border border-gray-300 rounded px-2 py-1 text-sm" placeholder="평가 항목명" required>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">설명 <span class="text-red-600">*</span></label>
-                        <textarea class="item-description w-full border border-gray-300 rounded px-2 py-1 text-sm" rows="2" placeholder="항목 설명" required></textarea>
-                    </div>
-                </div>
-            </div>
+            <tr class="evaluation-item hover:bg-gray-50">
+                <td class="py-3 px-4 text-center text-sm text-gray-600 border-r border-gray-300">${itemCount}</td>
+                <td class="py-3 px-4 border-r border-gray-300">
+                    <input type="text" class="item-name w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 명확성" required>
+                </td>
+                <td class="py-3 px-4 border-r border-gray-300">
+                    <input type="text" class="item-description w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 타당성과 명확성을 평가">
+                </td>
+                <td class="py-3 px-4 text-center">
+                    <span onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm cursor-pointer">
+                        삭제
+                    </span>
+                </td>
+            </tr>
         `;
     }
 
-    // Replace placeholder message if present
-    const placeholder = container.querySelector('p');
+    // Replace placeholder row if present
+    const placeholder = container.querySelector('tr td[colspan]');
     if (placeholder) {
-        placeholder.remove();
+        placeholder.closest('tr').remove();
     }
 
     container.insertAdjacentHTML('beforeend', itemHtml);
@@ -3853,15 +3882,24 @@ function removeEvaluationItem(button) {
 
     // Check if container is empty
     const container = document.getElementById('evaluation-items-container');
+    const evaluationType = document.getElementById('edit-criteria-type').value;
+
     if (container.querySelectorAll('.evaluation-item').length === 0) {
-        container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">평가 항목을 추가해주세요.</p>';
+        const colspan = evaluationType === 'score' ? '6' : '4';
+        container.innerHTML = `
+            <tr>
+                <td colspan="${colspan}" class="py-8 text-center text-sm text-gray-500">
+                    평가 항목을 추가해주세요.
+                </td>
+            </tr>
+        `;
     }
 
     // Renumber items
     container.querySelectorAll('.evaluation-item').forEach((item, idx) => {
-        const header = item.querySelector('h5');
-        if (header) {
-            header.textContent = `항목 ${idx + 1}`;
+        const sequenceCell = item.querySelector('td:first-child');
+        if (sequenceCell) {
+            sequenceCell.textContent = idx + 1;
         }
     });
 

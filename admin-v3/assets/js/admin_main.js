@@ -79,9 +79,14 @@ function switchView(viewName, param = null) {
     }
 
     if (viewName === 'evaluationCriteriaEdit') {
-        // 평가표 편집 화면 렌더링 후 이벤트 리스너 초기화
+        // 평가표 편집 화면 렌더링 후 이벤트 리스너 초기화 및 총점 계산
         if (typeof initEvaluationTypeChangeListener === 'function') {
             initEvaluationTypeChangeListener();
+        }
+        if (typeof updateTotalScore === 'function') {
+            setTimeout(() => {
+                updateTotalScore();
+            }, 0);
         }
     }
 }
@@ -113,18 +118,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // 모달 닫기 버튼들
-    document.getElementById('modal-close').addEventListener('click', closeModal);
-    document.getElementById('modal-cancel').addEventListener('click', closeModal);
-    document.getElementById('confirm-cancel').addEventListener('click', closeConfirm);
-    document.getElementById('alert-ok').addEventListener('click', closeAlert);
+    // 모달 닫기 버튼들 (존재하는 경우에만 이벤트 리스너 추가)
+    const modalClose = document.getElementById('modal-close');
+    const modalCancel = document.getElementById('modal-cancel');
+    const confirmCancel = document.getElementById('confirm-cancel');
+    const alertOk = document.getElementById('alert-ok');
+    const modalBackdrop = document.getElementById('modal-backdrop');
 
-    // 모달 백드롭 클릭
-    document.getElementById('modal-backdrop').addEventListener('click', () => {
-        closeModal();
-        closeConfirm();
-        closeAlert();
-    });
+    if (modalClose) {
+        modalClose.addEventListener('click', closeModal);
+    }
+    if (modalCancel) {
+        modalCancel.addEventListener('click', closeModal);
+    }
+    if (confirmCancel) {
+        confirmCancel.addEventListener('click', closeConfirm);
+    }
+    if (alertOk) {
+        alertOk.addEventListener('click', closeAlert);
+    }
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', () => {
+            closeModal();
+            closeConfirm();
+            closeAlert();
+        });
+    }
 
     // 모바일 메뉴 토글 (있는 경우)
     const menuToggle = document.getElementById('menu-toggle');
