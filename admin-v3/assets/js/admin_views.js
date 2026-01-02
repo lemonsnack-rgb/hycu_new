@@ -2081,59 +2081,63 @@ const views = {
         const data = appData.evaluationCriteria;
         return `
             <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">심사 기준 등록</h3>
-                        <button onclick="switchView('evaluationCriteriaEdit')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            등록
-                        </button>
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">심사 기준 목록</h3>
+                            <span class="table-count">(총 ${data.length}건)</span>
+                        </div>
+                        <div class="table-header-right">
+                            <button onclick="switchView('evaluationCriteriaEdit')" class="btn btn-primary btn-sm">
+                                <span class="icon">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M12 5v14M5 12h14"></path>
+                                    </svg>
+                                </span>
+                                등록
+                            </button>
+                        </div>
                     </div>
-                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4">
-                        <p class="text-sm text-blue-800">
-                            <i class="fas fa-info-circle mr-2"></i>
-                            평가표는 학과/전공과 무관하게 독립적으로 관리됩니다. 논문지도 단계 구성 시 필요한 평가표를 선택할 수 있습니다.
-                        </p>
-                    </div>
-                </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">평가표명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유형</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            ${data.map((item, idx) => {
-                                // 유형 표시 로직 개선 (evaluationType 사용)
-                                let typeClass, typeName;
-                                const evalType = item.evaluationType || 'score';
-                                if (evalType === 'passfail') {
-                                    typeClass = 'bg-gray-100 text-gray-800';
-                                    typeName = 'Pass/Fail형';
-                                } else if (evalType === 'grade') {
-                                    typeClass = 'bg-purple-100 text-purple-800';
-                                    typeName = '등급형';
-                                } else {
-                                    typeClass = 'bg-blue-100 text-blue-800';
-                                    typeName = '점수형';
-                                }
+                    <div class="table-scroll">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">순번</th>
+                                    <th style="width: auto;">심사기준(평가표)명</th>
+                                    <th style="width: 150px;">유형</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${data.map((item, idx) => {
+                                    // 유형 표시 로직 개선 (evaluationType 사용)
+                                    let typeClass, typeName;
+                                    const evalType = item.evaluationType || 'score';
+                                    if (evalType === 'passfail') {
+                                        typeClass = 'bg-gray-100 text-gray-800';
+                                        typeName = 'Pass/Fail형';
+                                    } else if (evalType === 'grade') {
+                                        typeClass = 'bg-purple-100 text-purple-800';
+                                        typeName = '등급형';
+                                    } else {
+                                        typeClass = 'bg-blue-100 text-blue-800';
+                                        typeName = '점수형';
+                                    }
 
-                                return `
-                                    <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('evaluationCriteriaEdit', '${item.id}')">
-                                        <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
-                                        <td class="py-3 px-4 text-sm text-gray-600">
-                                            <span class="px-2 py-1 text-xs rounded-full ${typeClass}">
-                                                ${typeName}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                `;
-                            }).join('')}
-                        </tbody>
-                    </table>
+                                    return `
+                                        <tr class="cursor-pointer" onclick="switchView('evaluationCriteriaEdit', '${item.id}')">
+                                            <td>${idx + 1}</td>
+                                            <td class="text-left font-medium">${item.name}</td>
+                                            <td>
+                                                <span class="px-2 py-1 text-xs rounded-full ${typeClass}">
+                                                    ${typeName}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         `;
@@ -2160,24 +2164,19 @@ const views = {
 
         return `
             <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b flex items-center justify-between">
-                    <button onclick="switchView('evaluationCriteria')"
-                            class="text-gray-600 hover:text-gray-800 flex items-center">
-                        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                        </svg>
-                        목록으로 돌아가기
-                    </button>
-                    <button onclick="saveEvaluationCriteria(${criteriaId})" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                        저장
-                    </button>
-                </div>
-
                 <div class="p-6">
+                    <div class="mb-6">
+                        <button onclick="switchView('evaluationCriteria')" class="back-to-list-btn">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            목록으로 돌아가기
+                        </button>
+                    </div>
                     <!-- 평가표 기본 정보 -->
                     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                         <h4 class="text-md font-semibold text-gray-800 mb-4">평가표 기본 정보</h4>
-                        <div class="grid grid-cols-1 gap-4">
+                        <div class="grid grid-cols-3 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
                                     평가표명 <span class="text-red-600">*</span>
@@ -2200,9 +2199,9 @@ const views = {
                                 <label class="block text-sm font-medium text-gray-700 mb-1">
                                     설명 <span class="text-red-600">*</span>
                                 </label>
-                                <textarea id="edit-criteria-description" rows="3"
-                                          placeholder="이 평가표의 용도와 특징을 설명해주세요"
-                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm">${description}</textarea>
+                                <input type="text" id="edit-criteria-description" value="${description}"
+                                       placeholder="이 평가표의 용도와 특징을 설명해주세요"
+                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                             </div>
                         </div>
                     </div>
@@ -2241,35 +2240,7 @@ const views = {
                                                min="0" max="100" placeholder="예: 70">
                                     </div>
                                 </div>
-                                <div class="bg-blue-50 border border-blue-200 rounded p-3">
-                                    <p class="text-sm text-blue-800">
-                                        <i class="fas fa-info-circle mr-2"></i>
-                                        예시: 총 심사위원 3명 중 2명 이상이 70점 이상을 줘야 통과
-                                    </p>
-                                </div>
                             </div>
-                        </div>
-                    ` : ''}
-
-                    <!-- 총점 표시 (점수형만) -->
-                    ${evaluationType === 'score' ? `
-                        <div class="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded-lg">
-                            <div class="flex items-center justify-between">
-                                <div class="flex items-center">
-                                    <i class="fas fa-calculator text-blue-600 mr-3 text-xl"></i>
-                                    <span class="text-sm font-medium text-gray-700">총점:</span>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span id="total-score-display" class="text-2xl font-bold text-blue-600">
-                                        ${items.reduce((sum, item) => sum + (item.score || 0), 0)}
-                                    </span>
-                                    <span class="text-sm text-gray-600">점</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-600 mt-2">
-                                <i class="fas fa-info-circle mr-1"></i>
-                                총점은 반드시 100점이어야 합니다.
-                            </p>
                         </div>
                     ` : ''}
 
@@ -2345,13 +2316,16 @@ const views = {
                         </div>
                     </div>
 
-                    ${isEdit && criteria ? `
-                        <div class="flex justify-end gap-2 pt-4 border-t">
+                    <div class="flex ${isEdit && criteria ? 'justify-between' : 'justify-end'} gap-2 pt-4 border-t">
+                        ${isEdit && criteria ? `
                             <button onclick="deleteEvaluationCriteriaConfirm(${criteriaId})" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 text-sm">
                                 <i class="fas fa-trash mr-1"></i> 평가표 삭제
                             </button>
-                        </div>
-                    ` : ''}
+                        ` : ''}
+                        <button onclick="saveEvaluationCriteria()" class="bg-admin-primary text-white px-6 py-2 rounded hover:bg-admin-dark text-sm">
+                            <i class="fas fa-save mr-1"></i>저장
+                        </button>
+                    </div>
                 </div>
             </div>
         `;

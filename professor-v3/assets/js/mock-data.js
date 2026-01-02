@@ -1574,6 +1574,7 @@ const journalReviews = [
                 role: '주심',
                 status: '완료',
                 score: 85,
+                itemScores: { 1: 18, 2: 17, 3: 17, 4: 16, 5: 17 },
                 comment: '연구 주제가 독창적이며 방법론이 탄탄합니다.'
             },
             {
@@ -1581,9 +1582,10 @@ const journalReviews = [
                 professorName: '이교수',
                 department: '컴퓨터공학과',
                 role: '부심',
-                status: '진행중',
-                score: null,
-                comment: null
+                status: '완료',
+                score: 88,
+                itemScores: { 1: 19, 2: 18, 3: 17, 4: 17, 5: 17 },
+                comment: 'AI 기술 적용이 매우 우수하며 실용성이 높습니다.'
             },
             {
                 professorId: 'PROF003',
@@ -1592,9 +1594,14 @@ const journalReviews = [
                 role: '부심',
                 status: '완료',
                 score: 82,
+                itemScores: { 1: 17, 2: 16, 3: 16, 4: 17, 5: 16 },
                 comment: '실증적 분석이 우수하나 일반화에 주의가 필요합니다.'
             }
         ],
+        chairDecision: {
+            decision: 'approve',
+            comment: '모든 심사위원의 평가가 우수함. 수정 사항 반영 후 게재 승인합니다.'
+        },
         rubric: {
             items: [
                 { id: 1, name: '연구 주제의 독창성', maxScore: 20 },

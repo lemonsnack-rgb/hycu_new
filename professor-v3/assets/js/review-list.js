@@ -77,17 +77,20 @@ function renderReviewList() {
                                        onchange="toggleSelectAllReviews(this.checked)"
                                        class="rounded border-gray-300">
                             </th>
-                            <th style="width: 60px;">번호</th>
-                            <th style="width: 100px;">대학원</th>
-                            <th style="width: 150px;">학과</th>
+                            <th style="width: 60px;">순번</th>
+                            <th style="width: 80px;">학년도</th>
+                            <th style="width: 60px;">학기</th>
+                            <th style="width: 100px;">대학구분</th>
+                            <th style="width: 100px;">계열/대학원</th>
+                            <th style="width: 120px;">학부(과)전공</th>
+                            <th style="width: 150px;">학과/전공</th>
                             <th style="width: 80px;">학위과정</th>
-                            <th style="width: 90px;">학번</th>
-                            <th style="width: 80px;">이름</th>
                             <th style="width: 80px;">학적상태</th>
-                            <th style="width: 100px;">심사유형</th>
-                            <th style="min-width: 200px;">논문명</th>
-                            <th style="width: 100px;">심사일</th> <!-- 관리자 > 심사 일정 관리에서 지정한 심사 예정일 -->
-                            <th style="width: 120px;">심사진행상태</th>
+                            <th style="width: 90px;">학번</th>
+                            <th style="width: 80px;">성명</th>
+                            <th style="width: 100px;">지도교수명</th>
+                            <th style="width: 100px;">심사단계</th>
+                            <th style="width: 100px;">심사결과</th>
                             <th style="width: 100px;">관리</th>
                         </tr>
                     </thead>
@@ -101,17 +104,18 @@ function renderReviewList() {
                                            data-student-id="${assignment.studentNumber}">
                                 </td>
                                 <td>${index + 1}</td>
+                                <td>${assignment.year || '2025'}</td>
+                                <td>${assignment.semester || '1'}</td>
                                 <td>${assignment.graduate || '일반대학원'}</td>
+                                <td>${assignment.college || '일반대학원'}</td>
+                                <td>${assignment.undergraduate || '-'}</td>
                                 <td>${assignment.major || '-'}</td>
                                 <td>${assignment.degree || '석사'}</td>
+                                <td>${assignment.academicStatus || '재학'}</td>
                                 <td>${assignment.studentNumber}</td>
                                 <td>${assignment.studentName}</td>
-                                <td>${assignment.academicStatus || '재학'}</td>
+                                <td>${assignment.advisorName || '-'}</td>
                                 <td>${assignment.reviewType || '예비심사'}</td>
-                                <td style="max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${assignment.thesisTitle}">
-                                    ${assignment.thesisTitle}
-                                </td>
-                                <td>${assignment.reviewDate || '-'}</td> <!-- reviewDate: 관리자가 심사 일정 관리에서 지정한 값 -->
                                 <td>
                                     ${getProgressStatusText(assignment.evaluationProgress)}
                                 </td>

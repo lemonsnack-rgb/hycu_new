@@ -523,9 +523,9 @@ function updateBreadcrumb(items) {
             // 마지막 항목 (현재 페이지)
             return `<span class="layout-v3-breadcrumb-current">${item.label}</span>`;
         } else {
-            // 링크 항목
+            // 일반 항목 (링크 없음)
             return `
-                <a href="${item.url || '#'}">${item.label}</a>
+                <span>${item.label}</span>
                 <span class="layout-v3-breadcrumb-separator">></span>
             `;
         }

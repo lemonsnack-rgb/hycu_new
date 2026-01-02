@@ -12,73 +12,120 @@ function renderJournalReviewList() {
     const contentHtml = `
         <!-- 검색 영역 -->
         <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="p-6">
-                <div class="search-container">
-                    <div class="search-grid">
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학년도
-                            </label>
-                            <select id="journal-filter-year" class="search-select">
-                                <option value="">전체</option>
-                                <option value="2025">2025학년도</option>
-                                <option value="2024">2024학년도</option>
-                                <option value="2023">2023학년도</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학기
-                            </label>
-                            <select id="journal-filter-semester" class="search-select">
-                                <option value="">전체</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                학기차
-                            </label>
-                            <select id="journal-filter-semester-count" class="search-select">
-                                <option value="">전체</option>
-                                <option value="1">1학기차</option>
-                                <option value="2">2학기차</option>
-                                <option value="3">3학기차</option>
-                                <option value="4">4학기차</option>
-                                <option value="5">5학기차</option>
-                                <option value="6">6학기차</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                심사진행상태
-                            </label>
-                            <select id="journal-filter-status" class="search-select">
-                                <option value="">전체</option>
-                                <option value="심사대기">심사대기</option>
-                                <option value="심사중">심사중</option>
-                                <option value="심사완료">심사완료</option>
-                            </select>
-                        </div>
-                        <div class="search-field">
-                            <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                키워드
-                            </label>
-                            <input type="text"
-                                   id="journal-filter-keyword"
-                                   placeholder="학번/성명/논문제목 검색"
-                                   class="search-input"
-                                   style="height: 38px;"
-                                   onkeypress="if(event.key==='Enter') searchJournalReviews()">
-                        </div>
+            <div class="p-4 bg-gray-50">
+                <div class="grid grid-cols-4 gap-4">
+                    <!-- 1행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                        <select id="journal-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="2025" selected>2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
                     </div>
-                    <div class="search-buttons">
-                        <button onclick="resetJournalSearch()" class="btn btn-secondary">
-                            <i class="fas fa-redo"></i> 초기화
-                        </button>
-                        <button onclick="searchJournalReviews()" class="btn btn-primary">
-                            <i class="fas fa-search"></i> 검색
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
+                        <select id="journal-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="1" selected>1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                        <select id="journal-filter-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="특수대학원">특수대학원</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                        <select id="journal-filter-graduate-school" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="디자인대학원">디자인대학원</option>
+                            <option value="경영대학원">경영대학원</option>
+                            <option value="부동산대학원">부동산대학원</option>
+                        </select>
+                    </div>
+
+                    <!-- 2행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                        <select id="journal-filter-undergraduate-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="컴퓨터공학과">컴퓨터공학과</option>
+                            <option value="전자공학과">전자공학과</option>
+                            <option value="경영학과">경영학과</option>
+                            <option value="디자인학부">디자인학부</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                        <select id="journal-filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="컴퓨터공학">컴퓨터공학</option>
+                            <option value="전자공학">전자공학</option>
+                            <option value="경영학">경영학</option>
+                            <option value="시각디자인">시각디자인</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                        <select id="journal-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="석사">석사</option>
+                            <option value="박사">박사</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                        <select id="journal-filter-status-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="재학">재학</option>
+                            <option value="휴학">휴학</option>
+                            <option value="수료">수료</option>
+                        </select>
+                    </div>
+
+                    <!-- 3행 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                        <input type="text" id="journal-filter-student-number" placeholder="학번"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                               onkeypress="if(event.key==='Enter') searchJournalReviews()">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                        <input type="text" id="journal-filter-student-name" placeholder="성명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                               onkeypress="if(event.key==='Enter') searchJournalReviews()">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                        <input type="text" id="journal-filter-advisor-name" placeholder="지도교수명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                               onkeypress="if(event.key==='Enter') searchJournalReviews()">
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">처리결과</label>
+                        <select id="journal-filter-result" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="심사대기">심사대기</option>
+                            <option value="심사중">심사중</option>
+                            <option value="심사완료">심사완료</option>
+                            <option value="승인">승인</option>
+                            <option value="보류">보류</option>
+                            <option value="반려">반려</option>
+                        </select>
+                    </div>
+
+                    <!-- 4행 - 조회 버튼 -->
+                    <div class="col-span-4 flex items-center justify-end">
+                        <button onclick="searchJournalReviews()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                            <i class="fas fa-search mr-1"></i>조회
                         </button>
                     </div>
                 </div>
@@ -140,63 +187,57 @@ function renderJournalReviewRows(journals) {
                                        onchange="toggleSelectAllJournals(this.checked)"
                                        class="rounded border-gray-300">
                             </th>
-                            <th style="width: 60px;">번호</th>
-                            <th style="width: 100px;">대학원</th>
-                            <th style="width: 150px;">학과</th>
+                            <th style="width: 60px;">순번</th>
+                            <th style="width: 80px;">학년도</th>
+                            <th style="width: 60px;">학기</th>
+                            <th style="width: 100px;">대학구분</th>
+                            <th style="width: 100px;">계열/대학원</th>
+                            <th style="width: 120px;">학부(과)전공</th>
+                            <th style="width: 150px;">학과/전공</th>
                             <th style="width: 80px;">학위과정</th>
+                            <th style="width: 80px;">학적상태</th>
                             <th style="width: 90px;">학번</th>
-                            <th style="width: 80px;">이름</th>
-                            <th style="min-width: 250px;">논문제목</th>
-                            <th style="min-width: 180px;">학술지명</th>
-                            <th style="width: 100px;">제출일</th>
-                            <th style="width: 120px;">심사진행상태</th>
+                            <th style="width: 80px;">성명</th>
+                            <th style="width: 100px;">지도교수명</th>
+                            <th style="width: 100px;">처리결과</th>
                             <th style="width: 100px;">관리</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${journals.map((journal, index) => {
-                            const statusClass = getJournalStatusBadgeClass(journal.status);
-
                             return `
                                 <tr>
-                                        <td>
+                                    <td>
                                         <input type="checkbox" class="journal-checkbox rounded border-gray-300"
                                                value="${journal.id}"
                                                data-name="${journal.studentName}"
                                                data-student-id="${journal.studentId}">
                                     </td>
                                     <td>${index + 1}</td>
-                                    <td>일반대학원</td>
+                                    <td>${journal.year || '2025'}</td>
+                                    <td>${journal.semester || '1'}</td>
+                                    <td>${journal.collegeType || '일반대학원'}</td>
+                                    <td>${journal.graduateSchool || '일반대학원'}</td>
+                                    <td>${journal.undergraduate || '-'}</td>
                                     <td>${journal.major || '-'}</td>
                                     <td>${journal.degree || '석사'}</td>
+                                    <td>${journal.academicStatus || '재학'}</td>
                                     <td>${journal.studentId}</td>
                                     <td>${journal.studentName}</td>
+                                    <td>${journal.advisorName || '-'}</td>
+                                    <td>${journal.status}</td>
                                     <td>
-                                        <div class="cell-truncate" title="${journal.paperTitle}">
-                                            ${journal.paperTitle}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div class="cell-truncate" title="${journal.journalName}">
-                                            ${journal.journalName}
-                                        </div>
-                                    </td>
-                                    <td>${journal.submissionDate || '-'}</td>
-                                    <td>
-                                        ${journal.status}
-                                    </td>
-                                    <td>
-                                        <div class="action-buttons">
-                                        <button onclick="viewJournalReviewDetail(${journal.id}, 'member')"
-                                                class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
-                                            심사
-                                        </button>
-                                        ${journal.myRole === 'chair' ? `
-                                            <button onclick="viewJournalReviewDetail(${journal.id}, 'chair')"
-                                                    class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
-                                                승인
+                                        <div class="flex gap-2 justify-center">
+                                            <button onclick="viewJournalReviewDetail(${journal.id}, 'member')"
+                                                    class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
+                                                심사
                                             </button>
-                                        ` : ''}
+                                            ${journal.myRole === 'chair' ? `
+                                                <button onclick="viewJournalReviewDetail(${journal.id}, 'chair')"
+                                                        class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
+                                                    승인
+                                                </button>
+                                            ` : ''}
                                         </div>
                                     </td>
                                 </tr>
