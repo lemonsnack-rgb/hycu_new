@@ -168,16 +168,22 @@ function renderExamScheduleScreen() {
                         <table class="min-w-full">
                             <thead>
                                 <tr>
-                                    <th>No</th>
+                                    <th>순번</th>
+                                    <th>학년도</th>
+                                    <th>학기</th>
+                                    <th>대학구분</th>
+                                    <th>계열/대학원</th>
+                                    <th>학부(과)전공</th>
+                                    <th>학과/전공</th>
+                                    <th>학위과정</th>
+                                    <th>학적상태</th>
                                     <th>학번</th>
-                                    <th>학생명</th>
-                                    <th>학과</th>
-                                    <th>학위</th>
-                                    <th>심사 단계</th>
-                                    <th>심사위원장</th>
-                                    <th>심사 일정</th>
-                                    <th>진행 방식</th>
-                                    <th>상태</th>
+                                    <th>성명</th>
+                                    <th>지도교수명</th>
+                                    <th>심사단계</th>
+                                    <th>등록상태</th>
+                                    <th>심사일정</th>
+                                    <th>진행방식</th>
                                 </tr>
                             </thead>
                             <tbody id="exam-schedule-table-body">
@@ -348,7 +354,7 @@ function renderExamScheduleTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="10" style="text-align: center; padding: 24px 12px;">
+                <td colspan="16" style="text-align: center; padding: 24px 12px;">
                     배정된 심사 일정이 없습니다.
                 </td>
             </tr>
@@ -372,15 +378,21 @@ function renderExamScheduleTable(data) {
         return `
             <tr class="cursor-pointer" onclick="showExamScheduleDetailReadonly('${item.assignmentId}')">
                 <td>${index + 1}</td>
+                <td>${item.year || '2025'}</td>
+                <td>${item.semester || '1'}</td>
+                <td>${item.collegeType || '일반대학원'}</td>
+                <td>${item.graduate || '일반대학원'}</td>
+                <td>${item.undergraduate || '-'}</td>
+                <td>${item.department}</td>
+                <td>${item.degreeType === 'master' ? '석사' : item.degreeType === 'doctor' ? '박사' : '석박통합'}</td>
+                <td>${item.status || '재학'}</td>
                 <td>${item.studentNumber}</td>
                 <td>${item.studentName}</td>
-                <td>${item.department}</td>
-                <td>${item.degreeType === 'master' ? '석사' : '박사'}</td>
+                <td>${item.advisorName || '-'}</td>
                 <td>${item.stageName}</td>
-                <td>${item.chairName}</td>
+                <td>${statusText}</td>
                 <td>${scheduleText}</td>
                 <td>${methodText}</td>
-                <td>${statusText}</td>
             </tr>
         `;
     }).join('');
@@ -496,22 +508,26 @@ function renderExamScheduleDetailReadonly(assignmentId) {
 
     const detailView = document.getElementById('exam-schedule-detail-view');
 
-    // 심사위원 목록 HTML 생성
-    const membersHTML = assignment.members.map(m => `
-        <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-            <div>
-                <span class="font-medium text-gray-900">${m.professorName}</span>
-                <span class="text-sm text-gray-600 ml-2">${m.department}</span>
-            </div>
-            <span class="text-xs px-2 py-1 rounded-full ${
-                m.role === 'chair'
-                    ? 'bg-[#FCE4EC] text-[#6A0028]'
-                    : 'bg-gray-100 text-gray-600'
-            }">
-                ${m.role === 'chair' ? '위원장' : '위원'}
-            </span>
+    // 심사위원 목록 HTML 생성 (5열 그리드)
+    const membersHTML = `
+        <div class="grid grid-cols-5 gap-3">
+            ${assignment.members.map(m => `
+                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs px-2 py-1 rounded-full ${
+                            m.role === 'chair'
+                                ? 'bg-[#FCE4EC] text-[#6A0028]'
+                                : 'bg-gray-100 text-gray-600'
+                        }">
+                            ${m.role === 'chair' ? '위원장' : '위원'}
+                        </span>
+                        <span class="font-medium text-gray-900 text-sm">${m.professorName}</span>
+                    </div>
+                    <span class="text-sm text-gray-600">${m.department}</span>
+                </div>
+            `).join('')}
         </div>
-    `).join('');
+    `;
 
     detailView.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
@@ -596,9 +612,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                 <!-- 심사위원 정보 -->
                 <div class="mb-6">
                     <h4 class="font-bold text-gray-800 mb-3">심사위원 정보</h4>
-                    <div class="space-y-2">
-                        ${membersHTML}
-                    </div>
+                    ${membersHTML}
                 </div>
 
                 <!-- 일정 정보 -->
@@ -640,7 +654,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                     </div>
 
                     ${schedule.method === 'online' && schedule.onlineInfo ? `
-                        <div class="p-4 bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg">
+                        <div class="p-4 bg-[#FAF6F1] border border-[#E8E0D8] rounded-lg">
                             <h5 class="font-medium text-gray-800 mb-3">Zoom 미팅 정보</h5>
                             <div class="space-y-2 text-sm">
                                 <div class="grid grid-cols-2 gap-4">
@@ -657,20 +671,22 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                                         </div>
                                     </div>
                                 </div>
-                                <div>
-                                    <span class="text-gray-600">참가 URL:</span>
-                                    <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
-                                        <a href="${schedule.onlineInfo.meetingUrl}" target="_blank" class="text-[#6A0028] hover:underline">
-                                            ${schedule.onlineInfo.meetingUrl}
-                                        </a>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <span class="text-gray-600">참가 URL:</span>
+                                        <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
+                                            <a href="${schedule.onlineInfo.meetingUrl}" target="_blank" class="text-[#6A0028] hover:underline">
+                                                ${schedule.onlineInfo.meetingUrl}
+                                            </a>
+                                        </div>
                                     </div>
-                                </div>
-                                <div>
-                                    <span class="text-gray-600">호스트 URL:</span>
-                                    <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
-                                        <a href="${schedule.onlineInfo.hostUrl}" target="_blank" class="text-[#6A0028] hover:underline">
-                                            ${schedule.onlineInfo.hostUrl}
-                                        </a>
+                                    <div>
+                                        <span class="text-gray-600">호스트 URL:</span>
+                                        <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
+                                            <a href="${schedule.onlineInfo.hostUrl}" target="_blank" class="text-[#6A0028] hover:underline">
+                                                ${schedule.onlineInfo.hostUrl}
+                                            </a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
