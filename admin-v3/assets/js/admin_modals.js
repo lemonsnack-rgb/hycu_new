@@ -122,20 +122,44 @@ function initEvaluationTypeChangeListener() {
             const newSelect = typeSelect.cloneNode(true);
             typeSelect.parentNode.replaceChild(newSelect, typeSelect);
 
+            // 통과 기준 필드 업데이트 함수
+            const updatePassCriteriaFields = (newType) => {
+                const requiredCommitteeInput = document.getElementById('pass-required-committee');
+                const minScoreInput = document.getElementById('pass-min-score');
+
+                if (requiredCommitteeInput && minScoreInput) {
+                    if (newType === 'passfail') {
+                        // Pass/Fail형으로 변경 시 비활성화 및 빈 값
+                        requiredCommitteeInput.value = '';
+                        requiredCommitteeInput.disabled = true;
+                        minScoreInput.value = '';
+                        minScoreInput.disabled = true;
+                    } else if (newType === 'score') {
+                        // 점수형으로 변경 시 활성화 및 기본값
+                        requiredCommitteeInput.value = '2';
+                        requiredCommitteeInput.disabled = false;
+                        minScoreInput.value = '70';
+                        minScoreInput.disabled = false;
+                    }
+                }
+            };
+
             newSelect.addEventListener('change', function(e) {
                 const container = document.getElementById('evaluation-items-container');
                 const existingItems = container.querySelectorAll('.evaluation-item');
+                const newType = e.target.value;
 
                 if (existingItems.length > 0) {
                     // 경고 모달 표시
                     showEvaluationTypeChangeWarning(
                         () => {
-                            // 확인 - 항목 초기화
+                            // 확인 - 항목 초기화 및 통과 기준 필드 업데이트
                             container.innerHTML = '<p class="text-sm text-gray-500 text-center py-4">평가 항목을 추가해주세요.</p>';
                             if (typeof updateTotalScore === 'function') {
                                 updateTotalScore();
                             }
-                            initialType = e.target.value;
+                            updatePassCriteriaFields(newType);
+                            initialType = newType;
                         },
                         () => {
                             // 취소 - 이전 값으로 복원
@@ -143,8 +167,9 @@ function initEvaluationTypeChangeListener() {
                         }
                     );
                 } else {
-                    // 항목이 없으면 그냥 변경
-                    initialType = e.target.value;
+                    // 항목이 없으면 그냥 변경하고 통과 기준 필드 업데이트
+                    updatePassCriteriaFields(newType);
+                    initialType = newType;
                 }
             });
         }

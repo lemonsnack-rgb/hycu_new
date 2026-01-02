@@ -2206,43 +2206,43 @@ const views = {
                         </div>
                     </div>
 
-                    <!-- 통과 기준 (점수형만) -->
-                    ${evaluationType === 'score' ? `
-                        <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                            <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
-                            <div class="grid grid-cols-1 gap-4">
-                                <div class="grid grid-cols-3 gap-3 items-end">
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                                            총 심사위원 수 <span class="text-red-600">*</span>
-                                        </label>
-                                        <input type="number" id="pass-total-committee"
-                                               value="${isEdit && criteria?.passCriteria?.totalCommittee !== undefined ? criteria.passCriteria.totalCommittee : 3}"
-                                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                               min="1" placeholder="예: 3">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                                            통과 필요 인원 <span class="text-red-600">*</span>
-                                        </label>
-                                        <input type="number" id="pass-required-committee"
-                                               value="${isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2}"
-                                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                               min="1" placeholder="예: 2">
-                                    </div>
-                                    <div>
-                                        <label class="block text-sm font-medium text-gray-700 mb-1">
-                                            최소 점수 <span class="text-red-600">*</span>
-                                        </label>
-                                        <input type="number" id="pass-min-score"
-                                               value="${isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70}"
-                                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                               min="0" max="100" placeholder="예: 70">
-                                    </div>
+                    <!-- 통과 기준 -->
+                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
+                        <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div class="grid grid-cols-3 gap-3 items-end">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        총 심사위원 수 <span class="text-red-600">*</span>
+                                    </label>
+                                    <input type="number" id="pass-total-committee"
+                                           value="${isEdit && criteria?.passCriteria?.totalCommittee !== undefined ? criteria.passCriteria.totalCommittee : 3}"
+                                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                           min="1" placeholder="예: 3">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        통과 필요 인원 <span class="text-red-600">*</span>
+                                    </label>
+                                    <input type="number" id="pass-required-committee"
+                                           value="${evaluationType === 'passfail' ? '' : (isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2)}"
+                                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                           min="1" placeholder="예: 2"
+                                           ${evaluationType === 'passfail' ? 'disabled' : ''}>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                                        최소 점수 <span class="text-red-600">*</span>
+                                    </label>
+                                    <input type="number" id="pass-min-score"
+                                           value="${evaluationType === 'passfail' ? '' : (isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70)}"
+                                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
+                                           min="0" max="100" placeholder="예: 70"
+                                           ${evaluationType === 'passfail' ? 'disabled' : ''}>
                                 </div>
                             </div>
                         </div>
-                    ` : ''}
+                    </div>
 
                     <!-- 평가 항목 -->
                     <div class="mb-6">
