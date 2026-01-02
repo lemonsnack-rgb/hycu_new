@@ -30,9 +30,10 @@ function calculateAverageScore(reviewers) {
  * 학술지 심사 상세 화면
  * @param {number} journalId - 학술지 ID
  * @param {string} viewType - 'member' 또는 'chair'
+ * @param {boolean} isAdminMode - 관리자 모드 여부 (true일 경우 뒤로가기 버튼 생략)
  */
-function viewJournalReviewDetail(journalId, viewType) {
-    console.log('viewJournalReviewDetail called with journalId:', journalId, 'viewType:', viewType);
+function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
+    console.log('viewJournalReviewDetail called with journalId:', journalId, 'viewType:', viewType, 'isAdminMode:', isAdminMode);
 
     // getJournalReviews가 정의되어 있는지 확인
     if (typeof getJournalReviews !== 'function') {
@@ -545,8 +546,8 @@ function viewJournalReviewDetail(journalId, viewType) {
     // 모달 대신 페이지 전환 방식으로 변경
     const container = document.getElementById('journal-review-content');
     if (container) {
-        // 뒤로가기 버튼 추가
-        const backButton = `
+        // 뒤로가기 버튼 추가 (관리자 모드가 아닐 때만)
+        const backButton = isAdminMode ? '' : `
             <div class="mb-6">
                 <button onclick="initJournalReview()" class="back-to-list-btn">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">

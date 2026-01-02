@@ -40,6 +40,10 @@
     <!-- Layout System v3 - Crimson Layout -->
     <link rel="stylesheet" href="assets/css/layout-v3.css">
 
+    <!-- Professor-v3 Review CSS (재사용) -->
+    <link rel="stylesheet" href="../professor-v3/assets/css/review.css">
+    <link rel="stylesheet" href="../professor-v3/assets/css/meeting-v2.css">
+
     <!-- Common Styles from Original Admin (common-style.css 제외 - layout-v3와 충돌) -->
     <link rel="stylesheet" href="assets/css/common-search.css">
     <link rel="stylesheet" href="assets/css/table-truncate.css">
@@ -536,11 +540,227 @@
             </section>
 
             <section id="thesisReview-screen" class="content-screen">
-                <div id="thesis-review-content"></div>
+                <div id="admin-main-content">
+                    <!-- 심사 유형 선택 (탭) -->
+                    <div class="meeting-tabs mb-6">
+                        <button id="admin-review-type-all" class="tab-btn active" onclick="toggleAdminReviewType('all')">
+                            전체
+                        </button>
+                        <button id="admin-review-type-preliminary" class="tab-btn" onclick="toggleAdminReviewType('preliminary')">
+                            예비심사
+                        </button>
+                        <button id="admin-review-type-main" class="tab-btn" onclick="toggleAdminReviewType('main')">
+                            본심사
+                        </button>
+                    </div>
+
+                    <!-- 검색 영역 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <div class="grid grid-cols-4 gap-3">
+                            <!-- 1행 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                                <select id="admin-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025학년도</option>
+                                    <option value="2024">2024학년도</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
+                                <select id="admin-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                                <select id="admin-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                    <option value="석박통합">석박통합</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                                <select id="admin-filter-academic-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="재학">재학</option>
+                                    <option value="휴학">휴학</option>
+                                    <option value="수료">수료</option>
+                                    <option value="졸업">졸업</option>
+                                </select>
+                            </div>
+
+                            <!-- 2행 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                                <select id="admin-filter-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="일반대학원">일반대학원</option>
+                                    <option value="디자인대학원">디자인대학원</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                                <select id="admin-filter-college" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="공학계열">공학계열</option>
+                                    <option value="인문사회계열">인문사회계열</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                                <select id="admin-filter-undergraduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="컴퓨터공학">컴퓨터공학</option>
+                                    <option value="경영학">경영학</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                                <select id="admin-filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                    <option value="경영학과">경영학과</option>
+                                </select>
+                            </div>
+
+                            <!-- 3행 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                                <input type="text" id="admin-filter-student-id" placeholder="학번"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                                <input type="text" id="admin-filter-name" placeholder="성명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                                <input type="text" id="admin-filter-advisor" placeholder="지도교수명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">처리결과</label>
+                                <select id="admin-filter-review-result" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="대기">대기</option>
+                                    <option value="진행 중">진행 중</option>
+                                    <option value="심사완료">심사완료</option>
+                                </select>
+                            </div>
+
+                            <!-- 4행 - 버튼 -->
+                            <div class="col-span-4 flex justify-end gap-2">
+                                <button onclick="searchAdminReviews()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                                    <i class="fas fa-search mr-1"></i>조회
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 콘텐츠 -->
+                    <div id="admin-thesis-review-list">
+                        <!-- admin_thesis_review.js에서 동적으로 렌더링 -->
+                    </div>
+                </div>
             </section>
 
             <section id="journalReview-screen" class="content-screen">
-                <div id="journal-review-content"></div>
+                <div id="admin-journal-main-content">
+                    <!-- 검색 영역 -->
+                    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                        <div class="grid grid-cols-4 gap-3">
+                            <!-- 1행 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                                <select id="admin-journal-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
+                                <select id="admin-journal-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                                <select id="admin-journal-filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                    <option value="경영학과">경영학과</option>
+                                    <option value="교육공학과">교육공학과</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                                <select id="admin-journal-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                </select>
+                            </div>
+
+                            <!-- 2행 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                                <input type="text" id="admin-journal-filter-student-id" placeholder="학번"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                                <input type="text" id="admin-journal-filter-name" placeholder="성명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학술지명</label>
+                                <input type="text" id="admin-journal-filter-journal-name" placeholder="학술지명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">진행상태</label>
+                                <select id="admin-journal-filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="심사대기">심사대기</option>
+                                    <option value="심사중">심사중</option>
+                                    <option value="심사완료">심사완료</option>
+                                </select>
+                            </div>
+
+                            <!-- 3행 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사결과</label>
+                                <select id="admin-journal-filter-decision" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="승인">승인</option>
+                                    <option value="보류">보류</option>
+                                    <option value="반려">반려</option>
+                                </select>
+                            </div>
+                            <div class="col-span-2"></div>
+                            <div class="flex items-center justify-end">
+                                <button onclick="searchAdminJournalReviews()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                                    <i class="fas fa-search mr-1"></i>조회
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 콘텐츠 -->
+                    <div id="admin-journal-review-list">
+                        <!-- admin_journal_review.js에서 동적으로 렌더링 -->
+                    </div>
+                </div>
             </section>
 
             <section id="evaluationCriteria-screen" class="content-screen">
@@ -642,6 +862,34 @@
 
         // admin_views.js의 views 객체를 사용하여 렌더링
         function renderAdminView(viewName) {
+            console.log('🎯 renderAdminView called with viewName:', viewName);
+
+            // thesisReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
+            if (viewName === 'thesisReview') {
+                console.log('🎯 Detected thesisReview, calling initAdminThesisReview');
+                if (typeof initAdminThesisReview === 'function') {
+                    setTimeout(() => {
+                        initAdminThesisReview();
+                    }, 0);
+                } else {
+                    console.error('❌ initAdminThesisReview function not found!');
+                }
+                return;
+            }
+
+            // journalReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
+            if (viewName === 'journalReview') {
+                console.log('🎯 Detected journalReview, calling initAdminJournalReview');
+                if (typeof initAdminJournalReview === 'function') {
+                    setTimeout(() => {
+                        initAdminJournalReview();
+                    }, 0);
+                } else {
+                    console.error('❌ initAdminJournalReview function not found!');
+                }
+                return;
+            }
+
             // views 객체가 로드되지 않았으면 대기
             if (typeof views === 'undefined') {
                 setTimeout(() => renderAdminView(viewName), 100);
@@ -659,7 +907,6 @@
                 'guidanceProgress': 'guidance-progress-content',
                 'scheduleManagement': 'schedule-management-content',
                 'committeeAssignment': 'committee-assignment-content',
-                'thesisReview': 'thesis-review-content',
                 'journalReview': 'journal-review-content',
                 'evaluationCriteria': 'evaluation-criteria-content',
                 'requirementManagement': 'requirement-management-content',
@@ -761,12 +1008,24 @@
         });
     </script>
 
+    <!-- Professor-v3 Review Scripts (재사용) -->
+    <script src="../professor-v3/assets/js/mock-data.js"></script>
+    <script src="../professor-v3/assets/js/review-data.js"></script>
+    <script src="../professor-v3/assets/js/review-list.js"></script>
+    <script src="../professor-v3/assets/js/review-detail.js"></script>
+    <script src="../professor-v3/assets/js/journal-review.js"></script>
+    <script src="../professor-v3/assets/js/journal-review-detail.js"></script>
+
     <!-- Admin JavaScript 파일들 -->
     <script src="assets/js/admin_data.js"></script>
     <script src="assets/js/mockData.js"></script>
     <script src="assets/js/admin_main.js"></script>
     <script src="assets/js/admin_views.js"></script>
     <script src="assets/js/admin_modals.js"></script>
+
+    <!-- Admin Review Scripts -->
+    <script src="assets/js/admin_thesis_review.js"></script>
+    <script src="assets/js/admin_journal_review.js"></script>
 
     <!-- Bridge old switchView to new showScreen -->
     <script>
@@ -812,13 +1071,41 @@
         // Update renderAdminView to handle parameters
         const originalRenderAdminView = renderAdminView;
         window.renderAdminView = function(viewName, param = null) {
+            console.log('🎯 window.renderAdminView called with viewName:', viewName, 'param:', param);
+
+            // CRITICAL: thesisReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
+            if (viewName === 'thesisReview') {
+                console.log('🎯 Detected thesisReview in window.renderAdminView');
+                if (typeof initAdminThesisReview === 'function') {
+                    setTimeout(() => {
+                        initAdminThesisReview();
+                    }, 0);
+                } else {
+                    console.error('❌ initAdminThesisReview function not found in window.renderAdminView!');
+                }
+                return;
+            }
+
+            // CRITICAL: journalReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
+            if (viewName === 'journalReview') {
+                console.log('🎯 Detected journalReview in window.renderAdminView');
+                if (typeof initAdminJournalReview === 'function') {
+                    setTimeout(() => {
+                        initAdminJournalReview();
+                    }, 0);
+                } else {
+                    console.error('❌ initAdminJournalReview function not found in window.renderAdminView!');
+                }
+                return;
+            }
+
             // views 객체가 로드되지 않았으면 대기
             if (typeof views === 'undefined') {
                 setTimeout(() => renderAdminView(viewName, param), 100);
                 return;
             }
 
-            // 각 화면별 컨테이너 ID 매핑
+            // 각 화면별 컨테이너 ID 매핑 (thesisReview 제거됨)
             const containerMap = {
                 'dashboard': 'content-area',
                 'stageManagement': 'stage-management-content',
@@ -829,7 +1116,6 @@
                 'guidanceProgress': 'guidance-progress-content',
                 'scheduleManagement': 'schedule-management-content',
                 'committeeAssignment': 'committee-assignment-content',
-                'thesisReview': 'thesis-review-content',
                 'journalReview': 'journal-review-content',
                 'evaluationCriteria': 'evaluation-criteria-content',
                 'evaluationCriteriaEdit': 'evaluation-criteria-content',

@@ -1322,22 +1322,38 @@ class ReviewService {
     // 내게 배정된 심사 목록 조회
     static getMyReviewAssignments() {
         const currentProfId = this.getCurrentProfessorId();
-        
+
         return REVIEW_ASSIGNMENTS.filter(assignment => {
             return assignment.committee.some(member => member.professorId === currentProfId);
         }).map(assignment => {
             // 내 역할 찾기
             const myRole = assignment.committee.find(m => m.professorId === currentProfId);
-            
+
             // 심사 진행 상황
             const evaluations = REVIEW_EVALUATIONS.filter(e => e.assignmentId === assignment.id);
             const totalMembers = assignment.committee.length;
             const completedCount = evaluations.filter(e => e.status === '제출완료').length;
-            
+
             return {
                 ...assignment,
                 myRole: myRole.role,
                 myCommitteeId: myRole.id,
+                evaluationProgress: `${completedCount}/${totalMembers}`,
+                isCompleted: completedCount === totalMembers
+            };
+        });
+    }
+
+    // 모든 심사 목록 조회 (관리자용)
+    static getAllReviewAssignments() {
+        return REVIEW_ASSIGNMENTS.map(assignment => {
+            // 심사 진행 상황
+            const evaluations = REVIEW_EVALUATIONS.filter(e => e.assignmentId === assignment.id);
+            const totalMembers = assignment.committee.length;
+            const completedCount = evaluations.filter(e => e.status === '제출완료').length;
+
+            return {
+                ...assignment,
                 evaluationProgress: `${completedCount}/${totalMembers}`,
                 isCompleted: completedCount === totalMembers
             };
@@ -1348,33 +1364,58 @@ class ReviewService {
     static getReviewDetail(assignmentId) {
         const assignment = REVIEW_ASSIGNMENTS.find(a => a.id === assignmentId);
         if (!assignment) return null;
-        
+
         const currentProfId = this.getCurrentProfessorId();
         const myRole = assignment.committee.find(m => m.professorId === currentProfId);
-        
+
         // 평가표 템플릿
         const template = EVALUATION_TEMPLATES[assignment.templateId];
-        
+
         // 내 평가
-        const myEvaluation = REVIEW_EVALUATIONS.find(e => 
+        const myEvaluation = REVIEW_EVALUATIONS.find(e =>
             e.assignmentId === assignmentId && e.professorId === currentProfId
         );
-        
+
         // 모든 평가 (위원장만)
-        const allEvaluations = myRole.role === 'chair' 
+        const allEvaluations = myRole && myRole.role === 'chair'
             ? REVIEW_EVALUATIONS.filter(e => e.assignmentId === assignmentId)
             : [];
-        
+
         // 심사 결과
         const result = REVIEW_RESULTS.find(r => r.assignmentId === assignmentId);
-        
+
         return {
             assignment,
-            myRole: myRole.role,
-            myCommitteeId: myRole.id,
+            myRole: myRole ? myRole.role : null,
+            myCommitteeId: myRole ? myRole.id : null,
             template,
             myEvaluation,
             allEvaluations,
+            result
+        };
+    }
+
+    // 관리자용 심사 상세 조회 (위원장 권한으로 모든 데이터 조회)
+    static getReviewDetailForAdmin(assignmentId) {
+        const assignment = REVIEW_ASSIGNMENTS.find(a => a.id === assignmentId);
+        if (!assignment) return null;
+
+        // 평가표 템플릿
+        const template = EVALUATION_TEMPLATES[assignment.templateId];
+
+        // 모든 평가 조회 (관리자는 모든 평가를 볼 수 있음)
+        const allEvaluations = REVIEW_EVALUATIONS.filter(e => e.assignmentId === assignmentId);
+
+        // 심사 결과
+        const result = REVIEW_RESULTS.find(r => r.assignmentId === assignmentId);
+
+        return {
+            assignment,
+            myRole: 'chair', // 관리자는 위원장 권한으로 모든 것을 볼 수 있음
+            myCommitteeId: null, // 관리자는 심사위원이 아님
+            template,
+            myEvaluation: null, // 관리자는 평가하지 않음
+            allEvaluations, // 모든 평가 표시
             result
         };
     }

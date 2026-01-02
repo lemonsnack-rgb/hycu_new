@@ -4,12 +4,17 @@ let currentAssignmentId = null;
 let currentEvaluationData = null;
 
 // ==================== 심사 상세 렌더링 ====================
-function renderReviewDetail(assignmentId, viewType) {
-    console.log('🎯 renderReviewDetail START - assignmentId:', assignmentId, 'viewType:', viewType);
+function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
+    console.log('🎯 renderReviewDetail START - assignmentId:', assignmentId, 'viewType:', viewType, 'isAdminMode:', isAdminMode);
 
     currentAssignmentId = assignmentId;
-    const detail = ReviewService.getReviewDetail(assignmentId);
-    console.log('🎯 ReviewService.getReviewDetail result:', detail);
+
+    // 관리자 모드인 경우 관리자 전용 함수 사용
+    const detail = isAdminMode
+        ? ReviewService.getReviewDetailForAdmin(assignmentId)
+        : ReviewService.getReviewDetail(assignmentId);
+
+    console.log('🎯 ReviewService result:', detail);
 
     if (!detail) {
         console.error('❌ detail is null/undefined');
@@ -40,12 +45,13 @@ function renderReviewDetail(assignmentId, viewType) {
     // 역할에 따라 화면 분리
     if (isChairView) {
         // 위원장 화면: 평가 요약 + 승인/보류/반려
-        if (detail.myRole !== 'chair') {
+        // 관리자 모드가 아니고, 위원장 권한이 없으면 에러 표시
+        if (!isAdminMode && detail.myRole !== 'chair') {
             html += `<div class="bg-red-50 border border-red-300 rounded-lg p-4 mb-6">
                 <p class="text-red-800">위원장 권한이 없습니다.</p>
             </div>`;
         } else {
-            // 위원장 화면 표시
+            // 위원장 화면 표시 (관리자 또는 위원장)
             html += renderChairApprovalScreen(detail, allSubmitted);
         }
     } else {

@@ -1566,6 +1566,13 @@ const journalReviews = [
         progress: 50,
         pdfUrl: '/uploads/papers/ai-learning-system.pdf',
         myRole: 'chair', // 'chair' 또는 'member'
+        year: '2025',
+        semester: '2',
+        collegeType: '일반대학원',
+        graduateSchool: '일반대학원',
+        undergraduate: '교육공학',
+        academicStatus: '재학',
+        advisorName: '홍길동',
         reviewers: [
             {
                 professorId: 'PROF001',
@@ -1599,7 +1606,7 @@ const journalReviews = [
             }
         ],
         chairDecision: {
-            decision: 'approve',
+            decision: '승인',
             comment: '모든 심사위원의 평가가 우수함. 수정 사항 반영 후 게재 승인합니다.'
         },
         rubric: {
@@ -1629,6 +1636,13 @@ const journalReviews = [
         decision: '수정후게재',
         pdfUrl: '/uploads/papers/metaverse-learning.pdf',
         myRole: 'member',
+        year: '2025',
+        semester: '2',
+        collegeType: '일반대학원',
+        graduateSchool: '일반대학원',
+        undergraduate: '교육공학',
+        academicStatus: '재학',
+        advisorName: '최교수',
         reviewers: [
             {
                 professorId: 'PROF004',
@@ -1679,6 +1693,13 @@ const journalReviews = [
         progress: 0,
         pdfUrl: '/uploads/papers/adaptive-learning-ml.pdf',
         myRole: 'member',
+        year: '2025',
+        semester: '2',
+        collegeType: '일반대학원',
+        graduateSchool: '일반대학원',
+        undergraduate: '컴퓨터공학',
+        academicStatus: '재학',
+        advisorName: '송교수',
         reviewers: [
             {
                 professorId: 'PROF006',
@@ -1699,6 +1720,179 @@ const journalReviews = [
                 comment: null
             }
         ],
+        rubric: {
+            items: [
+                { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
+                { id: 2, name: '연구 방법의 적절성', maxScore: 20 },
+                { id: 3, name: '연구 결과의 타당성', maxScore: 20 },
+                { id: 4, name: '논문 구성의 체계성', maxScore: 20 },
+                { id: 5, name: '학문적 기여도', maxScore: 20 }
+            ]
+        },
+        evaluation: null
+    },
+    {
+        id: 4,
+        journalName: '한국경영학회지',
+        paperTitle: 'ESG 경영이 기업가치에 미치는 영향 연구',
+        studentName: '최경영',
+        studentId: '2023010',
+        major: '경영학과',
+        degree: '석사',
+        advisor: '이교수',
+        submissionDate: '2025-09-10',
+        dueDate: '2025-11-20',
+        status: '심사중',
+        progress: 50,
+        pdfUrl: '/uploads/papers/esg-corporate-value.pdf',
+        myRole: 'chair',
+        year: '2025',
+        semester: '2',
+        collegeType: '일반대학원',
+        graduateSchool: '일반대학원',
+        undergraduate: '경영학',
+        academicStatus: '재학',
+        advisorName: '이교수',
+        reviewers: [
+            {
+                professorId: 'PROF008',
+                professorName: '이교수',
+                department: '경영학과',
+                role: '주심',
+                status: '완료',
+                score: 90,
+                itemScores: { 1: 19, 2: 18, 3: 18, 4: 18, 5: 17 },
+                comment: 'ESG 경영과 기업가치 간의 관계를 실증적으로 분석한 우수한 연구입니다.'
+            },
+            {
+                professorId: 'PROF009',
+                professorName: '박교수',
+                department: '회계학과',
+                role: '부심',
+                status: '대기',
+                score: null,
+                comment: null
+            }
+        ],
+        chairDecision: null,
+        rubric: {
+            items: [
+                { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
+                { id: 2, name: '연구 방법의 적절성', maxScore: 20 },
+                { id: 3, name: '연구 결과의 타당성', maxScore: 20 },
+                { id: 4, name: '논문 구성의 체계성', maxScore: 20 },
+                { id: 5, name: '학문적 기여도', maxScore: 20 }
+            ]
+        },
+        evaluation: null
+    },
+    {
+        id: 5,
+        journalName: 'IEEE Transactions on Neural Networks',
+        paperTitle: 'Deep Learning Approaches for Natural Language Understanding',
+        studentName: '정인공',
+        studentId: '2022008',
+        major: '컴퓨터공학과',
+        degree: '박사',
+        advisor: '김교수',
+        submissionDate: '2025-08-20',
+        dueDate: '2025-11-30',
+        status: '심사완료',
+        progress: 100,
+        pdfUrl: '/uploads/papers/deep-learning-nlu.pdf',
+        myRole: 'chair',
+        year: '2025',
+        semester: '2',
+        collegeType: '일반대학원',
+        graduateSchool: '일반대학원',
+        undergraduate: '컴퓨터공학',
+        academicStatus: '수료',
+        advisorName: '김교수',
+        reviewers: [
+            {
+                professorId: 'PROF010',
+                professorName: '김교수',
+                department: '컴퓨터공학과',
+                role: '주심',
+                status: '완료',
+                score: 92,
+                itemScores: { 1: 19, 2: 19, 3: 18, 4: 18, 5: 18 },
+                comment: '자연어 이해를 위한 딥러닝 접근법을 포괄적으로 분석한 훌륭한 연구입니다.'
+            },
+            {
+                professorId: 'PROF011',
+                professorName: '최교수',
+                department: '인공지능학과',
+                role: '부심',
+                status: '완료',
+                score: 88,
+                itemScores: { 1: 18, 2: 18, 3: 17, 4: 18, 5: 17 },
+                comment: '실험 설계가 체계적이며 결과 분석이 우수합니다.'
+            }
+        ],
+        chairDecision: {
+            decision: '보류',
+            comment: '전반적으로 우수한 연구이나, 일부 실험 결과에 대한 추가 검증이 필요합니다. 수정 후 재제출을 권장합니다.'
+        },
+        rubric: {
+            items: [
+                { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
+                { id: 2, name: '연구 방법의 적절성', maxScore: 20 },
+                { id: 3, name: '연구 결과의 타당성', maxScore: 20 },
+                { id: 4, name: '논문 구성의 체계성', maxScore: 20 },
+                { id: 5, name: '학문적 기여도', maxScore: 20 }
+            ]
+        },
+        evaluation: null
+    },
+    {
+        id: 6,
+        journalName: '교육학연구',
+        paperTitle: '온라인 학습 환경에서 학습자 참여도 향상 방안',
+        studentName: '강학습',
+        studentId: '2023015',
+        major: '교육공학과',
+        degree: '석사',
+        advisor: '정교수',
+        submissionDate: '2025-09-25',
+        dueDate: '2025-12-10',
+        status: '심사완료',
+        progress: 100,
+        pdfUrl: '/uploads/papers/online-learning-engagement.pdf',
+        myRole: 'chair',
+        year: '2025',
+        semester: '2',
+        collegeType: '일반대학원',
+        graduateSchool: '일반대학원',
+        undergraduate: '교육공학',
+        academicStatus: '재학',
+        advisorName: '정교수',
+        reviewers: [
+            {
+                professorId: 'PROF012',
+                professorName: '정교수',
+                department: '교육공학과',
+                role: '주심',
+                status: '완료',
+                score: 75,
+                itemScores: { 1: 16, 2: 15, 3: 15, 4: 14, 5: 15 },
+                comment: '주제는 시의적절하나 연구 방법론이 다소 부족합니다.'
+            },
+            {
+                professorId: 'PROF013',
+                professorName: '한교수',
+                department: '교육학과',
+                role: '부심',
+                status: '완료',
+                score: 72,
+                itemScores: { 1: 15, 2: 14, 3: 14, 4: 15, 5: 14 },
+                comment: '문헌 고찰이 충실하나 실증적 근거가 보완되어야 합니다.'
+            }
+        ],
+        chairDecision: {
+            decision: '반려',
+            comment: '연구 방법론과 실증적 분석이 미흡합니다. 연구 설계를 전면 수정한 후 재제출하시기 바랍니다.'
+        },
         rubric: {
             items: [
                 { id: 1, name: '연구 주제의 독창성', maxScore: 20 },
