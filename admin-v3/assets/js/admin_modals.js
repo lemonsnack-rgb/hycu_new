@@ -118,10 +118,6 @@ function initEvaluationTypeChangeListener() {
         if (typeSelect && !typeSelect.disabled) {
             let initialType = typeSelect.value;
 
-            // 기존 리스너 제거 (중복 방지)
-            const newSelect = typeSelect.cloneNode(true);
-            typeSelect.parentNode.replaceChild(newSelect, typeSelect);
-
             // 통과 기준 필드 업데이트 함수
             const updatePassCriteriaFields = (newType) => {
                 const requiredCommitteeInput = document.getElementById('pass-required-committee');
@@ -143,6 +139,13 @@ function initEvaluationTypeChangeListener() {
                     }
                 }
             };
+
+            // 초기 로딩 시 현재 선택된 타입에 따라 필드 상태 설정
+            updatePassCriteriaFields(initialType);
+
+            // 기존 리스너 제거 (중복 방지)
+            const newSelect = typeSelect.cloneNode(true);
+            typeSelect.parentNode.replaceChild(newSelect, typeSelect);
 
             newSelect.addEventListener('change', function(e) {
                 const container = document.getElementById('evaluation-items-container');
