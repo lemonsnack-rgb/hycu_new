@@ -45,19 +45,8 @@ function renderReviewDetail(assignmentId, viewType) {
                 <p class="text-red-800">위원장 권한이 없습니다.</p>
             </div>`;
         } else {
-            // 위원장이면서 자신의 위원 평가가 완료되지 않은 경우
-            if (!isSubmitted) {
-                html += `<div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4 mb-6">
-                    <p class="text-yellow-800 font-semibold">⚠️ 위원장 승인 전에 먼저 위원 역할로 평가를 완료해주세요.</p>
-                    <button onclick="openReviewDetail('${assignmentId}', 'member')"
-                            class="mt-3 bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034]">
-                        위원 평가 화면으로 이동
-                    </button>
-                </div>`;
-            } else {
-                // 위원 평가 완료 후 위원장 화면
-                html += renderChairApprovalScreen(detail, allSubmitted);
-            }
+            // 위원장 화면 표시
+            html += renderChairApprovalScreen(detail, allSubmitted);
         }
     } else {
         // 위원 화면: 평가표 입력만
@@ -130,71 +119,39 @@ function renderThesisInfo(assignment) {
             </div>
 
             <!-- 논문 정보 -->
-            <div class="px-6 py-4 border-b bg-white">
+            <div class="px-6 py-4 bg-white">
                 <h4 class="text-sm font-semibold text-gray-700 mb-3">논문 정보</h4>
                 <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
-                    <div class="col-span-3 flex gap-2">
+                    <div class="col-span-3 flex gap-2 items-center">
                         <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
-                        <span class="text-gray-900 font-medium">${assignment.thesisTitle}</span>
+                        <span class="text-gray-900 font-medium flex-1">${assignment.thesisTitle}</span>
+                        <button onclick="downloadThesis('${assignment.thesisFile}')"
+                                class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034] whitespace-nowrap">
+                            논문 다운로드
+                        </button>
                     </div>
                     <div class="flex gap-2">
                         <span class="text-gray-600 min-w-[80px]">제출일:</span>
                         <span class="text-gray-900 font-medium">${formatDateFull(assignment.submissionDate)}</span>
                     </div>
                     <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">심사 마감일:</span>
-                        <span class="text-gray-900 font-medium ${getDueDateColorClass(assignment.dueDate)}">
-                            ${formatDateFull(assignment.dueDate)} ${getDueDateBadge(assignment.dueDate)}
+                        <span class="text-gray-600 min-w-[80px]">심사 희망일:</span>
+                        <span class="text-gray-900 font-medium">
+                            ${formatDateFull(assignment.dueDate)}
                         </span>
                     </div>
                     <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">제출 단계:</span>
+                        <span class="text-gray-600 min-w-[80px]">심사 단계:</span>
                         <span class="text-gray-900 font-medium">
                             ${assignment.submissionType}
                         </span>
                     </div>
                     ${(assignment.submissionType === '중간논문' || assignment.submissionType === '최종논문') ? `
                     <div class="col-span-3 flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">표절/AI 검사:</span>
-                        <span class="text-gray-900 font-medium">CopyKiller: ${copyKiller}% / GPT Killer: ${gptKiller}%</span>
+                        <span class="text-gray-600 min-w-[80px]">CopyKiller/GPT Killer:</span>
+                        <span class="text-gray-900 font-medium">${copyKiller}% / ${gptKiller}%</span>
                     </div>
                     ` : ''}
-                </div>
-            </div>
-
-            <div class="p-6">
-
-            <div class="bg-gray-50 rounded-lg p-4 mb-4">
-                <h4 class="font-bold text-gray-800 mb-3">첨부 파일</h4>
-                <div class="flex items-center space-x-3 bg-white rounded-lg p-3 border border-gray-300">
-                    <a href="${assignment.thesisFile}" class="text-[#6A0028] hover:underline flex-1">${assignment.thesisFile}</a>
-                    <button onclick="downloadThesis('${assignment.thesisFile}')"
-                            class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034]">
-                        다운로드
-                    </button>
-                </div>
-            </div>
-
-            <div class="bg-gray-50 rounded-lg p-4 border border-gray-300">
-                <h4 class="font-bold text-gray-800 mb-3">심사위원회</h4>
-                <div class="space-y-2">
-                    ${assignment.committee.map(member => {
-                        const evaluation = REVIEW_EVALUATIONS.find(e => e.committeeId === member.id);
-                        const status = evaluation?.status === '제출완료';
-                        return `
-                            <div class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-300">
-                                <div>
-                                    <p class="font-medium">${member.professorName}</p>
-                                    <p class="text-sm text-gray-600">${member.department} / ${member.role === 'chair' ? '심사위원장' : '심사위원'}</p>
-                                </div>
-                                <div>
-                                    <span class="text-sm">
-                                        ${status ? '평가 완료' : '평가 진행중'}
-                                    </span>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
                 </div>
             </div>
         </div>
@@ -223,25 +180,74 @@ function renderEvaluationForm(template, existingEvaluation) {
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
 
-            <!-- 평가 기준 안내 -->
-            <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
-                <h4 class="font-bold text-[#4A001C] mb-3 flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    평가 기준 안내
-                </h4>
-                <div class="space-y-2 text-sm text-[#4A001C]">
-                    <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
-                        <span>${passCriteria.description || '평가 기준이 설정되지 않았습니다.'}</span>
-                    </p>
-                    <p class="flex items-center">
-                        <span class="w-2 h-2 bg-[#6A0028] rounded-full mr-2"></span>
-                        <span>총점 ${totalScore}점 만점</span>
-                    </p>
+            <!-- 데스크톱 테이블 -->
+            <div class="evaluation-table-desktop hidden md:block">
+                <div class="table-scroll">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 80px;">배점</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 100px;">점수</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${(template.items || template.categories || []).map((item, index) => {
+                                const savedScore = savedData.scores.find(s => s.categoryId === item.id || s.itemId === item.id);
+                                const currentScore = savedScore?.score || 0;
+                                const currentComment = savedScore?.comment || '';
+                                const maxScore = item.score || item.maxScore || 0;
+
+                                return `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center text-gray-700 text-sm">${index + 1}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 font-medium text-gray-900 text-sm">${item.name}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-xs text-gray-600">${item.description || '-'}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                            <span class="font-bold text-[#6A0028] text-sm">${maxScore}</span>
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-1">
+                                            <input type="number"
+                                                   class="score-input w-full border border-gray-300 rounded px-1.5 py-0.5 text-right text-sm"
+                                                   min="0"
+                                                   max="${maxScore}"
+                                                   step="0.5"
+                                                   value="${currentScore}"
+                                                   placeholder="0"
+                                                   data-category-id="${item.id}"
+                                                   data-max="${maxScore}">
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-1">
+                                            <textarea class="score-comment w-full border border-gray-300 rounded px-1.5 py-1 text-xs resize-y min-h-[32px]"
+                                                      rows="1"
+                                                      placeholder="의견 작성"
+                                                      data-category-id="${item.id}">${currentComment}</textarea>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                        <tfoot>
+                            <tr class="bg-gray-50">
+                                <td colspan="3" class="border border-gray-300 px-2 py-1.5 text-center font-bold text-gray-800 text-sm">총점</td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                    <span class="font-bold text-[#6A0028] text-sm">${totalScore}</span>
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1.5 text-center">
+                                    <span id="total-score" class="font-bold text-gray-400 text-sm">0</span>
+                                </td>
+                                <td class="border border-gray-300 px-2 py-1.5"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
 
-            <div id="evaluation-categories" class="space-y-4">
+            <!-- 모바일 카드 -->
+            <div class="evaluation-cards-mobile md:hidden" id="evaluation-categories">
                 ${(template.items || template.categories || []).map((item, index) => {
                     const savedScore = savedData.scores.find(s => s.categoryId === item.id || s.itemId === item.id);
                     const currentScore = savedScore?.score || 0;
@@ -249,51 +255,46 @@ function renderEvaluationForm(template, existingEvaluation) {
                     const maxScore = item.score || item.maxScore || 0;
 
                     return `
-                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 2px solid #d1d5db; border-radius: 0.5rem;"
-                             data-category-id="${item.id}">
-
-                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 1rem;">
-                                <div style="flex: 1 1 0%;">
-                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
+                        <div class="border-2 border-gray-300 rounded-lg p-4 bg-white mb-4" data-category-id="${item.id}">
+                            <div class="mb-3 pb-3 border-b border-gray-200">
+                                <div class="flex justify-between items-start mb-2">
+                                    <h4 class="font-bold text-gray-900 text-base">
                                         ${index + 1}. ${item.name}
                                     </h4>
-                                    ${item.description ? `<p style="font-size: 0.875rem; color: #4b5563;">${item.description}</p>` : ''}
+                                    <span class="ml-2 px-2 py-1 bg-[#FCE4EC] text-[#6A0028] rounded text-sm font-bold whitespace-nowrap">
+                                        배점: ${maxScore}점
+                                    </span>
                                 </div>
-                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${maxScore}</span>
-                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
-                                </div>
+                                ${item.description ? `<p class="text-sm text-gray-600 leading-relaxed">${item.description}</p>` : ''}
                             </div>
 
-                            <div>
-                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
-                                <input type="number"
-                                       class="score-input w-full border border-gray-300 rounded-lg p-2"
-                                       min="0"
-                                       max="${maxScore}"
-                                       step="0.5"
-                                       value="${currentScore}"
-                                       placeholder="0 ~ ${maxScore}점"
-                                       data-category-id="${item.id}"
-                                       data-max="${maxScore}">
+                            <div class="space-y-3">
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">점수 입력:</label>
+                                    <input type="number"
+                                           class="score-input w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-right text-lg"
+                                           style="min-height: 44px;"
+                                           min="0"
+                                           max="${maxScore}"
+                                           step="0.5"
+                                           value="${currentScore}"
+                                           placeholder="0 ~ ${maxScore}점"
+                                           data-category-id="${item.id}"
+                                           data-max="${maxScore}">
+                                </div>
 
-                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
-                                <textarea class="score-comment w-full border border-gray-300 rounded-lg p-2 text-sm"
-                                          rows="2"
-                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                          data-category-id="${item.id}">${currentComment}</textarea>
+                                <div>
+                                    <label class="block text-sm font-semibold text-gray-700 mb-1">평가 의견:</label>
+                                    <textarea class="score-comment w-full border-2 border-gray-300 rounded-lg px-3 py-2 text-sm"
+                                              style="min-height: 80px;"
+                                              rows="3"
+                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
+                                              data-category-id="${item.id}">${currentComment}</textarea>
+                                </div>
                             </div>
                         </div>
                     `;
                 }).join('')}
-            </div>
-
-            <!-- 총점 -->
-            <div class="mt-6 bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
-                <div class="flex items-center justify-between">
-                    <h4 class="text-lg font-bold text-gray-800">총점</h4>
-                    <div id="total-score" class="text-3xl font-bold text-gray-400">0 / ${totalScore}점</div>
-                </div>
             </div>
 
             <!-- 종합 의견 -->
@@ -305,11 +306,11 @@ function renderEvaluationForm(template, existingEvaluation) {
             </div>
 
             <!-- 버튼 -->
-            <div class="mt-6 flex gap-3">
-                <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="save-draft-btn" class="btn btn-secondary">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#8A0034] font-medium">
+                <button id="submit-evaluation-btn" class="btn btn-primary">
                     최종 제출
                 </button>
             </div>
@@ -324,18 +325,6 @@ function renderPassFailForm(template, savedData) {
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
-
-            <!-- 평가 기준 안내 -->
-            <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
-                <h4 class="font-bold text-[#4A001C] mb-3 flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    평가 기준 안내
-                </h4>
-                <p class="text-sm text-[#4A001C]">
-                    <strong>안내:</strong> 각 항목에 대해 Pass 또는 Fail을 선택해주세요.
-                    ${passCriteria.description || '통과 기준이 설정되지 않았습니다.'}
-                </p>
-            </div>
 
             <div id="passfail-items" class="space-y-4">
                 ${template.items.map((item, index) => {
@@ -417,11 +406,11 @@ function renderPassFailForm(template, savedData) {
             </div>
 
             <!-- 버튼 -->
-            <div class="mt-6 flex gap-3">
-                <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="save-draft-btn" class="btn btn-secondary">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#8A0034] font-medium">
+                <button id="submit-evaluation-btn" class="btn btn-primary">
                     최종 제출
                 </button>
             </div>
@@ -436,24 +425,6 @@ function renderGradeForm(template, savedData) {
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
-
-            <!-- 평가 기준 안내 -->
-            <div class="bg-purple-50 border-2 border-purple-300 rounded-lg p-4 mb-6">
-                <h4 class="font-bold text-purple-900 mb-3 flex items-center">
-                    <i class="fas fa-info-circle mr-2"></i>
-                    평가 기준 안내
-                </h4>
-                <div class="space-y-2 text-sm text-purple-900">
-                    <p class="flex items-center">
-                        <span class="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
-                        <span>각 항목을 A, B, C, D, F 등급으로 평가합니다.</span>
-                    </p>
-                    <p class="flex items-center">
-                        <span class="w-2 h-2 bg-purple-600 rounded-full mr-2"></span>
-                        <span>${passCriteria.description || '통과 기준이 설정되지 않았습니다.'}</span>
-                    </p>
-                </div>
-            </div>
 
             <div id="grade-items" class="space-y-4">
                 ${template.items.map((item, index) => {
@@ -526,11 +497,11 @@ function renderGradeForm(template, savedData) {
             </div>
 
             <!-- 버튼 -->
-            <div class="mt-6 flex gap-3">
-                <button id="save-draft-btn" class="flex-1 bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600 font-medium">
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="save-draft-btn" class="btn btn-secondary">
                     임시저장
                 </button>
-                <button id="submit-evaluation-btn" class="flex-1 bg-[#6A0028] text-white px-6 py-3 rounded-lg hover:bg-[#8A0034] font-medium">
+                <button id="submit-evaluation-btn" class="btn btn-primary">
                     최종 제출
                 </button>
             </div>
@@ -652,13 +623,6 @@ function renderSubmittedEvaluation(template, evaluation) {
                 </span>
             </div>
 
-            <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-6">
-                <p class="text-sm text-[#6A0028]">
-                    <strong>안내:</strong> 각 항목별로 점수를 입력해주세요.
-                    입력하신 점수가 합산되어 총점이 계산됩니다.
-                </p>
-            </div>
-
             <div id="evaluation-categories" class="space-y-4">
                 ${template.categories.map((category, index) => {
                     const score = evaluation.scores.find(s => s.categoryId === category.id);
@@ -685,7 +649,7 @@ function renderSubmittedEvaluation(template, evaluation) {
                             <div>
                                 <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
                                 <input type="number"
-                                       class="score-input w-full border border-gray-300 rounded-lg p-2 bg-gray-50"
+                                       class="score-input w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-right"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
@@ -823,13 +787,6 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                 </span>
             </div>
 
-            <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-6">
-                <p class="text-sm text-[#6A0028]">
-                    <strong>안내:</strong> 각 항목별로 점수를 입력해주세요.
-                    입력하신 점수가 합산되어 총점이 계산됩니다.
-                </p>
-            </div>
-
             <div class="space-y-4">
                 ${template.categories.map((category, index) => {
                     const score = evaluation.scores.find(s => s.categoryId === category.id);
@@ -854,7 +811,7 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                             <div>
                                 <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
                                 <input type="number"
-                                       class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50"
+                                       class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-right"
                                        min="0"
                                        max="${category.maxScore}"
                                        step="0.5"
@@ -914,12 +871,42 @@ function bindEvaluationEvents(detail, isSubmitted, isChair, allSubmitted) {
         } else {
             // 점수형 방식 (기존)
             document.querySelectorAll('.score-input').forEach(input => {
-                input.addEventListener('input', calculateTotalScore);
-                input.addEventListener('change', calculateTotalScore);
+                input.addEventListener('input', function() {
+                    validateScoreInput(this, parseFloat(this.dataset.max));
+                    calculateTotalScore();
+                });
+                input.addEventListener('change', function() {
+                    validateScoreInput(this, parseFloat(this.dataset.max));
+                    calculateTotalScore();
+                });
             });
 
             // 초기 총점 계산
             calculateTotalScore();
+        }
+
+        // 평가 항목별 평가 의견 textarea 자동 확장
+        const scoreComments = document.querySelectorAll('.score-comment');
+        scoreComments.forEach(textarea => {
+            const autoResize = function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            };
+            textarea.addEventListener('input', autoResize);
+            // 초기 높이 설정
+            autoResize.call(textarea);
+        });
+
+        // 종합 의견 textarea 자동 확장
+        const overallComment = document.getElementById('overall-comment');
+        if (overallComment) {
+            const autoResize = function() {
+                this.style.height = 'auto';
+                this.style.height = this.scrollHeight + 'px';
+            };
+            overallComment.addEventListener('input', autoResize);
+            // 초기 높이 설정
+            autoResize.call(overallComment);
         }
 
         // 임시저장 버튼
@@ -1023,27 +1010,59 @@ function updateGradeResult() {
 // ==================== 총점 계산 ====================
 function calculateTotalScore() {
     let total = 0;
-    let maxTotal = 0;
 
-    document.querySelectorAll('.evaluation-item').forEach(item => {
-        const input = item.querySelector('.score-input');
+    // 테이블 레이아웃의 score-input 또는 카드 레이아웃의 evaluation-item에서 점수 가져오기
+    const scoreInputs = document.querySelectorAll('.score-input');
+    scoreInputs.forEach(input => {
         const score = parseFloat(input.value) || 0;
-        const max = parseFloat(input.dataset.max) || 0;
-
         total += score;
-        maxTotal += max;
     });
 
     const totalEl = document.getElementById('total-score');
     if (totalEl) {
-        totalEl.textContent = `${total.toFixed(1)} / ${maxTotal}점`;
+        totalEl.textContent = total.toFixed(1);
 
         // 색상 업데이트
         if (total > 0) {
-            totalEl.className = 'text-3xl font-bold text-[#6A0028]';
+            totalEl.classList.remove('text-gray-400');
+            totalEl.classList.add('text-[#6A0028]');
         } else {
-            totalEl.className = 'text-3xl font-bold text-gray-400';
+            totalEl.classList.remove('text-[#6A0028]');
+            totalEl.classList.add('text-gray-400');
         }
+    }
+}
+
+// ==================== 점수 유효성 검사 ====================
+function validateScoreInput(input, maxScore) {
+    const value = input.value.trim();
+
+    // 빈 값은 허용 (0으로 처리)
+    if (value === '') {
+        return;
+    }
+
+    // 숫자가 아닌 경우
+    if (isNaN(value)) {
+        alert('숫자만 입력 가능합니다.');
+        input.value = '0';
+        return;
+    }
+
+    const numValue = parseFloat(value);
+
+    // 음수 입력
+    if (numValue < 0) {
+        alert('0 이상의 점수를 입력해주세요.');
+        input.value = '0';
+        return;
+    }
+
+    // 배점 초과
+    if (numValue > maxScore) {
+        alert(`배점(${maxScore}점)을 초과할 수 없습니다.`);
+        input.value = maxScore.toString();
+        return;
     }
 }
 
@@ -1325,62 +1344,182 @@ function viewThesisOnline(filename) {
 function renderChairApprovalScreen(detail, allSubmitted) {
     const result = detail.result;
     const isApproved = result && result.finalDecision;
+    const template = detail.template;
 
     let html = `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">📊 심사위원 평가 현황</h3>
+            <h3 class="text-lg font-bold text-gray-800 mb-4">심사위원 평가 현황</h3>
     `;
 
-    // 모든 위원의 평가 요약
-    if (allSubmitted) {
-        html += `<div class="space-y-4 mb-6">`;
+    // 테이블 형식으로 심사위원 평가 현황 표시
+    const categories = template.items || template.categories || [];
 
-        detail.allEvaluations.forEach((evaluation, index) => {
-            const committee = detail.assignment.committee.find(c => c.id === evaluation.committeeId);
-            const totalScore = evaluation.scores ? evaluation.scores.reduce((sum, s) => sum + s.weightedScore, 0) : 0;
+    html += `
+        <div class="table-scroll mb-6">
+            <table class="min-w-full border-collapse">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="border border-gray-300" style="text-align: center; width: 60px;">
+                            No.
+                        </th>
+                        <th class="border border-gray-300" style="text-align: left;">
+                            평가 항목
+                        </th>
+                        <th class="border border-gray-300" style="text-align: center; width: 80px;">
+                            배점
+                        </th>
+    `;
 
-            // 통과 기준 점수 (60점 이상)
-            const PASS_THRESHOLD = 60;
-            const isPassed = totalScore >= PASS_THRESHOLD;
+    // 테이블 헤더: 심사위원 이름
+    detail.assignment.committee.forEach(committee => {
+        const isChair = committee.role === 'chair';
+        const badgeClass = isChair ? 'bg-[#FCE4EC] text-[#6A0028]' : 'bg-gray-100 text-gray-600';
+        const roleText = isChair ? '위원장' : '위원';
 
-            html += `
-                <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
-                    <div class="flex justify-between items-start mb-2">
-                        <div>
-                            <p class="font-semibold text-gray-800">${committee.professorName}</p>
-                            <p class="text-sm text-gray-600">${committee.department} / ${committee.role === 'chair' ? '심사위원장' : '심사위원'}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-lg font-bold text-[#6A0028]">${totalScore.toFixed(1)}점</p>
-                            <span class="inline-block mt-1 px-3 py-1 text-xs font-semibold rounded ${
-                                isPassed ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-                            }">
-                                ${isPassed ? '✓ 통과' : '✗ 불통과'}
-                            </span>
-                        </div>
-                    </div>
-                    ${evaluation.overallComment ? `
-                        <div class="mt-3 p-3 bg-white rounded border border-gray-200">
-                            <p class="text-xs font-semibold text-gray-600 mb-1">종합 의견:</p>
-                            <p class="text-sm text-gray-700">${evaluation.overallComment}</p>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
+        html += `
+                        <th class="border border-gray-300">
+                            <div class="flex items-center justify-center gap-2">
+                                <span>${committee.professorName}</span>
+                                <span class="px-2 py-1 rounded-full ${badgeClass}" style="font-size: 12px;">${roleText}</span>
+                            </div>
+                        </th>
+        `;
+    });
+
+    html += `
+                    </tr>
+                </thead>
+                <tbody>
+    `;
+
+    // 테이블 본문: 각 평가 항목별 점수
+    categories.forEach((category, index) => {
+        const categoryName = category.name || category.title || '';
+        const maxScore = category.maxScore || category.weight || 0;
+
+        html += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="border border-gray-300 text-gray-700">
+                            ${index + 1}
+                        </td>
+                        <td class="border border-gray-300" style="text-align: left;">
+                            ${categoryName}
+                        </td>
+                        <td class="border border-gray-300 text-gray-700">
+                            ${maxScore}
+                        </td>
+        `;
+
+        // 각 심사위원별 점수
+        detail.assignment.committee.forEach(committee => {
+            const evaluation = detail.allEvaluations.find(e => e.committeeId === committee.id);
+
+            if (evaluation) {
+                // 평가 완료: 해당 항목 점수 찾기
+                const scoreItem = evaluation.scores?.find(s =>
+                    s.categoryId === category.id || s.itemId === category.id
+                );
+                const score = scoreItem?.score || scoreItem?.weightedScore || 0;
+
+                html += `
+                        <td class="border border-gray-300 font-medium text-gray-900">
+                            ${score.toFixed(1)}
+                        </td>
+                `;
+            } else {
+                // 평가 대기
+                html += `
+                        <td class="border border-gray-300 text-gray-500">
+                            대기
+                        </td>
+                `;
+            }
         });
 
-        html += `</div>`;
+        html += `
+                    </tr>
+        `;
+    });
 
-        // 평균 점수 계산 및 시스템 판정
-        const PASS_THRESHOLD = 60;
+    // 총점 행
+    html += `
+                    <tr class="bg-gray-100 font-semibold">
+                        <td class="border border-gray-300 text-gray-900" colspan="3" style="text-align: left;">
+                            총점
+                        </td>
+    `;
+
+    const PASS_THRESHOLD = 60;
+    detail.assignment.committee.forEach(committee => {
+        const evaluation = detail.allEvaluations.find(e => e.committeeId === committee.id);
+
+        if (evaluation) {
+            const totalScore = evaluation.scores ? evaluation.scores.reduce((sum, s) => sum + (s.weightedScore || s.score || 0), 0) : 0;
+
+            html += `
+                        <td class="border border-gray-300">
+                            <div class="font-bold text-[#6A0028]">${totalScore.toFixed(1)}</div>
+                        </td>
+            `;
+        } else {
+            html += `
+                        <td class="border border-gray-300 text-gray-500">
+                            대기
+                        </td>
+            `;
+        }
+    });
+
+    html += `
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    `;
+
+    // 종합 의견 영역
+    html += `
+        <div class="space-y-3 mb-6">
+            <h4 class="text-md font-semibold text-gray-800">종합 의견</h4>
+    `;
+
+    detail.assignment.committee.forEach(committee => {
+        const evaluation = detail.allEvaluations.find(e => e.committeeId === committee.id);
+        const roleText = committee.role === 'chair' ? '위원장' : '위원';
+
+        if (evaluation && evaluation.overallComment) {
+            html += `
+                <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">
+                        ${committee.professorName} (${roleText})
+                    </p>
+                    <p class="text-sm text-gray-700">${evaluation.overallComment}</p>
+                </div>
+            `;
+        } else if (!evaluation) {
+            html += `
+                <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">
+                        ${committee.professorName} (${roleText})
+                    </p>
+                    <p class="text-sm text-gray-500">평가 대기 중입니다.</p>
+                </div>
+            `;
+        }
+    });
+
+    html += `</div>`;
+
+    // 평균 점수 및 시스템 판정 - 항상 표시
+    if (allSubmitted) {
+        // 모든 평가 완료: 실제 평균 및 판정 계산
         const avgScore = detail.allEvaluations.reduce((sum, e) => {
-            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + sc.weightedScore, 0) : 0;
+            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + (sc.weightedScore || sc.score || 0), 0) : 0;
             return sum + totalScore;
         }, 0) / detail.allEvaluations.length;
 
-        // 각 심사위원의 통과 여부 확인
         const passedCount = detail.allEvaluations.filter(e => {
-            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + sc.weightedScore, 0) : 0;
+            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + (sc.weightedScore || sc.score || 0), 0) : 0;
             return totalScore >= PASS_THRESHOLD;
         }).length;
 
@@ -1408,71 +1547,87 @@ function renderChairApprovalScreen(detail, allSubmitted) {
                 </div>
             </div>
         `;
-
-        // 최종 승인 영역
-        if (!isApproved) {
-            html += `
-                <div class="bg-gray-50 border border-gray-300 rounded-lg p-6">
-                    <h4 class="font-bold text-gray-800 mb-4">최종 심사 결정</h4>
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">결정 선택 *</label>
-                        <div class="flex gap-3">
-                            <button onclick="selectDecision('승인')" id="btn-approve"
-                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-green-500 hover:bg-green-50 transition-colors">
-                                <span class="text-lg font-semibold text-gray-700">✓ 승인</span>
-                            </button>
-                            <button onclick="selectDecision('보류')" id="btn-hold"
-                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-yellow-500 hover:bg-yellow-50 transition-colors">
-                                <span class="text-lg font-semibold text-gray-700">⊙ 보류</span>
-                            </button>
-                            <button onclick="selectDecision('반려')" id="btn-reject"
-                                    class="flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-red-500 hover:bg-red-50 transition-colors">
-                                <span class="text-lg font-semibold text-gray-700">✗ 반려</span>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
-                        <textarea id="chair-final-comment" rows="4"
-                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"
-                                  placeholder="최종 심사 의견을 입력하세요"></textarea>
-                    </div>
-
-                    <button onclick="submitChairDecision()"
-                            class="w-full bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-3 rounded-lg font-semibold">
-                        최종 결정 제출
-                    </button>
-                </div>
-            `;
-        } else {
-            html += `
-                <div class="bg-green-50 border-2 border-green-300 rounded-lg p-6">
-                    <h4 class="font-bold text-green-800 mb-3">✓ 최종 심사 완료</h4>
-                    <div class="space-y-2 text-sm">
-                        <p><span class="font-semibold">결정:</span>
-                            <span class="font-semibold">${result.finalDecision}</span>
-                        </p>
-                        ${result.chairComment ? `
-                            <p class="mt-2"><span class="font-semibold">의견:</span> ${result.chairComment}</p>
-                        ` : ''}
-                        <p class="text-xs text-gray-600 mt-2">결정일: ${formatDateFull(result.decisionDate)}</p>
-                    </div>
-                </div>
-            `;
-        }
-
     } else {
+        // 평가 대기 중: 안내 메시지
         html += `
-            <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
-                <p class="text-yellow-800">모든 심사위원의 평가가 완료되면 최종 승인을 진행할 수 있습니다.</p>
-                <p class="text-sm text-yellow-700 mt-2">
-                    현재 진행률: ${detail.allEvaluations.length} / ${detail.assignment.committee.length}
-                </p>
+            <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-6">
+                <div class="flex justify-between items-center mb-3">
+                    <p class="font-bold text-gray-700">전체 평균 점수</p>
+                    <p class="text-2xl font-bold text-gray-500">-</p>
+                </div>
+                <div class="flex justify-between items-center pt-3 border-t border-gray-300">
+                    <p class="font-bold text-gray-700">시스템 판정 결과</p>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600">(${detail.allEvaluations.length}/${detail.assignment.committee.length}명 평가 완료)</span>
+                        <span class="inline-block px-4 py-2 rounded-lg font-bold bg-gray-100 text-gray-500 border border-gray-300">
+                            평가 대기
+                        </span>
+                    </div>
+                </div>
             </div>
         `;
     }
+
+    // 최종 승인 영역 - 항상 표시 (평가 미완료 시 또는 제출 후 비활성화)
+    const chairSubmitted = isApproved;
+    const isDisabled = !allSubmitted || chairSubmitted;
+    const disabledAttr = isDisabled ? 'disabled' : '';
+
+    // 제출된 결정이 있으면 해당 값 사용
+    const chairDecision = chairSubmitted ? result.finalDecision || '승인' : '';
+    const chairComment = chairSubmitted ? result.chairComment || '' : '';
+
+    // 결정 버튼 스타일 - 제출 후에도 선택된 항목이 명확히 보이도록 색상 강조
+    const approveSelected = chairDecision === '승인' ? 'border-2 border-green-600 bg-green-100' : 'border border-gray-300 bg-white';
+    const holdSelected = chairDecision === '보류' ? 'border-2 border-yellow-600 bg-yellow-100' : 'border border-gray-300 bg-white';
+    const rejectSelected = chairDecision === '반려' ? 'border-2 border-red-600 bg-red-100' : 'border border-gray-300 bg-white';
+
+    // 선택된 버튼의 텍스트 색상
+    const approveTextColor = chairDecision === '승인' ? 'text-green-700' : 'text-gray-700';
+    const holdTextColor = chairDecision === '보류' ? 'text-yellow-700' : 'text-gray-700';
+    const rejectTextColor = chairDecision === '반려' ? 'text-red-700' : 'text-gray-700';
+
+    // 비활성화 시 opacity는 제출 버튼에만 적용
+    const buttonDisabledClass = chairSubmitted ? 'cursor-not-allowed' : isDisabled ? 'opacity-50 cursor-not-allowed' : '';
+    const submitBtnDisabledClass = isDisabled ? 'opacity-50 cursor-not-allowed' : '';
+
+    html += `
+        <div class="bg-gray-50 border border-gray-300 rounded-lg p-6">
+            <h4 class="font-bold text-gray-800 mb-4">최종 심사 결정</h4>
+
+            <div class="mb-4">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">결정 선택 *</label>
+                <div class="flex gap-3">
+                    <button onclick="selectDecision('승인')" id="btn-approve" ${disabledAttr}
+                            class="flex-1 py-2 rounded ${approveSelected} ${!chairSubmitted ? 'hover:border-green-500 hover:bg-green-50' : ''} transition-colors ${buttonDisabledClass}">
+                        <span class="text-sm font-medium ${approveTextColor}">✓ 승인</span>
+                    </button>
+                    <button onclick="selectDecision('보류')" id="btn-hold" ${disabledAttr}
+                            class="flex-1 py-2 rounded ${holdSelected} ${!chairSubmitted ? 'hover:border-yellow-500 hover:bg-yellow-50' : ''} transition-colors ${buttonDisabledClass}">
+                        <span class="text-sm font-medium ${holdTextColor}">⊙ 보류</span>
+                    </button>
+                    <button onclick="selectDecision('반려')" id="btn-reject" ${disabledAttr}
+                            class="flex-1 py-2 rounded ${rejectSelected} ${!chairSubmitted ? 'hover:border-red-500 hover:bg-red-50' : ''} transition-colors ${buttonDisabledClass}">
+                        <span class="text-sm font-medium ${rejectTextColor}">✗ 반려</span>
+                    </button>
+                </div>
+            </div>
+
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
+                <textarea id="chair-final-comment" rows="4" ${disabledAttr}
+                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm ${chairSubmitted ? 'bg-white text-gray-900' : isDisabled ? 'bg-gray-100 text-gray-500' : 'bg-white'}"
+                          placeholder="${!allSubmitted ? '모든 심사위원의 평가가 완료되면 입력할 수 있습니다' : chairSubmitted ? '' : '최종 심사 의견을 입력하세요'}">${chairComment}</textarea>
+            </div>
+
+            <div class="flex justify-end">
+                <button onclick="submitChairDecision()" ${disabledAttr}
+                        class="btn btn-primary ${submitBtnDisabledClass}">
+                    최종 결정 제출
+                </button>
+            </div>
+        </div>
+    `;
 
     html += `</div>`;
 
@@ -1518,6 +1673,29 @@ function submitChairDecision() {
         return;
     }
 
+    // 제출 확인 (수정 불가 경고 포함)
+    const confirmMsg = `최종 심사 결정을 제출하시겠습니까?\n\n결정 내용: ${selectedDecision}\n\n※ 제출 후에는 수정이 불가능합니다.`;
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    // 데이터 저장
+    const assignment = ReviewService.getAssignmentById(currentAssignmentId);
+    if (assignment) {
+        assignment.chairDecision = selectedDecision;
+        assignment.chairComment = comment;
+        assignment.finalDecision = selectedDecision;
+        assignment.status = '심사완료';
+        assignment.chairDecidedAt = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        assignment.chairDecidedBy = 'P003'; // 현재 위원장 ID
+
+        console.log('✅ 위원장 최종 결정 저장:', {
+            assignmentId: currentAssignmentId,
+            decision: selectedDecision,
+            comment
+        });
+    }
+
     // 서버에 최종 결정 저장 (실제로는 API 호출)
     const result = {
         assignmentId: currentAssignmentId,
@@ -1534,7 +1712,7 @@ function submitChairDecision() {
         REVIEW_RESULTS.push(result);
     }
 
-    showToast('최종 심사 결정이 제출되었습니다', 'success');
+    showToast(`최종 결정(${selectedDecision})이 제출되었습니다`, 'success');
 
     // 화면 새로고침
     setTimeout(() => {
