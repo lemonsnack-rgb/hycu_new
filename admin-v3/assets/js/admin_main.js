@@ -5865,3 +5865,666 @@ console.log('✅ 최종 논문 제목 등록 함수 로드 완료');
 // 지도교수 배정 관련 함수 전역 export
 window.viewProposalDetail = viewProposalDetail;
 window.loadProposalForm = loadProposalForm;
+
+// ==================== 심사위원 배정 ====================
+
+/**
+ * 심사위원 배정 메인 렌더링 함수
+ */
+function showCommitteeAssignment() {
+    const data = window.filteredCommitteeData || appData.committeeAssignmentData;
+
+    if (!data) {
+        console.error('[showCommitteeAssignment] Mock 데이터가 없습니다.');
+        return;
+    }
+
+    const html = `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 검색 영역 -->
+            <div class="p-6 border-b">
+                <div class="grid grid-cols-5 gap-3">
+                    <!-- 1행: 5개 필드 -->
+
+                    <!-- 1. 학년도/학기 (복합 필드) -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            학년도/학기
+                        </label>
+                        <div class="flex gap-2 flex-1">
+                            <select id="yearFilter"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="2025" selected>2025</option>
+                                <option value="2024">2024</option>
+                                <option value="2023">2023</option>
+                            </select>
+                            <select id="semesterFilter"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="1" selected>1학기</option>
+                                <option value="2">2학기</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 2. 대학구분 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            대학구분
+                        </label>
+                        <select id="collegeTypeFilter"
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="대학원">대학원</option>
+                        </select>
+                    </div>
+
+                    <!-- 3. 계열/대학원 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            계열/대학원
+                        </label>
+                        <select id="graduateFilter"
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="일반대학원">일반대학원</option>
+                            <option value="경영대학원">경영대학원</option>
+                            <option value="정보대학원">정보대학원</option>
+                            <option value="디자인대학원">디자인대학원</option>
+                        </select>
+                    </div>
+
+                    <!-- 4. 학부(과)전공 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            학부(과)전공
+                        </label>
+                        <input type="text"
+                               id="undergraduateMajorFilter"
+                               placeholder="학부(과)전공"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                               style="height: 34px;">
+                    </div>
+
+                    <!-- 5. 학과/전공 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            학과/전공
+                        </label>
+                        <input type="text"
+                               id="majorFilter"
+                               placeholder="학과/전공"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                               style="height: 34px;">
+                    </div>
+
+                    <!-- 2행: 5개 필드 -->
+
+                    <!-- 6. 학위과정 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            학위과정
+                        </label>
+                        <select id="degreeFilter"
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="석사">석사</option>
+                            <option value="박사">박사</option>
+                            <option value="석박통합">석박통합</option>
+                        </select>
+                    </div>
+
+                    <!-- 7. 학적상태 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            학적상태
+                        </label>
+                        <select id="statusFilter"
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="재학">재학</option>
+                            <option value="휴학">휴학</option>
+                            <option value="졸업">졸업</option>
+                            <option value="수료">수료</option>
+                        </select>
+                    </div>
+
+                    <!-- 8. 학번 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            학번
+                        </label>
+                        <input type="text"
+                               id="studentIdFilter"
+                               placeholder="학번"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                               style="height: 34px;">
+                    </div>
+
+                    <!-- 9. 성명 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            성명
+                        </label>
+                        <input type="text"
+                               id="studentNameFilter"
+                               placeholder="성명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                               style="height: 34px;">
+                    </div>
+
+                    <!-- 10. 지도교수명 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            지도교수명
+                        </label>
+                        <input type="text"
+                               id="advisorNameFilter"
+                               placeholder="지도교수명"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                               style="height: 34px;">
+                    </div>
+
+                    <!-- 3행: 3개 필드 + 버튼 -->
+
+                    <!-- 11. 심사단계 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            심사단계
+                        </label>
+                        <select id="reviewStageFilter"
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="연구계획서">연구계획서</option>
+                            <option value="1차 보고서">1차 보고서</option>
+                            <option value="최종논문">최종논문</option>
+                        </select>
+                    </div>
+
+                    <!-- 12. 배정상태 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                            배정상태
+                        </label>
+                        <select id="assignmentStatusFilter"
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="배정 대기">배정 대기</option>
+                            <option value="배정 완료">배정 완료</option>
+                        </select>
+                    </div>
+
+                    <!-- 빈 공간 2칸 -->
+                    <div></div>
+                    <div></div>
+
+                    <!-- 버튼 영역 (마지막 열) -->
+                    <div class="flex items-center justify-end">
+                        <button onclick="searchCommitteeAssignment()"
+                                class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                            조회
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 테이블 영역 -->
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">심사위원 배정 목록</h3>
+                        <span class="table-count">(총 ${data.length}건)</span>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">순번</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">대학구분</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">계열/대학원</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학부(과)전공</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과/전공</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학적상태</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수명</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">심사단계</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">배정상태</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${data.length === 0 ? `
+                            <tr>
+                                <td colspan="15" class="px-6 py-8 text-center text-gray-500">
+                                    심사위원 배정 대기 중인 학생이 없습니다.
+                                </td>
+                            </tr>
+                        ` : data.map((item, index) => `
+                            <tr class="hover:bg-gray-50">
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${index + 1}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semester}학기</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.collegeType}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.graduate}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.undergraduateMajor}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.major}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.degreeType}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicStatus}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.advisorName}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.reviewStage}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.assignmentStatus}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    <button onclick="openCommitteeAssignmentModal('${item.id}')"
+                                            class="text-xs px-3 py-1 border border-[#6A0028] text-[#6A0028] rounded hover:bg-[#6A0028] hover:text-white">
+                                        배정
+                                    </button>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    const contentArea = document.getElementById('committee-assignment-content');
+    if (contentArea) {
+        contentArea.innerHTML = html;
+    }
+}
+
+/**
+ * 심사위원 배정 검색 함수
+ */
+function searchCommitteeAssignment() {
+    // 13개 필드 값 수집
+    const year = document.getElementById('yearFilter')?.value || '';
+    const semester = document.getElementById('semesterFilter')?.value || '';
+    const collegeType = document.getElementById('collegeTypeFilter')?.value || '';
+    const graduate = document.getElementById('graduateFilter')?.value || '';
+    const undergraduateMajor = document.getElementById('undergraduateMajorFilter')?.value.trim() || '';
+    const major = document.getElementById('majorFilter')?.value.trim() || '';
+    const degree = document.getElementById('degreeFilter')?.value || '';
+    const status = document.getElementById('statusFilter')?.value || '';
+    const studentId = document.getElementById('studentIdFilter')?.value.trim() || '';
+    const studentName = document.getElementById('studentNameFilter')?.value.trim() || '';
+    const advisorName = document.getElementById('advisorNameFilter')?.value.trim() || '';
+    const reviewStage = document.getElementById('reviewStageFilter')?.value || '';
+    const assignmentStatus = document.getElementById('assignmentStatusFilter')?.value || '';
+
+    // 필터링
+    let filtered = appData.committeeAssignmentData.filter(item => {
+        if (year && item.academicYear !== year) return false;
+        if (semester && item.semester !== semester) return false;
+        if (collegeType && item.collegeType !== collegeType) return false;
+        if (graduate && item.graduate !== graduate) return false;
+        if (undergraduateMajor && !item.undergraduateMajor.includes(undergraduateMajor)) return false;
+        if (major && !item.major.includes(major)) return false;
+        if (degree && item.degreeType !== degree) return false;
+        if (status && item.academicStatus !== status) return false;
+        if (studentId && !item.studentNumber.includes(studentId)) return false;
+        if (studentName && !item.studentName.includes(studentName)) return false;
+        if (advisorName && !item.advisorName.includes(advisorName)) return false;
+        if (reviewStage && item.reviewStage !== reviewStage) return false;
+        if (assignmentStatus && item.assignmentStatus !== assignmentStatus) return false;
+        return true;
+    });
+
+    window.filteredCommitteeData = filtered;
+    showCommitteeAssignment();
+
+    if (typeof showNotification === 'function') {
+        showNotification(`검색 결과: ${filtered.length}건`, 'success');
+    }
+}
+
+// 전역 export
+window.showCommitteeAssignment = showCommitteeAssignment;
+window.searchCommitteeAssignment = searchCommitteeAssignment;
+
+// =============================================================================
+// 심사위원 배정 모달
+// =============================================================================
+
+function openCommitteeAssignmentModal(committeeId) {
+    const reviewTarget = appData.committeeAssignmentData.find(rt => rt.id === committeeId);
+    if (!reviewTarget) {
+        showNotification('심사 대상 정보를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    window.selectedReviewTarget = reviewTarget;
+    window.selectedChair = null;
+    window.selectedMembers = [];
+
+    // 지도교수를 심사위원에 자동 추가
+    const advisor = appData.professors.find(p => p.name === reviewTarget.advisorName);
+    if (advisor) {
+        window.selectedMembers = [{ ...advisor }];
+    }
+
+    const minMembers = reviewTarget.degreeType === '석사' ? 2 : 4;
+    const maxMembers = reviewTarget.degreeType === '석사' ? 3 : 5; // 심사위원장 포함 최대 인원
+    const totalMin = reviewTarget.degreeType === '석사' ? 3 : 5;
+
+    // 최대 심사위원 수 저장 (심사위원장 제외)
+    window.maxCommitteeMembers = maxMembers - 1;
+
+    const modalHTML = `
+        <div class="admin-modal active" id="committee-assignment-modal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="admin-modal-content" style="width: 1200px; max-width: 90vw; background: white; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); max-height: 90vh; display: flex; flex-direction: column;">
+                <div class="admin-modal-header" style="padding: 20px 24px; border-bottom: 1px solid #e5e7eb; display: flex; justify-content: space-between; align-items: center;">
+                    <h2 style="font-size: 20px; font-weight: 600; color: #111827; margin: 0;">심사위원 배정</h2>
+                    <button class="admin-modal-close" onclick="closeCommitteeAssignmentModal()" style="background: none; border: none; font-size: 28px; line-height: 1; color: #6b7280; cursor: pointer; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border-radius: 4px;" onmouseover="this.style.background='#f3f4f6'" onmouseout="this.style.background='none'">&times;</button>
+                </div>
+                <div class="admin-modal-body" style="padding: 24px; overflow-y: auto; flex: 1;">
+                    <!-- 학생 정보 -->
+                    <div class="mb-4 p-4 bg-gray-50 rounded-lg">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">심사 대상 학생 정보</h3>
+                        <div class="grid grid-cols-4 gap-3 text-sm">
+                            <div>
+                                <span class="text-gray-500">학번:</span>
+                                <span class="ml-2 font-medium">${reviewTarget.studentNumber}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">성명:</span>
+                                <span class="ml-2 font-medium">${reviewTarget.studentName}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">학과:</span>
+                                <span class="ml-2 font-medium">${reviewTarget.major}</span>
+                            </div>
+                            <div>
+                                <span class="text-gray-500">학위과정:</span>
+                                <span class="ml-2 font-medium">${reviewTarget.degreeType}</span>
+                            </div>
+                        </div>
+                        <div class="mt-2 text-sm">
+                            <span class="text-gray-500">논문 제목:</span>
+                            <span class="ml-2 font-medium">${reviewTarget.thesisTitle}</span>
+                        </div>
+                    </div>
+
+                    <!-- 좌우 2분할 레이아웃 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px; margin-bottom: 20px;">
+                        <!-- 왼쪽: 심사위원장 -->
+                        <div style="border-right: 1px solid #e5e7eb; padding-right: 24px; display: flex; flex-direction: column;">
+                            <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">
+                                심사위원장 <span class="text-red-500 text-sm">*</span>
+                            </h4>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                                    <select id="chair-dept-filter" onchange="filterCommitteeMembers('chair')"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                        <option value="">전체</option>
+                                        ${[...new Set(appData.professors.map(p => p.department))].map(dept =>
+                                            `<option value="${dept}">${dept}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                                    <input type="text" id="chair-name-filter" placeholder="교수명 검색" onkeyup="filterCommitteeMembers('chair')"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                </div>
+                            </div>
+
+                            <!-- 컬럼 헤더 -->
+                            <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
+                                <div></div>
+                                <div>교번</div>
+                                <div>이름</div>
+                                <div>학과</div>
+                            </div>
+
+                            <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;" id="chair-list">
+                                ${appData.professors.map(prof => renderCommitteeMemberItem(prof, true, 'chair')).join('')}
+                            </div>
+                        </div>
+
+                        <!-- 오른쪽: 심사위원 -->
+                        <div style="padding-left: 24px; display: flex; flex-direction: column;">
+                            <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">
+                                심사위원 (복수 선택 가능) <span class="text-red-500 text-sm">*</span>
+                                <span class="text-xs text-gray-500 ml-2">(${minMembers}명 이상)</span>
+                            </h4>
+
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">학과</label>
+                                    <select id="member-dept-filter" onchange="filterCommitteeMembers('member')"
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                        <option value="">전체</option>
+                                        ${[...new Set(appData.professors.map(p => p.department))].map(dept =>
+                                            `<option value="${dept}">${dept}</option>`
+                                        ).join('')}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">교수명</label>
+                                    <input type="text" id="member-name-filter" placeholder="교수명 검색" onkeyup="filterCommitteeMembers('member')"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary text-sm">
+                                </div>
+                            </div>
+
+                            <!-- 컬럼 헤더 -->
+                            <div style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; padding: 8px 12px; background-color: #f9fafb; border: 1px solid #e5e7eb; border-bottom: none; border-radius: 8px 8px 0 0; font-size: 12px; font-weight: 600; color: #6b7280;">
+                                <div></div>
+                                <div>교번</div>
+                                <div>이름</div>
+                                <div>학과</div>
+                            </div>
+
+                            <div style="flex: 1; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 0 0 8px 8px;" id="member-list">
+                                ${appData.professors.map(prof => renderCommitteeMemberItem(prof, false, 'member')).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="admin-modal-footer" style="padding: 20px 24px; border-top: 1px solid #e5e7eb; display: flex; justify-content: flex-end; gap: 12px; background: white; border-radius: 0 0 8px 8px; flex-shrink: 0;">
+                    <button onclick="closeCommitteeAssignmentModal()" class="btn-secondary">
+                        취소
+                    </button>
+                    <button onclick="confirmCommitteeAssignment()" class="btn-primary" id="save-committee-btn">
+                        <i class="fas fa-check mr-1"></i>배정 완료
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHTML);
+    updateSaveCommitteeButtonState();
+}
+
+function closeCommitteeAssignmentModal() {
+    const modal = document.getElementById('committee-assignment-modal');
+    if (modal) {
+        modal.remove();
+    }
+    window.selectedReviewTarget = null;
+    window.selectedChair = null;
+    window.selectedMembers = [];
+}
+
+// =============================================================================
+// 심사위원 항목 렌더링
+// =============================================================================
+
+function renderCommitteeMemberItem(prof, isChair, side) {
+    const isSelected = isChair
+        ? (window.selectedChair?.id === prof.id)
+        : window.selectedMembers.some(m => m.id === prof.id);
+
+    const dataAttrs = `data-dept="${prof.department}" data-name="${prof.name}" data-side="${side}"`;
+
+    return `
+        <div class="committee-member-item" ${dataAttrs} style="display: grid; grid-template-columns: auto 1fr 1fr 1fr; gap: 12px; align-items: center; padding: 12px; border-bottom: 1px solid #e5e7eb;">
+            <input type="${isChair ? 'radio' : 'checkbox'}"
+                   name="${side}-committee-select"
+                   value="${prof.id}"
+                   ${isSelected ? 'checked' : ''}
+                   onchange="handleCommitteeSelection('${prof.id}', ${isChair})"
+                   style="margin: 0;">
+            <div class="text-sm text-gray-900">${prof.employeeNumber || '-'}</div>
+            <div class="text-sm font-medium text-gray-900">${prof.name}</div>
+            <div class="text-sm text-gray-600">${prof.department}</div>
+        </div>
+    `;
+}
+
+// =============================================================================
+// 심사위원 선택 처리
+// =============================================================================
+
+function handleCommitteeSelection(profId, isChair) {
+    const prof = appData.professors.find(p => p.id === profId);
+    if (!prof) return;
+
+    if (isChair) {
+        // 심사위원장 선택
+        window.selectedChair = { ...prof };
+        // 심사위원장이 심사위원 목록에 있으면 제거
+        window.selectedMembers = window.selectedMembers.filter(m => m.id !== profId);
+        // 심사위원 목록에서 해당 체크박스 해제
+        const memberCheckbox = document.querySelector(`#member-list input[value="${profId}"]`);
+        if (memberCheckbox) memberCheckbox.checked = false;
+    } else {
+        // 심사위원 선택
+        // 심사위원장으로 선택된 교수는 심사위원으로 선택 불가
+        if (window.selectedChair && window.selectedChair.id === profId) {
+            showNotification('심사위원장은 심사위원으로 중복 선택할 수 없습니다.', 'warning');
+            const checkbox = document.querySelector(`#member-list input[value="${profId}"]`);
+            if (checkbox) checkbox.checked = false;
+            return;
+        }
+
+        const index = window.selectedMembers.findIndex(m => m.id === profId);
+        if (index >= 0) {
+            // 체크박스 해제 - 선택 취소
+            window.selectedMembers.splice(index, 1);
+        } else {
+            // 체크박스 선택 - 추가
+            // 최대 인원 초과 체크
+            const maxMembers = window.maxCommitteeMembers || 4; // 기본값 4명 (석사 3명 - 위원장 1명)
+            if (window.selectedMembers.length >= maxMembers) {
+                showNotification('심사위원 수를 초과하였습니다.', 'warning');
+                const checkbox = document.querySelector(`#member-list input[value="${profId}"]`);
+                if (checkbox) checkbox.checked = false;
+                return;
+            }
+            window.selectedMembers.push({ ...prof });
+        }
+    }
+
+    updateSaveCommitteeButtonState();
+}
+
+// =============================================================================
+// 심사위원 필터링
+// =============================================================================
+
+function filterCommitteeMembers(side) {
+    const deptFilter = document.getElementById(`${side}-dept-filter`)?.value.toLowerCase() || '';
+    const nameFilter = document.getElementById(`${side}-name-filter`)?.value.toLowerCase() || '';
+
+    document.querySelectorAll(`.committee-member-item[data-side="${side}"]`).forEach(item => {
+        const dept = item.dataset.dept.toLowerCase();
+        const name = item.dataset.name.toLowerCase();
+
+        // 체크박스가 선택되어 있는지 확인
+        const checkbox = item.querySelector('input[type="checkbox"], input[type="radio"]');
+        const isChecked = checkbox && checkbox.checked;
+
+        const matchDept = !deptFilter || dept === deptFilter;
+        const matchName = !nameFilter || name.includes(nameFilter);
+
+        // 선택된 항목은 필터와 관계없이 항상 표시
+        if (isChecked) {
+            item.style.display = '';
+        } else {
+            item.style.display = (matchDept && matchName) ? '' : 'none';
+        }
+    });
+}
+
+// =============================================================================
+// 저장 버튼 상태 업데이트
+// =============================================================================
+
+function updateSaveCommitteeButtonState() {
+    const saveBtn = document.getElementById('save-committee-btn');
+    if (!saveBtn) return;
+
+    const reviewTarget = window.selectedReviewTarget;
+    const chair = window.selectedChair;
+    const members = window.selectedMembers;
+
+    if (!reviewTarget) {
+        saveBtn.disabled = true;
+        return;
+    }
+
+    const minMembers = reviewTarget.degreeType === '석사' ? 2 : 4;
+    const isValid = chair && members.length >= minMembers;
+
+    saveBtn.disabled = !isValid;
+}
+
+// =============================================================================
+// 심사위원 배정 확인
+// =============================================================================
+
+function confirmCommitteeAssignment() {
+    const reviewTarget = window.selectedReviewTarget;
+    const chair = window.selectedChair;
+    const members = window.selectedMembers;
+
+    // 유효성 검사
+    if (!chair) {
+        showNotification('심사위원장을 선택해주세요.', 'warning');
+        return;
+    }
+
+    const minMembers = reviewTarget.degreeType === '석사' ? 2 : 4;
+    if (members.length < minMembers) {
+        showNotification(`${reviewTarget.degreeType} 과정은 심사위원을 ${minMembers}명 이상 선택해야 합니다.`, 'warning');
+        return;
+    }
+
+    // 심사위원 배정 상태 업데이트
+    const targetIndex = appData.committeeAssignmentData.findIndex(rt => rt.id === reviewTarget.id);
+    if (targetIndex > -1) {
+        appData.committeeAssignmentData[targetIndex].assignmentStatus = '배정 완료';
+    }
+
+    closeCommitteeAssignmentModal();
+    showCommitteeAssignment();
+
+    showNotification(
+        `${reviewTarget.studentName} 학생의 심사위원 배정이 완료되었습니다. (심사위원장: ${chair.name}, 심사위원: ${members.length}명)`,
+        'success'
+    );
+}
+
+console.log('✅ 심사위원 배정 함수 로드 완료');

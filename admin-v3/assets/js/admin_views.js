@@ -2885,7 +2885,7 @@ const views = {
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <!-- 검색 영역 -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                <div class="p-6 border-b">
                     <div class="grid grid-cols-5 gap-3">
                         <!-- 1행: 5개 필드 -->
                         <div class="flex items-center gap-2">
@@ -3161,39 +3161,12 @@ const views = {
 
     // 심사위원 배정 화면 (P1-5)
     committeeAssignment: () => {
-        // Mock 데이터 로드
-        if (typeof mockReviewTargets === 'undefined' || typeof mockCommitteeAssignments === 'undefined') {
-            return `
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-red-500">
-                        <p class="text-lg">Mock 데이터가 로드되지 않았습니다.</p>
-                        <p class="text-sm mt-2">admin/assets/js/mockData.js 파일을 확인하세요.</p>
-                    </div>
-                </div>
-            `;
-        }
-
-        // JavaScript 파일 동적 로드
-        const existingScript = document.querySelector('script[src="assets/js/admin-committee-assignment.js"]');
-
-        if (!existingScript) {
-            // 스크립트가 없으면 새로 로드
-            const script = document.createElement('script');
-            script.src = 'assets/js/admin-committee-assignment.js';
-            script.onload = () => {
-                if (typeof renderCommitteeAssignmentContent === 'function') {
-                    renderCommitteeAssignmentContent();
-                }
-            };
-            document.body.appendChild(script);
-        } else {
-            // 이미 로드된 경우 다음 틱에서 렌더링 함수 호출
-            setTimeout(() => {
-                if (typeof renderCommitteeAssignmentContent === 'function') {
-                    renderCommitteeAssignmentContent();
-                }
-            }, 0);
-        }
+        // 초기화: 다음 틱에 렌더링 함수 호출
+        setTimeout(() => {
+            if (typeof showCommitteeAssignment === 'function') {
+                showCommitteeAssignment();
+            }
+        }, 100);
 
         return `<div id="committee-assignment-content"></div>`;
     },

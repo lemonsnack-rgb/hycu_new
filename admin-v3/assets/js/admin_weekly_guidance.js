@@ -23,7 +23,7 @@ function showGuidancePairsList() {
     contentArea.innerHTML = `
         <div class="bg-white rounded-lg shadow-md">
             <!-- 검색 영역 -->
-            <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <div class="p-6 border-b">
                 <div class="grid grid-cols-5 gap-3">
                     <!-- 1행: 5개 필드 -->
                     <!-- 1. 학년도/학기 -->
