@@ -300,7 +300,7 @@
                         </a>
                         <a href="#" onclick="showScreen('weeklyGuidance'); return false;" data-screen="weeklyGuidance"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>주차별 논문지도 현황</span>
+                            <span>학기별 지도 계획</span>
                         </a>
                         <a href="#" onclick="showScreen('guidanceProgress'); return false;" data-screen="guidanceProgress"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
@@ -397,9 +397,11 @@
 
                 <!-- 브레드크럼 -->
                 <div class="layout-v3-breadcrumb">
-                    <a href="#">홈</a>
+                    <span>홈</span>
                     <span class="layout-v3-breadcrumb-separator">></span>
-                    <span class="layout-v3-breadcrumb-current">대시보드</span>
+                    <span id="breadcrumb-menu">대시보드</span>
+                    <span class="layout-v3-breadcrumb-separator" id="breadcrumb-separator-2" style="display: none;">></span>
+                    <span id="breadcrumb-submenu" style="display: none;"></span>
                 </div>
             </div>
 
@@ -945,33 +947,50 @@
 
         // 브레드크럼 업데이트
         function updateBreadcrumb(screenId) {
-            const breadcrumbCurrent = document.querySelector('.layout-v3-breadcrumb-current');
-            const titleMap = {
-                'dashboard': '대시보드',
-                'stageManagement': '학생별 지도 단계 관리',
-                'typeManagement': '지도 단계 등록',
-                'stageTypeManagement': '지도 단계 유형 관리',
-                'advisorAssignment': '지도교수 배정',
-                'weeklyGuidance': '주차별 논문지도 현황',
-                'guidanceProgress': '논문 지도 현황',
-                'scheduleManagement': '심사 일정 관리',
-                'committeeAssignment': '심사위원 배정',
-                'thesisReview': '학위 논문 심사',
-                'journalReview': '학술지 논문 심사',
-                'evaluationCriteria': '심사 기준 등록',
-                'requirementManagement': '논문 제출 요건 등록',
-                'titleChangeRequests': '최종 논문 제목 등록',
-                'permissionManagement': '권한 관리',
-                'proxyLogin': '대리로그인',
-                'notice': '공지사항',
-                'board': '자료실',
-                'ethics': '연구윤리',
-                'schedule': '논문일정',
-                'process': '논문지도절차'
+            const breadcrumbMenu = document.getElementById('breadcrumb-menu');
+            const breadcrumbSubmenu = document.getElementById('breadcrumb-submenu');
+            const breadcrumbSeparator2 = document.getElementById('breadcrumb-separator-2');
+
+            // 메뉴 구조 정의 (메뉴명과 하위메뉴명)
+            const breadcrumbMap = {
+                'dashboard': { menu: '대시보드', submenu: null },
+                'notice': { menu: '논문 안내', submenu: '공지사항' },
+                'board': { menu: '논문 안내', submenu: '자료실' },
+                'ethics': { menu: '논문 안내', submenu: '연구윤리' },
+                'schedule': { menu: '논문 안내', submenu: '논문일정' },
+                'process': { menu: '논문 안내', submenu: '논문지도절차' },
+                'requirementManagement': { menu: '논문 제출', submenu: '논문 제출 요건 등록' },
+                'titleChangeRequests': { menu: '논문 제출', submenu: '최종 논문 제목 등록' },
+                'stageManagement': { menu: '논문 지도', submenu: '학생별 지도 단계 관리' },
+                'typeManagement': { menu: '논문 지도', submenu: '지도 단계 등록' },
+                'stageTypeManagement': { menu: '논문 지도', submenu: '지도 단계 유형 관리' },
+                'advisorAssignment': { menu: '논문 지도', submenu: '지도교수 배정' },
+                'weeklyGuidance': { menu: '논문 지도', submenu: '학기별 지도 계획' },
+                'guidanceProgress': { menu: '논문 지도', submenu: '논문 지도 현황' },
+                'committeeAssignment': { menu: '논문 심사', submenu: '심사위원 배정' },
+                'scheduleManagement': { menu: '논문 심사', submenu: '심사 일정 관리' },
+                'evaluationCriteria': { menu: '논문 심사', submenu: '심사 기준 등록' },
+                'thesisReview': { menu: '논문 심사', submenu: '학위 논문 심사' },
+                'journalReview': { menu: '논문 심사', submenu: '학술지 논문 심사' },
+                'permissionManagement': { menu: '시스템 설정', submenu: '권한 관리' },
+                'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' }
             };
 
-            if (breadcrumbCurrent) {
-                breadcrumbCurrent.textContent = titleMap[screenId] || '대시보드';
+            const breadcrumb = breadcrumbMap[screenId] || { menu: '대시보드', submenu: null };
+
+            if (breadcrumbMenu) {
+                breadcrumbMenu.textContent = breadcrumb.menu;
+            }
+
+            if (breadcrumb.submenu) {
+                // 하위메뉴가 있는 경우
+                breadcrumbSubmenu.textContent = breadcrumb.submenu;
+                breadcrumbSubmenu.style.display = '';
+                breadcrumbSeparator2.style.display = '';
+            } else {
+                // 하위메뉴가 없는 경우 (대시보드)
+                breadcrumbSubmenu.style.display = 'none';
+                breadcrumbSeparator2.style.display = 'none';
             }
         }
 
@@ -1026,6 +1045,7 @@
     <!-- Admin Review Scripts -->
     <script src="assets/js/admin_thesis_review.js"></script>
     <script src="assets/js/admin_journal_review.js"></script>
+    <script src="assets/js/admin_weekly_guidance.js"></script>
 
     <!-- Bridge old switchView to new showScreen -->
     <script>
@@ -1165,6 +1185,51 @@
             }
         };
     </script>
+
+    <!-- Modal Container -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+
+    <!-- Universal Modal -->
+    <div id="universal-modal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b flex-shrink-0">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800"></h3>
+                <button id="modal-close" class="text-gray-500 hover:text-gray-800 text-3xl" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-content" class="p-6 overflow-y-auto flex-grow"></div>
+            <div id="modal-footer" class="p-4 border-t flex justify-end items-center bg-gray-50 flex-shrink-0">
+                <button id="modal-cancel" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md mr-2 hover:bg-gray-300 text-sm" onclick="closeModal()">취소</button>
+                <button id="modal-confirm" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm">
+            <div class="p-6 text-center">
+                <svg class="w-16 h-16 mx-auto text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <h3 class="text-lg font-medium text-gray-900 mt-4" id="confirm-message"></h3>
+            </div>
+            <div class="p-4 bg-gray-50 flex justify-center space-x-4">
+                <button id="confirm-cancel" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 text-sm" onclick="closeConfirm()">취소</button>
+                <button id="confirm-ok" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm">확인</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-sm">
+            <div class="p-6 text-center">
+                <svg class="w-16 h-16 mx-auto text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <h3 class="text-lg font-medium text-gray-900 mt-4" id="alert-message"></h3>
+            </div>
+            <div class="p-4 bg-gray-50 flex justify-center">
+                <button id="alert-ok" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm" onclick="closeAlert()">확인</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
