@@ -2878,53 +2878,52 @@ const views = {
                     </div>
                 </div>
 
-                <!-- 학생 목록 테이블 -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-fixed divide-y divide-gray-200">
-                            <thead class="bg-gray-50">
+                <!-- 테이블 컨테이너 -->
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">지도교수 배정 목록</h3>
+                            <span class="table-count">(총 ${data.length}명)</span>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="min-w-full">
+                            <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학년도</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학기차</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학과</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">이름</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학위과정</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수</th>
-                                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">부지도교수</th>
+                                    <th style="width: 80px;">학년도</th>
+                                    <th style="width: 80px;">학기차</th>
+                                    <th style="width: 100px;">학번</th>
+                                    <th style="width: 150px;">학과</th>
+                                    <th style="width: 100px;">이름</th>
+                                    <th style="width: 100px;">학위과정</th>
+                                    <th style="width: 120px;">지도교수</th>
+                                    <th style="width: 150px;">부지도교수</th>
                                 </tr>
                             </thead>
-                            <tbody id="advisor-assignment-table" class="bg-white divide-y divide-gray-200">
+                            <tbody>
                                 ${data.map(item => `
-                                    <tr class="hover:bg-gray-50 cursor-pointer"
-                                        data-student-id="${item.studentId}"
-                                        data-department="${item.department}"
-                                        data-status="${item.status}"
-                                        onclick="viewProposalDetail('${item.id}')">
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.academicYear}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.semesterCount}학기</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department}</td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                                    <tr onclick="viewProposalDetail('${item.id}')">
+                                        <td>${item.academicYear}</td>
+                                        <td>${item.semesterCount}학기</td>
+                                        <td>${item.studentNumber}</td>
+                                        <td>${item.department}</td>
+                                        <td class="font-medium">
                                             ${item.studentName}
                                             <button onclick="event.stopPropagation(); showStudentInfo('${item.studentId}')"
-                                                    class="ml-1 text-gray-400 hover:text-primary"
+                                                    class="ml-1 text-gray-400 hover:text-[#6A0028]"
                                                     title="학생 상세정보">
                                                 <svg class="w-4 h-4 inline" fill="currentColor" viewBox="0 0 20 20">
                                                     <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
                                                 </svg>
                                             </button>
                                         </td>
-                                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                                                ${item.degreeType}
-                                            </span>
-                                        </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">
+                                        <td>${item.degreeType}</td>
+                                        <td>
                                             ${item.assignment && item.assignment.mainAdvisor
                                                 ? item.assignment.mainAdvisor.name
                                                 : '-'}
                                         </td>
-                                        <td class="px-6 py-4 text-sm text-gray-900">
+                                        <td>
                                             ${item.assignment && item.assignment.coAdvisors.length > 0
                                                 ? item.assignment.coAdvisors.map(c => c.name).join(', ')
                                                 : '-'}
@@ -2933,13 +2932,14 @@ const views = {
                                 `).join('')}
                             </tbody>
                         </table>
-
-                    ${data.length === 0 ? `
-                        <div class="text-center py-8 text-gray-500">
-                            ${window.filteredAdvisorData ? '검색 결과가 없습니다.' : '제출된 연구계획서가 없습니다.'}
-                        </div>
-                    ` : ''}
+                    </div>
                 </div>
+
+                ${data.length === 0 ? `
+                    <div class="text-center py-8 text-gray-500">
+                        ${window.filteredAdvisorData ? '검색 결과가 없습니다.' : '제출된 연구계획서가 없습니다.'}
+                    </div>
+                ` : ''}
 
             </div>
         `;
