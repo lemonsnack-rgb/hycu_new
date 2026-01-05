@@ -2774,81 +2774,110 @@ const views = {
                     <p class="text-sm text-gray-600 mt-1">학생의 지도교수 배정 현황을 조회합니다.</p>
                 </div>
 
-                <!-- 검색 옵션 (학위논문 심사와 동일한 디자인) -->
-                <div class="p-6 border-b">
-                    <div class="search-container">
-                        <div class="search-grid">
-                            <!-- 1. 학년도 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학년도
-                                </label>
-                                <select id="advisor-search-year" class="search-select">
+                <!-- 검색 영역 -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                    <div class="grid grid-cols-5 gap-3">
+                        <!-- 1행: 5개 필드 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
+                            <div class="flex gap-2 flex-1">
+                                <select id="advisor-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
                                     <option value="2025">2025</option>
                                     <option value="2024">2024</option>
                                     <option value="2023">2023</option>
                                 </select>
-                            </div>
-
-                            <!-- 2. 학기 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학기
-                                </label>
-                                <select id="advisor-search-semester" class="search-select">
+                                <select id="advisor-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
                                     <option value="1">1학기</option>
                                     <option value="2">2학기</option>
                                 </select>
                             </div>
-
-                            <!-- 3. 학기차 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학기차
-                                </label>
-                                <input type="text" id="advisor-search-semester-count" placeholder="학기차 입력"
-                                       class="search-input">
-                            </div>
-
-                            <!-- 4. 학과/전공 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학과/전공
-                                </label>
-                                <select id="advisor-search-department" class="search-select">
-                                    <option value="">전체</option>
-                                    ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                                </select>
-                            </div>
-
-                            <!-- 5. 학번 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학번
-                                </label>
-                                <input type="text" id="advisor-search-student-id" placeholder="학번 입력"
-                                       class="search-input">
-                            </div>
-
-                            <!-- 6. 이름 -->
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    이름
-                                </label>
-                                <input type="text" id="advisor-search-student-name" placeholder="이름 입력"
-                                       class="search-input">
-                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                            <select id="advisor-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="특수대학원">특수대학원</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                            <select id="advisor-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="교육대학원">교육대학원</option>
+                                <option value="산업정보대학원">산업정보대학원</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                            <select id="advisor-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="공과대학">공과대학</option>
+                                <option value="사범대학">사범대학</option>
+                                <option value="인문대학">인문대학</option>
+                                <option value="사회과학대학">사회과학대학</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                            <select id="advisor-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                            </select>
                         </div>
 
-                        <!-- 검색/초기화 버튼 -->
-                        <div class="search-buttons">
-                            <button onclick="searchAdvisorAssignment()" class="search-btn search-btn-primary">
-                                <i class="fas fa-search"></i>검색
-                            </button>
-                            <button onclick="resetAdvisorSearch()" class="search-btn search-btn-secondary">
-                                <i class="fas fa-redo"></i>초기화
+                        <!-- 2행: 5개 필드 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                            <select id="advisor-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                                <option value="석박통합">석박통합</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                            <select id="advisor-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="재학">재학</option>
+                                <option value="휴학">휴학</option>
+                                <option value="수료">수료</option>
+                                <option value="졸업">졸업</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">배정상태</label>
+                            <select id="advisor-search-assignment-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="배정완료">배정완료</option>
+                                <option value="미배정">미배정</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                            <input type="text" id="advisor-search-student-id" placeholder="학번"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                            <input type="text" id="advisor-search-student-name" placeholder="성명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                        </div>
+
+                        <!-- 3행: 1개 필드 + 버튼 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                            <input type="text" id="advisor-search-advisor-name" placeholder="지도교수명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                        </div>
+                        <div class="col-span-3"></div>
+                        <div class="flex items-center justify-end">
+                            <button onclick="searchAdvisorAssignment()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                                <i class="fas fa-search mr-1"></i>조회
                             </button>
                         </div>
                     </div>

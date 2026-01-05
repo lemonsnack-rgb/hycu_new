@@ -3337,10 +3337,16 @@ function searchAdvisorAssignment() {
     // 검색 조건 수집
     const year = document.getElementById('advisor-search-year')?.value || '';
     const semester = document.getElementById('advisor-search-semester')?.value || '';
-    const semesterCount = document.getElementById('advisor-search-semester-count')?.value || '';
+    const collegeType = document.getElementById('advisor-search-college-type')?.value || '';
+    const graduate = document.getElementById('advisor-search-graduate')?.value || '';
+    const majorCategory = document.getElementById('advisor-search-major-category')?.value || '';
     const department = document.getElementById('advisor-search-department')?.value || '';
-    const studentId = document.getElementById('advisor-search-student-id')?.value || '';
-    const studentName = document.getElementById('advisor-search-student-name')?.value || '';
+    const degree = document.getElementById('advisor-search-degree')?.value || '';
+    const status = document.getElementById('advisor-search-status')?.value || '';
+    const assignmentStatus = document.getElementById('advisor-search-assignment-status')?.value || '';
+    const studentId = document.getElementById('advisor-search-student-id')?.value.trim() || '';
+    const studentName = document.getElementById('advisor-search-student-name')?.value.trim() || '';
+    const advisorName = document.getElementById('advisor-search-advisor-name')?.value.trim() || '';
 
     // Mock 데이터가 없으면 종료
     if (typeof mockResearchProposals === 'undefined' || typeof mockAdvisorAssignments === 'undefined') {
@@ -3356,24 +3362,65 @@ function searchAdvisorAssignment() {
             ...proposal,
             academicYear: student?.academicYear || '-',
             semesterCount: student?.semesterCount || 0,
+            studentStatus: student?.status || 'active',
             assignment: assignment || null
         };
     });
 
     // 필터링
     window.filteredAdvisorData = proposalsWithAssignment.filter(item => {
+        // 학년도
         if (year && item.academicYear !== year) return false;
-        if (semester && !item.semester || semester) return false; // semester 필드가 없어서 임시 처리
-        if (semesterCount && item.semesterCount.toString() !== semesterCount) return false;
+
+        // 학기 (현재 Mock 데이터에 semester 필드 없음 - 추후 추가 필요)
+        // if (semester && item.semester !== semester) return false;
+
+        // 대학구분 (현재 Mock 데이터에 없음 - 추후 추가 필요)
+        // if (collegeType && item.collegeType !== collegeType) return false;
+
+        // 계열/대학원 (현재 Mock 데이터에 없음 - 추후 추가 필요)
+        // if (graduate && item.graduate !== graduate) return false;
+
+        // 학부(과)전공 (현재 Mock 데이터에 없음 - 추후 추가 필요)
+        // if (majorCategory && item.majorCategory !== majorCategory) return false;
+
+        // 학과/전공
         if (department && item.department !== department) return false;
+
+        // 학위과정
+        if (degree && item.degreeType !== degree) return false;
+
+        // 학적상태
+        if (status) {
+            const statusKorean = item.studentStatus === 'active' ? '재학' : '휴학';
+            if (status !== statusKorean) return false;
+        }
+
+        // 배정상태
+        if (assignmentStatus) {
+            const hasMainAdvisor = item.assignment && item.assignment.mainAdvisor;
+            if (assignmentStatus === '배정완료' && !hasMainAdvisor) return false;
+            if (assignmentStatus === '미배정' && hasMainAdvisor) return false;
+        }
+
+        // 학번
         if (studentId && !item.studentNumber.includes(studentId)) return false;
+
+        // 성명
         if (studentName && !item.studentName.includes(studentName)) return false;
+
+        // 지도교수명
+        if (advisorName) {
+            const mainAdvisorName = item.assignment?.mainAdvisor?.name || '';
+            if (!mainAdvisorName.includes(advisorName)) return false;
+        }
+
         return true;
     });
 
     // 뷰 재렌더링
     switchView('advisorAssignment');
-    showAlert(`검색 결과: ${window.filteredAdvisorData.length}건`);
+    showNotification(`검색 결과: ${window.filteredAdvisorData.length}건`, 'success');
 }
 
 // 지도교수 배정 검색 초기화
