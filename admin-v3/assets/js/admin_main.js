@@ -2779,8 +2779,8 @@ function showNotification(message, type = 'info') {
     // 알림 HTML 생성
     const notificationHtml = `
         <div id="notification-toast"
-             class="fixed top-4 right-4 z-50 ${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in"
-             style="min-width: 300px; max-width: 500px; animation: slideIn 0.3s ease-out;">
+             class="fixed top-4 right-4 ${bgColor} text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3 animate-slide-in"
+             style="min-width: 300px; max-width: 500px; z-index: 9999; animation: slideIn 0.3s ease-out;">
             <div class="flex-shrink-0">
                 ${icon}
             </div>
@@ -3663,27 +3663,29 @@ function renderStageManagementContent() {
     const tableRows = renderStudentTableRows(data);
 
     container.innerHTML = `
-        <!-- 검색 옵션 -->
-        <div class="p-4 border-b bg-gray-50">
-            <div class="grid grid-cols-4 gap-4">
-                <!-- 1행 -->
+        <!-- 검색 영역 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <div class="grid grid-cols-5 gap-3">
+                <!-- 1행: 5개 필드 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
-                    <select id="stage-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
-                        <option value="">전체</option>
-                        <option value="2025">2025</option>
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                    </select>
-                    <select id="stage-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
-                        <option value="">전체</option>
-                        <option value="1">1학기</option>
-                        <option value="2">2학기</option>
-                    </select>
+                    <div class="flex gap-2 flex-1">
+                        <select id="stage-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="2025">2025</option>
+                            <option value="2024">2024</option>
+                            <option value="2023">2023</option>
+                        </select>
+                        <select id="stage-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            <option value="">전체</option>
+                            <option value="1">1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
-                    <select id="stage-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    <select id="stage-search-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         <option value="">전체</option>
                         <option value="일반대학원">일반대학원</option>
                         <option value="특수대학원">특수대학원</option>
@@ -3691,7 +3693,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
-                    <select id="stage-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    <select id="stage-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         <option value="">전체</option>
                         <option value="일반대학원">일반대학원</option>
                         <option value="교육대학원">교육대학원</option>
@@ -3700,7 +3702,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
-                    <select id="stage-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    <select id="stage-search-major-category" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         <option value="">전체</option>
                         <option value="공과대학">공과대학</option>
                         <option value="사범대학">사범대학</option>
@@ -3708,18 +3710,18 @@ function renderStageManagementContent() {
                         <option value="사회과학대학">사회과학대학</option>
                     </select>
                 </div>
-
-                <!-- 2행 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
-                    <select id="stage-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    <select id="stage-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         <option value="">전체</option>
                         ${mockDepartmentNames.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
                     </select>
                 </div>
+
+                <!-- 2행: 5개 필드 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
-                    <select id="stage-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    <select id="stage-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         <option value="">전체</option>
                         <option value="석사">석사</option>
                         <option value="박사">박사</option>
@@ -3728,7 +3730,7 @@ function renderStageManagementContent() {
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
-                    <select id="stage-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                    <select id="stage-search-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         <option value="">전체</option>
                         <option value="재학">재학</option>
                         <option value="휴학">휴학</option>
@@ -3739,40 +3741,41 @@ function renderStageManagementContent() {
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
                     <input type="text" id="stage-search-student-id" placeholder="학번"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                 </div>
-
-                <!-- 3행 -->
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
                     <input type="text" id="stage-search-student-name" placeholder="성명"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                 </div>
                 <div class="flex items-center gap-2">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
                     <input type="text" id="stage-search-advisor" placeholder="지도교수명"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 27px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                 </div>
-                <div></div>
+
+                <!-- 3행: 버튼만 -->
+                <div class="col-span-4"></div>
                 <div class="flex items-center justify-end">
-                    <button onclick="searchStageManagement()" class="px-3 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] text-xs font-medium" style="height: 27px;">
+                    <button onclick="searchStageManagement()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
                         <i class="fas fa-search mr-1"></i>조회
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- 일괄 처리 버튼 영역 -->
-        <div class="px-6 py-4 border-b bg-gray-50">
-            <div class="flex justify-between items-center">
-                <div class="text-sm text-gray-600">
-                    총 <span class="font-semibold text-primary">${data.length}</span>명의 학생
+        <!-- 테이블 컨테이너 -->
+        <div class="table-container">
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 class="table-title">논문 지도 학생 현황 목록</h3>
+                    <span class="table-count">(총 ${data.length}명)</span>
                     <span id="selected-count" class="ml-2"></span>
                 </div>
-                <div class="flex gap-2">
+                <div class="table-header-right">
                     <!-- 통합: 지도 단계 설정 (미배정/배정 학생 모두 처리) -->
                     <button onclick="setThesisStage()"
-                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                             id="set-thesis-stage-btn"
                             disabled>
                         지도 단계 설정
@@ -3780,49 +3783,51 @@ function renderStageManagementContent() {
 
                     <!-- 기존: 단계 이동 -->
                     <button onclick="bulkChangeStage()"
-                            class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
                             id="bulk-change-stage-btn"
                             disabled>
                         단계 이동
                     </button>
                 </div>
             </div>
-        </div>
 
-        <!-- 학생 목록 테이블 -->
-        <div class="overflow-x-auto">
-                <table class="min-w-full divide-y divide-gray-200 table-fixed">
-                    <thead class="bg-gray-50">
+            <!-- 학생 목록 테이블 -->
+            <div class="table-scroll">
+                <table class="min-w-full">
+                    <thead>
                         <tr>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 50px;">
+                            <th class="text-center" style="width: 50px;">
                                 <input type="checkbox"
                                        onchange="toggleAllStageSelection(this.checked)"
                                        class="rounded border-gray-300 text-primary focus:ring-primary">
                             </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 50px;">No</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학년도</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학기</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">학번</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">학과</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">이름</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학위과정</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학적상태</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">지도교수</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">현재단계</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">진행상태</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">관리</th>
+                            <th style="width: 50px;">순번</th>
+                            <th style="width: 70px;">학년도</th>
+                            <th style="width: 60px;">학기</th>
+                            <th style="width: 100px;">대학구분</th>
+                            <th style="width: 110px;">계열/대학원</th>
+                            <th style="width: 120px;">학부(과)전공</th>
+                            <th style="width: 120px;">학과/전공</th>
+                            <th style="width: 80px;">학위과정</th>
+                            <th style="width: 80px;">학적상태</th>
+                            <th style="width: 90px;">학번</th>
+                            <th style="width: 70px;">성명</th>
+                            <th style="width: 90px;">지도교수명</th>
+                            <th style="width: 130px;">적용단계</th>
+                            <th style="width: 160px;">현재단계</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
+                    <tbody>
                         ${tableRows}
                     </tbody>
                 </table>
 
-            ${data.length === 0 ? `
-                <div class="text-center py-8 text-gray-500">
-                    ${window.filteredStageData ? '검색 결과가 없습니다.' : '등록된 학생이 없습니다.'}
-                </div>
-            ` : ''}
+                ${data.length === 0 ? `
+                    <div class="text-center py-8 text-gray-500">
+                        ${window.filteredStageData ? '검색 결과가 없습니다.' : '등록된 학생이 없습니다.'}
+                    </div>
+                ` : ''}
+            </div>
         </div>
     `;
 }
@@ -3858,7 +3863,7 @@ function renderStudentTableRows(data) {
                            onchange="updateBulkStageChangeButton()">
                 </td>
 
-                <!-- No -->
+                <!-- 순번 -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 text-center">
                     ${index + 1}
                 </td>
@@ -3873,76 +3878,63 @@ function renderStudentTableRows(data) {
                     ${semesterText}
                 </td>
 
+                <!-- 대학구분 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${student?.collegeType || '-'}
+                </td>
+
+                <!-- 계열/대학원 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${student?.division || '-'}
+                </td>
+
+                <!-- 학부(과)전공 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${student?.faculty || '-'}
+                </td>
+
+                <!-- 학과/전공 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${item.department}
+                </td>
+
+                <!-- 학위과정 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${item.degreeType}
+                </td>
+
+                <!-- 학적상태 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${studentStatus}
+                </td>
+
                 <!-- 학번 -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${item.studentNumber}
                 </td>
 
-                <!-- 학과 -->
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    ${item.department}
-                </td>
-
-                <!-- 이름 -->
+                <!-- 성명 -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                     ${item.studentName}
                 </td>
 
-                <!-- 학위과정 -->
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span class="px-2 py-1 text-xs rounded ${item.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                        ${item.degreeType}
-                    </span>
-                </td>
-
-                <!-- 학적상태 -->
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    <span class="px-2 py-1 text-xs rounded ${
-                        studentStatus === '재학' ? 'bg-blue-100 text-blue-800' :
-                        studentStatus === '휴학' ? 'bg-gray-100 text-gray-800' :
-                        studentStatus === '수료' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-green-100 text-green-800'
-                    }">
-                        ${studentStatus}
-                    </span>
-                </td>
-
-                <!-- 지도교수 -->
+                <!-- 지도교수명 -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${advisorName}
                 </td>
 
+                <!-- 적용단계 -->
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    ${workflow?.name || '-'}
+                </td>
+
                 <!-- 현재단계 -->
                 <td class="px-6 py-4 text-sm text-gray-900">
-                    ${item.currentStageOrder
-                        ? `<span class="font-semibold text-primary">${item.currentStageOrder}단계</span> - ${item.currentStageName}`
+                    ${item.currentStageName
+                        ? item.currentStageName
                         : item.thesisStageId
-                            ? workflow?.name || '-'
+                            ? '-'
                             : '<span class="font-medium text-red-600">미배정</span>'
-                    }
-                </td>
-
-                <!-- 진행상태 -->
-                <td class="px-6 py-4 whitespace-nowrap text-sm">
-                    ${item.thesisStageId === null
-                        ? '<span class="text-gray-400">-</span>'
-                        : item.canProceed
-                            ? '<span class="px-2 py-1 text-xs rounded bg-green-100 text-green-700">이관 가능</span>'
-                            : '<span class="px-2 py-1 text-xs rounded bg-blue-100 text-blue-700">진행 중</span>'
-                    }
-                </td>
-
-                <!-- 관리 -->
-                <td class="px-6 py-4 text-sm text-center">
-                    ${item.thesisStageId !== null
-                        ? `<button onclick="changeStudentStage('${item.studentId}')"
-                                class="text-xs px-3 py-1 bg-[#009DE8] text-white rounded hover:bg-[#0087c9] transition-colors">
-                            상세
-                        </button>`
-                        : `<button onclick="setThesisStageForStudent('${item.studentId}')"
-                                class="text-xs px-3 py-1 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors">
-                            배정
-                        </button>`
                     }
                 </td>
             </tr>
@@ -4168,13 +4160,13 @@ function changeStudentStage(studentId) {
     `).join('');
 
     const modalHTML = `
-        <div class="admin-modal active" id="stage-change-modal" style="display: block;">
-            <div class="admin-modal-content">
-                <div class="admin-modal-header">
-                    <h2>단계 변경</h2>
-                    <button class="admin-modal-close" onclick="closeStageChangeModal()">&times;</button>
+        <div class="modal-overlay show" id="stage-change-modal" onclick="if(event.target === this) closeStageChangeModal()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>단계 변경</h3>
+                    <button class="modal-close" onclick="closeStageChangeModal()">&times;</button>
                 </div>
-                <div class="admin-modal-body">
+                <div class="modal-body">
                     <!-- 학생 정보 -->
                     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                         <h3 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h3>
@@ -4224,13 +4216,13 @@ function changeStudentStage(studentId) {
                         </select>
                     </div>
 
-                    <div class="flex justify-end space-x-2 mt-6">
+                    <div class="modal-footer">
                         <button onclick="closeStageChangeModal()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50">
+                                class="btn btn-outline">
                             취소
                         </button>
                         <button onclick="confirmStageChange('${studentId}')"
-                                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark">
+                                class="btn btn-primary">
                             변경
                         </button>
                     </div>
@@ -4308,13 +4300,13 @@ function showBulkStageChangeModal(selectedIds, workflow) {
     `).join('');
 
     const modalHTML = `
-        <div class="admin-modal active" id="bulk-stage-change-modal" style="display: block;">
-            <div class="admin-modal-content">
-                <div class="admin-modal-header">
-                    <h2>일괄 단계 이동</h2>
-                    <button class="admin-modal-close" onclick="closeBulkStageChangeModal()">&times;</button>
+        <div class="modal-overlay show" id="bulk-stage-change-modal" onclick="if(event.target === this) closeBulkStageChangeModal()">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>일괄 단계 이동</h3>
+                    <button class="modal-close" onclick="closeBulkStageChangeModal()">&times;</button>
                 </div>
-                <div class="admin-modal-body">
+                <div class="modal-body">
                     <!-- 선택 정보 -->
                     <div class="mb-6 p-4 bg-blue-50 rounded-lg">
                         <h3 class="text-sm font-semibold text-gray-700 mb-2">선택 정보</h3>
@@ -4352,13 +4344,13 @@ function showBulkStageChangeModal(selectedIds, workflow) {
                         </div>
                     </div>
 
-                    <div class="flex justify-end space-x-2 mt-6">
+                    <div class="modal-footer">
                         <button onclick="closeBulkStageChangeModal()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
+                                class="btn btn-outline">
                             취소
                         </button>
                         <button onclick="confirmBulkStageChange()"
-                                class="px-4 py-2 bg-primary text-white rounded hover:bg-primary-dark transition-colors">
+                                class="btn btn-primary">
                             저장
                         </button>
                     </div>
@@ -4455,13 +4447,13 @@ function showThesisStageSetModal(selectedStudents, degreeType) {
     const hasUnassigned = selectedStudents.some(s => s.thesisStageId === null);
 
     const modalHTML = `
-        <div class="admin-modal active" id="thesis-stage-set-modal" style="display: block;">
-            <div class="admin-modal-content" style="max-width: 800px;">
-                <div class="admin-modal-header">
-                    <h2>지도 단계 설정</h2>
-                    <button class="admin-modal-close" onclick="closeThesisStageSetModal()">&times;</button>
+        <div class="modal-overlay show" id="thesis-stage-set-modal" onclick="if(event.target === this) closeThesisStageSetModal()">
+            <div class="modal-content" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3>지도 단계 설정</h3>
+                    <button class="modal-close" onclick="closeThesisStageSetModal()">&times;</button>
                 </div>
-                <div class="admin-modal-body">
+                <div class="modal-body">
                     <!-- 경고 메시지 -->
                     <div class="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
                         <div class="flex">
@@ -4499,7 +4491,7 @@ function showThesisStageSetModal(selectedStudents, degreeType) {
                         </label>
                         <select id="thesis-stage-set-select"
                                 onchange="handleThesisStageSetSelection(this.value)"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                                class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
                             <option value="">지도 단계를 선택하세요</option>
                             ${thesisStages.map(stage => `
                                 <option value="${stage.id}">
@@ -4507,14 +4499,6 @@ function showThesisStageSetModal(selectedStudents, degreeType) {
                                 </option>
                             `).join('')}
                         </select>
-
-                        <!-- 선택된 심사 단계 상세 정보 -->
-                        <div id="selected-set-stage-info" class="mt-3 p-3 bg-gray-50 rounded-lg hidden">
-                            <div class="text-sm text-gray-700">
-                                <div class="font-medium mb-2" id="set-stage-info-name"></div>
-                                <div class="text-xs text-gray-600" id="set-stage-info-details"></div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- 확인 체크박스 -->
@@ -4523,7 +4507,7 @@ function showThesisStageSetModal(selectedStudents, degreeType) {
                             <input type="checkbox"
                                    id="confirm-thesis-stage-set-checkbox"
                                    onchange="updateThesisStageSetButton()"
-                                   class="mt-1 rounded border-gray-300 text-orange-600 focus:ring-orange-500">
+                                   class="mt-1 rounded border-gray-300 text-primary focus:ring-primary">
                             <span class="text-sm text-gray-700">
                                 위 주의사항을 확인했으며, 지도 단계 설정 시 <strong>1단계로 ${hasUnassigned ? '시작' : '초기화'}</strong>됨을 이해했습니다.
                             </span>
@@ -4531,13 +4515,13 @@ function showThesisStageSetModal(selectedStudents, degreeType) {
                     </div>
 
                     <!-- 하단 버튼 -->
-                    <div class="flex justify-end gap-3">
+                    <div class="modal-footer">
                         <button onclick="closeThesisStageSetModal()"
-                                class="px-4 py-2 border border-gray-300 text-gray-700 rounded hover:bg-gray-50 transition-colors">
+                                class="btn btn-outline">
                             취소
                         </button>
                         <button onclick="confirmThesisStageSet()"
-                                class="px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700 transition-colors"
+                                class="btn btn-primary"
                                 id="confirm-thesis-stage-set-btn"
                                 disabled>
                             저장
@@ -4568,23 +4552,6 @@ function closeThesisStageSetModal() {
  */
 function handleThesisStageSetSelection(stageId) {
     window.selectedThesisStageForSet = stageId;
-
-    // 선택된 심사 단계 상세 정보 표시
-    const infoDiv = document.getElementById('selected-set-stage-info');
-    const nameDiv = document.getElementById('set-stage-info-name');
-    const detailsDiv = document.getElementById('set-stage-info-details');
-
-    if (stageId && infoDiv && nameDiv && detailsDiv) {
-        const stage = mockThesisStages.find(s => s.id === stageId);
-        if (stage) {
-            nameDiv.textContent = stage.name;
-            detailsDiv.textContent = `${stage.degreeType === 'master' ? '석사' : '박사'} 과정 - ${stage.stageCount}개 단계: ${stage.stages.slice(0, 3).map((s, i) => `${i + 1}. ${s.name}`).join(' → ')}${stage.stages.length > 3 ? ' ...' : ''}`;
-            infoDiv.classList.remove('hidden');
-        }
-    } else if (infoDiv) {
-        infoDiv.classList.add('hidden');
-    }
-
     updateThesisStageSetButton();
 }
 
