@@ -5366,9 +5366,9 @@ function renderTitleChangeDetail(request) {
         </div>
 
         <!-- 학생 정보 카드 (9개 항목, 회색 배경) -->
-        <div class="bg-gray-50 p-6 border-b">
-            <h4 class="text-sm font-bold text-gray-800 mb-4">학생 정보</h4>
-            <div class="grid grid-cols-2 gap-x-8 gap-y-3">
+        <div class="bg-gray-50 rounded-lg p-4 mx-6 my-4">
+            <h4 class="font-bold text-gray-800 mb-3">학생 정보</h4>
+            <div class="grid grid-cols-4 gap-4">
                 <div class="flex">
                     <span class="text-sm text-gray-600 w-32">학번:</span>
                     <span class="text-sm font-semibold text-gray-800">${request.studentId || '-'}</span>

@@ -1384,76 +1384,235 @@ const views = {
         `;
     },
 
-    // ========== 논문지도 일정 관리 ==========
+    // ========== 심사 일정 관리 (admin-v3 확장 버전) ==========
     scheduleManagement: () => {
-        const data = appData.schedules;
-        return `
-            <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-bold text-gray-800">논문지도 일정 관리</h3>
-                        <button onclick="switchView('scheduleCreate')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            등록
-                        </button>
-                    </div>
-                    
-                    <!-- 검색 영역 -->
-                    <div class="search-container">
-                        <div class="search-grid">
-                            <select id="schedule-search-target" class="search-select" onchange="searchSchedule()">
-                                <option value="">적용대상 전체</option>
-                                <option value="전체">전체</option>
-                                <option value="교육공학-석사">교육공학-석사</option>
-                                <option value="경영학-박사">경영학-박사</option>
-                            </select>
-                            <input type="text" 
-                                   id="schedule-search-keyword" 
-                                   placeholder="일정명/설명 검색"
-                                   class="search-input"
-                                   onkeypress="if(event.key==='Enter') searchSchedule()">
-                        </div>
-                        <div class="search-buttons">
-                            <button onclick="searchSchedule()" class="search-btn search-btn-primary">
-                                <i class="fas fa-search"></i> 검색
-                            </button>
-                            <button onclick="resetScheduleSearch()" class="search-btn search-btn-secondary">
-                                <i class="fas fa-redo"></i> 초기화
-                            </button>
-                        </div>
+        // Mock 데이터 로드 확인
+        if (typeof mockCommitteeAssignments === 'undefined' || typeof mockExamSchedules === 'undefined') {
+            return `
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-red-500">
+                        <p class="text-lg">Mock 데이터가 로드되지 않았습니다.</p>
+                        <p class="text-sm mt-2">assets/js/exam-schedule-data.js 파일을 확인하세요.</p>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">일정명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도 단계 유형</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">제출 기간</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사 기간</th>
-                            </tr>
-                        </thead>
-                        <tbody class="divide-y divide-gray-200">
-                            ${data.map(item => `
-                                <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('scheduleCreate', ${item.id})">
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.category || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.semester || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">
-                                        <div>${item.submissionStartDate || item.startDate}</div>
-                                        <div class="text-xs text-gray-500">~ ${item.submissionEndDate || item.endDate}</div>
-                                    </td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">
-                                        <div>${item.reviewStartDate || item.startDate}</div>
-                                        <div class="text-xs text-gray-500">~ ${item.reviewEndDate || item.endDate}</div>
-                                    </td>
+            `;
+        }
+
+        // 초기 렌더링은 HTML 반환 후 호출
+        const html = `
+            <!-- List View -->
+            <div id="exam-schedule-list-view">
+                <div class="bg-white rounded-lg shadow-md">
+                    <!-- 검색 영역 -->
+                    <div class="p-6 border-b">
+                        <div class="grid grid-cols-5 gap-3">
+                            <!-- 1행: 5개 필드 -->
+                            <!-- 1. 학년도 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                                <select id="filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                            </div>
+
+                            <!-- 2. 학기 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
+                                <select id="filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="1" selected>1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+
+                            <!-- 3. 대학구분 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                                <select id="filter-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="일반대학원">일반대학원</option>
+                                    <option value="디자인대학원">디자인대학원</option>
+                                </select>
+                            </div>
+
+                            <!-- 4. 계열/대학원 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                                <select id="filter-college" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="공학계열">공학계열</option>
+                                    <option value="인문사회계열">인문사회계열</option>
+                                </select>
+                            </div>
+
+                            <!-- 5. 학부(과)전공 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                                <select id="filter-undergraduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="컴퓨터공학">컴퓨터공학</option>
+                                    <option value="경영학">경영학</option>
+                                </select>
+                            </div>
+
+                            <!-- 2행: 5개 필드 -->
+                            <!-- 6. 학과/전공 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                                <select id="filter-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="경영학과">경영학과</option>
+                                    <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                    <option value="교육학과">교육학과</option>
+                                </select>
+                            </div>
+
+                            <!-- 7. 학위과정 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                                <select id="filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="석사">석사</option>
+                                    <option value="박사">박사</option>
+                                    <option value="석박통합">석박통합</option>
+                                </select>
+                            </div>
+
+                            <!-- 8. 학적상태 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                                <select id="filter-academic-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="재학">재학</option>
+                                    <option value="휴학">휴학</option>
+                                    <option value="수료">수료</option>
+                                    <option value="졸업">졸업</option>
+                                </select>
+                            </div>
+
+                            <!-- 9. 학번 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                                <input type="text" id="filter-student-number" placeholder="학번"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                       style="height: 34px;"
+                                       onkeypress="if(event.key==='Enter') filterExamSchedule()">
+                            </div>
+
+                            <!-- 10. 성명 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                                <input type="text" id="filter-student-name" placeholder="성명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                       style="height: 34px;"
+                                       onkeypress="if(event.key==='Enter') filterExamSchedule()">
+                            </div>
+
+                            <!-- 3행: 3개 필드 + 조회 버튼 -->
+                            <!-- 11. 지도교수명 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                                <input type="text" id="filter-advisor-name" placeholder="지도교수명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                       style="height: 34px;"
+                                       onkeypress="if(event.key==='Enter') filterExamSchedule()">
+                            </div>
+
+                            <!-- 12. 심사단계 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사단계</label>
+                                <select id="filter-stage" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <!-- 동적 로드 -->
+                                </select>
+                            </div>
+
+                            <!-- 13. 등록상태 -->
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">등록상태</label>
+                                <select id="filter-schedule-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
+                                    <option value="">전체</option>
+                                    <option value="scheduled">등록 완료</option>
+                                    <option value="unscheduled">미등록</option>
+                                </select>
+                            </div>
+
+                            <!-- 빈 공간 -->
+                            <div></div>
+
+                            <!-- 조회 버튼 -->
+                            <div class="flex justify-end">
+                                <button onclick="filterExamSchedule()" class="px-4 py-2 bg-[#6A0028] text-white rounded text-xs hover:bg-[#8A0034]">
+                                    <i class="fas fa-search"></i> 조회
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 테이블 헤더 -->
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">심사 일정 목록</h3>
+                            <span class="table-count">(총 <span id="exam-schedule-count">0</span>건)</span>
+                        </div>
+                    </div>
+
+                    <!-- 테이블 영역 (14개 컬럼) -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full table-fixed">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학구분</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">계열/대학원</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부(과)전공</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수명</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사단계</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록상태</th>
                                 </tr>
-                            `).join('')}
-                        </tbody>
-                    </table>
+                            </thead>
+                            <tbody id="exam-schedule-table-body" class="bg-white divide-y divide-gray-200">
+                                <!-- JavaScript로 동적 렌더링 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
+
+            <!-- Detail View (hidden initially) -->
+            <div id="exam-schedule-detail-view" style="display: none;">
+                <!-- JavaScript로 동적 렌더링 -->
+            </div>
         `;
+
+        // HTML 반환 후 초기 렌더링 호출 (스크립트 로드 후)
+        setTimeout(() => {
+            if (typeof window.renderExamScheduleList === 'function') {
+                console.log('✅ renderExamScheduleList 함수 호출 시작');
+                window.renderExamScheduleList();
+            } else {
+                console.error('❌ renderExamScheduleList 함수를 찾을 수 없습니다', typeof window.renderExamScheduleList);
+                // 재시도
+                setTimeout(() => {
+                    if (typeof window.renderExamScheduleList === 'function') {
+                        console.log('✅ renderExamScheduleList 함수 호출 (재시도)');
+                        window.renderExamScheduleList();
+                    }
+                }, 200);
+            }
+        }, 100);
+
+        return html;
     },
 
     // ========== 일정 등록 (신규/수정) ==========

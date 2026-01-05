@@ -686,6 +686,141 @@ function resetGuidanceProgressSearch() {
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
+// ========== 논문지도 일정 관리 검색 ==========
+function searchGuidanceSchedule() {
+    const filters = {
+        year: document.getElementById('schedule-search-year')?.value || '',
+        semester: document.getElementById('schedule-search-semester')?.value || '',
+        collegeType: document.getElementById('schedule-search-college-type')?.value || '',
+        college: document.getElementById('schedule-search-college')?.value || '',
+        faculty: document.getElementById('schedule-search-faculty')?.value || '',
+        major: document.getElementById('schedule-search-major')?.value || '',
+        degree: document.getElementById('schedule-search-degree')?.value || '',
+        status: document.getElementById('schedule-search-status')?.value || '',
+        studentId: document.getElementById('schedule-search-student-id')?.value.toLowerCase().trim() || '',
+        studentName: document.getElementById('schedule-search-student-name')?.value.toLowerCase().trim() || '',
+        professor: document.getElementById('schedule-search-professor')?.value.toLowerCase().trim() || '',
+        stage: document.getElementById('schedule-search-stage')?.value || '',
+        registration: document.getElementById('schedule-search-registration')?.value || ''
+    };
+
+    // 원본 데이터 백업
+    if (!appData.originalGuidanceScheduleStatus) {
+        appData.originalGuidanceScheduleStatus = [...appData.guidanceScheduleStatus];
+    }
+
+    // 필터링
+    let filtered = [...appData.originalGuidanceScheduleStatus];
+
+    // 학년도
+    if (filters.year) {
+        filtered = filtered.filter(item => item.year === filters.year);
+    }
+
+    // 학기
+    if (filters.semester) {
+        filtered = filtered.filter(item => item.semester === filters.semester);
+    }
+
+    // 대학구분
+    if (filters.collegeType) {
+        filtered = filtered.filter(item => item.collegeType === filters.collegeType);
+    }
+
+    // 계열/대학원
+    if (filters.college) {
+        filtered = filtered.filter(item => item.college === filters.college);
+    }
+
+    // 학부(과)전공
+    if (filters.faculty) {
+        filtered = filtered.filter(item => item.faculty === filters.faculty);
+    }
+
+    // 학과/전공
+    if (filters.major) {
+        filtered = filtered.filter(item => item.major === filters.major);
+    }
+
+    // 학위과정
+    if (filters.degree) {
+        filtered = filtered.filter(item => item.degree === filters.degree);
+    }
+
+    // 학적상태
+    if (filters.status) {
+        filtered = filtered.filter(item => item.status === filters.status);
+    }
+
+    // 학번
+    if (filters.studentId) {
+        filtered = filtered.filter(item => item.studentId.toLowerCase().includes(filters.studentId));
+    }
+
+    // 성명
+    if (filters.studentName) {
+        filtered = filtered.filter(item => item.studentName.toLowerCase().includes(filters.studentName));
+    }
+
+    // 지도교수명
+    if (filters.professor) {
+        filtered = filtered.filter(item => item.professor.toLowerCase().includes(filters.professor));
+    }
+
+    // 심사단계
+    if (filters.stage) {
+        filtered = filtered.filter(item => item.stage === filters.stage);
+    }
+
+    // 등록상태
+    if (filters.registration) {
+        filtered = filtered.filter(item => item.registrationStatus === filters.registration);
+    }
+
+    appData.guidanceScheduleStatus = filtered;
+
+    // 화면 새로고침
+    switchView('scheduleManagement');
+
+    showAlert(`검색 결과: ${filtered.length}건`);
+}
+
+function resetGuidanceScheduleSearch() {
+    // 원본 데이터 복원
+    if (appData.originalGuidanceScheduleStatus) {
+        appData.guidanceScheduleStatus = [...appData.originalGuidanceScheduleStatus];
+    }
+
+    // 검색 필드 초기화
+    const searchFields = [
+        'schedule-search-year',
+        'schedule-search-semester',
+        'schedule-search-college-type',
+        'schedule-search-college',
+        'schedule-search-faculty',
+        'schedule-search-major',
+        'schedule-search-degree',
+        'schedule-search-status',
+        'schedule-search-student-id',
+        'schedule-search-student-name',
+        'schedule-search-professor',
+        'schedule-search-stage',
+        'schedule-search-registration'
+    ];
+
+    searchFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (field) {
+            field.value = '';
+        }
+    });
+
+    // 화면 새로고침
+    switchView('scheduleManagement');
+
+    showAlert('검색 조건이 초기화되었습니다.');
+}
+
 // ========== 학위논문 심사 관리 탭 전환 (ID 6) ==========
 function switchThesisTab(tab) {
     window.currentThesisTab = tab;
@@ -6071,7 +6206,7 @@ function showCommitteeAssignment() {
                     <div class="flex items-center justify-end">
                         <button onclick="searchCommitteeAssignment()"
                                 class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
-                            조회
+                            <i class="fas fa-search mr-1"></i>조회
                         </button>
                     </div>
                 </div>
@@ -6528,3 +6663,12 @@ function confirmCommitteeAssignment() {
 }
 
 console.log('✅ 심사위원 배정 함수 로드 완료');
+
+// ==================== 심사 일정 관리 ====================
+
+/**
+ * 일정 상세 화면 표시
+ */
+function showScheduleDetail(scheduleId) {
+    alert('일정 상세 화면 (ID: ' + scheduleId + ')\n\n상세 화면은 추후 구현 예정입니다.');
+}

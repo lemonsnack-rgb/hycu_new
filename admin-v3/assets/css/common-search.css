@@ -4,10 +4,6 @@
  */
 
 .search-container {
-    background: #F9FAFB;
-    border: 1px solid #E5E5E5;
-    border-radius: 0.5rem;
-    padding: 1rem;
     margin-bottom: 1rem;
 }
 
@@ -62,12 +58,12 @@
 }
 
 .search-btn-primary {
-    background: #009DE8;
+    background: #6A0028;
     color: white;
 }
 
 .search-btn-primary:hover {
-    background: #0087c9;
+    background: #550020;
 }
 
 .search-btn-secondary {

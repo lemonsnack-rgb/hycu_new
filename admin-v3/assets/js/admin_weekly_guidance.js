@@ -121,7 +121,7 @@ function showGuidancePairsList() {
                 <div class="flex justify-end mt-4">
                     <button onclick="filterGuidancePairs()"
                             class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
-                        조회
+                        <i class="fas fa-search mr-1"></i>조회
                     </button>
                 </div>
             </div>
