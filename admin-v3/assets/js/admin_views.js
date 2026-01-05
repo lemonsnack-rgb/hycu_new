@@ -2769,11 +2769,6 @@ const views = {
 
         return `
             <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b border-gray-200">
-                    <h2 class="text-xl font-bold text-gray-800">지도교수 배정</h2>
-                    <p class="text-sm text-gray-600 mt-1">학생의 지도교수 배정 현황을 조회합니다.</p>
-                </div>
-
                 <!-- 검색 영역 -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-4">
                     <div class="grid grid-cols-5 gap-3">
