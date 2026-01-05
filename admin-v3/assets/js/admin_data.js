@@ -792,7 +792,29 @@ const appData = {
             requestDate: '2025-11-10',
             status: '대기',
             approvedDate: null,
-            approvedBy: null
+            approvedBy: null,
+            // 상세 페이지용 추가 필드
+            year: '2025',
+            semester: '1',
+            collegeType: '대학원',
+            faculty: '-',
+            status: '재학',
+            advisorName: '김교수',
+            professor: '김교수',
+            submitDate: '2025-11-10',
+            requestStatus: '피드백 대기',
+            changeHistory: [
+                {
+                    date: '2025-10-15',
+                    previousTitle: '인공지능을 활용한 맞춤형 교육 플랫폼 연구',
+                    reason: '연구 범위 구체화'
+                },
+                {
+                    date: '2025-09-01',
+                    previousTitle: 'AI 기반 교육 시스템',
+                    reason: '주제 명확화'
+                }
+            ]
         },
         {
             id: 2,
@@ -808,7 +830,18 @@ const appData = {
             requestDate: '2025-11-08',
             status: '승인',
             approvedDate: '2025-11-09',
-            approvedBy: '관리자'
+            approvedBy: '관리자',
+            // 상세 페이지용 추가 필드
+            year: '2025',
+            semester: '1',
+            collegeType: '대학원',
+            faculty: '-',
+            status: '재학',
+            advisorName: '박교수',
+            professor: '박교수',
+            submitDate: '2025-11-08',
+            requestStatus: '승인',
+            changeHistory: []
         },
         {
             id: 3,
@@ -824,7 +857,24 @@ const appData = {
             requestDate: '2025-11-05',
             status: '대기',
             approvedDate: null,
-            approvedBy: null
+            approvedBy: null,
+            // 상세 페이지용 추가 필드
+            year: '2025',
+            semester: '1',
+            collegeType: '대학원',
+            faculty: '-',
+            status: '재학',
+            advisorName: '홍길동',
+            professor: '홍길동',
+            submitDate: '2025-11-05',
+            requestStatus: '피드백 대기',
+            changeHistory: [
+                {
+                    date: '2025-10-20',
+                    previousTitle: 'Deep Learning 이미지 분류',
+                    reason: '논문 제목 구체화'
+                }
+            ]
         }
     ],
 

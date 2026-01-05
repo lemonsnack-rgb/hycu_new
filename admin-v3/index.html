@@ -44,12 +44,21 @@
     <link rel="stylesheet" href="../professor-v3/assets/css/review.css">
     <link rel="stylesheet" href="../professor-v3/assets/css/meeting-v2.css">
 
+    <!-- Admin Feedback CSS (읽기 전용 PDF 뷰어) -->
+    <link rel="stylesheet" href="assets/css/admin_feedback.css">
+
     <!-- Common Styles from Original Admin (common-style.css 제외 - layout-v3와 충돌) -->
     <link rel="stylesheet" href="assets/css/common-search.css">
     <link rel="stylesheet" href="assets/css/table-truncate.css">
 
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- PDF.js -->
+    <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
+
+    <!-- Fabric.js (for PDF annotations) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
 
     <!-- Crimson Color Override -->
     <style>
@@ -304,7 +313,7 @@
                         </a>
                         <a href="#" onclick="showScreen('guidanceProgress'); return false;" data-screen="guidanceProgress"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>논문 지도 현황</span>
+                            <span>논문 지도 활동</span>
                         </a>
                     </div>
                 </div>
@@ -1064,6 +1073,10 @@
     <script src="assets/js/admin_thesis_review.js"></script>
     <script src="assets/js/admin_journal_review.js"></script>
     <script src="assets/js/admin_weekly_guidance.js"></script>
+
+    <!-- Admin Feedback Scripts (읽기 전용 PDF 뷰어) -->
+    <script src="assets/js/admin_feedback_data.js"></script>
+    <script src="assets/js/admin_feedback_detail.js"></script>
 
     <!-- Bridge old switchView to new showScreen -->
     <script>

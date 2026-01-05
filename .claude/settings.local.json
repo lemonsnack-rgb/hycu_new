@@ -34,7 +34,8 @@
       "Bash(npx tailwindcss:*)",
       "Bash(curl:*)",
       "Bash(git revert:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": []

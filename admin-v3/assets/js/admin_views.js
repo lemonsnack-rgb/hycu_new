@@ -1209,179 +1209,170 @@ const views = {
         `;
     },
 
-    // ========== 논문지도 진행 현황 (PDF 피드백 조회) ==========
-    // Task 1-5: 온라인 피드백 현황 (Excel ID 22-24)
+    // ========== 논문 지도 활동 (PDF 피드백 조회) ==========
     guidanceProgress: () => {
         const data = appData.guidanceProgress;
         return `
-            <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">온라인 피드백 현황</h3>
-
-                    <!-- 검색 영역: 대학원, 전공, 학위과정, 지도교수, 학기차, 피드백상태, 학번, 성명 -->
-                    <div class="search-container">
-                        <div class="search-grid">
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    대학원
-                                </label>
-                                <select id="progress-search-graduate" class="search-select">
+            <!-- 검색 영역 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                    <div class="grid grid-cols-5 gap-3">
+                        <!-- 1행: 5개 필드 -->
+                        <!-- 1. 학년도/학기 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
+                            <div class="flex gap-2 flex-1">
+                                <select id="progress-search-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
-                                    <option value="일반대학원">일반대학원</option>
-                                    <option value="특수대학원">특수대학원</option>
-                                    <option value="전문대학원">전문대학원</option>
+                                    <option value="2025">2025</option>
+                                    <option value="2024">2024</option>
                                 </select>
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    전공
-                                </label>
-                                <select id="progress-search-major" class="search-select">
+                                <select id="progress-search-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
-                                    <option value="교육공학">교육공학</option>
-                                    <option value="경영학">경영학</option>
-                                    <option value="컴퓨터공학">컴퓨터공학</option>
+                                    <option value="1">1학기</option>
+                                    <option value="2">2학기</option>
                                 </select>
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학위과정
-                                </label>
-                                <select id="progress-search-degree" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="석사">석사</option>
-                                    <option value="박사">박사</option>
-                                    <option value="석박통합">석박통합</option>
-                                </select>
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    지도교수
-                                </label>
-                                <select id="progress-search-advisor" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="홍길동">홍길동</option>
-                                    <option value="박교수">박교수</option>
-                                    <option value="김교수">김교수</option>
-                                    <option value="이지도">이지도</option>
-                                </select>
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학기차
-                                </label>
-                                <select id="progress-search-semester-count" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="1">1학기차</option>
-                                    <option value="2">2학기차</option>
-                                    <option value="3">3학기차</option>
-                                    <option value="4">4학기차</option>
-                                    <option value="5">5학기차</option>
-                                    <option value="6">6학기차</option>
-                                </select>
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    피드백상태
-                                </label>
-                                <select id="progress-search-status" class="search-select">
-                                    <option value="">전체</option>
-                                    <option value="대기">대기</option>
-                                    <option value="진행 중">진행 중</option>
-                                    <option value="완료">완료</option>
-                                </select>
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    학번
-                                </label>
-                                <input type="text"
-                                       id="progress-search-student-id"
-                                       placeholder="학번 입력"
-                                       class="search-input"
-                                       onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
-                            </div>
-                            <div class="search-field">
-                                <label class="search-label" style="display: block; font-size: 0.875rem; font-weight: 600; color: #374151; margin-bottom: 0.25rem;">
-                                    성명
-                                </label>
-                                <input type="text"
-                                       id="progress-search-student-name"
-                                       placeholder="성명 입력"
-                                       class="search-input"
-                                       onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
                             </div>
                         </div>
-                        <div class="search-buttons">
-                            <button onclick="searchGuidanceProgress()"
-                                    class="search-btn search-btn-primary">
-                                <i class="fas fa-search"></i>검색
-                            </button>
-                            <button onclick="resetGuidanceProgressSearch()"
-                                    class="search-btn search-btn-secondary">
-                                <i class="fas fa-redo"></i>초기화
+                        <!-- 2. 대학구분 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
+                            <select id="progress-search-graduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="디자인대학원">디자인대학원</option>
+                            </select>
+                        </div>
+                        <!-- 3. 계열/대학원 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
+                            <select id="progress-search-college" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="공학계열">공학계열</option>
+                                <option value="인문사회계열">인문사회계열</option>
+                            </select>
+                        </div>
+                        <!-- 4. 학부(과)전공 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
+                            <select id="progress-search-undergraduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="컴퓨터공학">컴퓨터공학</option>
+                                <option value="경영학">경영학</option>
+                            </select>
+                        </div>
+                        <!-- 5. 학과/전공 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                            <select id="progress-search-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="컴퓨터공학과">컴퓨터공학과</option>
+                                <option value="경영학과">경영학과</option>
+                            </select>
+                        </div>
+
+                        <!-- 2행: 5개 필드 -->
+                        <!-- 6. 학위과정 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
+                            <select id="progress-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                                <option value="석박통합">석박통합</option>
+                            </select>
+                        </div>
+                        <!-- 7. 학적상태 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                            <select id="progress-search-academic-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="재학">재학</option>
+                                <option value="휴학">휴학</option>
+                                <option value="수료">수료</option>
+                                <option value="졸업">졸업</option>
+                            </select>
+                        </div>
+                        <!-- 8. 학번 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                            <input type="text" id="progress-search-student-id" placeholder="학번"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                   onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
+                        </div>
+                        <!-- 9. 성명 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                            <input type="text" id="progress-search-student-name" placeholder="성명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                   onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
+                        </div>
+                        <!-- 10. 지도교수명 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
+                            <input type="text" id="progress-search-advisor" placeholder="지도교수명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                   onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
+                        </div>
+
+                        <!-- 3행: 조회 버튼 -->
+                        <!-- 빈 공간 -->
+                        <div class="col-span-4"></div>
+                        <!-- 조회 버튼 -->
+                        <div class="flex items-center justify-end">
+                            <button onclick="searchGuidanceProgress()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                                <i class="fas fa-search mr-1"></i>조회
                             </button>
                         </div>
                     </div>
                 </div>
+            </div>
 
+            <!-- 테이블 영역 -->
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- 테이블 타이틀 -->
+                <div class="px-6 py-4 border-b border-gray-200">
+                    <h3 class="text-base font-semibold text-gray-800">논문 지도 활동 목록</h3>
+                </div>
                 <div class="overflow-x-auto">
                     <table class="min-w-full table-fixed text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">번호</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학년도</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학구분</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">계열/대학원</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부(과)전공</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학위과정</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학적상태</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기차</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문명</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">제출일시</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">상태</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">부지도교수</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.length > 0 ? data.map((item, idx) => {
-                                // 피드백 상태값 변환: 답변 대기중 → 대기, 피드백 완료 → 완료
-                                let statusText = item.feedbackStatus || '대기';
-                                if (statusText === '답변 대기중') statusText = '대기';
-                                if (statusText === '피드백 완료') statusText = '완료';
-
-                                const statusClass =
-                                    statusText === '대기' ? 'bg-yellow-100 text-yellow-700' :
-                                    statusText === '진행 중' ? 'bg-blue-100 text-blue-700' :
-                                    'bg-green-100 text-green-700';
-
                                 return `
                                 <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewPdfFeedback(${item.id}, true)">
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">2025</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">1학기</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
                                     <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.advisor}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">재학</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">
-                                        ${addStudentInfoIcon(item.studentName, item.studentId)}
-                                    </td>
-                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.semesterCount || '-'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-700">
-                                        <div class="td-truncate font-medium" title="${item.documentTitle}">
-                                            ${item.documentTitle}
-                                        </div>
-                                        <div class="text-xs text-gray-500 mt-1">${item.fileName}</div>
-                                    </td>
-                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.submitDate}</td>
-                                    <td class="py-3 px-4 text-center">
-                                        <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium ${statusClass}">
-                                            ${statusText}
-                                        </span>
-                                    </td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">${item.advisor}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">-</td>
                                 </tr>
                             `}).join('') : `
                                 <tr>
-                                    <td colspan="11" class="py-8 text-center text-gray-500">
+                                    <td colspan="13" class="py-8 text-center text-gray-500">
                                         데이터가 없습니다.
                                     </td>
                                 </tr>
@@ -2360,93 +2351,217 @@ const views = {
         return `
             <!-- 목록 화면 -->
             <div id="title-change-list-view">
-                <div class="bg-white rounded-lg shadow-md">
-                    <div class="p-6 border-b">
-                        <h3 class="text-lg font-bold text-gray-800 mb-4">논문 제목 등록 현황</h3>
+                <!-- 검색 옵션 카드 (표준 디자인) -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                    <div class="grid grid-cols-5 gap-3">
+                        <!-- 1행: 5개 필드 -->
 
-                        <!-- 검색 메뉴 -->
-                        <div class="search-container">
-                            <div class="search-grid">
-                                <!-- 1. 학년도 -->
-                                <div class="search-field">
-                                    <label class="search-label">학년도</label>
-                                    <select id="title-search-year" class="search-select">
-                                        <option value="">전체</option>
-                                        <option value="2025">2025</option>
-                                        <option value="2024">2024</option>
-                                        <option value="2023">2023</option>
-                                    </select>
-                                </div>
-
-                                <!-- 2. 학기 -->
-                                <div class="search-field">
-                                    <label class="search-label">학기</label>
-                                    <select id="title-search-semester" class="search-select">
-                                        <option value="">전체</option>
-                                        <option value="1">1학기</option>
-                                        <option value="2">2학기</option>
-                                    </select>
-                                </div>
-
-                                <!-- 3. 학번 -->
-                                <div class="search-field">
-                                    <label class="search-label">학번</label>
-                                    <input type="text" id="title-search-student-id" placeholder="학번 입력"
-                                           class="search-input">
-                                </div>
-
-                                <!-- 4. 성명 -->
-                                <div class="search-field">
-                                    <label class="search-label">성명</label>
-                                    <input type="text" id="title-search-student-name" placeholder="성명 입력"
-                                           class="search-input">
-                                </div>
-                            </div>
-
-                            <!-- 검색/초기화 버튼 -->
-                            <div class="search-buttons">
-                                <button onclick="searchTitleChangeRequests()" class="search-btn search-btn-primary">
-                                    <i class="fas fa-search"></i>검색
-                                </button>
-                                <button onclick="resetTitleChangeSearch()" class="search-btn search-btn-secondary">
-                                    <i class="fas fa-redo"></i>초기화
-                                </button>
+                        <!-- 1. 학년도/학기 (복합 필드) -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학년도/학기
+                            </label>
+                            <div class="flex gap-2 flex-1">
+                                <select id="title-search-year"
+                                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                        style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                                <select id="title-search-semester"
+                                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                        style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="1" selected>1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- 테이블 -->
+                        <!-- 2. 대학구분 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                대학구분
+                            </label>
+                            <select id="title-search-college-type"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="대학원">대학원</option>
+                                <option value="학부">학부</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. 계열/대학원 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                계열/대학원
+                            </label>
+                            <select id="title-search-college"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="디자인대학원">디자인대학원</option>
+                                <option value="부동산대학원">부동산대학원</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. 학부(과)전공 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학부(과)전공
+                            </label>
+                            <select id="title-search-faculty"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="공학부">공학부</option>
+                                <option value="인문사회학부">인문사회학부</option>
+                                <option value="디자인학부">디자인학부</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. 학과/전공 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학과/전공
+                            </label>
+                            <select id="title-search-major"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="컴퓨터공학">컴퓨터공학</option>
+                                <option value="전기전자공학">전기전자공학</option>
+                                <option value="경영학">경영학</option>
+                            </select>
+                        </div>
+
+                        <!-- 2행: 5개 필드 -->
+
+                        <!-- 6. 학위과정 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학위과정
+                            </label>
+                            <select id="title-search-degree"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                                <option value="석박통합">석박통합</option>
+                            </select>
+                        </div>
+
+                        <!-- 7. 학적상태 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학적상태
+                            </label>
+                            <select id="title-search-status"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="재학">재학</option>
+                                <option value="휴학">휴학</option>
+                                <option value="졸업">졸업</option>
+                            </select>
+                        </div>
+
+                        <!-- 8. 학번 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학번
+                            </label>
+                            <input type="text"
+                                   id="title-search-student-id"
+                                   placeholder="학번"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                   style="height: 34px;">
+                        </div>
+
+                        <!-- 9. 성명 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                성명
+                            </label>
+                            <input type="text"
+                                   id="title-search-student-name"
+                                   placeholder="성명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                   style="height: 34px;">
+                        </div>
+
+                        <!-- 10. 지도교수명 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                지도교수명
+                            </label>
+                            <input type="text"
+                                   id="title-search-advisor"
+                                   placeholder="지도교수명"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                   style="height: 34px;">
+                        </div>
+
+                        <!-- 3행: 버튼 (오른쪽 정렬) -->
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <!-- 버튼 영역 (마지막 열) -->
+                        <div class="flex items-center justify-end">
+                            <button onclick="searchTitleChangeRequests()"
+                                    class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                                조회
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 테이블 -->
+                <div class="bg-white rounded-lg shadow-md">
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-fixed">
                             <thead class="bg-gray-50">
                                 <tr>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">번호</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학원</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학년도</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학기</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학구분</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">계열/대학원</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부(과)전공</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학적상태</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">이름</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문 제목</th>
-                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">등록일(수정일)</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수명</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-gray-200">
                                 ${data.length > 0 ? data.map((item, idx) => `
                                     <tr class="hover:bg-gray-50 cursor-pointer" onclick="showTitleChangeDetail(${item.id})">
                                         <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.year || '2025'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.semester || '1'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.collegeType || '대학원'}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.faculty || '-'}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.status || '재학'}</td>
                                         <td class="py-3 px-4 text-sm text-gray-600">${item.studentId}</td>
-                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">${addStudentInfoIcon(item.studentName, item.studentId)}</td>
-                                        <td class="py-3 px-4 text-sm text-gray-600 td-truncate-extra-long" title="${item.titleKo || item.currentTitle || '-'}">
-                                            ${item.titleKo || item.currentTitle || '-'}
-                                        </td>
-                                        <td class="py-3 px-4 text-center text-sm text-gray-600">${item.registeredDate || item.requestDate || '-'}</td>
+                                        <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
+                                        <td class="py-3 px-4 text-sm text-gray-600">${item.advisorName || item.professor || '-'}</td>
                                     </tr>
                                 `).join('') : `
                                     <tr>
-                                        <td colspan="9" class="py-8 text-center text-gray-500">
+                                        <td colspan="12" class="py-8 text-center text-gray-500">
                                             논문 제목 등록 내역이 없습니다.
                                         </td>
                                     </tr>
@@ -2890,23 +3005,44 @@ const views = {
                         <table class="min-w-full">
                             <thead>
                                 <tr>
+                                    <th style="width: 60px;">순번</th>
                                     <th style="width: 80px;">학년도</th>
-                                    <th style="width: 80px;">학기차</th>
+                                    <th style="width: 70px;">학기</th>
+                                    <th style="width: 100px;">대학구분</th>
+                                    <th style="width: 120px;">계열/대학원</th>
+                                    <th style="width: 120px;">학부(과)전공</th>
+                                    <th style="width: 120px;">학과/전공</th>
+                                    <th style="width: 90px;">학위과정</th>
+                                    <th style="width: 90px;">학적상태</th>
+                                    <th style="width: 90px;">배정상태</th>
                                     <th style="width: 100px;">학번</th>
-                                    <th style="width: 150px;">학과</th>
-                                    <th style="width: 100px;">이름</th>
-                                    <th style="width: 100px;">학위과정</th>
+                                    <th style="width: 100px;">성명</th>
                                     <th style="width: 120px;">지도교수</th>
                                     <th style="width: 150px;">부지도교수</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                ${data.map(item => `
+                                ${data.map((item, index) => {
+                                    // 학기: semesterCount를 학기로 변환 (1학기, 2학기 등)
+                                    const semester = item.semesterCount ? `${item.semesterCount}학기` : '-';
+                                    // 학적상태: student.status 기반 ('active' → '재학', 'inactive' → '휴학')
+                                    const enrollmentStatus = item.studentStatus === 'active' ? '재학' : '휴학';
+                                    // 배정상태: mainAdvisor 존재 여부
+                                    const assignmentStatus = item.assignment?.mainAdvisor ? '배정완료' : '미배정';
+
+                                    return `
                                     <tr onclick="viewProposalDetail('${item.id}')">
+                                        <td>${index + 1}</td>
                                         <td>${item.academicYear}</td>
-                                        <td>${item.semesterCount}학기</td>
-                                        <td>${item.studentNumber}</td>
+                                        <td>${semester}</td>
+                                        <td>대학원</td>
+                                        <td>일반대학원</td>
+                                        <td>-</td>
                                         <td>${item.department}</td>
+                                        <td>${item.degreeType}</td>
+                                        <td>${enrollmentStatus}</td>
+                                        <td>${assignmentStatus}</td>
+                                        <td>${item.studentNumber}</td>
                                         <td class="font-medium">
                                             ${item.studentName}
                                             <button onclick="event.stopPropagation(); showStudentInfo('${item.studentId}')"
@@ -2917,7 +3053,6 @@ const views = {
                                                 </svg>
                                             </button>
                                         </td>
-                                        <td>${item.degreeType}</td>
                                         <td>
                                             ${item.assignment && item.assignment.mainAdvisor
                                                 ? item.assignment.mainAdvisor.name
@@ -2929,7 +3064,8 @@ const views = {
                                                 : '-'}
                                         </td>
                                     </tr>
-                                `).join('')}
+                                `;
+                                }).join('')}
                             </tbody>
                         </table>
                     </div>

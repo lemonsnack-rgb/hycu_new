@@ -3534,98 +3534,106 @@ function viewProposalDetail(proposalId) {
     // 상세 뷰 렌더링
     const detailView = `
         <div class="bg-white rounded-lg shadow-md">
-            <!-- 헤더 -->
+            <!-- 학생 정보 카드 -->
             <div class="px-8 py-6 border-b border-gray-200">
-                <div class="flex items-center justify-between mb-4">
-                    <button onclick="switchView('advisorAssignment')"
-                            class="flex items-center text-gray-600 hover:text-gray-900">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        목록으로
-                    </button>
-                    <span class="px-3 py-1 rounded text-sm font-medium ${proposal.degreeType === '석사' ? 'bg-green-100 text-green-800' : 'bg-purple-100 text-purple-800'}">
-                        ${proposal.degreeType}
-                    </span>
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-4 border-b bg-gray-50">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                        <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                                <span class="text-gray-900 font-medium">일반대학원</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                                <span class="text-gray-900 font-medium">일반대학원</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                                <span class="text-gray-900 font-medium">-</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                                <span class="text-gray-900 font-medium">${student?.department || '-'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                                <span class="text-gray-900 font-medium">${proposal.degreeType}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                                <span class="text-gray-900 font-medium">${student?.status === 'active' ? '재학' : '휴학'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학번:</span>
+                                <span class="text-gray-900 font-medium">${student?.studentNumber || '-'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">성명:</span>
+                                <span class="text-gray-900 font-medium">${student?.name || '-'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                                <span class="text-gray-900 font-medium">
+                                    ${assignment && assignment.mainAdvisor ? `${assignment.mainAdvisor.name} (주)` : '-'}${assignment && assignment.coAdvisors.length > 0 ? `, ${assignment.coAdvisors.map(c => `${c.name} (부)`).join(', ')}` : ''}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <h1 class="text-2xl font-bold text-gray-900">${proposal.title}</h1>
             </div>
 
-            <!-- 학생 정보 -->
-            <div class="px-8 py-6 border-b border-gray-200 bg-gray-50">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">학생 정보</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학번:</span>
-                        <span class="text-gray-900">${student?.studentNumber}</span>
-                    </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">성명:</span>
-                        <span class="text-gray-900">${student?.name}</span>
-                    </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학과:</span>
-                        <span class="text-gray-900">${student?.department}</span>
-                    </div>
-                    <div class="flex">
-                        <span class="w-24 text-gray-600 font-medium">학년:</span>
-                        <span class="text-gray-900">${student?.grade}</span>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 연구계획서 내용 -->
+            <!-- 연구계획서 정보 -->
             <div class="px-8 py-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서 정보</h2>
 
                 <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 목적
-                        </label>
-                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 제목</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <p class="text-gray-900 font-medium">${proposal.title}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 목적</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 필요성
-                        </label>
-                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 필요성</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                            연구 문제 및 연구 방법
-                        </label>
-                        <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 문제 및 연구 방법</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
                         </div>
                     </div>
 
                     ${proposal.desiredAdvisor ? `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                                희망 지도교수 (참고용)
-                            </label>
-                            <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</label>
+                            <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
                                 <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
                             </div>
                         </div>
                     ` : ''}
                 </div>
 
-                <!-- 연구계획서 출력 버튼 -->
+                <!-- 연구계획서 양식 불러오기 버튼 -->
                 <div class="mt-6 flex justify-end">
                     <button onclick="loadProposalForm('${proposal.id}')"
-                            class="px-6 py-3 bg-[#009DE8] text-white rounded-lg hover:bg-[#0087c9] flex items-center gap-2">
+                            class="px-6 py-3 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] flex items-center gap-2 transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                         </svg>
-                        연구계획서 출력하기
+                        연구계획서 양식 불러오기
                     </button>
                 </div>
             </div>
@@ -3635,50 +3643,57 @@ function viewProposalDetail(proposalId) {
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">지도교수 배정 현황</h2>
 
                 ${assignment ? `
-                    <div class="space-y-3">
-                        <div class="flex items-center">
-                            <span class="text-gray-600 font-medium" style="min-width: 100px;">지도교수:</span>
-                            <span class="text-gray-900">
-                                ${assignment.mainAdvisor
-                                    ? `${assignment.mainAdvisor.name} ${assignment.mainAdvisor.department}`
-                                    : `<span class="text-gray-500">미배정</span>`
-                                }
-                            </span>
-                        </div>
-
-                        <div class="flex items-center">
-                            <span class="text-gray-600 font-medium" style="min-width: 100px;">부지도교수:</span>
-                            <span class="text-gray-900">
-                                ${assignment.coAdvisors && assignment.coAdvisors.length > 0
-                                    ? assignment.coAdvisors.map(c => `${c.name} ${c.department}`).join(', ')
-                                    : `<span class="text-gray-500">미배정</span>`
-                                }
-                            </span>
+                    <div class="bg-white rounded-lg border border-gray-200 p-4">
+                        <div class="grid grid-cols-2 gap-6">
+                            <div class="info-row">
+                                <div class="info-label">지도교수</div>
+                                <div class="info-value">
+                                    ${assignment.mainAdvisor
+                                        ? `${assignment.mainAdvisor.name} (${assignment.mainAdvisor.department})`
+                                        : `<span class="text-gray-500">미배정</span>`
+                                    }
+                                </div>
+                            </div>
+                            <div class="info-row">
+                                <div class="info-label">부지도교수</div>
+                                <div class="info-value">
+                                    ${assignment.coAdvisors && assignment.coAdvisors.length > 0
+                                        ? assignment.coAdvisors.map(c => `${c.name} (${c.department})`).join(', ')
+                                        : `<span class="text-gray-500">미배정</span>`
+                                    }
+                                </div>
+                            </div>
                         </div>
                     </div>
                 ` : `
-                    <p class="text-gray-500 text-center py-8">지도교수가 배정되지 않았습니다.</p>
-                `}
-
-                <!-- 안내 메시지 -->
-                <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4">
-                    <div class="flex">
-                        <svg class="w-5 h-5 text-blue-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                            <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-                        </svg>
-                        <div class="text-sm text-blue-700">
-                            <p>지도교수 배정은 학교 시스템에서 관리됩니다.</p>
-                            <p class="mt-1">이 화면은 조회 전용이며, 배정 데이터는 학교 시스템에서 자동으로 불러옵니다.</p>
-                        </div>
+                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
+                        <p class="text-gray-500">지도교수가 배정되지 않았습니다.</p>
                     </div>
-                </div>
+                `}
             </div>
         </div>
     `;
 
-    // 콘텐츠 영역 업데이트
-    document.getElementById('content-area').innerHTML = detailView;
-    document.getElementById('view-title').textContent = '연구계획서 상세';
+    // 콘텐츠 영역 업데이트 (admin-v3는 advisor-assignment-content 사용)
+    let contentArea = document.getElementById('advisor-assignment-content');
+
+    // admin-dashboard.html의 경우 content-area 사용
+    if (!contentArea) {
+        contentArea = document.getElementById('content-area');
+    }
+
+    if (contentArea) {
+        contentArea.innerHTML = detailView;
+    } else {
+        console.error('콘텐츠 영역을 찾을 수 없습니다.');
+        return;
+    }
+
+    // view-title이 있는 경우에만 업데이트 (admin-dashboard.html용)
+    const viewTitle = document.getElementById('view-title');
+    if (viewTitle) {
+        viewTitle.textContent = '연구계획서 상세';
+    }
 }
 
 // ==============================================
@@ -5595,3 +5610,258 @@ window.deleteStageType = (id) => {
 };
 
 console.log('✅ 단계 유형 관리 함수 로드 완료');
+
+// ========== 최종 논문 제목 등록 관련 함수 ==========
+
+/**
+ * 최종 논문 제목 등록 검색 함수
+ * 11개 검색 필드를 사용하여 제목 변경 요청 목록을 필터링
+ */
+function searchTitleChangeRequests() {
+    // 검색 필드 값 수집
+    const year = document.getElementById('title-search-year')?.value || '';
+    const semester = document.getElementById('title-search-semester')?.value || '';
+    const collegeType = document.getElementById('title-search-college-type')?.value || '';
+    const college = document.getElementById('title-search-college')?.value || '';
+    const faculty = document.getElementById('title-search-faculty')?.value || '';
+    const major = document.getElementById('title-search-major')?.value || '';
+    const degree = document.getElementById('title-search-degree')?.value || '';
+    const status = document.getElementById('title-search-status')?.value || '';
+    const studentId = document.getElementById('title-search-student-id')?.value.trim() || '';
+    const studentName = document.getElementById('title-search-student-name')?.value.trim() || '';
+    const advisorName = document.getElementById('title-search-advisor')?.value.trim() || '';
+
+    // 데이터 필터링
+    let filtered = appData.titleChangeRequests || [];
+
+    if (year) {
+        filtered = filtered.filter(item => (item.year || '2025') === year);
+    }
+    if (semester) {
+        filtered = filtered.filter(item => (item.semester || '1') === semester);
+    }
+    if (collegeType) {
+        filtered = filtered.filter(item => (item.collegeType || '대학원') === collegeType);
+    }
+    if (college) {
+        filtered = filtered.filter(item => (item.graduate || item.college || '') === college);
+    }
+    if (faculty) {
+        filtered = filtered.filter(item => (item.faculty || '') === faculty);
+    }
+    if (major) {
+        filtered = filtered.filter(item => (item.major || '').includes(major));
+    }
+    if (degree) {
+        filtered = filtered.filter(item => (item.degree || '').includes(degree));
+    }
+    if (status) {
+        filtered = filtered.filter(item => (item.status || '재학') === status);
+    }
+    if (studentId) {
+        filtered = filtered.filter(item => (item.studentId || '').includes(studentId));
+    }
+    if (studentName) {
+        filtered = filtered.filter(item => (item.studentName || '').includes(studentName));
+    }
+    if (advisorName) {
+        filtered = filtered.filter(item => {
+            const advisor = item.advisorName || item.professor || '';
+            return advisor.includes(advisorName);
+        });
+    }
+
+    // 결과 표시
+    if (filtered.length === 0) {
+        showNotification('검색 결과가 없습니다.', 'warning');
+    } else {
+        showNotification(`${filtered.length}건의 데이터를 조회했습니다.`, 'success');
+    }
+
+    // 뷰 새로고침 (필터링된 데이터로)
+    const originalData = appData.titleChangeRequests;
+    appData.titleChangeRequests = filtered;
+    switchView('titleChangeRequests');
+    appData.titleChangeRequests = originalData; // 원본 데이터 복원
+}
+
+/**
+ * 제목 등록 상세 화면 표시 (학위 논문 심사와 동일한 구조)
+ */
+function showTitleChangeDetail(id) {
+    // 데이터 찾기
+    const data = appData.titleChangeRequests.find(item => item.id === id);
+
+    if (!data) {
+        showNotification('해당 데이터를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // 목록 화면 숨기기
+    const listView = document.getElementById('title-change-list-view');
+    if (listView) {
+        listView.style.display = 'none';
+    }
+
+    // 상세 화면 생성
+    const detailScreen = document.createElement('div');
+    detailScreen.id = 'title-change-detail-screen';
+    detailScreen.className = 'fixed inset-0 bg-white z-50 overflow-auto';
+
+    detailScreen.innerHTML = `
+        <div class="min-h-screen">
+            <!-- 헤더 (목록으로 돌아가기 버튼) -->
+            <div class="bg-white border-b" style="padding: 12px 24px;">
+                <button onclick="closeTitleChangeDetail()" class="back-to-list-btn flex items-center gap-2 text-gray-700 hover:text-gray-900 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+            </div>
+
+            <!-- 상세 내용 -->
+            <div class="max-w-6xl mx-auto p-6">
+                <!-- 학생 정보 카드 -->
+                <div class="bg-white rounded-lg shadow-md mb-6">
+                    <div class="px-6 py-4 border-b bg-gray-50">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                        <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                                <span class="text-gray-900 font-medium">${data.collegeType || '일반대학원'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                                <span class="text-gray-900 font-medium">${data.graduate || '일반대학원'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                                <span class="text-gray-900 font-medium">${data.faculty || '-'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                                <span class="text-gray-900 font-medium">${data.major}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                                <span class="text-gray-900 font-medium">${data.degree}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                                <span class="text-gray-900 font-medium">${data.status || '재학'}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학번:</span>
+                                <span class="text-gray-900 font-medium">${data.studentId}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">성명:</span>
+                                <span class="text-gray-900 font-medium">${data.studentName}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                                <span class="text-gray-900 font-medium">${data.advisorName || data.professor || '-'}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 논문 정보 카드 -->
+                <div class="bg-white rounded-lg shadow-md mb-6">
+                    <div class="px-6 py-4 bg-white">
+                        <h4 class="text-sm font-semibold text-gray-700 mb-3">논문 정보</h4>
+                        <div class="grid grid-cols-3 gap-x-6 gap-y-3 text-sm">
+                            <div class="col-span-3 flex gap-2 items-center">
+                                <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
+                                <span class="text-gray-900 font-medium flex-1">${data.currentTitle}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">학년도/학기:</span>
+                                <span class="text-gray-900 font-medium">${data.year || '2025'}학년도 ${data.semester || '1'}학기</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">제출일:</span>
+                                <span class="text-gray-900 font-medium">${data.submitDate || data.requestDate}</span>
+                            </div>
+                            <div class="flex gap-2">
+                                <span class="text-gray-600 min-w-[80px]">상태:</span>
+                                <span class="px-2 py-1 text-xs rounded-full ${getStatusBadgeClass(data.requestStatus || data.status)}">
+                                    ${data.requestStatus || data.status}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                ${data.changeHistory && data.changeHistory.length > 0 ? `
+                    <!-- 제목 변경 이력 카드 -->
+                    <div class="bg-white rounded-lg shadow-md">
+                        <div class="px-6 py-4 bg-white">
+                            <h4 class="text-sm font-semibold text-gray-700 mb-3">제목 변경 이력</h4>
+                            <div class="space-y-3">
+                                ${data.changeHistory.map((history, index) => `
+                                    <div class="bg-gray-50 rounded-lg p-3 border-l-4 border-blue-500">
+                                        <div class="text-xs text-gray-500 mb-1">[${index + 1}차] ${history.date}</div>
+                                        <div class="text-sm text-gray-700 mb-1">
+                                            <span class="font-medium">이전 제목:</span> ${history.previousTitle}
+                                        </div>
+                                        <div class="text-sm text-gray-600">
+                                            <span class="font-medium">변경 사유:</span> ${history.reason}
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(detailScreen);
+}
+
+/**
+ * 제목 등록 상세 화면 닫기
+ */
+function closeTitleChangeDetail() {
+    const detailScreen = document.getElementById('title-change-detail-screen');
+    if (detailScreen) {
+        detailScreen.remove();
+    }
+
+    // 목록 화면 다시 표시
+    const listView = document.getElementById('title-change-list-view');
+    if (listView) {
+        listView.style.display = 'block';
+    }
+}
+
+window.showTitleChangeDetail = showTitleChangeDetail;
+window.closeTitleChangeDetail = closeTitleChangeDetail;
+
+
+/**
+ * 상태 배지 클래스 반환
+ */
+function getStatusBadgeClass(status) {
+    if (!status) return 'bg-gray-100 text-gray-800';
+
+    switch(status) {
+        case '승인':
+            return 'bg-green-100 text-green-800';
+        case '반려':
+            return 'bg-red-100 text-red-800';
+        case '피드백 대기':
+        case '대기':
+        default:
+            return 'bg-yellow-100 text-yellow-800';
+    }
+}
+
+console.log('✅ 최종 논문 제목 등록 함수 로드 완료');
+
+// 지도교수 배정 관련 함수 전역 export
+window.viewProposalDetail = viewProposalDetail;
+window.loadProposalForm = loadProposalForm;

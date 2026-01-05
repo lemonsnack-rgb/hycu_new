@@ -5348,31 +5348,68 @@ function backToTitleChangeList() {
 }
 
 /**
- * 상세 화면 렌더링 (학생용 화면과 동일한 스타일)
+ * 상세 화면 렌더링 (학생용 화면과 동일한 스타일, readonly)
  */
 function renderTitleChangeDetail(request) {
     const detailView = document.getElementById('title-change-detail-view');
     if (!detailView) return;
 
     detailView.innerHTML = `
-        <!-- 논문 제목 상세 -->
-        <div class="card">
-            <div class="card-header">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <h2 style="font-size: 1.5rem; font-weight: 700; color: #1F2937;">최종 논문 제목 수정</h2>
-                        <p style="font-size: 0.875rem; color: #6B7280; margin-top: 0.25rem;">
-                            ${request.studentName} (${request.studentId}) - ${request.major} ${request.degree}
-                        </p>
-                    </div>
-                    <button onclick="backToTitleChangeList()" class="btn btn-secondary">
-                        <svg class="w-4 h-4 inline-block mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        목록으로
-                    </button>
+        <!-- 목록으로 돌아가기 버튼 -->
+        <div class="bg-white border-b" style="padding: 12px 24px;">
+            <button onclick="backToTitleChangeList()" class="text-gray-600 hover:text-gray-800 flex items-center gap-2 text-sm">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                목록으로 돌아가기
+            </button>
+        </div>
+
+        <!-- 학생 정보 카드 (9개 항목, 회색 배경) -->
+        <div class="bg-gray-50 p-6 border-b">
+            <h4 class="text-sm font-bold text-gray-800 mb-4">학생 정보</h4>
+            <div class="grid grid-cols-2 gap-x-8 gap-y-3">
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">학번:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.studentId || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">성명:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.studentName || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">대학구분:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.collegeType || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">계열/대학원:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.graduate || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">학부(과)전공:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.faculty || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">학과/전공:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.major || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">학위과정:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.degree || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">학적상태:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.status || '-'}</span>
+                </div>
+                <div class="flex">
+                    <span class="text-sm text-gray-600 w-32">지도교수:</span>
+                    <span class="text-sm font-semibold text-gray-800">${request.advisorName || '-'}</span>
                 </div>
             </div>
+        </div>
+
+        <!-- 논문 제목 카드 -->
+        <div class="card">
             <div class="card-body">
                 <form id="admin-title-form" style="max-width: 800px;">
                     <div style="margin-bottom: 1.5rem;">
@@ -5388,27 +5425,6 @@ function renderTitleChangeDetail(request) {
                         <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
                             예: 인공지능 기반 추천 시스템의 효율성 향상에 관한 연구
                         </p>
-                    </div>
-
-                    <div style="background: #EFF6FF; border: 1px solid #DBEAFE; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                        <div style="display: flex; align-items: start;">
-                            <svg style="width: 1.25rem; height: 1.25rem; color: #3B82F6; flex-shrink: 0; margin-right: 0.75rem; margin-top: 0.125rem;"
-                                 fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            <div style="font-size: 0.875rem; color: #1E40AF;">
-                                <p style="font-weight: 600; margin-bottom: 0.5rem;">등록 정보</p>
-                                <p>등록일: ${request.registeredDate || request.requestDate || '-'}</p>
-                                ${request.status ? `<p class="mt-1">상태: ${request.status}</p>` : ''}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: flex; justify-content: center; gap: 1rem;">
-                        <button type="button" onclick="backToTitleChangeList()" class="btn btn-secondary" style="min-width: 120px;">
-                            목록으로
-                        </button>
                     </div>
                 </form>
             </div>

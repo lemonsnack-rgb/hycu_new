@@ -146,8 +146,11 @@ function showGuidancePairDetail(pairId) {
         return;
     }
 
-    // 15주차 구조 생성 (학생용과 동일)
-    const weeks = generateAdminWeeks(plansData.plans);
+    // totalWeeks 기본값 15로 설정 (데이터에 없으면)
+    const totalWeeks = plansData.totalWeeks || 15;
+
+    // 주차 구조 생성
+    const weeks = generateAdminWeeks(plansData.plans, totalWeeks);
 
     const contentArea = document.getElementById('weekly-guidance-content');
     if (!contentArea) return;
@@ -171,23 +174,38 @@ function showGuidancePairDetail(pairId) {
 
         <!-- 학기 선택 카드 -->
         <div class="bg-blue-50 rounded-lg p-6 mb-6">
-            <div class="flex items-center gap-4 mb-4">
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">학년도</label>
-                    <select id="admin-select-year" onchange="changeAdminSemesterView()"
-                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
-                        <option value="2025" selected>2025학년도</option>
-                        <option value="2024">2024학년도</option>
-                    </select>
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-4">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">학년도</label>
+                        <select id="admin-select-year" onchange="changeAdminSemesterView()"
+                                class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                            <option value="2025" selected>2025학년도</option>
+                            <option value="2024">2024학년도</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">학기</label>
+                        <select id="admin-select-semester" onchange="changeAdminSemesterView()"
+                                class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                            <option value="1" selected>1학기</option>
+                            <option value="2">2학기</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <div class="bg-white px-4 py-2 rounded border border-gray-300">
+                            <span class="text-xs text-gray-600">현재 총 주차:</span>
+                            <span class="text-sm font-bold text-gray-800 ml-1">${totalWeeks}주</span>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">학기</label>
-                    <select id="admin-select-semester" onchange="changeAdminSemesterView()"
-                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
-                        <option value="1" selected>1학기</option>
-                        <option value="2">2학기</option>
-                    </select>
-                </div>
+                <button onclick="resetAdminTotalWeeks(${currentPairId})"
+                        class="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+                    </svg>
+                    주차 초기화
+                </button>
             </div>
         </div>
 
@@ -215,18 +233,22 @@ function showGuidancePairDetail(pairId) {
                     <span class="text-xs text-gray-600">학기:</span>
                     <span class="text-sm font-semibold text-gray-800 ml-2">${pair.semester}</span>
                 </div>
+                <div>
+                    <span class="text-xs text-gray-600">총 주차:</span>
+                    <span class="text-sm font-semibold text-gray-800 ml-2">${totalWeeks}주</span>
+                </div>
             </div>
         </div>
 
-        <!-- 주차별 지도 계획 및 실적 (항상 15주차 표시) -->
+        <!-- 주차별 지도 계획 및 실적 (totalWeeks에 따라 가변) -->
         ${renderAdminWeeklyCards(weeks)}
     `;
 }
 
-// 15주차 구조 생성 (학생용과 동일)
-function generateAdminWeeks(plans) {
+// 주차 구조 생성 (totalWeeks 기반)
+function generateAdminWeeks(plans, totalWeeks = 15) {
     const weeks = [];
-    for (let i = 1; i <= 15; i++) {
+    for (let i = 1; i <= totalWeeks; i++) {
         // 해당 주차의 모든 계획/실적 찾기
         const weekPlans = plans.filter(p => p.week === i);
 
@@ -771,6 +793,91 @@ function changeAdminSemesterView() {
     }
 }
 
+// 총 주차 초기화 함수
+function resetAdminTotalWeeks(pairId) {
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+    if (!plansData) return;
+
+    const currentWeeks = plansData.totalWeeks || 15;
+
+    // 주차 선택 옵션 생성 (1~15)
+    const weekOptions = Array.from({ length: 15 }, (_, i) => i + 1)
+        .map(week => `<option value="${week}" ${week === currentWeeks ? 'selected' : ''}>${week}주</option>`)
+        .join('');
+
+    const modalContent = `
+        <form id="reset-weeks-form" class="space-y-4">
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div class="flex">
+                    <svg class="h-5 w-5 text-yellow-400 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                    </svg>
+                    <div>
+                        <h3 class="text-sm font-medium text-yellow-800">주의사항</h3>
+                        <div class="mt-2 text-sm text-yellow-700">
+                            <p>• 현재 주차보다 작은 값으로 변경 시, 해당 주차 이후의 모든 계획 및 실적 데이터가 <strong>영구 삭제</strong>됩니다.</p>
+                            <p>• 현재 주차보다 큰 값으로 변경 시, 빈 주차가 추가됩니다.</p>
+                            <p>• <strong>이 작업은 되돌릴 수 없습니다.</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">새로운 총 주차 선택 *</label>
+                <select name="newTotalWeeks" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
+                    ${weekOptions}
+                </select>
+                <p class="text-xs text-gray-500 mt-1">현재: ${currentWeeks}주</p>
+            </div>
+
+            <div class="bg-blue-50 p-3 rounded-lg">
+                <p class="text-xs text-blue-800">
+                    💡 주차 수를 변경하면 해당 학기의 주차별 데이터가 재설정됩니다.
+                </p>
+            </div>
+        </form>
+    `;
+
+    openModal('주차 초기화', modalContent, '초기화 실행', () => executeResetWeeks(pairId), true);
+}
+
+// 주차 초기화 실행
+function executeResetWeeks(pairId) {
+    const form = document.getElementById('reset-weeks-form');
+    const formData = new FormData(form);
+    const newTotalWeeks = parseInt(formData.get('newTotalWeeks'));
+
+    if (!newTotalWeeks || newTotalWeeks < 1 || newTotalWeeks > 15) {
+        showAlert('올바른 주차 수를 선택해주세요 (1~15주)');
+        return;
+    }
+
+    const plansData = appData.weeklyGuidance.weeklyPlans[pairId];
+    const currentWeeks = plansData.totalWeeks || 15;
+    const totalPlansCount = plansData.plans.length;
+
+    // 최종 확인 (모든 데이터 삭제 경고)
+    if (totalPlansCount > 0) {
+        if (!confirm(`⚠️ 주차 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${totalPlansCount}건이 삭제됩니다.\n새로운 ${newTotalWeeks}주 구조로 초기화됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`)) {
+            return;
+        }
+    }
+
+    // 모든 계획 및 실적 삭제
+    plansData.plans = [];
+
+    // totalWeeks 업데이트
+    plansData.totalWeeks = newTotalWeeks;
+
+    showAlert(`총 주차가 ${newTotalWeeks}주로 초기화되었습니다.\n모든 계획 및 실적이 삭제되었습니다.`);
+
+    closeModal();
+    setTimeout(() => {
+        showGuidancePairDetail(pairId);
+    }, 100);
+}
+
 // 전역으로 export
 window.initWeeklyGuidance = initWeeklyGuidance;
 window.showGuidancePairsList = showGuidancePairsList;
@@ -785,3 +892,5 @@ window.resetGuidancePairsFilter = resetGuidancePairsFilter;
 window.toggleSelectAllPairs = toggleSelectAllPairs;
 window.sendNotificationToSelectedPairs = sendNotificationToSelectedPairs;
 window.changeAdminSemesterView = changeAdminSemesterView;
+window.resetAdminTotalWeeks = resetAdminTotalWeeks;
+window.executeResetWeeks = executeResetWeeks;
