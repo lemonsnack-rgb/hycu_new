@@ -1000,6 +1000,14 @@
                 container.innerHTML = html;
                 console.log('✅ Container innerHTML set');
 
+                // 공지사항 관리 화면인 경우 DOM 요소 즉시 확인
+                if (viewName === 'noticeManagement') {
+                    console.log('🔍 Verifying noticeManagement DOM elements after HTML injection:');
+                    console.log('  - notice-list-view:', !!document.getElementById('notice-list-view'));
+                    console.log('  - notice-table-body:', !!document.getElementById('notice-table-body'));
+                    console.log('  - filter-notice-title:', !!document.getElementById('filter-notice-title'));
+                }
+
                 // 특정 뷰에 대한 후처리
                 if (viewName === 'stageManagement' && typeof renderStageManagementContent === 'function') {
                     setTimeout(() => {
@@ -1019,8 +1027,19 @@
                 }
 
                 // 공지사항 관리 화면 후처리
-                if (viewName === 'noticeManagement' && typeof renderNoticeList === 'function') {
-                    setTimeout(() => renderNoticeList(), 0);
+                console.log('🔍 Checking noticeManagement post-processing...');
+                console.log('🔍 viewName:', viewName);
+                console.log('🔍 typeof renderNoticeList:', typeof renderNoticeList);
+                if (viewName === 'noticeManagement') {
+                    if (typeof renderNoticeList === 'function') {
+                        console.log('✅ Calling renderNoticeList...');
+                        setTimeout(() => {
+                            console.log('⏰ setTimeout executed for renderNoticeList');
+                            renderNoticeList();
+                        }, 100); // 100ms로 변경하여 DOM이 완전히 렌더링되도록
+                    } else {
+                        console.error('❌ renderNoticeList is not a function:', typeof renderNoticeList);
+                    }
                 }
             } else {
                 container.innerHTML = `<div class="p-8"><h2 class="text-2xl font-bold text-gray-800">${viewName}</h2><p class="mt-4 text-gray-600">이 화면은 준비 중입니다.</p></div>`;

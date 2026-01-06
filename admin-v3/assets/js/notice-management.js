@@ -52,11 +52,21 @@ function filterNoticeList() {
 function renderNoticeTable(data) {
     console.log('📋 테이블 렌더링 시작, 데이터:', data.length, '건');
 
+    // DOM 요소 체크
     const tbody = document.getElementById('notice-table-body');
     const countElement = document.getElementById('notice-count-display');
 
+    console.log('🔍 notice-table-body element:', tbody);
+    console.log('🔍 notice-table-body exists:', !!tbody);
+    console.log('🔍 notice-count-display element:', countElement);
+    console.log('🔍 notice-count-display exists:', !!countElement);
+
     if (!tbody) {
         console.error('❌ notice-table-body 요소를 찾을 수 없습니다');
+        console.log('🔍 전체 DOM 상태:');
+        console.log('  - notice-list-view:', document.getElementById('notice-list-view'));
+        console.log('  - notice-detail-view:', document.getElementById('notice-detail-view'));
+        console.log('  - notice-management-content:', document.getElementById('notice-management-content'));
         return;
     }
 
