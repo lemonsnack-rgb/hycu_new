@@ -4831,3 +4831,344 @@ views.stageTypeCreate = (id = null) => {
 
 // 별칭 추가
 views.stageTypeEdit = (id) => views.stageTypeCreate(id);
+
+// ==================== 논문 안내 화면들 (정적 콘텐츠) ====================
+
+// ========== 공지사항 ==========
+views.notice = () => `
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-bold text-gray-800">공지사항</h3>
+        </div>
+        <div class="p-8">
+            <div class="prose max-w-none">
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">2025학년도 1학기 논문 지도 일정 안내</h4>
+                    <p class="text-sm text-gray-600 mb-2">등록일: 2025-01-02</p>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>2025학년도 1학기 논문 지도 일정을 다음과 같이 안내드립니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>연구계획서 제출: 2025년 3월 1일 ~ 3월 15일</li>
+                            <li>중간논문 제출: 2025년 5월 1일 ~ 5월 31일</li>
+                            <li>최종논문 제출: 2025년 6월 1일 ~ 6월 30일</li>
+                            <li>학술지 심사 신청: 상시 접수</li>
+                        </ul>
+                        <p class="text-red-600">※ 각 단계별 제출 기한을 반드시 준수하시기 바랍니다.</p>
+                    </div>
+                </div>
+
+                <div class="border-t pt-8 mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">논문 심사위원 배정 안내</h4>
+                    <p class="text-sm text-gray-600 mb-2">등록일: 2024-12-15</p>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>논문 심사위원 배정 절차가 변경되었습니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>심사위원 배정은 관리자가 일괄 배정합니다</li>
+                            <li>배정 후 학생에게 자동으로 통보됩니다</li>
+                            <li>심사위원 변경 요청은 학과 사무실로 문의하시기 바랍니다</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="border-t pt-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">논문 제출 시 유의사항</h4>
+                    <p class="text-sm text-gray-600 mb-2">등록일: 2024-11-20</p>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>논문 제출 시 다음 사항을 반드시 확인하시기 바랍니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>논문 파일은 PDF 형식으로 제출</li>
+                            <li>파일명: 학번_성명_논문종류.pdf (예: 2024001_홍길동_연구계획서.pdf)</li>
+                            <li>논문 표지에 학교 로고 및 학과명 필수 기재</li>
+                            <li>표절 검사 결과 제출 필수 (최종논문만 해당)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+// ========== 연구윤리 ==========
+views.ethics = () => `
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-bold text-gray-800">연구윤리 지침</h3>
+        </div>
+        <div class="p-8">
+            <div class="prose max-w-none">
+                <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
+                    <h4 class="text-base font-bold text-red-800 mb-3">연구윤리 준수 의무</h4>
+                    <p class="text-sm text-red-700">
+                        모든 학생은 연구 수행 및 논문 작성 시 연구윤리 지침을 반드시 준수해야 하며,
+                        위반 시 학칙에 따라 처벌을 받을 수 있습니다.
+                    </p>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">1. 표절 금지</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>타인의 연구 결과나 아이디어를 적절한 인용 없이 사용하는 행위를 금지합니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>타인의 저작물을 인용할 때는 반드시 출처를 명시해야 합니다</li>
+                            <li>인용 표기는 본교의 논문 작성 지침을 따라야 합니다</li>
+                            <li>자기표절(이전에 제출했던 자신의 논문 재사용)도 금지됩니다</li>
+                            <li>최종논문 제출 시 표절 검사 결과를 함께 제출해야 합니다</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">2. 연구 데이터 조작 금지</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>연구 데이터를 조작, 변조, 위조하는 행위를 엄격히 금지합니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>실험 데이터는 사실대로 기록하고 보관해야 합니다</li>
+                            <li>연구 결과를 왜곡하거나 임의로 변경할 수 없습니다</li>
+                            <li>통계 분석은 적절한 방법을 사용해야 합니다</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">3. 중복 게재 금지</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>동일한 연구 결과를 여러 곳에 중복으로 게재하는 행위를 금지합니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>이미 발표된 논문을 다른 학술지에 투고할 수 없습니다</li>
+                            <li>학위논문과 학술지 논문은 별도로 간주됩니다</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">4. 저자 표시 원칙</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>연구에 실질적으로 기여한 사람만 저자로 표시해야 합니다.</p>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>명예 저자, 유령 저자 표기를 금지합니다</li>
+                            <li>지도교수의 기여도에 따라 공동 저자로 표기할 수 있습니다</li>
+                            <li>저자 순서는 기여도에 따라 결정합니다</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="border-t pt-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">5. 연구윤리 위반 시 조치</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p>연구윤리 위반이 확인될 경우 다음과 같은 조치가 취해집니다.</p>
+                        <ul class="list-disc pl-5 space-y-2 text-red-600">
+                            <li>논문 제출 불가 및 학위 취소</li>
+                            <li>학칙에 따른 징계 처분</li>
+                            <li>연구비 지원 중단</li>
+                            <li>학교 홈페이지에 위반 사실 공지</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+// ========== 논문일정 ==========
+views.schedule = () => `
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-bold text-gray-800">논문 제출 일정</h3>
+        </div>
+        <div class="p-8">
+            <div class="prose max-w-none">
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+                    <h4 class="text-base font-bold text-blue-800 mb-3">2025학년도 논문 제출 일정</h4>
+                    <p class="text-sm text-blue-700">
+                        각 학기별 논문 제출 일정을 안내드립니다.
+                        제출 기한을 반드시 준수하시기 바랍니다.
+                    </p>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">1학기 일정 (2025년 봄학기)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">구분</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">제출 기간</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">심사 기간</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">비고</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-800">연구계획서</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.03.01 ~ 03.15</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.03.16 ~ 03.31</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">심사위원 배정 후 2주</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-800">중간논문</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.05.01 ~ 05.31</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.06.01 ~ 06.15</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">연구계획서 승인 후</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-800">최종논문</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.06.01 ~ 06.30</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.07.01 ~ 07.31</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">중간논문 승인 후</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">2학기 일정 (2025년 가을학기)</h4>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full border border-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">구분</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">제출 기간</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">심사 기간</th>
+                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">비고</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200">
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-800">연구계획서</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.09.01 ~ 09.15</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.09.16 ~ 09.30</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">심사위원 배정 후 2주</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-800">중간논문</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.11.01 ~ 11.30</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.12.01 ~ 12.15</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">연구계획서 승인 후</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-3 text-sm text-gray-800">최종논문</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2025.12.01 ~ 12.31</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">2026.01.01 ~ 01.31</td>
+                                    <td class="px-4 py-3 text-sm text-gray-600">중간논문 승인 후</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="border-t pt-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">제출 시 유의사항</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>제출 기한은 마감일 23:59까지입니다</li>
+                            <li>시스템 오류를 대비하여 마감일 전에 미리 제출하시기 바랍니다</li>
+                            <li>기한 내 미제출 시 다음 학기로 연기됩니다</li>
+                            <li>심사 일정은 심사위원 배정 상황에 따라 변경될 수 있습니다</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
+
+// ========== 논문 지도 절차 ==========
+views.procedure = () => `
+    <div class="bg-white rounded-lg shadow-md">
+        <div class="p-6 border-b">
+            <h3 class="text-lg font-bold text-gray-800">논문 지도 절차</h3>
+        </div>
+        <div class="p-8">
+            <div class="prose max-w-none">
+                <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
+                    <h4 class="text-base font-bold text-green-800 mb-3">논문 지도 전체 프로세스</h4>
+                    <p class="text-sm text-green-700">
+                        학위 취득을 위한 논문 지도 절차를 단계별로 안내드립니다.
+                        각 단계를 순차적으로 완료해야 다음 단계로 진행할 수 있습니다.
+                    </p>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 1. 연구계획서 제출 및 심사</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-gray-800">목적: 연구 주제 및 방법론 확정</p>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>지도교수와 연구 주제 상의</li>
+                            <li>연구계획서 작성 (연구 배경, 목적, 방법론 등)</li>
+                            <li>시스템을 통한 연구계획서 제출</li>
+                            <li>심사위원 배정 (관리자)</li>
+                            <li>심사위원 검토 및 피드백</li>
+                            <li>수정 및 재제출 (필요시)</li>
+                            <li>최종 승인</li>
+                        </ol>
+                        <p class="text-blue-600">※ 승인 후 연구 진행 가능</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 2. 중간논문 제출 및 심사</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-gray-800">목적: 연구 진행 상황 점검 및 방향 조정</p>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>연구 수행 및 데이터 수집</li>
+                            <li>중간 결과 작성</li>
+                            <li>중간논문 제출</li>
+                            <li>심사위원 검토 및 피드백</li>
+                            <li>연구 방향 조정 (필요시)</li>
+                            <li>수정 및 재제출 (필요시)</li>
+                            <li>최종 승인</li>
+                        </ol>
+                        <p class="text-blue-600">※ 석사과정은 중간논문 생략 가능 (학과 규정에 따름)</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 3. 최종논문 제출 및 심사</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-gray-800">목적: 연구 결과 종합 및 학위 취득</p>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>연구 완료 및 논문 작성</li>
+                            <li>표절 검사 실시 (필수)</li>
+                            <li>최종논문 제출</li>
+                            <li>심사위원 정밀 검토</li>
+                            <li>논문 발표 (구두 심사)</li>
+                            <li>질의응답 및 최종 피드백</li>
+                            <li>수정 및 최종 제출</li>
+                            <li>심사 완료 및 학위 취득</li>
+                        </ol>
+                        <p class="text-red-600">※ 표절 검사 결과 15% 이상 시 재작성 필요</p>
+                    </div>
+                </div>
+
+                <div class="mb-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 4. 학술지 심사 (박사과정 필수)</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <p class="font-semibold text-gray-800">목적: 연구 성과 대외 발표</p>
+                        <ol class="list-decimal pl-5 space-y-2">
+                            <li>학술지 논문 작성 (학위논문 기반)</li>
+                            <li>학술지 선정 및 투고</li>
+                            <li>시스템에 학술지 심사 신청</li>
+                            <li>게재 승인 확인서 제출</li>
+                            <li>심사 완료</li>
+                        </ol>
+                        <p class="text-blue-600">※ 박사과정: 학술지 게재 필수 (학과별 상이)</p>
+                        <p class="text-blue-600">※ 석사과정: 학술지 게재 권장</p>
+                    </div>
+                </div>
+
+                <div class="border-t pt-8">
+                    <h4 class="text-base font-bold text-gray-800 mb-4">전체 소요 기간 (평균)</h4>
+                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li>석사과정: 2~3학기 (1년 ~ 1.5년)</li>
+                            <li>박사과정: 5~6학기 (2.5년 ~ 3년)</li>
+                            <li>석박통합: 7~8학기 (3.5년 ~ 4년)</li>
+                        </ul>
+                        <p class="text-gray-600">※ 개인 연구 진행 상황에 따라 차이가 있을 수 있습니다</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+`;
