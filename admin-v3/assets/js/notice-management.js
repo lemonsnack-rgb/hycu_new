@@ -88,7 +88,7 @@ function renderNoticeTable(data) {
         return;
     }
 
-    tbody.innerHTML = data.map((item, index) => {
+    const html = data.map((item, index) => {
         const attachmentIcon = item.hasAttachment
             ? '<i class="fas fa-paperclip text-[#6A0028]"></i>'
             : '<span class="text-gray-400">-</span>';
@@ -103,6 +103,10 @@ function renderNoticeTable(data) {
             </tr>
         `;
     }).join('');
+
+    console.log('✅ 생성된 HTML 길이:', html.length);
+    tbody.innerHTML = html;
+    console.log('✅ tbody.innerHTML 설정 완료, children 개수:', tbody.children.length);
 }
 
 /**
