@@ -370,6 +370,22 @@
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>대리로그인</span>
                         </a>
+                        <a href="#" onclick="showScreen('noticeManagement'); return false;" data-screen="noticeManagement"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>공지사항 관리</span>
+                        </a>
+                        <a href="#" onclick="showScreen('ethicsContentMgmt'); return false;" data-screen="ethicsContentMgmt"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>연구윤리 관리</span>
+                        </a>
+                        <a href="#" onclick="showScreen('scheduleContentMgmt'); return false;" data-screen="scheduleContentMgmt"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>논문일정 관리</span>
+                        </a>
+                        <a href="#" onclick="showScreen('procedureContentMgmt'); return false;" data-screen="procedureContentMgmt"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>논문지도절차 관리</span>
+                        </a>
                     </div>
                 </div>
             </nav>
@@ -832,6 +848,18 @@
                 <div id="process-content"></div>
             </section>
 
+            <section id="ethicsContentMgmt-screen" class="content-screen">
+                <div id="ethicsContentMgmt-content"></div>
+            </section>
+
+            <section id="scheduleContentMgmt-screen" class="content-screen">
+                <div id="scheduleContentMgmt-content"></div>
+            </section>
+
+            <section id="procedureContentMgmt-screen" class="content-screen">
+                <div id="procedureContentMgmt-content"></div>
+            </section>
+
         </main>
         </div> <!-- /layout-v3-main-content -->
     </div> <!-- /layout-v3-container -->
@@ -892,6 +920,7 @@
         // admin_views.js의 views 객체를 사용하여 렌더링
         function renderAdminView(viewName) {
             console.log('🎯 renderAdminView called with viewName:', viewName);
+            console.log('🎯 typeof views:', typeof views);
 
             // thesisReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
             if (viewName === 'thesisReview') {
@@ -946,26 +975,46 @@
                 'board': 'board-content',
                 'ethics': 'ethics-content',
                 'schedule': 'schedule-content',
-                'process': 'process-content'
+                'process': 'process-content',
+                'ethicsContentMgmt': 'ethicsContentMgmt-content',
+                'scheduleContentMgmt': 'scheduleContentMgmt-content',
+                'procedureContentMgmt': 'procedureContentMgmt-content'
             };
 
             const containerId = containerMap[viewName] || 'content-area';
+            console.log('🔍 containerId:', containerId);
             const container = document.getElementById(containerId);
+            console.log('🔍 container:', container);
 
             if (!container) {
-                console.error(`Container not found: ${containerId}`);
+                console.error(`❌ Container not found: ${containerId}`);
                 return;
             }
 
             // views 객체에서 뷰 함수 가져오기
             if (views[viewName]) {
-                container.innerHTML = views[viewName]();
+                console.log('✅ Rendering view:', viewName);
+                const html = views[viewName]();
+                console.log('✅ HTML length:', html.length);
+                container.innerHTML = html;
+                console.log('✅ Container innerHTML set');
 
                 // 특정 뷰에 대한 후처리
                 if (viewName === 'stageManagement' && typeof renderStageManagementContent === 'function') {
                     setTimeout(() => {
                         renderStageManagementContent();
                     }, 0);
+                }
+
+                // 콘텐츠 관리 화면 후처리
+                if (viewName === 'ethicsContentMgmt' && typeof initEthicsContentManagement === 'function') {
+                    setTimeout(() => initEthicsContentManagement(), 0);
+                }
+                if (viewName === 'scheduleContentMgmt' && typeof initScheduleContentManagement === 'function') {
+                    setTimeout(() => initScheduleContentManagement(), 0);
+                }
+                if (viewName === 'procedureContentMgmt' && typeof initProcedureContentManagement === 'function') {
+                    setTimeout(() => initProcedureContentManagement(), 0);
                 }
             } else {
                 container.innerHTML = `<div class="p-8"><h2 class="text-2xl font-bold text-gray-800">${viewName}</h2><p class="mt-4 text-gray-600">이 화면은 준비 중입니다.</p></div>`;
@@ -1000,7 +1049,11 @@
                 'thesisReview': { menu: '논문 심사', submenu: '학위 논문 심사' },
                 'journalReview': { menu: '논문 심사', submenu: '학술지 논문 심사' },
                 'permissionManagement': { menu: '시스템 설정', submenu: '권한 관리' },
-                'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' }
+                'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' },
+                'noticeManagement': { menu: '시스템 설정', submenu: '공지사항 관리' },
+                'ethicsContentMgmt': { menu: '시스템 설정', submenu: '연구윤리 관리' },
+                'scheduleContentMgmt': { menu: '시스템 설정', submenu: '논문일정 관리' },
+                'procedureContentMgmt': { menu: '시스템 설정', submenu: '논문지도절차 관리' }
             };
 
             const breadcrumb = breadcrumbMap[screenId] || { menu: '대시보드', submenu: null };
@@ -1068,9 +1121,11 @@
     <script src="assets/js/exam-schedule-data.js"></script>
     <script src="assets/js/schedule-utils.js"></script>
     <script src="assets/js/exam-schedule.js"></script>
+    <script src="assets/js/content-data.js"></script>
     <script src="assets/js/admin_main.js"></script>
     <script src="assets/js/admin_views.js"></script>
     <script src="assets/js/admin_modals.js"></script>
+    <script src="assets/js/content-management.js"></script>
 
     <!-- Admin Review Scripts -->
     <script src="assets/js/admin_thesis_review.js"></script>
@@ -1184,7 +1239,10 @@
                 'process': 'process-content',
                 'workflowCreateUnified': 'type-management-content',
                 'stageTypeCreate': 'stage-type-management-content',
-                'stageTypeEdit': 'stage-type-management-content'
+                'stageTypeEdit': 'stage-type-management-content',
+                'ethicsContentMgmt': 'ethicsContentMgmt-content',
+                'scheduleContentMgmt': 'scheduleContentMgmt-content',
+                'procedureContentMgmt': 'procedureContentMgmt-content'
             };
 
             const containerId = containerMap[viewName] || 'content-area';

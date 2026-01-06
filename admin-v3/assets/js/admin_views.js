@@ -4841,47 +4841,34 @@ views.notice = () => `
             <h3 class="text-lg font-bold text-gray-800">공지사항</h3>
         </div>
         <div class="p-8">
-            <div class="prose max-w-none">
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">2025학년도 1학기 논문 지도 일정 안내</h4>
-                    <p class="text-sm text-gray-600 mb-2">등록일: 2025-01-02</p>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>2025학년도 1학기 논문 지도 일정을 다음과 같이 안내드립니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>연구계획서 제출: 2025년 3월 1일 ~ 3월 15일</li>
-                            <li>중간논문 제출: 2025년 5월 1일 ~ 5월 31일</li>
-                            <li>최종논문 제출: 2025년 6월 1일 ~ 6월 30일</li>
-                            <li>학술지 심사 신청: 상시 접수</li>
-                        </ul>
-                        <p class="text-red-600">※ 각 단계별 제출 기한을 반드시 준수하시기 바랍니다.</p>
-                    </div>
-                </div>
+            <div class="prose prose-sm max-w-none">
+                <div style="line-height: 1.8; font-size: 14px; color: #333;">
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">2025학년도 1학기 논문 지도 일정 안내</h3>
+                    <p style="margin-bottom: 15px;">2025학년도 1학기 논문 지도 일정을 다음과 같이 안내드립니다.</p>
+                    <ul style="margin-left: 20px; margin-bottom: 20px;">
+                        <li style="margin-bottom: 8px;">연구계획서 제출: 2025년 3월 1일 ~ 3월 15일</li>
+                        <li style="margin-bottom: 8px;">중간논문 제출: 2025년 5월 1일 ~ 5월 31일</li>
+                        <li style="margin-bottom: 8px;">최종논문 제출: 2025년 6월 1일 ~ 6월 30일</li>
+                        <li style="margin-bottom: 8px;">학술지 심사 신청: 상시 접수</li>
+                    </ul>
+                    <p style="margin-bottom: 30px; color: #d32f2f;">※ 각 단계별 제출 기한을 반드시 준수하시기 바랍니다.</p>
 
-                <div class="border-t pt-8 mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">논문 심사위원 배정 안내</h4>
-                    <p class="text-sm text-gray-600 mb-2">등록일: 2024-12-15</p>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>논문 심사위원 배정 절차가 변경되었습니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>심사위원 배정은 관리자가 일괄 배정합니다</li>
-                            <li>배정 후 학생에게 자동으로 통보됩니다</li>
-                            <li>심사위원 변경 요청은 학과 사무실로 문의하시기 바랍니다</li>
-                        </ul>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">논문 심사위원 배정 안내</h3>
+                    <p style="margin-bottom: 15px;">논문 심사위원 배정 절차가 변경되었습니다.</p>
+                    <ul style="margin-left: 20px; margin-bottom: 30px;">
+                        <li style="margin-bottom: 8px;">심사위원 배정은 관리자가 일괄 배정합니다</li>
+                        <li style="margin-bottom: 8px;">배정 후 학생에게 자동으로 통보됩니다</li>
+                        <li style="margin-bottom: 8px;">심사위원 변경 요청은 학과 사무실로 문의하시기 바랍니다</li>
+                    </ul>
 
-                <div class="border-t pt-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">논문 제출 시 유의사항</h4>
-                    <p class="text-sm text-gray-600 mb-2">등록일: 2024-11-20</p>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>논문 제출 시 다음 사항을 반드시 확인하시기 바랍니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>논문 파일은 PDF 형식으로 제출</li>
-                            <li>파일명: 학번_성명_논문종류.pdf (예: 2024001_홍길동_연구계획서.pdf)</li>
-                            <li>논문 표지에 학교 로고 및 학과명 필수 기재</li>
-                            <li>표절 검사 결과 제출 필수 (최종논문만 해당)</li>
-                        </ul>
-                    </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">논문 제출 시 유의사항</h3>
+                    <p style="margin-bottom: 15px;">논문 제출 시 다음 사항을 반드시 확인하시기 바랍니다.</p>
+                    <ul style="margin-left: 20px;">
+                        <li style="margin-bottom: 8px;">논문 파일은 PDF 형식으로 제출</li>
+                        <li style="margin-bottom: 8px;">파일명: 학번_성명_논문종류.pdf (예: 2024001_홍길동_연구계획서.pdf)</li>
+                        <li style="margin-bottom: 8px;">논문 표지에 학교 로고 및 학과명 필수 기재</li>
+                        <li style="margin-bottom: 8px;">표절 검사 결과 제출 필수 (최종논문만 해당)</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -4895,74 +4882,48 @@ views.ethics = () => `
             <h3 class="text-lg font-bold text-gray-800">연구윤리 지침</h3>
         </div>
         <div class="p-8">
-            <div class="prose max-w-none">
-                <div class="bg-red-50 border border-red-200 rounded-lg p-6 mb-8">
-                    <h4 class="text-base font-bold text-red-800 mb-3">연구윤리 준수 의무</h4>
-                    <p class="text-sm text-red-700">
-                        모든 학생은 연구 수행 및 논문 작성 시 연구윤리 지침을 반드시 준수해야 하며,
-                        위반 시 학칙에 따라 처벌을 받을 수 있습니다.
-                    </p>
-                </div>
+            <div class="prose prose-sm max-w-none">
+                <div style="line-height: 1.8; font-size: 14px; color: #333;">
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">1. 표절 금지</h3>
+                    <p style="margin-bottom: 15px;">타인의 연구 결과나 아이디어를 적절한 인용 없이 사용하는 행위를 금지합니다.</p>
+                    <ul style="margin-left: 20px; margin-bottom: 30px;">
+                        <li style="margin-bottom: 8px;">타인의 저작물을 인용할 때는 반드시 출처를 명시해야 합니다</li>
+                        <li style="margin-bottom: 8px;">인용 표기는 본교의 논문 작성 지침을 따라야 합니다</li>
+                        <li style="margin-bottom: 8px;">자기표절(이전에 제출했던 자신의 논문 재사용)도 금지됩니다</li>
+                        <li style="margin-bottom: 8px;">최종논문 제출 시 표절 검사 결과를 함께 제출해야 합니다</li>
+                    </ul>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">1. 표절 금지</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>타인의 연구 결과나 아이디어를 적절한 인용 없이 사용하는 행위를 금지합니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>타인의 저작물을 인용할 때는 반드시 출처를 명시해야 합니다</li>
-                            <li>인용 표기는 본교의 논문 작성 지침을 따라야 합니다</li>
-                            <li>자기표절(이전에 제출했던 자신의 논문 재사용)도 금지됩니다</li>
-                            <li>최종논문 제출 시 표절 검사 결과를 함께 제출해야 합니다</li>
-                        </ul>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">2. 연구 데이터 조작 금지</h3>
+                    <p style="margin-bottom: 15px;">연구 데이터를 조작, 변조, 위조하는 행위를 엄격히 금지합니다.</p>
+                    <ul style="margin-left: 20px; margin-bottom: 30px;">
+                        <li style="margin-bottom: 8px;">실험 데이터는 사실대로 기록하고 보관해야 합니다</li>
+                        <li style="margin-bottom: 8px;">연구 결과를 왜곡하거나 임의로 변경할 수 없습니다</li>
+                        <li style="margin-bottom: 8px;">통계 분석은 적절한 방법을 사용해야 합니다</li>
+                    </ul>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">2. 연구 데이터 조작 금지</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>연구 데이터를 조작, 변조, 위조하는 행위를 엄격히 금지합니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>실험 데이터는 사실대로 기록하고 보관해야 합니다</li>
-                            <li>연구 결과를 왜곡하거나 임의로 변경할 수 없습니다</li>
-                            <li>통계 분석은 적절한 방법을 사용해야 합니다</li>
-                        </ul>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">3. 중복 게재 금지</h3>
+                    <p style="margin-bottom: 15px;">동일한 연구 결과를 여러 곳에 중복으로 게재하는 행위를 금지합니다.</p>
+                    <ul style="margin-left: 20px; margin-bottom: 30px;">
+                        <li style="margin-bottom: 8px;">이미 발표된 논문을 다른 학술지에 투고할 수 없습니다</li>
+                        <li style="margin-bottom: 8px;">학위논문과 학술지 논문은 별도로 간주됩니다</li>
+                    </ul>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">3. 중복 게재 금지</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>동일한 연구 결과를 여러 곳에 중복으로 게재하는 행위를 금지합니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>이미 발표된 논문을 다른 학술지에 투고할 수 없습니다</li>
-                            <li>학위논문과 학술지 논문은 별도로 간주됩니다</li>
-                        </ul>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">4. 저자 표시 원칙</h3>
+                    <p style="margin-bottom: 15px;">연구에 실질적으로 기여한 사람만 저자로 표시해야 합니다.</p>
+                    <ul style="margin-left: 20px; margin-bottom: 30px;">
+                        <li style="margin-bottom: 8px;">명예 저자, 유령 저자 표기를 금지합니다</li>
+                        <li style="margin-bottom: 8px;">지도교수의 기여도에 따라 공동 저자로 표기할 수 있습니다</li>
+                        <li style="margin-bottom: 8px;">저자 순서는 기여도에 따라 결정합니다</li>
+                    </ul>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">4. 저자 표시 원칙</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>연구에 실질적으로 기여한 사람만 저자로 표시해야 합니다.</p>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>명예 저자, 유령 저자 표기를 금지합니다</li>
-                            <li>지도교수의 기여도에 따라 공동 저자로 표기할 수 있습니다</li>
-                            <li>저자 순서는 기여도에 따라 결정합니다</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="border-t pt-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">5. 연구윤리 위반 시 조치</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p>연구윤리 위반이 확인될 경우 다음과 같은 조치가 취해집니다.</p>
-                        <ul class="list-disc pl-5 space-y-2 text-red-600">
-                            <li>논문 제출 불가 및 학위 취소</li>
-                            <li>학칙에 따른 징계 처분</li>
-                            <li>연구비 지원 중단</li>
-                            <li>학교 홈페이지에 위반 사실 공지</li>
-                        </ul>
-                    </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">5. 연구윤리 위반 시 조치</h3>
+                    <p style="margin-bottom: 15px;">연구윤리 위반이 확인될 경우 다음과 같은 조치가 취해집니다.</p>
+                    <ul style="margin-left: 20px; color: #d32f2f;">
+                        <li style="margin-bottom: 8px;">논문 제출 불가 및 학위 취소</li>
+                        <li style="margin-bottom: 8px;">학칙에 따른 징계 처분</li>
+                        <li style="margin-bottom: 8px;">연구비 지원 중단</li>
+                        <li style="margin-bottom: 8px;">학교 홈페이지에 위반 사실 공지</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -4976,97 +4937,79 @@ views.schedule = () => `
             <h3 class="text-lg font-bold text-gray-800">논문 제출 일정</h3>
         </div>
         <div class="p-8">
-            <div class="prose max-w-none">
-                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
-                    <h4 class="text-base font-bold text-blue-800 mb-3">2025학년도 논문 제출 일정</h4>
-                    <p class="text-sm text-blue-700">
-                        각 학기별 논문 제출 일정을 안내드립니다.
-                        제출 기한을 반드시 준수하시기 바랍니다.
-                    </p>
-                </div>
+            <div class="prose prose-sm max-w-none">
+                <div style="line-height: 1.8; font-size: 14px; color: #333;">
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">1학기 일정 (2025년 봄학기)</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #e5e7eb;">
+                        <thead style="background-color: #f9fafb;">
+                            <tr>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">구분</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">제출 기간</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">심사 기간</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">비고</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px;">연구계획서</td>
+                                <td style="padding: 12px; color: #666;">2025.03.01 ~ 03.15</td>
+                                <td style="padding: 12px; color: #666;">2025.03.16 ~ 03.31</td>
+                                <td style="padding: 12px; color: #666;">심사위원 배정 후 2주</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px;">중간논문</td>
+                                <td style="padding: 12px; color: #666;">2025.05.01 ~ 05.31</td>
+                                <td style="padding: 12px; color: #666;">2025.06.01 ~ 06.15</td>
+                                <td style="padding: 12px; color: #666;">연구계획서 승인 후</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px;">최종논문</td>
+                                <td style="padding: 12px; color: #666;">2025.06.01 ~ 06.30</td>
+                                <td style="padding: 12px; color: #666;">2025.07.01 ~ 07.31</td>
+                                <td style="padding: 12px; color: #666;">중간논문 승인 후</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">1학기 일정 (2025년 봄학기)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border border-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">구분</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">제출 기간</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">심사 기간</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">비고</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-gray-800">연구계획서</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.03.01 ~ 03.15</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.03.16 ~ 03.31</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">심사위원 배정 후 2주</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-gray-800">중간논문</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.05.01 ~ 05.31</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.06.01 ~ 06.15</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">연구계획서 승인 후</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-gray-800">최종논문</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.06.01 ~ 06.30</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.07.01 ~ 07.31</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">중간논문 승인 후</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">2학기 일정 (2025년 가을학기)</h3>
+                    <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px; border: 1px solid #e5e7eb;">
+                        <thead style="background-color: #f9fafb;">
+                            <tr>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">구분</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">제출 기간</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">심사 기간</th>
+                                <th style="padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; font-weight: 600;">비고</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px;">연구계획서</td>
+                                <td style="padding: 12px; color: #666;">2025.09.01 ~ 09.15</td>
+                                <td style="padding: 12px; color: #666;">2025.09.16 ~ 09.30</td>
+                                <td style="padding: 12px; color: #666;">심사위원 배정 후 2주</td>
+                            </tr>
+                            <tr style="border-bottom: 1px solid #e5e7eb;">
+                                <td style="padding: 12px;">중간논문</td>
+                                <td style="padding: 12px; color: #666;">2025.11.01 ~ 11.30</td>
+                                <td style="padding: 12px; color: #666;">2025.12.01 ~ 12.15</td>
+                                <td style="padding: 12px; color: #666;">연구계획서 승인 후</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 12px;">최종논문</td>
+                                <td style="padding: 12px; color: #666;">2025.12.01 ~ 12.31</td>
+                                <td style="padding: 12px; color: #666;">2026.01.01 ~ 01.31</td>
+                                <td style="padding: 12px; color: #666;">중간논문 승인 후</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">2학기 일정 (2025년 가을학기)</h4>
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border border-gray-200">
-                            <thead class="bg-gray-50">
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">구분</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">제출 기간</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">심사 기간</th>
-                                    <th class="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">비고</th>
-                                </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200">
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-gray-800">연구계획서</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.09.01 ~ 09.15</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.09.16 ~ 09.30</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">심사위원 배정 후 2주</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-gray-800">중간논문</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.11.01 ~ 11.30</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.12.01 ~ 12.15</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">연구계획서 승인 후</td>
-                                </tr>
-                                <tr>
-                                    <td class="px-4 py-3 text-sm text-gray-800">최종논문</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2025.12.01 ~ 12.31</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">2026.01.01 ~ 01.31</td>
-                                    <td class="px-4 py-3 text-sm text-gray-600">중간논문 승인 후</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <div class="border-t pt-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">제출 시 유의사항</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>제출 기한은 마감일 23:59까지입니다</li>
-                            <li>시스템 오류를 대비하여 마감일 전에 미리 제출하시기 바랍니다</li>
-                            <li>기한 내 미제출 시 다음 학기로 연기됩니다</li>
-                            <li>심사 일정은 심사위원 배정 상황에 따라 변경될 수 있습니다</li>
-                        </ul>
-                    </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">제출 시 유의사항</h3>
+                    <ul style="margin-left: 20px;">
+                        <li style="margin-bottom: 8px;">제출 기한은 마감일 23:59까지입니다</li>
+                        <li style="margin-bottom: 8px;">시스템 오류를 대비하여 마감일 전에 미리 제출하시기 바랍니다</li>
+                        <li style="margin-bottom: 8px;">기한 내 미제출 시 다음 학기로 연기됩니다</li>
+                        <li style="margin-bottom: 8px;">심사 일정은 심사위원 배정 상황에 따라 변경될 수 있습니다</li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -5080,95 +5023,261 @@ views.procedure = () => `
             <h3 class="text-lg font-bold text-gray-800">논문 지도 절차</h3>
         </div>
         <div class="p-8">
-            <div class="prose max-w-none">
-                <div class="bg-green-50 border border-green-200 rounded-lg p-6 mb-8">
-                    <h4 class="text-base font-bold text-green-800 mb-3">논문 지도 전체 프로세스</h4>
-                    <p class="text-sm text-green-700">
-                        학위 취득을 위한 논문 지도 절차를 단계별로 안내드립니다.
-                        각 단계를 순차적으로 완료해야 다음 단계로 진행할 수 있습니다.
-                    </p>
-                </div>
+            <div class="prose prose-sm max-w-none">
+                <div style="line-height: 1.8; font-size: 14px; color: #333;">
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">STEP 1. 연구계획서 제출 및 심사</h3>
+                    <p style="margin-bottom: 15px; font-weight: 600;">목적: 연구 주제 및 방법론 확정</p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li style="margin-bottom: 8px;">지도교수와 연구 주제 상의</li>
+                        <li style="margin-bottom: 8px;">연구계획서 작성 (연구 배경, 목적, 방법론 등)</li>
+                        <li style="margin-bottom: 8px;">시스템을 통한 연구계획서 제출</li>
+                        <li style="margin-bottom: 8px;">심사위원 배정 (관리자)</li>
+                        <li style="margin-bottom: 8px;">심사위원 검토 및 피드백</li>
+                        <li style="margin-bottom: 8px;">수정 및 재제출 (필요시)</li>
+                        <li style="margin-bottom: 8px;">최종 승인</li>
+                    </ol>
+                    <p style="margin-bottom: 30px; color: #1976d2;">※ 승인 후 연구 진행 가능</p>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 1. 연구계획서 제출 및 심사</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p class="font-semibold text-gray-800">목적: 연구 주제 및 방법론 확정</p>
-                        <ol class="list-decimal pl-5 space-y-2">
-                            <li>지도교수와 연구 주제 상의</li>
-                            <li>연구계획서 작성 (연구 배경, 목적, 방법론 등)</li>
-                            <li>시스템을 통한 연구계획서 제출</li>
-                            <li>심사위원 배정 (관리자)</li>
-                            <li>심사위원 검토 및 피드백</li>
-                            <li>수정 및 재제출 (필요시)</li>
-                            <li>최종 승인</li>
-                        </ol>
-                        <p class="text-blue-600">※ 승인 후 연구 진행 가능</p>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">STEP 2. 중간논문 제출 및 심사</h3>
+                    <p style="margin-bottom: 15px; font-weight: 600;">목적: 연구 진행 상황 점검 및 방향 조정</p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li style="margin-bottom: 8px;">연구 수행 및 데이터 수집</li>
+                        <li style="margin-bottom: 8px;">중간 결과 작성</li>
+                        <li style="margin-bottom: 8px;">중간논문 제출</li>
+                        <li style="margin-bottom: 8px;">심사위원 검토 및 피드백</li>
+                        <li style="margin-bottom: 8px;">연구 방향 조정 (필요시)</li>
+                        <li style="margin-bottom: 8px;">수정 및 재제출 (필요시)</li>
+                        <li style="margin-bottom: 8px;">최종 승인</li>
+                    </ol>
+                    <p style="margin-bottom: 30px; color: #1976d2;">※ 석사과정은 중간논문 생략 가능 (학과 규정에 따름)</p>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 2. 중간논문 제출 및 심사</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p class="font-semibold text-gray-800">목적: 연구 진행 상황 점검 및 방향 조정</p>
-                        <ol class="list-decimal pl-5 space-y-2">
-                            <li>연구 수행 및 데이터 수집</li>
-                            <li>중간 결과 작성</li>
-                            <li>중간논문 제출</li>
-                            <li>심사위원 검토 및 피드백</li>
-                            <li>연구 방향 조정 (필요시)</li>
-                            <li>수정 및 재제출 (필요시)</li>
-                            <li>최종 승인</li>
-                        </ol>
-                        <p class="text-blue-600">※ 석사과정은 중간논문 생략 가능 (학과 규정에 따름)</p>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">STEP 3. 최종논문 제출 및 심사</h3>
+                    <p style="margin-bottom: 15px; font-weight: 600;">목적: 연구 결과 종합 및 학위 취득</p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li style="margin-bottom: 8px;">연구 완료 및 논문 작성</li>
+                        <li style="margin-bottom: 8px;">표절 검사 실시 (필수)</li>
+                        <li style="margin-bottom: 8px;">최종논문 제출</li>
+                        <li style="margin-bottom: 8px;">심사위원 정밀 검토</li>
+                        <li style="margin-bottom: 8px;">논문 발표 (구두 심사)</li>
+                        <li style="margin-bottom: 8px;">질의응답 및 최종 피드백</li>
+                        <li style="margin-bottom: 8px;">수정 및 최종 제출</li>
+                        <li style="margin-bottom: 8px;">심사 완료 및 학위 취득</li>
+                    </ol>
+                    <p style="margin-bottom: 30px; color: #d32f2f;">※ 표절 검사 결과 15% 이상 시 재작성 필요</p>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 3. 최종논문 제출 및 심사</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p class="font-semibold text-gray-800">목적: 연구 결과 종합 및 학위 취득</p>
-                        <ol class="list-decimal pl-5 space-y-2">
-                            <li>연구 완료 및 논문 작성</li>
-                            <li>표절 검사 실시 (필수)</li>
-                            <li>최종논문 제출</li>
-                            <li>심사위원 정밀 검토</li>
-                            <li>논문 발표 (구두 심사)</li>
-                            <li>질의응답 및 최종 피드백</li>
-                            <li>수정 및 최종 제출</li>
-                            <li>심사 완료 및 학위 취득</li>
-                        </ol>
-                        <p class="text-red-600">※ 표절 검사 결과 15% 이상 시 재작성 필요</p>
-                    </div>
-                </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">STEP 4. 학술지 심사 (박사과정 필수)</h3>
+                    <p style="margin-bottom: 15px; font-weight: 600;">목적: 연구 성과 대외 발표</p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li style="margin-bottom: 8px;">학술지 논문 작성 (학위논문 기반)</li>
+                        <li style="margin-bottom: 8px;">학술지 선정 및 투고</li>
+                        <li style="margin-bottom: 8px;">시스템에 학술지 심사 신청</li>
+                        <li style="margin-bottom: 8px;">게재 승인 확인서 제출</li>
+                        <li style="margin-bottom: 8px;">심사 완료</li>
+                    </ol>
+                    <p style="margin-bottom: 8px; color: #1976d2;">※ 박사과정: 학술지 게재 필수 (학과별 상이)</p>
+                    <p style="margin-bottom: 30px; color: #1976d2;">※ 석사과정: 학술지 게재 권장</p>
 
-                <div class="mb-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">STEP 4. 학술지 심사 (박사과정 필수)</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <p class="font-semibold text-gray-800">목적: 연구 성과 대외 발표</p>
-                        <ol class="list-decimal pl-5 space-y-2">
-                            <li>학술지 논문 작성 (학위논문 기반)</li>
-                            <li>학술지 선정 및 투고</li>
-                            <li>시스템에 학술지 심사 신청</li>
-                            <li>게재 승인 확인서 제출</li>
-                            <li>심사 완료</li>
-                        </ol>
-                        <p class="text-blue-600">※ 박사과정: 학술지 게재 필수 (학과별 상이)</p>
-                        <p class="text-blue-600">※ 석사과정: 학술지 게재 권장</p>
-                    </div>
-                </div>
-
-                <div class="border-t pt-8">
-                    <h4 class="text-base font-bold text-gray-800 mb-4">전체 소요 기간 (평균)</h4>
-                    <div class="text-sm text-gray-700 leading-relaxed space-y-3">
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li>석사과정: 2~3학기 (1년 ~ 1.5년)</li>
-                            <li>박사과정: 5~6학기 (2.5년 ~ 3년)</li>
-                            <li>석박통합: 7~8학기 (3.5년 ~ 4년)</li>
-                        </ul>
-                        <p class="text-gray-600">※ 개인 연구 진행 상황에 따라 차이가 있을 수 있습니다</p>
-                    </div>
+                    <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">전체 소요 기간 (평균)</h3>
+                    <ul style="margin-left: 20px; margin-bottom: 15px;">
+                        <li style="margin-bottom: 8px;">석사과정: 2~3학기 (1년 ~ 1.5년)</li>
+                        <li style="margin-bottom: 8px;">박사과정: 5~6학기 (2.5년 ~ 3년)</li>
+                        <li style="margin-bottom: 8px;">석박통합: 7~8학기 (3.5년 ~ 4년)</li>
+                    </ul>
+                    <p style="color: #666;">※ 개인 연구 진행 상황에 따라 차이가 있을 수 있습니다</p>
                 </div>
             </div>
         </div>
     </div>
 `;
+
+// ========== Alias for routing ==========
+// 'process' 라우팅을 위한 alias
+views.process = views.procedure;
+
+// ========== 콘텐츠 관리 화면 ==========
+
+// 연구윤리 관리
+views.ethicsContentMgmt = () => {
+    console.log('✅ views.ethicsContentMgmt 호출됨');
+    return `
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 에디터 툴바 -->
+        <div id="ethics-toolbar" class="mb-3 p-3 bg-gray-50 border border-gray-300 rounded-t-lg flex flex-wrap gap-1">
+            <button type="button" onclick="formatEthicsText('bold')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="굵게">
+                <i class="fas fa-bold"></i>
+            </button>
+            <button type="button" onclick="formatEthicsText('italic')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="기울임">
+                <i class="fas fa-italic"></i>
+            </button>
+            <button type="button" onclick="formatEthicsText('underline')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="밑줄">
+                <i class="fas fa-underline"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatEthicsText('h1')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 1">H1</button>
+            <button type="button" onclick="formatEthicsText('h2')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 2">H2</button>
+            <button type="button" onclick="formatEthicsText('h3')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 3">H3</button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatEthicsText('ul')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="글머리 기호">
+                <i class="fas fa-list-ul"></i>
+            </button>
+            <button type="button" onclick="formatEthicsText('ol')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="번호 매기기">
+                <i class="fas fa-list-ol"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatEthicsText('link')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="링크">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+
+        <!-- 에디터 영역 -->
+        <div class="mb-4">
+            <div id="ethics-editor" contenteditable="true"
+                 class="w-full min-h-[500px] p-4 border border-gray-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028] overflow-y-auto"
+                 style="line-height: 1.8; font-size: 14px;">
+            </div>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="flex justify-between items-center pt-4 border-t">
+            <div class="text-sm text-gray-600">
+                <span id="ethics-last-modified"></span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="resetEthicsContent()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                    <i class="fas fa-undo mr-2"></i>초기화
+                </button>
+                <button onclick="saveEthicsContent()" class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020] transition-colors">
+                    <i class="fas fa-save mr-2"></i>저장
+                </button>
+            </div>
+        </div>
+    </div>
+`;
+};
+
+// 논문일정 관리
+views.scheduleContentMgmt = () => {
+    console.log('✅ views.scheduleContentMgmt 호출됨');
+    return `
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 에디터 툴바 -->
+        <div id="schedule-toolbar" class="mb-3 p-3 bg-gray-50 border border-gray-300 rounded-t-lg flex flex-wrap gap-1">
+            <button type="button" onclick="formatScheduleText('bold')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="굵게">
+                <i class="fas fa-bold"></i>
+            </button>
+            <button type="button" onclick="formatScheduleText('italic')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="기울임">
+                <i class="fas fa-italic"></i>
+            </button>
+            <button type="button" onclick="formatScheduleText('underline')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="밑줄">
+                <i class="fas fa-underline"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatScheduleText('h1')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 1">H1</button>
+            <button type="button" onclick="formatScheduleText('h2')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 2">H2</button>
+            <button type="button" onclick="formatScheduleText('h3')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 3">H3</button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatScheduleText('ul')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="글머리 기호">
+                <i class="fas fa-list-ul"></i>
+            </button>
+            <button type="button" onclick="formatScheduleText('ol')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="번호 매기기">
+                <i class="fas fa-list-ol"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatScheduleText('link')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="링크">
+                <i class="fas fa-link"></i>
+            </button>
+            <button type="button" onclick="formatScheduleText('table')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="표">
+                <i class="fas fa-table"></i>
+            </button>
+        </div>
+
+        <!-- 에디터 영역 -->
+        <div class="mb-4">
+            <div id="schedule-editor" contenteditable="true"
+                 class="w-full min-h-[500px] p-4 border border-gray-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028] overflow-y-auto"
+                 style="line-height: 1.8; font-size: 14px;">
+            </div>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="flex justify-between items-center pt-4 border-t">
+            <div class="text-sm text-gray-600">
+                <span id="schedule-last-modified"></span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="resetScheduleContent()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                    <i class="fas fa-undo mr-2"></i>초기화
+                </button>
+                <button onclick="saveScheduleContent()" class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020] transition-colors">
+                    <i class="fas fa-save mr-2"></i>저장
+                </button>
+            </div>
+        </div>
+    </div>
+`;
+};
+
+// 논문지도절차 관리
+views.procedureContentMgmt = () => {
+    console.log('✅ views.procedureContentMgmt 호출됨');
+    return `
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <!-- 에디터 툴바 -->
+        <div id="procedure-toolbar" class="mb-3 p-3 bg-gray-50 border border-gray-300 rounded-t-lg flex flex-wrap gap-1">
+            <button type="button" onclick="formatProcedureText('bold')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="굵게">
+                <i class="fas fa-bold"></i>
+            </button>
+            <button type="button" onclick="formatProcedureText('italic')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="기울임">
+                <i class="fas fa-italic"></i>
+            </button>
+            <button type="button" onclick="formatProcedureText('underline')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="밑줄">
+                <i class="fas fa-underline"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatProcedureText('h1')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 1">H1</button>
+            <button type="button" onclick="formatProcedureText('h2')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 2">H2</button>
+            <button type="button" onclick="formatProcedureText('h3')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 3">H3</button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatProcedureText('ul')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="글머리 기호">
+                <i class="fas fa-list-ul"></i>
+            </button>
+            <button type="button" onclick="formatProcedureText('ol')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="번호 매기기">
+                <i class="fas fa-list-ol"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="formatProcedureText('link')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="링크">
+                <i class="fas fa-link"></i>
+            </button>
+        </div>
+
+        <!-- 에디터 영역 -->
+        <div class="mb-4">
+            <div id="procedure-editor" contenteditable="true"
+                 class="w-full min-h-[500px] p-4 border border-gray-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028] overflow-y-auto"
+                 style="line-height: 1.8; font-size: 14px;">
+            </div>
+        </div>
+
+        <!-- 버튼 영역 -->
+        <div class="flex justify-between items-center pt-4 border-t">
+            <div class="text-sm text-gray-600">
+                <span id="procedure-last-modified"></span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="resetProcedureContent()" class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors">
+                    <i class="fas fa-undo mr-2"></i>초기화
+                </button>
+                <button onclick="saveProcedureContent()" class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020] transition-colors">
+                    <i class="fas fa-save mr-2"></i>저장
+                </button>
+            </div>
+        </div>
+    </div>
+`;
+};
+
+// 디버깅: 콘텐츠 관리 뷰가 제대로 등록되었는지 확인
+console.log('✅ admin_views.js 로드 완료');
+console.log('✅ views.ethicsContentMgmt:', typeof views.ethicsContentMgmt);
+console.log('✅ views.scheduleContentMgmt:', typeof views.scheduleContentMgmt);
+console.log('✅ views.procedureContentMgmt:', typeof views.procedureContentMgmt);
