@@ -237,7 +237,7 @@
                         <span>논문 안내</span>
                     </div>
                     <div class="pl-12 mt-1 space-y-1">
-                        <a href="#" onclick="showScreen('notice'); return false;" data-screen="notice"
+                        <a href="#" onclick="showScreen('noticeManagement'); return false;" data-screen="noticeManagement"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>공지사항</span>
                         </a>
@@ -369,10 +369,6 @@
                         <a href="#" onclick="showScreen('proxyLogin'); return false;" data-screen="proxyLogin"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>대리로그인</span>
-                        </a>
-                        <a href="#" onclick="showScreen('noticeManagement'); return false;" data-screen="noticeManagement"
-                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>공지사항 관리</span>
                         </a>
                         <a href="#" onclick="showScreen('ethicsContentMgmt'); return false;" data-screen="ethicsContentMgmt"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
@@ -860,6 +856,10 @@
                 <div id="procedureContentMgmt-content"></div>
             </section>
 
+            <section id="noticeManagement-screen" class="content-screen">
+                <div id="notice-management-content"></div>
+            </section>
+
         </main>
         </div> <!-- /layout-v3-main-content -->
     </div> <!-- /layout-v3-container -->
@@ -978,7 +978,8 @@
                 'process': 'process-content',
                 'ethicsContentMgmt': 'ethicsContentMgmt-content',
                 'scheduleContentMgmt': 'scheduleContentMgmt-content',
-                'procedureContentMgmt': 'procedureContentMgmt-content'
+                'procedureContentMgmt': 'procedureContentMgmt-content',
+                'noticeManagement': 'notice-management-content'
             };
 
             const containerId = containerMap[viewName] || 'content-area';
@@ -1016,6 +1017,11 @@
                 if (viewName === 'procedureContentMgmt' && typeof initProcedureContentManagement === 'function') {
                     setTimeout(() => initProcedureContentManagement(), 0);
                 }
+
+                // 공지사항 관리 화면 후처리
+                if (viewName === 'noticeManagement' && typeof renderNoticeList === 'function') {
+                    setTimeout(() => renderNoticeList(), 0);
+                }
             } else {
                 container.innerHTML = `<div class="p-8"><h2 class="text-2xl font-bold text-gray-800">${viewName}</h2><p class="mt-4 text-gray-600">이 화면은 준비 중입니다.</p></div>`;
             }
@@ -1050,7 +1056,7 @@
                 'journalReview': { menu: '논문 심사', submenu: '학술지 논문 심사' },
                 'permissionManagement': { menu: '시스템 설정', submenu: '권한 관리' },
                 'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' },
-                'noticeManagement': { menu: '시스템 설정', submenu: '공지사항 관리' },
+                'noticeManagement': { menu: '논문 안내', submenu: '공지사항' },
                 'ethicsContentMgmt': { menu: '시스템 설정', submenu: '연구윤리 관리' },
                 'scheduleContentMgmt': { menu: '시스템 설정', submenu: '논문일정 관리' },
                 'procedureContentMgmt': { menu: '시스템 설정', submenu: '논문지도절차 관리' }
@@ -1122,10 +1128,12 @@
     <script src="assets/js/schedule-utils.js"></script>
     <script src="assets/js/exam-schedule.js"></script>
     <script src="assets/js/content-data.js"></script>
+    <script src="assets/js/notice-data.js"></script>
     <script src="assets/js/admin_main.js"></script>
     <script src="assets/js/admin_views.js"></script>
     <script src="assets/js/admin_modals.js"></script>
     <script src="assets/js/content-management.js"></script>
+    <script src="assets/js/notice-management.js"></script>
 
     <!-- Admin Review Scripts -->
     <script src="assets/js/admin_thesis_review.js"></script>
@@ -1242,7 +1250,8 @@
                 'stageTypeEdit': 'stage-type-management-content',
                 'ethicsContentMgmt': 'ethicsContentMgmt-content',
                 'scheduleContentMgmt': 'scheduleContentMgmt-content',
-                'procedureContentMgmt': 'procedureContentMgmt-content'
+                'procedureContentMgmt': 'procedureContentMgmt-content',
+                'noticeManagement': 'notice-management-content'
             };
 
             const containerId = containerMap[viewName] || 'content-area';

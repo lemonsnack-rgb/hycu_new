@@ -5276,8 +5276,67 @@ views.procedureContentMgmt = () => {
 `;
 };
 
+// ========== 공지사항 관리 ==========
+views.noticeManagement = () => `
+    <div id="notice-list-view">
+        <!-- 검색 영역 -->
+        <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+            <div class="flex items-center gap-3">
+                <!-- 제목 검색 -->
+                <div class="flex items-center gap-2 flex-1">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
+                    <input type="text" id="filter-notice-title" placeholder="제목"
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                </div>
+                <!-- 조회 버튼 -->
+                <button onclick="filterNoticeList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                    <i class="fas fa-search mr-1"></i>조회
+                </button>
+            </div>
+        </div>
+
+        <!-- 테이블 컨테이너 -->
+        <div class="table-container">
+            <!-- 테이블 헤더 -->
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 class="table-title">공지사항 목록</h3>
+                    <span class="table-count" id="notice-count-display">(총 0건)</span>
+                </div>
+                <div class="table-header-right">
+                    <button onclick="showNoticeCreateForm()" class="btn-primary">
+                        <i class="fas fa-plus mr-1"></i>신규 등록
+                    </button>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table class="min-w-full">
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">순번</th>
+                            <th>제목</th>
+                            <th style="width: 100px;">첨부파일</th>
+                            <th style="width: 150px;">작성일</th>
+                            <th style="width: 120px;">작성자</th>
+                        </tr>
+                    </thead>
+                    <tbody id="notice-table-body">
+                        <!-- 동적으로 생성됨 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- 상세/작성/수정 영역 (초기에는 숨김) -->
+    <div id="notice-detail-view" style="display: none;">
+        <!-- 동적으로 생성됨 -->
+    </div>
+`;
+
 // 디버깅: 콘텐츠 관리 뷰가 제대로 등록되었는지 확인
 console.log('✅ admin_views.js 로드 완료');
 console.log('✅ views.ethicsContentMgmt:', typeof views.ethicsContentMgmt);
 console.log('✅ views.scheduleContentMgmt:', typeof views.scheduleContentMgmt);
 console.log('✅ views.procedureContentMgmt:', typeof views.procedureContentMgmt);
+console.log('✅ views.noticeManagement:', typeof views.noticeManagement);
