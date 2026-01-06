@@ -1027,19 +1027,29 @@
                 }
 
                 // 공지사항 관리 화면 후처리
-                console.log('🔍 Checking noticeManagement post-processing...');
-                console.log('🔍 viewName:', viewName);
-                console.log('🔍 typeof renderNoticeList:', typeof renderNoticeList);
                 if (viewName === 'noticeManagement') {
-                    if (typeof renderNoticeList === 'function') {
-                        console.log('✅ Calling renderNoticeList...');
-                        setTimeout(() => {
-                            console.log('⏰ setTimeout executed for renderNoticeList');
-                            renderNoticeList();
-                        }, 100); // 100ms로 변경하여 DOM이 완전히 렌더링되도록
-                    } else {
-                        console.error('❌ renderNoticeList is not a function:', typeof renderNoticeList);
-                    }
+                    console.log('🔍 공지사항 화면 post-processing 시작');
+
+                    // 함수가 로드될 때까지 재시도
+                    let retryCount = 0;
+                    const maxRetries = 20;
+
+                    const tryRenderNoticeList = () => {
+                        retryCount++;
+                        console.log(`⏰ 시도 #${retryCount}: filterNoticeList 타입 =`, typeof window.filterNoticeList);
+
+                        if (typeof window.filterNoticeList === 'function') {
+                            console.log('✅ filterNoticeList 함수 발견, 실행');
+                            window.filterNoticeList();
+                        } else if (retryCount < maxRetries) {
+                            console.log(`⏳ 50ms 후 재시도 (${retryCount}/${maxRetries})`);
+                            setTimeout(tryRenderNoticeList, 50);
+                        } else {
+                            console.error('❌ filterNoticeList 함수를 찾을 수 없습니다 (최대 재시도 횟수 초과)');
+                        }
+                    };
+
+                    setTimeout(tryRenderNoticeList, 100);
                 }
             } else {
                 container.innerHTML = `<div class="p-8"><h2 class="text-2xl font-bold text-gray-800">${viewName}</h2><p class="mt-4 text-gray-600">이 화면은 준비 중입니다.</p></div>`;
@@ -1299,6 +1309,15 @@
 
                 if (viewName === 'evaluationCriteriaEdit' && typeof initEvaluationTypeChangeListener === 'function') {
                     initEvaluationTypeChangeListener();
+                }
+
+                // 공지사항 관리 화면 후처리
+                if (viewName === 'noticeManagement') {
+                    setTimeout(() => {
+                        if (typeof window.filterNoticeList === 'function') {
+                            window.filterNoticeList();
+                        }
+                    }, 100);
                 }
             } else {
                 container.innerHTML = `<div class="p-8"><h2 class="text-2xl font-bold text-gray-800">${viewName}</h2><p class="mt-4 text-gray-600">이 화면은 준비 중입니다.</p></div>`;
