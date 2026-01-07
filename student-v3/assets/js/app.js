@@ -27,6 +27,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // 알림 초기화
     initNotifications();
+
+    // 모바일 오버레이 강제 비활성화 (딤 처리 버그 수정)
+    const overlay = document.getElementById('mobile-menu-overlay');
+    if (overlay) {
+        overlay.classList.remove('active');
+        console.log('mobile-menu-overlay 비활성화됨');
+    }
 });
 
 // 알림 초기화

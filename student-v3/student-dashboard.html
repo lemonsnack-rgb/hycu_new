@@ -97,6 +97,15 @@
             color: rgba(255, 255, 255, 0.8) !important;
         }
 
+        /* 오버레이 강제 숨김 (버그 수정) */
+        .layout-v3-sidebar-overlay {
+            display: none !important;
+        }
+
+        .layout-v3-sidebar-overlay.active {
+            display: block !important;
+        }
+
         .layout-v3-sidebar-logout:hover {
             color: #ffffff !important;
             background: rgba(255, 255, 255, 0.05) !important;
@@ -411,6 +420,13 @@
             // 브레드크럼 업데이트
             updateBreadcrumb(screenId);
 
+            // 화면별 초기화 함수 호출
+            if (screenId === 'thesis-submission' && typeof initThesisSubmission === 'function') {
+                initThesisSubmission();
+            } else if (screenId === 'journal-submission' && typeof initJournalSubmission === 'function') {
+                initJournalSubmission();
+            }
+
             // 모바일에서 화면 전환 시 사이드바 닫기
             if (window.innerWidth <= 768) {
                 toggleMobileMenu();
@@ -481,9 +497,9 @@
     </script>
 
     <!-- JavaScript 파일들 -->
-    <script src="assets/js/app.js?v=20260107001"></script>
-    <script src="assets/js/thesis-submission.js?v=20260107001"></script>
-    <script src="assets/js/journal-submission.js?v=20260107001"></script>
+    <script src="assets/js/app.js?v=20260107007"></script>
+    <script src="assets/js/thesis-submission.js?v=20260107011"></script>
+    <script src="assets/js/journal-submission.js?v=20260107002"></script>
 
 </body>
 </html>
