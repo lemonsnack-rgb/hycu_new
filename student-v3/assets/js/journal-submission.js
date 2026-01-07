@@ -1,203 +1,451 @@
 /**
  * 학술지 논문 제출 화면
- * Version: 20260107001
+ * Version: 20260107006
  */
 
-// 화면 초기화
-document.addEventListener('DOMContentLoaded', function() {
-    initJournalSubmission();
-});
+// 화면 상태
+let journalCurrentView = 'list'; // list | submit | detail
+let journalCurrentSubmissionId = null;
+
+// Mock 데이터
+const journalSubmissions = [
+    {
+        id: 1,
+        stageName: '1차 제출',
+        attemptNumber: 1,
+        submissionPeriod: {
+            start: '2025-01-01',
+            end: '2025-01-31'
+        },
+        status: 'submitted',
+        reviewResult: 'approved',
+        submittedData: {
+            title: 'AI 기반 추천 시스템에 관한 연구',
+            desiredExamDate: '2025-01-15',
+            fileName: 'journal_paper_v1.pdf',
+            fileSize: 2500000,
+            submittedAt: '2025-01-10 14:30'
+        }
+    },
+    {
+        id: 2,
+        stageName: '2차 제출',
+        attemptNumber: 1,
+        submissionPeriod: {
+            start: '2025-03-01',
+            end: '2025-03-31'
+        },
+        status: 'not_submitted',
+        reviewResult: null,
+        submittedData: null
+    },
+    {
+        id: 3,
+        stageName: '3차 제출',
+        attemptNumber: 1,
+        submissionPeriod: {
+            start: '2025-05-01',
+            end: '2025-05-31'
+        },
+        status: 'submitted',
+        reviewResult: 'rejected',
+        submittedData: {
+            title: '딥러닝 기반 음성 인식 시스템 개발',
+            desiredExamDate: '2025-05-20',
+            fileName: 'journal_paper_v2.pdf',
+            fileSize: 3200000,
+            submittedAt: '2025-05-15 10:20'
+        }
+    },
+    {
+        id: 4,
+        stageName: '3차 제출',
+        attemptNumber: 2,
+        submissionPeriod: {
+            start: '2025-06-01',
+            end: '2025-06-30'
+        },
+        status: 'not_submitted',
+        reviewResult: null,
+        submittedData: null
+    }
+];
 
 // 학술지 논문 제출 화면 초기화
 function initJournalSubmission() {
+    console.log('initJournalSubmission 호출됨');
     const content = document.getElementById('journal-submission-content');
-    if (!content) return;
+    if (!content) {
+        console.error('journal-submission-content 요소를 찾을 수 없습니다');
+        return;
+    }
 
-    content.innerHTML = renderJournalSubmissionScreen();
+    // 항상 목록 화면으로 시작
+    journalCurrentView = 'list';
+    journalCurrentSubmissionId = null;
 
-    // 제출 이력 로드
-    loadJournalSubmissionHistory();
+    // 이벤트 위임 설정 (한 번만)
+    setupEventDelegation();
+
+    // 화면 렌더링
+    renderScreen();
 }
 
-// 학술지 논문 제출 화면 렌더링
-function renderJournalSubmissionScreen() {
+// 이벤트 위임 설정 (한 번만 실행되도록)
+let journalEventDelegationSetup = false;
+function setupEventDelegation() {
+    if (journalEventDelegationSetup) {
+        console.log('이벤트 위임 이미 설정됨 - 건너뜀');
+        return;
+    }
+
+    console.log('이벤트 위임 설정 시작');
+    const content = document.getElementById('journal-submission-content');
+    if (!content) {
+        console.error('journal-submission-content 요소를 찾을 수 없습니다');
+        return;
+    }
+
+    // 이벤트 리스너 추가 (캡처 단계에서 처리)
+    content.addEventListener('click', function(e) {
+        console.log('클릭 이벤트 발생, target:', e.target, 'tagName:', e.target.tagName);
+
+        const target = e.target.closest('button');
+
+        // 버튼 클릭 처리
+        if (target) {
+            const action = target.getAttribute('data-action');
+            const id = target.getAttribute('data-id');
+
+            console.log('버튼 클릭됨, action:', action, 'id:', id);
+
+            if (action === 'submit' && id) {
+                e.preventDefault();
+                e.stopPropagation();
+                submitJournal(parseInt(id));
+            } else if (action === 'view' && id) {
+                e.preventDefault();
+                e.stopPropagation();
+                viewJournalSubmission(parseInt(id));
+            } else if (action === 'edit-journal' && id) {
+                e.preventDefault();
+                e.stopPropagation();
+                editJournalSubmission(parseInt(id));
+            } else if (action === 'back-to-list') {
+                e.preventDefault();
+                e.stopPropagation();
+                backToList();
+            } else if (action === 'save-journal') {
+                e.preventDefault();
+                e.stopPropagation();
+                saveJournalSubmission();
+            } else if (action === 'select-file') {
+                e.preventDefault();
+                e.stopPropagation();
+                const fileInput = document.getElementById('journal-file');
+                if (fileInput) {
+                    fileInput.click();
+                }
+            } else {
+                console.log('알 수 없는 버튼 클릭, action:', action, 'target:', target);
+            }
+        }
+    }, true); // 캡처 단계에서 이벤트 처리
+
+    // 파일 입력 변경 이벤트 (이벤트 위임으로 처리할 수 없으므로 직접 처리)
+    content.addEventListener('change', function(e) {
+        if (e.target && e.target.id === 'journal-file') {
+            handleFileSelect(e);
+        }
+    });
+
+    journalEventDelegationSetup = true;
+    console.log('이벤트 위임 설정 완료');
+}
+
+// 화면 렌더링
+function renderScreen() {
+    console.log('renderScreen 호출, journalCurrentView:', journalCurrentView, 'journalCurrentSubmissionId:', journalCurrentSubmissionId);
+    const content = document.getElementById('journal-submission-content');
+    if (!content) {
+        console.error('journal-submission-content 요소를 찾을 수 없습니다');
+        return;
+    }
+
+    if (journalCurrentView === 'list') {
+        console.log('목록 화면 렌더링');
+        content.innerHTML = renderJournalListScreen();
+    } else if (journalCurrentView === 'submit') {
+        console.log('제출 폼 화면 렌더링');
+        content.innerHTML = renderJournalSubmissionForm();
+    } else if (journalCurrentView === 'detail') {
+        console.log('상세 화면 렌더링');
+        content.innerHTML = renderJournalDetailView();
+    }
+    console.log('화면 렌더링 완료');
+}
+
+// 목록 화면
+function renderJournalListScreen() {
+    const submissions = journalSubmissions;
+
     return `
-        <!-- 제출 폼 -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-4">학술지 논문 제출</h3>
-
-            <div class="space-y-4">
-                <!-- 논문 제목 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">논문 제목 *</label>
-                    <input type="text" id="journal-title"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                           placeholder="논문 제목을 입력하세요">
-                </div>
-
-                <!-- 학술지 정보 -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">학술지명 *</label>
-                        <input type="text" id="journal-name"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                               placeholder="학술지명을 입력하세요">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">게재 연월 *</label>
-                        <input type="month" id="journal-date"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
-                    </div>
-                </div>
-
-                <!-- 학술지 등급 및 ISSN -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">학술지 등급</label>
-                        <select id="journal-grade"
-                                class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
-                            <option value="">선택</option>
-                            <option value="KCI">KCI 등재지</option>
-                            <option value="KCI후보">KCI 등재후보지</option>
-                            <option value="SCI">SCI</option>
-                            <option value="SSCI">SSCI</option>
-                            <option value="SCIE">SCIE</option>
-                            <option value="SCOPUS">SCOPUS</option>
-                            <option value="기타">기타</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">ISSN</label>
-                        <input type="text" id="journal-issn"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                               placeholder="ISSN 번호를 입력하세요">
-                    </div>
-                </div>
-
-                <!-- 저자 정보 -->
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">제1저자 *</label>
-                        <input type="text" id="journal-first-author"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                               placeholder="제1저자명">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">교신저자</label>
-                        <input type="text" id="journal-corresponding-author"
-                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                               placeholder="교신저자명">
-                    </div>
-                </div>
-
-                <!-- 공동저자 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">공동저자</label>
-                    <input type="text" id="journal-co-authors"
-                           class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                           placeholder="공동저자명 (쉼표로 구분)">
-                </div>
-
-                <!-- 파일 업로드 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">논문 파일 *</label>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                        <input type="file" id="journal-file" class="hidden" accept=".pdf,.doc,.docx" onchange="handleJournalFileSelect(event)">
-                        <button onclick="document.getElementById('journal-file').click()"
-                                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            파일 선택
-                        </button>
-                        <p class="text-xs text-gray-500 mt-2">PDF, DOC, DOCX 파일만 업로드 가능합니다 (최대 10MB)</p>
-                        <div id="journal-file-info" class="mt-3 text-sm text-gray-600"></div>
-                    </div>
-                </div>
-
-                <!-- 게재증명서 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">게재증명서</label>
-                    <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                        <input type="file" id="journal-proof" class="hidden" accept=".pdf,.jpg,.jpeg,.png" onchange="handleJournalProofSelect(event)">
-                        <button onclick="document.getElementById('journal-proof').click()"
-                                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200">
-                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            파일 선택
-                        </button>
-                        <p class="text-xs text-gray-500 mt-2">PDF, JPG, PNG 파일 업로드 가능 (선택사항)</p>
-                        <div id="journal-proof-info" class="mt-3 text-sm text-gray-600"></div>
-                    </div>
-                </div>
-
-                <!-- 제출 코멘트 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-2">제출 코멘트</label>
-                    <textarea id="journal-comment" rows="4"
-                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                              placeholder="교수님께 전달할 내용을 입력하세요 (선택사항)"></textarea>
-                </div>
-
-                <!-- 제출 버튼 -->
-                <div class="flex justify-end gap-3">
-                    <button onclick="resetJournalForm()"
-                            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
-                        초기화
-                    </button>
-                    <button onclick="submitJournal()"
-                            class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
-                        제출하기
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 제출 이력 -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="table-header">
                 <div class="table-header-left">
-                    <h3 class="table-title">제출 이력</h3>
-                    <span class="table-count" id="journal-submission-count">(총 0건)</span>
+                    <h3 class="table-title">학술지 논문 제출</h3>
+                    <span class="table-count">(총 ${submissions.length}건)</span>
                 </div>
             </div>
             <div class="table-scroll">
-                <table class="min-w-full">
+                <table class="min-w-full journal-table">
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제출일시</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">논문 제목</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학술지명</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">게재연월</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">등급</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">상태</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">작업</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">제출기간</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">제출상태</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">심사결과</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">관리</th>
                         </tr>
                     </thead>
-                    <tbody id="journal-submission-history" class="bg-white divide-y divide-gray-200">
-                        <!-- JavaScript로 동적 생성 -->
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        ${submissions.map((submission, index) => renderJournalListRow(submission, index)).join('')}
                     </tbody>
                 </table>
-                <div id="no-journal-submissions" class="text-center py-8 text-gray-500" style="display: none;">
-                    <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                    </svg>
-                    <p>제출 이력이 없습니다.</p>
+                ${submissions.length === 0 ? `
+                    <div class="text-center py-8 text-gray-500">
+                        <svg class="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p>등록된 제출 정보가 없습니다.</p>
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+    `;
+}
+
+// 목록 행 렌더링
+function renderJournalListRow(submission, index) {
+    const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
+
+    // 배지 대신 텍스트로 표시
+    const statusText = submission.status === 'submitted' ? '제출완료' : '미제출';
+
+    let resultText = '-';
+    if (submission.reviewResult === 'approved') {
+        resultText = '승인';
+    } else if (submission.reviewResult === 'rejected') {
+        resultText = '반려';
+    }
+
+    const actionButton = submission.status === 'submitted'
+        ? `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`
+        : `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
+
+    return `
+        <tr class="hover:bg-gray-50">
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${statusText}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${resultText}</td>
+            <td class="px-6 py-3 text-center">${actionButton}</td>
+        </tr>
+    `;
+}
+
+// 제출 화면으로 이동
+function submitJournal(id) {
+    console.log('submitJournal 호출됨, id:', id);
+    journalCurrentSubmissionId = id;
+    journalCurrentView = 'submit';
+    console.log('journalCurrentView 변경:', journalCurrentView);
+    renderScreen();
+}
+
+// 상세 화면으로 이동
+function viewJournalSubmission(id) {
+    console.log('viewJournalSubmission 호출됨, id:', id);
+    journalCurrentSubmissionId = id;
+    journalCurrentView = 'detail';
+    console.log('journalCurrentView 변경:', journalCurrentView);
+    renderScreen();
+}
+
+// 목록으로 돌아가기
+function backToList() {
+    journalCurrentView = 'list';
+    journalCurrentSubmissionId = null;
+    renderScreen();
+}
+
+// 제출 폼 화면
+function renderJournalSubmissionForm() {
+    const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
+    if (!submission) return '';
+
+    const isEdit = submission.status === 'submitted';
+    const data = isEdit ? submission.submittedData : {};
+
+    return `
+        <div class="mb-4">
+            <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                목록으로
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="space-y-4">
+                <!-- 논문제목 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목 *</label>
+                    <input type="text" id="journal-title" value="${data.title || ''}"
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="논문 제목을 입력하세요">
+                </div>
+
+                <!-- 희망심사일 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">희망심사일 *</label>
+                    <input type="date" id="journal-desired-exam-date" value="${data.desiredExamDate || ''}"
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
+                </div>
+
+                <!-- 파일업로드 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">파일 업로드 *</label>
+                    <div class="flex-1 flex items-center gap-3">
+                        <input type="file" id="journal-file" class="hidden" accept=".pdf">
+                        <button type="button" data-action="select-file"
+                                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                            </svg>
+                            파일 선택
+                        </button>
+                        <span class="text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</span>
+                        <div id="file-info" class="text-sm text-gray-600">
+                            ${data.fileName ? `
+                                <div class="flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
+                                    <span class="text-green-600 font-medium">${data.fileName} (${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                                </div>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 제출 버튼 -->
+                <div class="flex justify-end gap-3 pt-4">
+                    <button data-action="back-to-list"
+                            class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                        취소
+                    </button>
+                    <button data-action="save-journal"
+                            class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
+                        ${isEdit ? '저장' : '제출하기'}
+                    </button>
                 </div>
             </div>
         </div>
     `;
 }
 
-// 논문 파일 선택 처리
-function handleJournalFileSelect(event) {
+// 상세/보기 화면
+function renderJournalDetailView() {
+    const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
+    if (!submission || submission.status !== 'submitted') return '';
+
+    const data = submission.submittedData;
+    const stageDisplay = submission.attemptNumber > 1
+        ? `${submission.stageName} (${submission.attemptNumber}차)`
+        : submission.stageName;
+
+    return `
+        <div class="mb-4">
+            <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                목록으로
+            </button>
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-semibold text-gray-800">논문 제출 정보</h3>
+                <button data-action="edit-journal" data-id="${submission.id}"
+                        class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
+                    수정
+                </button>
+            </div>
+
+            <div class="space-y-4">
+                <!-- 심사단계 + 희망심사일 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
+                    <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${stageDisplay}</div>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">희망심사일</label>
+                    <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${data.desiredExamDate}</div>
+                </div>
+
+                <!-- 논문제목 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목</label>
+                    <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${data.title}</div>
+                </div>
+
+                <!-- 첨부파일 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">첨부파일</label>
+                    <div class="flex-1 flex items-center gap-3 px-3 py-1.5 bg-gray-50 rounded-md">
+                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span class="text-sm text-gray-900">${data.fileName}</span>
+                        <span class="text-xs text-gray-500">(${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                        <button class="ml-auto text-sm text-[#6A0028] hover:text-[#8A0034]">다운로드</button>
+                    </div>
+                </div>
+
+                <!-- 제출 정보 -->
+                <div class="border-t pt-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">제출 정보</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-xs text-gray-500">제출일시</span>
+                            <div class="text-sm text-gray-900 mt-1">${data.submittedAt}</div>
+                        </div>
+                        <div>
+                            <span class="text-xs text-gray-500">제출상태</span>
+                            <div class="text-sm text-gray-900 mt-1">제출완료</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// 수정 모드로 전환
+function editJournalSubmission(id) {
+    journalCurrentSubmissionId = id;
+    journalCurrentView = 'submit';
+    renderScreen();
+}
+
+// 파일 선택 처리
+function handleFileSelect(event) {
     const file = event.target.files[0];
-    const fileInfo = document.getElementById('journal-file-info');
+    const fileInfo = document.getElementById('file-info');
 
     if (file) {
         const fileSize = (file.size / 1024 / 1024).toFixed(2);
@@ -212,152 +460,102 @@ function handleJournalFileSelect(event) {
     }
 }
 
-// 게재증명서 파일 선택 처리
-function handleJournalProofSelect(event) {
-    const file = event.target.files[0];
-    const fileInfo = document.getElementById('journal-proof-info');
-
-    if (file) {
-        const fileSize = (file.size / 1024 / 1024).toFixed(2);
-        fileInfo.innerHTML = `
-            <div class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span class="text-green-600 font-medium">${file.name} (${fileSize} MB)</span>
-            </div>
-        `;
-    }
-}
-
-// 폼 초기화
-function resetJournalForm() {
-    document.getElementById('journal-title').value = '';
-    document.getElementById('journal-name').value = '';
-    document.getElementById('journal-date').value = '';
-    document.getElementById('journal-grade').value = '';
-    document.getElementById('journal-issn').value = '';
-    document.getElementById('journal-first-author').value = '';
-    document.getElementById('journal-corresponding-author').value = '';
-    document.getElementById('journal-co-authors').value = '';
-    document.getElementById('journal-file').value = '';
-    document.getElementById('journal-proof').value = '';
-    document.getElementById('journal-comment').value = '';
-    document.getElementById('journal-file-info').innerHTML = '';
-    document.getElementById('journal-proof-info').innerHTML = '';
-}
-
-// 학술지 논문 제출
-function submitJournal() {
+// 학술지 논문 제출/수정 저장
+function saveJournalSubmission() {
     const title = document.getElementById('journal-title').value.trim();
-    const journalName = document.getElementById('journal-name').value.trim();
-    const journalDate = document.getElementById('journal-date').value;
-    const firstAuthor = document.getElementById('journal-first-author').value.trim();
+    const desiredExamDate = document.getElementById('journal-desired-exam-date').value;
     const file = document.getElementById('journal-file').files[0];
+
+    const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
+    const isEdit = submission.status === 'submitted';
 
     if (!title) {
         alert('논문 제목을 입력해주세요.');
         return;
     }
 
-    if (!journalName) {
-        alert('학술지명을 입력해주세요.');
+    if (!desiredExamDate) {
+        alert('희망심사일을 선택해주세요.');
         return;
     }
 
-    if (!journalDate) {
-        alert('게재 연월을 선택해주세요.');
+    if (!isEdit && !file) {
+        alert('파일을 선택해주세요.');
         return;
     }
 
-    if (!firstAuthor) {
-        alert('제1저자를 입력해주세요.');
-        return;
-    }
-
-    if (!file) {
-        alert('논문 파일을 선택해주세요.');
-        return;
-    }
-
-    if (confirm('학술지 논문을 제출하시겠습니까?')) {
+    const confirmMessage = isEdit ? '학술지 논문을 수정하시겠습니까?' : '학술지 논문을 제출하시겠습니까?';
+    if (confirm(confirmMessage)) {
         // 실제로는 서버로 전송
-        console.log('학술지 논문 제출:', {
-            title,
-            journalName,
-            journalDate,
-            firstAuthor,
-            file
-        });
+        submission.status = 'submitted';
+        submission.submittedData = {
+            title: title,
+            desiredExamDate: desiredExamDate,
+            fileName: file ? file.name : submission.submittedData.fileName,
+            fileSize: file ? file.size : submission.submittedData.fileSize,
+            submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
+            }).replace(/\. /g, '-').replace('.', '')
+        };
 
-        alert('학술지 논문이 제출되었습니다.');
-        resetJournalForm();
-        loadJournalSubmissionHistory();
+        console.log('학술지 논문 저장:', submission);
+
+        alert(isEdit ? '학술지 논문이 수정되었습니다.' : '학술지 논문이 제출되었습니다.');
+        backToList();
     }
 }
 
-// 제출 이력 로드
-function loadJournalSubmissionHistory() {
-    const tbody = document.getElementById('journal-submission-history');
-    const noSubmissions = document.getElementById('no-journal-submissions');
-    const countSpan = document.getElementById('journal-submission-count');
-
-    // Mock 데이터
-    const submissions = [
-        {
-            id: 1,
-            date: '2024-12-01 16:20',
-            title: '딥러닝 기반 음성 인식 시스템 개발',
-            journal: '한국음향학회지',
-            publishDate: '2024-11',
-            grade: 'KCI',
-            status: 'approved'
+// 스타일 추가 (즉시 실행)
+(function() {
+    const style = document.createElement('style');
+    style.textContent = `
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e5e7eb;
         }
-    ];
-
-    if (submissions.length === 0) {
-        tbody.innerHTML = '';
-        noSubmissions.style.display = 'block';
-        countSpan.textContent = '(총 0건)';
-        return;
-    }
-
-    noSubmissions.style.display = 'none';
-    countSpan.textContent = `(총 ${submissions.length}건)`;
-
-    const statusMap = {
-        'pending': '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">검토중</span>',
-        'approved': '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">승인</span>',
-        'rejected': '<span class="px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">반려</span>'
-    };
-
-    tbody.innerHTML = submissions.map((submission, index) => `
-        <tr class="hover:bg-gray-50">
-            <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
-            <td class="px-6 py-3 text-sm text-gray-900">${submission.date}</td>
-            <td class="px-6 py-3 text-sm text-gray-900">${submission.title}</td>
-            <td class="px-6 py-3 text-sm text-gray-900">${submission.journal}</td>
-            <td class="px-6 py-3 text-sm text-gray-900">${submission.publishDate}</td>
-            <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.grade}</td>
-            <td class="px-6 py-3 text-center">${statusMap[submission.status]}</td>
-            <td class="px-6 py-3 text-center">
-                <button onclick="viewJournalSubmission(${submission.id})"
-                        class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">
-                    상세보기
-                </button>
-            </td>
-        </tr>
-    `).join('');
-}
-
-// 제출 상세보기
-function viewJournalSubmission(id) {
-    alert(`학술지 논문 제출 ID ${id} 상세보기 (구현 예정)`);
-}
+        .table-header-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .table-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        .table-count {
+            font-size: 14px;
+            color: #6b7280;
+        }
+        .table-scroll {
+            overflow-x: auto;
+        }
+        .journal-table {
+            table-layout: fixed;
+            width: 100%;
+        }
+        .journal-table th,
+        .journal-table td {
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+    `;
+    document.head.appendChild(style);
+})();
 
 // 전역 함수 등록
-window.handleJournalFileSelect = handleJournalFileSelect;
-window.handleJournalProofSelect = handleJournalProofSelect;
-window.resetJournalForm = resetJournalForm;
+window.initJournalSubmission = initJournalSubmission;
 window.submitJournal = submitJournal;
 window.viewJournalSubmission = viewJournalSubmission;
+window.backToList = backToList;
+window.editJournalSubmission = editJournalSubmission;
+window.handleFileSelect = handleFileSelect;
+window.saveJournalSubmission = saveJournalSubmission;
