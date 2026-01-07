@@ -457,8 +457,8 @@
                 <div class="bg-white rounded-lg shadow-md p-6">
                     <h3 class="text-lg font-semibold text-gray-800 mb-6">최종 논문 제목 수정</h3>
 
-                    <form id="title-modification-form" class="space-y-4">
-                        <!-- 논문 제목 (horizontal layout) -->
+                    <form id="title-modification-form">
+                        <!-- 논문 제목 + 버튼 (single row) -->
                         <div class="flex items-center gap-4">
                             <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">
                                 논문 제목 <span class="text-red-600">*</span>
@@ -467,16 +467,12 @@
                                    class="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
                                    placeholder="논문 제목을 입력하세요"
                                    required>
-                        </div>
-
-                        <!-- Buttons -->
-                        <div class="flex justify-end gap-3 pt-4">
                             <button type="button" id="title-modification-cancel-btn"
-                                    class="px-6 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors">
+                                    class="px-6 py-2 text-sm border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors whitespace-nowrap">
                                 취소
                             </button>
                             <button type="submit"
-                                    class="px-6 py-2 text-sm bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] transition-colors">
+                                    class="px-6 py-2 text-sm bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] transition-colors whitespace-nowrap">
                                 저장
                             </button>
                         </div>
