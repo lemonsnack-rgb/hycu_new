@@ -193,6 +193,40 @@
                     <span>대시보드</span>
                 </a>
 
+                <!-- 논문 안내 -->
+                <div class="mt-2">
+                    <div class="layout-v3-nav-item" style="cursor: default;">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>논문 안내</span>
+                    </div>
+                    <!-- 2depth 메뉴 -->
+                    <div id="info-submenu" class="pl-12 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('notice'); return false;" data-screen="notice"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>공지사항</span>
+                        </a>
+                        <a href="#" onclick="showScreen('resources'); return false;" data-screen="resources"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>자료실</span>
+                        </a>
+                        <a href="#" onclick="showScreen('research-ethics'); return false;" data-screen="research-ethics"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>연구윤리</span>
+                        </a>
+                        <a href="#" onclick="showScreen('thesis-schedule'); return false;" data-screen="thesis-schedule"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문일정</span>
+                        </a>
+                        <a href="#" onclick="showScreen('guidance-procedure'); return false;" data-screen="guidance-procedure"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문지도절차</span>
+                        </a>
+                    </div>
+                </div>
+
                 <!-- 논문 제출 -->
                 <div class="mt-2">
                     <div class="layout-v3-nav-item" style="cursor: default;">
@@ -206,33 +240,63 @@
                     <div id="submission-submenu" class="pl-12 mt-1 space-y-1">
                         <a href="#" onclick="showScreen('thesis-submission'); return false;" data-screen="thesis-submission"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>학위논문 제출</span>
+                            <span>학위 논문 제출</span>
                         </a>
                         <a href="#" onclick="showScreen('journal-submission'); return false;" data-screen="journal-submission"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>학술지 논문 제출</span>
                         </a>
+                        <a href="#" onclick="showScreen('title-modification'); return false;" data-screen="title-modification"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>최종 논문 제목 수정</span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- 논문지도 -->
+                <!-- 논문 지도 -->
                 <div class="mt-2">
                     <div class="layout-v3-nav-item" style="cursor: default;">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                                  d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                         </svg>
-                        <span>논문지도</span>
+                        <span>논문 지도</span>
                     </div>
                     <!-- 2depth 메뉴 -->
                     <div id="guidance-submenu" class="pl-12 mt-1 space-y-1">
-                        <a href="#" onclick="showScreen('weekly-guidance'); return false;" data-screen="weekly-guidance"
+                        <a href="#" onclick="showScreen('advisor-assignment'); return false;" data-screen="advisor-assignment"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>주간 지도 기록</span>
+                            <span>지도교수 배정</span>
                         </a>
-                        <a href="#" onclick="showScreen('thesis-feedback'); return false;" data-screen="thesis-feedback"
+                        <a href="#" onclick="showScreen('semester-guidance-plan'); return false;" data-screen="semester-guidance-plan"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>학위논문 피드백</span>
+                            <span>학기별 지도 계획</span>
+                        </a>
+                        <a href="#" onclick="showScreen('guidance-status'); return false;" data-screen="guidance-status"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문 지도 현황</span>
+                        </a>
+                        <a href="#" onclick="showScreen('realtime-reservation'); return false;" data-screen="realtime-reservation"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>실시간 지도 예약</span>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 논문 심사 -->
+                <div class="mt-2">
+                    <div class="layout-v3-nav-item" style="cursor: default;">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                        </svg>
+                        <span>논문 심사</span>
+                    </div>
+                    <!-- 2depth 메뉴 -->
+                    <div id="evaluation-submenu" class="pl-12 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('evaluation-schedule'); return false;" data-screen="evaluation-schedule"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>심사 일정 관리</span>
                         </a>
                     </div>
                 </div>
@@ -335,34 +399,106 @@
                 </div>
             </section>
 
-            <!-- 학위논문 제출 화면 -->
+            <!-- 논문 안내 메뉴 화면들 -->
+            <section id="notice-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">공지사항 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="resources-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">자료실 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="research-ethics-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">연구윤리 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="thesis-schedule-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">논문일정 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="guidance-procedure-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">논문지도절차 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 논문 제출 메뉴 화면들 -->
             <section id="thesis-submission-screen" class="content-screen">
                 <div id="thesis-submission-content">
                     <!-- JavaScript로 동적 렌더링 -->
                 </div>
             </section>
 
-            <!-- 학술지 논문 제출 화면 -->
             <section id="journal-submission-screen" class="content-screen">
                 <div id="journal-submission-content">
                     <!-- JavaScript로 동적 렌더링 -->
                 </div>
             </section>
 
-            <!-- 주간 지도 기록 화면 (읽기 전용) -->
-            <section id="weekly-guidance-screen" class="content-screen">
+            <section id="title-modification-screen" class="content-screen">
                 <div class="bg-white rounded-lg shadow-md p-8">
                     <div class="text-center text-gray-500">
-                        <p class="text-lg">주간 지도 기록 콘텐츠 준비 중입니다.</p>
+                        <p class="text-lg">최종 논문 제목 수정 콘텐츠 준비 중입니다.</p>
                     </div>
                 </div>
             </section>
 
-            <!-- 학위논문 피드백 화면 (읽기 전용) -->
-            <section id="thesis-feedback-screen" class="content-screen">
+            <!-- 논문 지도 메뉴 화면들 -->
+            <section id="advisor-assignment-screen" class="content-screen">
                 <div class="bg-white rounded-lg shadow-md p-8">
                     <div class="text-center text-gray-500">
-                        <p class="text-lg">학위논문 피드백 콘텐츠 준비 중입니다.</p>
+                        <p class="text-lg">지도교수 배정 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="semester-guidance-plan-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">학기별 지도 계획 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="guidance-status-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">논문 지도 현황 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="realtime-reservation-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">실시간 지도 예약 콘텐츠 준비 중입니다.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 논문 심사 메뉴 화면들 -->
+            <section id="evaluation-schedule-screen" class="content-screen">
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg">심사 일정 관리 콘텐츠 준비 중입니다.</p>
                     </div>
                 </div>
             </section>
@@ -437,10 +573,23 @@
         function updateBreadcrumb(screenId) {
             const breadcrumbMap = {
                 'dashboard': '대시보드',
-                'thesis-submission': '학위논문 제출',
+                // 논문 안내
+                'notice': '공지사항',
+                'resources': '자료실',
+                'research-ethics': '연구윤리',
+                'thesis-schedule': '논문일정',
+                'guidance-procedure': '논문지도절차',
+                // 논문 제출
+                'thesis-submission': '학위 논문 제출',
                 'journal-submission': '학술지 논문 제출',
-                'weekly-guidance': '주간 지도 기록',
-                'thesis-feedback': '학위논문 피드백'
+                'title-modification': '최종 논문 제목 수정',
+                // 논문 지도
+                'advisor-assignment': '지도교수 배정',
+                'semester-guidance-plan': '학기별 지도 계획',
+                'guidance-status': '논문 지도 현황',
+                'realtime-reservation': '실시간 지도 예약',
+                // 논문 심사
+                'evaluation-schedule': '심사 일정 관리'
             };
 
             const breadcrumbCurrent = document.querySelector('.layout-v3-breadcrumb-current');
