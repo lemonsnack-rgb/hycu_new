@@ -13,19 +13,16 @@ function renderJournalReviewList() {
         <!-- 검색 영역 -->
         <div class="bg-white rounded-lg shadow-md mb-6">
             <div class="p-4 bg-gray-50">
-                <div class="grid grid-cols-4 gap-4">
+                <div class="grid grid-cols-5 gap-4">
                     <!-- 1행 -->
                     <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
                         <select id="journal-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                             <option value="">전체</option>
                             <option value="2025" selected>2025</option>
                             <option value="2024">2024</option>
                             <option value="2023">2023</option>
                         </select>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
                         <select id="journal-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                             <option value="">전체</option>
                             <option value="1" selected>1학기</option>
@@ -50,8 +47,6 @@ function renderJournalReviewList() {
                             <option value="부동산대학원">부동산대학원</option>
                         </select>
                     </div>
-
-                    <!-- 2행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
                         <select id="journal-filter-undergraduate-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -72,6 +67,8 @@ function renderJournalReviewList() {
                             <option value="시각디자인">시각디자인</option>
                         </select>
                     </div>
+
+                    <!-- 2행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
                         <select id="journal-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -89,8 +86,6 @@ function renderJournalReviewList() {
                             <option value="수료">수료</option>
                         </select>
                     </div>
-
-                    <!-- 3행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
                         <input type="text" id="journal-filter-student-number" placeholder="학번"
@@ -109,6 +104,8 @@ function renderJournalReviewList() {
                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
                                onkeypress="if(event.key==='Enter') searchJournalReviews()">
                     </div>
+
+                    <!-- 3행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">처리결과</label>
                         <select id="journal-filter-result" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -121,9 +118,8 @@ function renderJournalReviewList() {
                             <option value="반려">반려</option>
                         </select>
                     </div>
-
-                    <!-- 4행 - 조회 버튼 -->
-                    <div class="col-span-4 flex items-center justify-end">
+                    <div class="col-span-3"></div>
+                    <div class="flex items-center justify-end">
                         <button onclick="searchJournalReviews()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
                             <i class="fas fa-search mr-1"></i>조회
                         </button>

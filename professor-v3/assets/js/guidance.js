@@ -28,7 +28,7 @@ function showStudentList() {
         <!-- 검색 영역 -->
         <div class="bg-white rounded-lg shadow-md mb-6">
             <div class="p-4 bg-gray-50">
-                <div class="grid grid-cols-4 gap-4">
+                <div class="grid grid-cols-5 gap-4">
                     <!-- 1행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
@@ -71,8 +71,6 @@ function showStudentList() {
                             <option value="사회과학대학">사회과학대학</option>
                         </select>
                     </div>
-
-                    <!-- 2행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
                         <select id="filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -81,6 +79,8 @@ function showStudentList() {
                             <option value="경영학과">경영학과</option>
                         </select>
                     </div>
+
+                    <!-- 2행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
                         <select id="filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -105,8 +105,6 @@ function showStudentList() {
                         <input type="text" id="filter-student-id" placeholder="학번"
                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                     </div>
-
-                    <!-- 3행 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
                         <input type="text" id="filter-name" placeholder="성명"
@@ -117,7 +115,10 @@ function showStudentList() {
                         <input type="text" id="filter-advisor" placeholder="지도교수명"
                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                     </div>
-                    <div class="col-span-2 flex items-center justify-end">
+
+                    <!-- 3행 -->
+                    <div class="col-span-4"></div>
+                    <div class="flex items-center justify-end">
                         <button onclick="searchStudents()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
                             <i class="fas fa-search mr-1"></i>조회
                         </button>

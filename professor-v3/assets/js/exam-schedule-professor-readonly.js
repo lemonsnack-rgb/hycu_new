@@ -38,7 +38,7 @@ function renderExamScheduleScreen() {
             <!-- 검색 영역 -->
             <div class="bg-white rounded-lg shadow-md mb-6">
                 <div class="p-4 bg-gray-50">
-                    <div class="grid grid-cols-4 gap-4">
+                    <div class="grid grid-cols-5 gap-4">
                         <!-- 1행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
@@ -80,8 +80,6 @@ function renderExamScheduleScreen() {
                                 <option value="사회과학대학">사회과학대학</option>
                             </select>
                         </div>
-
-                        <!-- 2행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
                             <select id="exam-filter-major" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -91,6 +89,8 @@ function renderExamScheduleScreen() {
                                 <option value="교육학과">교육학과</option>
                             </select>
                         </div>
+
+                        <!-- 2행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
                             <select id="exam-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -116,8 +116,6 @@ function renderExamScheduleScreen() {
                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
                                    onkeypress="if(event.key==='Enter') filterExamScheduleList()">
                         </div>
-
-                        <!-- 3행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
                             <input type="text" id="exam-filter-student-name" placeholder="성명"
@@ -130,6 +128,8 @@ function renderExamScheduleScreen() {
                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
                                    onkeypress="if(event.key==='Enter') filterExamScheduleList()">
                         </div>
+
+                        <!-- 3행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사단계</label>
                             <select id="exam-filter-stage" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -144,9 +144,8 @@ function renderExamScheduleScreen() {
                                 <option value="unscheduled">미등록</option>
                             </select>
                         </div>
-
-                        <!-- 4행 - 조회 버튼 -->
-                        <div class="col-span-4 flex items-center justify-end">
+                        <div class="col-span-2"></div>
+                        <div class="flex items-center justify-end">
                             <button onclick="filterExamScheduleList()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
                                 <i class="fas fa-search mr-1"></i>조회
                             </button>

@@ -494,29 +494,42 @@ function renderAdminWeekCard(week) {
 // 실적 댓글 렌더링 (학생용과 동일)
 function renderAdminExecutionComment(execution) {
     return `
-        <div class="execution-comment bg-gray-50 border-gray-200 border rounded-lg p-4">
-            <div class="flex justify-between items-start mb-2">
-                <div>
-                    <div class="text-sm font-semibold text-gray-800">
-                        ${execution.professorName}
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
-                        <span>${formatAdminDateWithTime(execution.executionDate)}</span>
-                        <span>•</span>
-                        <span class="px-2 py-0.5 rounded ${getAdminMethodBadgeClass(execution.method)}">
-                            ${getAdminMethodText(execution.method)}
-                        </span>
-                    </div>
-                </div>
+        <div class="execution-item bg-gray-50 border-gray-200 border rounded-lg p-4">
+            <div class="flex justify-between items-center mb-3">
+                <span class="text-sm font-semibold text-gray-800">
+                    ${execution.professorName}
+                </span>
             </div>
-            <div class="space-y-2 mt-3">
-                <div>
-                    <span class="text-xs font-semibold text-gray-600">실행 내용:</span>
-                    <p class="text-sm text-gray-800 mt-1">${execution.executionContent}</p>
+
+            <div class="space-y-3">
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">실행일 *</label>
+                        <input type="date" value="${execution.executionDate}"
+                               class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm bg-gray-100" disabled>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">지도 방식 *</label>
+                        <select class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm bg-gray-100" disabled>
+                            <option value="meeting" ${execution.method === 'meeting' ? 'selected' : ''}>대면</option>
+                            <option value="online" ${execution.method === 'online' ? 'selected' : ''}>온라인</option>
+                            <option value="zoom" ${execution.method === 'zoom' ? 'selected' : ''}>Zoom</option>
+                            <option value="email" ${execution.method === 'email' ? 'selected' : ''}>이메일</option>
+                            <option value="phone" ${execution.method === 'phone' ? 'selected' : ''}>전화</option>
+                        </select>
+                    </div>
                 </div>
+
                 <div>
-                    <span class="text-xs font-semibold text-gray-600">교수 의견:</span>
-                    <p class="text-sm text-gray-800 mt-1">${execution.comment}</p>
+                    <label class="block text-xs text-gray-600 mb-1">실행 내용 *</label>
+                    <textarea rows="3"
+                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100" disabled>${execution.executionContent}</textarea>
+                </div>
+
+                <div>
+                    <label class="block text-xs text-gray-600 mb-1">교수 의견 *</label>
+                    <textarea rows="2"
+                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100" disabled>${execution.comment}</textarea>
                 </div>
             </div>
         </div>

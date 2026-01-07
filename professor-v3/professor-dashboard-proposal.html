@@ -611,7 +611,7 @@
                 <!-- 검색 영역 -->
                 <div class="bg-white rounded-lg shadow-md mb-6">
                     <div class="p-4 bg-gray-50">
-                        <div class="grid grid-cols-4 gap-4">
+                        <div class="grid grid-cols-5 gap-4">
                             <!-- 1행 -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
@@ -654,14 +654,14 @@
                                     <option value="사회과학대학">사회과학대학</option>
                                 </select>
                             </div>
-
-                            <!-- 2행 -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
                                 <select id="prof-advisor-search-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
                                 </select>
                             </div>
+
+                            <!-- 2행 -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
                                 <select id="prof-advisor-search-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -689,8 +689,6 @@
                                     <option value="미배정">미배정</option>
                                 </select>
                             </div>
-
-                            <!-- 3행 -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
                                 <input type="text" id="prof-advisor-search-student-id" placeholder="학번"
@@ -701,6 +699,8 @@
                                 <input type="text" id="prof-advisor-search-student-name" placeholder="성명"
                                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                             </div>
+
+                            <!-- 3행 -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
                                 <input type="text" id="prof-advisor-search-advisor" placeholder="지도교수명"
@@ -863,18 +863,15 @@
 
                 <!-- 검색 영역 -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-4">
-                    <div class="grid grid-cols-4 gap-3">
+                    <div class="grid grid-cols-5 gap-3">
                         <!-- 1행 -->
                         <div class="flex items-center gap-2">
-                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
                             <select id="feedback-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                 <option value="">전체</option>
-                                <option value="2025">2025학년도</option>
-                                <option value="2024">2024학년도</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
                             </select>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
                             <select id="feedback-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                 <option value="">전체</option>
                                 <option value="1">1학기</option>
@@ -900,8 +897,6 @@
                                 <option value="졸업">졸업</option>
                             </select>
                         </div>
-
-                        <!-- 2행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
                             <select id="feedback-filter-university-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -918,6 +913,8 @@
                                 <option value="인문사회계열">인문사회계열</option>
                             </select>
                         </div>
+
+                        <!-- 2행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
                             <select id="feedback-filter-undergraduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -934,8 +931,6 @@
                                 <option value="경영학과">경영학과</option>
                             </select>
                         </div>
-
-                        <!-- 3행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번/성명</label>
                             <input type="text" id="feedback-filter-student-search" placeholder="학번 또는 성명"
@@ -955,6 +950,9 @@
                                 <option value="완료">완료</option>
                             </select>
                         </div>
+
+                        <!-- 3행 -->
+                        <div class="col-span-4"></div>
                         <div class="flex items-center justify-end">
                             <button onclick="searchFeedback()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
                                 <i class="fas fa-search mr-1"></i>조회
@@ -989,18 +987,15 @@
 
                 <!-- 검색 영역 -->
                 <div class="bg-white rounded-lg shadow-md p-6 mb-4">
-                    <div class="grid grid-cols-4 gap-3">
+                    <div class="grid grid-cols-5 gap-3">
                         <!-- 1행 -->
                         <div class="flex items-center gap-2">
-                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
                             <select id="filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                 <option value="">전체</option>
-                                <option value="2025">2025학년도</option>
-                                <option value="2024">2024학년도</option>
+                                <option value="2025">2025</option>
+                                <option value="2024">2024</option>
                             </select>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학기</label>
                             <select id="filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                 <option value="">전체</option>
                                 <option value="1">1학기</option>
@@ -1026,8 +1021,6 @@
                                 <option value="졸업">졸업</option>
                             </select>
                         </div>
-
-                        <!-- 2행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
                             <select id="filter-university-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -1044,6 +1037,8 @@
                                 <option value="인문사회계열">인문사회계열</option>
                             </select>
                         </div>
+
+                        <!-- 2행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
                             <select id="filter-undergraduate" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -1060,8 +1055,6 @@
                                 <option value="경영학과">경영학과</option>
                             </select>
                         </div>
-
-                        <!-- 3행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
                             <input type="text" id="filter-student-id" placeholder="학번 입력"
@@ -1077,6 +1070,8 @@
                             <input type="text" id="filter-professor" placeholder="지도교수명 입력"
                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                         </div>
+
+                        <!-- 3행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사단계</label>
                             <select id="filter-stage" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -1086,8 +1081,6 @@
                                 <option value="본심사">본심사</option>
                             </select>
                         </div>
-
-                        <!-- 4행 -->
                         <div class="flex items-center gap-2">
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사결과</label>
                             <select id="filter-result" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -1099,12 +1092,7 @@
                                 <option value="불합격">불합격</option>
                             </select>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <!-- 빈 공간 -->
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <!-- 빈 공간 -->
-                        </div>
+                        <div class="col-span-2"></div>
                         <div class="flex items-center justify-end">
                             <button onclick="searchReviews()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
                                 <i class="fas fa-search mr-1"></i>조회
@@ -1192,6 +1180,24 @@
     <!-- 모달 컨테이너 -->
     <div id="modal-container"></div>
 
+    <!-- Universal Modal (관리자용과 동일) -->
+    <div id="universal-modal" class="fixed inset-0 flex items-center justify-center hidden z-50 p-4">
+        <div class="bg-white rounded-lg shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center p-4 border-b flex-shrink-0">
+                <h3 id="modal-title" class="text-xl font-bold text-gray-800"></h3>
+                <button id="modal-close" class="text-gray-500 hover:text-gray-800 text-3xl" onclick="closeModal()">&times;</button>
+            </div>
+            <div id="modal-content" class="p-6 overflow-y-auto flex-grow"></div>
+            <div id="modal-footer" class="p-4 border-t flex justify-end items-center bg-gray-50 flex-shrink-0">
+                <button id="modal-cancel" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md mr-2 hover:bg-gray-300 text-sm" onclick="closeModal()">취소</button>
+                <button id="modal-confirm" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm">저장</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Backdrop -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
+
     <!-- Layout v3 JavaScript -->
     <script>
         // 사이드바 토글 함수
@@ -1271,7 +1277,9 @@
     <script src="assets/js/app.js?v=20251219008"></script>
     <script src="assets/js/dashboard.js?v=20251218002"></script>
     <script src="assets/js/journal-review.js?v=20251218003"></script>
-    <script src="assets/js/guidance.js?v=20251218003"></script>
+    <!-- ✨ 새로운 주차별 지도 관리 (관리자 UI 기반 + 실적 입력 기능) -->
+    <script src="assets/js/weekly-guidance.js?v=20260107017"></script>
+
     <script src="assets/js/meeting-v2.js?v=20251218020"></script>
     <script src="assets/js/meeting-v2-part2.js?v=20251219001"></script>
     <script src="assets/js/feedback-data.js?v=20251218002"></script>
@@ -1283,8 +1291,6 @@
     <script src="assets/js/review-detail.js?v=20251219013"></script>
     <script src="assets/js/board.js?v=20251218003"></script>
     <script src="assets/js/journal-review-detail.js?v=20251218002"></script>
-    <script src="assets/js/semester-guidance.js?v=20251218002"></script>
-    <script src="assets/js/semester-guidance-v2.js?v=20251218002"></script>
 
     <!-- 공통 유틸리티 -->
     <script src="../common-utils.js"></script>

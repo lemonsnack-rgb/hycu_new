@@ -102,9 +102,11 @@ function showScreen(screenId) {
                 console.error('❌ renderExamScheduleScreen 함수를 찾을 수 없습니다');
             }
         } else if (screenId === 'guidance') {
-            // 주차별 논문지도 현황 초기화
-            if (typeof initGuidance === 'function') {
-                initGuidance();
+            // ✨ 주차별 논문지도 현황 초기화 (새로운 weekly-guidance.js 사용)
+            if (typeof initProfessorWeeklyGuidance === 'function') {
+                initProfessorWeeklyGuidance();
+            } else {
+                console.error('❌ initProfessorWeeklyGuidance 함수를 찾을 수 없습니다');
             }
         } else if (screenId === 'ethics' || screenId === 'schedule' || screenId === 'process') {
             // 안내문 화면 렌더링 (공통 함수 사용)
