@@ -361,41 +361,37 @@ function renderExamScheduleDetail(assignmentId) {
                     <div class="mb-6">
                         <h4 class="font-bold text-gray-800 mb-3">일정 정보</h4>
 
-                        <div class="grid grid-cols-3 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    심사 날짜 <span class="text-red-600">*</span>
-                                </label>
-                                <input type="date"
-                                       id="exam-date"
-                                       value="${schedule?.examDate || ''}"
-                                       min="${getTodayString()}"
-                                       required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    심사 시간 <span class="text-red-600">*</span>
-                                </label>
-                                <input type="time"
-                                       id="exam-time"
-                                       value="${schedule?.examTime || ''}"
-                                       required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    소요 시간 (분) <span class="text-red-600">*</span>
-                                </label>
-                                <select id="exam-duration"
-                                        required
-                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
-                                    <option value="30" ${schedule?.duration === 30 ? 'selected' : ''}>30분</option>
-                                    <option value="60" ${schedule?.duration === 60 ? 'selected' : ''}>60분</option>
-                                    <option value="90" ${schedule?.duration === 90 ? 'selected' : ''}>90분</option>
-                                    <option value="120" ${schedule?.duration === 120 ? 'selected' : ''}>120분</option>
-                                </select>
-                            </div>
+                        <div class="flex items-center gap-4 mb-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                심사 날짜 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="date"
+                                   id="exam-date"
+                                   value="${schedule?.examDate || ''}"
+                                   min="${getTodayString()}"
+                                   required
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                심사 시간 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="time"
+                                   id="exam-time"
+                                   value="${schedule?.examTime || ''}"
+                                   required
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                소요 시간 (분) <span class="text-red-600">*</span>
+                            </label>
+                            <select id="exam-duration"
+                                    required
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                                <option value="30" ${schedule?.duration === 30 ? 'selected' : ''}>30분</option>
+                                <option value="60" ${schedule?.duration === 60 ? 'selected' : ''}>60분</option>
+                                <option value="90" ${schedule?.duration === 90 ? 'selected' : ''}>90분</option>
+                                <option value="120" ${schedule?.duration === 120 ? 'selected' : ''}>120분</option>
+                            </select>
                         </div>
 
                         <!-- 충돌 경고 영역 -->
@@ -406,7 +402,7 @@ function renderExamScheduleDetail(assignmentId) {
                     <div class="mb-6">
                         <h4 class="font-bold text-gray-800 mb-3">진행 방식</h4>
 
-                        <div class="flex gap-4 mb-4">
+                        <div class="flex items-center gap-4 mb-2">
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio"
                                        name="exam-method"
@@ -416,6 +412,16 @@ function renderExamScheduleDetail(assignmentId) {
                                        class="mr-2">
                                 <span class="text-sm font-medium text-gray-700">온라인 (Zoom)</span>
                             </label>
+
+                            <!-- 링크 생성 버튼 (온라인/오프라인 사이에 위치, 항상 표시) -->
+                            <button type="button"
+                                    id="create-zoom-link-btn"
+                                    onclick="createZoomMeetingUI()"
+                                    ${schedule?.method === 'offline' ? 'disabled' : ''}
+                                    class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors inline-flex items-center">
+                                <i class="fas fa-video mr-1"></i> ${schedule?.onlineInfo ? '재생성' : '링크 생성'}
+                            </button>
+
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio"
                                        name="exam-method"
@@ -427,50 +433,38 @@ function renderExamScheduleDetail(assignmentId) {
                             </label>
                         </div>
 
+                        <p id="zoom-btn-hint" class="text-xs text-gray-500 mb-3">※ 심사 날짜와 시간을 먼저 입력하세요</p>
+
                         <!-- 온라인 정보 -->
                         <div id="online-fields" style="display: ${!schedule || schedule.method === 'online' ? 'block' : 'none'};">
-                            <!-- 링크 생성 버튼 -->
-                            <div class="mb-3">
-                                <button type="button"
-                                        id="create-zoom-link-btn"
-                                        onclick="createZoomMeetingUI()"
-                                        ${!schedule && 'disabled'}
-                                        class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
-                                    <i class="fas fa-video mr-1"></i> ${schedule?.onlineInfo ? '재생성' : '링크 생성'}
-                                </button>
-                                <p class="text-xs text-gray-500 mt-1">※ 심사 날짜와 시간을 먼저 입력하세요</p>
-                            </div>
 
                             <!-- 생성된 링크 정보 -->
-                            <div id="zoom-link-info" style="display: ${schedule?.onlineInfo ? 'block' : 'none'};" class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-                                <h5 class="font-medium text-gray-800 mb-3">생성된 Zoom 회의 정보</h5>
-                                <div class="space-y-2 text-sm">
-                                    <div class="flex items-start">
-                                        <span class="text-gray-600 w-28 flex-shrink-0">미팅 ID:</span>
-                                        <span id="display-meeting-id" class="font-medium break-all">${schedule?.onlineInfo?.meetingId || ''}</span>
+                            <div id="zoom-link-info" style="display: ${schedule?.onlineInfo ? 'block' : 'none'};" class="p-4 bg-[#FAF6F1] border border-[#E8E0D8] rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-3">Zoom 미팅 정보</h5>
+                                <div class="grid grid-cols-4 gap-4 text-sm">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-600 whitespace-nowrap">미팅 ID:</span>
+                                        <span id="display-meeting-id" class="font-mono text-gray-900">${schedule?.onlineInfo?.meetingId || ''}</span>
                                     </div>
-                                    <div class="flex items-start">
-                                        <span class="text-gray-600 w-28 flex-shrink-0">비밀번호:</span>
-                                        <span id="display-meeting-password" class="font-medium">${schedule?.onlineInfo?.password || ''}</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-600 whitespace-nowrap">비밀번호:</span>
+                                        <span id="display-meeting-password" class="font-mono text-gray-900">${schedule?.onlineInfo?.password || ''}</span>
                                     </div>
-                                    <div class="flex items-start">
-                                        <span class="text-gray-600 w-28 flex-shrink-0">참가 링크:</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-600 whitespace-nowrap">참가 URL:</span>
                                         <a id="display-meeting-url"
                                            href="${schedule?.onlineInfo?.meetingUrl || '#'}"
                                            target="_blank"
-                                           class="text-blue-600 hover:underline break-all flex-1">${schedule?.onlineInfo?.meetingUrl || ''}</a>
+                                           class="text-[#6A0028] hover:underline break-all">${schedule?.onlineInfo?.meetingUrl || ''}</a>
                                     </div>
-                                    <div class="flex items-start">
-                                        <span class="text-gray-600 w-28 flex-shrink-0">호스트 링크:</span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-gray-600 whitespace-nowrap">호스트 URL:</span>
                                         <a id="display-host-url"
                                            href="${schedule?.onlineInfo?.hostUrl || '#'}"
                                            target="_blank"
-                                           class="text-blue-600 hover:underline break-all flex-1">${schedule?.onlineInfo?.hostUrl || ''}</a>
+                                           class="text-[#6A0028] hover:underline break-all">${schedule?.onlineInfo?.hostUrl || ''}</a>
                                     </div>
                                 </div>
-                                <p class="text-xs text-gray-500 mt-3 pt-3 border-t border-blue-300">
-                                    <i class="fas fa-info-circle mr-1"></i> 생성된 링크 정보는 수정할 수 없습니다
-                                </p>
                             </div>
 
                             <!-- 숨겨진 필드 (저장용) -->

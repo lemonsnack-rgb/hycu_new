@@ -507,24 +507,17 @@ function renderExamScheduleDetailReadonly(assignmentId) {
 
     const detailView = document.getElementById('exam-schedule-detail-view');
 
-    // 심사위원 목록 HTML 생성 (5열 그리드)
+    // 심사위원 목록 HTML 생성 (5열 그리드, 괄호로 역할 표시)
     const membersHTML = `
         <div class="grid grid-cols-5 gap-3">
-            ${assignment.members.map(m => `
-                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs px-2 py-1 rounded-full ${
-                            m.role === 'chair'
-                                ? 'bg-[#FCE4EC] text-[#6A0028]'
-                                : 'bg-gray-100 text-gray-600'
-                        }">
-                            ${m.role === 'chair' ? '위원장' : '위원'}
-                        </span>
-                        <span class="font-medium text-gray-900 text-sm">${m.professorName}</span>
+            ${assignment.members.map(m => {
+                const roleText = m.role === 'chair' ? '위원장' : '위원';
+                return `
+                    <div class="p-3 bg-gray-50 rounded-lg text-center">
+                        <div class="text-sm font-medium text-gray-900">${m.professorName} (${roleText})</div>
                     </div>
-                    <span class="text-sm text-gray-600">${m.department}</span>
-                </div>
-            `).join('')}
+                `;
+            }).join('')}
         </div>
     `;
 
@@ -617,90 +610,121 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                 <!-- 일정 정보 -->
                 <div class="mb-6">
                     <h4 class="font-bold text-gray-800 mb-3">일정 정보</h4>
-                    <div class="grid grid-cols-3 gap-4 mb-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">심사 날짜</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm">
-                                ${schedule.examDate}
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">심사 시간</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm">
-                                ${schedule.examTime}
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">소요 시간</label>
-                            <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm">
-                                ${schedule.duration}분
-                            </div>
-                        </div>
+
+                    <div class="flex items-center gap-4 mb-4">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                            심사 날짜 <span class="text-red-600">*</span>
+                        </label>
+                        <input type="date"
+                               id="exam-date"
+                               value="${schedule.examDate}"
+                               disabled
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed">
+
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                            심사 시간 <span class="text-red-600">*</span>
+                        </label>
+                        <input type="time"
+                               id="exam-time"
+                               value="${schedule.examTime}"
+                               disabled
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed">
+
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                            소요 시간 (분) <span class="text-red-600">*</span>
+                        </label>
+                        <select id="exam-duration"
+                                disabled
+                                class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed">
+                            <option value="30" ${schedule.duration === 30 ? 'selected' : ''}>30분</option>
+                            <option value="60" ${schedule.duration === 60 ? 'selected' : ''}>60분</option>
+                            <option value="90" ${schedule.duration === 90 ? 'selected' : ''}>90분</option>
+                            <option value="120" ${schedule.duration === 120 ? 'selected' : ''}>120분</option>
+                        </select>
                     </div>
                 </div>
 
                 <!-- 진행 방식 -->
                 <div class="mb-6">
                     <h4 class="font-bold text-gray-800 mb-3">진행 방식</h4>
-                    <div class="mb-4">
-                        <span class="px-3 py-1 rounded-full text-sm font-medium ${
-                            schedule.method === 'online'
-                                ? 'bg-[#FCE4EC] text-[#6A0028]'
-                                : 'bg-green-100 text-green-800'
-                        }">
-                            ${schedule.method === 'online' ? '온라인 (Zoom)' : '오프라인'}
-                        </span>
+
+                    <div class="flex items-center gap-4 mb-2">
+                        <label class="flex items-center cursor-not-allowed">
+                            <input type="radio"
+                                   name="exam-method"
+                                   value="online"
+                                   ${schedule.method === 'online' ? 'checked' : ''}
+                                   disabled
+                                   class="mr-2">
+                            <span class="text-sm font-medium text-gray-700">온라인 (Zoom)</span>
+                        </label>
+
+                        <!-- 링크 생성 버튼 (비활성화) -->
+                        <button type="button"
+                                id="create-zoom-link-btn"
+                                disabled
+                                class="px-4 py-2 bg-gray-300 text-white rounded cursor-not-allowed inline-flex items-center">
+                            <i class="fas fa-video mr-1"></i> ${schedule.onlineInfo ? '재생성' : '링크 생성'}
+                        </button>
+
+                        <label class="flex items-center cursor-not-allowed">
+                            <input type="radio"
+                                   name="exam-method"
+                                   value="offline"
+                                   ${schedule.method === 'offline' ? 'checked' : ''}
+                                   disabled
+                                   class="mr-2">
+                            <span class="text-sm font-medium text-gray-700">오프라인</span>
+                        </label>
                     </div>
 
-                    ${schedule.method === 'online' && schedule.onlineInfo ? `
-                        <div class="p-4 bg-[#FAF6F1] border border-[#E8E0D8] rounded-lg">
-                            <h5 class="font-medium text-gray-800 mb-3">Zoom 미팅 정보</h5>
-                            <div class="space-y-2 text-sm">
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <span class="text-gray-600">미팅 ID:</span>
-                                        <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono">
-                                            ${schedule.onlineInfo.meetingId}
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-600">비밀번호:</span>
-                                        <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono">
-                                            ${schedule.onlineInfo.password}
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="grid grid-cols-2 gap-4">
-                                    <div>
-                                        <span class="text-gray-600">참가 URL:</span>
-                                        <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
-                                            <a href="${schedule.onlineInfo.meetingUrl}" target="_blank" class="text-[#6A0028] hover:underline">
-                                                ${schedule.onlineInfo.meetingUrl}
-                                            </a>
-                                        </div>
-                                    </div>
-                                    <div>
-                                        <span class="text-gray-600">호스트 URL:</span>
-                                        <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm break-all">
-                                            <a href="${schedule.onlineInfo.hostUrl}" target="_blank" class="text-[#6A0028] hover:underline">
-                                                ${schedule.onlineInfo.hostUrl}
-                                            </a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    ` : ''}
+                    <p class="text-xs text-gray-500 mb-3">※ 심사 날짜와 시간을 먼저 입력하세요</p>
 
-                    ${schedule.method === 'offline' && schedule.offlineInfo ? `
-                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
-                            <h5 class="font-medium text-gray-800 mb-3">오프라인 심사</h5>
-                            <div class="text-sm">
-                                <span class="text-gray-600">장소:</span>
-                                <span class="ml-2 font-medium">${schedule.offlineInfo.location}</span>
+                    <!-- 온라인 정보 -->
+                    <div id="online-fields" style="display: ${schedule.method === 'online' ? 'block' : 'none'};">
+
+                        <!-- 생성된 링크 정보 -->
+                        <div id="zoom-link-info" style="display: ${schedule.onlineInfo ? 'block' : 'none'};" class="p-4 bg-[#FAF6F1] border border-[#E8E0D8] rounded-lg">
+                            <h5 class="font-medium text-gray-800 mb-3">Zoom 미팅 정보</h5>
+                            <div class="grid grid-cols-4 gap-4 text-sm">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-600 whitespace-nowrap">미팅 ID:</span>
+                                    <span class="font-mono text-gray-900">${schedule.onlineInfo?.meetingId || ''}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-600 whitespace-nowrap">비밀번호:</span>
+                                    <span class="font-mono text-gray-900">${schedule.onlineInfo?.password || ''}</span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-600 whitespace-nowrap">참가 URL:</span>
+                                    <a href="${schedule.onlineInfo?.meetingUrl || '#'}"
+                                       target="_blank"
+                                       class="text-[#6A0028] hover:underline break-all">${schedule.onlineInfo?.meetingUrl || ''}</a>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="text-gray-600 whitespace-nowrap">호스트 URL:</span>
+                                    <a href="${schedule.onlineInfo?.hostUrl || '#'}"
+                                       target="_blank"
+                                       class="text-[#6A0028] hover:underline break-all">${schedule.onlineInfo?.hostUrl || ''}</a>
+                                </div>
                             </div>
                         </div>
-                    ` : ''}
+                    </div>
+
+                    <!-- 오프라인 정보 -->
+                    <div id="offline-fields" style="display: ${schedule.method === 'offline' ? 'block' : 'none'};">
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                장소 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="text"
+                                   id="offline-location"
+                                   value="${schedule.offlineInfo?.location || ''}"
+                                   placeholder="예: 제1공학관 301호"
+                                   disabled
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 cursor-not-allowed">
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
