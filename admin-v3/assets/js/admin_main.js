@@ -3732,33 +3732,36 @@ function viewProposalDetail(proposalId) {
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 목적</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 필요성</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 문제 및 연구 방법</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
                         </div>
                     </div>
 
-                    ${proposal.desiredAdvisor ? `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</label>
-                            <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
-                                <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
-                            </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                            ${student?.degreeType === '박사'
+                                ? (proposal.desiredAdvisor
+                                    ? `<p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>`
+                                    : `<p class="text-gray-500">-</p>`)
+                                : `<p class="text-gray-500">(박사 과정에서만 사용할 수 있는 기능)</p>`
+                            }
                         </div>
-                    ` : ''}
+                    </div>
                 </div>
 
                 <!-- 연구계획서 양식 불러오기 버튼 -->
@@ -3771,40 +3774,6 @@ function viewProposalDetail(proposalId) {
                         연구계획서 양식 불러오기
                     </button>
                 </div>
-            </div>
-
-            <!-- 지도교수 배정 현황 -->
-            <div class="px-8 py-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">지도교수 배정 현황</h2>
-
-                ${assignment ? `
-                    <div class="bg-white rounded-lg border border-gray-200 p-4">
-                        <div class="grid grid-cols-2 gap-6">
-                            <div class="info-row">
-                                <div class="info-label">지도교수</div>
-                                <div class="info-value">
-                                    ${assignment.mainAdvisor
-                                        ? `${assignment.mainAdvisor.name} (${assignment.mainAdvisor.department})`
-                                        : `<span class="text-gray-500">미배정</span>`
-                                    }
-                                </div>
-                            </div>
-                            <div class="info-row">
-                                <div class="info-label">부지도교수</div>
-                                <div class="info-value">
-                                    ${assignment.coAdvisors && assignment.coAdvisors.length > 0
-                                        ? assignment.coAdvisors.map(c => `${c.name} (${c.department})`).join(', ')
-                                        : `<span class="text-gray-500">미배정</span>`
-                                    }
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                ` : `
-                    <div class="bg-gray-50 rounded-lg border border-gray-200 p-6 text-center">
-                        <p class="text-gray-500">지도교수가 배정되지 않았습니다.</p>
-                    </div>
-                `}
             </div>
         </div>
     `;

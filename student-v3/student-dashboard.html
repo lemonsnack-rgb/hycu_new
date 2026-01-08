@@ -294,9 +294,9 @@
                     </div>
                     <!-- 2depth 메뉴 -->
                     <div id="evaluation-submenu" class="pl-12 mt-1 space-y-1">
-                        <a href="#" onclick="showScreen('evaluation-schedule'); return false;" data-screen="evaluation-schedule"
+                        <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>심사 일정 관리</span>
+                            <span>심사 일정 조회</span>
                         </a>
                     </div>
                 </div>
@@ -482,10 +482,8 @@
 
             <!-- 논문 지도 메뉴 화면들 -->
             <section id="advisor-assignment-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">지도교수 배정 콘텐츠 준비 중입니다.</p>
-                    </div>
+                <div id="advisor-assignment-content">
+                    <!-- JavaScript로 동적 렌더링 -->
                 </div>
             </section>
 
@@ -496,112 +494,6 @@
             </section>
 
             <section id="guidance-status-screen" class="content-screen">
-                <!-- 검색 필터 영역 -->
-                <div class="bg-white rounded-lg shadow-md mb-6 p-6">
-                    <h3 class="text-lg font-bold text-gray-800 mb-4">검색 옵션</h3>
-
-                    <div class="grid grid-cols-4 gap-4 mb-4">
-                        <!-- Row 1 -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">학년도</label>
-                            <select id="student-guidance-filter-year" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="2025" selected>2025</option>
-                                <option value="2024">2024</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">학기</label>
-                            <select id="student-guidance-filter-semester" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="1">1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">학위과정</label>
-                            <select id="student-guidance-filter-program" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                                <option value="석박사통합">석박사통합</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">피드백상태</label>
-                            <select id="student-guidance-filter-feedback-status" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="대기">대기</option>
-                                <option value="진행중">진행중</option>
-                                <option value="완료">완료</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-4 gap-4 mb-4">
-                        <!-- Row 2 -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">대학구분</label>
-                            <select id="student-guidance-filter-university-type" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="일반대학원">일반대학원</option>
-                                <option value="특수대학원">특수대학원</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">계열/대학원</label>
-                            <select id="student-guidance-filter-college" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="공학계열">공학계열</option>
-                                <option value="사회과학계열">사회과학계열</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">학부(과)전공</label>
-                            <select id="student-guidance-filter-undergraduate" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="컴퓨터공학">컴퓨터공학</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">학과/전공</label>
-                            <select id="student-guidance-filter-major" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="컴퓨터공학전공">컴퓨터공학전공</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="grid grid-cols-4 gap-4 mb-4">
-                        <!-- Row 3 -->
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">학적상태</label>
-                            <select id="student-guidance-filter-academic-status" class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="재학">재학</option>
-                                <option value="휴학">휴학</option>
-                                <option value="수료">수료</option>
-                                <option value="졸업">졸업</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">지도교수명</label>
-                            <input type="text" id="student-guidance-filter-professor"
-                                   placeholder="지도교수명"
-                                   class="w-full px-2 border rounded text-xs" style="height: 34px;">
-                        </div>
-                    </div>
-
-                    <div class="flex gap-2 justify-end">
-                        <button onclick="searchStudentGuidanceStatus()" class="btn btn-primary btn-sm">
-                            검색
-                        </button>
-                        <button onclick="resetStudentGuidanceStatusSearch()" class="btn btn-secondary btn-sm">
-                            초기화
-                        </button>
-                    </div>
-                </div>
-
                 <!-- 목록 영역 -->
                 <div id="student-guidance-status-content"></div>
             </section>
@@ -615,11 +507,9 @@
             </section>
 
             <!-- 논문 심사 메뉴 화면들 -->
-            <section id="evaluation-schedule-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">심사 일정 관리 콘텐츠 준비 중입니다.</p>
-                    </div>
+            <section id="exam-schedule-screen" class="content-screen">
+                <div id="student-exam-schedule-content">
+                    <!-- JavaScript로 동적 렌더링 -->
                 </div>
             </section>
 
@@ -685,6 +575,18 @@
                 initStudentSemesterGuidancePlan();
             } else if (screenId === 'guidance-status' && typeof initStudentGuidanceStatusList === 'function') {
                 initStudentGuidanceStatusList();
+            } else if (screenId === 'exam-schedule') {
+                setTimeout(() => {
+                    if (typeof renderStudentExamScheduleScreen === 'function') {
+                        renderStudentExamScheduleScreen();
+                    }
+                }, 50);
+            } else if (screenId === 'advisor-assignment') {
+                setTimeout(() => {
+                    if (typeof renderStudentAdvisorAssignmentScreen === 'function') {
+                        renderStudentAdvisorAssignmentScreen();
+                    }
+                }, 50);
             }
 
             // 모바일에서 화면 전환 시 사이드바 닫기
@@ -713,7 +615,8 @@
                 'guidance-status': '논문 지도 현황',
                 'realtime-reservation': '실시간 지도 예약',
                 // 논문 심사
-                'evaluation-schedule': '심사 일정 관리'
+                'evaluation-schedule': '심사 일정 관리',
+                'exam-schedule': '심사 일정 조회'
             };
 
             const breadcrumbCurrent = document.querySelector('.layout-v3-breadcrumb-current');
@@ -806,6 +709,14 @@
     <script src="assets/js/guidance-status-detail.js?v=20260107001"></script>
     <script src="assets/js/guidance-status-viewer.js?v=20260107001"></script>
     <script src="assets/js/guidance-status-tools.js?v=20260107001"></script>
+
+    <!-- 심사 일정 관련 (교수/관리자 코드 재사용) -->
+    <script src="../admin-v3/assets/js/mockData.js?v=20260108001"></script>
+    <script src="../admin-v3/assets/js/exam-schedule-data.js?v=20260108001"></script>
+    <script src="assets/js/student-exam-schedule.js?v=20260108001"></script>
+
+    <!-- 지도교수 배정 관련 -->
+    <script src="assets/js/student-advisor-assignment.js?v=20260108002"></script>
 
 </body>
 </html>

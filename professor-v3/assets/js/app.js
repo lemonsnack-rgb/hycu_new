@@ -559,77 +559,62 @@ function viewProfessorProposalDetail(proposalId) {
                 </div>
             </div>
 
-            <!-- 연구계획서 내용 -->
-            <div class="px-6 py-4 border-b bg-white">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">연구계획서</h4>
-                <div class="px-2 space-y-4">
+            <!-- 연구계획서 정보 -->
+            <div class="px-8 py-6 border-b border-gray-200">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서 정보</h2>
+
+                <div class="space-y-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            연구 목적
-                        </label>
-                        <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 제목</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <p class="text-gray-900 font-medium">${proposal.title || ''}</p>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 목적</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            연구 필요성
-                        </label>
-                        <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 필요성</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">
-                            연구 문제 및 연구 방법
-                        </label>
-                        <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 문제 및 연구 방법</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
                         </div>
                     </div>
 
-                    ${proposal.desiredAdvisor ? `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                희망 지도교수 (참고용)
-                            </label>
-                            <div class="px-4 py-3 border border-gray-300 rounded bg-gray-50">
-                                <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
-                            </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                            ${student?.degreeType === '박사'
+                                ? (proposal.desiredAdvisor
+                                    ? `<p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>`
+                                    : `<p class="text-gray-500">-</p>`)
+                                : `<p class="text-gray-500">(박사 과정에서만 사용할 수 있는 기능)</p>`
+                            }
                         </div>
-                    ` : ''}
-                </div>
-                </div>
-            </div>
-
-            <!-- 지도교수 정보 -->
-            <div class="px-6 py-4 border-b bg-gray-50">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">지도교수</h4>
-                ${assignment ? `
-                    <div class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
-                        <div class="flex gap-2">
-                            <span class="text-gray-600 min-w-[80px]">주지도교수:</span>
-                            <span class="text-gray-900 font-medium">
-                                ${assignment.mainAdvisor
-                                    ? `${assignment.mainAdvisor.name} (${assignment.mainAdvisor.department})`
-                                    : `<span class="text-gray-500">미배정</span>`
-                                }
-                            </span>
-                        </div>
-                        ${assignment.coAdvisors && assignment.coAdvisors.length > 0 ? `
-                            <div class="flex gap-2">
-                                <span class="text-gray-600 min-w-[80px]">부지도교수:</span>
-                                <span class="text-gray-900 font-medium">
-                                    ${assignment.coAdvisors.map(c => `${c.name} (${c.department})`).join(', ')}
-                                </span>
-                            </div>
-                        ` : ''}
                     </div>
-                ` : `
-                    <p class="text-sm text-gray-500">지도교수가 배정되지 않았습니다.</p>
-                `}
+                </div>
+
+                <!-- 연구계획서 양식 불러오기 버튼 -->
+                <div class="mt-6 flex justify-end">
+                    <button onclick="loadProposalForm('${proposal.id}')"
+                            class="px-6 py-3 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] flex items-center gap-2 transition-colors">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        연구계획서 양식 불러오기
+                    </button>
+                </div>
             </div>
         </div>
     `;
