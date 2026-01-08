@@ -4,8 +4,8 @@
  */
 
 // 화면 상태
-let currentView = 'list'; // list | submit | detail
-let currentSubmissionId = null;
+let thesisCurrentView = 'list'; // list | submit | detail
+let thesisCurrentSubmissionId = null;
 
 // Mock 데이터
 const thesisSubmissions = [
@@ -94,20 +94,20 @@ function initThesisSubmission() {
     }
 
     // 항상 목록 화면으로 시작
-    currentView = 'list';
-    currentSubmissionId = null;
+    thesisCurrentView = 'list';
+    thesisCurrentSubmissionId = null;
 
     // 이벤트 위임 설정 (한 번만)
-    setupEventDelegation();
+    setupThesisEventDelegation();
 
     // 화면 렌더링
-    renderScreen();
+    renderThesisScreen();
 }
 
 // 이벤트 위임 설정 (한 번만 실행되도록)
-let eventDelegationSetup = false;
-function setupEventDelegation() {
-    if (eventDelegationSetup) {
+let thesisEventDelegationSetup = false;
+function setupThesisEventDelegation() {
+    if (thesisEventDelegationSetup) {
         console.log('이벤트 위임 이미 설정됨 - 건너뜀');
         return;
     }
@@ -172,26 +172,26 @@ function setupEventDelegation() {
         }
     });
 
-    eventDelegationSetup = true;
+    thesisEventDelegationSetup = true;
     console.log('이벤트 위임 설정 완료');
 }
 
 // 화면 렌더링
-function renderScreen() {
-    console.log('renderScreen 호출, currentView:', currentView, 'currentSubmissionId:', currentSubmissionId);
+function renderThesisScreen() {
+    console.log('renderScreen 호출, thesisCurrentView:', thesisCurrentView, 'thesisCurrentSubmissionId:', thesisCurrentSubmissionId);
     const content = document.getElementById('thesis-submission-content');
     if (!content) {
         console.error('thesis-submission-content 요소를 찾을 수 없습니다');
         return;
     }
 
-    if (currentView === 'list') {
+    if (thesisCurrentView === 'list') {
         console.log('목록 화면 렌더링');
         content.innerHTML = renderThesisListScreen();
-    } else if (currentView === 'submit') {
+    } else if (thesisCurrentView === 'submit') {
         console.log('제출 폼 화면 렌더링');
         content.innerHTML = renderThesisSubmissionForm();
-    } else if (currentView === 'detail') {
+    } else if (thesisCurrentView === 'detail') {
         console.log('상세 화면 렌더링');
         content.innerHTML = renderThesisDetailView();
     }
@@ -277,31 +277,31 @@ function renderThesisListRow(submission, index) {
 // 제출 화면으로 이동
 function submitThesis(id) {
     console.log('submitThesis 호출됨, id:', id);
-    currentSubmissionId = id;
-    currentView = 'submit';
-    console.log('currentView 변경:', currentView);
-    renderScreen();
+    thesisCurrentSubmissionId = id;
+    thesisCurrentView = 'submit';
+    console.log('thesisCurrentView 변경:', thesisCurrentView);
+    renderThesisScreen();
 }
 
 // 상세 화면으로 이동
 function viewThesisSubmission(id) {
     console.log('viewThesisSubmission 호출됨, id:', id);
-    currentSubmissionId = id;
-    currentView = 'detail';
-    console.log('currentView 변경:', currentView);
-    renderScreen();
+    thesisCurrentSubmissionId = id;
+    thesisCurrentView = 'detail';
+    console.log('thesisCurrentView 변경:', thesisCurrentView);
+    renderThesisScreen();
 }
 
 // 목록으로 돌아가기
 function backToList() {
-    currentView = 'list';
-    currentSubmissionId = null;
-    renderScreen();
+    thesisCurrentView = 'list';
+    thesisCurrentSubmissionId = null;
+    renderThesisScreen();
 }
 
 // 제출 폼 화면
 function renderThesisSubmissionForm() {
-    const submission = thesisSubmissions.find(s => s.id === currentSubmissionId);
+    const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
     if (!submission) return '';
 
     const isEdit = submission.status === 'submitted';
@@ -386,7 +386,7 @@ function renderThesisSubmissionForm() {
 
 // 상세/보기 화면
 function renderThesisDetailView() {
-    const submission = thesisSubmissions.find(s => s.id === currentSubmissionId);
+    const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
     if (!submission || submission.status !== 'submitted') return '';
 
     const data = submission.submittedData;
@@ -463,9 +463,9 @@ function renderThesisDetailView() {
 
 // 수정 모드로 전환
 function editThesisSubmission(id) {
-    currentSubmissionId = id;
-    currentView = 'submit';
-    renderScreen();
+    thesisCurrentSubmissionId = id;
+    thesisCurrentView = 'submit';
+    renderThesisScreen();
 }
 
 // 파일 선택 처리
@@ -492,7 +492,7 @@ function saveThesisSubmission() {
     const desiredDate = document.getElementById('desired-exam-date').value;
     const file = document.getElementById('thesis-file').files[0];
 
-    const submission = thesisSubmissions.find(s => s.id === currentSubmissionId);
+    const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
     const isEdit = submission.status === 'submitted';
 
     if (!title) {
