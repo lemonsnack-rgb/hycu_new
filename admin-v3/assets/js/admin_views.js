@@ -3415,7 +3415,7 @@ const views = {
 
                 <!-- Workflow Basic Info -->
                 <div class="p-6 border-b bg-gray-50">
-                    <div class="flex items-center gap-8">
+                    <div class="flex items-center gap-6">
                         <!-- 좌측: 심사 단계 이름 -->
                         <div class="flex items-center gap-4 flex-1">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
@@ -3428,7 +3428,7 @@ const views = {
                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
 
-                        <!-- 우측: 학위 과정 -->
+                        <!-- 중앙: 학위 과정 -->
                         <div class="flex items-center gap-4 flex-1">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
                                 학위 과정 *
@@ -3451,6 +3451,27 @@ const views = {
                                            ${isEdit && item.degreeType === 'integrated' ? 'checked' : ''}
                                            class="mr-2 w-4 h-4 cursor-pointer">
                                     <span class="text-sm text-gray-700">통합과정</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 우측: 논문 유형 -->
+                        <div class="flex items-center gap-4 flex-1">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
+                                논문 유형 *
+                            </label>
+                            <div class="flex items-center gap-6">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="workflow-thesis-type" value="degree"
+                                           ${isEdit && item.thesisType === 'degree' ? 'checked' : (!isEdit ? 'checked' : '')}
+                                           class="mr-2 w-4 h-4 cursor-pointer">
+                                    <span class="text-sm text-gray-700">학위 논문</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="workflow-thesis-type" value="journal"
+                                           ${isEdit && item.thesisType === 'journal' ? 'checked' : ''}
+                                           class="mr-2 w-4 h-4 cursor-pointer">
+                                    <span class="text-sm text-gray-700">학술지 논문</span>
                                 </label>
                             </div>
                         </div>

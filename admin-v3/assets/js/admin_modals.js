@@ -6569,6 +6569,7 @@ function saveUnifiedWorkflow() {
     const name = document.getElementById('workflow-name').value.trim();
     const degreeCheckboxes = document.querySelectorAll('input[name="workflow-degree"]:checked');
     const selectedDegrees = Array.from(degreeCheckboxes).map(cb => cb.value);
+    const thesisType = document.querySelector('input[name="workflow-thesis-type"]:checked')?.value;
 
     if (!name) {
         alert('워크플로우 이름을 입력해주세요.');
@@ -6577,6 +6578,11 @@ function saveUnifiedWorkflow() {
 
     if (selectedDegrees.length === 0) {
         alert('학위 과정을 최소 1개 이상 선택해주세요.');
+        return;
+    }
+
+    if (!thesisType) {
+        alert('논문 유형을 선택해주세요.');
         return;
     }
 
@@ -6611,6 +6617,7 @@ function saveUnifiedWorkflow() {
         if (workflow) {
             workflow.name = name;
             workflow.degreeType = selectedDegrees[0]; // 첫 번째 선택값 사용
+            workflow.thesisType = thesisType;
             workflow.stageCount = window.composedStages.length;
             workflow.stages = JSON.parse(JSON.stringify(window.composedStages));
 
@@ -6662,6 +6669,7 @@ function saveUnifiedWorkflow() {
             id: newId,
             name: name,
             degreeType: selectedDegrees[0], // 첫 번째 선택값 사용
+            thesisType: thesisType,
             stageCount: newStages.length,
             createdDate: new Date().toISOString().split('T')[0],
             stages: newStages

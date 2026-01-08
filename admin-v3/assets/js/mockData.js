@@ -131,6 +131,7 @@ const mockThesisStages = [
         id: 'TS001',
         name: '석사 표준 과정',
         degreeType: 'master',
+        thesisType: 'degree',
         stageCount: 5,
         createdDate: '2025-01-01',
         stages: [
@@ -225,6 +226,7 @@ const mockThesisStages = [
         id: 'TS002',
         name: '박사 표준 과정',
         degreeType: 'phd',
+        thesisType: 'degree',
         stageCount: 7,
         createdDate: '2025-01-01',
         stages: [
@@ -489,7 +491,10 @@ const mockReviewTargets = [
 
     // 박사 최종논문 심사 대상 (2명)
     { id: 'RT009', studentId: 'STU014', studentNumber: '2023004', studentName: '양학생', department: '경영학과', degreeType: '박사', academicYear: '2023', semesterCount: 7, reviewType: 'final', title: '빅데이터 분석을 통한 소비자 행동 예측 모델', submittedDate: '2025-02-20', advisorId: 'PROF004', advisorName: '이교수', status: 'pending' },
-    { id: 'RT010', studentId: 'STU016', studentNumber: '2023006', studentName: '송학생', department: '교육학과', degreeType: '박사', academicYear: '2023', semesterCount: 7, reviewType: 'final', title: '인공지능 기반 개인화 학습 시스템 설계', submittedDate: '2025-02-21', advisorId: 'PROF006', advisorName: '강교수', status: 'pending' }
+    { id: 'RT010', studentId: 'STU016', studentNumber: '2023006', studentName: '송학생', department: '교육학과', degreeType: '박사', academicYear: '2023', semesterCount: 7, reviewType: 'final', title: '인공지능 기반 개인화 학습 시스템 설계', submittedDate: '2025-02-21', advisorId: 'PROF006', advisorName: '강교수', status: 'pending' },
+
+    // 학생용(student-v3) 테스트 데이터 - S2024001 (김철수 학생) - 박사 예비심사
+    { id: 'RT011', studentId: 'S2024001', studentNumber: '2024001', studentName: '김철수', department: '컴퓨터공학과', degreeType: '박사', academicYear: '2025', semesterCount: 6, reviewType: 'preliminary', title: 'AI 기반 실시간 데이터 처리 최적화 연구', submittedDate: '2025-02-23', advisorId: 'PROF001', advisorName: '김교수', status: 'assigned' }
 ];
 
 // 심사위원 배정 데이터
@@ -573,6 +578,42 @@ const mockCommitteeAssignments = [
             { professorId: 'PROF005', professorName: '정교수', role: 'member', department: '교육학과' }
         ],
         assignedDate: '2025-02-22',
+        status: 'completed'
+    },
+    // 학생용(student-v3) 테스트 데이터 추가 - S2024001 (김철수 학생)
+    {
+        id: 'CA004',
+        reviewTargetId: 'RT011',
+        studentId: 'S2024001',
+        studentNumber: '2024001',
+        studentName: '김철수',
+        department: '컴퓨터공학과',
+        degreeType: '박사',
+        reviewType: 'preliminary',
+
+        // 추가 학생 정보 (확장된 검색 필터용 - 13개 필드)
+        year: '2025',
+        semester: '1',
+        graduate: '일반대학원',
+        college: '공학계열',
+        undergraduate: '컴퓨터공학과',
+        academicStatus: '재학',
+        advisorName: '박교수',
+
+        // 논문 지도 단계 정보 (박사 - 예비심사)
+        thesisStageId: 'TS002',
+        stageId: 'STAGE_TS002_005',
+        stageName: '예비심사',
+        stageOrder: 5,
+
+        chairId: 'PROF001',
+        chairName: '김교수',
+        members: [
+            { professorId: 'PROF001', professorName: '김교수', role: 'chair', department: '컴퓨터공학과' },
+            { professorId: 'PROF002', professorName: '이교수', role: 'member', department: '컴퓨터공학과' },
+            { professorId: 'PROF003', professorName: '박교수', role: 'member', department: '경영학과' }
+        ],
+        assignedDate: '2025-02-23',
         status: 'completed'
     }
 ];
