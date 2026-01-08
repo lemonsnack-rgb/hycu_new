@@ -119,8 +119,13 @@ function openModal(title, content, confirmText = '저장', onConfirm = null, sho
     }
 
     // 모달 표시
-    document.getElementById('universal-modal').classList.remove('hidden');
-    document.getElementById('modal-backdrop').classList.remove('hidden');
+    const modalElement = document.getElementById('universal-modal');
+    const backdropElement = document.getElementById('modal-backdrop');
+    modalElement.classList.remove('hidden');
+    modalElement.classList.add('flex');
+    modalElement.style.cssText = ''; // 모든 inline style 제거
+    backdropElement.classList.remove('hidden');
+    backdropElement.style.cssText = ''; // 모든 inline style 제거
 
     // ✨ 취소 버튼에 직접 이벤트 리스너 연결 (onclick 속성 무시)
     const cancelBtn = document.getElementById('modal-cancel');
@@ -173,7 +178,7 @@ function openModal(title, content, confirmText = '저장', onConfirm = null, sho
 }
 
 function closeModal() {
-    console.log('closeModal 호출됨');
+    console.log('🔴 closeModal 호출됨 - 강제 닫기 시작');
     const modal = document.getElementById('universal-modal');
     const backdrop = document.getElementById('modal-backdrop');
 
@@ -185,18 +190,26 @@ function closeModal() {
     });
 
     if (modal) {
+        // 🔥 모든 방법을 동원해서 강제로 숨김
         modal.classList.add('hidden');
-        console.log('✅ 모달 hidden 클래스 추가');
+        modal.classList.remove('flex');
+        modal.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;';
+        console.log('✅ 모달 강제 숨김 처리 완료');
     } else {
         console.error('❌ universal-modal 요소를 찾을 수 없음');
     }
 
     if (backdrop) {
+        // 🔥 모든 방법을 동원해서 강제로 숨김
         backdrop.classList.add('hidden');
-        console.log('✅ backdrop hidden 클래스 추가');
+        backdrop.classList.remove('flex');
+        backdrop.style.cssText = 'display: none !important; visibility: hidden !important; opacity: 0 !important; pointer-events: none !important;';
+        console.log('✅ backdrop 강제 숨김 처리 완료');
     } else {
         console.error('❌ modal-backdrop 요소를 찾을 수 없음');
     }
+
+    console.log('🟢 closeModal 실행 완료');
 }
 
 // 전역으로 명시적 등록
@@ -379,6 +392,13 @@ function showProfessorStudentList() {
 function showProfessorStudentDetail(studentId) {
     currentStudentId = studentId;
 
+    // ✨ semester-guidance-v2.js의 함수 호출 (테이블 방식)
+    if (typeof showSemesterGuidanceDetail === 'function') {
+        showSemesterGuidanceDetail(studentId);
+        return;
+    }
+
+    // Fallback: 기존 방식
     const student = DataService.getStudentDetail(studentId);
     if (!student) {
         showToast('학생 정보를 찾을 수 없습니다', 'error');
@@ -1071,33 +1091,8 @@ function executeProfessorResetWeeks() {
     console.log('토스트 메시지 표시:', message);
     showToast(message, 'success');
 
-    console.log('⏰ closeModal 호출 직전');
-    console.log('typeof closeModal:', typeof closeModal);
-    console.log('typeof window.closeModal:', typeof window.closeModal);
-    console.log('window.closeModal === closeModal:', window.closeModal === closeModal);
-
-    try {
-        console.log('⚡ window.closeModal() 실행 시작');
-        const modal = document.getElementById('universal-modal');
-        const backdrop = document.getElementById('modal-backdrop');
-        console.log('모달 DOM 요소 직접 확인:', {
-            modal: !!modal,
-            backdrop: !!backdrop,
-            modalDisplay: modal ? window.getComputedStyle(modal).display : 'N/A',
-            backdropDisplay: backdrop ? window.getComputedStyle(backdrop).display : 'N/A'
-        });
-
-        // 직접 hidden 클래스 추가
-        if (modal) modal.classList.add('hidden');
-        if (backdrop) backdrop.classList.add('hidden');
-        console.log('✅ 직접 hidden 클래스 추가 완료');
-
-        console.log('⚡ window.closeModal() 실행 완료');
-    } catch (error) {
-        console.error('❌ closeModal 실행 중 오류:', error);
-        console.error('오류 스택:', error.stack);
-    }
-
+    console.log('⏰ closeModal 호출 시작');
+    window.closeModal();
     console.log('⏰ closeModal 호출 완료');
 
     setTimeout(() => {

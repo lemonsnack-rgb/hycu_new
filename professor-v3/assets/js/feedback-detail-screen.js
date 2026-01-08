@@ -80,15 +80,22 @@ function createFeedbackDetailScreen(request, feedbackData) {
                 </button>
             </div>
 
-            <!-- 논문 정보 영역 -->
-            <div class="px-6 py-3 border-b bg-gray-50">
-                <div class="flex items-center justify-between gap-4">
-                    <span class="text-sm font-medium text-gray-900 truncate" style="max-width: 50ch;">
-                        ${request.thesisTitle || '논문명'}
-                    </span>
-                    <div class="text-sm text-gray-600 flex-shrink-0">
+            <!-- 학생 정보 및 표절률 영역 -->
+            <div class="px-6 py-2 border-b bg-gray-50">
+                <div class="text-xs text-gray-700 flex items-center justify-between">
+                    <div>
+                        <span class="font-semibold">논문명:</span>
+                        <span title="${request.thesisTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || '논문명'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학부(과)전공:</span> ${request.graduate || '-'} / ${request.major || '-'}
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">성명:</span> ${request.studentName || '-'}
+                    </div>
+                    <div class="text-gray-600 flex-shrink-0 ml-4">
                         <span class="font-semibold ${getPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-[#6A0028] hover:underline text-xs">결과보고서(통합)</a>
+                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReport('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-[#6A0028] hover:underline">결과보고서(통합)</a>
                         </span>
                     </div>
                 </div>

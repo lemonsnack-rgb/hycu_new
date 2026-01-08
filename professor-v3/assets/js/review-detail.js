@@ -517,7 +517,7 @@ function renderGradeForm(template, savedData) {
 
 // ==================== 제출된 평가 표시 (읽기 모드) ====================
 function renderSubmittedEvaluation(template, evaluation) {
-    // Pass/Fail 방식
+    // Pass/Fail 방식 - 테이블 형태
     if (evaluation.evaluationType === 'passfail') {
         return `
             <div class="bg-white rounded-lg shadow-md p-6 mb-6">
@@ -535,65 +535,126 @@ function renderSubmittedEvaluation(template, evaluation) {
                     </p>
                 </div>
 
-                <div id="passfail-items" class="space-y-4">
-                    ${template.items.map((item, index) => {
-                        const result = evaluation.passFailResults.find(r => r.itemId === item.id);
-                        const currentResult = result?.result || '';
-                        const currentComment = result?.comment || '';
+                <!-- 데스크톱 테이블 -->
+                <div class="evaluation-table-desktop hidden md:block">
+                    <div class="table-scroll">
+                        <table class="min-w-full border-collapse border border-gray-300">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 120px;">판정</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${template.items.map((item, index) => {
+                                    const result = evaluation.passFailResults.find(r => r.itemId === item.id);
+                                    const currentResult = result?.result || '';
+                                    const currentComment = result?.comment || '';
 
-                        return `
-                            <div class="passfail-item bg-white border border-gray-300 rounded-lg p-4"
-                                 data-item-id="${item.id}">
-                                <!-- 제목 -->
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h4 class="font-bold text-gray-800 mb-1">
-                                            ${index + 1}. ${item.name}
-                                            ${item.required ? '<span class="text-red-600 text-sm ml-1">[필수]</span>' : ''}
+                                    return `
+                                        <tr>
+                                            <td class="border border-gray-300 px-2 py-2 text-center text-sm">${index + 1}</td>
+                                            <td class="border border-gray-300 px-2 py-2 text-sm font-medium">
+                                                ${item.name}
+                                                ${item.required ? '<span class="text-red-600 text-xs ml-1">[필수]</span>' : ''}
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2 text-sm text-gray-600">${item.description}</td>
+                                            <td class="border border-gray-300 px-2 py-2 text-center">
+                                                <div class="flex justify-center gap-2">
+                                                    <label class="flex items-center gap-1 px-3 py-1 rounded border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300'}">
+                                                        <input type="radio"
+                                                               name="result-${item.id}"
+                                                               value="pass"
+                                                               data-item-id="${item.id}"
+                                                               ${currentResult === 'pass' ? 'checked' : ''}
+                                                               disabled>
+                                                        <span class="text-xs font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
+                                                    </label>
+                                                    <label class="flex items-center gap-1 px-3 py-1 rounded border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300'}">
+                                                        <input type="radio"
+                                                               name="result-${item.id}"
+                                                               value="fail"
+                                                               data-item-id="${item.id}"
+                                                               ${currentResult === 'fail' ? 'checked' : ''}
+                                                               disabled>
+                                                        <span class="text-xs font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="passfail-comment w-full border-0 bg-transparent text-sm resize-none"
+                                                          rows="2"
+                                                          data-item-id="${item.id}"
+                                                          disabled>${currentComment}</textarea>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 모바일 카드 -->
+                <div class="evaluation-table-mobile block md:hidden">
+                    <div class="space-y-4">
+                        ${template.items.map((item, index) => {
+                            const result = evaluation.passFailResults.find(r => r.itemId === item.id);
+                            const currentResult = result?.result || '';
+                            const currentComment = result?.comment || '';
+
+                            return `
+                                <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                                    <div class="mb-3">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-medium text-gray-500">순번 ${index + 1}</span>
+                                        </div>
+                                        <h4 class="font-bold text-gray-900 mb-1">
+                                            ${item.name}
+                                            ${item.required ? '<span class="text-red-600 text-xs ml-1">[필수]</span>' : ''}
                                         </h4>
                                         <p class="text-sm text-gray-600">${item.description}</p>
                                     </div>
-                                </div>
 
-                                <!-- Pass/Fail 선택 (읽기 모드) -->
-                                <div class="flex items-center gap-4 mb-3">
-                                    <label class="text-sm font-medium text-gray-700">판정:</label>
-                                    <div class="flex gap-3">
-                                        <label class="flex items-center gap-2 p-2 px-4 rounded-lg border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'}">
-                                            <input type="radio"
-                                                   name="result-${item.id}"
-                                                   value="pass"
-                                                   class="passfail-radio"
-                                                   data-item-id="${item.id}"
-                                                   ${currentResult === 'pass' ? 'checked' : ''}
-                                                   disabled>
-                                            <span class="font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 p-2 px-4 rounded-lg border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}">
-                                            <input type="radio"
-                                                   name="result-${item.id}"
-                                                   value="fail"
-                                                   class="passfail-radio"
-                                                   data-item-id="${item.id}"
-                                                   ${currentResult === 'fail' ? 'checked' : ''}
-                                                   disabled>
-                                            <span class="font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
-                                        </label>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <label class="text-xs font-medium text-gray-700 block mb-1">판정</label>
+                                            <div class="flex gap-2">
+                                                <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300'}">
+                                                    <input type="radio"
+                                                           name="result-mobile-${item.id}"
+                                                           value="pass"
+                                                           data-item-id="${item.id}"
+                                                           ${currentResult === 'pass' ? 'checked' : ''}
+                                                           disabled>
+                                                    <span class="text-sm font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
+                                                </label>
+                                                <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300'}">
+                                                    <input type="radio"
+                                                           name="result-mobile-${item.id}"
+                                                           value="fail"
+                                                           data-item-id="${item.id}"
+                                                           ${currentResult === 'fail' ? 'checked' : ''}
+                                                           disabled>
+                                                    <span class="text-sm font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-gray-700 block mb-1">평가 의견</label>
+                                            <textarea class="passfail-comment w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-sm"
+                                                      rows="2"
+                                                      data-item-id="${item.id}"
+                                                      disabled>${currentComment}</textarea>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <!-- 평가 의견 (읽기 모드) -->
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>
-                                    <textarea class="passfail-comment w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
-                                              rows="2"
-                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                              data-item-id="${item.id}"
-                                              disabled>${currentComment}</textarea>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                            `;
+                        }).join('')}
+                    </div>
                 </div>
 
                 <!-- 최종 결과 -->
@@ -619,7 +680,7 @@ function renderSubmittedEvaluation(template, evaluation) {
         `;
     }
 
-    // 점수형 방식
+    // 점수형 방식 - 테이블 형태
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <div class="flex items-center justify-between mb-4">
@@ -629,52 +690,106 @@ function renderSubmittedEvaluation(template, evaluation) {
                 </span>
             </div>
 
-            <div id="evaluation-categories" class="space-y-4">
-                ${template.categories.map((category, index) => {
-                    const score = evaluation.scores.find(s => s.categoryId === category.id);
-                    const currentScore = score?.score || 0;
-                    const currentComment = score?.comment || '';
+            <!-- 데스크톱 테이블 -->
+            <div class="evaluation-table-desktop hidden md:block">
+                <div class="table-scroll">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 80px;">배점</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 100px;">점수</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${template.categories.map((category, index) => {
+                                const score = evaluation.scores.find(s => s.categoryId === category.id);
+                                const currentScore = score?.score || 0;
+                                const currentComment = score?.comment || '';
 
-                    return `
-                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 1px solid #d1d5db; border-radius: 0.5rem;"
-                             data-category-id="${category.id}">
+                                return `
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-2 text-center text-sm">${index + 1}</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-sm font-medium">${category.name}</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-sm text-gray-600">${category.description}</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-center text-sm font-bold text-[#6A0028]">${category.maxScore}점</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-center">
+                                            <input type="number"
+                                                   class="score-input w-full border-0 bg-transparent text-center text-sm font-medium"
+                                                   min="0"
+                                                   max="${category.maxScore}"
+                                                   step="0.5"
+                                                   value="${currentScore}"
+                                                   data-category-id="${category.id}"
+                                                   data-max="${category.maxScore}"
+                                                   disabled>
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-2">
+                                            <textarea class="score-input w-full border-0 bg-transparent text-sm resize-none"
+                                                      rows="2"
+                                                      data-category-id="${category.id}"
+                                                      disabled>${currentComment}</textarea>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
 
-                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 0.75rem;">
-                                <div style="flex: 1 1 0%;">
-                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
-                                        ${index + 1}. ${category.name}
-                                    </h4>
-                                    <p style="font-size: 0.875rem; color: #4b5563;">${category.description}</p>
+            <!-- 모바일 카드 -->
+            <div class="evaluation-table-mobile block md:hidden">
+                <div class="space-y-4">
+                    ${template.categories.map((category, index) => {
+                        const score = evaluation.scores.find(s => s.categoryId === category.id);
+                        const currentScore = score?.score || 0;
+                        const currentComment = score?.comment || '';
+
+                        return `
+                            <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-medium text-gray-500">순번 ${index + 1}</span>
+                                        </div>
+                                        <h4 class="font-bold text-gray-900 mb-1">${category.name}</h4>
+                                        <p class="text-sm text-gray-600">${category.description}</p>
+                                    </div>
+                                    <div class="text-right ml-3">
+                                        <span class="text-xl font-bold text-[#6A0028]">${category.maxScore}</span>
+                                        <span class="text-xs text-gray-600">점</span>
+                                    </div>
                                 </div>
-                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${category.maxScore}</span>
-                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
+
+                                <div class="space-y-2">
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 block mb-1">점수</label>
+                                        <input type="number"
+                                               class="score-input w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-right text-sm"
+                                               min="0"
+                                               max="${category.maxScore}"
+                                               step="0.5"
+                                               value="${currentScore}"
+                                               data-category-id="${category.id}"
+                                               data-max="${category.maxScore}"
+                                               disabled>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 block mb-1">평가 의견</label>
+                                        <textarea class="score-input w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-sm"
+                                                  rows="2"
+                                                  data-category-id="${category.id}"
+                                                  disabled>${currentComment}</textarea>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div>
-                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
-                                <input type="number"
-                                       class="score-input w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-right"
-                                       min="0"
-                                       max="${category.maxScore}"
-                                       step="0.5"
-                                       value="${currentScore}"
-                                       placeholder="0 ~ ${category.maxScore}점"
-                                       data-category-id="${category.id}"
-                                       data-max="${category.maxScore}"
-                                       disabled>
-
-                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
-                                <textarea class="score-input w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
-                                          rows="2"
-                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                          data-category-id="${category.id}"
-                                          disabled>${currentComment}</textarea>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
+                        `;
+                    }).join('')}
+                </div>
             </div>
 
             <!-- 총점 -->
@@ -700,7 +815,7 @@ function renderSubmittedEvaluation(template, evaluation) {
 
 // ==================== 심사위원 개별 평가 표시 (위원장용) ====================
 function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
-    // Pass/Fail 방식
+    // Pass/Fail 방식 - 테이블 형태
     if (evaluation.evaluationType === 'passfail') {
         return `
             <div class="bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-[#6A0028]">
@@ -721,45 +836,120 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                     </p>
                 </div>
 
-                <div class="space-y-4">
-                    ${template.items.map((item, index) => {
-                        const result = evaluation.passFailResults.find(r => r.itemId === item.id);
-                        const currentResult = result?.result || '';
-                        const currentComment = result?.comment || '';
+                <!-- 데스크톱 테이블 -->
+                <div class="evaluation-table-desktop hidden md:block">
+                    <div class="table-scroll">
+                        <table class="min-w-full border-collapse border border-gray-300">
+                            <thead>
+                                <tr class="bg-gray-50">
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 120px;">판정</th>
+                                    <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${template.items.map((item, index) => {
+                                    const result = evaluation.passFailResults.find(r => r.itemId === item.id);
+                                    const currentResult = result?.result || '';
+                                    const currentComment = result?.comment || '';
 
-                        return `
-                            <div class="passfail-item bg-white border border-gray-300 rounded-lg p-4">
-                                <div class="flex items-start justify-between mb-3">
-                                    <div class="flex-1">
-                                        <h4 class="font-bold text-gray-800 mb-1">
-                                            ${index + 1}. ${item.name}
-                                            ${item.required ? '<span class="text-red-600 text-sm ml-1">[필수]</span>' : ''}
+                                    return `
+                                        <tr>
+                                            <td class="border border-gray-300 px-2 py-2 text-center text-sm">${index + 1}</td>
+                                            <td class="border border-gray-300 px-2 py-2 text-sm font-medium">
+                                                ${item.name}
+                                                ${item.required ? '<span class="text-red-600 text-xs ml-1">[필수]</span>' : ''}
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2 text-sm text-gray-600">${item.description}</td>
+                                            <td class="border border-gray-300 px-2 py-2 text-center">
+                                                <div class="flex justify-center gap-2">
+                                                    <label class="flex items-center gap-1 px-3 py-1 rounded border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300'}">
+                                                        <input type="radio"
+                                                               name="result-${memberNumber}-${item.id}"
+                                                               value="pass"
+                                                               ${currentResult === 'pass' ? 'checked' : ''}
+                                                               disabled>
+                                                        <span class="text-xs font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
+                                                    </label>
+                                                    <label class="flex items-center gap-1 px-3 py-1 rounded border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300'}">
+                                                        <input type="radio"
+                                                               name="result-${memberNumber}-${item.id}"
+                                                               value="fail"
+                                                               ${currentResult === 'fail' ? 'checked' : ''}
+                                                               disabled>
+                                                        <span class="text-xs font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
+                                                    </label>
+                                                </div>
+                                            </td>
+                                            <td class="border border-gray-300 px-2 py-2">
+                                                <textarea class="w-full border-0 bg-transparent text-sm resize-none"
+                                                          rows="2"
+                                                          disabled>${currentComment}</textarea>
+                                            </td>
+                                        </tr>
+                                    `;
+                                }).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 모바일 카드 -->
+                <div class="evaluation-table-mobile block md:hidden">
+                    <div class="space-y-4">
+                        ${template.items.map((item, index) => {
+                            const result = evaluation.passFailResults.find(r => r.itemId === item.id);
+                            const currentResult = result?.result || '';
+                            const currentComment = result?.comment || '';
+
+                            return `
+                                <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                                    <div class="mb-3">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-medium text-gray-500">순번 ${index + 1}</span>
+                                        </div>
+                                        <h4 class="font-bold text-gray-900 mb-1">
+                                            ${item.name}
+                                            ${item.required ? '<span class="text-red-600 text-xs ml-1">[필수]</span>' : ''}
                                         </h4>
                                         <p class="text-sm text-gray-600">${item.description}</p>
                                     </div>
-                                </div>
 
-                                <div class="flex items-center gap-4 mb-3">
-                                    <label class="text-sm font-medium text-gray-700">판정:</label>
-                                    <div class="flex gap-3">
-                                        <label class="flex items-center gap-2 p-2 px-4 rounded-lg border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'}">
-                                            <input type="radio" name="result-${memberNumber}-${item.id}" value="pass" ${currentResult === 'pass' ? 'checked' : ''} disabled>
-                                            <span class="font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 p-2 px-4 rounded-lg border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}">
-                                            <input type="radio" name="result-${memberNumber}-${item.id}" value="fail" ${currentResult === 'fail' ? 'checked' : ''} disabled>
-                                            <span class="font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
-                                        </label>
+                                    <div class="space-y-2">
+                                        <div>
+                                            <label class="text-xs font-medium text-gray-700 block mb-1">판정</label>
+                                            <div class="flex gap-2">
+                                                <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300'}">
+                                                    <input type="radio"
+                                                           name="result-mobile-${memberNumber}-${item.id}"
+                                                           value="pass"
+                                                           ${currentResult === 'pass' ? 'checked' : ''}
+                                                           disabled>
+                                                    <span class="text-sm font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
+                                                </label>
+                                                <label class="flex-1 flex items-center justify-center gap-2 px-3 py-2 rounded border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300'}">
+                                                    <input type="radio"
+                                                           name="result-mobile-${memberNumber}-${item.id}"
+                                                           value="fail"
+                                                           ${currentResult === 'fail' ? 'checked' : ''}
+                                                           disabled>
+                                                    <span class="text-sm font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <label class="text-xs font-medium text-gray-700 block mb-1">평가 의견</label>
+                                            <textarea class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-sm"
+                                                      rows="2"
+                                                      disabled>${currentComment}</textarea>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 mb-1 block">평가 의견:</label>
-                                    <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50" rows="2" disabled>${currentComment}</textarea>
-                                </div>
-                            </div>
-                        `;
-                    }).join('')}
+                            `;
+                        }).join('')}
+                    </div>
                 </div>
 
                 <div class="mt-6 ${evaluation.passed ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'} rounded-lg p-4 border-2">
@@ -780,7 +970,7 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
         `;
     }
 
-    // 점수형 방식
+    // 점수형 방식 - 테이블 형태
     return `
         <div class="bg-white rounded-lg shadow-md p-6 mb-6 border-l-4 border-[#6A0028]">
             <div class="flex items-center justify-between mb-4">
@@ -793,47 +983,100 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                 </span>
             </div>
 
-            <div class="space-y-4">
-                ${template.categories.map((category, index) => {
-                    const score = evaluation.scores.find(s => s.categoryId === category.id);
-                    const currentScore = score?.score || 0;
-                    const currentComment = score?.comment || '';
+            <!-- 데스크톱 테이블 -->
+            <div class="evaluation-table-desktop hidden md:block">
+                <div class="table-scroll">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 80px;">배점</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 100px;">점수</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${template.categories.map((category, index) => {
+                                const score = evaluation.scores.find(s => s.categoryId === category.id);
+                                const currentScore = score?.score || 0;
+                                const currentComment = score?.comment || '';
 
-                    return `
-                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 1px solid #d1d5db; border-radius: 0.5rem;">
-                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 0.75rem;">
-                                <div style="flex: 1 1 0%;">
-                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
-                                        ${index + 1}. ${category.name}
-                                    </h4>
-                                    <p style="font-size: 0.875rem; color: #4b5563;">${category.description}</p>
+                                return `
+                                    <tr>
+                                        <td class="border border-gray-300 px-2 py-2 text-center text-sm">${index + 1}</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-sm font-medium">${category.name}</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-sm text-gray-600">${category.description}</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-center text-sm font-bold text-[#6A0028]">${category.maxScore}점</td>
+                                        <td class="border border-gray-300 px-2 py-2 text-center">
+                                            <input type="number"
+                                                   class="w-full border-0 bg-transparent text-center text-sm font-medium"
+                                                   min="0"
+                                                   max="${category.maxScore}"
+                                                   step="0.5"
+                                                   value="${currentScore}"
+                                                   disabled>
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-2">
+                                            <textarea class="w-full border-0 bg-transparent text-sm resize-none"
+                                                      rows="2"
+                                                      disabled>${currentComment}</textarea>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 모바일 카드 -->
+            <div class="evaluation-table-mobile block md:hidden">
+                <div class="space-y-4">
+                    ${template.categories.map((category, index) => {
+                        const score = evaluation.scores.find(s => s.categoryId === category.id);
+                        const currentScore = score?.score || 0;
+                        const currentComment = score?.comment || '';
+
+                        return `
+                            <div class="border border-gray-300 rounded-lg p-4 bg-white">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <div class="flex items-center gap-2 mb-1">
+                                            <span class="text-xs font-medium text-gray-500">순번 ${index + 1}</span>
+                                        </div>
+                                        <h4 class="font-bold text-gray-900 mb-1">${category.name}</h4>
+                                        <p class="text-sm text-gray-600">${category.description}</p>
+                                    </div>
+                                    <div class="text-right ml-3">
+                                        <span class="text-xl font-bold text-[#6A0028]">${category.maxScore}</span>
+                                        <span class="text-xs text-gray-600">점</span>
+                                    </div>
                                 </div>
-                                <div style="text-align: right; margin-left: 1rem; flex-shrink: 0;">
-                                    <span style="font-size: 1.5rem; font-weight: 700; color: #6A0028;">${category.maxScore}</span>
-                                    <span style="font-size: 0.875rem; color: #4b5563;">점</span>
+
+                                <div class="space-y-2">
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 block mb-1">점수</label>
+                                        <input type="number"
+                                               class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-right text-sm"
+                                               min="0"
+                                               max="${category.maxScore}"
+                                               step="0.5"
+                                               value="${currentScore}"
+                                               disabled>
+                                    </div>
+                                    <div>
+                                        <label class="text-xs font-medium text-gray-700 block mb-1">평가 의견</label>
+                                        <textarea class="w-full border border-gray-300 rounded px-3 py-2 bg-gray-50 text-sm"
+                                                  rows="2"
+                                                  disabled>${currentComment}</textarea>
+                                    </div>
                                 </div>
                             </div>
-
-                            <div>
-                                <label class="text-sm font-medium text-gray-700 block mb-1">점수 입력:</label>
-                                <input type="number"
-                                       class="w-full border border-gray-300 rounded-lg p-2 bg-gray-50 text-right"
-                                       min="0"
-                                       max="${category.maxScore}"
-                                       step="0.5"
-                                       value="${currentScore}"
-                                       placeholder="0 ~ ${category.maxScore}점"
-                                       disabled>
-
-                                <label class="text-sm font-medium text-gray-700 block mt-3 mb-1">평가 의견:</label>
-                                <textarea class="w-full border border-gray-300 rounded-lg p-2 text-sm bg-gray-50"
-                                          rows="2"
-                                          placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                          disabled>${currentComment}</textarea>
-                            </div>
-                        </div>
-                    `;
-                }).join('')}
+                        `;
+                    }).join('')}
+                </div>
             </div>
 
             <div class="mt-6 bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4">

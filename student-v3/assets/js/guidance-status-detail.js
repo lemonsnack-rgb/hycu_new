@@ -20,9 +20,9 @@ function openStudentGuidanceStatusDetail(requestId) {
     const feedbackData = StudentGuidanceDataService.getStudentGuidanceFeedbackData(requestId);
 
     // 목록 화면 숨기기
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-        mainContent.style.display = 'none';
+    const guidanceStatusScreen = document.getElementById('guidance-status-screen');
+    if (guidanceStatusScreen) {
+        guidanceStatusScreen.style.display = 'none';
     }
 
     // 상세 화면 생성 및 표시
@@ -69,6 +69,21 @@ function openStudentGuidanceStatusDetail(requestId) {
             window.CURRENT_USER = CURRENT_STUDENT;
         }
 
+        // 디버그: 현재 사용자 확인
+        console.log('✅ 학생용 논문 지도 현황 - 현재 사용자:', window.CURRENT_USER);
+
+        // Mock 데이터의 generalFeedbackThread를 window._generalComments로 매핑
+        if (feedbackData && feedbackData.generalFeedbackThread) {
+            window._generalComments = window._generalComments || {};
+            window._generalComments[requestId] = feedbackData.generalFeedbackThread.map(item => ({
+                ...item,
+                text: item.text,
+                ts: item.ts || new Date(item.timestamp).getTime(),
+                attach: item.attachments || []
+            }));
+            console.log('✅ 전체 평가 데이터 매핑 완료:', window._generalComments[requestId]);
+        }
+
         // 제출 이력 사이드바 생성
         ensureStudentSubmissionSidebar(request);
 
@@ -99,19 +114,17 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                 <!-- 🔒 학생은 피드백 완료 버튼 없음 -->
             </div>
 
-            <!-- 논문 정보 영역 -->
-            <div class="px-6 py-3 border-b bg-gray-50">
-                <div class="flex items-center justify-between gap-4">
-                    <span class="text-sm font-medium text-gray-900 truncate" style="max-width: 50ch;">
-                        ${request.thesisTitle || '논문명'}
-                    </span>
-                    <div class="text-sm text-gray-600 flex-shrink-0">
-                        <span class="font-semibold ${getStudentPlagiarismColorClass(request.copykillerScore, request.gptkillerScore)}">
-                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore}
-                            <a href="#" onclick="downloadStudentPlagiarismReport('combined', '${request.id}'); event.preventDefault();"
-                               class="ml-2 text-[#6A0028] hover:underline text-xs">결과보고서(통합)</a>
-                        </span>
-                    </div>
+            <!-- 학생 정보 영역 -->
+            <div class="px-6 py-2 border-b bg-gray-50">
+                <div class="text-xs text-gray-700">
+                    <span class="font-semibold">논문명:</span>
+                    <span title="${request.thesisTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || '논문명'}</span>
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold">학부(과)전공:</span> ${request.graduate || '-'} / ${request.major || '-'}
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold">성명:</span> ${request.studentName || '-'}
                 </div>
             </div>
 
@@ -291,9 +304,9 @@ function closeStudentGuidanceStatusDetail() {
     }
 
     // 목록 화면 다시 표시
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-        mainContent.style.display = 'block';
+    const guidanceStatusScreen = document.getElementById('guidance-status-screen');
+    if (guidanceStatusScreen) {
+        guidanceStatusScreen.classList.add('active');
     }
 
     // 제출 이력 사이드바 제거
@@ -305,6 +318,12 @@ function closeStudentGuidanceStatusDetail() {
     // 전역 변수 정리
     if (window._currentStudentGuidanceCtx) {
         window._currentStudentGuidanceCtx = null;
+    }
+    if (window._currentFeedbackCtx) {
+        window._currentFeedbackCtx = null;
+    }
+    if (window.currentFeedbackId) {
+        window.currentFeedbackId = null;
     }
 }
 

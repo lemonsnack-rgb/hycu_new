@@ -11,53 +11,71 @@ const AVAILABLE_SLOTS_V3 = [
     {
         id: 'SLOT001',
         professorId: 'P001',
-        type: 'repeat', // 'oneTime' or 'repeat'
-        dayOfWeek: 1, // 월요일 (0=일, 1=월, ...)
-        date: null,
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-01-10',
         time: '14:00',
         duration: 60,
-        meetingType: 'online', // online, offline, both
-        startDate: '2025-11-01',
-        endDate: '2025-12-31',
+        meetingType: 'online',
+        startDate: '2026-01-10',
+        endDate: '2026-01-10',
         status: 'active'
     },
     {
         id: 'SLOT002',
         professorId: 'P001',
-        type: 'repeat',
-        dayOfWeek: 3,
-        date: null,
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-01-13',
         time: '10:00',
-        duration: 90,
-        meetingType: 'both',
-        startDate: '2025-11-01',
-        endDate: '2025-12-31',
+        duration: 60,
+        meetingType: 'offline',
+        startDate: '2026-01-13',
+        endDate: '2026-01-13',
         status: 'active'
     },
     {
         id: 'SLOT003',
         professorId: 'P001',
-        type: 'repeat',
-        dayOfWeek: 5,
-        date: null,
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-01-15',
         time: '15:00',
-        duration: 60,
-        meetingType: 'offline',
-        startDate: '2025-11-01',
-        endDate: '2025-12-31',
+        duration: 90,
+        meetingType: 'online',
+        startDate: '2026-01-15',
+        endDate: '2026-01-15',
         status: 'active'
     },
     {
         id: 'SLOT004',
-        professorId: 'P001',
+        professorId: 'P002',
+        professorName: '박교수',
         type: 'oneTime',
         dayOfWeek: null,
-        date: '2025-11-12',
+        date: '2026-01-17',
         time: '16:00',
         duration: 60,
         meetingType: 'online',
-        startDate: '2025-11-12',
-        endDate: '2025-11-12',
+        startDate: '2026-01-17',
+        endDate: '2026-01-17',
+        status: 'active'
+    },
+    {
+        id: 'SLOT005',
+        professorId: 'P002',
+        professorName: '박교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-01-20',
+        time: '11:00',
+        duration: 60,
+        meetingType: 'offline',
+        startDate: '2026-01-20',
+        endDate: '2026-01-20',
         status: 'active'
     }
 ];
@@ -169,128 +187,150 @@ const STUDENTS_V3 = [
  * - 학생 정보 13개 필드 추가 (검색 필터용)
  */
 const MEETING_REQUESTS_V3 = [
+    // 학생 2023001 (홍길동)의 신청 내역
     {
-        // 기본 정보
         id: 'REQ001',
-        type: 'individual', // individual (1:1)
+        type: 'individual',
         slotId: 'SLOT001',
-        studentId: 'S001',
-
-        // 학생 정보 (13개 검색 필터용) - STUDENTS_V3에서 자동 매핑
-        studentNumber: '2024001',
-        studentName: '김철수',
+        studentId: 'S999',
+        studentNumber: '2023001',
+        studentName: '홍길동',
         academicYear: '2025',
         semester: '1',
         collegeType: '일반대학원',
         division: '일반대학원',
-        undergradMajor: '-',
+        undergradMajor: '컴퓨터공학부',
         department: '컴퓨터공학',
         degreeType: '석사',
         enrollmentStatus: '재학',
-        advisorName: '박교수',
+        advisorName: '김교수',
 
-        // 미팅 정보
-        requestDate: '2025-10-28',
-        selectedDate: '2025-11-04',
+        requestDate: '2026-01-07',
+        selectedDate: '2026-01-10',
         selectedTime: '14:00',
         duration: 60,
-        meetingType: 'online', // 지도방식 (검색 필터)
-        topic: '연구방법론 논의',
-        description: '질적연구와 양적연구 방법론에 대해 상담 받고 싶습니다.',
+        meetingType: 'online',
+        topic: '논문 주제 상담',
+        description: '논문 주제 선정에 대해 상담 받고 싶습니다.',
+        status: 'pending',
 
-        // 상태 (확정여부 검색 필터)
-        status: 'pending', // pending, approved, rejected, completed, cancelled
-
-        // 취소 정보
         cancelledAt: null,
         cancelledBy: null,
         cancelReason: null,
-
-        // 승인 정보
         approvedDate: null,
         professorComment: null,
-
-        // Zoom 정보
         zoomMeetingId: null,
         zoomJoinUrl: null,
         zoomPassword: null,
         zoomStartUrl: null,
-
-        // 완료 정보
         completedDate: null,
         actualDuration: null,
         meetingSummary: null,
-
-        // 녹화 정보
         recordingId: null,
         recordingUrl: null,
         recordingDuration: null,
         recordingSize: null,
-
-        // 거절 정보
         rejectedDate: null,
         rejectionReason: null,
-
-        // 생성 정보
         createdBy: 'student',
-        createdAt: '2025-10-28T09:30:00'
+        createdAt: '2026-01-07T10:30:00'
     },
     {
         id: 'REQ002',
         type: 'individual',
-        slotId: 'SLOT002',
-        studentId: 'S002',
-
-        studentNumber: '2024002',
-        studentName: '이영희',
+        slotId: 'SLOT003',
+        studentId: 'S999',
+        studentNumber: '2023001',
+        studentName: '홍길동',
         academicYear: '2025',
         semester: '1',
         collegeType: '일반대학원',
         division: '일반대학원',
-        undergradMajor: '-',
-        department: '소프트웨어공학',
+        undergradMajor: '컴퓨터공학부',
+        department: '컴퓨터공학',
         degreeType: '석사',
         enrollmentStatus: '재학',
-        advisorName: '박교수',
+        advisorName: '김교수',
 
-        requestDate: '2025-10-25',
-        selectedDate: '2025-11-06',
-        selectedTime: '10:00',
+        requestDate: '2026-01-05',
+        selectedDate: '2026-01-15',
+        selectedTime: '15:00',
         duration: 90,
         meetingType: 'online',
-        topic: '중간논문 피드백',
-        description: '3장까지 작성한 중간논문에 대한 피드백을 받고 싶습니다.',
+        topic: '연구 방법론 논의',
+        description: '연구 설계 방법에 대해 논의하고 싶습니다.',
         status: 'approved',
 
         cancelledAt: null,
         cancelledBy: null,
         cancelReason: null,
-
-        approvedDate: '2025-10-26',
-        professorComment: '3장까지 잘 작성되었습니다.',
-
-        zoomMeetingId: '123456789',
-        zoomJoinUrl: 'https://zoom.us/j/123456789?pwd=abc123',
-        zoomPassword: 'abc123',
-        zoomStartUrl: 'https://zoom.us/s/123456789?zak=xyz789',
-
+        approvedDate: '2026-01-06',
+        professorComment: '연구 방향이 좋습니다.',
+        zoomMeetingId: '987654321',
+        zoomJoinUrl: 'https://zoom.us/j/987654321?pwd=def456',
+        zoomPassword: 'def456',
+        zoomStartUrl: 'https://zoom.us/s/987654321?zak=uvw456',
         completedDate: null,
         actualDuration: null,
         meetingSummary: null,
-
         recordingId: null,
         recordingUrl: null,
         recordingDuration: null,
         recordingSize: null,
-
         rejectedDate: null,
         rejectionReason: null,
-
         createdBy: 'student',
-        createdAt: '2025-10-25T14:20:00'
+        createdAt: '2026-01-05T09:00:00'
     },
     {
         id: 'REQ003',
+        type: 'individual',
+        slotId: null,
+        studentId: 'S999',
+        studentNumber: '2023001',
+        studentName: '홍길동',
+        academicYear: '2025',
+        semester: '1',
+        collegeType: '일반대학원',
+        division: '일반대학원',
+        undergradMajor: '컴퓨터공학부',
+        department: '컴퓨터공학',
+        degreeType: '석사',
+        enrollmentStatus: '재학',
+        advisorName: '김교수',
+
+        requestDate: '2026-01-03',
+        selectedDate: '2026-01-08',
+        selectedTime: '10:00',
+        duration: 60,
+        meetingType: 'online',
+        topic: '문헌 검토',
+        description: '문헌 검토 결과에 대해 논의하고 싶습니다.',
+        status: 'completed',
+
+        cancelledAt: null,
+        cancelledBy: null,
+        cancelReason: null,
+        approvedDate: '2026-01-03',
+        professorComment: '문헌 검토 결과를 함께 검토하겠습니다.',
+        zoomMeetingId: '111222333',
+        zoomJoinUrl: 'https://zoom.us/j/111222333?pwd=ghi789',
+        zoomPassword: 'ghi789',
+        zoomStartUrl: 'https://zoom.us/s/111222333?zak=rst123',
+        completedDate: '2026-01-08',
+        actualDuration: 65,
+        meetingSummary: '문헌 검토 결과 논의 완료. 다음 단계로 연구 설계 진행 예정.',
+        recordingId: 'REC001',
+        recordingUrl: 'https://zoom.us/rec/111222333',
+        recordingDuration: 65,
+        recordingSize: 250,
+        rejectedDate: null,
+        rejectionReason: null,
+        createdBy: 'student',
+        createdAt: '2026-01-03T08:00:00'
+    },
+    {
+        id: 'REQ004',
         type: 'individual',
         slotId: 'SLOT003',
         studentId: 'S001',

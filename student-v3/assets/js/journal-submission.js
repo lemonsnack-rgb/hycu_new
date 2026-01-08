@@ -8,6 +8,7 @@ let journalCurrentView = 'list'; // list | submit | detail
 let journalCurrentSubmissionId = null;
 
 // Mock 데이터
+// reviewResult: approved(승인), rejected(반려), revision_required(보완후재제출), on_hold(보류)
 const journalSubmissions = [
     {
         id: 1,
@@ -35,12 +36,30 @@ const journalSubmissions = [
             start: '2025-03-01',
             end: '2025-03-31'
         },
+        status: 'submitted',
+        reviewResult: 'revision_required',
+        submittedData: {
+            title: '머신러닝 기반 데이터 분석 연구',
+            desiredExamDate: '2025-03-15',
+            fileName: 'journal_paper_2nd_v1.pdf',
+            fileSize: 2800000,
+            submittedAt: '2025-03-12 09:30'
+        }
+    },
+    {
+        id: 3,
+        stageName: '2차 제출',
+        attemptNumber: 2,
+        submissionPeriod: {
+            start: '2025-04-01',
+            end: '2025-04-30'
+        },
         status: 'not_submitted',
         reviewResult: null,
         submittedData: null
     },
     {
-        id: 3,
+        id: 4,
         stageName: '3차 제출',
         attemptNumber: 1,
         submissionPeriod: {
@@ -48,7 +67,7 @@ const journalSubmissions = [
             end: '2025-05-31'
         },
         status: 'submitted',
-        reviewResult: 'rejected',
+        reviewResult: 'on_hold',
         submittedData: {
             title: '딥러닝 기반 음성 인식 시스템 개발',
             desiredExamDate: '2025-05-20',
@@ -58,7 +77,7 @@ const journalSubmissions = [
         }
     },
     {
-        id: 4,
+        id: 5,
         stageName: '3차 제출',
         attemptNumber: 2,
         submissionPeriod: {
@@ -202,6 +221,7 @@ function renderJournalListScreen() {
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">심사단계</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">제출기간</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">제출상태</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">심사결과</th>
@@ -228,6 +248,10 @@ function renderJournalListScreen() {
 
 // 목록 행 렌더링
 function renderJournalListRow(submission, index) {
+    const stageDisplay = submission.attemptNumber > 1
+        ? `${submission.stageName} (${submission.attemptNumber}차)`
+        : submission.stageName;
+
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
 
     // 배지 대신 텍스트로 표시
@@ -238,6 +262,10 @@ function renderJournalListRow(submission, index) {
         resultText = '승인';
     } else if (submission.reviewResult === 'rejected') {
         resultText = '반려';
+    } else if (submission.reviewResult === 'revision_required') {
+        resultText = '보완후재제출';
+    } else if (submission.reviewResult === 'on_hold') {
+        resultText = '보류';
     }
 
     const actionButton = submission.status === 'submitted'
@@ -247,6 +275,7 @@ function renderJournalListRow(submission, index) {
     return `
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${stageDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${statusText}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${resultText}</td>

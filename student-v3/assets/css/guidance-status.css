@@ -769,3 +769,57 @@ body:has(.layout-v3-sidebar.collapsed) .submission-history {
 
 /* disable text select on pdf text layer (defensive) */
 #text-layer { user-select:none !important; pointer-events:none !important; }
+
+/* 댓글 입력창 스타일 */
+.general-reply-input {
+    margin-top: 16px;
+    padding-top: 16px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.general-reply-input textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 13px;
+    resize: vertical;
+    min-height: 60px;
+}
+
+.general-reply-input textarea:focus {
+    outline: none;
+    border-color: #6A0028;
+    box-shadow: 0 0 0 3px rgba(106, 0, 40, 0.1);
+}
+
+/* 논문 지도 요청 모달 스타일 */
+.student-guidance-modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+}
+
+.student-guidance-modal-content {
+    background: white;
+    border-radius: 0.5rem;
+    max-width: 600px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    position: relative;
+    z-index: 10000;
+}
+
+.student-guidance-modal-inner {
+    display: flex;
+    flex-direction: column;
+}

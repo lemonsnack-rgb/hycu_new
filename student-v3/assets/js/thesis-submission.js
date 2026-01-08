@@ -147,7 +147,7 @@ function setupThesisEventDelegation() {
             } else if (action === 'back-to-list') {
                 e.preventDefault();
                 e.stopPropagation();
-                backToList();
+                backToThesisList();
             } else if (action === 'save-thesis') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -293,7 +293,7 @@ function viewThesisSubmission(id) {
 }
 
 // 목록으로 돌아가기
-function backToList() {
+function backToThesisList() {
     thesisCurrentView = 'list';
     thesisCurrentSubmissionId = null;
     renderThesisScreen();
@@ -532,7 +532,7 @@ function saveThesisSubmission() {
         console.log('논문 저장:', submission);
 
         alert(isEdit ? '논문이 수정되었습니다.' : '논문이 제출되었습니다.');
-        backToList();
+        backToThesisList();
     }
 }
 
@@ -580,7 +580,7 @@ function saveThesisSubmission() {
 // 전역 함수 등록
 window.submitThesis = submitThesis;
 window.viewThesisSubmission = viewThesisSubmission;
-window.backToList = backToList;
+window.backToThesisList = backToThesisList;
 window.editThesisSubmission = editThesisSubmission;
 window.handleFileSelect = handleFileSelect;
 window.saveThesisSubmission = saveThesisSubmission;

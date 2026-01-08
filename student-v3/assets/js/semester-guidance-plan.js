@@ -26,6 +26,13 @@ let studentCurrentSemester = 1;
 // 학기별 계획 데이터 저장소 (임시)
 const studentSemesterPlansStorage = {};
 
+// 현재 학기 계획 (전역 변수)
+let currentStudentSemester = {
+    year: 2025,
+    semester: 1
+};
+let semesterPlan = null;
+
 // DataService 확장 - 학생용 학기별 계획 관리
 if (typeof DataService === 'undefined') {
     window.DataService = {};
@@ -168,8 +175,12 @@ function showStudentSemesterPlanDetail() {
         advisorName: '김교수'
     };
 
-    // 학기별 계획 데이터 가져오기
-    const semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
+    // 현재 학기 정보 업데이트
+    currentStudentSemester.year = studentCurrentYear;
+    currentStudentSemester.semester = studentCurrentSemester;
+
+    // 학기별 계획 데이터 가져오기 (전역 변수에 할당)
+    semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
     const totalWeeks = semesterPlan?.totalWeeks || 0;
     const plans = semesterPlan?.plans || [];
 
@@ -269,26 +280,6 @@ function showStudentSemesterPlanDetail() {
                         </button>
                     </div>
                 </div>
-
-                ${totalWeeks > 0 ? `
-                <!-- 주차 바로가기 버튼 -->
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                    <div class="flex items-center gap-2 mb-2">
-                        <svg class="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="text-xs text-gray-500">주차를 클릭하면 해당 주차 카드로 이동합니다</span>
-                    </div>
-                    <div class="flex flex-wrap gap-2">
-                        ${Array.from({ length: totalWeeks }, (_, i) => i + 1).map(weekNum => `
-                            <button onclick="scrollToWeek(${weekNum})"
-                                    class="px-3 py-1.5 text-xs font-medium rounded border border-gray-300 bg-white text-gray-700 hover:border-[#6A0028] hover:bg-[#FCE4EC] hover:text-[#6A0028] transition-colors">
-                                ${weekNum}주
-                            </button>
-                        `).join('')}
-                    </div>
-                </div>
-                ` : ''}
             </div>
         </div>
 
@@ -331,134 +322,300 @@ function generateStudentWeeks(plans, totalWeeks = 15) {
     return weeks;
 }
 
-// 주차별 카드 렌더링
+// 주차별 테이블 렌더링 (교수용과 완전히 동일)
 function renderStudentWeeklyCards(weeks) {
+    // 주차가 없으면 안내 메시지 표시
+    if (weeks.length === 0) {
+        return `
+            <div class="space-y-4">
+                <div class="mb-4">
+                    <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
+                </div>
+                <div class="bg-white rounded-lg shadow-md p-8">
+                    <div class="text-center text-gray-500">
+                        <p class="text-lg mb-2">📅 이 학기의 지도 계획이 아직 생성되지 않았습니다.</p>
+                        <p class="text-sm">상단의 "계획 생성" 버튼을 클릭하여 계획을 생성하세요.</p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
     return `
         <div class="space-y-4">
             <div class="mb-4">
                 <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
             </div>
 
-            ${weeks.map(week => renderStudentWeekCard(week)).join('')}
+            <!-- Desktop Table View -->
+            <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" rowspan="2" style="width: 60px;">주차</th>
+                                <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700" colspan="3">계획</th>
+                                <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700" colspan="5">실적</th>
+                            </tr>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 200px;">주제</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">계획 내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">예정 지도 방식</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">실행 내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">교수명</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">교수의견</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 90px;">실행일</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">지도 방식</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${weeks.map(week => renderStudentWeekCard(week)).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     `;
 }
 
-// 개별 주차 카드 (학생용 - 실적 입력 불가, 읽기 전용)
+// 개별 주차 테이블 행 렌더링 (학생용 - 교수용과 UI 동일, 권한만 다름)
 function renderStudentWeekCard(week) {
     const hasExecutions = week.executions && week.executions.length > 0;
-    const hasPlan = week.plannedTopic && week.plannedTopic.trim() !== '';
+    const rowCount = hasExecutions ? week.executions.length + 1 : 2;
+    const isApproved = semesterPlan && semesterPlan.approved === true;
+    const readonlyAttr = isApproved ? 'readonly' : '';
+    const disabledAttr = isApproved ? 'disabled' : '';
+    const bgClass = isApproved ? 'bg-gray-100' : '';
+
+    // 첫 번째 행 (계획 정보는 rowspan 적용)
+    // 교수용과 완전히 동일한 구조, 단 학생은 계획 편집 가능(승인 전), 실적은 읽기만 가능
+    let firstRow = `
+        <tr id="week-card-${week.week}">
+            <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">${week.week}주</td>
+            <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
+                <input type="text" id="student-plan-topic-${week.week}"
+                       value="${week.plannedTopic || ''}"
+                       placeholder="주제 입력"
+                       ${readonlyAttr}
+                       class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none ${bgClass}">
+            </td>
+            <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
+                <textarea id="student-plan-content-${week.week}"
+                          placeholder="계획 내용 입력"
+                          ${readonlyAttr}
+                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea ${bgClass}"
+                          style="min-height: 40px; overflow-y: hidden;">${week.plannedContent || ''}</textarea>
+            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center" rowspan="${rowCount}">
+                <select id="student-plan-method-${week.week}" ${disabledAttr} class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none ${bgClass}">
+                    <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                    <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                    <option value="zoom" ${week.plannedMethod === 'zoom' || !week.plannedMethod ? 'selected' : ''}>Zoom</option>
+                    <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                    <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                </select>
+            </td>`;
+
+    if (hasExecutions) {
+        // 첫 번째 실적을 첫 행에 포함 (교수용 코드 그대로)
+        const firstExec = week.executions[0];
+        firstRow += `
+            <td class="border border-gray-300 px-2 py-2">
+                <textarea readonly
+                          class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                          style="min-height: 40px; overflow-y: hidden;">${firstExec.executionContent || ''}</textarea>
+            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-sm">
+                ${firstExec.professorName || '-'}
+            </td>
+            <td class="border border-gray-300 px-2 py-2">
+                <textarea readonly
+                          class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                          style="min-height: 40px; overflow-y: hidden;">${firstExec.comment || ''}</textarea>
+            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-xs">${formatDate(firstExec.executionDate)}</td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-xs">${getMethodText(firstExec.method)}</td>
+        `;
+    } else {
+        // 실적이 없는 경우: 빈 실적 셀 5개 추가
+        firstRow += `
+            <td class="border border-gray-300 px-2 py-2"></td>
+            <td class="border border-gray-300 px-2 py-2"></td>
+            <td class="border border-gray-300 px-2 py-2"></td>
+            <td class="border border-gray-300 px-2 py-2"></td>
+            <td class="border border-gray-300 px-2 py-2"></td>
+        `;
+    }
+    firstRow += `</tr>`;
+
+    // 추가 실적 행들 (2번째 실적부터) - 교수용과 동일
+    let additionalRows = '';
+    if (hasExecutions && week.executions.length > 1) {
+        additionalRows = week.executions.slice(1).map(exec => {
+            return `
+                <tr>
+                    <td class="border border-gray-300 px-2 py-2">
+                        <textarea readonly
+                                  class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                                  style="min-height: 40px; overflow-y: hidden;">${exec.executionContent || ''}</textarea>
+                    </td>
+                    <td class="border border-gray-300 px-2 py-2 text-center text-sm">
+                        ${exec.professorName || '-'}
+                    </td>
+                    <td class="border border-gray-300 px-2 py-2">
+                        <textarea readonly
+                                  class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                                  style="min-height: 40px; overflow-y: hidden;">${exec.comment || ''}</textarea>
+                    </td>
+                    <td class="border border-gray-300 px-2 py-2 text-center text-xs">${formatDate(exec.executionDate)}</td>
+                    <td class="border border-gray-300 px-2 py-2 text-center text-xs">${getMethodText(exec.method)}</td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 실적 입력 폼 행 (학생용 - 읽기 전용)
+    const today = getTodayDate();
+    const inputFormRow = `
+        <tr class="bg-gray-50">
+            <td class="border border-gray-300 px-2 py-2">
+                <textarea readonly
+                          placeholder="실행 내용 입력"
+                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea bg-gray-100"
+                          style="min-height: 40px; overflow-y: hidden;"></textarea>
+            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-xs"></td>
+            <td class="border border-gray-300 px-2 py-2">
+                <textarea readonly
+                          placeholder="교수 의견 입력"
+                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea bg-gray-100"
+                          style="min-height: 40px; overflow-y: hidden;"></textarea>
+            </td>
+            <td class="border border-gray-300 px-2 py-2">
+                <input type="date" disabled value="${today}"
+                       class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none bg-gray-100">
+            </td>
+            <td class="border border-gray-300 px-2 py-2">
+                <select disabled class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none bg-gray-100">
+                    <option value="meeting">대면</option>
+                    <option value="online">온라인</option>
+                    <option value="zoom">Zoom</option>
+                    <option value="email">이메일</option>
+                    <option value="phone">전화</option>
+                </select>
+            </td>
+        </tr>
+    `;
+
+    return firstRow + additionalRows + inputFormRow;
+}
+
+// 모바일 카드 뷰 렌더링 (학생용)
+function renderStudentWeekCardMobile(week) {
+    const hasExecutions = week.executions && week.executions.length > 0;
 
     return `
-        <div id="week-card-${week.week}" class="week-card-v2 bg-white border border-gray-200 rounded-lg">
-                ${hasPlan ? `
-                    <!-- 계획 표시 (읽기 전용) -->
-                    <div class="p-4 bg-yellow-50 border-b border-yellow-200">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
-                                <input type="text" value="${week.plannedTopic}"
-                                       placeholder="예: 연구방법론 개요" readonly
-                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+        <div id="week-card-mobile-${week.week}" class="bg-white border border-gray-200 rounded-lg">
+            <!-- 계획 섹션 -->
+            <div class="p-4 bg-yellow-50 border-b border-yellow-200">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
+                <div class="space-y-3">
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">지도 주제</label>
+                        <input type="text" value="${week.plannedTopic || ''}" readonly
+                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">계획 내용</label>
+                        <textarea readonly rows="3"
+                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">${week.plannedContent || ''}</textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-600 mb-1">예정 지도 방식</label>
+                        <select disabled class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100 w-full">
+                            <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
+                            <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
+                            <option value="zoom" ${week.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
+                            <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
+                            <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 실적 섹션 -->
+            <div class="p-4">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">
+                    실적 및 교수의견 (${week.executions.length}건)
+                </h4>
+                ${hasExecutions ? `
+                    <div class="space-y-3">
+                        ${week.executions.map(exec => `
+                            <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-sm font-semibold text-gray-800">${exec.professorName || '-'}</span>
+                                    <span class="text-xs text-gray-500">${exec.executionDate || '-'}</span>
+                                </div>
+                                <div class="space-y-2 text-sm">
+                                    <div>
+                                        <span class="font-medium text-gray-600">지도방식:</span>
+                                        <span class="text-gray-800 ml-1">${getMethodText(exec.method)}</span>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-600 mb-1">실행 내용:</div>
+                                        <div class="text-gray-800 whitespace-pre-wrap">${exec.executionContent || '-'}</div>
+                                    </div>
+                                    <div>
+                                        <div class="font-medium text-gray-600 mb-1">교수의견:</div>
+                                        <div class="text-gray-800 whitespace-pre-wrap">${exec.comment || '-'}</div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
-                                <textarea rows="3" readonly
-                                          placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
-                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">${week.plannedContent}</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
-                                <select disabled class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
-                                    <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
-                                    <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
-                                    <option value="zoom" ${week.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
-                                    <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
-                                    <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
-                                </select>
-                            </div>
-                        </div>
+                        `).join('')}
                     </div>
                 ` : `
-                    <!-- 계획 미입력 상태 -->
-                    <div class="p-4 bg-yellow-50 border-b border-yellow-200">
-                        <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
-                        <div class="space-y-3">
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
-                                <input type="text"
-                                       placeholder="예: 연구방법론 개요" readonly
-                                       class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
-                                <textarea rows="3" readonly
-                                          placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
-                                          class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100"></textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs text-gray-600 mb-1">예정 지도 방식 *</label>
-                                <select disabled class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
-                                    <option value="meeting">대면</option>
-                                    <option value="online">온라인</option>
-                                    <option value="zoom" selected>Zoom</option>
-                                    <option value="email">이메일</option>
-                                    <option value="phone">전화</option>
-                                </select>
-                            </div>
-                        </div>
+                    <div class="text-center py-6 text-gray-400">
+                        <p class="text-sm">등록된 지도 실적이 없습니다</p>
                     </div>
                 `}
-
-                <!-- 실적 목록 (댓글 형태, 읽기 전용) -->
-                <div class="p-4">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-3">
-                        실적 및 교수의견 (${week.executions.length}건)
-                    </h4>
-
-                    <!-- 기존 실적 목록 -->
-                    ${week.executions.length > 0 ? `
-                        <div class="space-y-3">
-                            ${week.executions.map(exec => renderStudentExecutionComment(exec)).join('')}
-                        </div>
-                    ` : `
-                        <div class="text-center py-6 text-gray-400">
-                            <p class="text-sm">등록된 지도 실적이 없습니다</p>
-                        </div>
-                    `}
-                </div>
+            </div>
         </div>
     `;
 }
 
-// 실적 렌더링 (학생용 - 읽기 전용)
-function renderStudentExecutionComment(execution) {
-    return `
-        <div id="execution-${execution.id}" class="execution-item bg-gray-50 border-gray-200 border rounded-lg p-4">
-            <div class="flex justify-between items-center mb-3">
-                <span class="text-sm font-semibold text-gray-800">
-                    ${execution.professorName}
-                </span>
-                <span class="text-xs text-gray-500">${execution.executionDate}</span>
-            </div>
+// ========== 유틸리티 함수 ==========
 
-            <div class="space-y-2 text-sm">
-                <div class="flex items-center gap-2 text-gray-600">
-                    <span class="font-medium">지도방식:</span>
-                    <span>${getMethodText(execution.method)}</span>
-                </div>
-                <div>
-                    <div class="font-medium text-gray-600 mb-1">실행 내용:</div>
-                    <div class="text-gray-800 whitespace-pre-wrap">${execution.executionContent}</div>
-                </div>
-                <div>
-                    <div class="font-medium text-gray-600 mb-1">교수 의견:</div>
-                    <div class="text-gray-800 whitespace-pre-wrap">${execution.comment}</div>
-                </div>
-            </div>
-        </div>
-    `;
+function getTodayDate() {
+    const today = new Date();
+    return today.toISOString().split('T')[0];
+}
+
+function getDegreeText(degree) {
+    const degreeMap = {
+        'master': '석사',
+        'doctor': '박사',
+        'integrated': '석박통합'
+    };
+    return degreeMap[degree] || degree;
+}
+
+function getMethodText(method) {
+    const methodMap = {
+        'meeting': '대면',
+        'online': '온라인',
+        'zoom': 'Zoom',
+        'email': '이메일',
+        'phone': '전화'
+    };
+    return methodMap[method] || method;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}.${day}`;
 }
 
 // 학기 변경
@@ -476,7 +633,8 @@ function changeStudentSemesterView() {
 
 // 계획 생성/초기화
 function resetStudentTotalWeeks() {
-    const semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
+    // 전역 semesterPlan 변수 업데이트
+    semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
     const currentWeeks = semesterPlan?.totalWeeks || 0;
     const hasPlans = currentWeeks > 0;
 
@@ -567,26 +725,98 @@ function scrollToWeek(weekNumber) {
     }
 }
 
-// 유틸리티 함수
-function getDegreeText(degree) {
-    const degreeMap = {
-        'master': '석사',
-        'doctor': '박사',
-        'integrated': '석박통합'
-    };
-    return degreeMap[degree] || degree;
+// ========== Auto-expanding Textarea 기능 ==========
+
+/**
+ * 텍스트 영역 자동 확장 기능
+ * 내용이 많아지면 textarea가 세로로 자동 확장됨
+ */
+function initAutoExpandTextareas() {
+    // 이벤트 위임 방식으로 동적으로 추가된 textarea도 처리
+    document.addEventListener('input', function(e) {
+        if (e.target.classList.contains('auto-expand-textarea')) {
+            autoExpandTextarea(e.target);
+        }
+    });
+
+    // 페이지 로드 시 기존 textarea 모두 확장
+    document.addEventListener('DOMContentLoaded', function() {
+        expandAllTextareas();
+    });
 }
 
-function getMethodText(method) {
-    const methodMap = {
-        'meeting': '대면',
-        'online': '온라인',
-        'zoom': 'Zoom',
-        'email': '이메일',
-        'phone': '전화'
-    };
-    return methodMap[method] || method;
+/**
+ * 개별 textarea 자동 확장
+ */
+function autoExpandTextarea(textarea) {
+    // 높이를 auto로 초기화하여 scrollHeight를 정확히 측정
+    textarea.style.height = 'auto';
+
+    // 내용에 맞게 높이 조정 (최소 높이 40px)
+    const newHeight = Math.max(40, textarea.scrollHeight);
+    textarea.style.height = newHeight + 'px';
 }
+
+/**
+ * 모든 auto-expand-textarea 확장
+ */
+function expandAllTextareas() {
+    const textareas = document.querySelectorAll('.auto-expand-textarea');
+    textareas.forEach(textarea => {
+        autoExpandTextarea(textarea);
+    });
+}
+
+// 학기 계획 상세 화면 렌더링 후 textarea 확장 적용
+const originalShowDetail = showStudentSemesterPlanDetail;
+showStudentSemesterPlanDetail = function() {
+    originalShowDetail();
+    // 렌더링 후 약간의 지연을 두고 확장 적용
+    setTimeout(() => {
+        expandAllTextareas();
+    }, 100);
+};
+
+// ==================== 학생용 주차별 계획 저장 ====================
+function saveStudentWeekPlan(weekNumber) {
+    const topic = document.getElementById(`student-plan-topic-${weekNumber}`).value.trim();
+    const content = document.getElementById(`student-plan-content-${weekNumber}`).value.trim();
+    const method = document.getElementById(`student-plan-method-${weekNumber}`).value;
+
+    if (!topic || !content) {
+        alert('지도 주제와 계획 내용을 모두 입력해주세요.');
+        return;
+    }
+
+    const planData = {
+        plannedTopic: topic,
+        plannedContent: content,
+        plannedMethod: method,
+        plannedDate: null  // 학사시스템에서 자동 설정
+    };
+
+    try {
+        StudentDataService.updateWeekPlan(
+            currentStudentSemester.year,
+            currentStudentSemester.semester,
+            weekNumber,
+            planData
+        );
+
+        alert(`${weekNumber}주차 계획이 저장되었습니다.`);
+
+        // 화면 새로고침
+        setTimeout(() => {
+            showStudentSemesterPlanDetail();
+        }, 300);
+
+    } catch (error) {
+        alert(error.message || '계획 저장에 실패했습니다.');
+    }
+}
+
+// 초기화 실행
+initAutoExpandTextareas();
 
 // 전역으로 export
 window.initStudentSemesterGuidancePlan = initStudentSemesterGuidancePlan;
@@ -595,5 +825,8 @@ window.changeStudentSemesterView = changeStudentSemesterView;
 window.resetStudentTotalWeeks = resetStudentTotalWeeks;
 window.executeStudentResetWeeks = executeStudentResetWeeks;
 window.scrollToWeek = scrollToWeek;
+window.saveStudentWeekPlan = saveStudentWeekPlan;
+window.autoExpandTextarea = autoExpandTextarea;
+window.expandAllTextareas = expandAllTextareas;
 
 console.log('✅ 학생용 학기별 지도 계획 모듈 로드 완료');

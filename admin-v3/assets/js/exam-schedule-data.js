@@ -88,6 +88,46 @@ const mockExamSchedules = [
         createdAt: "2025-02-26T09:00:00",
         updatedBy: "ADM001",
         updatedAt: "2025-02-26T09:00:00"
+    },
+    // 학생용(student-v3) 테스트 데이터 - S2024001 (김철수 학생) - 온라인 일정
+    {
+        scheduleId: "SCH003",
+        assignmentId: "CA004",
+
+        studentId: "S2024001",
+        studentName: "김철수",
+        studentNumber: "2024001",
+        department: "컴퓨터공학과",
+        degreeType: "박사",
+
+        stageId: "STAGE_TS002_005",
+        stageName: "예비심사",
+
+        thesisTitle: "AI 기반 실시간 데이터 처리 최적화 연구",
+
+        examDate: "2025-03-25",
+        examTime: "10:00",
+        duration: 90,  // 분
+
+        method: "online",
+
+        onlineInfo: {
+            platform: "zoom",
+            meetingUrl: "https://zoom.us/j/9876543210",
+            meetingId: "987 654 3210",
+            password: "xyz789",
+            hostUrl: "https://zoom.us/s/9876543210?zak=eyJh..."
+        },
+
+        offlineInfo: null,
+
+        status: "scheduled",
+        cancelReason: null,
+
+        createdBy: "ADM001",
+        createdAt: "2025-02-27T14:00:00",
+        updatedBy: "ADM001",
+        updatedAt: "2025-02-27T14:00:00"
     }
     // CA003 (윤학생 - 예비심사)은 일정 미등록 상태
 ];

@@ -19,17 +19,24 @@ function renderStudentGuidanceStatusList() {
         return;
     }
 
-    // 필터링 적용
-    const filters = getCurrentStudentGuidanceFilters();
-    const filteredRequests = filterStudentGuidanceRequests(requests, filters);
+    // 학생은 본인 것만 보므로 필터링 불필요
+    const filteredRequests = requests;
 
     contentArea.innerHTML = `
         <div class="table-container">
-            <!-- 테이블 헤더: 타이틀(건수) -->
+            <!-- 테이블 헤더: 타이틀(건수) + 논문 지도 요청 버튼 -->
             <div class="table-header">
                 <div class="table-header-left">
                     <h3 class="table-title">논문 지도 현황</h3>
                     <span class="table-count">(총 ${filteredRequests.length}건)</span>
+                </div>
+                <div class="table-header-right">
+                    <button onclick="showStudentGuidanceRequestModal()"
+                            class="btn-primary"
+                            style="background: #6A0028; color: white; padding: 0.5rem 1rem; border-radius: 0.5rem; border: none; cursor: pointer; font-weight: 500; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-plus"></i>
+                        <span>논문 지도 요청</span>
+                    </button>
                 </div>
             </div>
 
@@ -108,142 +115,162 @@ function renderStudentGuidanceRow(request, idx) {
             <td style="text-align: center;">${request.professorName || '-'}</td>
             <td style="text-align: center;">${request.uploadDate || '-'}</td>
             <td style="text-align: center;">${request.guidanceStage || '연구계획서'}</td>
-            <td style="text-align: center;">
-                <span class="${statusClass} px-2 py-1 rounded-full text-xs font-medium">
-                    ${feedbackStatus}
-                </span>
-            </td>
+            <td style="text-align: center;">${feedbackStatus}</td>
         </tr>
     `;
 }
 
-// ==================== 검색 필터 ====================
-function getCurrentStudentGuidanceFilters() {
-    return {
-        year: document.getElementById('student-guidance-filter-year')?.value || '',
-        semester: document.getElementById('student-guidance-filter-semester')?.value || '',
-        universityType: document.getElementById('student-guidance-filter-university-type')?.value || '',
-        college: document.getElementById('student-guidance-filter-college')?.value || '',
-        undergraduate: document.getElementById('student-guidance-filter-undergraduate')?.value || '',
-        major: document.getElementById('student-guidance-filter-major')?.value || '',
-        program: document.getElementById('student-guidance-filter-program')?.value || '',
-        academicStatus: document.getElementById('student-guidance-filter-academic-status')?.value || '',
-        professor: document.getElementById('student-guidance-filter-professor')?.value || '',
-        feedbackStatus: document.getElementById('student-guidance-filter-feedback-status')?.value || ''
+// ==================== 검색 필터 (학생용은 불필요 - 제거됨) ====================
+// 학생은 본인의 제출물만 보므로 검색/필터 기능 불필요
+
+// ==================== 논문 지도 요청 모달 ====================
+function showStudentGuidanceRequestModal() {
+    // 기존 모달이 있으면 제거
+    const existingModal = document.getElementById("student-guidance-request-modal");
+    if (existingModal) {
+        existingModal.remove();
+    }
+
+    const modal = document.createElement("div");
+    modal.className = "student-guidance-modal-backdrop";
+    modal.id = "student-guidance-request-modal";
+
+    modal.innerHTML = `
+        <div class="student-guidance-modal-content">
+            <div class="student-guidance-modal-inner">
+                <div class="modal-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.5rem; border-bottom: 1px solid #E5E7EB;">
+                    <h3 style="font-size: 1.25rem; font-weight: 700; color: #1F2937;">논문 지도 요청</h3>
+                    <button onclick="closeStudentGuidanceRequestModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer; color: #9CA3AF; line-height: 1;">×</button>
+                </div>
+                <div class="modal-body" style="padding: 1.5rem;">
+                    <form id="student-guidance-request-form" onsubmit="submitStudentGuidanceRequest(event)">
+                        <!-- 논문 제목 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                논문 제목 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="text" id="student-guidance-title" required
+                                   style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;"
+                                   placeholder="논문 제목을 입력하세요">
+                        </div>
+
+                        <!-- 논문 진행 단계 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                논문 진행 단계 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <select id="student-guidance-stage" required
+                                    style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                                <option value="">선택하세요</option>
+                                <option value="연구계획서">연구계획서</option>
+                                <option value="중간논문">중간논문</option>
+                                <option value="최종논문">최종논문</option>
+                                <option value="기타">기타</option>
+                            </select>
+                        </div>
+
+                        <!-- 첨부파일 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                첨부파일 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="file" id="student-guidance-file" required accept=".pdf"
+                                   style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                PDF 파일만 업로드 가능 (최대 30MB)
+                            </p>
+                        </div>
+
+                        <!-- 주의사항 -->
+                        <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
+                            <p style="font-weight: 600; color: #1E40AF; margin-bottom: 0.5rem; font-size: 0.875rem;">안내사항</p>
+                            <ul style="font-size: 0.75rem; color: #1E40AF; margin-left: 1rem; padding-left: 0.5rem;">
+                                <li>한 번에 하나의 파일만 업로드 가능합니다</li>
+                                <li>PDF 파일만 업로드 가능하며, 최대 용량은 30MB입니다</li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer" style="display: flex; justify-content: flex-end; gap: 0.5rem; padding: 1rem 1.5rem; border-top: 1px solid #E5E7EB; background: #F9FAFB;">
+                    <button onclick="closeStudentGuidanceRequestModal()"
+                            class="btn btn-secondary"
+                            style="padding: 0.5rem 1rem; border: 1px solid #D1D5DB; background: white; color: #374151; border-radius: 0.375rem; cursor: pointer; font-size: 0.875rem;">
+                        취소
+                    </button>
+                    <button onclick="document.getElementById('student-guidance-request-form').requestSubmit()"
+                            class="btn btn-primary"
+                            style="padding: 0.5rem 1rem; background: #6A0028; color: white; border: none; border-radius: 0.375rem; cursor: pointer; font-weight: 500; font-size: 0.875rem;">
+                        요청하기
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    // 배경 클릭 시 모달 닫기
+    modal.addEventListener('click', function(e) {
+        if (e.target === modal) {
+            closeStudentGuidanceRequestModal();
+        }
+    });
+
+    // ESC 키로 모달 닫기
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            closeStudentGuidanceRequestModal();
+            document.removeEventListener('keydown', handleEscape);
+        }
     };
+    document.addEventListener('keydown', handleEscape);
 }
 
-function filterStudentGuidanceRequests(requests, filters) {
-    return requests.filter(req => {
-        // 학년도 필터
-        if (filters.year && req.year !== filters.year) {
-            return false;
-        }
+function submitStudentGuidanceRequest(event) {
+    event.preventDefault();
 
-        // 학기 필터
-        if (filters.semester && req.semester !== filters.semester) {
-            return false;
-        }
+    const title = document.getElementById('student-guidance-title').value;
+    const stage = document.getElementById('student-guidance-stage').value;
+    const file = document.getElementById('student-guidance-file').files[0];
 
-        // 대학구분 필터
-        if (filters.universityType && req.graduate !== filters.universityType) {
-            return false;
-        }
+    if (!file) {
+        alert('파일을 선택해주세요');
+        return;
+    }
 
-        // 계열/대학원 필터
-        if (filters.college && req.college !== filters.college) {
-            return false;
-        }
+    // 파일 크기 검증 (30MB = 30 * 1024 * 1024 bytes)
+    const maxSize = 30 * 1024 * 1024;
+    if (file.size > maxSize) {
+        alert('파일 크기는 30MB를 초과할 수 없습니다');
+        return;
+    }
 
-        // 학부(과)전공 필터
-        if (filters.undergraduate && req.undergraduate !== filters.undergraduate) {
-            return false;
-        }
+    // 파일 형식 검증
+    if (file.type !== 'application/pdf') {
+        alert('PDF 파일만 업로드 가능합니다');
+        return;
+    }
 
-        // 학과/전공 필터
-        if (filters.major && req.major !== filters.major) {
-            return false;
-        }
+    // 실제로는 서버로 전송
+    console.log('논문 지도 요청:', { title, stage, file: file.name });
 
-        // 학위과정 필터
-        if (filters.program && req.program !== filters.program) {
-            return false;
-        }
-
-        // 학적상태 필터
-        if (filters.academicStatus) {
-            const statusText = req.status === 'active' ? '재학' :
-                             req.status === 'leave' ? '휴학' :
-                             req.status === 'completed' ? '수료' :
-                             req.status === 'graduated' ? '졸업' : '재학';
-
-            if (statusText !== filters.academicStatus) {
-                return false;
-            }
-        }
-
-        // 지도교수명 필터
-        if (filters.professor) {
-            const professorName = req.professorName || '';
-            if (!professorName.includes(filters.professor)) {
-                return false;
-            }
-        }
-
-        // 피드백상태 필터
-        if (filters.feedbackStatus) {
-            const commentCount = req.commentCount || 0;
-            let currentStatus;
-            if (req.isCompleted) {
-                currentStatus = '완료';
-            } else if (commentCount > 0) {
-                currentStatus = '진행중';
-            } else {
-                currentStatus = '대기';
-            }
-
-            if (currentStatus !== filters.feedbackStatus) {
-                return false;
-            }
-        }
-
-        return true;
-    });
-}
-
-function searchStudentGuidanceStatus() {
+    alert('논문 지도 요청이 완료되었습니다');
+    closeStudentGuidanceRequestModal();
     renderStudentGuidanceStatusList();
 }
 
-function resetStudentGuidanceStatusSearch() {
-    // 모든 검색 필터 초기화
-    const filterIds = [
-        'student-guidance-filter-year',
-        'student-guidance-filter-semester',
-        'student-guidance-filter-university-type',
-        'student-guidance-filter-college',
-        'student-guidance-filter-undergraduate',
-        'student-guidance-filter-major',
-        'student-guidance-filter-program',
-        'student-guidance-filter-academic-status',
-        'student-guidance-filter-professor',
-        'student-guidance-filter-feedback-status'
-    ];
-
-    filterIds.forEach(id => {
-        const element = document.getElementById(id);
-        if (element) {
-            element.value = '';
-        }
-    });
-
-    renderStudentGuidanceStatusList();
+function closeStudentGuidanceRequestModal() {
+    const modal = document.getElementById('student-guidance-request-modal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 // Export
 window.initStudentGuidanceStatusList = initStudentGuidanceStatusList;
 window.renderStudentGuidanceStatusList = renderStudentGuidanceStatusList;
-window.searchStudentGuidanceStatus = searchStudentGuidanceStatus;
-window.resetStudentGuidanceStatusSearch = resetStudentGuidanceStatusSearch;
+window.showStudentGuidanceRequestModal = showStudentGuidanceRequestModal;
+window.submitStudentGuidanceRequest = submitStudentGuidanceRequest;
+window.closeStudentGuidanceRequestModal = closeStudentGuidanceRequestModal;
 
 console.log('✅ 학생용 논문 지도 현황 목록 화면 로드 완료');
