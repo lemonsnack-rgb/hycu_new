@@ -28,14 +28,6 @@ const MeetingList = {
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">미팅유형</label>
-                                <select id="meeting-filter-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="individual">1:1 미팅</option>
-                                    <option value="group">그룹미팅</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">상태</label>
                                 <select id="meeting-filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
@@ -46,8 +38,14 @@ const MeetingList = {
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">참여학생</label>
-                                <input type="text" id="meeting-filter-student" placeholder="학번 또는 성명"
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
+                                <input type="text" id="meeting-filter-student-number" placeholder="학번"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
+                                <input type="text" id="meeting-filter-student-name" placeholder="성명"
                                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
                                        onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
                             </div>
@@ -118,8 +116,8 @@ const MeetingList = {
     applyFilters() {
         const filters = {
             meetingType: document.getElementById('meeting-filter-method').value,
-            meetingTypeFilter: document.getElementById('meeting-filter-type').value,
-            studentSearch: document.getElementById('meeting-filter-student').value,
+            studentNumber: document.getElementById('meeting-filter-student-number').value,
+            studentName: document.getElementById('meeting-filter-student-name').value,
             status: []
         };
 
@@ -141,9 +139,9 @@ const MeetingList = {
      */
     resetFilters() {
         document.getElementById('meeting-filter-method').value = '';
-        document.getElementById('meeting-filter-type').value = '';
         document.getElementById('meeting-filter-status').value = '';
-        document.getElementById('meeting-filter-student').value = '';
+        document.getElementById('meeting-filter-student-number').value = '';
+        document.getElementById('meeting-filter-student-name').value = '';
 
         this.applyFilters();
     },
@@ -177,9 +175,7 @@ const MeetingList = {
 
             // 참여인원 계산
             const participantCount = meeting.participants?.length || 1;
-            const participantText = participantCount === 1
-                ? '1명'
-                : `<span style="color: #6A0028; font-weight: 600;">${participantCount}명</span>`;
+            const participantText = `${participantCount}명`;
 
             return `
                 <tr onclick="MeetingList.showDetail('${meeting.id}')" style="cursor: pointer;">

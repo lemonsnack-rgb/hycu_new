@@ -900,25 +900,28 @@ const DataServiceV3 = {
             allMeetings = allMeetings.filter(m => m.meetingType === filters.meetingType);
         }
 
-        // 2. 미팅유형 필터 (1:1 / 그룹)
-        if (filters.meetingTypeFilter === 'individual') {
-            allMeetings = allMeetings.filter(m => m.participants.length === 1);
-        } else if (filters.meetingTypeFilter === 'group') {
-            allMeetings = allMeetings.filter(m => m.participants.length > 1);
-        }
-
-        // 3. 상태 필터
+        // 2. 상태 필터
         if (filters.status && filters.status.length > 0) {
             allMeetings = allMeetings.filter(m => filters.status.includes(m.status));
         }
 
-        // 4. 참여학생 검색 (학번 또는 성명)
-        if (filters.studentSearch) {
-            const searchTerm = filters.studentSearch.toLowerCase();
+        // 3. 학번 검색
+        if (filters.studentNumber) {
+            const searchTerm = filters.studentNumber.toLowerCase();
             allMeetings = allMeetings.filter(meeting => {
                 // participants 배열에서 하나라도 매칭되면 true
                 return meeting.participants.some(p =>
-                    p.studentNumber.toLowerCase().includes(searchTerm) ||
+                    p.studentNumber.toLowerCase().includes(searchTerm)
+                );
+            });
+        }
+
+        // 4. 성명 검색
+        if (filters.studentName) {
+            const searchTerm = filters.studentName.toLowerCase();
+            allMeetings = allMeetings.filter(meeting => {
+                // participants 배열에서 하나라도 매칭되면 true
+                return meeting.participants.some(p =>
                     p.name.toLowerCase().includes(searchTerm)
                 );
             });
