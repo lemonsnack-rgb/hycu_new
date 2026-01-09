@@ -3,11 +3,8 @@
 const MeetingUtils = {
     formatDateTime(date, time) {
         if (!date) return '-';
-        const dateObj = new Date(date);
-        const dayNames = ['일', '월', '화', '수', '목', '금', '토'];
-        const dayName = dayNames[dateObj.getDay()];
         const formattedTime = time || '';
-        return `${date} (${dayName}) ${formattedTime}`.trim();
+        return `${date} ${formattedTime}`.trim();
     },
 
     formatDate(date) {

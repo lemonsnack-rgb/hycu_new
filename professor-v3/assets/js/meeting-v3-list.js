@@ -179,7 +179,7 @@ const MeetingList = {
             const participantCount = meeting.participants?.length || 1;
             const participantText = participantCount === 1
                 ? '1명'
-                : `<span style="color: #6A0028; font-weight: 600;">👥 ${participantCount}명</span>`;
+                : `<span style="color: #6A0028; font-weight: 600;">${participantCount}명</span>`;
 
             return `
                 <tr onclick="MeetingList.showDetail('${meeting.id}')" style="cursor: pointer;">
