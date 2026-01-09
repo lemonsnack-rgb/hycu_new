@@ -18,7 +18,7 @@ const MeetingList = {
                 <!-- 검색 영역 -->
                 <div class="bg-white rounded-lg shadow-md mb-6">
                     <div class="p-4 bg-gray-50">
-                        <div class="grid grid-cols-5 gap-4">
+                        <div class="grid grid-cols-3 gap-4">
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도방식</label>
                                 <select id="meeting-filter-method" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -36,18 +36,6 @@ const MeetingList = {
                                     <option value="completed">완료</option>
                                     <option value="cancelled">취소</option>
                                 </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
-                                <input type="text" id="meeting-filter-student-number" placeholder="학번"
-                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
-                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
-                                <input type="text" id="meeting-filter-student-name" placeholder="성명"
-                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
-                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
                             </div>
                             <div class="flex items-center justify-end">
                                 <button onclick="MeetingList.applyFilters()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
@@ -116,8 +104,6 @@ const MeetingList = {
     applyFilters() {
         const filters = {
             meetingType: document.getElementById('meeting-filter-method').value,
-            studentNumber: document.getElementById('meeting-filter-student-number').value,
-            studentName: document.getElementById('meeting-filter-student-name').value,
             status: []
         };
 
@@ -140,8 +126,6 @@ const MeetingList = {
     resetFilters() {
         document.getElementById('meeting-filter-method').value = '';
         document.getElementById('meeting-filter-status').value = '';
-        document.getElementById('meeting-filter-student-number').value = '';
-        document.getElementById('meeting-filter-student-name').value = '';
 
         this.applyFilters();
     },
