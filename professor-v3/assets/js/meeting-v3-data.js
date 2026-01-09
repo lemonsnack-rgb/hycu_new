@@ -446,24 +446,23 @@ const MEETING_REQUESTS_V3 = [
  * - 2명 이상 = 그룹 미팅
  */
 const GROUP_MEETINGS_V3 = [
+    // 그룹 미팅 1: 2명 (석사 재학생)
     {
         id: 'GM001',
-        type: 'group', // group (2명 이상)
+        type: 'group',
         professorId: 'P001',
 
-        // 미팅 정보
-        date: '2025-11-28',
+        date: '2026-01-18',
         startTime: '10:00',
         duration: 90,
         meetingType: 'online',
         topic: '연구방법론 집단 지도',
 
-        // 참여 학생 목록
         participants: [
             {
                 studentId: 'S001',
                 studentNumber: '2024001',
-                studentName: '김철수',
+                name: '김철수',
                 academicYear: '2025',
                 semester: '1',
                 collegeType: '일반대학원',
@@ -477,7 +476,7 @@ const GROUP_MEETINGS_V3 = [
             {
                 studentId: 'S002',
                 studentNumber: '2024002',
-                studentName: '이영희',
+                name: '이영희',
                 academicYear: '2025',
                 semester: '1',
                 collegeType: '일반대학원',
@@ -491,53 +490,222 @@ const GROUP_MEETINGS_V3 = [
         ],
         participantCount: 2,
 
-        // 상태
-        status: 'confirmed', // confirmed, completed, cancelled
+        status: 'confirmed',
 
-        // Zoom 정보
         zoomMeetingId: '987654321',
         zoomJoinUrl: 'https://zoom.us/j/987654321?pwd=xyz789',
         zoomPassword: 'xyz789',
         zoomStartUrl: 'https://zoom.us/s/987654321?zak=abc123',
 
-        // 생성 정보
         createdBy: 'professor',
-        createdAt: '2025-11-15T14:30:00',
+        createdAt: '2026-01-05T14:30:00',
 
-        // 취소 정보
         cancelledAt: null,
         cancelledBy: null,
         cancelReason: null,
 
-        // 완료 정보
         completedDate: null,
         actualDuration: null,
         meetingSummary: null,
 
-        // 녹화 정보
         recordingId: null,
         recordingUrl: null,
         recordingDuration: null,
         recordingSize: null
     },
+    // 그룹 미팅 2: 3명 (석사+박사 혼합)
     {
-        id: 'DIR001',
-        type: 'direct_individual', // direct_individual (교수가 직접 생성한 1:1)
+        id: 'GM002',
+        type: 'group',
         professorId: 'P001',
 
-        // 미팅 정보
-        date: '2025-12-05',
+        date: '2026-01-22',
+        startTime: '14:00',
+        duration: 120,
+        meetingType: 'offline',
+        topic: '중간 발표 점검',
+
+        participants: [
+            {
+                studentId: 'S001',
+                studentNumber: '2024001',
+                name: '김철수',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '컴퓨터공학',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            },
+            {
+                studentId: 'S003',
+                studentNumber: '2024003',
+                name: '박민수',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '컴퓨터공학',
+                degreeType: '박사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            },
+            {
+                studentId: 'S005',
+                studentNumber: '2024005',
+                name: '정민호',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '데이터사이언스',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            }
+        ],
+        participantCount: 3,
+
+        status: 'pending',
+
+        zoomMeetingId: null,
+        zoomJoinUrl: null,
+        zoomPassword: null,
+        zoomStartUrl: null,
+
+        createdBy: 'professor',
+        createdAt: '2026-01-08T10:15:00',
+
+        cancelledAt: null,
+        cancelledBy: null,
+        cancelReason: null,
+
+        completedDate: null,
+        actualDuration: null,
+        meetingSummary: null,
+
+        recordingId: null,
+        recordingUrl: null,
+        recordingDuration: null,
+        recordingSize: null
+    },
+    // 그룹 미팅 3: 4명 (서로 다른 학과)
+    {
+        id: 'GM003',
+        type: 'group',
+        professorId: 'P001',
+
+        date: '2026-01-28',
+        startTime: '15:00',
+        duration: 120,
+        meetingType: 'online',
+        topic: '연구윤리 교육',
+
+        participants: [
+            {
+                studentId: 'S001',
+                studentNumber: '2024001',
+                name: '김철수',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '컴퓨터공학',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            },
+            {
+                studentId: 'S002',
+                studentNumber: '2024002',
+                name: '이영희',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '소프트웨어공학',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            },
+            {
+                studentId: 'S004',
+                studentNumber: '2024004',
+                name: '최수진',
+                academicYear: '2024',
+                semester: '2',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '정보보안학',
+                degreeType: '석사',
+                enrollmentStatus: '휴학',
+                advisorName: '박교수'
+            },
+            {
+                studentId: 'S005',
+                studentNumber: '2024005',
+                name: '정민호',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '데이터사이언스',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            }
+        ],
+        participantCount: 4,
+
+        status: 'confirmed',
+
+        zoomMeetingId: '111222333',
+        zoomJoinUrl: 'https://zoom.us/j/111222333?pwd=abc123',
+        zoomPassword: 'abc123',
+        zoomStartUrl: 'https://zoom.us/s/111222333?zak=def456',
+
+        createdBy: 'professor',
+        createdAt: '2026-01-10T09:00:00',
+
+        cancelledAt: null,
+        cancelledBy: null,
+        cancelReason: null,
+
+        completedDate: null,
+        actualDuration: null,
+        meetingSummary: null,
+
+        recordingId: null,
+        recordingUrl: null,
+        recordingDuration: null,
+        recordingSize: null
+    },
+    // 교수 직접 생성 1:1 미팅
+    {
+        id: 'DIR001',
+        type: 'direct_individual',
+        professorId: 'P001',
+
+        date: '2026-02-05',
         startTime: '14:00',
         duration: 60,
         meetingType: 'online',
         topic: '최종 논문 검토',
 
-        // 참여 학생 (1명)
         participants: [
             {
                 studentId: 'S003',
                 studentNumber: '2024003',
-                studentName: '박민수',
+                name: '박민수',
                 academicYear: '2025',
                 semester: '1',
                 collegeType: '일반대학원',
@@ -559,7 +727,7 @@ const GROUP_MEETINGS_V3 = [
         zoomStartUrl: 'https://zoom.us/s/555666777?zak=rty456',
 
         createdBy: 'professor',
-        createdAt: '2025-11-20T10:15:00',
+        createdAt: '2026-01-20T10:15:00',
 
         cancelledAt: null,
         cancelledBy: null,
@@ -568,6 +736,73 @@ const GROUP_MEETINGS_V3 = [
         completedDate: null,
         actualDuration: null,
         meetingSummary: null,
+
+        recordingId: null,
+        recordingUrl: null,
+        recordingDuration: null,
+        recordingSize: null
+    },
+    // 그룹 미팅 4: 2명 (완료된 미팅)
+    {
+        id: 'GM004',
+        type: 'group',
+        professorId: 'P001',
+
+        date: '2026-01-12',
+        startTime: '11:00',
+        duration: 90,
+        meetingType: 'offline',
+        topic: '논문 리뷰',
+
+        participants: [
+            {
+                studentId: 'S002',
+                studentNumber: '2024002',
+                name: '이영희',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '소프트웨어공학',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            },
+            {
+                studentId: 'S005',
+                studentNumber: '2024005',
+                name: '정민호',
+                academicYear: '2025',
+                semester: '1',
+                collegeType: '일반대학원',
+                division: '일반대학원',
+                undergradMajor: '-',
+                department: '데이터사이언스',
+                degreeType: '석사',
+                enrollmentStatus: '재학',
+                advisorName: '박교수'
+            }
+        ],
+        participantCount: 2,
+
+        status: 'completed',
+
+        zoomMeetingId: null,
+        zoomJoinUrl: null,
+        zoomPassword: null,
+        zoomStartUrl: null,
+
+        createdBy: 'professor',
+        createdAt: '2026-01-03T15:00:00',
+
+        cancelledAt: null,
+        cancelledBy: null,
+        cancelReason: null,
+
+        completedDate: '2026-01-12',
+        actualDuration: 95,
+        meetingSummary: '논문 리뷰 완료. 각자 수정사항 반영 예정.',
 
         recordingId: null,
         recordingUrl: null,
@@ -620,111 +855,79 @@ const DataServiceV3 = {
     },
 
     /**
-     * 미팅 목록 조회 (통합)
+     * 미팅 목록 조회 (통합) - V3.1 간소화 버전
      * - 1:1 신청 미팅 + 직접 생성 미팅 + 그룹 미팅
+     * - 필터: 지도방식, 미팅유형, 상태, 참여학생검색만 사용
      */
     getAllMeetings(filters = {}) {
-        // 개별 미팅 (학생 신청)
+        // 개별 미팅 (학생 신청) - participants 배열 형태로 변환
         const individualMeetings = MEETING_REQUESTS_V3.map(m => ({
             ...m,
-            displayType: '1:1 (신청)',
-            searchKey: m.studentName + m.studentNumber + m.department
+            // 1:1 미팅도 participants 배열 형태로 통일
+            participants: m.participants || [{
+                studentId: m.studentId,
+                studentNumber: m.studentNumber,
+                name: m.studentName,
+                academicYear: m.academicYear,
+                semester: m.semester,
+                collegeType: m.collegeType,
+                division: m.division,
+                undergradMajor: m.undergradMajor,
+                department: m.department,
+                degreeType: m.degreeType,
+                enrollmentStatus: m.enrollmentStatus,
+                advisorName: m.advisorName
+            }],
+            displayType: '1:1 (신청)'
         }));
 
-        // 그룹 미팅 + 직접 생성 미팅
-        const groupMeetings = GROUP_MEETINGS_V3.map(m => {
-            // 첫 번째 참여자 정보를 대표로 사용 (목록 표시용)
-            const mainParticipant = m.participants[0];
-
-            return {
-                ...m,
-                // 그룹 미팅은 첫 번째 학생 정보를 대표로 표시
-                studentId: mainParticipant.studentId,
-                studentNumber: mainParticipant.studentNumber,
-                studentName: mainParticipant.studentName,
-                academicYear: mainParticipant.academicYear,
-                semester: mainParticipant.semester,
-                collegeType: mainParticipant.collegeType,
-                division: mainParticipant.division,
-                undergradMajor: mainParticipant.undergradMajor,
-                department: mainParticipant.department,
-                degreeType: mainParticipant.degreeType,
-                enrollmentStatus: mainParticipant.enrollmentStatus,
-                advisorName: mainParticipant.advisorName,
-
-                // 날짜 필드 통일
-                selectedDate: m.date,
-                selectedTime: m.startTime,
-
-                // 표시 타입
-                displayType: m.type === 'group' ? `그룹 (${m.participantCount}명)` : '1:1 (직접)',
-                searchKey: m.participants.map(p => p.studentName + p.studentNumber + p.department).join(' ')
-            };
-        });
+        // 그룹 미팅 + 직접 생성 미팅 (이미 participants 배열 형태)
+        const groupMeetings = GROUP_MEETINGS_V3.map(m => ({
+            ...m,
+            // 날짜 필드 통일
+            selectedDate: m.date,
+            selectedTime: m.startTime,
+            displayType: m.type === 'group' ? `그룹 (${m.participantCount}명)` : '1:1 (직접)'
+        }));
 
         // 통합
         let allMeetings = [...individualMeetings, ...groupMeetings];
 
-        // 필터 적용
-        if (filters.status && filters.status.length > 0) {
-            allMeetings = allMeetings.filter(m => {
-                // status 배열에 포함된 것만
-                return filters.status.includes(m.status);
-            });
-        }
+        // ==================== 필터 적용 (간소화) ====================
 
-        if (filters.academicYear) {
-            allMeetings = allMeetings.filter(m => m.academicYear === filters.academicYear);
-        }
-
-        if (filters.semester) {
-            allMeetings = allMeetings.filter(m => m.semester === filters.semester);
-        }
-
-        if (filters.collegeType) {
-            allMeetings = allMeetings.filter(m => m.collegeType === filters.collegeType);
-        }
-
-        if (filters.division) {
-            allMeetings = allMeetings.filter(m => m.division === filters.division);
-        }
-
-        if (filters.undergradMajor && filters.undergradMajor !== '-') {
-            allMeetings = allMeetings.filter(m => m.undergradMajor === filters.undergradMajor);
-        }
-
-        if (filters.department) {
-            allMeetings = allMeetings.filter(m => m.department === filters.department);
-        }
-
-        if (filters.degreeType) {
-            allMeetings = allMeetings.filter(m => m.degreeType === filters.degreeType);
-        }
-
-        if (filters.enrollmentStatus) {
-            allMeetings = allMeetings.filter(m => m.enrollmentStatus === filters.enrollmentStatus);
-        }
-
-        if (filters.studentNumber) {
-            allMeetings = allMeetings.filter(m => m.studentNumber.includes(filters.studentNumber));
-        }
-
-        if (filters.studentName) {
-            allMeetings = allMeetings.filter(m => m.studentName.includes(filters.studentName));
-        }
-
-        if (filters.advisorName) {
-            allMeetings = allMeetings.filter(m => m.advisorName.includes(filters.advisorName));
-        }
-
+        // 1. 지도방식 필터
         if (filters.meetingType) {
             allMeetings = allMeetings.filter(m => m.meetingType === filters.meetingType);
         }
 
+        // 2. 미팅유형 필터 (1:1 / 그룹)
+        if (filters.meetingTypeFilter === 'individual') {
+            allMeetings = allMeetings.filter(m => m.participants.length === 1);
+        } else if (filters.meetingTypeFilter === 'group') {
+            allMeetings = allMeetings.filter(m => m.participants.length > 1);
+        }
+
+        // 3. 상태 필터
+        if (filters.status && filters.status.length > 0) {
+            allMeetings = allMeetings.filter(m => filters.status.includes(m.status));
+        }
+
+        // 4. 참여학생 검색 (학번 또는 성명)
+        if (filters.studentSearch) {
+            const searchTerm = filters.studentSearch.toLowerCase();
+            allMeetings = allMeetings.filter(meeting => {
+                // participants 배열에서 하나라도 매칭되면 true
+                return meeting.participants.some(p =>
+                    p.studentNumber.toLowerCase().includes(searchTerm) ||
+                    p.name.toLowerCase().includes(searchTerm)
+                );
+            });
+        }
+
         // 날짜순 정렬 (최신순)
         allMeetings.sort((a, b) => {
-            const dateA = new Date(a.selectedDate + ' ' + a.selectedTime);
-            const dateB = new Date(b.selectedDate + ' ' + b.selectedTime);
+            const dateA = new Date((a.selectedDate || a.date) + ' ' + (a.selectedTime || a.startTime));
+            const dateB = new Date((b.selectedDate || b.date) + ' ' + (b.selectedTime || b.startTime));
             return dateB - dateA;
         });
 

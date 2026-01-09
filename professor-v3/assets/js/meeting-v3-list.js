@@ -18,90 +18,8 @@ const MeetingList = {
                 <!-- 검색 영역 -->
                 <div class="bg-white rounded-lg shadow-md mb-6">
                     <div class="p-4 bg-gray-50">
-                        <div class="grid grid-cols-5 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <!-- 1행 -->
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
-                                <select id="meeting-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="2025" selected>2025</option>
-                                    <option value="2024">2024</option>
-                                </select>
-                                <select id="meeting-filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="1" selected>1학기</option>
-                                    <option value="2">2학기</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
-                                <select id="meeting-filter-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="일반대학원">일반대학원</option>
-                                    <option value="특수대학원">특수대학원</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">계열/대학원</label>
-                                <select id="meeting-filter-division" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="일반대학원">일반대학원</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학부(과)전공</label>
-                                <input type="text" id="meeting-filter-undergrad" placeholder="-"
-                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
-                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
-                                <select id="meeting-filter-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="컴퓨터공학">컴퓨터공학</option>
-                                    <option value="소프트웨어공학">소프트웨어공학</option>
-                                    <option value="정보보안학">정보보안학</option>
-                                    <option value="데이터사이언스">데이터사이언스</option>
-                                </select>
-                            </div>
-
-                            <!-- 2행 -->
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학위과정</label>
-                                <select id="meeting-filter-degree" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="석사">석사</option>
-                                    <option value="박사">박사</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
-                                <select id="meeting-filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                    <option value="">전체</option>
-                                    <option value="재학">재학</option>
-                                    <option value="휴학">휴학</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번</label>
-                                <input type="text" id="meeting-filter-student-number" placeholder="학번"
-                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
-                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">성명</label>
-                                <input type="text" id="meeting-filter-student-name" placeholder="성명"
-                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
-                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도교수명</label>
-                                <input type="text" id="meeting-filter-advisor" placeholder="지도교수명"
-                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
-                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
-                            </div>
-
-                            <!-- 3행 -->
                             <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도방식</label>
                                 <select id="meeting-filter-method" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -111,8 +29,18 @@ const MeetingList = {
                                 </select>
                             </div>
                             <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">미팅유형</label>
+                                <select id="meeting-filter-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="individual">1:1 미팅</option>
+                                    <option value="group">그룹미팅</option>
+                                </select>
+                            </div>
+
+                            <!-- 2행 -->
+                            <div class="flex items-center gap-2">
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">상태</label>
-                                <select id="meeting-filter-confirm" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <select id="meeting-filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                     <option value="">전체</option>
                                     <option value="pending">대기</option>
                                     <option value="approved,confirmed">확정</option>
@@ -120,8 +48,18 @@ const MeetingList = {
                                     <option value="cancelled">취소</option>
                                 </select>
                             </div>
-                            <div class="col-span-2"></div>
-                            <div class="flex items-center justify-end gap-2">
+                            <div class="flex items-center gap-2">
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">참여학생</label>
+                                <input type="text" id="meeting-filter-student" placeholder="학번 또는 성명"
+                                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                                       onkeypress="if(event.key==='Enter') MeetingList.applyFilters()">
+                            </div>
+
+                            <!-- 3행 버튼 -->
+                            <div class="col-span-2 flex items-center justify-end gap-2">
+                                <button onclick="MeetingList.resetFilters()" class="px-3 bg-gray-500 text-white rounded hover:bg-gray-600 text-xs font-medium" style="height: 34px;">
+                                    초기화
+                                </button>
                                 <button onclick="MeetingList.applyFilters()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
                                     <i class="fas fa-search mr-1"></i>조회
                                 </button>
@@ -155,19 +93,9 @@ const MeetingList = {
                                 <thead>
                                     <tr>
                                         <th>순번</th>
-                                        <th>학년도</th>
-                                        <th>학기</th>
-                                        <th>대학구분</th>
-                                        <th>계열/대학원</th>
-                                        <th>학부(과)전공</th>
-                                        <th>학과/전공</th>
-                                        <th>학위과정</th>
-                                        <th>학적상태</th>
-                                        <th>학번</th>
-                                        <th>성명</th>
-                                        <th>지도교수명</th>
                                         <th>미팅일시</th>
                                         <th>지도방식</th>
+                                        <th>참여인원</th>
                                         <th>상태</th>
                                     </tr>
                                 </thead>
@@ -197,25 +125,16 @@ const MeetingList = {
      */
     applyFilters() {
         const filters = {
-            academicYear: document.getElementById('meeting-filter-year').value,
-            semester: document.getElementById('meeting-filter-semester').value,
-            collegeType: document.getElementById('meeting-filter-college-type').value,
-            division: document.getElementById('meeting-filter-division').value,
-            undergradMajor: document.getElementById('meeting-filter-undergrad').value,
-            department: document.getElementById('meeting-filter-department').value,
-            degreeType: document.getElementById('meeting-filter-degree').value,
-            enrollmentStatus: document.getElementById('meeting-filter-status').value,
-            studentNumber: document.getElementById('meeting-filter-student-number').value,
-            studentName: document.getElementById('meeting-filter-student-name').value,
-            advisorName: document.getElementById('meeting-filter-advisor').value,
             meetingType: document.getElementById('meeting-filter-method').value,
+            meetingTypeFilter: document.getElementById('meeting-filter-type').value,
+            studentSearch: document.getElementById('meeting-filter-student').value,
             status: []
         };
 
-        // 확정여부 필터 처리
-        const confirmFilter = document.getElementById('meeting-filter-confirm').value;
-        if (confirmFilter) {
-            filters.status = confirmFilter.split(',');
+        // 상태 필터 처리
+        const statusFilter = document.getElementById('meeting-filter-status').value;
+        if (statusFilter) {
+            filters.status = statusFilter.split(',');
         }
 
         // 데이터 가져오기
@@ -229,19 +148,10 @@ const MeetingList = {
      * 필터 초기화
      */
     resetFilters() {
-        document.getElementById('meeting-filter-year').value = '2025';
-        document.getElementById('meeting-filter-semester').value = '1';
-        document.getElementById('meeting-filter-college-type').value = '';
-        document.getElementById('meeting-filter-division').value = '';
-        document.getElementById('meeting-filter-undergrad').value = '';
-        document.getElementById('meeting-filter-department').value = '';
-        document.getElementById('meeting-filter-degree').value = '';
-        document.getElementById('meeting-filter-status').value = '';
-        document.getElementById('meeting-filter-student-number').value = '';
-        document.getElementById('meeting-filter-student-name').value = '';
-        document.getElementById('meeting-filter-advisor').value = '';
         document.getElementById('meeting-filter-method').value = '';
-        document.getElementById('meeting-filter-confirm').value = '';
+        document.getElementById('meeting-filter-type').value = '';
+        document.getElementById('meeting-filter-status').value = '';
+        document.getElementById('meeting-filter-student').value = '';
 
         this.applyFilters();
     },
@@ -260,7 +170,7 @@ const MeetingList = {
         if (this.allMeetings.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="15" class="text-center text-gray-500 py-8">
+                    <td colspan="5" class="text-center text-gray-500 py-8">
                         검색 결과가 없습니다.
                     </td>
                 </tr>
@@ -270,26 +180,21 @@ const MeetingList = {
 
         tbody.innerHTML = this.allMeetings.map((meeting, index) => {
             const statusText = MeetingStatusUtils.getStatusText(meeting.status);
-            const meetingTypeText = MeetingTypeUtils.getMeetingTypeText(meeting);
             const meetingMethodText = MeetingTypeUtils.getMeetingMethodText(meeting.meetingType);
             const dateTimeText = MeetingUtils.formatDateTime(meeting.selectedDate || meeting.date, meeting.selectedTime || meeting.startTime);
+
+            // 참여인원 계산
+            const participantCount = meeting.participants?.length || 1;
+            const participantText = participantCount === 1
+                ? '1명'
+                : `<span style="color: #6A0028; font-weight: 600;">👥 ${participantCount}명</span>`;
 
             return `
                 <tr onclick="MeetingList.showDetail('${meeting.id}')" style="cursor: pointer;">
                     <td>${index + 1}</td>
-                    <td>${meeting.academicYear || '-'}</td>
-                    <td>${meeting.semester || '-'}학기</td>
-                    <td>${meeting.collegeType || '-'}</td>
-                    <td>${meeting.division || '-'}</td>
-                    <td>${meeting.undergradMajor || '-'}</td>
-                    <td>${meeting.department || '-'}</td>
-                    <td>${meeting.degreeType || '-'}</td>
-                    <td>${meeting.enrollmentStatus || '-'}</td>
-                    <td>${meeting.studentNumber || '-'}</td>
-                    <td>${meeting.studentName || '-'}</td>
-                    <td>${meeting.advisorName || '-'}</td>
                     <td>${dateTimeText}</td>
                     <td>${meetingMethodText}</td>
+                    <td>${participantText}</td>
                     <td>${statusText}</td>
                 </tr>
             `;
