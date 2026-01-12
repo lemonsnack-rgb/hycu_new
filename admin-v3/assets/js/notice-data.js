@@ -1,6 +1,6 @@
 // ==================== 공지사항 데이터 관리 ====================
 
-// 공지사항 Mock Data
+// 공지사항 Mock Data (학과별 필터링 지원)
 const noticeDataStore = [
     {
         id: 'notice_001',
@@ -23,7 +23,10 @@ const noticeDataStore = [
             { id: 'file_001', name: '2025-1학기_논문지도일정.pdf', size: 524288, url: '#' }
         ],
         hasAttachment: true,
-        viewCount: 125
+        viewCount: 125,
+        // 신규 추가: 학과별 필터링
+        visibility: 'all',        // 'all' | 'specific'
+        targetDepartments: ['all']  // ['all'] 또는 ['컴퓨터공학과', '경영학과', ...]
     },
     {
         id: 'notice_002',
@@ -42,7 +45,9 @@ const noticeDataStore = [
         updatedAt: '2025-01-05 14:30',
         attachments: [],
         hasAttachment: false,
-        viewCount: 87
+        viewCount: 87,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_003',
@@ -65,7 +70,9 @@ const noticeDataStore = [
             { id: 'file_003', name: '논문표지_양식.docx', size: 204800, url: '#' }
         ],
         hasAttachment: true,
-        viewCount: 215
+        viewCount: 215,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_004',
@@ -89,7 +96,9 @@ const noticeDataStore = [
             { id: 'file_004', name: '학위수여식_안내문.pdf', size: 819200, url: '#' }
         ],
         hasAttachment: true,
-        viewCount: 342
+        viewCount: 342,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_005',
@@ -111,7 +120,9 @@ const noticeDataStore = [
         updatedAt: '2025-01-02 11:20',
         attachments: [],
         hasAttachment: false,
-        viewCount: 178
+        viewCount: 178,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_006',
@@ -134,7 +145,9 @@ const noticeDataStore = [
             { id: 'file_005', name: '학술지논문심사_절차안내.pdf', size: 614400, url: '#' }
         ],
         hasAttachment: true,
-        viewCount: 93
+        viewCount: 93,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_007',
@@ -155,7 +168,9 @@ const noticeDataStore = [
         updatedAt: '2024-12-20 15:30',
         attachments: [],
         hasAttachment: false,
-        viewCount: 156
+        viewCount: 156,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_008',
@@ -180,7 +195,9 @@ const noticeDataStore = [
             { id: 'file_007', name: '신청서_양식.docx', size: 153600, url: '#' }
         ],
         hasAttachment: true,
-        viewCount: 284
+        viewCount: 284,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_009',
@@ -202,7 +219,9 @@ const noticeDataStore = [
         updatedAt: '2024-12-10 14:25',
         attachments: [],
         hasAttachment: false,
-        viewCount: 167
+        viewCount: 167,
+        visibility: 'all',
+        targetDepartments: ['all']
     },
     {
         id: 'notice_010',
@@ -227,7 +246,9 @@ const noticeDataStore = [
             { id: 'file_008', name: '논문제본_양식기준.pdf', size: 409600, url: '#' }
         ],
         hasAttachment: true,
-        viewCount: 201
+        viewCount: 201,
+        visibility: 'all',
+        targetDepartments: ['all']
     }
 ];
 

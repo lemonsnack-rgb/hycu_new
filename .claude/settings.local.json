@@ -35,7 +35,10 @@
       "Bash(curl:*)",
       "Bash(git revert:*)",
       "Bash(git log:*)",
-      "Bash(git restore:*)"
+      "Bash(git restore:*)",
+      "Bash(git branch:*)",
+      "Bash(git tag:*)",
+      "Bash(git diff:*)"
     ],
     "deny": [],
     "ask": []

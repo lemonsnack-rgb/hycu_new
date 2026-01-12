@@ -270,6 +270,32 @@ function showNoticeCreateForm() {
                                    placeholder="제목을 입력하세요">
                         </div>
 
+                        <!-- 공개 대상 학과 -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                공개 대상 학과 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <input type="radio" id="visibility-all" name="visibility" value="all" checked
+                                           onclick="toggleDepartmentSelection(false)"
+                                           class="text-[#6A0028] focus:ring-[#6A0028]">
+                                    <label for="visibility-all" class="text-sm text-gray-700">전체 공개 (모든 학과)</label>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <input type="radio" id="visibility-specific" name="visibility" value="specific"
+                                           onclick="toggleDepartmentSelection(true)"
+                                           class="mt-0.5 text-[#6A0028] focus:ring-[#6A0028]">
+                                    <div class="flex-1">
+                                        <label for="visibility-specific" class="text-sm text-gray-700 block mb-2">특정 학과만 공개</label>
+                                        <div id="department-checkboxes" class="pl-6 space-y-2" style="display: none;">
+                                            ${DepartmentUtils.generateDepartmentCheckboxes([])}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 에디터 툴바 -->
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -386,6 +412,34 @@ function showNoticeEditForm(noticeId) {
                                    placeholder="제목을 입력하세요">
                         </div>
 
+                        <!-- 공개 대상 학과 -->
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-3">
+                                공개 대상 학과 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="space-y-3">
+                                <div class="flex items-center gap-2">
+                                    <input type="radio" id="visibility-all" name="visibility" value="all"
+                                           ${notice.visibility === 'all' ? 'checked' : ''}
+                                           onclick="toggleDepartmentSelection(false)"
+                                           class="text-[#6A0028] focus:ring-[#6A0028]">
+                                    <label for="visibility-all" class="text-sm text-gray-700">전체 공개 (모든 학과)</label>
+                                </div>
+                                <div class="flex items-start gap-2">
+                                    <input type="radio" id="visibility-specific" name="visibility" value="specific"
+                                           ${notice.visibility === 'specific' ? 'checked' : ''}
+                                           onclick="toggleDepartmentSelection(true)"
+                                           class="mt-0.5 text-[#6A0028] focus:ring-[#6A0028]">
+                                    <div class="flex-1">
+                                        <label for="visibility-specific" class="text-sm text-gray-700 block mb-2">특정 학과만 공개</label>
+                                        <div id="department-checkboxes" class="pl-6 space-y-2" style="display: ${notice.visibility === 'specific' ? 'block' : 'none'};">
+                                            ${DepartmentUtils.generateDepartmentCheckboxes(notice.targetDepartments || [])}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- 에디터 툴바 -->
                         <div class="mb-2">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -486,6 +540,16 @@ function formatNoticeText(command) {
 }
 
 /**
+ * 학과 선택 영역 토글
+ */
+function toggleDepartmentSelection(show) {
+    const checkboxContainer = document.getElementById('department-checkboxes');
+    if (checkboxContainer) {
+        checkboxContainer.style.display = show ? 'block' : 'none';
+    }
+}
+
+/**
  * 공지사항 저장
  */
 function saveNoticeData(event) {
@@ -495,6 +559,19 @@ function saveNoticeData(event) {
     const editor = document.getElementById('notice-editor');
     const content = editor?.innerHTML.trim();
     const filesInput = document.getElementById('notice-files');
+
+    // 공개 대상 학과 수집
+    const visibility = document.querySelector('input[name="visibility"]:checked')?.value || 'all';
+    let targetDepartments = ['all'];
+
+    if (visibility === 'specific') {
+        const checkboxes = document.querySelectorAll('input[name="targetDepartments"]:checked');
+        if (checkboxes.length === 0) {
+            alert('특정 학과 공개를 선택한 경우, 최소 1개 이상의 학과를 선택해주세요.');
+            return;
+        }
+        targetDepartments = Array.from(checkboxes).map(cb => cb.value);
+    }
 
     // 유효성 검사
     if (!title) {
@@ -527,6 +604,8 @@ function saveNoticeData(event) {
         content,
         author: '관리자',
         authorId: 'admin', // 실제로는 로그인한 사용자 ID
+        visibility,
+        targetDepartments,
         attachments: currentMode === 'edit'
             ? (attachments.length > 0 ? attachments : getNoticeById(currentNoticeId).attachments)
             : attachments,
@@ -578,6 +657,7 @@ window.backToNoticeList = backToNoticeList;
 window.showNoticeCreateForm = showNoticeCreateForm;
 window.showNoticeEditForm = showNoticeEditForm;
 window.formatNoticeText = formatNoticeText;
+window.toggleDepartmentSelection = toggleDepartmentSelection;
 window.saveNoticeData = saveNoticeData;
 window.deleteNoticeConfirm = deleteNoticeConfirm;
 

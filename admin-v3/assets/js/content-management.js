@@ -1,43 +1,227 @@
-// ========== 콘텐츠 관리 로직 ==========
-// 연구윤리, 논문일정, 논문지도절차 콘텐츠 CRUD
+// ==================== 콘텐츠 관리 (연구윤리, 논문일정, 지도절차) ====================
+// 공지사항과 동일한 등록/수정 방식
 
-// ========== 에디터 툴바 포맷 함수 ==========
+const ContentManagement = {
+    currentContentType: null, // 'ethics', 'schedule', 'procedure'
+    currentContentId: null,
 
-// 연구윤리 텍스트 포맷
-function formatEthicsText(command) {
-    const editor = document.getElementById('ethics-editor');
-    editor.focus();
+    /**
+     * 콘텐츠 타입별 제목 매핑
+     */
+    contentTypeLabels: {
+        ethics: '연구윤리',
+        schedule: '논문일정',
+        procedure: '논문지도절차'
+    },
 
-    if (command === 'h1' || command === 'h2' || command === 'h3') {
-        document.execCommand('formatBlock', false, command);
-    } else if (command === 'link') {
-        const url = prompt('URL을 입력하세요:');
-        if (url) {
-            document.execCommand('createLink', false, url);
+    /**
+     * 편집 화면 표시 (공지사항 방식)
+     * @param {string} contentType - 콘텐츠 타입 ('ethics', 'schedule', 'procedure')
+     * @param {string|null} contentId - 수정 시 콘텐츠 ID, 신규 시 null
+     */
+    showEditForm(contentType, contentId = null) {
+        console.log(`ContentManagement.showEditForm(${contentType}, ${contentId})`);
+
+        this.currentContentType = contentType;
+        this.currentContentId = contentId;
+
+        // 콘텐츠 로드
+        let content = null;
+        if (contentId) {
+            content = getContentById(contentType, contentId);
         }
-    } else if (command === 'ul' || command === 'ol') {
-        const listCommand = command === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
-        document.execCommand(listCommand, false, null);
-    } else {
-        document.execCommand(command, false, null);
-    }
-}
 
-// 논문일정 텍스트 포맷
-function formatScheduleText(command) {
-    const editor = document.getElementById('schedule-editor');
-    editor.focus();
+        const isEdit = !!content;
 
-    if (command === 'h1' || command === 'h2' || command === 'h3') {
-        document.execCommand('formatBlock', false, command);
-    } else if (command === 'link') {
-        const url = prompt('URL을 입력하세요:');
-        if (url) {
-            document.execCommand('createLink', false, url);
+        // 화면 HTML 생성 (공지사항 방식)
+        const editFormHTML = `
+            <div class="review-detail-content-wrapper">
+                <!-- 헤더 -->
+                <div class="review-detail-header" style="padding: 12px 24px;">
+                    <button onclick="ContentManagement.backToList()" class="back-to-list-btn">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        목록으로 돌아가기
+                    </button>
+                </div>
+
+                <!-- 본문 -->
+                <div class="review-detail-body">
+                    <div class="bg-white rounded-lg shadow-md p-6">
+                        <h2 class="text-xl font-bold text-gray-900 mb-6">
+                            ${this.contentTypeLabels[contentType]} ${isEdit ? '수정' : '작성'}
+                        </h2>
+
+                        <form id="content-form" onsubmit="ContentManagement.saveContent(event)">
+                            <!-- 제목 -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    제목 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="text" id="content-title" required
+                                       value="${content ? content.title : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028]"
+                                       placeholder="제목을 입력하세요">
+                            </div>
+
+                            <!-- 공개 대상 학과 (공지사항 방식) -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">
+                                    공개 대상 학과 <span class="text-red-600">*</span>
+                                </label>
+                                <div class="space-y-3">
+                                    <div class="flex items-center gap-2">
+                                        <input type="radio" id="visibility-all" name="visibility" value="all"
+                                               ${!content || content.visibility === 'all' || content.department === 'all' ? 'checked' : ''}
+                                               onclick="ContentManagement.toggleDepartmentSelection(false)"
+                                               class="text-[#6A0028] focus:ring-[#6A0028]">
+                                        <label for="visibility-all" class="text-sm text-gray-700">전체 공개 (모든 학과)</label>
+                                    </div>
+                                    <div class="flex items-start gap-2">
+                                        <input type="radio" id="visibility-specific" name="visibility" value="specific"
+                                               ${content && content.visibility === 'specific' ? 'checked' : ''}
+                                               onclick="ContentManagement.toggleDepartmentSelection(true)"
+                                               class="mt-0.5 text-[#6A0028] focus:ring-[#6A0028]">
+                                        <div class="flex-1">
+                                            <label for="visibility-specific" class="text-sm text-gray-700 block mb-2">특정 학과만 공개</label>
+                                            <div id="department-checkboxes" class="pl-6 space-y-2" style="display: ${content && content.visibility === 'specific' ? 'block' : 'none'};">
+                                                ${DepartmentUtils.generateDepartmentCheckboxes(content?.targetDepartments || [])}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 에디터 툴바 -->
+                            <div class="mb-2">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    내용 <span class="text-red-600">*</span>
+                                </label>
+                                <div id="content-toolbar" class="p-3 bg-gray-50 border border-gray-300 rounded-t-lg flex flex-wrap gap-1">
+                                    ${this.getToolbarHTML(contentType)}
+                                </div>
+                            </div>
+
+                            <!-- 에디터 영역 -->
+                            <div class="mb-6">
+                                <div id="content-editor" contenteditable="true"
+                                     class="w-full min-h-[400px] p-4 border border-gray-300 rounded-b-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028] overflow-y-auto"
+                                     style="line-height: 1.8; font-size: 14px;">${content ? content.content : ''}</div>
+                            </div>
+
+                            <!-- 최종 수정 정보 -->
+                            ${content ? `
+                                <div class="mb-6 text-sm text-gray-500">
+                                    최종 수정일: ${content.lastModified || content.createdAt || '-'} (${content.modifiedBy || content.author || '-'})
+                                </div>
+                            ` : ''}
+
+                            <!-- 버튼 영역 -->
+                            <div class="flex justify-end gap-2 pt-6 border-t">
+                                <button type="button" onclick="ContentManagement.backToList()"
+                                        class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                    취소
+                                </button>
+                                <button type="submit"
+                                        class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020] transition-colors">
+                                    <i class="fas fa-save mr-1"></i> 저장
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        // 메인 콘텐츠 영역에 렌더링
+        const contentArea = document.getElementById('content-area');
+        if (contentArea) {
+            contentArea.innerHTML = editFormHTML;
+        } else {
+            console.error('content-area 요소를 찾을 수 없습니다');
         }
-    } else if (command === 'table') {
+    },
+
+    /**
+     * 콘텐츠 타입별 툴바 HTML 생성
+     */
+    getToolbarHTML(contentType) {
+        const commonButtons = `
+            <button type="button" onclick="ContentManagement.formatText('bold')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="굵게">
+                <i class="fas fa-bold"></i>
+            </button>
+            <button type="button" onclick="ContentManagement.formatText('italic')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="기울임">
+                <i class="fas fa-italic"></i>
+            </button>
+            <button type="button" onclick="ContentManagement.formatText('underline')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="밑줄">
+                <i class="fas fa-underline"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="ContentManagement.formatText('h1')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 1">H1</button>
+            <button type="button" onclick="ContentManagement.formatText('h2')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 2">H2</button>
+            <button type="button" onclick="ContentManagement.formatText('h3')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 3">H3</button>
+            <button type="button" onclick="ContentManagement.formatText('h4')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="제목 4">H4</button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="ContentManagement.formatText('ul')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="글머리 기호">
+                <i class="fas fa-list-ul"></i>
+            </button>
+            <button type="button" onclick="ContentManagement.formatText('ol')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="번호 매기기">
+                <i class="fas fa-list-ol"></i>
+            </button>
+            <div class="w-px bg-gray-300 mx-1"></div>
+            <button type="button" onclick="ContentManagement.formatText('link')" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="링크">
+                <i class="fas fa-link"></i>
+            </button>
+        `;
+
+        // 논문일정은 표 기능 추가
+        if (contentType === 'schedule') {
+            return commonButtons + `
+                <div class="w-px bg-gray-300 mx-1"></div>
+                <button type="button" onclick="ContentManagement.insertTable()" class="px-3 py-1 bg-white border border-gray-300 rounded hover:bg-gray-100" title="표 삽입">
+                    <i class="fas fa-table"></i>
+                </button>
+            `;
+        }
+
+        return commonButtons;
+    },
+
+    /**
+     * 텍스트 포맷 적용
+     */
+    formatText(command) {
+        const editor = document.getElementById('content-editor');
+        if (!editor) return;
+
+        editor.focus();
+
+        if (command === 'h1' || command === 'h2' || command === 'h3' || command === 'h4') {
+            document.execCommand('formatBlock', false, command);
+        } else if (command === 'link') {
+            const url = prompt('URL을 입력하세요:');
+            if (url) {
+                document.execCommand('createLink', false, url);
+            }
+        } else if (command === 'ul' || command === 'ol') {
+            const listCommand = command === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
+            document.execCommand(listCommand, false, null);
+        } else {
+            document.execCommand(command, false, null);
+        }
+    },
+
+    /**
+     * 표 삽입 (논문일정용)
+     */
+    insertTable() {
+        const editor = document.getElementById('content-editor');
+        if (!editor) return;
+
         const rows = prompt('행 수를 입력하세요:', '3');
         const cols = prompt('열 수를 입력하세요:', '3');
+
         if (rows && cols) {
             let tableHTML = '<table style="width: 100%; border-collapse: collapse; margin: 20px 0;"><tbody>';
             for (let i = 0; i < parseInt(rows); i++) {
@@ -48,322 +232,104 @@ function formatScheduleText(command) {
                 tableHTML += '</tr>';
             }
             tableHTML += '</tbody></table>';
+
+            editor.focus();
             document.execCommand('insertHTML', false, tableHTML);
         }
-    } else if (command === 'ul' || command === 'ol') {
-        const listCommand = command === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
-        document.execCommand(listCommand, false, null);
-    } else {
-        document.execCommand(command, false, null);
-    }
-}
+    },
 
-// 논문지도절차 텍스트 포맷
-function formatProcedureText(command) {
-    const editor = document.getElementById('procedure-editor');
-    editor.focus();
-
-    if (command === 'h1' || command === 'h2' || command === 'h3') {
-        document.execCommand('formatBlock', false, command);
-    } else if (command === 'link') {
-        const url = prompt('URL을 입력하세요:');
-        if (url) {
-            document.execCommand('createLink', false, url);
+    /**
+     * 학과 선택 영역 토글
+     */
+    toggleDepartmentSelection(show) {
+        const checkboxContainer = document.getElementById('department-checkboxes');
+        if (checkboxContainer) {
+            checkboxContainer.style.display = show ? 'block' : 'none';
         }
-    } else if (command === 'ul' || command === 'ol') {
-        const listCommand = command === 'ul' ? 'insertUnorderedList' : 'insertOrderedList';
-        document.execCommand(listCommand, false, null);
-    } else {
-        document.execCommand(command, false, null);
-    }
-}
+    },
 
-// ========== 연구윤리 관리 ==========
+    /**
+     * 콘텐츠 저장 (공지사항 방식)
+     */
+    saveContent(event) {
+        event.preventDefault();
 
-// 연구윤리 콘텐츠 초기화
-function initEthicsContentManagement() {
-    const content = getContent('ethics');
-    const editor = document.getElementById('ethics-editor');
-    const lastModified = document.getElementById('ethics-last-modified');
+        const title = document.getElementById('content-title')?.value.trim();
+        const editor = document.getElementById('content-editor');
+        const content = editor?.innerHTML.trim();
 
-    if (editor && content) {
-        editor.innerHTML = content.content;
-    }
+        // 공개 대상 학과 수집
+        const visibility = document.querySelector('input[name="visibility"]:checked')?.value || 'all';
+        let targetDepartments = ['all'];
 
-    if (lastModified && content) {
-        lastModified.textContent = `최종 수정일: ${content.lastModified} (${content.modifiedBy})`;
-    }
-}
-
-// 연구윤리 콘텐츠 저장
-function saveEthicsContent() {
-    const editor = document.getElementById('ethics-editor');
-
-    if (!editor) {
-        alert('에디터를 찾을 수 없습니다.');
-        return;
-    }
-
-    if (!editor.innerHTML.trim()) {
-        alert('콘텐츠를 입력해주세요.');
-        return;
-    }
-
-    const content = getContent('ethics');
-    content.content = editor.innerHTML;
-    content.modifiedBy = 'admin';
-
-    const success = saveContent('ethics', content);
-
-    if (success) {
-        alert('연구윤리 콘텐츠가 저장되었습니다.');
-        initEthicsContentManagement();
-
-        // 실제 뷰 페이지도 업데이트
-        updateEthicsView();
-    } else {
-        alert('저장에 실패했습니다.');
-    }
-}
-
-// 연구윤리 콘텐츠 초기화
-function resetEthicsContent() {
-    if (!confirm('초기 콘텐츠로 되돌리시겠습니까? 저장하지 않은 변경사항은 사라집니다.')) {
-        return;
-    }
-
-    // localStorage에서 삭제하여 기본값으로 리셋
-    localStorage.removeItem('contentData_ethics');
-    initContentData();
-    initEthicsContentManagement();
-
-    alert('초기 콘텐츠로 되돌렸습니다.');
-}
-
-// 연구윤리 실제 뷰 업데이트
-function updateEthicsView() {
-    // admin_views.js의 views.ethics를 동적으로 업데이트
-    const content = getContent('ethics');
-    views.ethics = () => `
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="p-6 border-b">
-            <h3 class="text-lg font-bold text-gray-800">연구윤리</h3>
-        </div>
-        <div class="p-8">
-            <div class="prose prose-sm max-w-none">
-                ${content.content}
-            </div>
-        </div>
-    </div>
-`;
-}
-
-// ========== 논문일정 관리 ==========
-
-// 논문일정 콘텐츠 초기화
-function initScheduleContentManagement() {
-    const content = getContent('schedule');
-    const editor = document.getElementById('schedule-editor');
-    const lastModified = document.getElementById('schedule-last-modified');
-
-    if (editor && content) {
-        editor.innerHTML = content.content;
-    }
-
-    if (lastModified && content) {
-        lastModified.textContent = `최종 수정일: ${content.lastModified} (${content.modifiedBy})`;
-    }
-}
-
-// 논문일정 콘텐츠 저장
-function saveScheduleContent() {
-    const editor = document.getElementById('schedule-editor');
-
-    if (!editor) {
-        alert('에디터를 찾을 수 없습니다.');
-        return;
-    }
-
-    if (!editor.innerHTML.trim()) {
-        alert('콘텐츠를 입력해주세요.');
-        return;
-    }
-
-    const content = getContent('schedule');
-    content.content = editor.innerHTML;
-    content.modifiedBy = 'admin';
-
-    const success = saveContent('schedule', content);
-
-    if (success) {
-        alert('논문일정 콘텐츠가 저장되었습니다.');
-        initScheduleContentManagement();
-
-        // 실제 뷰 페이지도 업데이트
-        updateScheduleView();
-    } else {
-        alert('저장에 실패했습니다.');
-    }
-}
-
-// 논문일정 콘텐츠 초기화
-function resetScheduleContent() {
-    if (!confirm('초기 콘텐츠로 되돌리시겠습니까? 저장하지 않은 변경사항은 사라집니다.')) {
-        return;
-    }
-
-    // localStorage에서 삭제하여 기본값으로 리셋
-    localStorage.removeItem('contentData_schedule');
-    initContentData();
-    initScheduleContentManagement();
-
-    alert('초기 콘텐츠로 되돌렸습니다.');
-}
-
-// 논문일정 실제 뷰 업데이트
-function updateScheduleView() {
-    // admin_views.js의 views.schedule을 동적으로 업데이트
-    const content = getContent('schedule');
-    views.schedule = () => `
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="p-6 border-b">
-            <h3 class="text-lg font-bold text-gray-800">논문일정</h3>
-        </div>
-        <div class="p-8">
-            <div class="prose prose-sm max-w-none">
-                ${content.content}
-            </div>
-        </div>
-    </div>
-`;
-}
-
-// ========== 논문지도절차 관리 ==========
-
-// 논문지도절차 콘텐츠 초기화
-function initProcedureContentManagement() {
-    const content = getContent('procedure');
-    const editor = document.getElementById('procedure-editor');
-    const lastModified = document.getElementById('procedure-last-modified');
-
-    if (editor && content) {
-        editor.innerHTML = content.content;
-    }
-
-    if (lastModified && content) {
-        lastModified.textContent = `최종 수정일: ${content.lastModified} (${content.modifiedBy})`;
-    }
-}
-
-// 논문지도절차 콘텐츠 저장
-function saveProcedureContent() {
-    const editor = document.getElementById('procedure-editor');
-
-    if (!editor) {
-        alert('에디터를 찾을 수 없습니다.');
-        return;
-    }
-
-    if (!editor.innerHTML.trim()) {
-        alert('콘텐츠를 입력해주세요.');
-        return;
-    }
-
-    const content = getContent('procedure');
-    content.content = editor.innerHTML;
-    content.modifiedBy = 'admin';
-
-    const success = saveContent('procedure', content);
-
-    if (success) {
-        alert('논문지도절차 콘텐츠가 저장되었습니다.');
-        initProcedureContentManagement();
-
-        // 실제 뷰 페이지도 업데이트
-        updateProcedureView();
-    } else {
-        alert('저장에 실패했습니다.');
-    }
-}
-
-// 논문지도절차 콘텐츠 초기화
-function resetProcedureContent() {
-    if (!confirm('초기 콘텐츠로 되돌리시겠습니까? 저장하지 않은 변경사항은 사라집니다.')) {
-        return;
-    }
-
-    // localStorage에서 삭제하여 기본값으로 리셋
-    localStorage.removeItem('contentData_procedure');
-    initContentData();
-    initProcedureContentManagement();
-
-    alert('초기 콘텐츠로 되돌렸습니다.');
-}
-
-// 논문지도절차 실제 뷰 업데이트
-function updateProcedureView() {
-    // admin_views.js의 views.procedure를 동적으로 업데이트
-    const content = getContent('procedure');
-    views.procedure = () => `
-    <div class="bg-white rounded-lg shadow-md">
-        <div class="p-6 border-b">
-            <h3 class="text-lg font-bold text-gray-800">논문 지도 절차</h3>
-        </div>
-        <div class="p-8">
-            <div class="prose prose-sm max-w-none">
-                ${content.content}
-            </div>
-        </div>
-    </div>
-`;
-    // process alias도 업데이트
-    views.process = views.procedure;
-}
-
-// ========== 화면 전환 시 초기화 ==========
-
-// renderView 함수에 후처리 추가를 위한 리스너
-// showScreen 함수가 호출될 때 자동으로 초기화되도록 설정
-
-// 전역 이벤트 리스너 등록 (페이지 로드 시)
-if (typeof window !== 'undefined') {
-    // MutationObserver를 사용하여 화면 전환 감지
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
-                const target = mutation.target;
-
-                // 화면이 활성화되었을 때
-                if (target.classList.contains('active')) {
-                    const screenId = target.id;
-
-                    // 각 관리 화면에 대한 초기화 함수 호출
-                    if (screenId === 'ethicsContentMgmt-screen') {
-                        setTimeout(() => initEthicsContentManagement(), 0);
-                    } else if (screenId === 'scheduleContentMgmt-screen') {
-                        setTimeout(() => initScheduleContentManagement(), 0);
-                    } else if (screenId === 'procedureContentMgmt-screen') {
-                        setTimeout(() => initProcedureContentManagement(), 0);
-                    }
-                }
+        if (visibility === 'specific') {
+            const checkboxes = document.querySelectorAll('input[name="targetDepartments"]:checked');
+            if (checkboxes.length === 0) {
+                alert('특정 학과 공개를 선택한 경우, 최소 1개 이상의 학과를 선택해주세요.');
+                return;
             }
-        });
-    });
+            targetDepartments = Array.from(checkboxes).map(cb => cb.value);
+        }
 
-    // DOM 로드 후 observer 등록
-    window.addEventListener('DOMContentLoaded', function() {
-        // 모든 content-screen 요소를 감시
-        const screens = document.querySelectorAll('.content-screen');
-        screens.forEach(screen => {
-            observer.observe(screen, {
-                attributes: true,
-                attributeFilter: ['class']
-            });
-        });
+        // 유효성 검사
+        if (!title) {
+            alert('제목을 입력해주세요.');
+            return;
+        }
 
-        // 페이지 로드 시 실제 뷰도 업데이트
-        updateEthicsView();
-        updateScheduleView();
-        updateProcedureView();
-    });
-}
+        if (!content || content === '<br>') {
+            alert('내용을 입력해주세요.');
+            return;
+        }
+
+        // 데이터 구성 (공지사항 방식)
+        const contentData = {
+            title,
+            content,
+            author: 'admin',
+            visibility,
+            targetDepartments,
+            createdAt: this.currentContentId ? undefined : new Date().toISOString().split('T')[0],
+            lastModified: new Date().toISOString().split('T')[0],
+            modifiedBy: 'admin'
+        };
+
+        // 수정 모드일 경우 ID 추가
+        if (this.currentContentId) {
+            contentData.id = this.currentContentId;
+        }
+
+        // 저장
+        const success = saveContentItem(this.currentContentType, contentData);
+
+        if (success) {
+            alert(this.currentContentId ? '수정되었습니다.' : '등록되었습니다.');
+            this.backToList();
+        } else {
+            alert('저장에 실패했습니다.');
+        }
+    },
+
+    /**
+     * 목록으로 돌아가기
+     */
+    backToList() {
+        const viewMap = {
+            ethics: 'ethicsList',
+            schedule: 'scheduleList',
+            procedure: 'procedureList'
+        };
+        const targetView = viewMap[this.currentContentType];
+
+        if (targetView && typeof window.renderAdminView === 'function') {
+            window.renderAdminView(targetView);
+        } else {
+            console.error('renderAdminView 함수를 찾을 수 없습니다');
+        }
+    }
+};
+
+// 전역 export
+window.ContentManagement = ContentManagement;
+
+console.log('content-management.js loaded');

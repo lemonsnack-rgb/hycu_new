@@ -241,15 +241,15 @@
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>공지사항</span>
                         </a>
-                        <a href="#" onclick="showScreen('ethics'); return false;" data-screen="ethics"
+                        <a href="#" onclick="showScreen('ethicsList'); return false;" data-screen="ethicsList"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>연구윤리</span>
                         </a>
-                        <a href="#" onclick="showScreen('schedule'); return false;" data-screen="schedule"
+                        <a href="#" onclick="showScreen('scheduleList'); return false;" data-screen="scheduleList"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>논문일정</span>
                         </a>
-                        <a href="#" onclick="showScreen('process'); return false;" data-screen="process"
+                        <a href="#" onclick="showScreen('procedureList'); return false;" data-screen="procedureList"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>논문지도절차</span>
                         </a>
@@ -358,25 +358,17 @@
                         <span>시스템 설정</span>
                     </div>
                     <div class="pl-12 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('workScheduleManagement'); return false;" data-screen="workScheduleManagement"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>업무일정등록</span>
+                        </a>
                         <a href="#" onclick="showScreen('permissionManagement'); return false;" data-screen="permissionManagement"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>권한 관리</span>
+                            <span>권한관리</span>
                         </a>
-                        <a href="#" onclick="showScreen('proxyLogin'); return false;" data-screen="proxyLogin"
+                        <a href="#" onclick="showScreen('statistics'); return false;" data-screen="statistics"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>대리로그인</span>
-                        </a>
-                        <a href="#" onclick="showScreen('ethicsContentMgmt'); return false;" data-screen="ethicsContentMgmt"
-                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>연구윤리 관리</span>
-                        </a>
-                        <a href="#" onclick="showScreen('scheduleContentMgmt'); return false;" data-screen="scheduleContentMgmt"
-                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>논문일정 관리</span>
-                        </a>
-                        <a href="#" onclick="showScreen('procedureContentMgmt'); return false;" data-screen="procedureContentMgmt"
-                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>논문지도절차 관리</span>
+                            <span>통계</span>
                         </a>
                     </div>
                 </div>
@@ -891,8 +883,15 @@
                 screen.classList.remove('active');
             });
 
+            // 콘텐츠 목록 화면은 dashboard-screen에 렌더링
+            const contentListScreens = ['ethicsList', 'scheduleList', 'procedureList'];
+            let targetScreenId = screenId;
+            if (contentListScreens.includes(screenId)) {
+                targetScreenId = 'dashboard';
+            }
+
             // 선택된 화면 보이기
-            const targetScreen = document.getElementById(screenId + '-screen');
+            const targetScreen = document.getElementById(targetScreenId + '-screen');
             if (targetScreen) {
                 targetScreen.classList.add('active');
             }
@@ -946,7 +945,7 @@
 
             // views 객체가 로드되지 않았으면 대기
             if (typeof views === 'undefined') {
-                setTimeout(() => renderAdminView(viewName), 100);
+                console.error('❌ views 객체가 로드되지 않았습니다. admin_views.js 파일을 확인하세요.');
                 return;
             }
 
@@ -975,6 +974,9 @@
                 'ethicsContentMgmt': 'ethicsContentMgmt-content',
                 'scheduleContentMgmt': 'scheduleContentMgmt-content',
                 'procedureContentMgmt': 'procedureContentMgmt-content',
+                'ethicsList': 'content-area',
+                'scheduleList': 'content-area',
+                'procedureList': 'content-area',
                 'noticeManagement': 'notice-management-content'
             };
 
@@ -1020,6 +1022,34 @@
                 }
                 if (viewName === 'procedureContentMgmt' && typeof initProcedureContentManagement === 'function') {
                     setTimeout(() => initProcedureContentManagement(), 0);
+                }
+
+                // 콘텐츠 목록 관리 화면 후처리
+                if (viewName === 'ethicsList' || viewName === 'scheduleList' || viewName === 'procedureList') {
+                    console.log('🔍 콘텐츠 목록 화면 post-processing 시작:', viewName);
+
+                    const contentTypeMap = {
+                        'ethicsList': 'ethics',
+                        'scheduleList': 'schedule',
+                        'procedureList': 'procedure'
+                    };
+                    const contentType = contentTypeMap[viewName];
+
+                    // innerHTML이 완료된 후 다음 이벤트 루프에서 실행
+                    setTimeout(() => {
+                        console.log('⏰ setTimeout 실행: ContentListManagement 타입 =', typeof ContentListManagement);
+                        const tbody = document.getElementById('content-table-body');
+                        console.log('⏰ setTimeout 실행: content-table-body 존재 =', !!tbody);
+
+                        if (typeof ContentListManagement !== 'undefined' && tbody) {
+                            console.log('✅ ContentListManagement.init 실행');
+                            ContentListManagement.init(contentType);
+                        } else {
+                            console.error('❌ ContentListManagement 또는 content-table-body를 찾을 수 없습니다');
+                            console.error('  - ContentListManagement:', typeof ContentListManagement);
+                            console.error('  - tbody:', tbody);
+                        }
+                    }, 0);
                 }
 
                 // 공지사항 관리 화면 후처리
@@ -1079,12 +1109,17 @@
                 'evaluationCriteria': { menu: '논문 심사', submenu: '심사 기준 등록' },
                 'thesisReview': { menu: '논문 심사', submenu: '학위 논문 심사' },
                 'journalReview': { menu: '논문 심사', submenu: '학술지 논문 심사' },
-                'permissionManagement': { menu: '시스템 설정', submenu: '권한 관리' },
+                'workScheduleManagement': { menu: '시스템 설정', submenu: '업무일정등록' },
+                'permissionManagement': { menu: '시스템 설정', submenu: '권한관리' },
+                'statistics': { menu: '시스템 설정', submenu: '통계' },
                 'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' },
                 'noticeManagement': { menu: '논문 안내', submenu: '공지사항' },
                 'ethicsContentMgmt': { menu: '시스템 설정', submenu: '연구윤리 관리' },
                 'scheduleContentMgmt': { menu: '시스템 설정', submenu: '논문일정 관리' },
-                'procedureContentMgmt': { menu: '시스템 설정', submenu: '논문지도절차 관리' }
+                'procedureContentMgmt': { menu: '시스템 설정', submenu: '논문지도절차 관리' },
+                'ethicsList': { menu: '논문 안내', submenu: '연구윤리' },
+                'scheduleList': { menu: '논문 안내', submenu: '논문일정' },
+                'procedureList': { menu: '논문 안내', submenu: '논문지도절차' }
             };
 
             const breadcrumb = breadcrumbMap[screenId] || { menu: '대시보드', submenu: null };
@@ -1154,9 +1189,13 @@
     <script src="assets/js/exam-schedule.js"></script>
     <script src="assets/js/content-data.js"></script>
     <script src="assets/js/notice-data.js"></script>
+    <script src="assets/js/department-utils.js"></script>
     <script src="assets/js/admin_main.js"></script>
     <script src="assets/js/admin_views.js"></script>
     <script src="assets/js/admin_modals.js"></script>
+    <script src="assets/js/auth-utils.js"></script>
+    <script src="assets/js/content-detail.js"></script>
+    <script src="assets/js/content-list-management.js"></script>
     <script src="assets/js/content-management.js"></script>
     <script src="assets/js/notice-management.js"></script>
 
@@ -1210,113 +1249,30 @@
             }
         };
 
-        // Update renderAdminView to handle parameters
+        // Update renderAdminView to add post-processing for content list views
         const originalRenderAdminView = renderAdminView;
         window.renderAdminView = function(viewName, param = null) {
-            console.log('🎯 window.renderAdminView called with viewName:', viewName, 'param:', param);
+            console.log('🎯 window.renderAdminView wrapper called with viewName:', viewName, 'param:', param);
 
-            // CRITICAL: thesisReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
-            if (viewName === 'thesisReview') {
-                console.log('🎯 Detected thesisReview in window.renderAdminView');
-                if (typeof initAdminThesisReview === 'function') {
-                    setTimeout(() => {
-                        initAdminThesisReview();
-                    }, 0);
-                } else {
-                    console.error('❌ initAdminThesisReview function not found in window.renderAdminView!');
-                }
-                return;
-            }
+            // 원본 함수 호출
+            originalRenderAdminView(viewName);
 
-            // CRITICAL: journalReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
-            if (viewName === 'journalReview') {
-                console.log('🎯 Detected journalReview in window.renderAdminView');
-                if (typeof initAdminJournalReview === 'function') {
-                    setTimeout(() => {
-                        initAdminJournalReview();
-                    }, 0);
-                } else {
-                    console.error('❌ initAdminJournalReview function not found in window.renderAdminView!');
-                }
-                return;
-            }
+            // 콘텐츠 목록 관리 화면 후처리
+            if (viewName === 'ethicsList' || viewName === 'scheduleList' || viewName === 'procedureList') {
+                const contentTypeMap = {
+                    'ethicsList': 'ethics',
+                    'scheduleList': 'schedule',
+                    'procedureList': 'procedure'
+                };
+                const contentType = contentTypeMap[viewName];
 
-            // views 객체가 로드되지 않았으면 대기
-            if (typeof views === 'undefined') {
-                setTimeout(() => renderAdminView(viewName, param), 100);
-                return;
-            }
-
-            // 각 화면별 컨테이너 ID 매핑 (thesisReview 제거됨)
-            const containerMap = {
-                'dashboard': 'content-area',
-                'stageManagement': 'stage-management-content',
-                'typeManagement': 'type-management-content',
-                'stageTypeManagement': 'stage-type-management-content',
-                'advisorAssignment': 'advisor-assignment-content',
-                'weeklyGuidance': 'weekly-guidance-content',
-                'guidanceProgress': 'guidance-progress-content',
-                'scheduleManagement': 'schedule-management-content',
-                'committeeAssignment': 'committee-assignment-content',
-                'journalReview': 'journal-review-content',
-                'evaluationCriteria': 'evaluation-criteria-content',
-                'evaluationCriteriaEdit': 'evaluation-criteria-content',
-                'requirementManagement': 'requirement-management-content',
-                'titleChangeRequests': 'title-change-requests-content',
-                'permissionManagement': 'permission-management-content',
-                'proxyLogin': 'proxy-login-content',
-                'notice': 'notice-content',
-                'board': 'board-content',
-                'ethics': 'ethics-content',
-                'schedule': 'schedule-content',
-                'process': 'process-content',
-                'workflowCreateUnified': 'type-management-content',
-                'stageTypeCreate': 'stage-type-management-content',
-                'stageTypeEdit': 'stage-type-management-content',
-                'ethicsContentMgmt': 'ethicsContentMgmt-content',
-                'scheduleContentMgmt': 'scheduleContentMgmt-content',
-                'procedureContentMgmt': 'procedureContentMgmt-content',
-                'noticeManagement': 'notice-management-content'
-            };
-
-            const containerId = containerMap[viewName] || 'content-area';
-            const container = document.getElementById(containerId);
-
-            if (!container) {
-                console.error(`Container not found: ${containerId}`);
-                return;
-            }
-
-            // views 객체에서 뷰 함수 가져오기
-            if (views[viewName]) {
-                // 파라미터가 있으면 전달
-                if (param !== null) {
-                    container.innerHTML = views[viewName](param);
-                } else {
-                    container.innerHTML = views[viewName]();
-                }
-
-                // 특정 뷰에 대한 후처리
-                if (viewName === 'stageManagement' && typeof renderStageManagementContent === 'function') {
-                    setTimeout(() => {
-                        renderStageManagementContent();
-                    }, 0);
-                }
-
-                if (viewName === 'evaluationCriteriaEdit' && typeof initEvaluationTypeChangeListener === 'function') {
-                    initEvaluationTypeChangeListener();
-                }
-
-                // 공지사항 관리 화면 후처리
-                if (viewName === 'noticeManagement') {
-                    setTimeout(() => {
-                        if (typeof window.filterNoticeList === 'function') {
-                            window.filterNoticeList();
-                        }
-                    }, 100);
-                }
-            } else {
-                container.innerHTML = `<div class="p-8"><h2 class="text-2xl font-bold text-gray-800">${viewName}</h2><p class="mt-4 text-gray-600">이 화면은 준비 중입니다.</p></div>`;
+                setTimeout(() => {
+                    if (typeof ContentListManagement !== 'undefined') {
+                        ContentListManagement.init(contentType);
+                    } else {
+                        console.error('ContentListManagement를 찾을 수 없습니다');
+                    }
+                }, 0);
             }
         };
     </script>

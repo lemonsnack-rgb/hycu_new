@@ -1,12 +1,18 @@
-// ========== 콘텐츠 관리 데이터 저장소 ==========
+// ========== 콘텐츠 관리 데이터 저장소 (학과별 버전) ==========
 // localStorage를 사용하여 데이터 영속성 제공
+// 각 콘텐츠 타입은 학과별 배열로 관리
 
 const contentData = {
-    // 연구윤리 콘텐츠 (단일)
-    ethics: {
-        id: 'ethics',
-        title: '연구윤리',
-        content: `<div style="line-height: 1.8; font-size: 14px; color: #333;">
+    // 연구윤리 콘텐츠 (공지사항 방식 - 목록)
+    ethics: [
+        {
+            id: 'ethics_001',
+            title: '연구윤리',
+            author: 'admin',
+            visibility: 'all',
+            targetDepartments: ['all'],
+            createdAt: '2025-01-06',
+            content: `<div style="line-height: 1.8; font-size: 14px; color: #333;">
     <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">연구윤리 준수 안내</h3>
 
     <p style="margin-bottom: 30px;">
@@ -67,16 +73,20 @@ const contentData = {
         <strong>※ 연구윤리 위반은 학문적 신뢰를 훼손하는 중대한 행위입니다.</strong><br>
         논문 작성 시 반드시 연구윤리를 준수하시기 바랍니다.
     </p>
-</div>`,
-        lastModified: '2025-01-06',
-        modifiedBy: 'admin'
-    },
+</div>`
+        }
+    ],
 
-    // 논문일정 콘텐츠 (단일)
-    schedule: {
-        id: 'schedule',
-        title: '논문일정',
-        content: `<div style="line-height: 1.8; font-size: 14px; color: #333;">
+    // 논문일정 콘텐츠 (공지사항 방식 - 목록)
+    schedule: [
+        {
+            id: 'schedule_001',
+            title: '논문일정',
+            author: 'admin',
+            visibility: 'all',
+            targetDepartments: ['all'],
+            createdAt: '2025-01-06',
+            content: `<div style="line-height: 1.8; font-size: 14px; color: #333;">
     <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">2025학년도 학위논문 일정 안내</h3>
 
     <p style="margin-bottom: 30px;">
@@ -164,16 +174,20 @@ const contentData = {
     <p style="margin-top: 40px; padding: 15px; background-color: #f5f5f5; border-left: 4px solid #1976d2; color: #1976d2;">
         <strong>※ 자세한 사항은 대학원 홈페이지 또는 행정실로 문의하시기 바랍니다.</strong>
     </p>
-</div>`,
-        lastModified: '2025-01-06',
-        modifiedBy: 'admin'
-    },
+</div>`
+        }
+    ],
 
-    // 논문지도절차 콘텐츠 (단일)
-    procedure: {
-        id: 'procedure',
-        title: '논문 지도 절차',
-        content: `<div style="line-height: 1.8; font-size: 14px; color: #333;">
+    // 논문지도절차 콘텐츠 (공지사항 방식 - 목록)
+    procedure: [
+        {
+            id: 'procedure_001',
+            title: '논문 지도 절차',
+            author: 'admin',
+            visibility: 'all',
+            targetDepartments: ['all'],
+            createdAt: '2025-01-06',
+            content: `<div style="line-height: 1.8; font-size: 14px; color: #333;">
     <h3 style="font-size: 18px; font-weight: bold; margin-bottom: 20px; color: #333;">논문 지도 절차 안내</h3>
 
     <p style="margin-bottom: 30px;">
@@ -258,59 +272,194 @@ const contentData = {
     <p style="margin-top: 20px; padding: 15px; background-color: #f5f5f5; border-left: 4px solid #1976d2; color: #1976d2;">
         <strong>※ 논문 작성 및 심사와 관련된 자세한 사항은 학위논문 작성 지침을 참고하시기 바랍니다.</strong>
     </p>
-</div>`,
-        lastModified: '2025-01-06',
-        modifiedBy: 'admin'
-    }
+</div>`
+        }
+    ]
 };
 
 // ========== localStorage 관리 함수 ==========
 
-// 초기 데이터 로드
-function initContentData() {
-    const storedEthics = localStorage.getItem('contentData_ethics');
-    const storedSchedule = localStorage.getItem('contentData_schedule');
-    const storedProcedure = localStorage.getItem('contentData_procedure');
+/**
+ * 기존 단일 객체 데이터를 배열로 마이그레이션
+ */
+function migrateOldDataToArray(type) {
+    const oldKey = `contentData_${type}`;
+    const newKey = `contentData_${type}_list`;
 
-    if (!storedEthics) {
-        localStorage.setItem('contentData_ethics', JSON.stringify(contentData.ethics));
-    } else {
-        contentData.ethics = JSON.parse(storedEthics);
+    // 이미 마이그레이션 되었는지 확인
+    const newData = localStorage.getItem(newKey);
+    if (newData) {
+        return JSON.parse(newData);
     }
 
-    if (!storedSchedule) {
-        localStorage.setItem('contentData_schedule', JSON.stringify(contentData.schedule));
-    } else {
-        contentData.schedule = JSON.parse(storedSchedule);
+    // 기존 데이터 확인
+    const oldData = localStorage.getItem(oldKey);
+    if (oldData) {
+        try {
+            const parsed = JSON.parse(oldData);
+            // 단일 객체인 경우 배열로 변환 (department: 'all'로 설정)
+            if (!Array.isArray(parsed)) {
+                const migrated = [{
+                    ...parsed,
+                    department: 'all',
+                    id: `${type}_all`
+                }];
+                localStorage.setItem(newKey, JSON.stringify(migrated));
+                console.log(`✅ Migrated ${type} data to array format`);
+                return migrated;
+            }
+        } catch (e) {
+            console.error(`Migration error for ${type}:`, e);
+        }
     }
 
-    if (!storedProcedure) {
-        localStorage.setItem('contentData_procedure', JSON.stringify(contentData.procedure));
-    } else {
-        contentData.procedure = JSON.parse(storedProcedure);
-    }
+    return null;
 }
 
-// 콘텐츠 가져오기
-function getContent(type) {
-    const stored = localStorage.getItem(`contentData_${type}`);
+/**
+ * 초기 데이터 로드
+ */
+function initContentData() {
+    const types = ['ethics', 'schedule', 'procedure'];
+
+    types.forEach(type => {
+        // 마이그레이션 시도
+        const migrated = migrateOldDataToArray(type);
+
+        const storedKey = `contentData_${type}_list`;
+        const stored = localStorage.getItem(storedKey);
+
+        if (!stored && !migrated) {
+            // 신규 데이터 저장
+            localStorage.setItem(storedKey, JSON.stringify(contentData[type]));
+        } else if (stored) {
+            // 기존 배열 데이터 로드
+            contentData[type] = JSON.parse(stored);
+        } else if (migrated) {
+            // 마이그레이션된 데이터 사용
+            contentData[type] = migrated;
+        }
+    });
+}
+
+/**
+ * 콘텐츠 목록 가져오기
+ */
+function getContentList(type) {
+    const stored = localStorage.getItem(`contentData_${type}_list`);
     if (stored) {
         return JSON.parse(stored);
     }
-    return contentData[type];
+    return contentData[type] || [];
 }
 
-// 콘텐츠 저장하기
-function saveContent(type, data) {
-    data.lastModified = new Date().toISOString().split('T')[0];
-    contentData[type] = data;
-    localStorage.setItem(`contentData_${type}`, JSON.stringify(data));
+/**
+ * 학과별 콘텐츠 가져오기 (우선순위: 학과 전용 > 전체 공개)
+ */
+function getContentByDepartment(type, department) {
+    const list = getContentList(type);
+
+    // 1. 해당 학과 전용 콘텐츠 찾기
+    let content = list.find(item => item.department === department);
+
+    // 2. 없으면 전체 공개 콘텐츠 찾기
+    if (!content) {
+        content = list.find(item => item.department === 'all');
+    }
+
+    return content || null;
+}
+
+/**
+ * 콘텐츠 저장하기 (공지사항 방식)
+ */
+function saveContentItem(type, contentItem) {
+    // ID 생성 (없는 경우)
+    if (!contentItem.id) {
+        const timestamp = Date.now();
+        const random = Math.floor(Math.random() * 1000);
+        contentItem.id = `${type}_${timestamp}_${random}`;
+    }
+
+    // 날짜 필드 업데이트
+    const now = new Date().toISOString().split('T')[0];
+    if (!contentItem.createdAt) {
+        contentItem.createdAt = now;
+    }
+    contentItem.lastModified = now;
+
+    const list = getContentList(type);
+    const existingIndex = list.findIndex(item => item.id === contentItem.id);
+
+    if (existingIndex >= 0) {
+        // 기존 항목 업데이트 (createdAt 유지)
+        contentItem.createdAt = list[existingIndex].createdAt || contentItem.createdAt;
+        list[existingIndex] = contentItem;
+    } else {
+        // 신규 항목 추가
+        list.push(contentItem);
+    }
+
+    // 저장
+    localStorage.setItem(`contentData_${type}_list`, JSON.stringify(list));
+    contentData[type] = list;
+
     return true;
+}
+
+/**
+ * 콘텐츠 삭제하기
+ */
+function deleteContentItem(type, contentId) {
+    const list = getContentList(type);
+    const filtered = list.filter(item => item.id !== contentId);
+
+    localStorage.setItem(`contentData_${type}_list`, JSON.stringify(filtered));
+    contentData[type] = filtered;
+
+    return true;
+}
+
+/**
+ * 중복 체크 (제거됨 - 목록 방식에서는 중복 허용)
+ * @deprecated 더 이상 사용되지 않음
+ */
+function checkDuplicateContent(type, department, excludeId = null) {
+    // 목록 방식에서는 중복을 허용하므로 항상 false 반환
+    return false;
+}
+
+/**
+ * ID로 콘텐츠 가져오기
+ */
+function getContentById(type, contentId) {
+    const list = getContentList(type);
+    return list.find(item => item.id === contentId) || null;
+}
+
+// ========== 하위 호환성 함수 (기존 코드 지원) ==========
+
+/**
+ * 기존 getContent() 함수 - 'all' 콘텐츠 반환
+ */
+function getContent(type) {
+    return getContentByDepartment(type, 'all');
+}
+
+/**
+ * 기존 saveContent() 함수 - 'all' 콘텐츠로 저장
+ */
+function saveContent(type, data) {
+    if (!data.department) {
+        data.department = 'all';
+    }
+    return saveContentItem(type, data);
 }
 
 // 페이지 로드 시 초기화
 if (typeof window !== 'undefined') {
     window.addEventListener('DOMContentLoaded', function() {
         initContentData();
+        console.log('content-data.js loaded (department-based version)');
     });
 }

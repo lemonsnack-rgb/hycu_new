@@ -4896,7 +4896,8 @@ views.notice = () => `
     </div>
 `;
 
-// ========== 연구윤리 ==========
+// ========== 연구윤리 (DEPRECATED - ethicsList로 통합) ==========
+/*
 views.ethics = () => `
     <div class="bg-white rounded-lg shadow-md">
         <div class="p-6 border-b">
@@ -4950,8 +4951,10 @@ views.ethics = () => `
         </div>
     </div>
 `;
+*/
 
-// ========== 논문일정 ==========
+// ========== 논문일정 (DEPRECATED - scheduleList로 통합) ==========
+/*
 views.schedule = () => `
     <div class="bg-white rounded-lg shadow-md">
         <div class="p-6 border-b">
@@ -5036,8 +5039,10 @@ views.schedule = () => `
         </div>
     </div>
 `;
+*/
 
-// ========== 논문 지도 절차 ==========
+// ========== 논문 지도 절차 (DEPRECATED - procedureList로 통합) ==========
+/*
 views.procedure = () => `
     <div class="bg-white rounded-lg shadow-md">
         <div class="p-6 border-b">
@@ -5110,14 +5115,16 @@ views.procedure = () => `
         </div>
     </div>
 `;
+*/
 
-// ========== Alias for routing ==========
+// ========== Alias for routing (DEPRECATED) ==========
 // 'process' 라우팅을 위한 alias
-views.process = views.procedure;
+// views.process = views.procedure;
 
-// ========== 콘텐츠 관리 화면 ==========
+// ========== 콘텐츠 관리 화면 (DEPRECATED - ContentManagement.showEditForm으로 통합) ==========
 
 // 연구윤리 관리
+/*
 views.ethicsContentMgmt = () => {
     console.log('✅ views.ethicsContentMgmt 호출됨');
     return `
@@ -5175,8 +5182,10 @@ views.ethicsContentMgmt = () => {
     </div>
 `;
 };
+*/
 
 // 논문일정 관리
+/*
 views.scheduleContentMgmt = () => {
     console.log('✅ views.scheduleContentMgmt 호출됨');
     return `
@@ -5237,8 +5246,10 @@ views.scheduleContentMgmt = () => {
     </div>
 `;
 };
+*/
 
 // 논문지도절차 관리
+/*
 views.procedureContentMgmt = () => {
     console.log('✅ views.procedureContentMgmt 호출됨');
     return `
@@ -5295,6 +5306,181 @@ views.procedureContentMgmt = () => {
         </div>
     </div>
 `;
+};
+*/
+
+// ========== 콘텐츠 목록 관리 (학과별) ==========
+
+// 연구윤리 목록
+views.ethicsList = () => {
+    // ContentListManagement.init() 호출은 index.html의 renderAdminView() 후처리에서 처리됨
+    return `
+    <!-- 검색 영역 -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+        <div class="flex items-center gap-3">
+            <!-- 제목 검색 -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
+                <input type="text" id="filter-content-title" placeholder="제목"
+                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+            </div>
+            <!-- 조회 버튼 -->
+            <button onclick="ContentListManagement.filterContentList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                <i class="fas fa-search mr-1"></i>조회
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-header-left">
+                <h3 class="table-title">연구윤리 목록</h3>
+                <span class="table-count" id="content-count-display">(총 0건)</span>
+            </div>
+            <div class="table-header-right">
+                <button onclick="ContentListManagement.showCreateForm()" class="btn-primary">
+                    <i class="fas fa-plus mr-1"></i>신규 등록
+                </button>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">순번</th>
+                        <th>제목</th>
+                        <th style="width: 150px;">대상학과</th>
+                        <th style="width: 150px;">작성일</th>
+                        <th style="width: 120px;">작성자</th>
+                        <th style="width: 150px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody id="content-table-body">
+                    <!-- 동적으로 생성됨 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+};
+
+// 논문일정 목록
+views.scheduleList = () => {
+    // ContentListManagement.init() 호출은 index.html의 renderAdminView() 후처리에서 처리됨
+    return `
+    <!-- 검색 영역 -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+        <div class="flex items-center gap-3">
+            <!-- 제목 검색 -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
+                <input type="text" id="filter-content-title" placeholder="제목"
+                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+            </div>
+            <!-- 조회 버튼 -->
+            <button onclick="ContentListManagement.filterContentList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                <i class="fas fa-search mr-1"></i>조회
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-header-left">
+                <h3 class="table-title">논문일정 목록</h3>
+                <span class="table-count" id="content-count-display">(총 0건)</span>
+            </div>
+            <div class="table-header-right">
+                <button onclick="ContentListManagement.showCreateForm()" class="btn-primary">
+                    <i class="fas fa-plus mr-1"></i>신규 등록
+                </button>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">순번</th>
+                        <th>제목</th>
+                        <th style="width: 150px;">대상학과</th>
+                        <th style="width: 150px;">작성일</th>
+                        <th style="width: 120px;">작성자</th>
+                        <th style="width: 150px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody id="content-table-body">
+                    <!-- 동적으로 생성됨 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+};
+
+// 논문지도절차 목록
+views.procedureList = () => {
+    // ContentListManagement.init() 호출은 index.html의 renderAdminView() 후처리에서 처리됨
+    return `
+    <!-- 검색 영역 -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+        <div class="flex items-center gap-3">
+            <!-- 제목 검색 -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
+                <input type="text" id="filter-content-title" placeholder="제목"
+                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+            </div>
+            <!-- 조회 버튼 -->
+            <button onclick="ContentListManagement.filterContentList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                <i class="fas fa-search mr-1"></i>조회
+            </button>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="table-header">
+            <div class="table-header-left">
+                <h3 class="table-title">논문지도절차 목록</h3>
+                <span class="table-count" id="content-count-display">(총 0건)</span>
+            </div>
+            <div class="table-header-right">
+                <button onclick="ContentListManagement.showCreateForm()" class="btn-primary">
+                    <i class="fas fa-plus mr-1"></i>신규 등록
+                </button>
+            </div>
+        </div>
+        <div class="table-scroll">
+            <table class="min-w-full">
+                <thead>
+                    <tr>
+                        <th style="width: 60px;">순번</th>
+                        <th>제목</th>
+                        <th style="width: 150px;">대상학과</th>
+                        <th style="width: 150px;">작성일</th>
+                        <th style="width: 120px;">작성자</th>
+                        <th style="width: 150px;">관리</th>
+                    </tr>
+                </thead>
+                <tbody id="content-table-body">
+                    <!-- 동적으로 생성됨 -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+};
+
+// 전역 함수: ContentListManagement로 라우팅
+window.navigateToContentList = function(contentType) {
+    const viewMap = {
+        ethics: 'ethicsList',
+        schedule: 'scheduleList',
+        procedure: 'procedureList'
+    };
+    const viewName = viewMap[contentType];
+    if (viewName && typeof window.navigateToView === 'function') {
+        window.navigateToView(viewName);
+    }
 };
 
 // ========== 공지사항 관리 ==========
