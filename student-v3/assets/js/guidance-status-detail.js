@@ -19,15 +19,16 @@ function openStudentGuidanceStatusDetail(requestId) {
 
     const feedbackData = StudentGuidanceDataService.getStudentGuidanceFeedbackData(requestId);
 
-    // 목록 화면 숨기기
-    const guidanceStatusScreen = document.getElementById('guidance-status-screen');
-    if (guidanceStatusScreen) {
-        guidanceStatusScreen.style.display = 'none';
-    }
-
-    // 상세 화면 생성 및 표시
+    // 상세 화면 생성 및 표시 (모달 방식)
     const detailScreen = createStudentGuidanceStatusDetailScreen(request, feedbackData);
     document.body.appendChild(detailScreen);
+
+    // 백드롭 클릭으로 닫기
+    detailScreen.addEventListener('click', (e) => {
+        if (e.target === detailScreen) {
+            closeStudentGuidanceStatusDetail();
+        }
+    });
 
     // ESC 키로 닫기
     const handleEscape = (e) => {
@@ -103,30 +104,32 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
 
     screen.innerHTML = `
         <div class="feedback-detail-content">
-            <!-- 헤더: 목록으로 돌아가기 -->
-            <div class="px-6 py-3 border-b bg-white flex items-center justify-between">
-                <button onclick="closeStudentGuidanceStatusDetail()" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
-                <!-- 🔒 학생은 피드백 완료 버튼 없음 -->
-            </div>
+            <!-- 헤더: 논문 정보 + 닫기 버튼 -->
+            <div class="px-6 py-3 border-b bg-white">
+                <div class="flex items-center justify-between">
+                    <!-- 좌측: 논문 정보 -->
+                    <div class="text-xs text-gray-700 flex-1 mr-4">
+                        <span class="font-semibold">논문명:</span>
+                        <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학부(과)전공:</span> ${request.graduate || '-'} / ${request.major || '-'}
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">성명:</span> ${request.studentName || '-'}
+                    </div>
 
-            <!-- 학생 정보 영역 -->
-            <div class="px-6 py-2 border-b bg-gray-50">
-                <div class="text-xs text-gray-700">
-                    <span class="font-semibold">논문명:</span>
-                    <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold">학부(과)전공:</span> ${request.graduate || '-'} / ${request.major || '-'}
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold">성명:</span> ${request.studentName || '-'}
+                    <!-- 우측: 닫기 버튼 (학생은 피드백 완료 버튼 없음) -->
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <button onclick="closeStudentGuidanceStatusDetail()"
+                                class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -436,18 +439,11 @@ function updateStudentInfoSection(request) {
     `;
 }
 
-// ==================== 상세 화면 닫기 (목록으로 돌아가기) ====================
+// ==================== 상세 화면 닫기 (모달 닫기) ====================
 function closeStudentGuidanceStatusDetail() {
     const screen = document.getElementById('student-guidance-detail-screen');
     if (screen) {
         screen.remove();
-    }
-
-    // 목록 화면 다시 표시
-    const guidanceStatusScreen = document.getElementById('guidance-status-screen');
-    if (guidanceStatusScreen) {
-        guidanceStatusScreen.style.display = '';  // display: none 제거
-        guidanceStatusScreen.classList.add('active');
     }
 
     // 제출 이력 사이드바 제거
