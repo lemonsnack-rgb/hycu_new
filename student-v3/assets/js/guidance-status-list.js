@@ -181,6 +181,18 @@ function showStudentGuidanceRequestModal() {
                             </p>
                         </div>
 
+                        <!-- 피드백 희망일자 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                피드백 희망일자 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="date" id="student-guidance-desired-date" required
+                                   style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                피드백을 받고 싶은 희망 날짜를 선택하세요
+                            </p>
+                        </div>
+
                         <!-- 주의사항 -->
                         <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
                             <p style="font-weight: 600; color: #1E40AF; margin-bottom: 0.5rem; font-size: 0.875rem;">안내사항</p>
@@ -232,9 +244,15 @@ function submitStudentGuidanceRequest(event) {
     const title = document.getElementById('student-guidance-title').value;
     const stage = document.getElementById('student-guidance-stage').value;
     const file = document.getElementById('student-guidance-file').files[0];
+    const desiredDate = document.getElementById('student-guidance-desired-date').value;
 
     if (!file) {
         alert('파일을 선택해주세요');
+        return;
+    }
+
+    if (!desiredDate) {
+        alert('피드백 희망일자를 선택해주세요');
         return;
     }
 
@@ -252,7 +270,7 @@ function submitStudentGuidanceRequest(event) {
     }
 
     // 실제로는 서버로 전송
-    console.log('논문 지도 요청:', { title, stage, file: file.name });
+    console.log('논문 지도 요청:', { title, stage, file: file.name, desiredDate });
 
     alert('논문 지도 요청이 완료되었습니다');
     closeStudentGuidanceRequestModal();
