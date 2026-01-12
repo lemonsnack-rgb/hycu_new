@@ -339,16 +339,17 @@ function ensureSubmissionSidebar() {
         </ul>
     `;
 
-    // 이벤트 리스너 (처음 생성 시에만)
+    // 이벤트 리스너 (처음 생성 시에만 추가, 항상 최신 상태 참조)
     if (isNew) {
         container.addEventListener('click', (e) => {
             const li = e.target.closest('li[data-feedback-id]');
             if (!li) return;
 
             const targetFeedbackId = li.getAttribute('data-feedback-id');
+            const currentId = window._currentFeedbackCtx?.id;
 
             // 이미 선택된 버전이면 무시
-            if (targetFeedbackId === currentFeedbackId) return;
+            if (targetFeedbackId === currentId) return;
 
             // 다른 버전으로 전환
             switchToSubmissionVersion(targetFeedbackId);

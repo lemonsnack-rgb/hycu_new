@@ -321,16 +321,17 @@ function ensureStudentSubmissionSidebar(request) {
         </ul>
     `;
 
-    // 이벤트 리스너 (처음 생성 시에만)
+    // 이벤트 리스너 (처음 생성 시에만 추가, 항상 최신 상태 참조)
     if (isNew) {
         container.addEventListener('click', (e) => {
             const li = e.target.closest('li[data-request-id]');
             if (!li) return;
 
             const targetRequestId = li.getAttribute('data-request-id');
+            const currentId = window._currentStudentGuidanceCtx?.id;
 
             // 이미 선택된 버전이면 무시
-            if (targetRequestId === currentRequestId) return;
+            if (targetRequestId === currentId) return;
 
             // 다른 버전으로 전환
             switchToStudentSubmissionVersion(targetRequestId);
