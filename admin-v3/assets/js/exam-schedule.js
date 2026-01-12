@@ -410,17 +410,8 @@ function renderExamScheduleDetail(assignmentId) {
                                        ${!schedule || schedule.method === 'online' ? 'checked' : ''}
                                        onchange="toggleMethodFields()"
                                        class="mr-2">
-                                <span class="text-sm font-medium text-gray-700">온라인 (Zoom)</span>
+                                <span class="text-sm font-medium text-gray-700">온라인</span>
                             </label>
-
-                            <!-- 링크 생성 버튼 (온라인/오프라인 사이에 위치, 항상 표시) -->
-                            <button type="button"
-                                    id="create-zoom-link-btn"
-                                    onclick="createZoomMeetingUI()"
-                                    ${schedule?.method === 'offline' ? 'disabled' : ''}
-                                    class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors inline-flex items-center">
-                                <i class="fas fa-video mr-1"></i> ${schedule?.onlineInfo ? '재생성' : '링크 생성'}
-                            </button>
 
                             <label class="flex items-center cursor-pointer">
                                 <input type="radio"
@@ -431,60 +422,84 @@ function renderExamScheduleDetail(assignmentId) {
                                        class="mr-2">
                                 <span class="text-sm font-medium text-gray-700">오프라인</span>
                             </label>
+
+                            <label class="flex items-center cursor-pointer">
+                                <input type="radio"
+                                       name="exam-method"
+                                       value="both"
+                                       ${schedule?.method === 'both' ? 'checked' : ''}
+                                       onchange="toggleMethodFields()"
+                                       class="mr-2">
+                                <span class="text-sm font-medium text-gray-700">온/오프라인</span>
+                            </label>
+
+                            <!-- Zoom 회의 생성 버튼 -->
+                            <button type="button"
+                                    id="create-zoom-link-btn"
+                                    onclick="createZoomMeetingUI()"
+                                    ${schedule?.method === 'offline' ? 'disabled' : ''}
+                                    class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors">
+                                Zoom 회의 생성
+                            </button>
                         </div>
 
                         <p id="zoom-btn-hint" class="text-xs text-gray-500 mb-3">※ 심사 날짜와 시간을 먼저 입력하세요</p>
 
                         <!-- 온라인 정보 -->
-                        <div id="online-fields" style="display: ${!schedule || schedule.method === 'online' ? 'block' : 'none'};">
+                        <div id="online-fields" class="mb-4" style="display: ${!schedule || schedule.method === 'online' || schedule.method === 'both' ? 'block' : 'none'};">
+                            <div class="p-4 bg-[#FAF6F1] border border-[#E8E0D8] rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-3">온라인 회의 정보</h5>
 
-                            <!-- 생성된 링크 정보 -->
-                            <div id="zoom-link-info" style="display: ${schedule?.onlineInfo ? 'block' : 'none'};" class="p-4 bg-[#FAF6F1] border border-[#E8E0D8] rounded-lg">
-                                <h5 class="font-medium text-gray-800 mb-3">Zoom 미팅 정보</h5>
-                                <div class="grid grid-cols-4 gap-4 text-sm">
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-gray-600 whitespace-nowrap">미팅 ID:</span>
-                                        <span id="display-meeting-id" class="font-mono text-gray-900">${schedule?.onlineInfo?.meetingId || ''}</span>
+                                <!-- 회의 링크 (1행, 전체 width) -->
+                                <div class="mb-3">
+                                    <label class="block text-xs text-gray-600 mb-1">회의 링크</label>
+                                    <input type="url"
+                                           id="meeting-url"
+                                           value="${schedule?.onlineInfo?.meetingUrl || ''}"
+                                           placeholder="https://zoom.us/j/..."
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                                    <p class="mt-1 text-xs text-gray-500">직접 입력하거나 'Zoom 회의 생성' 버튼을 클릭하세요</p>
+                                </div>
+
+                                <!-- 회의 ID + 비밀번호 (2행, 2열 그리드) -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <div>
+                                        <label class="block text-xs text-gray-600 mb-1">회의 ID</label>
+                                        <input type="text"
+                                               id="meeting-id"
+                                               value="${schedule?.onlineInfo?.meetingId || ''}"
+                                               placeholder="123 456 7890"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
                                     </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-gray-600 whitespace-nowrap">비밀번호:</span>
-                                        <span id="display-meeting-password" class="font-mono text-gray-900">${schedule?.onlineInfo?.password || ''}</span>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-gray-600 whitespace-nowrap">참가 URL:</span>
-                                        <a id="display-meeting-url"
-                                           href="${schedule?.onlineInfo?.meetingUrl || '#'}"
-                                           target="_blank"
-                                           class="text-[#6A0028] hover:underline break-all">${schedule?.onlineInfo?.meetingUrl || ''}</a>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-gray-600 whitespace-nowrap">호스트 URL:</span>
-                                        <a id="display-host-url"
-                                           href="${schedule?.onlineInfo?.hostUrl || '#'}"
-                                           target="_blank"
-                                           class="text-[#6A0028] hover:underline break-all">${schedule?.onlineInfo?.hostUrl || ''}</a>
+
+                                    <div>
+                                        <label class="block text-xs text-gray-600 mb-1">비밀번호 (선택)</label>
+                                        <input type="text"
+                                               id="meeting-password"
+                                               value="${schedule?.onlineInfo?.password || ''}"
+                                               placeholder="비밀번호를 입력하세요"
+                                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
                                     </div>
                                 </div>
-                            </div>
 
-                            <!-- 숨겨진 필드 (저장용) -->
-                            <input type="hidden" id="meeting-id" value="${schedule?.onlineInfo?.meetingId || ''}">
-                            <input type="hidden" id="meeting-password" value="${schedule?.onlineInfo?.password || ''}">
-                            <input type="hidden" id="meeting-url" value="${schedule?.onlineInfo?.meetingUrl || ''}">
-                            <input type="hidden" id="host-url" value="${schedule?.onlineInfo?.hostUrl || ''}">
+                                <!-- 호스트 URL (숨김) -->
+                                <input type="hidden" id="host-url" value="${schedule?.onlineInfo?.hostUrl || ''}">
+                            </div>
                         </div>
 
                         <!-- 오프라인 정보 -->
-                        <div id="offline-fields" style="display: ${schedule?.method === 'offline' ? 'block' : 'none'};">
-                            <div class="flex items-center gap-4">
-                                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    장소 <span class="text-red-600">*</span>
-                                </label>
-                                <input type="text"
-                                       id="offline-location"
-                                       value="${schedule?.offlineInfo?.location || ''}"
-                                       placeholder="예: 제1공학관 301호"
-                                       class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                        <div id="offline-fields" style="display: ${schedule?.method === 'offline' || schedule?.method === 'both' ? 'block' : 'none'};">
+                            <div class="p-4 bg-gray-50 border border-gray-200 rounded-lg">
+                                <h5 class="font-medium text-gray-800 mb-3">오프라인 장소 정보</h5>
+                                <div>
+                                    <label class="block text-xs text-gray-600 mb-1">장소</label>
+                                    <input type="text"
+                                           id="offline-location"
+                                           value="${schedule?.offlineInfo?.location || ''}"
+                                           placeholder="예: 제1공학관 301호"
+                                           class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#6A0028] focus:border-transparent">
+                                    <p class="mt-1 text-xs text-gray-500">회의실 또는 장소를 입력하세요</p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -600,13 +615,20 @@ function toggleMethodFields() {
 
     const onlineFields = document.getElementById('online-fields');
     const offlineFields = document.getElementById('offline-fields');
+    const createZoomBtn = document.getElementById('create-zoom-link-btn');
 
     if (method === 'online') {
         onlineFields.style.display = 'block';
         offlineFields.style.display = 'none';
-    } else {
+        createZoomBtn.disabled = false;
+    } else if (method === 'offline') {
         onlineFields.style.display = 'none';
         offlineFields.style.display = 'block';
+        createZoomBtn.disabled = true;
+    } else if (method === 'both') {
+        onlineFields.style.display = 'block';
+        offlineFields.style.display = 'block';
+        createZoomBtn.disabled = false;
     }
 }
 
@@ -645,30 +667,11 @@ async function createZoomMeetingUI() {
         });
 
         if (result.success) {
-            // 숨겨진 필드에 값 저장
+            // 입력 필드에 값 채우기
+            document.getElementById('meeting-url').value = result.data.meetingUrl;
             document.getElementById('meeting-id').value = result.data.meetingId;
             document.getElementById('meeting-password').value = result.data.password;
-            document.getElementById('meeting-url').value = result.data.meetingUrl;
             document.getElementById('host-url').value = result.data.hostUrl;
-
-            // 표시 영역에 값 출력
-            document.getElementById('display-meeting-id').textContent = result.data.meetingId;
-            document.getElementById('display-meeting-password').textContent = result.data.password;
-
-            const meetingUrlLink = document.getElementById('display-meeting-url');
-            meetingUrlLink.textContent = result.data.meetingUrl;
-            meetingUrlLink.href = result.data.meetingUrl;
-
-            const hostUrlLink = document.getElementById('display-host-url');
-            hostUrlLink.textContent = result.data.hostUrl;
-            hostUrlLink.href = result.data.hostUrl;
-
-            // 링크 정보 영역 표시
-            document.getElementById('zoom-link-info').style.display = 'block';
-
-            // 버튼 텍스트 변경
-            const createBtn = document.getElementById('create-zoom-link-btn');
-            createBtn.innerHTML = '<i class="fas fa-redo mr-1"></i> 재생성';
 
             showCustomAlert('Zoom 미팅이 생성되었습니다.', 'success');
         } else {
