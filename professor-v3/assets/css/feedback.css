@@ -41,7 +41,7 @@
     inset: 0; /* 전체 화면 커버 */
     background: rgba(0, 0, 0, 0.5); /* 반투명 백드롭 */
     backdrop-filter: blur(4px);
-    z-index: 200; /* 유틸리티 헤더(z-index: 300)보다 낮게, 일반 콘텐츠보다는 높게 */
+    z-index: 500; /* 사이드바(z-index: 400)보다 높게 설정 */
     display: flex;
     align-items: center;
     justify-content: center;
