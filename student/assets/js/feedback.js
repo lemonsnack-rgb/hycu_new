@@ -94,6 +94,7 @@ function renderFeedback() {
 
 // 피드백 요청 모달
 function showFeedbackRequestModal() {
+    console.log('showFeedbackRequestModal 호출됨 - 버전: 20260112001');
     const modal = document.createElement("div");
     modal.className = "modal-backdrop active";
     modal.id = "feedback-request-modal";
@@ -144,6 +145,18 @@ function showFeedbackRequestModal() {
                             </p>
                         </div>
 
+                        <!-- 피드백 희망일자 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem;">
+                                피드백 희망일자 <span style="color: #EF4444;">*</span>
+                            </label>
+                            <input type="date" id="feedback-desired-date" required
+                                   style="width: 100%; padding: 0.5rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem;">
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                피드백을 받고 싶은 희망 날짜를 선택하세요
+                            </p>
+                        </div>
+
                         <!-- 주의사항 -->
                         <div style="background: #EFF6FF; border-left: 4px solid #3B82F6; padding: 0.75rem; border-radius: 0.375rem; margin-bottom: 1.5rem;">
                             <p style="font-weight: 600; color: #1E40AF; margin-bottom: 0.5rem;">안내사항</p>
@@ -165,7 +178,7 @@ function showFeedbackRequestModal() {
         </div>
     `;
 
-    document.getElementById('modal-container').innerHTML = modalContent;
+    document.body.appendChild(modal);
 }
 
 function submitFeedbackRequest(event) {
@@ -174,9 +187,15 @@ function submitFeedbackRequest(event) {
     const title = document.getElementById('feedback-title').value;
     const stage = document.getElementById('feedback-stage').value;
     const file = document.getElementById('feedback-file').files[0];
+    const desiredDate = document.getElementById('feedback-desired-date').value;
 
     if (!file) {
         alert('파일을 선택해주세요');
+        return;
+    }
+
+    if (!desiredDate) {
+        alert('피드백 희망일자를 선택해주세요');
         return;
     }
 
@@ -194,7 +213,7 @@ function submitFeedbackRequest(event) {
     }
 
     // 실제로는 서버로 전송
-    console.log('피드백 요청:', { title, stage, file: file.name });
+    console.log('피드백 요청:', { title, stage, file: file.name, desiredDate });
 
     alert('피드백 요청이 완료되었습니다');
     closeFeedbackRequestModal();
@@ -202,7 +221,10 @@ function submitFeedbackRequest(event) {
 }
 
 function closeFeedbackRequestModal() {
-    document.getElementById('modal-container').innerHTML = '';
+    const modal = document.getElementById('feedback-request-modal');
+    if (modal) {
+        modal.remove();
+    }
 }
 
 // PDF 뷰어 모달 열기 (교수용과 동일한 레이아웃)
