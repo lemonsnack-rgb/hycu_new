@@ -42,7 +42,10 @@ let elements = null;  // DOM 요소 참조
 // ==================== PDF 뷰어 초기화 ====================
 function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
     currentFeedbackId = feedbackId;
-    annotations = feedbackData && feedbackData.annotations ? {...feedbackData.annotations} : {};
+    // ✅ 깊은 복사로 변경 (중복 렌더링 방지)
+    annotations = feedbackData && feedbackData.annotations
+        ? JSON.parse(JSON.stringify(feedbackData.annotations))
+        : {};
 
     elements = {
         canvas: document.getElementById('pdf-canvas'),
@@ -730,16 +733,22 @@ function addAnnotation(obj, type) {
             annotationData.linkedComments = [];
             annotationData.commentAudio = null;
         }
-        
-        annotations[pageNum].push(annotationData);
-        
-        // ✅ 신규: FEEDBACK_DATA에도 저장
+
+        // ✅ FEEDBACK_DATA에만 저장 (중복 방지)
         const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
         if (feedbackId) {
-            console.log(`✅ FEEDBACK_DATA에도 저장: feedbackId=${feedbackId}, page=${pageNum}`);
+            console.log(`✅ FEEDBACK_DATA에 저장: feedbackId=${feedbackId}, page=${pageNum}`);
             FeedbackDataService.addAnnotation(feedbackId, pageNum, annotationData);
+
+            // 로컬 annotations를 FEEDBACK_DATA와 동기화 (deep copy)
+            const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+            if (feedbackData && feedbackData.annotations) {
+                annotations = JSON.parse(JSON.stringify(feedbackData.annotations));
+            }
         } else {
             console.error('❌ feedbackId가 없어서 FEEDBACK_DATA에 저장 실패!');
+            // feedbackId가 없는 경우에만 로컬에 저장
+            annotations[pageNum].push(annotationData);
         }
         
         console.log(`✅ Added annotation: type=${type}, id=${id}, page=${pageNum}`);
@@ -837,12 +846,7 @@ function renderCommentPanel() {
     items.sort((a, b) => a.pageNum - b.pageNum);
     
     if (items.length === 0) {
-        container.innerHTML = `
-            <p class="text-xs text-center text-gray-500">
-                등록된 첨삭이 없습니다.<br>
-                도구를 사용해 새 첨삭을 추가하세요.
-            </p>
-        `;
+        container.innerHTML = ''; // 안내 텍스트 제거
         return;
     }
     
@@ -975,22 +979,23 @@ function renderCommentCard(comment, pageNum) {
                         <div class="comment-bubble ${author ? (author.role === 'main' ? 'professor-main' : author.role === 'co' ? 'professor-co' : 'student-comment') : 'student-comment'}">
                             <p>${mainComment.text}</p>
                             ${mainComment.audio ? `<audio controls class="w-full h-8 mt-2" src="${mainComment.audio}"></audio>` : ''}
-                            <div class="timestamp">${mainComment.timestamp}</div>
-                        </div>
-                        <!-- 버튼: 수정, 삭제 -->
-                        <div class="flex gap-2 mt-2 flex-wrap">
-                            ${isOwner ? `
-                                <button onclick="event.stopPropagation(); editMainComment('${comment.id}')"
-                                        class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
-                                    <i class="fas fa-edit"></i>
-                                    <span>수정</span>
-                                </button>
-                                <button onclick="event.stopPropagation(); deleteMainComment('${comment.id}')"
-                                        class="text-xs bg-red-100 text-red-700 px-3 py-1.5 rounded-md hover:bg-red-200 flex items-center gap-1">
-                                    <i class="fas fa-trash"></i>
-                                    <span>삭제</span>
-                                </button>
-                            ` : ''}
+                            <div class="flex items-center justify-between mt-2">
+                                <div class="timestamp">${mainComment.timestamp}</div>
+                                ${isOwner ? `
+                                    <div class="flex gap-2">
+                                        <button onclick="event.stopPropagation(); editMainComment('${comment.id}')"
+                                                class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
+                                            <i class="fas fa-edit"></i>
+                                            <span>수정</span>
+                                        </button>
+                                        <button onclick="event.stopPropagation(); deleteMainComment('${comment.id}')"
+                                                class="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
+                                            <i class="fas fa-trash"></i>
+                                            <span>삭제</span>
+                                        </button>
+                                    </div>
+                                ` : ''}
+                            </div>
                         </div>
                     </div>
                     <div id="main-comment-edit-${comment.id}" style="display: none;">
@@ -1077,7 +1082,7 @@ function renderCommentCard(comment, pageNum) {
                 <div class="comment-replies">
                     <h6 class="text-xs font-semibold text-gray-600 mb-2">💬 댓글 (${replies.length})</h6>
                     <div class="comment-thread">
-                        ${replies.length > 0 ? replies.map(c => renderCommentBubble(c, comment.id)).join('') : '<p class="text-xs text-gray-400 text-center py-2">댓글이 없습니다.</p>'}
+                        ${replies.map(c => renderCommentBubble(c, comment.id)).join('')}
                     </div>
                     
                     <div class="mt-3 space-y-2">
@@ -1487,7 +1492,7 @@ function renderGeneralFeedback(feedbackData) {
     if (!container) return;
     
     if (!feedbackData || !feedbackData.generalFeedbackThread) {
-        container.innerHTML = '<p class="text-xs text-gray-500 text-center">총평이 없습니다.</p>';
+        container.innerHTML = ''; // 안내 텍스트 제거
         return;
     }
     
@@ -1526,7 +1531,7 @@ function renderGeneralFeedback(feedbackData) {
         `;
     }
     
-    container.innerHTML = html || '<p class="text-xs text-gray-500 text-center">총평이 없습니다.</p>';
+    container.innerHTML = html || ''; // 안내 텍스트 제거
 }
 
 // ==================== 전체 피드백 추가 (총평) ====================
@@ -2034,19 +2039,19 @@ function addMainComment(commentId) {
     if (feedbackData && feedbackData.annotations) {
         console.log('🔵 [addMainComment] annotations 동기화 시작');
         console.log('🔵 [addMainComment] 동기화 전 annotations:', annotations);
-        
-        // ✅ 수정: 병합 방식 - 로컬과 FEEDBACK_DATA 합치기
+
+        // ✅ 깊은 복사로 변경 (중복 렌더링 방지)
         const feedbackAnnotations = feedbackData.annotations;
-        
+
         // FEEDBACK_DATA가 비어있으면 로컬 것 유지
         if (Object.keys(feedbackAnnotations).length === 0 && Object.keys(annotations).length > 0) {
             console.log('🔵 [addMainComment] FEEDBACK_DATA가 비어있음, 로컬 annotations 유지');
             // annotations 그대로 유지
         } else {
-            // FEEDBACK_DATA에 데이터가 있으면 사용
-            annotations = feedbackAnnotations;
+            // FEEDBACK_DATA에 데이터가 있으면 깊은 복사로 사용
+            annotations = JSON.parse(JSON.stringify(feedbackAnnotations));
         }
-        
+
         console.log('🔵 [addMainComment] annotations 동기화 완료:', annotations);
         console.log('🔵 [addMainComment] Object.keys(annotations):', Object.keys(annotations));
     } else {

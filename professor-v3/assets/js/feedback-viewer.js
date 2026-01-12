@@ -539,7 +539,7 @@ function renderGeneralThread(feedbackId){
   
   // 등록된 평가가 없으면 입력창 표시
   if (items.length === 0) {
-    listEl.innerHTML = '<p class="text-xs text-gray-400 text-center py-2">등록된 전체 평가가 없습니다.</p>';
+    listEl.innerHTML = ''; // 안내 텍스트 제거
     if (inputSection) inputSection.style.display = 'block';
     return;
   }
