@@ -569,7 +569,7 @@ const appData = {
             stage: '최종본',
             copyKiller: 7,
             gptKiller: 1,
-            feedbackStatus: '답변 대기중',
+            feedbackStatus: '대기',
             feedbackCount: 3,
             lastFeedbackDate: '2025-11-26'
         },
@@ -587,7 +587,7 @@ const appData = {
             stage: '최종본',
             copyKiller: 8,
             gptKiller: 1,
-            feedbackStatus: '피드백 완료',
+            feedbackStatus: '완료',
             feedbackCount: 2,
             lastFeedbackDate: '2025-11-21'
         },
@@ -605,7 +605,7 @@ const appData = {
             stage: '중간논문',
             copyKiller: 15,
             gptKiller: 3,
-            feedbackStatus: '피드백 완료',
+            feedbackStatus: '완료',
             feedbackCount: 1,
             lastFeedbackDate: '2025-11-19'
         },
@@ -623,7 +623,7 @@ const appData = {
             stage: '연구계획서',
             copyKiller: 5,
             gptKiller: 2,
-            feedbackStatus: '답변 대기중',
+            feedbackStatus: '대기',
             feedbackCount: 0,
             lastFeedbackDate: null
         },
@@ -641,7 +641,7 @@ const appData = {
             stage: '중간논문',
             copyKiller: 12,
             gptKiller: 2,
-            feedbackStatus: '피드백 완료',
+            feedbackStatus: '완료',
             feedbackCount: 2,
             lastFeedbackDate: '2025-11-16'
         }

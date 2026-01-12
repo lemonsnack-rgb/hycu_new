@@ -27,7 +27,7 @@ function switchView(viewName, param = null) {
         midThesis: '중간논문 제출 현황',
         finalThesis: '최종논문 제출 현황',
         journalSubmission: '학술지 심사 신청 현황',
-        guidanceProgress: '논문 지도 현황',
+        guidanceProgress: '논문 지도 활동',
         scheduleManagement: '일정 관리',
         scheduleCreate: param ? '일정 수정' : '일정 등록',
         requirementManagement: '논문 제출 요건 등록',

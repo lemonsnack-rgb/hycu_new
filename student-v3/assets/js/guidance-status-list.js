@@ -1,11 +1,11 @@
 /**
- * 학생용 논문 지도 현황 - 목록 화면
+ * 학생용 논문 지도 활동 - 목록 화면
  * Version: 20260107001
  */
 
 // ==================== 목록 초기화 ====================
 function initStudentGuidanceStatusList() {
-    console.log('학생용 논문 지도 현황 초기화');
+    console.log('학생용 논문 지도 활동 초기화');
     renderStudentGuidanceStatusList();
 }
 
@@ -27,7 +27,7 @@ function renderStudentGuidanceStatusList() {
             <!-- 테이블 헤더: 타이틀(건수) + 논문 지도 요청 버튼 -->
             <div class="table-header">
                 <div class="table-header-left">
-                    <h3 class="table-title">논문 지도 현황</h3>
+                    <h3 class="table-title">논문 지도 활동</h3>
                     <span class="table-count">(총 ${filteredRequests.length}건)</span>
                 </div>
                 <div class="table-header-right">
@@ -53,9 +53,12 @@ function renderStudentGuidanceStatusList() {
                             <th style="width: 150px; text-align: center;">학과/전공</th>
                             <th style="width: 80px; text-align: center;">학위과정</th>
                             <th style="width: 80px; text-align: center;">학적상태</th>
+                            <th style="width: 90px; text-align: center;">학번</th>
+                            <th style="width: 80px; text-align: center;">성명</th>
                             <th style="min-width: 250px; text-align: center;">논문명</th>
                             <th style="width: 100px; text-align: center;">지도교수명</th>
                             <th style="width: 120px; text-align: center;">제출일시</th>
+                            <th style="width: 120px; text-align: center;">피드백 희망일자</th>
                             <th style="width: 120px; text-align: center;">지도단계</th>
                             <th style="width: 100px; text-align: center;">피드백상태</th>
                         </tr>
@@ -63,7 +66,7 @@ function renderStudentGuidanceStatusList() {
                     <tbody id="student-guidance-status-list-body">
                         ${filteredRequests.length > 0
                             ? filteredRequests.map((req, idx) => renderStudentGuidanceRow(req, idx + 1)).join('')
-                            : '<tr><td colspan="14" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
+                            : '<tr><td colspan="17" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
                         }
                     </tbody>
                 </table>
@@ -76,17 +79,14 @@ function renderStudentGuidanceStatusList() {
 function renderStudentGuidanceRow(request, idx) {
     // 피드백 상태 계산
     const commentCount = request.commentCount || 0;
-    let feedbackStatus, statusClass;
+    let feedbackStatus;
 
     if (request.isCompleted) {
         feedbackStatus = '완료';
-        statusClass = 'bg-green-100 text-green-700';
     } else if (commentCount > 0) {
-        feedbackStatus = '진행중';
-        statusClass = 'bg-[#FCE4EC] text-[#6A0028]';
+        feedbackStatus = '진행';
     } else {
         feedbackStatus = '대기';
-        statusClass = 'bg-gray-100 text-gray-800';
     }
 
     // 학적상태 텍스트 변환
@@ -107,6 +107,8 @@ function renderStudentGuidanceRow(request, idx) {
             <td style="text-align: center;">${request.major}</td>
             <td style="text-align: center;">${request.program}</td>
             <td style="text-align: center;">${statusText}</td>
+            <td style="text-align: center;">${request.studentNumber}</td>
+            <td style="text-align: center;">${request.studentName}</td>
             <td style="text-align: left; padding-left: 12px;">
                 <div class="cell-truncate" title="${request.thesisTitle || request.file}">
                     ${request.thesisTitle || request.file}
@@ -114,6 +116,7 @@ function renderStudentGuidanceRow(request, idx) {
             </td>
             <td style="text-align: center;">${request.professorName || '-'}</td>
             <td style="text-align: center;">${request.uploadDate || '-'}</td>
+            <td style="text-align: center;">${request.desiredDate || '-'}</td>
             <td style="text-align: center;">${request.guidanceStage || '연구계획서'}</td>
             <td style="text-align: center;">${feedbackStatus}</td>
         </tr>

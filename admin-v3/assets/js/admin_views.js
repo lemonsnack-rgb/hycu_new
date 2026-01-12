@@ -1337,42 +1337,59 @@ const views = {
                     <table class="min-w-full table-fixed text-sm">
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">순번</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학년도</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학기</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">대학구분</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">계열/대학원</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학부(과)전공</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과/전공</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학위과정</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학적상태</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">학번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">부지도교수</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">
+                                    <input type="checkbox" id="select-all-feedbacks" onchange="toggleAllFeedbacks(this)" class="rounded">
+                                </th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학년도</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">학기</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">대학구분</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">계열/대학원</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">학부(과)전공</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">학과/전공</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학위과정</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학적상태</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 90px;">학번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">성명</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="min-width: 250px;">논문명</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">지도교수명</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">제출일시</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">피드백 희망일자</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">지도단계</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">피드백상태</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.length > 0 ? data.map((item, idx) => {
+                                const feedbackStatus = item.feedbackStatus || '대기';
                                 return `
                                 <tr class="hover:bg-gray-50 cursor-pointer" onclick="viewPdfFeedback(${item.id}, true)">
+                                    <td class="py-3 px-4 text-center" onclick="event.stopPropagation()">
+                                        <input type="checkbox" class="feedback-checkbox rounded" data-feedback-id="${item.id}">
+                                    </td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">2025</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">1학기</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.major}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.graduate || '일반대학원'}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.graduate || '공학계열'}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.major}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.major}</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.degree}</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">재학</td>
                                     <td class="py-3 px-4 text-center text-sm text-gray-600">${item.studentId}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.studentName}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.advisor}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">-</td>
+                                    <td class="py-3 px-4 text-center text-sm font-medium text-gray-800">${item.studentName}</td>
+                                    <td class="py-3 px-4 text-left text-sm text-gray-600" style="padding-left: 12px;">
+                                        <div class="cell-truncate" title="${item.documentTitle || item.fileName}">${item.documentTitle || item.fileName}</div>
+                                    </td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.advisor}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.submitDate || '-'}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.desiredDate || '-'}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${item.stage || '연구계획서'}</td>
+                                    <td class="py-3 px-4 text-center text-sm text-gray-600">${feedbackStatus}</td>
                                 </tr>
                             `}).join('') : `
                                 <tr>
-                                    <td colspan="13" class="py-8 text-center text-gray-500">
+                                    <td colspan="18" class="py-8 text-center text-gray-500">
                                         데이터가 없습니다.
                                     </td>
                                 </tr>

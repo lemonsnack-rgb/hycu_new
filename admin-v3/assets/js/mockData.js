@@ -1178,7 +1178,7 @@ const mockMenus = [
     {
         id: 'MENU_003_002',
         parentId: 'MENU_003',
-        name: '논문 지도 현황',
+        name: '논문 지도 활동',
         code: 'guidance_progress',
         depth: 2,
         order: 2

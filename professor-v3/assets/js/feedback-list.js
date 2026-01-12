@@ -23,7 +23,7 @@ function renderFeedbackList() {
             <!-- 테이블 헤더: 타이틀(건수) + 액션버튼 -->
             <div class="table-header">
                 <div class="table-header-left">
-                    <h3 class="table-title">논문 지도 현황</h3>
+                    <h3 class="table-title">논문 지도 활동</h3>
                     <span class="table-count">(총 ${filteredRequests.length}건)</span>
                 </div>
                 <div class="table-header-right">
@@ -63,6 +63,7 @@ function renderFeedbackList() {
                                 <th style="min-width: 250px; text-align: center;">논문명</th>
                                 <th style="width: 100px; text-align: center;">지도교수명</th>
                                 <th style="width: 120px; text-align: center;">제출일시</th>
+                                <th style="width: 120px; text-align: center;">피드백 희망일자</th>
                                 <th style="width: 120px; text-align: center;">지도단계</th>
                                 <th style="width: 100px; text-align: center;">피드백상태</th>
                             </tr>
@@ -70,7 +71,7 @@ function renderFeedbackList() {
                         <tbody id="feedback-list-body">
                             ${filteredRequests.length > 0
                                 ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                                : '<tr><td colspan="17" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
+                                : '<tr><td colspan="18" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
                             }
                         </tbody>
                     </table>
@@ -83,20 +84,17 @@ function renderFeedbackList() {
 function renderFeedbackRow(request, idx) {
     // ID 48: 피드백 상태 로직
     // 대기: 코멘트 0건
-    // 진행중: 코멘트 1건 이상, 완료 버튼 누르지 않음
+    // 진행: 코멘트 1건 이상, 완료 버튼 누르지 않음
     // 완료: 명시적으로 완료 버튼 클릭
     const commentCount = request.commentCount || 0;
-    let feedbackStatus, statusClass;
+    let feedbackStatus;
 
     if (request.isCompleted) {
         feedbackStatus = '완료';
-        statusClass = 'bg-green-100 text-green-700';
     } else if (commentCount > 0) {
-        feedbackStatus = '진행중';
-        statusClass = 'bg-[#FCE4EC] text-[#6A0028]';
+        feedbackStatus = '진행';
     } else {
         feedbackStatus = '대기';
-        statusClass = 'bg-gray-100 text-gray-800';
     }
 
     // 학적상태 텍스트 변환
@@ -136,6 +134,7 @@ function renderFeedbackRow(request, idx) {
             </td>
             <td style="text-align: center;">${request.professorName || '-'}</td>
             <td style="text-align: center;">${request.uploadDate || '-'}</td>
+            <td style="text-align: center;">${request.desiredDate || '-'}</td>
             <td style="text-align: center;">${request.guidanceStage || '연구계획서'}</td>
             <td style="text-align: center;">
                 ${feedbackStatus}

@@ -19,7 +19,7 @@ const breadcrumbMap = {
     // 논문지도
     'advisor-assignment': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '지도교수 배정' }],
     'guidance': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '주차별 논문지도 현황' }],
-    'feedback': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '논문 지도 현황' }],
+    'feedback': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '논문 지도 활동' }],
     'meeting': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '실시간 지도 예약' }],
     // 논문 심사
     'exam-schedule': [{ label: '홈', url: '#' }, { label: '논문 심사' }, { label: '심사 일정 관리' }],
