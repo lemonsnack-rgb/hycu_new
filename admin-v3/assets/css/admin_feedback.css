@@ -35,32 +35,29 @@
     overflow: hidden;
 }
 
-/* ==================== 피드백 상세 화면 (페이지 전환 방식) ==================== */
+/* ==================== 피드백 상세 화면 (모달 팝업 방식) ==================== */
 .feedback-detail-screen {
     position: fixed;
-    top: 48px; /* 유틸리티 헤더 높이 (--utility-header-height) */
-    left: 240px; /* 사이드바 너비 (--sidebar-width) */
-    right: 0;
-    bottom: 0;
-    background: #F3F4F6;
-    z-index: 50; /* 유틸리티 헤더(z-index: 300)보다 낮게, 일반 콘텐츠보다는 높게 */
+    inset: 0; /* 전체 화면 커버 */
+    background: rgba(0, 0, 0, 0.5); /* 반투명 백드롭 */
+    backdrop-filter: blur(4px);
+    z-index: 500; /* 사이드바(z-index: 400)보다 높게 설정 */
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-/* 사이드바가 접힌 경우 */
-body:has(.layout-v3-sidebar.collapsed) .feedback-detail-screen {
-    left: 0;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
 }
 
 .feedback-detail-content {
-    width: 100%;
-    height: 100%;
+    width: 95vw;
+    height: 90vh;
+    max-width: 95vw;
+    background: white;
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: white;
 }
 
 /* ==================== 3단 레이아웃 ==================== */

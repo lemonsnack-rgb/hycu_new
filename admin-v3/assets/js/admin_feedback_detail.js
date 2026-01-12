@@ -14,15 +14,16 @@ function viewPdfFeedback(feedbackId, isReadOnly = true) {
     console.log('[viewPdfFeedback] 요청:', request);
     console.log('[viewPdfFeedback] 피드백 데이터:', feedbackData);
 
-    // 목록 화면 숨기기
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-        mainContent.style.display = 'none';
-    }
-
-    // 상세 화면 생성 및 표시
+    // 상세 화면 생성 및 표시 (모달 방식)
     const detailScreen = createFeedbackDetailScreenReadOnly(request, feedbackData);
     document.body.appendChild(detailScreen);
+
+    // 백드롭 클릭으로 닫기
+    detailScreen.addEventListener('click', (e) => {
+        if (e.target === detailScreen) {
+            closeFeedbackDetailScreenReadOnly();
+        }
+    });
 
     // ESC 키로 닫기
     const handleEscape = (e) => {
@@ -55,27 +56,11 @@ function createFeedbackDetailScreenReadOnly(request, feedbackData) {
 
     screen.innerHTML = `
         <div class="feedback-detail-content">
-            <!-- 헤더: 목록으로 돌아가기 + 읽기 전용 배지 -->
-            <div class="px-6 py-3 border-b bg-white flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <button onclick="closeFeedbackDetailScreenReadOnly()" class="back-to-list-btn flex items-center gap-2 text-gray-700 hover:text-gray-900 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                        </svg>
-                        <span class="text-sm font-medium">목록으로 돌아가기</span>
-                    </button>
-                    <!-- 읽기 전용 배지 -->
-                    <span class="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600 font-medium flex items-center gap-1">
-                        <i class="fas fa-eye"></i>
-                        읽기 전용 모드
-                    </span>
-                </div>
-            </div>
-
-            <!-- 학생 정보 및 표절률 영역 -->
-            <div class="px-6 py-2 border-b bg-gray-50">
-                <div class="text-xs text-gray-700 flex items-center justify-between">
-                    <div>
+            <!-- 헤더: 논문 정보 + 표절률 + 읽기전용 배지 + 닫기 버튼 -->
+            <div class="px-6 py-3 border-b bg-white">
+                <div class="flex items-center justify-between">
+                    <!-- 좌측: 논문 정보 -->
+                    <div class="text-xs text-gray-700 flex-1 mr-4">
                         <span class="font-semibold">논문명:</span>
                         <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
@@ -87,10 +72,23 @@ function createFeedbackDetailScreenReadOnly(request, feedbackData) {
                         <span class="mx-2 text-gray-400">|</span>
                         <span class="font-semibold">성명:</span> ${request.studentName || '-'}
                     </div>
-                    <div class="text-gray-600 flex-shrink-0 ml-4">
-                        <span class="font-semibold ${getPlagiarismColorClassReadOnly(request.copykillerScore, request.gptkillerScore)}">
-                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore} <a href="#" onclick="downloadPlagiarismReportReadOnly('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-[#6A0028] hover:underline">결과보고서(통합)</a>
+
+                    <!-- 우측: 표절률 + 읽기 전용 배지 + 닫기 버튼 -->
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <span class="text-xs font-semibold ${getPlagiarismColorClassReadOnly(request.copykillerScore, request.gptkillerScore)}">
+                            CopyKiller: ${request.copykillerScore} <span class="text-gray-400 mx-1">/</span> GPT Killer: ${request.gptkillerScore}
+                            <a href="#" onclick="downloadPlagiarismReportReadOnly('combined', '${request.id}'); event.preventDefault();" class="ml-2 text-[#6A0028] hover:underline">결과보고서(통합)</a>
                         </span>
+                        <span class="text-xs px-3 py-1 rounded-full bg-gray-100 text-gray-600 font-medium flex items-center gap-1">
+                            <i class="fas fa-eye"></i>
+                            읽기 전용
+                        </span>
+                        <button onclick="closeFeedbackDetailScreenReadOnly()"
+                                class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -260,17 +258,11 @@ function ensureSubmissionSidebarReadOnly() {
     };
 }
 
-// ==================== 상세 화면 닫기 (목록으로 돌아가기) ====================
+// ==================== 상세 화면 닫기 (모달 닫기) ====================
 function closeFeedbackDetailScreenReadOnly() {
     const screen = document.getElementById('feedback-detail-screen');
     if (screen) {
         screen.remove();
-    }
-
-    // 목록 화면 다시 표시
-    const mainContent = document.getElementById('main-content');
-    if (mainContent) {
-        mainContent.style.display = 'block';
     }
 
     // PDF 뷰어 관련 정리 (cleanup)
