@@ -118,7 +118,9 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
             <div class="px-6 py-2 border-b bg-gray-50">
                 <div class="text-xs text-gray-700">
                     <span class="font-semibold">논문명:</span>
-                    <span title="${request.thesisTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || '논문명'}</span>
+                    <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
                     <span class="mx-2 text-gray-400">|</span>
                     <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
                     <span class="mx-2 text-gray-400">|</span>
@@ -135,16 +137,27 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                     <h4 class="text-sm font-bold text-gray-700 mb-3">제출 이력</h4>
                     <div class="space-y-2">
                         <div class="bg-white p-3 rounded border-l-4 border-[#6A0028]">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 bg-[#FCE4EC] rounded-full"></span>
-                                <span class="text-xs font-bold text-gray-700">v${feedbackData ? feedbackData.version : 1} (현재)</span>
-                            </div>
-                            <p class="text-xs text-gray-600">${request.date}</p>
-                            ${feedbackData && feedbackData.lastModifiedBy ? `
-                                <p class="text-xs text-gray-500 mt-1">
-                                    수정: ${feedbackData.lastModified}
-                                </p>
-                            ` : ''}
+                            <!-- 파일명만 표시 (레이블 제거) -->
+                            <p class="text-xs text-gray-600 break-words mb-2" title="${request.fileName ? request.fileName.replace(/\.pdf$/i, '') : '파일명 없음'}">
+                                ${(() => {
+                                    const fileName = request.fileName ? request.fileName.replace(/\.pdf$/i, '') : '파일명 없음';
+                                    return fileName.length > 30 ? fileName.substring(0, 30) + '...' : fileName;
+                                })()}
+                            </p>
+
+                            <!-- 제출일시: yyyy-mm-dd hh:mm 형식으로 한 행 표시 -->
+                            <p class="text-xs text-gray-600">
+                                <span class="font-semibold">제출일시:</span> ${(() => {
+                                    const dateStr = request.date || '';
+                                    if (!dateStr) return '-';
+                                    const parts = dateStr.split(' ');
+                                    if (parts.length >= 2) {
+                                        const time = parts[1].substring(0, 5);
+                                        return `${parts[0]} ${time}`;
+                                    }
+                                    return parts[0];
+                                })()}
+                            </p>
                         </div>
                     </div>
                 </div>

@@ -85,9 +85,11 @@ function createFeedbackDetailScreen(request, feedbackData) {
                 <div class="text-xs text-gray-700 flex items-center justify-between">
                     <div>
                         <span class="font-semibold">논문명:</span>
-                        <span title="${request.thesisTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || '논문명'}</span>
+                        <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
-                        <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
+                        <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학번:</span> ${request.studentNumber || request.studentId || '-'}
                         <span class="mx-2 text-gray-400">|</span>
                         <span class="font-semibold">학부(과)전공:</span> ${request.graduate || '-'} / ${request.major || '-'}
                         <span class="mx-2 text-gray-400">|</span>
@@ -110,16 +112,28 @@ function createFeedbackDetailScreen(request, feedbackData) {
                     <h4 class="text-sm font-bold text-gray-700 mb-3">제출 이력</h4>
                     <div class="space-y-2">
                         <div class="bg-white p-3 rounded border-l-4 border-[#6A0028]">
-                            <div class="flex items-center gap-2 mb-1">
-                                <span class="w-2 h-2 bg-[#FCE4EC]0 rounded-full"></span>
-                                <span class="text-xs font-bold text-gray-700">v${feedbackData ? feedbackData.version : 1} (현재)</span>
-                            </div>
-                            <p class="text-xs text-gray-600">${request.date}</p>
-                            ${feedbackData && feedbackData.lastModifiedBy ? `
-                                <p class="text-xs text-gray-500 mt-1">
-                                    수정: ${FeedbackDataService.getUserById(feedbackData.lastModifiedBy)?.name}
-                                </p>
-                            ` : ''}
+                            <!-- 파일명만 표시 (레이블 제거) -->
+                            <p class="text-xs text-gray-600 break-words mb-2" title="${request.fileName ? request.fileName.replace(/\.pdf$/i, '') : '파일명 없음'}">
+                                ${(() => {
+                                    const fileName = request.fileName ? request.fileName.replace(/\.pdf$/i, '') : '파일명 없음';
+                                    return fileName.length > 30 ? fileName.substring(0, 30) + '...' : fileName;
+                                })()}
+                            </p>
+
+                            <!-- 제출일시: yyyy-mm-dd hh:mm 형식으로 한 행 표시 -->
+                            <p class="text-xs text-gray-600">
+                                <span class="font-semibold">제출일시:</span> ${(() => {
+                                    const dateStr = request.date || '';
+                                    if (!dateStr) return '-';
+                                    // "yyyy-mm-dd hh:mm:ss" 또는 "yyyy-mm-dd" 형식을 "yyyy-mm-dd hh:mm"로 변환
+                                    const parts = dateStr.split(' ');
+                                    if (parts.length >= 2) {
+                                        const time = parts[1].substring(0, 5); // hh:mm만 추출
+                                        return `${parts[0]} ${time}`;
+                                    }
+                                    return parts[0]; // 날짜만 있는 경우
+                                })()}
+                            </p>
                         </div>
                     </div>
                 </div>
