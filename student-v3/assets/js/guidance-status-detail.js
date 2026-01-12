@@ -319,6 +319,7 @@ function closeStudentGuidanceStatusDetail() {
     // 목록 화면 다시 표시
     const guidanceStatusScreen = document.getElementById('guidance-status-screen');
     if (guidanceStatusScreen) {
+        guidanceStatusScreen.style.display = '';  // display: none 제거
         guidanceStatusScreen.classList.add('active');
     }
 
