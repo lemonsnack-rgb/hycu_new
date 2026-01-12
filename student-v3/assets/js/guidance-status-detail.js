@@ -268,45 +268,171 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
     return screen;
 }
 
-// ==================== 제출 이력 사이드바 생성 ====================
+// ==================== 제출 이력 사이드바 생성 (동적) ====================
 function ensureStudentSubmissionSidebar(request) {
-    if (document.getElementById('student-submission-history')) return;
+    // 이미 있으면 업데이트만 수행
+    let container = document.getElementById('student-submission-history');
+    const isNew = !container;
 
-    const container = document.createElement('div');
-    container.id = 'student-submission-history';
-    container.className = 'submission-history';
-
-    const versions = [
-        {
-            ver: `v${request.version}`,
-            label: '최신',
-            date: request.uploadDate
-        }
-    ];
-
-    if (request.previousVersions && request.previousVersions.length > 0) {
-        request.previousVersions.forEach((prev, idx) => {
-            versions.push({
-                ver: `v${prev.version}`,
-                label: '',
-                date: prev.uploadDate
-            });
-        });
+    if (isNew) {
+        container = document.createElement('div');
+        container.id = 'student-submission-history';
+        container.className = 'submission-history';
+        document.body.appendChild(container);
     }
 
+    // 현재 문서의 제출 이력 가져오기
+    const currentRequestId = window._currentStudentGuidanceCtx?.id;
+    if (!currentRequestId) {
+        console.warn('❌ currentRequestId가 없습니다');
+        return;
+    }
+
+    const documentId = StudentGuidanceDataService.getDocumentIdByRequestId(currentRequestId);
+    if (!documentId) {
+        console.warn('❌ documentId를 찾을 수 없습니다');
+        return;
+    }
+
+    const submissionHistory = StudentGuidanceDataService.getSubmissionHistory(documentId);
+
+    // 동적으로 HTML 생성
+    const historyListHtml = submissionHistory.map((submission, index) => {
+        const isLatest = index === 0;
+        const isActive = submission.id === currentRequestId;
+        const versionLabel = `v${submission.version}`;
+        const dateLabel = submission.uploadDate || submission.date || '-';
+        const metaLabel = isLatest ? `최신 · ${dateLabel}` : dateLabel;
+
+        return `
+            <li data-request-id="${submission.id}"
+                data-version="${submission.version}"
+                class="${isActive ? 'active' : ''}">
+                <strong>${versionLabel}</strong>
+                <span class="sh-meta">${metaLabel}</span>
+            </li>
+        `;
+    }).join('');
+
     container.innerHTML = `
-        <div class="sh-header">제출이력</div>
+        <div class="sh-header">제출이력 (${submissionHistory.length}건)</div>
         <ul class="sh-list">
-            ${versions.map((v, idx) => `
-                <li data-ver="${v.ver}" class="${idx === 0 ? 'active' : ''}">
-                    <strong>${v.ver}</strong>
-                    <span class="sh-meta">${v.label ? v.label + ' · ' : ''}${v.date}</span>
-                </li>
-            `).join('')}
+            ${historyListHtml}
         </ul>
     `;
 
-    document.body.appendChild(container);
+    // 이벤트 리스너 (처음 생성 시에만)
+    if (isNew) {
+        container.addEventListener('click', (e) => {
+            const li = e.target.closest('li[data-request-id]');
+            if (!li) return;
+
+            const targetRequestId = li.getAttribute('data-request-id');
+
+            // 이미 선택된 버전이면 무시
+            if (targetRequestId === currentRequestId) return;
+
+            // 다른 버전으로 전환
+            switchToStudentSubmissionVersion(targetRequestId);
+        });
+    }
+}
+
+// ==================== 제출 버전 전환 ====================
+function switchToStudentSubmissionVersion(targetRequestId) {
+    console.log(`🔄 제출 버전 전환 시작: ${targetRequestId}`);
+
+    // 1. 타겟 제출물 데이터 가져오기
+    const targetRequest = StudentGuidanceDataService.getStudentGuidanceRequestById(targetRequestId);
+    if (!targetRequest) {
+        alert('제출물을 찾을 수 없습니다.');
+        return;
+    }
+
+    const targetFeedbackData = StudentGuidanceDataService.getStudentGuidanceFeedbackData(targetRequestId);
+
+    // 2. 현재 PDF 뷰어 정리
+    if (window.fabricCanvas) {
+        try {
+            window.fabricCanvas.dispose();
+        } catch (e) {
+            console.warn('fabricCanvas dispose 오류:', e);
+        }
+        window.fabricCanvas = null;
+    }
+    if (window.pdfDoc) {
+        try {
+            window.pdfDoc.destroy();
+        } catch (e) {
+            console.warn('pdfDoc destroy 오류:', e);
+        }
+        window.pdfDoc = null;
+    }
+
+    // 3. 전역 컨텍스트 업데이트
+    window._currentStudentGuidanceCtx = {
+        id: targetRequestId,
+        fileUrl: targetRequest.fileUrl,
+        data: targetFeedbackData
+    };
+    window._currentFeedbackCtx = {
+        id: targetRequestId,
+        fileUrl: targetRequest.fileUrl,
+        data: targetFeedbackData
+    };
+
+    // 4. PDF 뷰어 재초기화
+    if (typeof initPDFViewer === 'function') {
+        initPDFViewer(targetRequestId, targetRequest.fileUrl, targetFeedbackData);
+    }
+
+    // 5. 첨삭/총평 UI 업데이트
+    if (typeof renderCommentPanel === 'function') {
+        renderCommentPanel();
+    }
+    if (typeof renderGeneralThread === 'function') {
+        renderGeneralThread(targetRequestId);
+    }
+    if (typeof refreshInlineTabMarker === 'function') {
+        refreshInlineTabMarker();
+    }
+
+    // 6. 제출 이력 사이드바 업데이트 (active 상태 변경)
+    ensureStudentSubmissionSidebar(targetRequest);
+
+    // 7. 학생 정보 영역 업데이트
+    updateStudentInfoSection(targetRequest);
+
+    console.log(`✅ 버전 전환 완료: v${targetRequest.version}`);
+    if (typeof showToast === 'function') {
+        showToast(`v${targetRequest.version}으로 전환되었습니다.`, 'success');
+    }
+}
+
+// ==================== 학생 정보 영역 업데이트 ====================
+function updateStudentInfoSection(request) {
+    const infoSection = document.querySelector('.feedback-detail-content .px-6.py-2.border-b.bg-gray-50 .text-xs.text-gray-700');
+    if (!infoSection) {
+        console.warn('학생 정보 영역을 찾을 수 없습니다');
+        return;
+    }
+
+    infoSection.innerHTML = `
+        <span class="font-semibold">논문명:</span>
+        <span title="${request.thesisTitle || request.documentTitle}">${
+            request.thesisTitle && request.thesisTitle.length > 30
+                ? request.thesisTitle.substring(0, 30) + '...'
+                : request.thesisTitle || request.documentTitle || '논문명'
+        }</span>
+        <span class="mx-2 text-gray-400">|</span>
+        <span class="font-semibold text-[#6A0028]">${request.stage || request.guidanceStage || '연구계획서'}</span>
+        <span class="mx-2 text-gray-400">|</span>
+        <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
+        <span class="mx-2 text-gray-400">|</span>
+        <span class="font-semibold">학부(과)전공:</span> ${request.graduate || '-'} / ${request.major || '-'}
+        <span class="mx-2 text-gray-400">|</span>
+        <span class="font-semibold">성명:</span> ${request.studentName || '-'}
+    `;
 }
 
 // ==================== 상세 화면 닫기 (목록으로 돌아가기) ====================
@@ -418,5 +544,7 @@ window.closeStudentGuidanceStatusDetail = closeStudentGuidanceStatusDetail;
 window.downloadStudentPlagiarismReport = downloadStudentPlagiarismReport;
 window.switchStudentFeedbackTab = switchStudentFeedbackTab;
 window.ensureStudentSubmissionSidebar = ensureStudentSubmissionSidebar;
+window.switchToStudentSubmissionVersion = switchToStudentSubmissionVersion;
+window.updateStudentInfoSection = updateStudentInfoSection;
 
 console.log('✅ 학생용 논문 지도 현황 상세 화면 로드 완료');

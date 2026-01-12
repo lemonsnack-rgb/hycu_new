@@ -436,7 +436,20 @@ const FeedbackDataService = {
     getFeedbackRequestById(id) {
         return FEEDBACK_REQUESTS.find(req => req.id === id);
     },
-    
+
+    // 제출 이력 조회 (동일 documentId의 모든 버전)
+    getSubmissionHistory(documentId) {
+        return FEEDBACK_REQUESTS
+            .filter(req => req.documentId === documentId)
+            .sort((a, b) => b.version - a.version); // 최신순 (내림차순)
+    },
+
+    // feedbackId로 documentId 조회
+    getDocumentIdByFeedbackId(feedbackId) {
+        const request = this.getFeedbackRequestById(feedbackId);
+        return request ? request.documentId : null;
+    },
+
     // 피드백 데이터
     getFeedbackData(feedbackId) {
         return FEEDBACK_DATA[feedbackId] ? {...FEEDBACK_DATA[feedbackId]} : null;

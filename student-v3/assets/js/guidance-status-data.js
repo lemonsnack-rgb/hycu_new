@@ -326,6 +326,19 @@ const StudentGuidanceDataService = {
         return STUDENT_GUIDANCE_SUBMISSIONS.find(req => req.id === id);
     },
 
+    // 제출 이력 조회 (동일 documentId의 모든 버전)
+    getSubmissionHistory(documentId) {
+        return STUDENT_GUIDANCE_SUBMISSIONS
+            .filter(req => req.documentId === documentId)
+            .sort((a, b) => b.version - a.version); // 최신순 (내림차순)
+    },
+
+    // requestId로 documentId 조회
+    getDocumentIdByRequestId(requestId) {
+        const request = this.getStudentGuidanceRequestById(requestId);
+        return request ? request.documentId : null;
+    },
+
     // 피드백 데이터
     getStudentGuidanceFeedbackData(requestId) {
         return STUDENT_GUIDANCE_FEEDBACK_DATA[requestId] ?
