@@ -208,10 +208,6 @@
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>공지사항</span>
                         </a>
-                        <a href="#" onclick="showScreen('resources'); return false;" data-screen="resources"
-                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>자료실</span>
-                        </a>
                         <a href="#" onclick="showScreen('research-ethics'); return false;" data-screen="research-ethics"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>연구윤리</span>
@@ -272,13 +268,17 @@
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>학기별 지도 계획</span>
                         </a>
+                        <a href="#" onclick="showScreen('realtime-reservation'); return false;" data-screen="realtime-reservation"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>실시간 지도 예약</span>
+                        </a>
                         <a href="#" onclick="showScreen('guidance-status'); return false;" data-screen="guidance-status"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>논문 지도 활동</span>
                         </a>
-                        <a href="#" onclick="showScreen('realtime-reservation'); return false;" data-screen="realtime-reservation"
+                        <a href="#" onclick="showScreen('resources'); return false;" data-screen="resources"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>실시간 지도 예약</span>
+                            <span>논문지도 자료실</span>
                         </a>
                     </div>
                 </div>
@@ -296,7 +296,7 @@
                     <div id="evaluation-submenu" class="pl-12 mt-1 space-y-1">
                         <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>심사 일정 조회</span>
+                            <span>심사일정현황</span>
                         </a>
                     </div>
                 </div>
@@ -615,8 +615,8 @@
                 'guidance-status': { depth1: '논문 지도', depth2: '논문 지도 활동' },
                 'realtime-reservation': { depth1: '논문 지도', depth2: '실시간 지도 예약' },
                 // 논문 심사
-                'evaluation-schedule': { depth1: '논문 심사', depth2: '심사 일정 관리' },
-                'exam-schedule': { depth1: '논문 심사', depth2: '심사 일정 조회' }
+                'evaluation-schedule': { depth1: '논문 심사', depth2: '심사일정현황' },
+                'exam-schedule': { depth1: '논문 심사', depth2: '심사일정현황' }
             };
 
             const breadcrumb1depth = document.getElementById('breadcrumb-1depth');

@@ -408,10 +408,6 @@
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>공지사항</span>
                         </a>
-                        <a href="#" onclick="showScreen('board'); return false;" data-screen="board"
-                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>자료실</span>
-                        </a>
                         <a href="#" onclick="showScreen('ethics'); return false;" data-screen="ethics"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>연구윤리</span>
@@ -446,13 +442,17 @@
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>학기별 지도 계획</span>
                         </a>
+                        <a href="#" onclick="showScreen('meeting'); return false;" data-screen="meeting"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>실시간 지도 예약</span>
+                        </a>
                         <a href="#" onclick="showScreen('feedback'); return false;" data-screen="feedback"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>논문 지도 활동</span>
                         </a>
-                        <a href="#" onclick="showScreen('meeting'); return false;" data-screen="meeting"
+                        <a href="#" onclick="showScreen('board'); return false;" data-screen="board"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>실시간 지도 예약</span>
+                            <span>논문지도 자료실</span>
                         </a>
                     </div>
                 </div>
@@ -470,15 +470,15 @@
                     <div id="thesis-review-submenu" class="pl-12 mt-1 space-y-1">
                         <a href="#" onclick="showScreen('exam-schedule'); return false;" data-screen="exam-schedule"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span class="sidebar-text">심사 일정 관리</span>
+                            <span class="sidebar-text">심사일정현황</span>
                         </a>
                         <a href="#" onclick="showScreen('review'); return false;" data-screen="review"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>학위 논문 심사</span>
+                            <span>학위논문심사</span>
                         </a>
                         <a href="#" onclick="showScreen('journal-review'); return false;" data-screen="journal-review"
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
-                            <span>학술지 논문 심사</span>
+                            <span>학술지논문심사</span>
                         </a>
                     </div>
                 </div>
@@ -1225,7 +1225,7 @@
             const titleMap = {
                 'dashboard': '대시보드',
                 'notice': '공지사항',
-                'board': '자료실',
+                'board': '논문지도 자료실',
                 'ethics': '연구윤리',
                 'schedule': '논문일정',
                 'process': '논문지도절차',
@@ -1233,9 +1233,9 @@
                 'guidance': '학기별 지도 계획',
                 'feedback': '논문 지도 활동',
                 'meeting': '실시간 지도 예약',
-                'exam-schedule': '심사 일정 관리',
-                'review': '학위 논문 심사',
-                'journal-review': '학술지 논문 심사'
+                'exam-schedule': '심사일정현황',
+                'review': '학위논문심사',
+                'journal-review': '학술지논문심사'
             };
 
             const title = titleMap[screenId] || '대시보드';

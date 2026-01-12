@@ -334,7 +334,7 @@
                         </a>
                         <a href="#" onclick="showScreen('scheduleManagement'); return false;" data-screen="scheduleManagement"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>심사일정등록</span>
+                            <span>심사일정현황</span>
                         </a>
                         <a href="#" onclick="showScreen('thesisReview'); return false;" data-screen="thesisReview"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
@@ -913,8 +913,8 @@
         }
 
         // admin_views.js의 views 객체를 사용하여 렌더링
-        function renderAdminView(viewName) {
-            console.log('🎯 renderAdminView called with viewName:', viewName);
+        function renderAdminView(viewName, param = null) {
+            console.log('🎯 renderAdminView called with viewName:', viewName, 'param:', param);
             console.log('🎯 typeof views:', typeof views);
 
             // thesisReview는 HTML에 이미 마크업되어 있으므로 초기화만 실행
@@ -954,14 +954,19 @@
                 'dashboard': 'content-area',
                 'stageManagement': 'stage-management-content',
                 'typeManagement': 'type-management-content',
+                'workflowCreateUnified': 'type-management-content', // 지도 단계 등록/수정
                 'stageTypeManagement': 'stage-type-management-content',
+                'stageTypeCreate': 'stage-type-management-content', // 지도 단계 유형 등록
+                'stageTypeEdit': 'stage-type-management-content', // 지도 단계 유형 수정
                 'advisorAssignment': 'advisor-assignment-content',
                 'weeklyGuidance': 'weekly-guidance-content',
                 'guidanceProgress': 'guidance-progress-content',
                 'scheduleManagement': 'schedule-management-content',
+                'scheduleCreate': 'schedule-management-content', // 일정 등록/수정
                 'committeeAssignment': 'committee-assignment-content',
                 'journalReview': 'journal-review-content',
                 'evaluationCriteria': 'evaluation-criteria-content',
+                'evaluationCriteriaEdit': 'evaluation-criteria-content', // 평가 기준 수정
                 'requirementManagement': 'requirement-management-content',
                 'titleChangeRequests': 'title-change-requests-content',
                 'permissionManagement': 'permission-management-content',
@@ -992,8 +997,8 @@
 
             // views 객체에서 뷰 함수 가져오기
             if (views[viewName]) {
-                console.log('✅ Rendering view:', viewName);
-                const html = views[viewName]();
+                console.log('✅ Rendering view:', viewName, 'with param:', param);
+                const html = param !== null ? views[viewName](param) : views[viewName]();
                 console.log('✅ HTML length:', html.length);
                 container.innerHTML = html;
                 console.log('✅ Container innerHTML set');
@@ -1106,7 +1111,7 @@
                 'guidanceProgress': { menu: '논문 지도', submenu: '논문 지도 활동' },
                 'evaluationCriteria': { menu: '논문 심사', submenu: '심사평가기준등록' },
                 'committeeAssignment': { menu: '논문 심사', submenu: '심사위원등록' },
-                'scheduleManagement': { menu: '논문 심사', submenu: '심사일정등록' },
+                'scheduleManagement': { menu: '논문 심사', submenu: '심사일정현황' },
                 'thesisReview': { menu: '논문 심사', submenu: '학위논문심사' },
                 'journalReview': { menu: '논문 심사', submenu: '학술지논문심사' },
                 'workScheduleManagement': { menu: '시스템 설정', submenu: '업무일정등록' },
@@ -1213,6 +1218,8 @@
         // Override the original switchView to use the new layout
         const originalSwitchView = window.switchView;
         window.switchView = function(viewName, param = null) {
+            console.log('🔧 switchView called with:', viewName, param);
+
             // 등록/수정 화면과 부모 화면 매핑
             const parentScreenMap = {
                 'workflowCreateUnified': 'typeManagement',
@@ -1222,15 +1229,17 @@
                 'evaluationCriteriaEdit': 'evaluationCriteria'
             };
 
-            // 부모 화면이 있으면 부모 섹션으로 이동 후 렌더링
+            // 부모 화면이 있으면 부모 섹션으로 이동 후 자식 화면 렌더링
             if (parentScreenMap[viewName]) {
                 const parentScreen = parentScreenMap[viewName];
+                console.log('🔧 Switching to parent screen:', parentScreen, 'then rendering child:', viewName);
                 showScreen(parentScreen); // 부모 섹션 활성화
                 setTimeout(() => {
-                    renderAdminView(viewName, param); // 자식 화면 렌더링
+                    window.renderAdminView(viewName, param); // wrapper 함수 호출
                 }, 0);
             } else {
                 // 일반 화면은 기존 방식
+                console.log('🔧 Showing screen directly:', viewName);
                 showScreen(viewName, param);
             }
         };
@@ -1254,8 +1263,8 @@
         window.renderAdminView = function(viewName, param = null) {
             console.log('🎯 window.renderAdminView wrapper called with viewName:', viewName, 'param:', param);
 
-            // 원본 함수 호출
-            originalRenderAdminView(viewName);
+            // 원본 함수 호출 (param도 함께 전달)
+            originalRenderAdminView(viewName, param);
 
             // 콘텐츠 목록 관리 화면 후처리
             if (viewName === 'ethicsList' || viewName === 'scheduleList' || viewName === 'procedureList') {
