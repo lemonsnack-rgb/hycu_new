@@ -6,6 +6,70 @@ let currentStudentIdV2 = null; // 현재 선택된 학생 ID (V2)
 let currentSemesterView = { year: 2025, semester: 1 };
 let availableSemesters = []; // 조회 가능한 학기 목록
 
+// ==================== 커스텀 확인 대화상자 ====================
+function showCustomConfirm(title, message, confirmText = '확인', cancelText = '취소', type = 'danger') {
+    return new Promise((resolve) => {
+        // 오버레이 생성
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-confirm-overlay';
+
+        // 다이얼로그 생성
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-confirm-dialog';
+
+        const confirmBtnClass = type === 'danger' ? 'custom-confirm-btn-confirm' : 'custom-confirm-btn-primary';
+
+        dialog.innerHTML = `
+            <div class="custom-confirm-header">
+                <h3 class="custom-confirm-title">${title}</h3>
+            </div>
+            <div class="custom-confirm-body">
+                <p class="custom-confirm-message">${message}</p>
+            </div>
+            <div class="custom-confirm-footer">
+                <button class="custom-confirm-btn custom-confirm-btn-cancel" data-action="cancel">
+                    ${cancelText}
+                </button>
+                <button class="custom-confirm-btn ${confirmBtnClass}" data-action="confirm">
+                    ${confirmText}
+                </button>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        // 버튼 클릭 핸들러
+        const handleClick = (e) => {
+            const action = e.target.dataset.action;
+            if (action === 'confirm' || action === 'cancel') {
+                overlay.remove();
+                resolve(action === 'confirm');
+            }
+        };
+
+        dialog.addEventListener('click', handleClick);
+
+        // ESC 키로 닫기
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                overlay.remove();
+                document.removeEventListener('keydown', handleEscape);
+                resolve(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+
+        // 오버레이 클릭으로 닫기
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                resolve(false);
+            }
+        });
+    });
+}
+
 // ==================== 학기별 상세 화면 (모달 팝업) ====================
 function showSemesterGuidanceDetail(studentId) {
     // 이미 모달이 열려있으면 무시
@@ -434,7 +498,7 @@ function changeSemesterViewInModal() {
 }
 
 // 모달 내 계획 초기화
-function resetTotalWeeksInModal() {
+async function resetTotalWeeksInModal() {
     console.log('🔄 resetTotalWeeksInModal 호출됨');
     console.log('  - currentStudentIdV2:', currentStudentIdV2);
     console.log('  - currentSemesterView:', currentSemesterView);
@@ -468,32 +532,23 @@ function resetTotalWeeksInModal() {
 
     console.log('  - 총 계획/실적 건수:', totalItems);
 
-    // 모달을 일시적으로 숨겨서 confirm 대화상자가 표시되도록 함
-    const modal = document.getElementById('semester-guidance-modal');
-    const originalDisplay = modal ? modal.style.display : '';
+    // 커스텀 확인 대화상자 표시
+    const confirmed = await showCustomConfirm(
+        '⚠️ 계획 초기화 확인',
+        `현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`,
+        '초기화',
+        '취소',
+        'danger'
+    );
 
-    if (modal) {
-        modal.style.display = 'none';
+    console.log('  - 사용자 확인 결과:', confirmed);
+
+    if (!confirmed) {
+        console.log('❌ 사용자가 초기화 취소');
+        return;
     }
 
-    // requestAnimationFrame으로 다음 프레임에 confirm 실행
-    requestAnimationFrame(() => {
-        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
-
-        console.log('  - 사용자 확인 결과:', confirmed);
-
-        // 모달 다시 표시
-        if (modal) {
-            modal.style.display = originalDisplay || '';
-        }
-
-        if (!confirmed) {
-            console.log('❌ 사용자가 초기화 취소');
-            return;
-        }
-
-        executeResetPlan();
-    });
+    executeResetPlan();
 }
 
 // 실제 초기화 실행 함수 분리
@@ -917,30 +972,21 @@ function saveAllWeekPlans() {
 // 대신 resetTotalWeeksInModal과 executeCreatePlan 함수를 사용합니다.
 
 // ==================== 학기 계획 승인 ====================
-function approveSemesterPlan() {
-    // 모달을 일시적으로 숨겨서 confirm 대화상자가 표시되도록 함
-    const modal = document.getElementById('semester-guidance-modal');
-    const originalDisplay = modal ? modal.style.display : '';
+async function approveSemesterPlan() {
+    // 커스텀 확인 대화상자 표시
+    const confirmed = await showCustomConfirm(
+        '계획 승인 확인',
+        '이 학기의 지도 계획을 승인하시겠습니까?',
+        '승인',
+        '취소',
+        'primary'
+    );
 
-    if (modal) {
-        modal.style.display = 'none';
+    if (!confirmed) {
+        return;
     }
 
-    // requestAnimationFrame으로 다음 프레임에 confirm 실행
-    requestAnimationFrame(() => {
-        const confirmed = confirm('이 학기의 지도 계획을 승인하시겠습니까?');
-
-        // 모달 다시 표시
-        if (modal) {
-            modal.style.display = originalDisplay || '';
-        }
-
-        if (!confirmed) {
-            return;
-        }
-
-        executeApprovePlan();
-    });
+    executeApprovePlan();
 }
 
 // 실제 승인 실행 함수
