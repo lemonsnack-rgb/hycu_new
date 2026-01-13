@@ -403,11 +403,7 @@
 
             <!-- 논문 안내 메뉴 화면들 -->
             <section id="notice-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">공지사항 콘텐츠 준비 중입니다.</p>
-                    </div>
-                </div>
+                <!-- JavaScript로 동적 렌더링 -->
             </section>
 
             <section id="resources-screen" class="content-screen">
@@ -418,28 +414,16 @@
                 </div>
             </section>
 
-            <section id="research-ethics-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">연구윤리 콘텐츠 준비 중입니다.</p>
-                    </div>
-                </div>
+            <section id="ethics-screen" class="content-screen">
+                <!-- JavaScript로 동적 렌더링 -->
             </section>
 
-            <section id="thesis-schedule-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">논문일정 콘텐츠 준비 중입니다.</p>
-                    </div>
-                </div>
+            <section id="schedule-screen" class="content-screen">
+                <!-- JavaScript로 동적 렌더링 -->
             </section>
 
-            <section id="guidance-procedure-screen" class="content-screen">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">논문지도절차 콘텐츠 준비 중입니다.</p>
-                    </div>
-                </div>
+            <section id="process-screen" class="content-screen">
+                <!-- JavaScript로 동적 렌더링 -->
             </section>
 
             <!-- 논문 제출 메뉴 화면들 -->
@@ -573,6 +557,14 @@
                 initStudentSemesterGuidancePlan();
             } else if (screenId === 'guidance-status' && typeof initStudentGuidanceStatusList === 'function') {
                 initStudentGuidanceStatusList();
+            } else if (screenId === 'notice' && typeof initStudentNotice === 'function') {
+                initStudentNotice();
+            } else if (screenId === 'research-ethics' && typeof initStudentEthics === 'function') {
+                initStudentEthics();
+            } else if (screenId === 'thesis-schedule' && typeof initStudentSchedule === 'function') {
+                initStudentSchedule();
+            } else if (screenId === 'guidance-procedure' && typeof initStudentProcedure === 'function') {
+                initStudentProcedure();
             } else if (screenId === 'exam-schedule') {
                 setTimeout(() => {
                     if (typeof renderStudentExamScheduleScreen === 'function') {
@@ -720,6 +712,15 @@
     <div id="modal-backdrop" class="fixed inset-0 bg-black bg-opacity-50 hidden z-40"></div>
 
     <!-- JavaScript 파일들 -->
+    <!-- 공지사항/콘텐츠 데이터 (관리자용 데이터 재사용) -->
+    <script src="../admin-v3/assets/js/notice-data.js"></script>
+    <script src="../admin-v3/assets/js/content-data.js"></script>
+
+    <!-- 학생용 학과 유틸리티 및 화면 모듈 -->
+    <script src="assets/js/department-utils.js"></script>
+    <script src="assets/js/student-notice.js"></script>
+    <script src="assets/js/student-content.js"></script>
+
     <script src="assets/js/app.js?v=20260107007"></script>
     <script src="assets/js/thesis-submission.js?v=20260107011"></script>
     <script src="assets/js/journal-submission.js?v=20260107006"></script>

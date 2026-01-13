@@ -1,0 +1,289 @@
+// ==================== 학생용 공지사항 화면 ====================
+// 교수용 화면과 동일한 목록형 UI (학과 드롭다운은 disabled 처리)
+
+// 전역 변수
+let currentStudentDepartmentFilter = null; // 학생 소속 학과로 고정
+let currentStudentNoticeFilters = {
+    title: ''
+};
+let currentStudentNoticeId = null;
+let currentStudentNoticeMode = 'list'; // 'list' or 'detail'
+
+/**
+ * 공지사항 목록 초기화
+ */
+function initStudentNotice() {
+    console.log('🎯 학생용 공지사항 화면 초기화');
+
+    // 학생 소속 학과로 고정 (변경 불가)
+    currentStudentDepartmentFilter = getStudentDepartment();
+    console.log(`📍 학생 소속 학과 설정: ${currentStudentDepartmentFilter}`);
+
+    renderStudentNoticeListView();
+}
+
+/**
+ * 목록 화면 렌더링
+ */
+function renderStudentNoticeListView() {
+    const container = document.getElementById('notice-screen');
+
+    if (!container) {
+        console.error('❌ notice-screen 컨테이너를 찾을 수 없습니다.');
+        return;
+    }
+
+    currentStudentNoticeMode = 'list';
+
+    // 전체 공지사항 데이터 가져오기
+    const allNotices = getAllNotices();
+
+    // 학과 필터링 적용 (학생 소속 학과)
+    let filteredNotices = filterStudentNoticesByDepartment(allNotices, currentStudentDepartmentFilter);
+
+    // 제목 검색 필터 적용
+    if (currentStudentNoticeFilters.title) {
+        filteredNotices = filteredNotices.filter(notice =>
+            notice.title.toLowerCase().includes(currentStudentNoticeFilters.title.toLowerCase())
+        );
+    }
+
+    // HTML 생성 (list-view와 detail-view 모두 포함)
+    container.innerHTML = `
+        <!-- 목록 화면 -->
+        <div id="student-notice-list-view">
+            <!-- 검색 필터 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                <div class="flex items-center gap-3">
+                    <!-- 학과/전공 (비활성화) -->
+                    <div class="flex items-center gap-2 flex-1">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                        <select id="filter-student-notice-department"
+                                disabled
+                                class="flex-1 px-2 border border-gray-300 rounded text-xs bg-gray-100 cursor-not-allowed"
+                                style="height: 34px;">
+                            <option value="${currentStudentDepartmentFilter}" selected>${currentStudentDepartmentFilter}</option>
+                        </select>
+                    </div>
+                    <!-- 제목 -->
+                    <div class="flex items-center gap-2 flex-1">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
+                        <input type="text" id="filter-student-notice-title"
+                               placeholder="제목"
+                               value="${currentStudentNoticeFilters.title}"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                               style="height: 34px;"
+                               onkeypress="if(event.key === 'Enter') filterStudentNoticeList()">
+                    </div>
+                    <!-- 조회 버튼 -->
+                    <button onclick="filterStudentNoticeList()"
+                            class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                        <i class="fas fa-search mr-1"></i>조회
+                    </button>
+                </div>
+            </div>
+
+            <!-- 공지사항 테이블 -->
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">공지사항 목록</h3>
+                        <span id="student-notice-count-display" class="table-count">(총 ${filteredNotices.length}건)</span>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="min-w-full">
+                        <thead>
+                            <tr>
+                                <th style="width: 60px;">순번</th>
+                                <th>제목</th>
+                                <th style="width: 100px;">첨부파일</th>
+                                <th style="width: 150px;">작성일</th>
+                                <th style="width: 120px;">작성자</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-notice-table-body">
+                            ${renderStudentNoticeTableRows(filteredNotices)}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상세 화면 (초기에는 숨김) -->
+        <div id="student-notice-detail-view" style="display: none;">
+            <!-- 동적으로 생성됨 -->
+        </div>
+    `;
+}
+
+/**
+ * 테이블 행 렌더링
+ */
+function renderStudentNoticeTableRows(notices) {
+    if (notices.length === 0) {
+        return `
+            <tr>
+                <td colspan="5" class="text-center py-12">
+                    <div class="text-6xl mb-4">📢</div>
+                    <h3 class="text-lg font-semibold text-gray-600 mb-2">등록된 공지사항이 없습니다</h3>
+                    <p class="text-gray-500">공지사항이 등록되면 이곳에 표시됩니다.</p>
+                </td>
+            </tr>
+        `;
+    }
+
+    return notices.map((notice, index) => {
+        const attachmentIcon = notice.hasAttachment && notice.attachments && notice.attachments.length > 0
+            ? '<i class="fas fa-paperclip text-[#6A0028]"></i>'
+            : '<span class="text-gray-400">-</span>';
+
+        return `
+            <tr onclick="showStudentNoticeDetail('${notice.id}')" style="cursor: pointer;" class="hover:bg-gray-50">
+                <td>${index + 1}</td>
+                <td class="text-left font-medium">${notice.title}</td>
+                <td>${attachmentIcon}</td>
+                <td>${notice.createdAt}</td>
+                <td>${notice.author}</td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/**
+ * 학과 필터링
+ */
+function filterStudentNoticesByDepartment(notices, department) {
+    return notices.filter(notice => {
+        return shouldShowContentForStudent(notice, department);
+    });
+}
+
+/**
+ * 검색 필터링 (제목만)
+ */
+function filterStudentNoticeList() {
+    // 학과 필터는 고정 (변경 불가)
+
+    // 제목 필터 값 가져오기
+    const titleInput = document.getElementById('filter-student-notice-title');
+    if (titleInput) {
+        currentStudentNoticeFilters.title = titleInput.value.trim();
+    }
+
+    console.log(`🔍 검색 조건 - 학과: ${currentStudentDepartmentFilter} (고정), 제목: ${currentStudentNoticeFilters.title}`);
+    renderStudentNoticeListView();
+}
+
+/**
+ * 공지사항 상세보기 (페이지 전환)
+ */
+function showStudentNoticeDetail(noticeId) {
+    console.log(`📄 공지사항 상세보기: ${noticeId}`);
+
+    const allNotices = getAllNotices();
+    const notice = allNotices.find(n => n.id === noticeId);
+
+    if (!notice) {
+        alert('공지사항을 찾을 수 없습니다.');
+        return;
+    }
+
+    currentStudentNoticeId = noticeId;
+    currentStudentNoticeMode = 'detail';
+
+    // 조회수 증가
+    incrementViewCount(noticeId);
+
+    // 첨부파일 HTML 생성
+    let attachmentsHTML = '';
+    if (notice.attachments && notice.attachments.length > 0) {
+        attachmentsHTML = `
+            <div class="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">첨부파일</h4>
+                <div class="space-y-2">
+                    ${notice.attachments.map(file => `
+                        <div class="flex items-center gap-2 text-sm">
+                            <i class="fas fa-file text-gray-600"></i>
+                            <a href="${file.url}" class="text-blue-600 hover:underline">${file.name}</a>
+                            <span class="text-gray-500 text-xs">(${formatFileSize(file.size)})</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+        `;
+    }
+
+    // 화면 전환
+    document.getElementById('student-notice-list-view').style.display = 'none';
+    const detailView = document.getElementById('student-notice-detail-view');
+    detailView.style.display = 'block';
+
+    // 상세 내용 렌더링
+    detailView.innerHTML = `
+        <div class="review-detail-content-wrapper">
+            <!-- 헤더 -->
+            <div class="review-detail-header" style="padding: 12px 24px;">
+                <button onclick="backToStudentNoticeList()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+            </div>
+
+            <!-- 본문 -->
+            <div class="review-detail-body">
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <!-- 제목 -->
+                    <h2 class="text-2xl font-bold text-gray-900 mb-4">${notice.title}</h2>
+
+                    <!-- 메타 정보 -->
+                    <div class="flex gap-4 text-sm text-gray-600 pb-4 border-b mb-6">
+                        <span><i class="fas fa-user mr-1"></i> ${notice.author}</span>
+                        <span><i class="fas fa-calendar mr-1"></i> ${notice.createdAt}</span>
+                        <span><i class="fas fa-eye mr-1"></i> 조회수 ${notice.viewCount}</span>
+                    </div>
+
+                    <!-- 본문 -->
+                    <div class="prose prose-sm max-w-none">
+                        <div style="line-height: 1.8; font-size: 14px; color: #333;">
+                            ${notice.content}
+                        </div>
+                    </div>
+
+                    <!-- 첨부파일 -->
+                    ${attachmentsHTML}
+
+                    <!-- 버튼 영역 -->
+                    <div class="flex justify-end gap-2 mt-6 pt-6 border-t">
+                        <button onclick="backToStudentNoticeList()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                            목록
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * 목록으로 돌아가기
+ */
+function backToStudentNoticeList() {
+    document.getElementById('student-notice-list-view').style.display = 'block';
+    document.getElementById('student-notice-detail-view').style.display = 'none';
+    currentStudentNoticeId = null;
+    currentStudentNoticeMode = 'list';
+    // 목록 재렌더링 (필터 상태 유지)
+    renderStudentNoticeListView();
+}
+
+// Export
+window.initStudentNotice = initStudentNotice;
+window.renderStudentNoticeListView = renderStudentNoticeListView;
+window.filterStudentNoticeList = filterStudentNoticeList;
+window.showStudentNoticeDetail = showStudentNoticeDetail;
+window.backToStudentNoticeList = backToStudentNoticeList;
+
+console.log('✅ 학생용 공지사항 모듈 로드 완료');
