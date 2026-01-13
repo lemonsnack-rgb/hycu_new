@@ -1,6 +1,9 @@
 // ===================================
 // 관리자용 학기별 지도 계획 (교수용 화면과 동일한 모달 구조)
-// Version: 20260113002
+// Version: 20260113003
+//
+// 변경사항 (v20260113003):
+// - DataService 함수 확장 추가 (getSemesterPlan, getAllSemesterPlans, saveSemesterPlan 등)
 //
 // 변경사항 (v20260113002):
 // - 교수용 화면과 완전히 동일한 모달 팝업 구조로 변경
@@ -15,6 +18,104 @@ let currentAdminPairId = null;
 let currentAdminStudentId = null;
 let currentAdminSemesterView = { year: new Date().getFullYear(), semester: 1 };
 let adminAvailableSemesters = [];
+
+// 학기별 계획 데이터 저장소 (관리자용)
+const adminSemesterPlansStorage = {};
+
+// DataService 확장 - 학기별 계획 관리 함수 (관리자용)
+if (typeof DataService === 'undefined') {
+    window.DataService = {};
+}
+
+// 학기별 계획 조회
+if (!DataService.getSemesterPlan) {
+    DataService.getSemesterPlan = function(studentId, year, semester) {
+        const key = `${studentId}_${year}_${semester}`;
+        return adminSemesterPlansStorage[key] || null;
+    };
+}
+
+// 학생의 모든 학기 계획 조회
+if (!DataService.getAllSemesterPlans) {
+    DataService.getAllSemesterPlans = function(studentId) {
+        const plans = [];
+        for (const key in adminSemesterPlansStorage) {
+            if (key.startsWith(`${studentId}_`)) {
+                plans.push(adminSemesterPlansStorage[key]);
+            }
+        }
+        return plans;
+    };
+}
+
+// 학기별 계획 저장/업데이트
+if (!DataService.saveSemesterPlan) {
+    DataService.saveSemesterPlan = function(studentId, year, semester, totalWeeks, weeks) {
+        const key = `${studentId}_${year}_${semester}`;
+        adminSemesterPlansStorage[key] = {
+            studentId,
+            year,
+            semester,
+            totalWeeks,
+            weeks,
+            approved: adminSemesterPlansStorage[key]?.approved || false
+        };
+        console.log(`✅ 관리자: 학기 계획 저장: ${key}`, adminSemesterPlansStorage[key]);
+        return adminSemesterPlansStorage[key];
+    };
+}
+
+// 학기별 계획 초기화/생성
+if (!DataService.resetSemesterPlan) {
+    DataService.resetSemesterPlan = function(studentId, year, semester, totalWeeks) {
+        const key = `${studentId}_${year}_${semester}`;
+
+        // totalWeeks가 0이면 계획 삭제
+        if (totalWeeks === 0) {
+            delete adminSemesterPlansStorage[key];
+            console.log(`✅ 관리자: 학기 계획 삭제: ${key}`);
+            return null;
+        }
+
+        // 주차 배열 생성
+        const weeks = [];
+        for (let i = 1; i <= totalWeeks; i++) {
+            weeks.push({
+                week: i,
+                plannedContent: '',
+                executions: []
+            });
+        }
+
+        adminSemesterPlansStorage[key] = {
+            studentId,
+            year,
+            semester,
+            totalWeeks,
+            weeks,
+            approved: false
+        };
+        console.log(`✅ 관리자: 학기 계획 생성/초기화: ${key}, ${totalWeeks}주`);
+        return adminSemesterPlansStorage[key];
+    };
+}
+
+// 학기별 계획 삭제
+if (!DataService.deleteSemesterPlan) {
+    DataService.deleteSemesterPlan = function(studentId, year, semester) {
+        const key = `${studentId}_${year}_${semester}`;
+        delete adminSemesterPlansStorage[key];
+        console.log(`✅ 관리자: 학기 계획 삭제: ${key}`);
+    };
+}
+
+// 학생 지도교수 조회
+if (!DataService.getStudentAdvisors) {
+    DataService.getStudentAdvisors = function(studentId) {
+        const pair = appData.weeklyGuidance.guidancePairs.find(p => p.student.studentId === studentId);
+        return pair?.student.advisors || [];
+    };
+}
 
 // ==================== 목록 화면 ====================
 function initWeeklyGuidance() {
