@@ -356,8 +356,15 @@ function showStudentSemesterPlanDetail() {
                                 .join('')}
                         </select>
                     </div>
+                    ${isApproved ? `
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                ✓ 승인됨
+                            </span>
+                        </div>
+                    ` : ''}
                     ${totalWeeks === 0 ? `
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-2 ml-auto">
                             <label class="text-sm text-gray-600 min-w-[80px]">총 주차 수:</label>
                             <select id="student-new-total-weeks" class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
                                 ${Array.from({ length: 15 }, (_, i) => i + 1)
@@ -368,13 +375,6 @@ function showStudentSemesterPlanDetail() {
                                     class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-5 py-2 rounded text-sm font-medium">
                                 계획 생성
                             </button>
-                        </div>
-                    ` : ''}
-                    ${isApproved ? `
-                        <div class="flex items-center gap-2 text-sm">
-                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
-                                ✓ 승인됨
-                            </span>
                         </div>
                     ` : ''}
                     ${!isApproved && totalWeeks > 0 ? `
