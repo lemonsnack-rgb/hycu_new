@@ -344,7 +344,7 @@ function renderStudentWeeklyCards(weeks) {
     return `
         <div class="space-y-4">
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
+                <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
             </div>
 
             <!-- Desktop Table View -->
