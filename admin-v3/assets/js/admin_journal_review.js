@@ -238,15 +238,18 @@ function openAdminJournalReviewDetail(journalId) {
     detailScreen.className = 'review-detail-screen';
     detailScreen.dataset.journalId = journalId;
 
+    // 동적 타이틀 생성 (관리자는 항상 읽기 전용이므로 타이틀만 표시)
+    const modalTitle = '[학술지 논문 심사 조회]';
+
     detailScreen.innerHTML = `
         <div class="review-detail-content-wrapper">
             <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="closeAdminJournalReviewDetailScreen()" class="back-to-list-btn">
+            <div class="review-detail-header">
+                <h3 class="modal-title">${modalTitle}</h3>
+                <button onclick="closeAdminJournalReviewDetailScreen()" class="modal-close-btn" aria-label="닫기">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    목록으로 돌아가기
                 </button>
             </div>
 

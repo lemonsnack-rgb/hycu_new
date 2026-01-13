@@ -416,15 +416,18 @@ function openJournalReviewDetail(journalId, viewType) {
     detailScreen.dataset.journalId = journalId;
     detailScreen.dataset.viewType = viewType || 'member';
 
+    // 동적 타이틀 생성
+    const modalTitle = viewType === 'chair' ? '[학술지 논문 심사 승인]' : '[학술지 논문 심사]';
+
     detailScreen.innerHTML = `
         <div class="review-detail-content-wrapper">
             <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="closeJournalReviewDetailScreen()" class="back-to-list-btn">
+            <div class="review-detail-header">
+                <h3 class="modal-title">${modalTitle}</h3>
+                <button onclick="closeJournalReviewDetailScreen()" class="modal-close-btn" aria-label="닫기">
                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                     </svg>
-                    목록으로 돌아가기
                 </button>
             </div>
 
