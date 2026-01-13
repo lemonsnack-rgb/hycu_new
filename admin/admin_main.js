@@ -3539,17 +3539,6 @@ function viewProposalDetail(proposalId) {
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
                         </div>
                     </div>
-
-                    ${proposal.desiredAdvisor ? `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2 bg-gray-100 px-4 py-2 rounded-t-lg border border-gray-300 border-b-0">
-                                희망 지도교수 (참고용)
-                            </label>
-                            <div class="px-4 py-3 bg-white border border-gray-300 rounded-b-lg">
-                                <p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
 
                 <!-- 연구계획서 출력 버튼 -->

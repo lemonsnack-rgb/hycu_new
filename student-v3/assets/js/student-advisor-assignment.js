@@ -147,18 +147,6 @@ function renderAdvisorAssignmentDetail(proposal, student, assignment, container)
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method || ''}</p>
                         </div>
                     </div>
-
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">희망 지도교수 (참고용)</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
-                            ${student?.degreeType === '박사'
-                                ? (proposal.desiredAdvisor
-                                    ? `<p class="text-gray-900">${proposal.desiredAdvisor.name} (${proposal.desiredAdvisor.department || '소속 정보 없음'})</p>`
-                                    : `<p class="text-gray-500">-</p>`)
-                                : `<p class="text-gray-500">(박사 과정에서만 사용할 수 있는 기능)</p>`
-                            }
-                        </div>
-                    </div>
                 </div>
 
                 <!-- 연구계획서 양식 불러오기 버튼 -->
