@@ -241,20 +241,10 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
                     <table class="min-w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-gray-50">
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" rowspan="2" style="width: 60px;">주차</th>
-                                <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700" colspan="3">계획</th>
-                                <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700" colspan="5">실적</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" rowspan="2" style="width: 60px;">작업</th>
-                            </tr>
-                            <tr class="bg-gray-50">
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 200px;">주제</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">계획 내용</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">예정 지도 방식</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">실행 내용</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">교수명</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">교수의견</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 90px;">실행일</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">지도 방식</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 80px;">주차</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">계획내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">실행내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 100px;">교수명</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -275,36 +265,19 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
 // 개별 주차 테이블 행 렌더링 (교수용 - 수정 가능)
 function renderWeekCard(week, advisors, currentProf, plan, studentId) {
     const hasExecutions = week.executions && week.executions.length > 0;
-    const hasPlan = week.plannedTopic && week.plannedTopic.trim() !== '';
 
-    // 실적이 있으면 실적 수 + 1 (입력 폼), 없으면 2 (빈 실적 행 + 입력 폼)
-    const rowCount = hasExecutions ? week.executions.length + 1 : 2;
+    // 실적이 있으면 실적 수만큼, 없으면 1 (실적 없음 표시)
+    const rowCount = hasExecutions ? week.executions.length : 1;
 
-    // 첫 번째 행 (계획 정보는 rowspan 적용)
-    // 계획은 항상 textarea/input으로 수정 가능하도록 표시
+    // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
         <tr>
             <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">${week.week}주</td>
-            <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
-                <input type="text" id="plan-topic-${week.week}"
-                       value="${week.plannedTopic || ''}"
-                       placeholder="주제 입력"
-                       class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
-            </td>
             <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
                 <textarea id="plan-content-${week.week}"
                           placeholder="계획 내용 입력"
                           class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea"
                           style="min-height: 40px; overflow-y: hidden;">${week.plannedContent || ''}</textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center" rowspan="${rowCount}">
-                <select id="plan-method-${week.week}" class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none">
-                    <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
-                    <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
-                    <option value="zoom" ${week.plannedMethod === 'zoom' || !week.plannedMethod ? 'selected' : ''}>Zoom</option>
-                    <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
-                    <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
-                </select>
             </td>`;
 
     if (hasExecutions) {
@@ -313,36 +286,24 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId) {
         const isMyExecution = firstExec.professorId === currentProf.id;
         firstRow += `
             <td class="border border-gray-300 px-2 py-2">
-                <textarea readonly
-                          class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
-                          style="min-height: 40px; overflow-y: hidden;">${firstExec.executionContent || ''}</textarea>
+                <div class="flex flex-col gap-2">
+                    <textarea readonly
+                              class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                              style="min-height: 40px; overflow-y: hidden;">${firstExec.executionContent || ''}</textarea>
+                    ${isMyExecution ? `
+                        <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${week.week}, '${firstExec.executionId}')"
+                                class="self-end text-xs text-red-600 hover:underline">삭제</button>
+                    ` : ''}
+                </div>
             </td>
             <td class="border border-gray-300 px-2 py-2 text-center text-sm">
                 ${firstExec.professorName || '-'}
             </td>
-            <td class="border border-gray-300 px-2 py-2">
-                <textarea readonly
-                          class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
-                          style="min-height: 40px; overflow-y: hidden;">${firstExec.comment || ''}</textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs">${formatDate(firstExec.executionDate)}</td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs">${getMethodText(firstExec.method)}</td>
-            <td class="border border-gray-300 px-2 py-2 text-center">
-                ${isMyExecution ? `
-                    <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${week.week}, '${firstExec.executionId}')"
-                            class="text-xs text-red-600 hover:underline">삭제</button>
-                ` : '-'}
-            </td>
         `;
     } else {
-        // 실적이 없는 경우: 빈 실적 셀 6개 추가 (작업 컬럼 제외)
+        // 실적이 없는 경우: "실적 없음" 표시 (colspan="2")
         firstRow += `
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-gray-500" colspan="2">실적 없음</td>
         `;
     }
     firstRow += `</tr>`;
@@ -355,25 +316,18 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId) {
             return `
                 <tr>
                     <td class="border border-gray-300 px-2 py-2">
-                        <textarea readonly
-                                  class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
-                                  style="min-height: 40px; overflow-y: hidden;">${exec.executionContent || ''}</textarea>
+                        <div class="flex flex-col gap-2">
+                            <textarea readonly
+                                      class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                                      style="min-height: 40px; overflow-y: hidden;">${exec.executionContent || ''}</textarea>
+                            ${isMyExecution ? `
+                                <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${week.week}, '${exec.executionId}')"
+                                        class="self-end text-xs text-red-600 hover:underline">삭제</button>
+                            ` : ''}
+                        </div>
                     </td>
                     <td class="border border-gray-300 px-2 py-2 text-center text-sm">
                         ${exec.professorName || '-'}
-                    </td>
-                    <td class="border border-gray-300 px-2 py-2">
-                        <textarea readonly
-                                  class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
-                                  style="min-height: 40px; overflow-y: hidden;">${exec.comment || ''}</textarea>
-                    </td>
-                    <td class="border border-gray-300 px-2 py-2 text-center text-xs">${formatDate(exec.executionDate)}</td>
-                    <td class="border border-gray-300 px-2 py-2 text-center text-xs">${getMethodText(exec.method)}</td>
-                    <td class="border border-gray-300 px-2 py-2 text-center">
-                        ${isMyExecution ? `
-                            <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${week.week}, '${exec.executionId}')"
-                                    class="text-xs text-red-600 hover:underline">삭제</button>
-                        ` : '-'}
                     </td>
                 </tr>
             `;
@@ -381,39 +335,21 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId) {
     }
 
     // 실적 추가 입력 폼 행
-    const today = getTodayDate();
     const inputFormRow = `
         <tr class="bg-gray-50">
+            <td class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-400">${week.week}주</td>
+            <td class="border border-gray-300 px-2 py-2 bg-gray-100"></td>
             <td class="border border-gray-300 px-2 py-2">
-                <textarea id="exec-content-${week.week}"
-                          placeholder="실행 내용 입력"
-                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none auto-expand-textarea"
-                          style="min-height: 40px; overflow-y: hidden;"></textarea>
+                <div class="flex flex-col gap-2">
+                    <textarea id="exec-content-${week.week}"
+                              placeholder="실행 내용 입력"
+                              class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none auto-expand-textarea"
+                              style="min-height: 40px; overflow-y: hidden;"></textarea>
+                    <button onclick="addExecutionV2(${week.week})"
+                            class="self-end text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">+ 추가</button>
+                </div>
             </td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs"></td>
-            <td class="border border-gray-300 px-2 py-2">
-                <textarea id="exec-comment-${week.week}"
-                          placeholder="교수 의견 입력"
-                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none auto-expand-textarea"
-                          style="min-height: 40px; overflow-y: hidden;"></textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2">
-                <input type="date" id="exec-date-${week.week}" value="${today}"
-                       class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none">
-            </td>
-            <td class="border border-gray-300 px-2 py-2">
-                <select id="exec-method-${week.week}" class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none">
-                    <option value="meeting">대면</option>
-                    <option value="online">온라인</option>
-                    <option value="zoom">Zoom</option>
-                    <option value="email">이메일</option>
-                    <option value="phone">전화</option>
-                </select>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center">
-                <button onclick="addExecutionV2(${week.week})"
-                        class="text-xs text-blue-600 hover:underline">+ 추가</button>
-            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-xs text-gray-400">자동입력</td>
         </tr>
     `;
 
@@ -423,180 +359,53 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId) {
 // 모바일 카드 뷰 렌더링 (교수용)
 function renderWeekCardMobile(week, advisors, currentProf, plan, studentId) {
     const hasExecutions = week.executions && week.executions.length > 0;
-    const hasPlan = week.plannedTopic && week.plannedTopic.trim() !== '';
+    const hasPlan = week.plannedContent && week.plannedContent.trim() !== '';
 
     return `
         <div class="bg-white border border-gray-200 rounded-lg">
-            ${hasPlan ? `
-                <!-- 계획 표시 영역 -->
-                <div class="p-4 bg-gray-50 border-b border-gray-200">
-                    <div class="mb-3">
-                        <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
-                        <span class="text-gray-400 mx-2">-</span>
-                        <span class="text-base font-medium text-gray-800">${week.plannedTopic}</span>
-                        <span class="text-xs px-2 py-1 rounded ${getMethodBadgeClass(week.plannedMethod)} ml-2">
-                            ${getMethodText(week.plannedMethod)}
-                        </span>
-                    </div>
-                    <div class="mb-2">
-                        <span class="text-sm font-semibold text-gray-700">계획 내용:</span>
-                        <p class="text-sm text-gray-700 mt-1">${week.plannedContent}</p>
-                    </div>
-                </div>
-            ` : `
-                <!-- 계획 입력 폼 -->
-                ${renderWeekPlanInputForm(week.week)}
-            `}
+            <!-- 주차 헤더 -->
+            <div class="p-4 bg-gray-50 border-b border-gray-200">
+                <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
+            </div>
+
+            <!-- 계획 내용 -->
+            <div class="p-4 border-b border-gray-200">
+                <span class="text-sm font-semibold text-gray-700">계획 내용:</span>
+                ${hasPlan ? `
+                    <p class="text-sm text-gray-700 mt-2">${week.plannedContent}</p>
+                ` : `
+                    <textarea id="plan-content-${week.week}"
+                              placeholder="계획 내용 입력"
+                              class="w-full border border-gray-300 rounded px-2 py-2 text-sm resize-none mt-2"
+                              style="min-height: 60px;">${week.plannedContent || ''}</textarea>
+                `}
+            </div>
 
             <!-- 실적 목록 -->
             <div class="p-4">
                 <h4 class="text-sm font-semibold text-gray-700 mb-3">
-                    실적 및 교수의견 (${week.executions.length}건)
+                    실적 (${week.executions.length}건)
                 </h4>
 
                 <!-- 기존 실적 목록 -->
-                ${week.executions.length > 0 ? `
+                ${hasExecutions ? `
                     <div class="space-y-3 mb-4">
-                        ${week.executions.map(exec => renderExecutionComment(exec, currentProf, week.week, studentId)).join('')}
+                        ${week.executions.map(exec => renderExecutionCommentMobile(exec, currentProf, week.week, studentId)).join('')}
                     </div>
-                ` : ''}
+                ` : `
+                    <p class="text-sm text-gray-500 mb-4">실적 없음</p>
+                `}
 
                 <!-- 실적 추가 폼 -->
-                ${renderExecutionInputForm(week.week, currentProf)}
-            </div>
-        </div>
-    `;
-}
-
-// 실적 댓글 렌더링
-function renderExecutionComment(execution, currentProf, weekNumber, studentId) {
-    const isMyExecution = execution.professorId === currentProf.id;
-
-    return `
-        <div class="execution-comment ${isMyExecution ? 'bg-[#FCE4EC] border-[#F8BBD9]' : 'bg-gray-50 border-gray-200'} border rounded-lg p-4">
-            <div class="flex justify-between items-start mb-2">
-                <div>
-                    <div class="text-sm font-semibold ${isMyExecution ? 'text-[#6A0028]' : 'text-gray-800'}">
-                        ${execution.professorName} ${isMyExecution ? '(나)' : ''}
-                    </div>
-                    <div class="flex items-center gap-2 text-xs text-gray-600 mt-1">
-                        <span>${formatDateWithTime(execution.executionDate)}</span>
-                        <span>•</span>
-                        <span class="px-2 py-0.5 rounded ${getMethodBadgeClass(execution.method)}">
-                            ${getMethodText(execution.method)}
-                        </span>
-                    </div>
-                </div>
-                ${isMyExecution ? `
-                    <div class="flex gap-2">
-                        <button onclick="editExecutionInlineV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
-                                class="text-xs text-[#6A0028] hover:text-[#6A0028]">
-                            수정
-                        </button>
-                        <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
-                                class="text-xs text-red-600 hover:text-red-800">
-                            삭제
-                        </button>
-                    </div>
-                ` : ''}
-            </div>
-            <div class="space-y-2 mt-3">
-                <div>
-                    <span class="text-xs font-semibold text-gray-600">실행 내용:</span>
-                    <p class="text-sm text-gray-800 mt-1">${execution.executionContent}</p>
-                </div>
-                <div>
-                    <span class="text-xs font-semibold text-gray-600">교수 의견:</span>
-                    <p class="text-sm text-gray-800 mt-1">${execution.comment}</p>
-                </div>
-            </div>
-        </div>
-    `;
-}
-
-// 실적 추가 인라인 폼
-function renderExecutionInputForm(weekNumber, currentProf) {
-    const today = getTodayDate();
-
-    return `
-        <div class="execution-input-form bg-gray-50 border border-gray-200 rounded-lg p-4">
-            <div class="mb-2">
-                <span class="text-sm font-semibold text-gray-700">${currentProf.name} 교수 - 실적 추가</span>
-            </div>
-            <div class="space-y-3">
-                    <div class="flex items-end gap-2">
-                        <div class="flex-1">
-                            <label class="block text-xs text-gray-600 mb-1">실행일 *</label>
-                            <input type="date" id="exec-date-${weekNumber}" value="${today}"
-                                   class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm">
-                        </div>
-                        <div class="flex-1">
-                            <label class="block text-xs text-gray-600 mb-1">지도 방식 *</label>
-                            <select id="exec-method-${weekNumber}" class="w-full border border-gray-300 rounded px-3 py-1.5 text-sm">
-                                <option value="meeting">대면</option>
-                                <option value="online">온라인</option>
-                                <option value="zoom">Zoom</option>
-                                <option value="email">이메일</option>
-                                <option value="phone">전화</option>
-                            </select>
-                        </div>
-                        <button onclick="addExecutionV2(${weekNumber})"
-                                class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1 whitespace-nowrap">
-                            <i class="fas fa-plus-circle"></i>
-                            실적 추가
-                        </button>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">실행 내용 *</label>
-                        <textarea id="exec-content-${weekNumber}" rows="2"
-                                  placeholder="실제로 지도한 내용을 입력하세요"
-                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">교수 의견 *</label>
-                        <textarea id="exec-comment-${weekNumber}" rows="2"
-                                  placeholder="학생의 이해도, 진행 상황 등에 대한 의견을 입력하세요"
-                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
-                    </div>
-                </div>
-        </div>
-    `;
-}
-
-// 주차별 계획 입력 폼 (인라인)
-function renderWeekPlanInputForm(weekNumber) {
-    return `
-        <div class="p-4 bg-yellow-50 border-b border-yellow-200">
-            <h4 class="text-sm font-semibold text-gray-700 mb-3">${weekNumber}주차 계획</h4>
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">지도 주제 *</label>
-                    <input type="text" id="plan-topic-${weekNumber}"
-                           placeholder="예: 연구방법론 개요"
-                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs text-gray-600 mb-1">계획 내용 *</label>
-                    <textarea id="plan-content-${weekNumber}" rows="3"
-                              placeholder="이번 주차에 지도할 내용을 상세히 입력하세요"
-                              class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
-                </div>
-                <div class="flex justify-between items-end gap-4">
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm text-gray-600 min-w-[100px]">예정 지도 방식:</label>
-                        <select id="plan-method-${weekNumber}"
-                                class="border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="meeting">대면</option>
-                            <option value="online">온라인</option>
-                            <option value="zoom" selected>Zoom</option>
-                            <option value="email">이메일</option>
-                            <option value="phone">전화</option>
-                        </select>
-                    </div>
-                    <button onclick="saveWeekPlan(${weekNumber})"
-                            class="bg-[#6A0028] text-white px-4 py-2 rounded text-sm hover:bg-[#8A0034] font-semibold flex items-center gap-1">
-                        <i class="fas fa-save"></i>
-                        계획 저장
+                <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
+                    <span class="text-xs font-semibold text-gray-700 block mb-2">실적 추가</span>
+                    <textarea id="exec-content-${week.week}"
+                              placeholder="실행 내용 입력"
+                              class="w-full border border-gray-300 rounded px-2 py-2 text-sm resize-none mb-2"
+                              style="min-height: 60px;"></textarea>
+                    <button onclick="addExecutionV2(${week.week})"
+                            class="w-full px-3 py-2 bg-blue-600 text-white text-sm rounded hover:bg-blue-700">
+                        + 추가
                     </button>
                 </div>
             </div>
@@ -604,27 +413,49 @@ function renderWeekPlanInputForm(weekNumber) {
     `;
 }
 
+// 모바일용 실적 렌더링
+function renderExecutionCommentMobile(execution, currentProf, weekNumber, studentId) {
+    const isMyExecution = execution.professorId === currentProf.id;
+
+    return `
+        <div class="execution-comment ${isMyExecution ? 'bg-[#FCE4EC] border-[#F8BBD9]' : 'bg-gray-50 border-gray-200'} border rounded-lg p-3">
+            <div class="flex justify-between items-start mb-2">
+                <div class="text-sm font-semibold ${isMyExecution ? 'text-[#6A0028]' : 'text-gray-800'}">
+                    ${execution.professorName} ${isMyExecution ? '(나)' : ''}
+                </div>
+                ${isMyExecution ? `
+                    <button onclick="deleteExecutionV2('${studentId}', ${currentSemesterView.year}, ${currentSemesterView.semester}, ${weekNumber}, '${execution.executionId}')"
+                            class="text-xs text-red-600 hover:text-red-800">
+                        삭제
+                    </button>
+                ` : ''}
+            </div>
+            <p class="text-sm text-gray-800">${execution.executionContent}</p>
+        </div>
+    `;
+}
+
+// (renderExecutionInputForm 및 renderWeekPlanInputForm 함수 제거 - 더 이상 사용하지 않음)
+
 // ==================== 실적 추가 (인라인) ====================
 function addExecutionV2(weekNumber) {
-    const executionDate = document.getElementById(`exec-date-${weekNumber}`).value;
-    const method = document.getElementById(`exec-method-${weekNumber}`).value;
     const content = document.getElementById(`exec-content-${weekNumber}`).value.trim();
-    const comment = document.getElementById(`exec-comment-${weekNumber}`).value.trim();
 
-    if (!executionDate || !content || !comment) {
-        showToast('모든 필수 항목을 입력해주세요.', 'warning');
+    if (!content) {
+        showToast('실행 내용을 입력해주세요.', 'warning');
         return;
     }
 
     const currentProf = DataService.getCurrentProfessor();
+    const today = new Date().toISOString().split('T')[0]; // yyyy-mm-dd
 
     const executionData = {
         professorId: currentProf.id,
         professorName: currentProf.name,
-        executionDate,
+        executionDate: today,
         executionContent: content,
-        comment: comment,
-        method: method
+        comment: '', // 교수 의견 필드 제거
+        method: 'zoom' // 기본값
     };
 
     try {
@@ -667,19 +498,17 @@ function deleteExecutionV2(studentId, year, semester, week, executionId) {
 
 // ==================== 주차별 계획 저장 (인라인) ====================
 function saveWeekPlan(weekNumber) {
-    const topic = document.getElementById(`plan-topic-${weekNumber}`).value.trim();
     const content = document.getElementById(`plan-content-${weekNumber}`).value.trim();
-    const method = document.getElementById(`plan-method-${weekNumber}`).value;
 
-    if (!topic || !content) {
-        showToast('지도 주제와 계획 내용을 모두 입력해주세요.', 'warning');
+    if (!content) {
+        showToast('계획 내용을 입력해주세요.', 'warning');
         return;
     }
 
     const planData = {
-        plannedTopic: topic,
+        plannedTopic: '', // 주제 필드 제거
         plannedContent: content,
-        plannedMethod: method,
+        plannedMethod: 'zoom', // 기본값
         plannedDate: null  // 학사시스템에서 자동 설정
     };
 
@@ -717,32 +546,22 @@ function saveAllWeekPlans() {
     let emptyCount = 0;
 
     for (let week = 1; week <= totalWeeks; week++) {
-        const topicEl = document.getElementById(`plan-topic-${week}`);
         const contentEl = document.getElementById(`plan-content-${week}`);
-        const methodEl = document.getElementById(`plan-method-${week}`);
 
-        if (!topicEl || !contentEl || !methodEl) continue;
+        if (!contentEl) continue;
 
-        const topic = topicEl.value.trim();
         const content = contentEl.value.trim();
-        const method = methodEl.value;
 
         // 빈 주차는 건너뜀
-        if (!topic && !content) {
+        if (!content) {
             emptyCount++;
             continue;
         }
 
-        // 주제나 내용 중 하나만 있으면 경고
-        if (!topic || !content) {
-            showToast(`${week}주차: 지도 주제와 계획 내용을 모두 입력해주세요.`, 'warning');
-            return;
-        }
-
         const planData = {
-            plannedTopic: topic,
+            plannedTopic: '', // 주제 필드 제거
             plannedContent: content,
-            plannedMethod: method,
+            plannedMethod: 'zoom', // 기본값
             plannedDate: null
         };
 
