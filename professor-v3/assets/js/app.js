@@ -499,21 +499,46 @@ function viewProfessorProposalDetail(proposalId) {
     const student = mockStudents.find(s => s.id === proposal.studentId);
     const assignment = mockAdvisorAssignments.find(a => a.studentId === proposal.studentId);
 
-    // 목록 뷰 숨김, 상세 뷰 표시
-    document.getElementById('advisor-assignment-list-view').style.display = 'none';
-    document.getElementById('advisor-assignment-detail-view').style.display = 'block';
+    // 기존 모달이 있으면 제거
+    const existingModal = document.getElementById('advisor-assignment-modal');
+    if (existingModal) {
+        existingModal.remove();
+    }
 
-    // 상세 뷰 렌더링 (관리자 화면과 동일, 읽기 전용)
-    const detailView = `
-        <div class="bg-white rounded-lg shadow-md">
-            <!-- 헤더 -->
-            <div class="px-6 py-3 border-b border-gray-200">
-                <button onclick="returnToAdvisorAssignmentList(); return false;" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
+    // 모달 생성
+    const modal = document.createElement('div');
+    modal.id = 'advisor-assignment-modal';
+    modal.className = 'feedback-detail-screen';
+    modal.style.zIndex = '9999';
+
+    modal.innerHTML = `
+        <div class="feedback-detail-content" style="max-width: 1400px;">
+            <!-- 헤더: 연구계획서 정보 -->
+            <div class="px-6 py-3 border-b bg-white">
+                <div class="flex items-center justify-between">
+                    <!-- 좌측: 연구계획서 핵심 정보 -->
+                    <div class="text-xs text-gray-700 flex-1 mr-4">
+                        <span class="font-semibold">연구 제목:</span>
+                        <span title="${proposal.title}">${proposal.title && proposal.title.length > 40 ? proposal.title.substring(0, 40) + '...' : proposal.title || '-'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학위과정:</span>
+                        <span>${proposal?.degreeType || '-'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학번:</span>
+                        <span>${student?.studentNumber || '-'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">성명:</span>
+                        <span>${student?.name || '-'}</span>
+                    </div>
+
+                    <!-- 우측: 닫기 버튼 -->
+                    <button onclick="closeAdvisorAssignmentModal()"
+                            class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
             <!-- 학생 정보 -->
@@ -559,18 +584,9 @@ function viewProfessorProposalDetail(proposalId) {
                 </div>
             </div>
 
-            <!-- 연구계획서 정보 -->
-            <div class="px-8 py-6 border-b border-gray-200">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">연구계획서 정보</h2>
-
+            <!-- 연구계획서 상세 내용 (스크롤 가능) -->
+            <div class="p-6" style="max-height: calc(100vh - 200px); overflow-y: auto;">
                 <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 제목</label>
-                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
-                            <p class="text-gray-900 font-medium">${proposal.title || ''}</p>
-                        </div>
-                    </div>
-
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 목적</label>
                         <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
@@ -591,26 +607,46 @@ function viewProfessorProposalDetail(proposalId) {
                             <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
                         </div>
                     </div>
-                </div>
 
-                <!-- 연구계획서 양식 불러오기 버튼 -->
-                <div class="mt-6 flex justify-end">
-                    <button onclick="loadProposalForm('${proposal.id}')"
-                            class="px-6 py-3 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] flex items-center gap-2 transition-colors">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        연구계획서 양식 불러오기
-                    </button>
+                    <!-- 연구계획서 양식 불러오기 버튼 -->
+                    <div class="mt-6 flex justify-end">
+                        <button onclick="loadProposalForm('${proposal.id}')"
+                                class="px-6 py-3 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] flex items-center gap-2 transition-colors">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            연구계획서 양식 불러오기
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     `;
 
-    // advisor-assignment-detail-view 영역 업데이트
-    const detailContainer = document.getElementById('advisor-assignment-detail-view');
-    if (detailContainer) {
-        detailContainer.innerHTML = detailView;
+    document.body.appendChild(modal);
+
+    // 백드롭 클릭으로 닫기
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeAdvisorAssignmentModal();
+        }
+    });
+
+    // ESC 키로 닫기
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            closeAdvisorAssignmentModal();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+}
+
+// 모달 닫기 함수
+function closeAdvisorAssignmentModal() {
+    const modal = document.getElementById('advisor-assignment-modal');
+    if (modal) {
+        modal.remove();
     }
 }
 
