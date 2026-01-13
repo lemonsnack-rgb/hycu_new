@@ -1,12 +1,19 @@
 /**
  * 학생용 학기별 지도 계획
- * Version: 20260107003
+ * Version: 20260113001
  *
  * 기능:
  * - 본인의 학기별 지도 계획 조회
  * - 계획 생성/초기화 (학생도 가능)
  * - 교수 실적 조회 (읽기 전용)
  * - 실적 입력 불가 (교수 전용 기능 제외)
+ * - 승인 후 수정 불가
+ *
+ * 변경사항 (v20260113001):
+ * - 학년도 동적 생성 (최근 5년)
+ * - 승인 후 계획 수정 제한 추가
+ * - 계획 승인 시 계획 초기화 버튼 비활성화
+ * - UI를 교수용 화면과 완전히 동일하게 구현
  *
  * 변경사항 (v003):
  * - 계획 생성 후 시스템 alert 제거
@@ -20,7 +27,7 @@
  * - 실적 카드: 댓글 형태로 변경
  */
 
-let studentCurrentYear = 2025;
+let studentCurrentYear = new Date().getFullYear();
 let studentCurrentSemester = 1;
 
 // 학기별 계획 데이터 저장소 (임시)
@@ -159,10 +166,34 @@ function closeStudentModal() {
 
 // ========== 학기별 지도 계획 함수 ==========
 
+// 사용 가능한 학기 목록 생성 (최근 5년)
+function generateStudentAvailableSemesters() {
+    const currentYear = new Date().getFullYear();
+    const semesters = [];
+
+    for (let y = currentYear; y >= currentYear - 4; y--) {
+        for (let s = 1; s <= 2; s++) {
+            const plan = DataService.getStudentSemesterPlan(y, s);
+            semesters.push({
+                year: y,
+                semester: s,
+                hasPlan: plan && plan.totalWeeks > 0
+            });
+        }
+    }
+
+    return semesters;
+}
+
 // 학생용 학기별 지도 계획 초기화
 function initStudentSemesterGuidancePlan() {
     console.log('학생용 학기별 지도 계획 초기화');
     showStudentSemesterPlanDetail();
+}
+
+// 승인된 계획 수정 시도 시 경고
+function alertStudentApprovedPlanEdit() {
+    alert('⚠️ 교수님이 승인한 계획은 수정할 수 없습니다.\n\n계획 수정이 필요한 경우 지도교수님께 문의하세요.');
 }
 
 // 상세 화면 (본인 정보만 표시, 목록 화면 없음)
@@ -183,6 +214,10 @@ function showStudentSemesterPlanDetail() {
     semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
     const totalWeeks = semesterPlan?.totalWeeks || 0;
     const plans = semesterPlan?.plans || [];
+    const isApproved = semesterPlan && semesterPlan.approved === true;
+
+    // 사용 가능한 학기 목록 생성
+    const availableSemesters = generateStudentAvailableSemesters();
 
     // 주차 구조 생성
     const weeks = generateStudentWeeks(plans, totalWeeks);
@@ -248,16 +283,19 @@ function showStudentSemesterPlanDetail() {
                         <label class="text-gray-600 min-w-[60px]">학년도:</label>
                         <select id="student-select-year" onchange="changeStudentSemesterView()"
                                 class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
-                            <option value="2025" ${studentCurrentYear === 2025 ? 'selected' : ''}>2025학년도</option>
-                            <option value="2024" ${studentCurrentYear === 2024 ? 'selected' : ''}>2024학년도</option>
+                            ${Array.from(new Set(availableSemesters.map(s => s.year)))
+                                .map(y => `<option value="${y}" ${y === studentCurrentYear ? 'selected' : ''}>${y}학년도</option>`)
+                                .join('')}
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
                         <label class="text-gray-600 min-w-[60px]">학기:</label>
                         <select id="student-select-semester" onchange="changeStudentSemesterView()"
                                 class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
-                            <option value="1" ${studentCurrentSemester === 1 ? 'selected' : ''}>1학기</option>
-                            <option value="2" ${studentCurrentSemester === 2 ? 'selected' : ''}>2학기</option>
+                            ${availableSemesters
+                                .filter(s => s.year === studentCurrentYear)
+                                .map(s => `<option value="${s.semester}" ${s.semester === studentCurrentSemester ? 'selected' : ''}>${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
+                                .join('')}
                         </select>
                     </div>
                     ${totalWeeks > 0 ? `
@@ -265,14 +303,20 @@ function showStudentSemesterPlanDetail() {
                         <span class="text-gray-600">총 주차:</span>
                         <span class="text-gray-900 font-medium">${totalWeeks}주</span>
                     </div>
+                    ${isApproved ? `
+                    <div class="flex items-center gap-2">
+                        <span class="text-green-600 font-medium">✓ 승인완료</span>
+                    </div>
+                    ` : ''}
                     ` : `
                     <div class="flex items-center gap-2">
                         <span class="text-orange-600 text-sm">⚠ 아직 지도 계획이 생성되지 않았습니다.</span>
                     </div>
                     `}
                     <div class="ml-auto">
-                        <button onclick="resetStudentTotalWeeks()"
-                                class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2">
+                        <button onclick="${isApproved ? 'alertStudentApprovedPlanEdit()' : 'resetStudentTotalWeeks()'}"
+                                class="${isApproved ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#6A0028] hover:bg-[#8A0034]'} text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2"
+                                ${isApproved ? 'disabled' : ''}>
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
                             </svg>
@@ -376,6 +420,7 @@ function renderStudentWeekCard(week) {
     const isApproved = semesterPlan && semesterPlan.approved === true;
     const readonlyAttr = isApproved ? 'readonly' : '';
     const bgClass = isApproved ? 'bg-gray-100' : '';
+    const clickEvent = isApproved ? 'onclick="alertStudentApprovedPlanEdit()"' : '';
 
     // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
@@ -385,8 +430,9 @@ function renderStudentWeekCard(week) {
                 <textarea id="student-plan-content-${week.week}"
                           placeholder="계획 내용 입력"
                           ${readonlyAttr}
+                          ${clickEvent}
                           class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea ${bgClass}"
-                          style="min-height: 40px; overflow-y: hidden;">${week.plannedContent || ''}</textarea>
+                          style="min-height: 40px; overflow-y: hidden; ${isApproved ? 'cursor: not-allowed;' : ''}">${week.plannedContent || ''}</textarea>
             </td>`;
 
     if (hasExecutions) {
@@ -395,7 +441,7 @@ function renderStudentWeekCard(week) {
         firstRow += `
             <td class="border border-gray-300 px-2 py-2">
                 <textarea readonly
-                          class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                          class="w-full bg-gray-50 cursor-not-allowed border border-gray-300 rounded text-sm px-2 py-1 resize-none focus:outline-none auto-expand-textarea"
                           style="min-height: 40px; overflow-y: hidden;">${firstExec.executionContent || ''}</textarea>
             </td>
             <td class="border border-gray-300 px-2 py-2 text-center text-sm">
@@ -418,7 +464,7 @@ function renderStudentWeekCard(week) {
                 <tr>
                     <td class="border border-gray-300 px-2 py-2">
                         <textarea readonly
-                                  class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
+                                  class="w-full bg-gray-50 cursor-not-allowed border border-gray-300 rounded text-sm px-2 py-1 resize-none focus:outline-none auto-expand-textarea"
                                   style="min-height: 40px; overflow-y: hidden;">${exec.executionContent || ''}</textarea>
                     </td>
                     <td class="border border-gray-300 px-2 py-2 text-center text-sm">
@@ -517,11 +563,27 @@ function formatDate(dateString) {
 
 // 학기 변경
 function changeStudentSemesterView() {
-    const year = document.getElementById('student-select-year')?.value;
-    const semester = document.getElementById('student-select-semester')?.value;
+    const yearSelect = document.getElementById('student-select-year');
+    const semesterSelect = document.getElementById('student-select-semester');
 
-    if (year) studentCurrentYear = parseInt(year);
-    if (semester) studentCurrentSemester = parseInt(semester);
+    if (!yearSelect || !semesterSelect) return;
+
+    const year = parseInt(yearSelect.value);
+    const previousYear = studentCurrentYear;
+
+    // 학년도가 변경된 경우, 해당 학년도의 학기 옵션으로 업데이트
+    if (year !== previousYear) {
+        const availableSemesters = generateStudentAvailableSemesters();
+        const semesterOptions = availableSemesters
+            .filter(s => s.year === year)
+            .map(s => `<option value="${s.semester}">${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
+            .join('');
+        semesterSelect.innerHTML = semesterOptions;
+        semesterSelect.value = '1';
+    }
+
+    studentCurrentYear = year;
+    studentCurrentSemester = parseInt(semesterSelect.value);
 
     console.log(`학기 변경: ${studentCurrentYear}학년도 ${studentCurrentSemester}학기`);
 
