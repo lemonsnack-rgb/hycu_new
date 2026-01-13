@@ -63,14 +63,67 @@ DataService.getStudentSemesterPlan = function(year, semester) {
 DataService.resetStudentSemesterPlan = function(year, semester, totalWeeks) {
     const student = window.currentStudent || { id: 'S2024001' };
     const key = `${student.id}_${year}_${semester}`;
+
+    // totalWeeks가 0이면 계획 삭제
+    if (totalWeeks === 0) {
+        delete studentSemesterPlansStorage[key];
+        console.log(`✅ 학생: 학기 계획 삭제: ${key}`);
+        return null;
+    }
+
+    // 주차 배열 생성
+    const weeks = [];
+    for (let i = 1; i <= totalWeeks; i++) {
+        weeks.push({
+            week: i,
+            plannedContent: '',
+            executions: []
+        });
+    }
+
     studentSemesterPlansStorage[key] = {
         studentId: student.id,
         year,
         semester,
         totalWeeks,
-        plans: []
+        weeks,
+        approved: false
     };
+    console.log(`✅ 학생: 학기 계획 생성/초기화: ${key}, ${totalWeeks}주`);
     return studentSemesterPlansStorage[key];
+};
+
+// 주차별 계획 업데이트
+DataService.updateStudentWeekPlan = function(year, semester, weekNumber, planData) {
+    const student = window.currentStudent || { id: 'S2024001' };
+    const key = `${student.id}_${year}_${semester}`;
+    const plan = studentSemesterPlansStorage[key];
+
+    if (!plan) {
+        throw new Error('학기 계획이 존재하지 않습니다. 먼저 계획을 생성해주세요.');
+    }
+
+    if (!plan.weeks) {
+        plan.weeks = [];
+    }
+
+    // 해당 주차 찾기 또는 생성
+    let week = plan.weeks.find(w => w.week === weekNumber);
+    if (!week) {
+        week = {
+            week: weekNumber,
+            plannedContent: '',
+            executions: []
+        };
+        plan.weeks.push(week);
+        plan.weeks.sort((a, b) => a.week - b.week);
+    }
+
+    // 계획 내용 업데이트
+    week.plannedContent = planData.plannedContent || '';
+
+    console.log(`✅ 학생: ${weekNumber}주차 계획 저장 완료`);
+    return true;
 };
 
 // ========== 모달 유틸리티 함수 ==========
@@ -220,14 +273,13 @@ function showStudentSemesterPlanDetail() {
     // 학기별 계획 데이터 가져오기 (전역 변수에 할당)
     semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
     const totalWeeks = semesterPlan?.totalWeeks || 0;
-    const plans = semesterPlan?.plans || [];
     const isApproved = semesterPlan && semesterPlan.approved === true;
 
     // 사용 가능한 학기 목록 생성
     const availableSemesters = generateStudentAvailableSemesters();
 
     // 주차 구조 생성
-    const weeks = generateStudentWeeks(plans, totalWeeks);
+    const weeks = semesterPlan?.weeks || [];
 
     const contentArea = document.getElementById('semester-guidance-plan-content');
     if (!contentArea) {
@@ -346,39 +398,7 @@ function showStudentSemesterPlanDetail() {
     `;
 }
 
-// 주차 구조 생성 (교수용과 동일)
-function generateStudentWeeks(plans, totalWeeks = 15) {
-    const weeks = [];
-    for (let i = 1; i <= totalWeeks; i++) {
-        const weekPlans = plans.filter(p => p.week === i);
-
-        const weekObj = {
-            week: i,
-            plannedDate: weekPlans[0]?.plannedDate || null,
-            plannedTopic: weekPlans[0]?.plannedTopic || '',
-            plannedContent: weekPlans[0]?.plannedContent || '',
-            plannedMethod: weekPlans[0]?.plannedMethod || 'meeting',
-            executions: []
-        };
-
-        weekPlans.forEach(plan => {
-            if (plan.executionDate) {
-                weekObj.executions.push({
-                    id: plan.id,
-                    professorId: plan.professorId || plan.advisor?.id,
-                    professorName: plan.professorName || plan.advisor?.name,
-                    executionDate: plan.executionDate,
-                    method: plan.method || plan.actualMethod || plan.plannedMethod,
-                    executionContent: plan.executionContent || '',
-                    comment: plan.comment || plan.professorComment || ''
-                });
-            }
-        });
-
-        weeks.push(weekObj);
-    }
-    return weeks;
-}
+// Note: generateStudentWeeks 함수 제거됨 - 이제 semesterPlan.weeks를 직접 사용
 
 // 주차별 테이블 렌더링 (교수용과 완전히 동일)
 function renderStudentWeeklyCards(weeks) {
@@ -636,11 +656,17 @@ function resetStudentTotalWeeks() {
 
     const semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
     const currentWeeks = semesterPlan?.totalWeeks || 0;
-    const plans = semesterPlan?.plans || [];
+    const weeks = semesterPlan?.weeks || [];
+
+    // 계획 내용이 있는지 확인
+    let hasPlanContent = false;
+    if (weeks.length > 0) {
+        hasPlanContent = weeks.some(w => w.plannedContent && w.plannedContent.trim());
+    }
 
     // 최종 확인
-    if (currentWeeks > 0 && plans.length > 0) {
-        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
+    if (currentWeeks > 0 && hasPlanContent) {
+        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 내용이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
         if (!confirmed) {
             return;
         }
@@ -730,14 +756,23 @@ showStudentSemesterPlanDetail = function() {
 function saveAllStudentWeekPlans() {
     // 현재 학기의 주차 수를 동적으로 가져오기
     const semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
-    const totalWeeks = semesterPlan?.totalWeeks || 15;
+    const totalWeeks = semesterPlan?.totalWeeks || 0;
+
+    if (totalWeeks === 0) {
+        alert('저장할 학기 계획이 없습니다.\n먼저 계획을 생성해주세요.');
+        return;
+    }
+
     let savedCount = 0;
     let emptyCount = 0;
 
     for (let week = 1; week <= totalWeeks; week++) {
         const contentEl = document.getElementById(`student-plan-content-${week}`);
 
-        if (!contentEl) continue;
+        if (!contentEl) {
+            console.warn(`${week}주차 textarea 요소를 찾을 수 없습니다`);
+            continue;
+        }
 
         const content = contentEl.value.trim();
 
@@ -748,14 +783,11 @@ function saveAllStudentWeekPlans() {
         }
 
         const planData = {
-            plannedTopic: '', // 주제 필드 제거
-            plannedContent: content,
-            plannedMethod: 'zoom', // 기본값
-            plannedDate: null
+            plannedContent: content
         };
 
         try {
-            StudentDataService.updateWeekPlan(
+            DataService.updateStudentWeekPlan(
                 studentCurrentYear,
                 studentCurrentSemester,
                 week,
@@ -764,6 +796,8 @@ function saveAllStudentWeekPlans() {
             savedCount++;
         } catch (error) {
             console.error(`${week}주차 저장 실패:`, error);
+            alert(`${week}주차 저장 중 오류가 발생했습니다: ${error.message}`);
+            return;
         }
     }
 
@@ -781,7 +815,13 @@ function saveAllStudentWeekPlans() {
 
 // ==================== 학생용 주차별 계획 저장 ====================
 function saveStudentWeekPlan(weekNumber) {
-    const content = document.getElementById(`student-plan-content-${weekNumber}`).value.trim();
+    const contentEl = document.getElementById(`student-plan-content-${weekNumber}`);
+    if (!contentEl) {
+        alert('계획 입력란을 찾을 수 없습니다.');
+        return;
+    }
+
+    const content = contentEl.value.trim();
 
     if (!content) {
         alert('계획 내용을 입력해주세요.');
@@ -789,14 +829,11 @@ function saveStudentWeekPlan(weekNumber) {
     }
 
     const planData = {
-        plannedTopic: '', // 주제 필드 제거
-        plannedContent: content,
-        plannedMethod: 'zoom', // 기본값
-        plannedDate: null  // 학사시스템에서 자동 설정
+        plannedContent: content
     };
 
     try {
-        StudentDataService.updateWeekPlan(
+        DataService.updateStudentWeekPlan(
             studentCurrentYear,
             studentCurrentSemester,
             weekNumber,
@@ -811,6 +848,7 @@ function saveStudentWeekPlan(weekNumber) {
         }, 300);
 
     } catch (error) {
+        console.error('계획 저장 오류:', error);
         alert(error.message || '계획 저장에 실패했습니다.');
     }
 }
