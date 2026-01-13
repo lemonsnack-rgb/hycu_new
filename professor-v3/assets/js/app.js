@@ -108,12 +108,34 @@ function showScreen(screenId) {
             } else {
                 console.error('❌ initProfessorWeeklyGuidance 함수를 찾을 수 없습니다');
             }
-        } else if (screenId === 'ethics' || screenId === 'schedule' || screenId === 'process') {
-            // 안내문 화면 렌더링 (공통 함수 사용)
-            renderGuideScreen(screenId);
+        } else if (screenId === 'ethics') {
+            // 연구윤리 화면 렌더링
+            if (typeof initProfessorEthics === 'function') {
+                initProfessorEthics();
+            } else {
+                console.error('❌ initProfessorEthics 함수를 찾을 수 없습니다');
+            }
+        } else if (screenId === 'schedule') {
+            // 논문일정 화면 렌더링
+            if (typeof initProfessorSchedule === 'function') {
+                initProfessorSchedule();
+            } else {
+                console.error('❌ initProfessorSchedule 함수를 찾을 수 없습니다');
+            }
+        } else if (screenId === 'process') {
+            // 논문지도절차 화면 렌더링
+            if (typeof initProfessorProcedure === 'function') {
+                initProfessorProcedure();
+            } else {
+                console.error('❌ initProfessorProcedure 함수를 찾을 수 없습니다');
+            }
         } else if (screenId === 'notice') {
             // 공지사항 화면 렌더링
-            renderNoticeScreen();
+            if (typeof initProfessorNotice === 'function') {
+                initProfessorNotice();
+            } else {
+                console.error('❌ initProfessorNotice 함수를 찾을 수 없습니다');
+            }
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];
             if (initFunction) {

@@ -391,7 +391,8 @@ function formatFileSize(bytes) {
 // 즉시 초기화 실행
 initNoticeData();
 
-// window 객체에 함수 노출 (다른 파일에서 접근 가능하도록)
+// window 객체에 함수 및 데이터 노출 (다른 파일에서 접근 가능하도록)
+window.noticeDataStore = noticeDataStore;
 window.getAllNotices = getAllNotices;
 window.getNoticeById = getNoticeById;
 window.saveNotice = saveNotice;
@@ -400,4 +401,5 @@ window.incrementViewCount = incrementViewCount;
 window.formatFileSize = formatFileSize;
 
 console.log('✅ notice-data.js 로드 완료');
+console.log('✅ window.noticeDataStore:', noticeDataStore.length, '건');
 console.log('✅ window.getAllNotices:', typeof window.getAllNotices);

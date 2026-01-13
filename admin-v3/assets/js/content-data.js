@@ -462,4 +462,14 @@ if (typeof window !== 'undefined') {
         initContentData();
         console.log('content-data.js loaded (department-based version)');
     });
+
+    // window 객체에 데이터 및 함수 노출 (다른 파일에서 접근 가능하도록)
+    window.contentData = contentData;
+    window.getContentList = getContentList;
+    window.getContentByDepartment = getContentByDepartment;
+    window.saveContentItem = saveContentItem;
+    window.deleteContentItem = deleteContentItem;
+    window.getContentById = getContentById;
+    window.getContent = getContent;
+    window.saveContent = saveContent;
 }

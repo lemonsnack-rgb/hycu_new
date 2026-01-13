@@ -1280,8 +1280,15 @@
     <script src="assets/js/meeting-v3-detail.js?v=20260108003"></script>
     <script src="assets/js/meeting-v3-main.js?v=20260108003"></script>
 
-    <!-- Mock 데이터 -->
+    <!-- Mock 데이터 (가장 먼저 로드) -->
     <script src="../admin/assets/js/mockData.js"></script>
+
+    <!-- 공지사항 및 콘텐츠 데이터 (admin 데이터 공유) -->
+    <script src="../admin-v3/assets/js/notice-data.js"></script>
+    <script src="../admin-v3/assets/js/content-data.js"></script>
+
+    <!-- 학과 필터링 유틸리티 (mockData 이후 로드) -->
+    <script src="assets/js/department-utils.js"></script>
 
     <script src="assets/js/zoom-api.js?v=20251218002"></script>
     <script src="assets/js/review-data.js?v=20251218002"></script>
@@ -1311,6 +1318,10 @@
     <script src="../admin/assets/js/exam-schedule-data.js"></script>
     <script src="../admin/assets/js/schedule-utils.js"></script>
     <script src="assets/js/exam-schedule-professor-readonly.js"></script>
+
+    <!-- 교수용 공지사항 및 콘텐츠 화면 -->
+    <script src="assets/js/professor-notice.js"></script>
+    <script src="assets/js/professor-content.js"></script>
 
 <!-- injected: i18n minimal handler -->
 <script data-i18n-ready>
