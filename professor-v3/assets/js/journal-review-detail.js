@@ -603,22 +603,10 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
 
     content += `</div>`;
 
-    // 모달 대신 페이지 전환 방식으로 변경
+    // 오버레이 모달 방식 (관리자 화면과 일반 화면에서 동작)
     const container = document.getElementById('journal-review-content');
     if (container) {
-        // 뒤로가기 버튼 추가 (관리자 모드가 아닐 때만)
-        const backButton = isAdminMode ? '' : `
-            <div class="mb-6">
-                <button onclick="initJournalReview()" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
-            </div>
-        `;
-
-        container.innerHTML = backButton + content;
+        container.innerHTML = content;
 
         // 위원 화면인 경우 점수 입력 이벤트 바인딩
         if (viewType === 'member') {
@@ -671,8 +659,11 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
             }
         }
 
-        // 페이지 맨 위로 스크롤
-        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // 모달 내용 맨 위로 스크롤
+        const detailBody = document.querySelector('.review-detail-body');
+        if (detailBody) {
+            detailBody.scrollTop = 0;
+        }
     } else {
         console.error('journal-review-content container not found');
         alert('화면을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
@@ -794,21 +785,15 @@ function submitJournalEvaluation(journalId) {
         // 파일 배열 초기화
         journalEvaluationFiles = [];
 
-        // 모달 닫기
-        const modalBackdrop = document.querySelector('.modal-backdrop');
-        if (modalBackdrop) {
-            modalBackdrop.remove();
-        }
-
         if (typeof showToast === 'function') {
             showToast('평가가 제출되었습니다', 'success');
         } else {
             alert('평가가 제출되었습니다.');
         }
 
-        // 목록 새로고침
-        if (typeof renderJournalReviewList === 'function') {
-            renderJournalReviewList();
+        // 모달 닫기 (오버레이 제거)
+        if (typeof closeJournalReviewDetailScreen === 'function') {
+            closeJournalReviewDetailScreen();
         }
     }
 }
@@ -910,9 +895,9 @@ function submitJournalChairDecision(journalId) {
         alert(`최종 결정(${journalSelectedDecision})이 제출되었습니다.`);
     }
 
-    // 목록 새로고침
-    if (typeof renderJournalReviewList === 'function') {
-        renderJournalReviewList();
+    // 모달 닫기 (오버레이 제거)
+    if (typeof closeJournalReviewDetailScreen === 'function') {
+        closeJournalReviewDetailScreen();
     }
 }
 

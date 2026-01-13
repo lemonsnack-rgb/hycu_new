@@ -224,12 +224,12 @@ function renderJournalReviewRows(journals) {
                                     <td>${journal.status}</td>
                                     <td>
                                         <div class="flex gap-2 justify-center">
-                                            <button onclick="viewJournalReviewDetail(${journal.id}, 'member')"
+                                            <button onclick="openJournalReviewDetail(${journal.id}, 'member')"
                                                     class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-2 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
                                                 심사
                                             </button>
                                             ${journal.myRole === 'chair' ? `
-                                                <button onclick="viewJournalReviewDetail(${journal.id}, 'chair')"
+                                                <button onclick="openJournalReviewDetail(${journal.id}, 'chair')"
                                                         class="text-green-600 hover:text-green-800 text-xs font-medium px-2 py-1 border border-green-300 rounded hover:bg-green-50">
                                                     승인
                                                 </button>
@@ -401,6 +401,73 @@ function confirmSendJournalNotification(students) {
     if (selectAll) selectAll.checked = false;
 }
 
+// ==================== 학술지 심사 상세 열기 (모달 오버레이) ====================
+function openJournalReviewDetail(journalId, viewType) {
+    // 목록 화면 숨기기
+    const mainContent = document.getElementById('journal-main-content');
+    if (mainContent) {
+        mainContent.style.display = 'none';
+    }
+
+    // 상세 화면 생성 (review-detail-screen 클래스 재사용하여 동일한 모달 스타일 적용)
+    const detailScreen = document.createElement('div');
+    detailScreen.id = 'journal-review-detail-screen';
+    detailScreen.className = 'review-detail-screen';
+    detailScreen.dataset.journalId = journalId;
+    detailScreen.dataset.viewType = viewType || 'member';
+
+    detailScreen.innerHTML = `
+        <div class="review-detail-content-wrapper">
+            <!-- 헤더 -->
+            <div class="review-detail-header" style="padding: 12px 24px;">
+                <button onclick="closeJournalReviewDetailScreen()" class="back-to-list-btn">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+            </div>
+
+            <!-- 상세 내용 -->
+            <div id="journal-review-content" class="review-detail-body"></div>
+        </div>
+    `;
+
+    document.body.appendChild(detailScreen);
+
+    // 상세 정보 렌더링
+    setTimeout(() => {
+        console.log('🔍 openJournalReviewDetail - journalId:', journalId, 'viewType:', viewType);
+
+        if (typeof window.viewJournalReviewDetail === 'function') {
+            console.log('✅ Calling viewJournalReviewDetail...');
+            window.viewJournalReviewDetail(journalId, viewType);
+            console.log('✅ viewJournalReviewDetail called');
+        } else {
+            console.error('❌ viewJournalReviewDetail is not a function!');
+            alert('학술지 심사 상세 렌더링 함수를 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+        }
+    }, 50);
+}
+
+function closeJournalReviewDetailScreen() {
+    const detailScreen = document.getElementById('journal-review-detail-screen');
+    if (detailScreen) {
+        detailScreen.remove();
+    }
+
+    // 목록 화면 다시 표시
+    const mainContent = document.getElementById('journal-main-content');
+    if (mainContent) {
+        mainContent.style.display = 'block';
+    }
+
+    // 목록 재렌더링 (변경사항 반영)
+    if (typeof renderJournalReviewList === 'function') {
+        renderJournalReviewList();
+    }
+}
+
 // 전역 export
 window.initJournalReview = initJournalReview;
 window.searchJournalReviews = searchJournalReviews;
@@ -409,5 +476,7 @@ window.downloadJournalPdf = downloadJournalPdf;
 window.toggleSelectAllJournals = toggleSelectAllJournals;
 window.sendNotificationToSelectedJournals = sendNotificationToSelectedJournals;
 window.confirmSendJournalNotification = confirmSendJournalNotification;
+window.openJournalReviewDetail = openJournalReviewDetail;
+window.closeJournalReviewDetailScreen = closeJournalReviewDetailScreen;
 
 console.log('✅ 학술지 심사 목록 모듈 로드 완료');
