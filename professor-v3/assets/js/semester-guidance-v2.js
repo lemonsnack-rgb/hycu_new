@@ -105,8 +105,10 @@ function closeSemesterGuidanceModal() {
 
 // ==================== 계획 생성 폼 렌더링 ====================
 function renderPlanCreationForm(student) {
+    const advisors = DataService.getStudentAdvisors(currentStudentIdV2);
+
     return `
-        <div class="feedback-detail-content">
+        <div class="feedback-detail-content" style="max-width: 1400px;">
             <!-- 헤더 -->
             <div class="px-6 py-3 border-b bg-white">
                 <div class="flex items-center justify-between">
@@ -121,41 +123,91 @@ function renderPlanCreationForm(student) {
             </div>
 
             <!-- 학생 정보 -->
-            <div class="px-6 py-3 border-b bg-gray-50">
-                <div class="text-xs text-gray-700">
-                    <span class="font-semibold">학번:</span> ${student.studentId}
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold">성명:</span> ${student.name}
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold">학과:</span> ${student.major}
-                    <span class="mx-2 text-gray-400">|</span>
-                    <span class="font-semibold">학기:</span> ${currentSemesterView.year}학년도 ${currentSemesterView.semester}학기
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">${student.universityType || '일반대학원'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">${student.college || '공학계열'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${student.undergraduate || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${student.major}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${getDegreeText(student.degree)}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">${student.status || '재학'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">입학학기:</span>
+                        <span class="text-gray-900 font-medium">${student.admissionSemester || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">졸업예정:</span>
+                        <span class="text-gray-900 font-medium">${student.expectedGraduation || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${student.studentId}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${student.name}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">${advisors.map(a => a.name).join(', ')}</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- 생성 폼 -->
-            <div class="p-8">
-                <div class="max-w-md mx-auto text-center">
-                    <div class="mb-6">
-                        <p class="text-lg text-gray-600 mb-2">📋 등록된 학기별 지도계획이 없습니다</p>
-                        <p class="text-sm text-gray-500">주차 수를 선택하여 계획을 생성하세요</p>
+            <!-- 주차 설정 -->
+            <div class="px-6 py-4 bg-white border-b">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">주차 설정</h4>
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
+                        <span class="text-sm text-gray-900 font-medium">${currentSemesterView.year}학년도</span>
                     </div>
-
-                    <div class="mb-6">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">주차 수 *</label>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 min-w-[60px]">학기:</label>
+                        <span class="text-sm text-gray-900 font-medium">${currentSemesterView.semester}학기</span>
+                    </div>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <label class="text-sm text-gray-700 font-medium">주차 수:</label>
                         <select id="week-count-select"
-                                class="w-full border border-gray-300 rounded px-4 py-2 text-center text-lg">
+                                class="border border-gray-300 rounded px-4 py-2 text-sm bg-white">
                             ${Array.from({length: 20}, (_, i) => i + 1).map(week =>
                                 `<option value="${week}" ${week === 15 ? 'selected' : ''}>${week}주</option>`
                             ).join('')}
                         </select>
-                        <p class="text-xs text-gray-500 mt-1">1주 ~ 20주 사이로 선택하세요</p>
+                        <button onclick="executeCreatePlan()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
+                            계획 생성
+                        </button>
                     </div>
+                </div>
+            </div>
 
-                    <button onclick="executeCreatePlan()"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded text-base font-medium">
-                        계획 생성
-                    </button>
+            <!-- 안내 메시지 -->
+            <div class="p-8">
+                <div class="max-w-2xl mx-auto text-center">
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-8">
+                        <p class="text-lg text-gray-600 mb-2">📋 등록된 학기별 지도계획이 없습니다</p>
+                        <p class="text-sm text-gray-500">위에서 주차 수를 선택하고 '계획 생성' 버튼을 클릭하세요</p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -338,7 +390,7 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
                                 class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-sm font-medium">
                             계획 승인
                         </button>
-                        <button onclick="resetTotalWeeksInModal()"
+                        <button onclick="event.stopPropagation(); resetTotalWeeksInModal();"
                                 class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
                             계획 초기화
                         </button>
@@ -387,22 +439,23 @@ function resetTotalWeeksInModal() {
     console.log('  - currentStudentIdV2:', currentStudentIdV2);
     console.log('  - currentSemesterView:', currentSemesterView);
 
-    // 현재 학기 계획 조회
-    const allPlans = DataService.getAllSemesterPlans(currentStudentIdV2);
-    const currentPlan = allPlans.find(p =>
-        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
+    // getSemesterPlan을 사용하여 현재 학기 계획 조회
+    const semesterPlan = DataService.getSemesterPlan(
+        currentStudentIdV2,
+        currentSemesterView.year,
+        currentSemesterView.semester
     );
 
-    console.log('  - currentPlan:', currentPlan);
+    console.log('  - semesterPlan:', semesterPlan);
 
-    // 주차 수 계산
-    const weekCount = currentPlan?.weeks?.length || 0;
-    console.log('  - 주차 수:', weekCount);
+    // 주차 수 계산 (totalWeeks 사용)
+    const weekCount = semesterPlan?.totalWeeks || 0;
+    console.log('  - 주차 수 (totalWeeks):', weekCount);
 
     // 계획과 실적 건수 계산
     let totalItems = 0;
-    if (currentPlan?.weeks) {
-        currentPlan.weeks.forEach(week => {
+    if (semesterPlan?.weeks) {
+        semesterPlan.weeks.forEach(week => {
             // 계획이 있으면 +1
             if (week.plannedContent && week.plannedContent.trim()) {
                 totalItems++;
@@ -416,10 +469,23 @@ function resetTotalWeeksInModal() {
 
     console.log('  - 총 계획/실적 건수:', totalItems);
 
-    if (!confirm(`⚠️ 계획 초기화 확인\n\n현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`)) {
-        console.log('❌ 사용자가 초기화 취소');
-        return;
-    }
+    // setTimeout으로 확인 대화상자 실행을 지연시켜 이벤트 전파 문제 방지
+    setTimeout(() => {
+        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
+
+        console.log('  - 사용자 확인 결과:', confirmed);
+
+        if (!confirmed) {
+            console.log('❌ 사용자가 초기화 취소');
+            return;
+        }
+
+        executeResetPlan();
+    }, 100);
+}
+
+// 실제 초기화 실행 함수 분리
+function executeResetPlan() {
 
     console.log('✅ 사용자가 초기화 확인');
 
