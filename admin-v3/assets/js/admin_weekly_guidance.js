@@ -1,6 +1,12 @@
 // ===================================
 // 관리자용 학기별 지도 계획 (교수용 화면과 동일한 모달 구조)
-// Version: 20260113003
+// Version: 20260113004
+//
+// 변경사항 (v20260113004):
+// - UI를 교수용 화면과 완전히 동기화
+// - 버튼 스타일, 레이아웃, 테이블 컬럼 사이즈 통일
+// - 계획 초기화 버튼 색상 변경 (bg-gray-600)
+// - 버튼 패딩 통일 (px-5 py-2)
 //
 // 변경사항 (v20260113003):
 // - DataService 함수 확장 추가 (getSemesterPlan, getAllSemesterPlans, saveSemesterPlan 등)
@@ -647,17 +653,9 @@ function renderAdminSemesterDetailContent(student, allPlans, currentPlan, totalW
                 </div>
             </div>
 
-            <!-- 학기 정보 및 제어 -->
-            <div class="px-6 py-4 border-b bg-white">
-                <div class="flex items-center justify-between mb-3">
-                    <h4 class="text-sm font-semibold text-gray-700">학기별 지도 계획</h4>
-                    <div class="flex items-center gap-3">
-                        ${isApproved ? `
-                            <span class="text-sm px-3 py-1 bg-green-100 text-green-700 rounded font-medium">✓ 승인완료</span>
-                        ` : ''}
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
+            <!-- 학기 선택 및 버튼 (교수용과 완전히 동일한 레이아웃) -->
+            <div class="px-6 py-3 bg-white border-b">
+                <div class="flex items-center gap-6">
                     <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
                         <select id="admin-select-year" onchange="changeAdminSemesterViewInModal()"
@@ -677,45 +675,51 @@ function renderAdminSemesterDetailContent(student, allPlans, currentPlan, totalW
                                 .join('')}
                         </select>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-600">총 주차:</span>
-                        <span class="text-sm text-gray-900 font-medium">${totalWeeks}주</span>
-                    </div>
-                    <div class="ml-auto flex items-center gap-2">
+                    ${isApproved ? `
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                ✓ 승인됨
+                            </span>
+                        </div>
+                    ` : ''}
+                    <div class="flex items-center gap-3 ml-auto">
                         ${!isApproved ? `
+                            <!-- 미승인 상태: 저장, 초기화 가능 (관리자는 승인 권한 없음) -->
                             <button onclick="saveAllAdminWeekPlans()"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium">
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
                                 전체 저장
                             </button>
-                        ` : ''}
-                        <button onclick="${isApproved ? 'alertAdminApprovedPlanEdit()' : 'resetAdminTotalWeeksInModal()'}"
-                                class="${isApproved ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-600 hover:bg-orange-700'} text-white px-4 py-2 rounded text-sm font-medium"
-                                ${isApproved ? 'disabled' : ''}>
-                            계획 초기화
-                        </button>
+                            <button onclick="event.stopPropagation(); resetAdminTotalWeeksInModal();"
+                                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
+                                계획 초기화
+                            </button>
+                        ` : `
+                            <!-- 승인된 상태: 초기화 버튼 비활성화 -->
+                            <button onclick="alertAdminApprovedPlanEdit()"
+                                    class="bg-gray-400 cursor-not-allowed text-white px-4 py-2 rounded text-sm font-medium"
+                                    disabled>
+                                계획 초기화
+                            </button>
+                        `}
                     </div>
                 </div>
             </div>
 
-            <!-- 주차별 테이블 -->
-            <div class="px-6 py-4">
-                <div class="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full border-collapse border border-gray-300">
-                            <thead>
-                                <tr class="bg-gray-50">
-                                    <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 80px;">주차</th>
-                                    <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">계획내용</th>
-                                    <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">실행내용</th>
-                                    <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 100px;">교수명</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                ${weeks.map(week => renderAdminWeekRow(week, isApproved)).join('')}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+            <!-- 주차별 테이블 (스크롤 가능, 교수용과 동일) -->
+            <div class="p-6" style="max-height: calc(100vh - 280px); overflow-y: auto;">
+                <table class="min-w-full border-collapse border border-gray-300">
+                    <thead>
+                        <tr class="bg-gray-50">
+                            <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 80px;">주차</th>
+                            <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 35%;">계획내용</th>
+                            <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 50%;">실행내용</th>
+                            <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 100px;">교수명</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${weeks.map(week => renderAdminWeekRow(week, isApproved)).join('')}
+                    </tbody>
+                </table>
             </div>
         </div>
     `;
