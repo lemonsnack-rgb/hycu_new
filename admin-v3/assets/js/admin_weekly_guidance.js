@@ -224,7 +224,9 @@ function showAdminGuidanceDetail(studentId) {
     currentAdminStudentId = studentId;
     console.log('📝 currentAdminStudentId 설정:', currentAdminStudentId);
 
-    const student = DataService.getStudentDetail(studentId);
+    // appData.weeklyGuidance.guidancePairs에서 학생 정보 가져오기
+    const pair = appData.weeklyGuidance.guidancePairs.find(p => p.student.studentId === studentId);
+    const student = pair ? pair.student : null;
     console.log('👤 학생 정보:', student);
 
     if (!student) {
@@ -736,7 +738,9 @@ function refreshAdminModalContent() {
     const modal = document.getElementById('admin-guidance-modal');
     if (!modal) return;
 
-    const student = DataService.getStudentDetail(currentAdminStudentId);
+    // appData.weeklyGuidance.guidancePairs에서 학생 정보 가져오기
+    const pair = appData.weeklyGuidance.guidancePairs.find(p => p.student.studentId === currentAdminStudentId);
+    const student = pair ? pair.student : null;
     if (!student) return;
 
     const allPlans = DataService.getAllSemesterPlans(currentAdminStudentId);
