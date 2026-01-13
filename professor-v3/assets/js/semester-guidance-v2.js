@@ -264,46 +264,82 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
                 </div>
             </div>
 
-            <!-- 학생 정보 및 학기 선택 -->
-            <div class="px-6 py-3 border-b bg-gray-50">
-                <div class="flex items-center justify-between">
-                    <div class="text-xs text-gray-700">
-                        <span class="font-semibold">학번:</span> ${student.studentId}
-                        <span class="mx-2 text-gray-400">|</span>
-                        <span class="font-semibold">성명:</span> ${student.name}
-                        <span class="mx-2 text-gray-400">|</span>
-                        <span class="font-semibold">학과:</span> ${student.major}
+            <!-- 학생 정보 -->
+            <div class="px-6 py-4 border-b bg-gray-50">
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
+                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                        <span class="text-gray-900 font-medium">${student.universityType || '일반대학원'}</span>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs text-gray-600">학년도:</label>
-                            <select id="select-year" onchange="changeSemesterViewInModal()"
-                                    class="border border-gray-300 rounded px-2 py-1 text-xs bg-white">
-                                ${Array.from(new Set(availableSemesters.map(s => s.year)))
-                                    .map(y => `<option value="${y}" ${y === currentSemesterView.year ? 'selected' : ''}>${y}학년도</option>`)
-                                    .join('')}
-                            </select>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <label class="text-xs text-gray-600">학기:</label>
-                            <select id="select-semester" onchange="changeSemesterViewInModal()"
-                                    class="border border-gray-300 rounded px-2 py-1 text-xs bg-white">
-                                ${availableSemesters
-                                    .filter(s => s.year === currentSemesterView.year)
-                                    .map(s => `<option value="${s.semester}" ${s.semester === currentSemesterView.semester ? 'selected' : ''}>${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
-                                    .join('')}
-                            </select>
-                        </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                        <span class="text-gray-900 font-medium">${student.college || '공학계열'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                        <span class="text-gray-900 font-medium">${student.undergraduate || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                        <span class="text-gray-900 font-medium">${student.major}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                        <span class="text-gray-900 font-medium">${getDegreeText(student.degree)}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                        <span class="text-gray-900 font-medium">${student.status || '재학'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                        <span class="text-gray-900 font-medium">${student.studentId}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                        <span class="text-gray-900 font-medium">${student.name}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                        <span class="text-gray-900 font-medium">${advisors.map(a => a.name).join(', ')}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 학기 선택 및 버튼 -->
+            <div class="px-6 py-3 bg-white border-b">
+                <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
+                        <select id="select-year" onchange="changeSemesterViewInModal()"
+                                class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                            ${Array.from(new Set(availableSemesters.map(s => s.year)))
+                                .map(y => `<option value="${y}" ${y === currentSemesterView.year ? 'selected' : ''}>${y}학년도</option>`)
+                                .join('')}
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm text-gray-600 min-w-[60px]">학기:</label>
+                        <select id="select-semester" onchange="changeSemesterViewInModal()"
+                                class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                            ${availableSemesters
+                                .filter(s => s.year === currentSemesterView.year)
+                                .map(s => `<option value="${s.semester}" ${s.semester === currentSemesterView.semester ? 'selected' : ''}>${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
+                                .join('')}
+                        </select>
+                    </div>
+                    <div class="flex items-center gap-3 ml-auto">
                         <button onclick="saveAllWeekPlans()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-xs font-medium">
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
                             전체 저장
                         </button>
                         <button onclick="approveSemesterPlan()"
-                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded text-xs font-medium">
+                                class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-sm font-medium">
                             계획 승인
                         </button>
                         <button onclick="resetTotalWeeksInModal()"
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1.5 rounded text-xs font-medium">
+                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
                             계획 초기화
                         </button>
                     </div>
@@ -311,7 +347,7 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
             </div>
 
             <!-- 주차별 테이블 (스크롤 가능) -->
-            <div class="p-6" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+            <div class="p-6" style="max-height: calc(100vh - 280px); overflow-y: auto;">
                 ${renderWeeklyCards(weeks, advisors, currentProf, currentPlan)}
             </div>
         </div>
@@ -347,37 +383,64 @@ function changeSemesterViewInModal() {
 
 // 모달 내 계획 초기화
 function resetTotalWeeksInModal() {
+    console.log('🔄 resetTotalWeeksInModal 호출됨');
+    console.log('  - currentStudentIdV2:', currentStudentIdV2);
+    console.log('  - currentSemesterView:', currentSemesterView);
+
     const semesterPlan = DataService.getSemesterPlan(
         currentStudentIdV2,
         currentSemesterView.year,
         currentSemesterView.semester
     );
+    console.log('  - semesterPlan:', semesterPlan);
+
     const currentWeeks = semesterPlan?.totalWeeks || 0;
     const plans = semesterPlan?.plans || [];
+    console.log('  - currentWeeks:', currentWeeks);
+    console.log('  - plans.length:', plans.length);
 
     if (!confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`)) {
+        console.log('❌ 사용자가 초기화 취소');
         return;
     }
 
+    console.log('✅ 사용자가 초기화 확인');
+
     // 초기화 후 생성 폼 표시
     const modal = document.getElementById('semester-guidance-modal');
-    if (!modal) return;
+    if (!modal) {
+        console.error('❌ 모달을 찾을 수 없습니다');
+        return;
+    }
 
     const student = DataService.getStudentDetail(currentStudentIdV2);
-    if (!student) return;
+    if (!student) {
+        console.error('❌ 학생 정보를 찾을 수 없습니다');
+        return;
+    }
+
+    console.log('✅ 데이터 삭제 시작');
 
     // 데이터 삭제
-    DataService.resetSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester,
-        0 // 0으로 설정하여 계획 완전 삭제
-    );
+    try {
+        DataService.resetSemesterPlan(
+            currentStudentIdV2,
+            currentSemesterView.year,
+            currentSemesterView.semester,
+            0 // 0으로 설정하여 계획 완전 삭제
+        );
+        console.log('✅ 데이터 삭제 완료');
+    } catch (error) {
+        console.error('❌ 데이터 삭제 실패:', error);
+        showToast('계획 초기화에 실패했습니다.', 'error');
+        return;
+    }
 
     // 생성 폼으로 전환
+    console.log('✅ 생성 폼으로 전환');
     modal.innerHTML = renderPlanCreationForm(student);
 
-    showToast('계획이 초기화되었습니다. 새로운 주차 수를 입력하세요.', 'success');
+    showToast('계획이 초기화되었습니다. 새로운 주차 수를 선택하세요.', 'success');
 }
 
 // ==================== 주차별 테이블 렌더링 ====================
