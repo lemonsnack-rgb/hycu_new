@@ -806,7 +806,23 @@ const REVIEW_EVALUATIONS = [
             improvements: '결과 분석 부분을 좀 더 심화할 필요 있음',
             conclusion: '전반적으로 우수한 연구. 최종 논문으로 발전 가능성 높음'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_001',
+                name: '심사의견서_김교수.hwp',
+                size: 1536000,
+                type: 'hwp'
+            },
+            {
+                id: 'FILE_EVAL_002',
+                name: '세부평가표.pdf',
+                size: 820000,
+                type: 'pdf'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-15 14:30:00',
         createdAt: '2025-11-10 10:00:00'
@@ -1303,6 +1319,28 @@ const REVIEW_RESULTS = [
         chairComment: '모든 심사위원의 평가가 우수함. 지적사항 보완 후 최종 논문 진행 승인',
         chairDecidedAt: '2025-11-17 16:00:00',
         chairDecidedBy: 'P003',
+
+        // 위원장 최종 결정 첨부 파일
+        chairDecisionFiles: [
+            {
+                id: 'FILE_CHAIR_001',
+                fileName: '최종심사의견서.hwp',
+                fileSize: 2560000,
+                fileType: 'hwp',
+                uploadedAt: '2025-11-17T16:00:00',
+                uploadedBy: 'P003',
+                fileUrl: '/uploads/review/RA002/최종심사의견서.hwp'
+            },
+            {
+                id: 'FILE_CHAIR_002',
+                fileName: '심사결과종합.pdf',
+                fileSize: 1024000,
+                fileType: 'pdf',
+                uploadedAt: '2025-11-17T16:00:00',
+                uploadedBy: 'P003',
+                fileUrl: '/uploads/review/RA002/심사결과종합.pdf'
+            }
+        ],
 
         finalDecision: '승인',
         

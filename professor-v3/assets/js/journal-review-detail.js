@@ -5,6 +5,10 @@
 
 console.log('🔄 journal-review-detail.js 로드 시작...');
 
+// ==================== 파일 첨부 전역 변수 ====================
+let journalEvaluationFiles = []; // 학술지 심사위원 평가 파일
+let journalChairFiles = []; // 학술지 위원장 최종 결정 파일
+
 // 평가 항목별 설명
 function getItemDescription(itemName) {
     const descriptions = {
@@ -247,6 +251,32 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
                               placeholder="평가에 대한 종합 의견을 작성해주세요"></textarea>
                 </div>
 
+                <!-- 파일 첨부 -->
+                <div class="mt-6">
+                    <h4 class="text-sm font-bold text-gray-800 mb-3">파일 첨부</h4>
+                    <p class="text-sm text-gray-600 mb-3">평가 관련 파일을 첨부할 수 있습니다. (선택사항)</p>
+
+                    <div class="mb-3">
+                        <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                            <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L9 8m4-4v12"></path>
+                            </svg>
+                            파일 선택
+                            <input type="file"
+                                   id="journal-evaluation-file-input"
+                                   onchange="handleJournalEvaluationFileSelect(event)"
+                                   accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                                   multiple
+                                   class="hidden">
+                        </label>
+                        <span class="ml-3 text-xs text-gray-500">허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt (최대 30MB)</span>
+                    </div>
+
+                    <div id="journal-evaluation-file-list" class="space-y-2">
+                        <p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>
+                    </div>
+                </div>
+
                 <!-- 버튼 -->
                 <div class="mt-6 flex justify-end gap-3">
                     <button id="save-draft-btn" class="btn btn-secondary" onclick="saveJournalDraft(${journalId})">
@@ -399,6 +429,7 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
                                     ${reviewer.professorName} (${roleText})
                                 </p>
                                 <p class="text-sm text-gray-700">${reviewer.comment}</p>
+                                ${reviewer.files && reviewer.files.length > 0 ? renderJournalUploadedFileList(reviewer.files) : ''}
                             </div>
                         `;
                     } else if (reviewer.score === null || reviewer.score === undefined) {
@@ -528,6 +559,35 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
                         <textarea id="journal-chair-comment" rows="4" ${disabledAttr}
                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm ${chairSubmitted ? 'bg-white text-gray-900' : isDisabled ? 'bg-gray-100 text-gray-500' : 'bg-white'}"
                                   placeholder="${!allSubmitted ? '모든 심사위원의 평가가 완료되면 입력할 수 있습니다' : chairSubmitted ? '' : '최종 심사 의견을 입력하세요'}">${chairComment}</textarea>
+                    </div>
+
+                    ${chairSubmitted && journal.chairDecision.files && journal.chairDecision.files.length > 0 ? renderJournalUploadedFileList(journal.chairDecision.files) : ''}
+
+                    <!-- 파일 첨부 -->
+                    <div class="mb-6">
+                        <h4 class="text-sm font-bold text-gray-800 mb-3">파일 첨부</h4>
+                        <p class="text-sm text-gray-600 mb-3">최종 결정 관련 파일을 첨부할 수 있습니다. (선택사항)</p>
+
+                        <div class="mb-3">
+                            <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors ${isDisabled ? 'opacity-50 cursor-not-allowed' : ''}">
+                                <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L9 8m4-4v12"></path>
+                                </svg>
+                                파일 선택
+                                <input type="file"
+                                       id="journal-chair-file-input"
+                                       onchange="handleJournalChairFileSelect(event)"
+                                       accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                                       multiple
+                                       ${disabledAttr}
+                                       class="hidden">
+                            </label>
+                            <span class="ml-3 text-xs text-gray-500">허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt (최대 30MB)</span>
+                        </div>
+
+                        <div id="journal-chair-file-list" class="space-y-2">
+                            <p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>
+                        </div>
                     </div>
 
                     <div class="flex justify-end">
@@ -719,9 +779,20 @@ function submitJournalEvaluation(journalId) {
         return;
     }
 
-    // 평가 저장
+    // 평가 저장 (파일 포함)
     if (typeof updateJournalEvaluation === 'function') {
-        updateJournalEvaluation(journalId, scores, comment, itemComments);
+        // 파일 데이터를 서버 전송 형식으로 변환
+        const fileData = journalEvaluationFiles.map(f => ({
+            id: f.id,
+            name: f.name,
+            size: f.size,
+            type: f.type
+        }));
+
+        updateJournalEvaluation(journalId, scores, comment, itemComments, fileData);
+
+        // 파일 배열 초기화
+        journalEvaluationFiles = [];
 
         // 모달 닫기
         const modalBackdrop = document.querySelector('.modal-backdrop');
@@ -798,21 +869,34 @@ function submitJournalChairDecision(journalId) {
         return;
     }
 
+    // 파일 데이터를 서버 전송 형식으로 변환
+    const fileData = journalChairFiles.map(f => ({
+        id: f.id,
+        name: f.name,
+        size: f.size,
+        type: f.type
+    }));
+
     // 데이터 저장
     const journal = getJournalReviews().find(j => j.id === journalId);
     if (journal) {
         journal.chairDecision = {
             decision: journalSelectedDecision,  // 영어 값으로 저장 (approve/hold/reject)
-            comment: comment
+            comment: comment,
+            files: fileData  // 파일 데이터 포함
         };
         journal.status = '심사완료';
 
         console.log('✅ 위원장 최종 결정 저장:', {
             journalId,
             decision: journalSelectedDecision,
-            comment
+            comment,
+            files: fileData
         });
     }
+
+    // 파일 배열 초기화
+    journalChairFiles = [];
 
     // 모달 닫기
     const modalBackdrop = document.querySelector('.modal-backdrop');
@@ -832,6 +916,222 @@ function submitJournalChairDecision(journalId) {
     }
 }
 
+// ==================== 파일 첨부 관련 함수 ====================
+/**
+ * 학술지 심사위원 평가 파일 선택 핸들러
+ */
+function handleJournalEvaluationFileSelect(event) {
+    const files = Array.from(event.target.files);
+    const allowedExtensions = ['hwp', 'hwpx', 'doc', 'docx', 'ppt', 'pptx', 'pdf', 'txt'];
+    const maxSize = 30 * 1024 * 1024; // 30MB
+
+    for (const file of files) {
+        // 파일 확장자 검증
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(ext)) {
+            alert(`${file.name}: 허용되지 않는 파일 형식입니다.\n허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt`);
+            continue;
+        }
+
+        // 파일 크기 검증
+        if (file.size > maxSize) {
+            alert(`${file.name}: 파일 크기가 30MB를 초과합니다.`);
+            continue;
+        }
+
+        // 파일 추가 (중복 체크)
+        const exists = journalEvaluationFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) {
+            journalEvaluationFiles.push({
+                id: `FILE_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: file.name,
+                size: file.size,
+                type: ext,
+                file: file // 실제 파일 객체
+            });
+        }
+    }
+
+    // 파일 목록 렌더링
+    renderJournalEvaluationFileList();
+
+    // input 초기화
+    event.target.value = '';
+}
+
+/**
+ * 학술지 심사위원 평가 파일 목록 렌더링
+ */
+function renderJournalEvaluationFileList() {
+    const container = document.getElementById('journal-evaluation-file-list');
+    if (!container) return;
+
+    if (journalEvaluationFiles.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>';
+        return;
+    }
+
+    const html = journalEvaluationFiles.map(file => {
+        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+        return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                        <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                    </div>
+                </div>
+                <button onclick="removeJournalEvaluationFile('${file.id}')"
+                        class="text-red-600 hover:text-red-800 p-1 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+/**
+ * 학술지 심사위원 평가 파일 삭제
+ */
+function removeJournalEvaluationFile(fileId) {
+    journalEvaluationFiles = journalEvaluationFiles.filter(f => f.id !== fileId);
+    renderJournalEvaluationFileList();
+}
+
+/**
+ * 학술지 위원장 최종 결정 파일 선택 핸들러
+ */
+function handleJournalChairFileSelect(event) {
+    const files = Array.from(event.target.files);
+    const allowedExtensions = ['hwp', 'hwpx', 'doc', 'docx', 'ppt', 'pptx', 'pdf', 'txt'];
+    const maxSize = 30 * 1024 * 1024; // 30MB
+
+    for (const file of files) {
+        // 파일 확장자 검증
+        const ext = file.name.split('.').pop().toLowerCase();
+        if (!allowedExtensions.includes(ext)) {
+            alert(`${file.name}: 허용되지 않는 파일 형식입니다.\n허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt`);
+            continue;
+        }
+
+        // 파일 크기 검증
+        if (file.size > maxSize) {
+            alert(`${file.name}: 파일 크기가 30MB를 초과합니다.`);
+            continue;
+        }
+
+        // 파일 추가 (중복 체크)
+        const exists = journalChairFiles.some(f => f.name === file.name && f.size === file.size);
+        if (!exists) {
+            journalChairFiles.push({
+                id: `FILE_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+                name: file.name,
+                size: file.size,
+                type: ext,
+                file: file // 실제 파일 객체
+            });
+        }
+    }
+
+    // 파일 목록 렌더링
+    renderJournalChairFileList();
+
+    // input 초기화
+    event.target.value = '';
+}
+
+/**
+ * 학술지 위원장 최종 결정 파일 목록 렌더링
+ */
+function renderJournalChairFileList() {
+    const container = document.getElementById('journal-chair-file-list');
+    if (!container) return;
+
+    if (journalChairFiles.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>';
+        return;
+    }
+
+    const html = journalChairFiles.map(file => {
+        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+        return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                        <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                    </div>
+                </div>
+                <button onclick="removeJournalChairFile('${file.id}')"
+                        class="text-red-600 hover:text-red-800 p-1 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+/**
+ * 학술지 위원장 최종 결정 파일 삭제
+ */
+function removeJournalChairFile(fileId) {
+    journalChairFiles = journalChairFiles.filter(f => f.id !== fileId);
+    renderJournalChairFileList();
+}
+
+/**
+ * 업로드된 파일 목록 렌더링 (읽기 전용)
+ */
+function renderJournalUploadedFileList(files) {
+    if (!files || files.length === 0) {
+        return '';
+    }
+
+    return `
+        <div class="mt-6">
+            <h4 class="text-sm font-bold text-gray-800 mb-3">첨부 파일</h4>
+            <div class="space-y-2">
+                ${files.map(file => {
+                    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    return `
+                        <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                            <div class="flex items-center gap-3 flex-1 min-w-0">
+                                <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                                    <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                                </div>
+                            </div>
+                            <a href="#" onclick="event.preventDefault(); alert('파일 다운로드 기능은 서버 연동 후 사용 가능합니다.');"
+                               class="text-[#6A0028] hover:text-[#8A0034] p-1 flex-shrink-0">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+        </div>
+    `;
+}
+
 // 전역으로 노출
 try {
     window.viewJournalReviewDetail = viewJournalReviewDetail;
@@ -840,11 +1140,20 @@ try {
     window.saveJournalDraft = saveJournalDraft;
     window.selectJournalDecision = selectJournalDecision;
     window.submitJournalChairDecision = submitJournalChairDecision;
+    window.handleJournalEvaluationFileSelect = handleJournalEvaluationFileSelect;
+    window.renderJournalEvaluationFileList = renderJournalEvaluationFileList;
+    window.removeJournalEvaluationFile = removeJournalEvaluationFile;
+    window.handleJournalChairFileSelect = handleJournalChairFileSelect;
+    window.renderJournalChairFileList = renderJournalChairFileList;
+    window.removeJournalChairFile = removeJournalChairFile;
+    window.renderJournalUploadedFileList = renderJournalUploadedFileList;
 
     console.log('✅ 학술지 상세보기 (위원/위원장 분리) 로드 완료');
     console.log('   - viewJournalReviewDetail:', typeof window.viewJournalReviewDetail);
     console.log('   - updateJournalTotalScore:', typeof window.updateJournalTotalScore);
     console.log('   - submitJournalEvaluation:', typeof window.submitJournalEvaluation);
+    console.log('   - handleJournalEvaluationFileSelect:', typeof window.handleJournalEvaluationFileSelect);
+    console.log('   - handleJournalChairFileSelect:', typeof window.handleJournalChairFileSelect);
 } catch (error) {
     console.error('❌ journal-review-detail.js 로드 중 에러:', error);
 }

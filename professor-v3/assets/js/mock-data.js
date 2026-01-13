@@ -1582,7 +1582,21 @@ const journalReviews = [
                 status: '완료',
                 score: 85,
                 itemScores: { 1: 18, 2: 17, 3: 17, 4: 16, 5: 17 },
-                comment: '연구 주제가 독창적이며 방법론이 탄탄합니다.'
+                comment: '연구 주제가 독창적이며 방법론이 탄탄합니다.',
+                files: [
+                    {
+                        id: 'FILE_JOURNAL_001',
+                        name: '학술지심사의견서.hwp',
+                        size: 1024000,
+                        type: 'hwp'
+                    },
+                    {
+                        id: 'FILE_JOURNAL_002',
+                        name: '보충자료.pdf',
+                        size: 512000,
+                        type: 'pdf'
+                    }
+                ]
             },
             {
                 professorId: 'PROF002',
@@ -1606,8 +1620,22 @@ const journalReviews = [
             }
         ],
         chairDecision: {
-            decision: '승인',
-            comment: '모든 심사위원의 평가가 우수함. 수정 사항 반영 후 게재 승인합니다.'
+            decision: 'approve',
+            comment: '모든 심사위원의 평가가 우수함. 수정 사항 반영 후 게재 승인합니다.',
+            files: [
+                {
+                    id: 'FILE_CHAIR_JOURNAL_001',
+                    name: '위원장종합의견서.hwp',
+                    size: 2048000,
+                    type: 'hwp'
+                },
+                {
+                    id: 'FILE_CHAIR_JOURNAL_002',
+                    name: '최종심사결과.pdf',
+                    size: 1536000,
+                    type: 'pdf'
+                }
+            ]
         },
         rubric: {
             items: [
@@ -1910,17 +1938,26 @@ function getJournalReviews() {
     return journalReviews;
 }
 
-function updateJournalEvaluation(journalId, scores, comment, itemComments = {}) {
+function updateJournalEvaluation(journalId, scores, comment, itemComments = {}, files = []) {
     const journal = journalReviews.find(j => j.id === journalId);
     if (journal) {
         journal.evaluation = {
             scores: scores,
             comment: comment,
             itemComments: itemComments,
+            files: files,
             submittedAt: new Date().toISOString().split('T')[0]
         };
         journal.status = '심사완료';
         journal.progress = 100;
+
+        // 현재 사용자의 평가를 reviewers에 업데이트
+        const currentReviewer = journal.reviewers.find(r => r.professorId === 'PROF001'); // 예시로 PROF001 사용
+        if (currentReviewer) {
+            currentReviewer.comment = comment;
+            currentReviewer.files = files;
+        }
+
         return true;
     }
     return false;

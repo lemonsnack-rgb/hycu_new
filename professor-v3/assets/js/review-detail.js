@@ -52,7 +52,7 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
             </div>`;
         } else {
             // 위원장 화면 표시 (관리자 또는 위원장)
-            html += renderChairApprovalScreen(detail, allSubmitted);
+            html += renderChairApprovalScreen(detail, allSubmitted, isAdminMode);
         }
     } else {
         // 위원 화면: 평가표 입력만
@@ -311,6 +311,27 @@ function renderEvaluationForm(template, existingEvaluation) {
                           placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment?.combined || savedData.overallComment?.conclusion || ''}</textarea>
             </div>
 
+            <!-- 평가 파일 업로드 -->
+            <div class="mt-6 bg-white border border-gray-300 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가 파일 첨부</h4>
+                <p class="text-sm text-gray-600 mb-3">평가와 관련된 파일을 첨부할 수 있습니다. (선택사항)</p>
+                <p class="text-xs text-gray-500 mb-3">
+                    허용 파일: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt | 최대 용량: 30MB/파일
+                </p>
+
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        파일 선택
+                        <input type="file" id="evaluation-file-input"
+                               onchange="handleEvaluationFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple class="hidden">
+                    </label>
+                </div>
+
+                <div id="evaluation-file-list"></div>
+            </div>
+
             <!-- 버튼 -->
             <div class="mt-6 flex justify-end gap-3">
                 <button id="save-draft-btn" class="btn btn-secondary">
@@ -411,6 +432,27 @@ function renderPassFailForm(template, savedData) {
                           placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
             </div>
 
+            <!-- 평가 파일 업로드 -->
+            <div class="mt-6 bg-white border border-gray-300 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가 파일 첨부</h4>
+                <p class="text-sm text-gray-600 mb-3">평가와 관련된 파일을 첨부할 수 있습니다. (선택사항)</p>
+                <p class="text-xs text-gray-500 mb-3">
+                    허용 파일: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt | 최대 용량: 30MB/파일
+                </p>
+
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        파일 선택
+                        <input type="file" id="evaluation-file-input"
+                               onchange="handleEvaluationFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple class="hidden">
+                    </label>
+                </div>
+
+                <div id="evaluation-file-list"></div>
+            </div>
+
             <!-- 버튼 -->
             <div class="mt-6 flex justify-end gap-3">
                 <button id="save-draft-btn" class="btn btn-secondary">
@@ -500,6 +542,27 @@ function renderGradeForm(template, savedData) {
                 <textarea id="grade-overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm"
                           rows="4"
                           placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
+            </div>
+
+            <!-- 평가 파일 업로드 -->
+            <div class="mt-6 bg-white border border-gray-300 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가 파일 첨부</h4>
+                <p class="text-sm text-gray-600 mb-3">평가와 관련된 파일을 첨부할 수 있습니다. (선택사항)</p>
+                <p class="text-xs text-gray-500 mb-3">
+                    허용 파일: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt | 최대 용량: 30MB/파일
+                </p>
+
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        파일 선택
+                        <input type="file" id="evaluation-file-input"
+                               onchange="handleEvaluationFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple class="hidden">
+                    </label>
+                </div>
+
+                <div id="evaluation-file-list"></div>
             </div>
 
             <!-- 버튼 -->
@@ -676,6 +739,37 @@ function renderSubmittedEvaluation(template, evaluation) {
                               placeholder="전체적인 평가 의견을 작성해주세요"
                               disabled>${evaluation.overallComment || ''}</textarea>
                 </div>
+
+                <!-- 첨부 파일 (읽기 모드) -->
+                ${evaluation.files && evaluation.files.length > 0 ? `
+                <div class="mt-6">
+                    <h4 class="text-sm font-bold text-gray-800 mb-3">첨부 파일</h4>
+                    <div class="space-y-2">
+                        ${evaluation.files.map(file => {
+                            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                            return `
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                                            <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                                        </div>
+                                    </div>
+                                    <a href="#" onclick="event.preventDefault(); alert('파일 다운로드 기능은 서버 연동 후 사용 가능합니다.');"
+                                       class="text-[#6A0028] hover:text-[#8A0034] p-1 flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
             </div>
         `;
     }
@@ -809,6 +903,37 @@ function renderSubmittedEvaluation(template, evaluation) {
                           placeholder="평가에 대한 종합 의견을 작성해주세요"
                           disabled>${evaluation.overallComment?.combined || evaluation.overallComment?.conclusion || ''}</textarea>
             </div>
+
+            <!-- 첨부 파일 (읽기 모드) -->
+            ${evaluation.files && evaluation.files.length > 0 ? `
+            <div class="mt-6">
+                <h4 class="text-sm font-bold text-gray-800 mb-3">첨부 파일</h4>
+                <div class="space-y-2">
+                    ${evaluation.files.map(file => {
+                        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                        return `
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                    <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                                        <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                                    </div>
+                                </div>
+                                <a href="#" onclick="event.preventDefault(); alert('파일 다운로드 기능은 서버 연동 후 사용 가능합니다.');"
+                                   class="text-[#6A0028] hover:text-[#8A0034] p-1 flex-shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            ` : ''}
         </div>
     `;
 }
@@ -966,6 +1091,37 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                     <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
                     <textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="3" disabled>${evaluation.overallComment || ''}</textarea>
                 </div>
+
+                <!-- 첨부 파일 -->
+                ${evaluation.files && evaluation.files.length > 0 ? `
+                <div class="mt-6">
+                    <h4 class="text-sm font-bold text-gray-800 mb-3">첨부 파일</h4>
+                    <div class="space-y-2">
+                        ${evaluation.files.map(file => {
+                            const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                            return `
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                                    <div class="flex items-center gap-3 flex-1 min-w-0">
+                                        <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <div class="flex-1 min-w-0">
+                                            <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                                            <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                                        </div>
+                                    </div>
+                                    <a href="#" onclick="event.preventDefault(); alert('파일 다운로드 기능은 서버 연동 후 사용 가능합니다.');"
+                                       class="text-[#6A0028] hover:text-[#8A0034] p-1 flex-shrink-0">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                    </a>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                </div>
+                ` : ''}
             </div>
         `;
     }
@@ -1091,6 +1247,37 @@ function renderCommitteeMemberEvaluation(template, evaluation, memberNumber) {
                 <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
                 <textarea class="w-full border border-gray-300 rounded-lg p-3 text-sm bg-gray-50" rows="4" disabled>${evaluation.overallComment?.combined || evaluation.overallComment?.conclusion || ''}</textarea>
             </div>
+
+            <!-- 첨부 파일 -->
+            ${evaluation.files && evaluation.files.length > 0 ? `
+            <div class="mt-6">
+                <h4 class="text-sm font-bold text-gray-800 mb-3">첨부 파일</h4>
+                <div class="space-y-2">
+                    ${evaluation.files.map(file => {
+                        const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                        return `
+                            <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300">
+                                <div class="flex items-center gap-3 flex-1 min-w-0">
+                                    <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium text-gray-900 truncate">${file.name}</p>
+                                        <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                                    </div>
+                                </div>
+                                <a href="#" onclick="event.preventDefault(); alert('파일 다운로드 기능은 서버 연동 후 사용 가능합니다.');"
+                                   class="text-[#6A0028] hover:text-[#8A0034] p-1 flex-shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            </div>
+            ` : ''}
         </div>
     `;
 }
@@ -1338,6 +1525,8 @@ function submitEvaluation(detail) {
     if (confirm('평가를 제출하시겠습니까? 제출 후에는 수정할 수 없습니다.')) {
         if (ReviewService.submitEvaluation(currentAssignmentId, data)) {
             showToast('평가가 제출되었습니다', 'success');
+            // 파일 목록 초기화
+            evaluationFiles = [];
             renderReviewDetail(currentAssignmentId);
         } else {
             showToast('제출 중 오류가 발생했습니다', 'error');
@@ -1375,7 +1564,8 @@ function collectEvaluationData() {
             passed,
             passCount,
             totalCount,
-            overallComment: document.getElementById('passfail-overall-comment')?.value.trim() || ''
+            overallComment: document.getElementById('passfail-overall-comment')?.value.trim() || '',
+            files: evaluationFiles.map(f => ({ id: f.id, name: f.name, size: f.size, type: f.type }))
         };
     }
 
@@ -1411,7 +1601,8 @@ function collectEvaluationData() {
             evaluationType: 'grade',
             gradeResults,
             averageGrade: avgGrade,
-            overallComment: document.getElementById('grade-overall-comment')?.value.trim() || ''
+            overallComment: document.getElementById('grade-overall-comment')?.value.trim() || '',
+            files: evaluationFiles.map(f => ({ id: f.id, name: f.name, size: f.size, type: f.type }))
         };
     }
 
@@ -1444,7 +1635,8 @@ function collectEvaluationData() {
         totalScore: parseFloat(total.toFixed(1)),
         overallComment: {
             combined: document.getElementById('overall-comment')?.value.trim() || ''
-        }
+        },
+        files: evaluationFiles.map(f => ({ id: f.id, name: f.name, size: f.size, type: f.type }))
     };
 }
 
@@ -1590,9 +1782,10 @@ function viewThesisOnline(filename) {
 }
 
 // ==================== 위원장 승인 화면 ====================
-function renderChairApprovalScreen(detail, allSubmitted) {
+function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
     const result = detail.result;
     const isApproved = result && result.finalDecision;
+    const chairSubmitted = isApproved; // 위원장이 이미 결정을 제출했는지 여부
     const template = detail.template;
 
     let html = `
@@ -1861,7 +2054,6 @@ function renderChairApprovalScreen(detail, allSubmitted) {
     }
 
     // 최종 승인 영역 - 항상 표시 (평가 미완료 시 또는 제출 후 비활성화)
-    const chairSubmitted = isApproved;
     const isDisabled = !allSubmitted || chairSubmitted;
     const disabledAttr = isDisabled ? 'disabled' : '';
 
@@ -2051,10 +2243,109 @@ function submitChairDecision() {
 
 // ==================== 파일 업로드 관련 함수 ====================
 // 선택된 파일 목록 저장 (전역)
-let chairDecisionFiles = [];
+let evaluationFiles = []; // 심사위원 평가 파일
+let chairDecisionFiles = []; // 위원장 최종 결정 파일
 
 /**
- * 파일 선택 처리
+ * 심사위원 평가 파일 선택 처리
+ */
+function handleEvaluationFileSelect(event) {
+    const files = Array.from(event.target.files);
+
+    // 파일 확장자 검증
+    const allowedExtensions = ['hwp', 'hwpx', 'doc', 'docx', 'ppt', 'pptx', 'pdf', 'txt'];
+    const maxFileSize = 30 * 1024 * 1024; // 30MB in bytes
+
+    for (const file of files) {
+        // 확장자 체크
+        const fileName = file.name.toLowerCase();
+        const extension = fileName.split('.').pop();
+
+        if (!allowedExtensions.includes(extension)) {
+            showToast(`허용되지 않은 파일 형식입니다: ${file.name}\n허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt`, 'error');
+            continue;
+        }
+
+        // 파일 크기 체크
+        if (file.size > maxFileSize) {
+            showToast(`파일 크기가 30MB를 초과합니다: ${file.name}`, 'error');
+            continue;
+        }
+
+        // 중복 체크
+        const isDuplicate = evaluationFiles.some(f => f.name === file.name && f.size === file.size);
+        if (isDuplicate) {
+            showToast(`이미 선택된 파일입니다: ${file.name}`, 'warning');
+            continue;
+        }
+
+        // 파일 추가
+        evaluationFiles.push({
+            id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            file: file,
+            name: file.name,
+            size: file.size,
+            type: extension
+        });
+    }
+
+    // 파일 input 초기화 (같은 파일 재선택 가능하도록)
+    event.target.value = '';
+
+    // UI 업데이트
+    renderEvaluationFileList();
+}
+
+/**
+ * 심사위원 평가 파일 목록 렌더링
+ */
+function renderEvaluationFileList() {
+    const container = document.getElementById('evaluation-file-list');
+    if (!container) return;
+
+    if (evaluationFiles.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>';
+        return;
+    }
+
+    const html = evaluationFiles.map(fileItem => {
+        const sizeInMB = (fileItem.size / (1024 * 1024)).toFixed(2);
+        return `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded border border-gray-300 mb-2">
+                <div class="flex items-center gap-3 flex-1 min-w-0">
+                    <svg class="w-5 h-5 text-[#6A0028] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">${fileItem.name}</p>
+                        <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                    </div>
+                </div>
+                <button onclick="removeEvaluationFile('${fileItem.id}')"
+                        class="text-red-600 hover:text-red-800 p-1 flex-shrink-0 ml-2"
+                        title="삭제">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+/**
+ * 심사위원 평가 파일 제거
+ */
+function removeEvaluationFile(fileId) {
+    evaluationFiles = evaluationFiles.filter(f => f.id !== fileId);
+    renderEvaluationFileList();
+    showToast('파일이 제거되었습니다.', 'info');
+}
+
+/**
+ * 위원장 최종 결정 파일 선택 처리
  */
 function handleChairDecisionFileSelect(event) {
     const files = Array.from(event.target.files);
@@ -2186,6 +2477,9 @@ function renderUploadedFileList(files) {
 window.renderReviewDetail = renderReviewDetail;
 window.selectDecision = selectDecision;
 window.submitChairDecision = submitChairDecision;
+window.handleEvaluationFileSelect = handleEvaluationFileSelect;
+window.removeEvaluationFile = removeEvaluationFile;
+window.renderEvaluationFileList = renderEvaluationFileList;
 window.handleChairDecisionFileSelect = handleChairDecisionFileSelect;
 window.removeChairDecisionFile = removeChairDecisionFile;
 window.renderChairDecisionFileList = renderChairDecisionFileList;
