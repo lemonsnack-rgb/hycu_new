@@ -138,19 +138,18 @@ function renderPlanCreationForm(student) {
                 <div class="max-w-md mx-auto text-center">
                     <div class="mb-6">
                         <p class="text-lg text-gray-600 mb-2">📋 등록된 학기별 지도계획이 없습니다</p>
-                        <p class="text-sm text-gray-500">주차 수를 입력하여 계획을 생성하세요</p>
+                        <p class="text-sm text-gray-500">주차 수를 선택하여 계획을 생성하세요</p>
                     </div>
 
                     <div class="mb-6">
                         <label class="block text-sm font-medium text-gray-700 mb-2">주차 수 *</label>
-                        <input type="number"
-                               id="week-count-input"
-                               min="1"
-                               max="20"
-                               value="15"
-                               class="w-full border border-gray-300 rounded px-4 py-2 text-center text-lg"
-                               placeholder="1~20">
-                        <p class="text-xs text-gray-500 mt-1">1주 ~ 20주 사이로 입력하세요</p>
+                        <select id="week-count-select"
+                                class="w-full border border-gray-300 rounded px-4 py-2 text-center text-lg">
+                            ${Array.from({length: 20}, (_, i) => i + 1).map(week =>
+                                `<option value="${week}" ${week === 15 ? 'selected' : ''}>${week}주</option>`
+                            ).join('')}
+                        </select>
+                        <p class="text-xs text-gray-500 mt-1">1주 ~ 20주 사이로 선택하세요</p>
                     </div>
 
                     <button onclick="executeCreatePlan()"
@@ -165,11 +164,11 @@ function renderPlanCreationForm(student) {
 
 // ==================== 계획 생성 실행 ====================
 function executeCreatePlan() {
-    const weekCountInput = document.getElementById('week-count-input');
-    const weekCount = parseInt(weekCountInput.value);
+    const weekCountSelect = document.getElementById('week-count-select');
+    const weekCount = parseInt(weekCountSelect.value);
 
     if (!weekCount || weekCount < 1 || weekCount > 20) {
-        showToast('주차 수는 1~20 사이로 입력해주세요.', 'warning');
+        showToast('주차 수는 1~20 사이로 선택해주세요.', 'warning');
         return;
     }
 
@@ -256,18 +255,12 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
             <div class="px-6 py-3 border-b bg-white">
                 <div class="flex items-center justify-between">
                     <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
-                    <div class="flex items-center gap-3">
-                        <button onclick="resetTotalWeeksInModal()"
-                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
-                            계획 초기화
-                        </button>
-                        <button onclick="closeSemesterGuidanceModal()"
-                                class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
-                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                            </svg>
-                        </button>
-                    </div>
+                    <button onclick="closeSemesterGuidanceModal()"
+                            class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
@@ -308,6 +301,10 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
                         <button onclick="approveSemesterPlan()"
                                 class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded text-xs font-medium">
                             계획 승인
+                        </button>
+                        <button onclick="resetTotalWeeksInModal()"
+                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-1.5 rounded text-xs font-medium">
+                            계획 초기화
                         </button>
                     </div>
                 </div>
