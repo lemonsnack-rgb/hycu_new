@@ -1936,8 +1936,40 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                         ${committee.professorName} (${roleText})
                     </p>
                     <p class="text-sm text-gray-700">${evaluation.overallComment}</p>
-                </div>
             `;
+
+            // 첨부파일 표시 (있는 경우에만)
+            if (evaluation.files && evaluation.files.length > 0) {
+                html += `
+                    <div class="mt-3 pt-3 border-t border-gray-200">
+                        <p class="text-xs font-medium text-gray-600 mb-2">첨부파일:</p>
+                        <div class="space-y-1">
+                `;
+
+                evaluation.files.forEach(file => {
+                    const sizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+                    const fileIcon = getFileIcon(file.type);
+
+                    html += `
+                        <div class="flex items-center gap-2 text-xs text-gray-700">
+                            <span class="text-gray-400">${fileIcon}</span>
+                            <span class="flex-1 truncate">${file.name}</span>
+                            <span class="text-gray-500">(${sizeInMB}MB)</span>
+                            <button onclick="downloadFile('${file.id}', '${file.name}')"
+                                    class="text-[#6A0028] hover:text-[#550020] hover:underline">
+                                다운로드
+                            </button>
+                        </div>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
         } else if (!evaluation) {
             html += `
                 <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
@@ -2474,6 +2506,44 @@ function renderUploadedFileList(files) {
     }).join('');
 }
 
+// ==================== 파일 관련 유틸리티 함수 ====================
+
+/**
+ * 파일 타입에 따른 아이콘 반환
+ */
+function getFileIcon(fileType) {
+    const iconMap = {
+        'pdf': '📄',
+        'hwp': '📝',
+        'doc': '📝',
+        'docx': '📝',
+        'xls': '📊',
+        'xlsx': '📊',
+        'ppt': '📊',
+        'pptx': '📊',
+        'txt': '📄',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️',
+        'gif': '🖼️',
+        'zip': '📦',
+        'rar': '📦'
+    };
+    return iconMap[fileType?.toLowerCase()] || '📎';
+}
+
+/**
+ * 파일 다운로드 (Mock)
+ */
+function downloadFile(fileId, fileName) {
+    console.log('📥 파일 다운로드:', fileId, fileName);
+    showToast(`"${fileName}" 다운로드를 시작합니다`, 'info');
+
+    // 실제 구현 시:
+    // const downloadUrl = `/api/review/download-file/${fileId}`;
+    // window.open(downloadUrl, '_blank');
+}
+
 window.renderReviewDetail = renderReviewDetail;
 window.selectDecision = selectDecision;
 window.submitChairDecision = submitChairDecision;
@@ -2483,7 +2553,9 @@ window.renderEvaluationFileList = renderEvaluationFileList;
 window.handleChairDecisionFileSelect = handleChairDecisionFileSelect;
 window.removeChairDecisionFile = removeChairDecisionFile;
 window.renderChairDecisionFileList = renderChairDecisionFileList;
+window.getFileIcon = getFileIcon;
+window.downloadFile = downloadFile;
 
-console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-13-001');
+console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-13-002');
 console.log('   renderEvaluationForm:', typeof renderEvaluationForm);
 console.log('   renderReviewDetail:', typeof renderReviewDetail);

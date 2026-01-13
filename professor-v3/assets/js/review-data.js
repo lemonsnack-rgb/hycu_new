@@ -869,7 +869,17 @@ const REVIEW_EVALUATIONS = [
             improvements: '결과 분석을 더 깊이 있게 진행 필요',
             conclusion: '합격 수준. 지적사항 보완 필요'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_003',
+                name: '심사의견서_이교수.hwp',
+                size: 1280000,
+                type: 'hwp'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-16 16:20:00'
     },
@@ -911,7 +921,23 @@ const REVIEW_EVALUATIONS = [
             improvements: '일부 표현 개선 필요',
             conclusion: '합격 수준'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_004',
+                name: '심사평가표_한교수.pdf',
+                size: 950000,
+                type: 'pdf'
+            },
+            {
+                id: 'FILE_EVAL_005',
+                name: '보완사항_한교수.docx',
+                size: 450000,
+                type: 'docx'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-14 18:45:00'
     },
@@ -965,7 +991,23 @@ const REVIEW_EVALUATIONS = [
             improvements: '일부 참고문헌 보완 필요',
             conclusion: '우수한 최종논문. 학위 수여 권장'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_006',
+                name: '최종심사의견_이교수.pdf',
+                size: 1850000,
+                type: 'pdf'
+            },
+            {
+                id: 'FILE_EVAL_007',
+                name: '참고문헌_보완목록.xlsx',
+                size: 125000,
+                type: 'xlsx'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-03 10:00:00'
     },
@@ -1012,7 +1054,17 @@ const REVIEW_EVALUATIONS = [
             improvements: '없음',
             conclusion: '학위 수여 적극 권장'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_008',
+                name: '심사의견_김교수.hwp',
+                size: 1450000,
+                type: 'hwp'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-04 14:20:00'
     },
@@ -1059,7 +1111,9 @@ const REVIEW_EVALUATIONS = [
             improvements: '실험 결과 추가 검증 필요',
             conclusion: '합격 권장'
         },
-        
+
+        // 심사위원 평가 첨부 파일 (파일 없음)
+
         status: '제출완료',
         submittedAt: '2025-11-05 11:30:00'
     },
@@ -1106,7 +1160,23 @@ const REVIEW_EVALUATIONS = [
             improvements: '없음',
             conclusion: '우수한 논문. 합격'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_009',
+                name: '최종평가서_강교수.hwp',
+                size: 1920000,
+                type: 'hwp'
+            },
+            {
+                id: 'FILE_EVAL_010',
+                name: '연구기여도분석.pdf',
+                size: 780000,
+                type: 'pdf'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-06 16:45:00'
     },
@@ -1155,7 +1225,17 @@ const REVIEW_EVALUATIONS = [
             improvements: '결론 부분 보강 필요',
             conclusion: '합격 권장'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_011',
+                name: '심사의견서_김교수_RA006.hwp',
+                size: 1650000,
+                type: 'hwp'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-01 14:00:00'
     },
@@ -1202,7 +1282,9 @@ const REVIEW_EVALUATIONS = [
             improvements: '이론적 배경 보완',
             conclusion: '합격'
         },
-        
+
+        // 심사위원 평가 첨부 파일 (없음 - 파일 업로드 안함)
+
         status: '제출완료',
         submittedAt: '2025-11-02 10:30:00'
     },
@@ -1249,7 +1331,23 @@ const REVIEW_EVALUATIONS = [
             improvements: '없음',
             conclusion: '합격'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_012',
+                name: '분석평가_한교수.pdf',
+                size: 2100000,
+                type: 'pdf'
+            },
+            {
+                id: 'FILE_EVAL_013',
+                name: '데이터분석_검토의견.docx',
+                size: 580000,
+                type: 'docx'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-02 15:20:00'
     },
@@ -1296,7 +1394,17 @@ const REVIEW_EVALUATIONS = [
             improvements: '없음',
             conclusion: '합격'
         },
-        
+
+        // 심사위원 평가 첨부 파일
+        files: [
+            {
+                id: 'FILE_EVAL_014',
+                name: '최종평가의견_윤교수.hwp',
+                size: 1350000,
+                type: 'hwp'
+            }
+        ],
+
         status: '제출완료',
         submittedAt: '2025-11-03 09:15:00'
     }
