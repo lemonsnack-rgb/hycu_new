@@ -468,23 +468,23 @@ function resetTotalWeeksInModal() {
 
     console.log('  - 총 계획/실적 건수:', totalItems);
 
-    // 모달의 z-index를 임시로 낮춰서 confirm 대화상자가 표시되도록 함
+    // 모달을 일시적으로 숨겨서 confirm 대화상자가 표시되도록 함
     const modal = document.getElementById('semester-guidance-modal');
-    const originalZIndex = modal ? modal.style.zIndex : '500';
+    const originalDisplay = modal ? modal.style.display : '';
 
     if (modal) {
-        modal.style.zIndex = '0';
+        modal.style.display = 'none';
     }
 
-    // setTimeout으로 확인 대화상자 실행을 지연
-    setTimeout(() => {
+    // requestAnimationFrame으로 다음 프레임에 confirm 실행
+    requestAnimationFrame(() => {
         const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
 
         console.log('  - 사용자 확인 결과:', confirmed);
 
-        // z-index 복원
+        // 모달 다시 표시
         if (modal) {
-            modal.style.zIndex = originalZIndex;
+            modal.style.display = originalDisplay || '';
         }
 
         if (!confirmed) {
@@ -493,7 +493,7 @@ function resetTotalWeeksInModal() {
         }
 
         executeResetPlan();
-    }, 100);
+    });
 }
 
 // 실제 초기화 실행 함수 분리
@@ -918,20 +918,21 @@ function saveAllWeekPlans() {
 
 // ==================== 학기 계획 승인 ====================
 function approveSemesterPlan() {
-    // 모달의 z-index를 임시로 낮춰서 confirm 대화상자가 표시되도록 함
+    // 모달을 일시적으로 숨겨서 confirm 대화상자가 표시되도록 함
     const modal = document.getElementById('semester-guidance-modal');
-    const originalZIndex = modal ? modal.style.zIndex : '500';
+    const originalDisplay = modal ? modal.style.display : '';
 
     if (modal) {
-        modal.style.zIndex = '0';
+        modal.style.display = 'none';
     }
 
-    setTimeout(() => {
+    // requestAnimationFrame으로 다음 프레임에 confirm 실행
+    requestAnimationFrame(() => {
         const confirmed = confirm('이 학기의 지도 계획을 승인하시겠습니까?');
 
-        // z-index 복원
+        // 모달 다시 표시
         if (modal) {
-            modal.style.zIndex = originalZIndex;
+            modal.style.display = originalDisplay || '';
         }
 
         if (!confirmed) {
@@ -939,7 +940,7 @@ function approveSemesterPlan() {
         }
 
         executeApprovePlan();
-    }, 100);
+    });
 }
 
 // 실제 승인 실행 함수
