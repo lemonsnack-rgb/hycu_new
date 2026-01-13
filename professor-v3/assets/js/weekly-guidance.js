@@ -17,20 +17,164 @@ if (typeof DataService !== 'undefined') {
         return semesterPlansStorage[key] || null;
     };
 
+    // 학생의 모든 학기 계획 조회
+    DataService.getAllSemesterPlans = function(studentId) {
+        const plans = [];
+        for (const key in semesterPlansStorage) {
+            if (key.startsWith(`${studentId}_`)) {
+                plans.push(semesterPlansStorage[key]);
+            }
+        }
+        return plans;
+    };
+
+    // 학기별 계획 저장/업데이트
+    DataService.saveSemesterPlan = function(studentId, year, semester, planData) {
+        const key = `${studentId}_${year}_${semester}`;
+        semesterPlansStorage[key] = planData;
+        console.log(`✅ 학기 계획 저장: ${key}`, planData);
+        return semesterPlansStorage[key];
+    };
+
     // 학기별 계획 초기화/생성
     DataService.resetSemesterPlan = function(studentId, year, semester, totalWeeks) {
         const key = `${studentId}_${year}_${semester}`;
+
+        // totalWeeks가 0이면 계획 삭제
+        if (totalWeeks === 0) {
+            delete semesterPlansStorage[key];
+            console.log(`✅ 학기 계획 삭제: ${key}`);
+            return null;
+        }
+
+        // 주차 배열 생성
+        const weeks = [];
+        for (let i = 1; i <= totalWeeks; i++) {
+            weeks.push({
+                week: i,
+                plannedDate: null,
+                plannedContent: '',
+                plannedMethod: 'meeting',
+                executions: []
+            });
+        }
+
         semesterPlansStorage[key] = {
             studentId,
             year,
             semester,
             totalWeeks,
-            plans: []
+            weeks,  // 새로운 구조: weeks 배열
+            plans: [],  // 레거시: plans 배열 (하위 호환성)
+            approved: false
         };
+        console.log(`✅ 학기 계획 생성/초기화: ${key}, ${totalWeeks}주`);
         return semesterPlansStorage[key];
     };
 
+    // 주차별 계획 업데이트
+    DataService.updateWeekPlan = function(studentId, year, semester, weekNumber, planData) {
+        const key = `${studentId}_${year}_${semester}`;
+        const plan = semesterPlansStorage[key];
+
+        if (!plan) {
+            throw new Error('학기 계획이 존재하지 않습니다.');
+        }
+
+        const week = plan.weeks?.find(w => w.week === weekNumber);
+        if (!week) {
+            throw new Error('해당 주차를 찾을 수 없습니다.');
+        }
+
+        // 계획 데이터 업데이트
+        Object.assign(week, planData);
+        console.log(`✅ ${weekNumber}주차 계획 업데이트:`, planData);
+        return true;
+    };
+
     // 실적 추가
+    DataService.addExecution = function(studentId, year, semester, weekNumber, executionData) {
+        const key = `${studentId}_${year}_${semester}`;
+        const plan = semesterPlansStorage[key];
+
+        if (!plan) {
+            throw new Error('학기 계획이 존재하지 않습니다.');
+        }
+
+        const week = plan.weeks?.find(w => w.week === weekNumber);
+        if (!week) {
+            throw new Error('해당 주차를 찾을 수 없습니다.');
+        }
+
+        // executions 배열 초기화
+        if (!week.executions) {
+            week.executions = [];
+        }
+
+        // 실적 ID 생성
+        const execution = {
+            ...executionData,
+            executionId: executionData.executionId || `EXEC_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        };
+
+        week.executions.push(execution);
+        console.log(`✅ ${weekNumber}주차 실적 추가:`, execution);
+        return true;
+    };
+
+    // 실적 수정
+    DataService.updateExecution = function(studentId, year, semester, weekNumber, executionId, newContent) {
+        const key = `${studentId}_${year}_${semester}`;
+        const plan = semesterPlansStorage[key];
+
+        if (!plan) {
+            throw new Error('학기 계획이 존재하지 않습니다.');
+        }
+
+        const week = plan.weeks?.find(w => w.week === weekNumber);
+        if (!week) {
+            throw new Error('해당 주차를 찾을 수 없습니다.');
+        }
+
+        const execution = week.executions?.find(e => e.executionId === executionId);
+        if (!execution) {
+            throw new Error('해당 실적을 찾을 수 없습니다.');
+        }
+
+        execution.executionContent = newContent;
+        console.log(`✅ ${weekNumber}주차 실적 수정: ${executionId}`);
+        return true;
+    };
+
+    // 실적 삭제
+    DataService.deleteExecution = function(studentId, year, semester, weekNumber, executionId) {
+        const key = `${studentId}_${year}_${semester}`;
+        const plan = semesterPlansStorage[key];
+
+        if (!plan) {
+            throw new Error('학기 계획이 존재하지 않습니다.');
+        }
+
+        const week = plan.weeks?.find(w => w.week === weekNumber);
+        if (!week) {
+            throw new Error('해당 주차를 찾을 수 없습니다.');
+        }
+
+        if (!week.executions) {
+            throw new Error('실적이 없습니다.');
+        }
+
+        const index = week.executions.findIndex(e => e.executionId === executionId);
+        if (index === -1) {
+            throw new Error('해당 실적을 찾을 수 없습니다.');
+        }
+
+        week.executions.splice(index, 1);
+        console.log(`✅ ${weekNumber}주차 실적 삭제: ${executionId}`);
+        return true;
+    };
+
+    // 실적 추가 (레거시 - plans 배열용)
     DataService.addSemesterExecution = function(studentId, year, semester, execution) {
         const key = `${studentId}_${year}_${semester}`;
         if (!semesterPlansStorage[key]) {
