@@ -232,7 +232,7 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
     return `
         <div class="space-y-4">
             <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
+                <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
             </div>
 
             <!-- Desktop Table View -->
@@ -266,8 +266,8 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
 function renderWeekCard(week, advisors, currentProf, plan, studentId) {
     const hasExecutions = week.executions && week.executions.length > 0;
 
-    // 실적이 있으면 실적 수만큼, 없으면 1 (실적 없음 표시)
-    const rowCount = hasExecutions ? week.executions.length : 1;
+    // rowspan 계산: 실적 수 + 입력 행 1개
+    const rowCount = hasExecutions ? week.executions.length + 1 : 1;
 
     // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
@@ -301,17 +301,27 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId) {
             </td>
         `;
     } else {
-        // 실적이 없는 경우: "실적 없음" 표시 (colspan="2")
+        // 실적이 없는 경우: 입력 폼을 첫 행에 바로 표시
         firstRow += `
-            <td class="border border-gray-300 px-2 py-2 text-center text-gray-500" colspan="2">실적 없음</td>
+            <td class="border border-gray-300 px-2 py-2">
+                <div class="flex gap-2 items-center">
+                    <textarea id="exec-content-${week.week}"
+                              placeholder="실행 내용 입력"
+                              class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm resize-none auto-expand-textarea"
+                              style="min-height: 40px; overflow-y: hidden;"></textarea>
+                    <button onclick="addExecutionV2(${week.week})"
+                            class="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">+ 추가</button>
+                </div>
+            </td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
         `;
     }
     firstRow += `</tr>`;
 
-    // 추가 실적 행들 (2번째 실적부터)
+    // 추가 실적 행들 (2번째~마지막-1 실적까지)
     let additionalRows = '';
     if (hasExecutions && week.executions.length > 1) {
-        additionalRows = week.executions.slice(1).map(exec => {
+        additionalRows = week.executions.slice(1).map((exec, index) => {
             const isMyExecution = exec.professorId === currentProf.id;
             return `
                 <tr>
@@ -334,24 +344,25 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId) {
         }).join('');
     }
 
-    // 실적 추가 입력 폼 행
-    const inputFormRow = `
-        <tr class="bg-gray-50">
-            <td class="border border-gray-300 px-2 py-2 text-center font-semibold text-gray-400">${week.week}주</td>
-            <td class="border border-gray-300 px-2 py-2 bg-gray-100"></td>
-            <td class="border border-gray-300 px-2 py-2">
-                <div class="flex flex-col gap-2">
-                    <textarea id="exec-content-${week.week}"
-                              placeholder="실행 내용 입력"
-                              class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none auto-expand-textarea"
-                              style="min-height: 40px; overflow-y: hidden;"></textarea>
-                    <button onclick="addExecutionV2(${week.week})"
-                            class="self-end text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">+ 추가</button>
-                </div>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs text-gray-400">자동입력</td>
-        </tr>
-    `;
+    // 마지막 입력 폼 행 (실적이 있을 때만)
+    let inputFormRow = '';
+    if (hasExecutions) {
+        inputFormRow = `
+            <tr>
+                <td class="border border-gray-300 px-2 py-2">
+                    <div class="flex gap-2 items-center">
+                        <textarea id="exec-content-${week.week}"
+                                  placeholder="실행 내용 입력"
+                                  class="flex-1 border border-gray-300 rounded px-2 py-1 text-sm resize-none auto-expand-textarea"
+                                  style="min-height: 40px; overflow-y: hidden;"></textarea>
+                        <button onclick="addExecutionV2(${week.week})"
+                                class="text-xs px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 whitespace-nowrap">+ 추가</button>
+                    </div>
+                </td>
+                <td class="border border-gray-300 px-2 py-2 text-center text-sm">-</td>
+            </tr>
+        `;
+    }
 
     return firstRow + additionalRows + inputFormRow;
 }
