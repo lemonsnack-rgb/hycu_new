@@ -432,7 +432,7 @@ function openJournalReviewDetail(journalId, viewType) {
             </div>
 
             <!-- 상세 내용 -->
-            <div id="journal-review-content" class="review-detail-body"></div>
+            <div id="journal-review-detail-content" class="review-detail-body"></div>
         </div>
     `;
 
@@ -444,7 +444,7 @@ function openJournalReviewDetail(journalId, viewType) {
 
         if (typeof window.viewJournalReviewDetail === 'function') {
             console.log('✅ Calling viewJournalReviewDetail...');
-            window.viewJournalReviewDetail(journalId, viewType);
+            window.viewJournalReviewDetail(journalId, viewType, false); // isAdminMode = false
             console.log('✅ viewJournalReviewDetail called');
         } else {
             console.error('❌ viewJournalReviewDetail is not a function!');

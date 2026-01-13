@@ -47,12 +47,19 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
     }
 
     const allJournals = getJournalReviews();
-    const journal = allJournals.find(j => j.id === journalId);
+    console.log('🔍 All journals:', allJournals);
+    console.log('🔍 Looking for journalId:', journalId, 'type:', typeof journalId);
+    console.log('🔍 Journal IDs:', allJournals.map(j => ({ id: j.id, type: typeof j.id })));
+
+    const journal = allJournals.find(j => j.id == journalId); // == 대신 === 사용하여 타입도 비교
 
     if (!journal) {
+        console.error('❌ Journal not found! journalId:', journalId);
         alert('학술지 정보를 찾을 수 없습니다. (ID: ' + journalId + ')');
         return;
     }
+
+    console.log('✅ Found journal:', journal);
 
     const roleText = viewType === 'chair' ? '위원장' : '위원';
 
@@ -604,7 +611,13 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
     content += `</div>`;
 
     // 오버레이 모달 방식 (관리자 화면과 일반 화면에서 동작)
-    const container = document.getElementById('journal-review-content');
+    // isAdminMode가 true이면 관리자 화면 (journal-review-content)
+    // false이면 교수 모달 (journal-review-detail-content)
+    const containerId = isAdminMode ? 'journal-review-content' : 'journal-review-detail-content';
+    const container = document.getElementById(containerId);
+
+    console.log('🔍 Looking for container:', containerId, 'found:', !!container);
+
     if (container) {
         container.innerHTML = content;
 
@@ -665,7 +678,11 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
             detailBody.scrollTop = 0;
         }
     } else {
-        console.error('journal-review-content container not found');
+        console.error(`❌ Container not found: ${containerId}`);
+        console.error('Available elements:', {
+            journalReviewContent: !!document.getElementById('journal-review-content'),
+            journalReviewDetailContent: !!document.getElementById('journal-review-detail-content')
+        });
         alert('화면을 표시할 수 없습니다. 페이지를 새로고침해주세요.');
     }
 }
