@@ -353,19 +353,10 @@ function renderStudentWeeklyCards(weeks) {
                     <table class="min-w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-gray-50">
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" rowspan="2" style="width: 60px;">주차</th>
-                                <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700" colspan="3">계획</th>
-                                <th class="border border-gray-300 px-2 py-1 text-xs font-semibold text-gray-700" colspan="5">실적</th>
-                            </tr>
-                            <tr class="bg-gray-50">
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 200px;">주제</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">계획 내용</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">예정 지도 방식</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">실행 내용</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">교수명</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600">교수의견</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 90px;">실행일</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-medium text-gray-600" style="width: 80px;">지도 방식</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 80px;">주차</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">계획내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">실행내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 100px;">교수명</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -381,43 +372,25 @@ function renderStudentWeeklyCards(weeks) {
 // 개별 주차 테이블 행 렌더링 (학생용 - 교수용과 UI 동일, 권한만 다름)
 function renderStudentWeekCard(week) {
     const hasExecutions = week.executions && week.executions.length > 0;
-    const rowCount = hasExecutions ? week.executions.length + 1 : 2;
+    const rowCount = hasExecutions ? week.executions.length : 1;
     const isApproved = semesterPlan && semesterPlan.approved === true;
     const readonlyAttr = isApproved ? 'readonly' : '';
-    const disabledAttr = isApproved ? 'disabled' : '';
     const bgClass = isApproved ? 'bg-gray-100' : '';
 
-    // 첫 번째 행 (계획 정보는 rowspan 적용)
-    // 교수용과 완전히 동일한 구조, 단 학생은 계획 편집 가능(승인 전), 실적은 읽기만 가능
+    // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
         <tr id="week-card-${week.week}">
             <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">${week.week}주</td>
-            <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
-                <input type="text" id="student-plan-topic-${week.week}"
-                       value="${week.plannedTopic || ''}"
-                       placeholder="주제 입력"
-                       ${readonlyAttr}
-                       class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none ${bgClass}">
-            </td>
             <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
                 <textarea id="student-plan-content-${week.week}"
                           placeholder="계획 내용 입력"
                           ${readonlyAttr}
                           class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea ${bgClass}"
                           style="min-height: 40px; overflow-y: hidden;">${week.plannedContent || ''}</textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center" rowspan="${rowCount}">
-                <select id="student-plan-method-${week.week}" ${disabledAttr} class="w-full border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none ${bgClass}">
-                    <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
-                    <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
-                    <option value="zoom" ${week.plannedMethod === 'zoom' || !week.plannedMethod ? 'selected' : ''}>Zoom</option>
-                    <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
-                    <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
-                </select>
             </td>`;
 
     if (hasExecutions) {
-        // 첫 번째 실적을 첫 행에 포함 (교수용 코드 그대로)
+        // 첫 번째 실적을 첫 행에 포함
         const firstExec = week.executions[0];
         firstRow += `
             <td class="border border-gray-300 px-2 py-2">
@@ -428,27 +401,16 @@ function renderStudentWeekCard(week) {
             <td class="border border-gray-300 px-2 py-2 text-center text-sm">
                 ${firstExec.professorName || '-'}
             </td>
-            <td class="border border-gray-300 px-2 py-2">
-                <textarea readonly
-                          class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
-                          style="min-height: 40px; overflow-y: hidden;">${firstExec.comment || ''}</textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs">${formatDate(firstExec.executionDate)}</td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs">${getMethodText(firstExec.method)}</td>
         `;
     } else {
-        // 실적이 없는 경우: 빈 실적 셀 5개 추가
+        // 실적이 없는 경우: "실적 없음" 표시 (colspan="2")
         firstRow += `
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
-            <td class="border border-gray-300 px-2 py-2"></td>
+            <td class="border border-gray-300 px-2 py-2 text-center text-gray-500" colspan="2">실적 없음</td>
         `;
     }
     firstRow += `</tr>`;
 
-    // 추가 실적 행들 (2번째 실적부터) - 교수용과 동일
+    // 추가 실적 행들 (2번째 실적부터)
     let additionalRows = '';
     if (hasExecutions && week.executions.length > 1) {
         additionalRows = week.executions.slice(1).map(exec => {
@@ -462,121 +424,56 @@ function renderStudentWeekCard(week) {
                     <td class="border border-gray-300 px-2 py-2 text-center text-sm">
                         ${exec.professorName || '-'}
                     </td>
-                    <td class="border border-gray-300 px-2 py-2">
-                        <textarea readonly
-                                  class="w-full border-0 bg-transparent text-sm px-1 py-1 resize-none focus:outline-none auto-expand-textarea"
-                                  style="min-height: 40px; overflow-y: hidden;">${exec.comment || ''}</textarea>
-                    </td>
-                    <td class="border border-gray-300 px-2 py-2 text-center text-xs">${formatDate(exec.executionDate)}</td>
-                    <td class="border border-gray-300 px-2 py-2 text-center text-xs">${getMethodText(exec.method)}</td>
                 </tr>
             `;
         }).join('');
     }
 
-    // 실적 입력 폼 행 (학생용 - 읽기 전용)
-    const today = getTodayDate();
-    const inputFormRow = `
-        <tr class="bg-gray-50">
-            <td class="border border-gray-300 px-2 py-2">
-                <textarea readonly
-                          placeholder="실행 내용 입력"
-                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea bg-gray-100"
-                          style="min-height: 40px; overflow-y: hidden;"></textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2 text-center text-xs"></td>
-            <td class="border border-gray-300 px-2 py-2">
-                <textarea readonly
-                          placeholder="교수 의견 입력"
-                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea bg-gray-100"
-                          style="min-height: 40px; overflow-y: hidden;"></textarea>
-            </td>
-            <td class="border border-gray-300 px-2 py-2">
-                <input type="date" disabled value="${today}"
-                       class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none bg-gray-100">
-            </td>
-            <td class="border border-gray-300 px-2 py-2">
-                <select disabled class="w-full border border-gray-300 rounded px-2 py-1 text-xs focus:outline-none bg-gray-100">
-                    <option value="meeting">대면</option>
-                    <option value="online">온라인</option>
-                    <option value="zoom">Zoom</option>
-                    <option value="email">이메일</option>
-                    <option value="phone">전화</option>
-                </select>
-            </td>
-        </tr>
-    `;
-
-    return firstRow + additionalRows + inputFormRow;
+    return firstRow + additionalRows;
 }
 
 // 모바일 카드 뷰 렌더링 (학생용)
 function renderStudentWeekCardMobile(week) {
     const hasExecutions = week.executions && week.executions.length > 0;
+    const isApproved = semesterPlan && semesterPlan.approved === true;
+    const readonlyAttr = isApproved ? 'readonly' : '';
+    const bgClass = isApproved ? 'bg-gray-100' : '';
 
     return `
         <div id="week-card-mobile-${week.week}" class="bg-white border border-gray-200 rounded-lg">
-            <!-- 계획 섹션 -->
-            <div class="p-4 bg-yellow-50 border-b border-yellow-200">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">${week.week}주차 계획</h4>
-                <div class="space-y-3">
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">지도 주제</label>
-                        <input type="text" value="${week.plannedTopic || ''}" readonly
-                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">계획 내용</label>
-                        <textarea readonly rows="3"
-                                  class="w-full border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">${week.plannedContent || ''}</textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs text-gray-600 mb-1">예정 지도 방식</label>
-                        <select disabled class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100 w-full">
-                            <option value="meeting" ${week.plannedMethod === 'meeting' ? 'selected' : ''}>대면</option>
-                            <option value="online" ${week.plannedMethod === 'online' ? 'selected' : ''}>온라인</option>
-                            <option value="zoom" ${week.plannedMethod === 'zoom' ? 'selected' : ''}>Zoom</option>
-                            <option value="email" ${week.plannedMethod === 'email' ? 'selected' : ''}>이메일</option>
-                            <option value="phone" ${week.plannedMethod === 'phone' ? 'selected' : ''}>전화</option>
-                        </select>
-                    </div>
-                </div>
+            <!-- 주차 헤더 -->
+            <div class="p-4 bg-gray-50 border-b border-gray-200">
+                <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
             </div>
 
-            <!-- 실적 섹션 -->
+            <!-- 계획 내용 -->
+            <div class="p-4 border-b border-gray-200">
+                <span class="text-sm font-semibold text-gray-700">계획 내용:</span>
+                <textarea id="student-plan-content-mobile-${week.week}"
+                          placeholder="계획 내용 입력"
+                          ${readonlyAttr}
+                          class="w-full border border-gray-300 rounded px-2 py-2 text-sm resize-none mt-2 ${bgClass}"
+                          style="min-height: 60px;">${week.plannedContent || ''}</textarea>
+            </div>
+
+            <!-- 실적 목록 -->
             <div class="p-4">
                 <h4 class="text-sm font-semibold text-gray-700 mb-3">
-                    실적 및 교수의견 (${week.executions.length}건)
+                    실적 (${week.executions.length}건)
                 </h4>
                 ${hasExecutions ? `
                     <div class="space-y-3">
                         ${week.executions.map(exec => `
                             <div class="bg-gray-50 border border-gray-200 rounded-lg p-3">
-                                <div class="flex justify-between items-center mb-2">
+                                <div class="flex justify-between items-start mb-2">
                                     <span class="text-sm font-semibold text-gray-800">${exec.professorName || '-'}</span>
-                                    <span class="text-xs text-gray-500">${exec.executionDate || '-'}</span>
                                 </div>
-                                <div class="space-y-2 text-sm">
-                                    <div>
-                                        <span class="font-medium text-gray-600">지도방식:</span>
-                                        <span class="text-gray-800 ml-1">${getMethodText(exec.method)}</span>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-gray-600 mb-1">실행 내용:</div>
-                                        <div class="text-gray-800 whitespace-pre-wrap">${exec.executionContent || '-'}</div>
-                                    </div>
-                                    <div>
-                                        <div class="font-medium text-gray-600 mb-1">교수의견:</div>
-                                        <div class="text-gray-800 whitespace-pre-wrap">${exec.comment || '-'}</div>
-                                    </div>
-                                </div>
+                                <p class="text-sm text-gray-800">${exec.executionContent || '-'}</p>
                             </div>
                         `).join('')}
                     </div>
                 ` : `
-                    <div class="text-center py-6 text-gray-400">
-                        <p class="text-sm">등록된 지도 실적이 없습니다</p>
-                    </div>
+                    <p class="text-sm text-gray-500">실적 없음</p>
                 `}
             </div>
         </div>
@@ -779,19 +676,17 @@ showStudentSemesterPlanDetail = function() {
 
 // ==================== 학생용 주차별 계획 저장 ====================
 function saveStudentWeekPlan(weekNumber) {
-    const topic = document.getElementById(`student-plan-topic-${weekNumber}`).value.trim();
     const content = document.getElementById(`student-plan-content-${weekNumber}`).value.trim();
-    const method = document.getElementById(`student-plan-method-${weekNumber}`).value;
 
-    if (!topic || !content) {
-        alert('지도 주제와 계획 내용을 모두 입력해주세요.');
+    if (!content) {
+        alert('계획 내용을 입력해주세요.');
         return;
     }
 
     const planData = {
-        plannedTopic: topic,
+        plannedTopic: '', // 주제 필드 제거
         plannedContent: content,
-        plannedMethod: method,
+        plannedMethod: 'zoom', // 기본값
         plannedDate: null  // 학사시스템에서 자동 설정
     };
 
