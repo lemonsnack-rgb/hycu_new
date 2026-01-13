@@ -6,8 +6,15 @@ let currentStudentIdV2 = null; // 현재 선택된 학생 ID (V2)
 let currentSemesterView = { year: 2025, semester: 1 };
 let availableSemesters = []; // 조회 가능한 학기 목록
 
-// ==================== 학기별 상세 화면 (통합) ====================
+// ==================== 학기별 상세 화면 (모달 팝업) ====================
 function showSemesterGuidanceDetail(studentId) {
+    // 이미 모달이 열려있으면 무시
+    const existingModal = document.getElementById('semester-guidance-modal');
+    if (existingModal) {
+        console.warn('학기별 지도 계획 모달이 이미 열려 있습니다.');
+        return;
+    }
+
     currentStudentIdV2 = studentId;
 
     const student = DataService.getStudentDetail(studentId);
@@ -35,10 +42,184 @@ function showSemesterGuidanceDetail(studentId) {
         currentSemesterView = { year: currentYear, semester: currentSemester };
     }
 
-    const contentArea = document.getElementById('guidance-content-area');
-    if (!contentArea) return;
+    // 모달 생성 및 표시
+    const modal = createSemesterGuidanceModal(student, allPlans);
+    document.body.appendChild(modal);
 
-    contentArea.innerHTML = renderSemesterDetailScreen(student, allPlans);
+    // 백드롭 클릭으로 닫기
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            closeSemesterGuidanceModal();
+        }
+    });
+
+    // ESC 키로 닫기
+    const handleEscape = (e) => {
+        if (e.key === 'Escape') {
+            closeSemesterGuidanceModal();
+            document.removeEventListener('keydown', handleEscape);
+        }
+    };
+    document.addEventListener('keydown', handleEscape);
+}
+
+// ==================== 모달 생성 ====================
+function createSemesterGuidanceModal(student, allPlans) {
+    const modal = document.createElement('div');
+    modal.id = 'semester-guidance-modal';
+    modal.className = 'feedback-detail-screen'; // 기존 모달과 동일한 스타일 사용
+    modal.style.zIndex = '500';
+
+    const currentPlan = allPlans.find(p =>
+        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
+    );
+
+    // 학기 계획 데이터 가져오기
+    const semesterPlan = DataService.getSemesterPlan(
+        currentStudentIdV2,
+        currentSemesterView.year,
+        currentSemesterView.semester
+    );
+    const totalWeeks = semesterPlan?.totalWeeks || 0;
+
+    // 계획이 없으면 생성 폼 표시
+    if (totalWeeks === 0) {
+        modal.innerHTML = renderPlanCreationForm(student);
+    } else {
+        modal.innerHTML = renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks);
+    }
+
+    return modal;
+}
+
+// ==================== 모달 닫기 ====================
+function closeSemesterGuidanceModal() {
+    const modal = document.getElementById('semester-guidance-modal');
+    if (modal) {
+        modal.remove();
+    }
+
+    // 전역 변수 정리
+    currentStudentIdV2 = null;
+}
+
+// ==================== 계획 생성 폼 렌더링 ====================
+function renderPlanCreationForm(student) {
+    return `
+        <div class="feedback-detail-content">
+            <!-- 헤더 -->
+            <div class="px-6 py-3 border-b bg-white">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
+                    <button onclick="closeSemesterGuidanceModal()"
+                            class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 학생 정보 -->
+            <div class="px-6 py-3 border-b bg-gray-50">
+                <div class="text-xs text-gray-700">
+                    <span class="font-semibold">학번:</span> ${student.studentId}
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold">성명:</span> ${student.name}
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold">학과:</span> ${student.major}
+                    <span class="mx-2 text-gray-400">|</span>
+                    <span class="font-semibold">학기:</span> ${currentSemesterView.year}학년도 ${currentSemesterView.semester}학기
+                </div>
+            </div>
+
+            <!-- 생성 폼 -->
+            <div class="p-8">
+                <div class="max-w-md mx-auto text-center">
+                    <div class="mb-6">
+                        <p class="text-lg text-gray-600 mb-2">📋 등록된 학기별 지도계획이 없습니다</p>
+                        <p class="text-sm text-gray-500">주차 수를 입력하여 계획을 생성하세요</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">주차 수 *</label>
+                        <input type="number"
+                               id="week-count-input"
+                               min="1"
+                               max="20"
+                               value="15"
+                               class="w-full border border-gray-300 rounded px-4 py-2 text-center text-lg"
+                               placeholder="1~20">
+                        <p class="text-xs text-gray-500 mt-1">1주 ~ 20주 사이로 입력하세요</p>
+                    </div>
+
+                    <button onclick="executeCreatePlan()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded text-base font-medium">
+                        계획 생성
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+// ==================== 계획 생성 실행 ====================
+function executeCreatePlan() {
+    const weekCountInput = document.getElementById('week-count-input');
+    const weekCount = parseInt(weekCountInput.value);
+
+    if (!weekCount || weekCount < 1 || weekCount > 20) {
+        showToast('주차 수는 1~20 사이로 입력해주세요.', 'warning');
+        return;
+    }
+
+    // DataService를 통해 계획 생성
+    DataService.resetSemesterPlan(
+        currentStudentIdV2,
+        currentSemesterView.year,
+        currentSemesterView.semester,
+        weekCount
+    );
+
+    showToast(`지도 계획이 ${weekCount}주로 생성되었습니다.`, 'success');
+
+    // 모달 내용을 테이블로 전환
+    setTimeout(() => {
+        refreshModalContent();
+    }, 300);
+}
+
+// ==================== 모달 내용 새로고침 ====================
+function refreshModalContent() {
+    const modal = document.getElementById('semester-guidance-modal');
+    if (!modal) return;
+
+    const student = DataService.getStudentDetail(currentStudentIdV2);
+    if (!student) return;
+
+    const allPlans = DataService.getAllSemesterPlans(currentStudentIdV2);
+    const currentPlan = allPlans.find(p =>
+        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
+    );
+
+    const semesterPlan = DataService.getSemesterPlan(
+        currentStudentIdV2,
+        currentSemesterView.year,
+        currentSemesterView.semester
+    );
+    const totalWeeks = semesterPlan?.totalWeeks || 0;
+
+    // 계획이 없으면 생성 폼, 있으면 테이블
+    if (totalWeeks === 0) {
+        modal.innerHTML = renderPlanCreationForm(student);
+    } else {
+        modal.innerHTML = renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks);
+    }
+
+    // textarea 자동 확장 재적용
+    setTimeout(() => {
+        expandAllTextareas();
+    }, 100);
 }
 
 // 사용 가능한 학기 목록 생성 (최근 5년)
@@ -61,125 +242,82 @@ function generateAvailableSemesters(existingPlans) {
     return semesters;
 }
 
-// ==================== 통합 화면 렌더링 ====================
-function renderSemesterDetailScreen(student, allPlans) {
-    const currentPlan = allPlans.find(p =>
-        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
-    );
-
+// ==================== 모달 콘텐츠 렌더링 (테이블 뷰) ====================
+function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks) {
     const advisors = DataService.getStudentAdvisors(currentStudentIdV2);
     const currentProf = DataService.getCurrentProfessor();
 
-    // 학기 계획 데이터 가져오기
-    const semesterPlan = DataService.getSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester
-    );
-    const totalWeeks = semesterPlan?.totalWeeks || 0;
-
-    // totalWeeks가 설정되어 있으면 주차 생성, 없으면 빈 배열
-    const weeks = totalWeeks > 0
-        ? (currentPlan ? currentPlan.weeks : generateEmptyWeeks(totalWeeks))
-        : [];
+    // totalWeeks가 설정되어 있으면 주차 생성
+    const weeks = currentPlan ? currentPlan.weeks : generateEmptyWeeks(totalWeeks);
 
     return `
-        <!-- 뒤로가기 -->
-        <div class="mb-4">
-            <button onclick="showStudentList()" class="back-to-list-btn">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                </svg>
-                목록으로 돌아가기
-            </button>
-        </div>
-
-        <!-- 학생 정보 -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="px-6 py-4 border-b bg-gray-50">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보</h4>
-                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
-                        <span class="text-gray-900 font-medium">${student.universityType || '일반대학원'}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
-                        <span class="text-gray-900 font-medium">${student.college || '공학계열'}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
-                        <span class="text-gray-900 font-medium">${student.undergraduate || '-'}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
-                        <span class="text-gray-900 font-medium">${student.major}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
-                        <span class="text-gray-900 font-medium">${getDegreeText(student.degree)}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
-                        <span class="text-gray-900 font-medium">${student.status || '재학'}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">학번:</span>
-                        <span class="text-gray-900 font-medium">${student.studentId}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">성명:</span>
-                        <span class="text-gray-900 font-medium">${student.name}</span>
-                    </div>
-                    <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
-                        <span class="text-gray-900 font-medium">${advisors.map(a => a.name).join(', ')}</span>
+        <div class="feedback-detail-content" style="max-width: 1400px;">
+            <!-- 헤더 -->
+            <div class="px-6 py-3 border-b bg-white">
+                <div class="flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
+                    <div class="flex items-center gap-3">
+                        <button onclick="resetTotalWeeksInModal()"
+                                class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
+                            계획 초기화
+                        </button>
+                        <button onclick="closeSemesterGuidanceModal()"
+                                class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 학기 선택 카드 -->
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex items-center gap-6">
-                <div class="flex items-center gap-2">
-                    <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
-                    <select id="select-year" onchange="changeSemesterView()"
-                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
-                        ${Array.from(new Set(availableSemesters.map(s => s.year)))
-                            .map(y => `<option value="${y}" ${y === currentSemesterView.year ? 'selected' : ''}>${y}학년도</option>`)
-                            .join('')}
-                    </select>
-                </div>
-                <div class="flex items-center gap-2">
-                    <label class="text-sm text-gray-600 min-w-[60px]">학기:</label>
-                    <select id="select-semester" onchange="changeSemesterView()"
-                            class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
-                        ${availableSemesters
-                            .filter(s => s.year === currentSemesterView.year)
-                            .map(s => `<option value="${s.semester}" ${s.semester === currentSemesterView.semester ? 'selected' : ''}>${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
-                            .join('')}
-                    </select>
-                </div>
-                <div class="flex items-center gap-3 ml-auto">
-                    <button onclick="resetTotalWeeks()"
-                            class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
-                        ${totalWeeks > 0 ? '계획 초기화' : '계획 생성'}
-                    </button>
-                    <button onclick="saveAllWeekPlans()"
-                            class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
-                        전체 저장
-                    </button>
-                    <button onclick="approveSemesterPlan()"
-                            class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-sm font-medium">
-                        계획 승인
-                    </button>
+            <!-- 학생 정보 및 학기 선택 -->
+            <div class="px-6 py-3 border-b bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="text-xs text-gray-700">
+                        <span class="font-semibold">학번:</span> ${student.studentId}
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">성명:</span> ${student.name}
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">학과:</span> ${student.major}
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-gray-600">학년도:</label>
+                            <select id="select-year" onchange="changeSemesterViewInModal()"
+                                    class="border border-gray-300 rounded px-2 py-1 text-xs bg-white">
+                                ${Array.from(new Set(availableSemesters.map(s => s.year)))
+                                    .map(y => `<option value="${y}" ${y === currentSemesterView.year ? 'selected' : ''}>${y}학년도</option>`)
+                                    .join('')}
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs text-gray-600">학기:</label>
+                            <select id="select-semester" onchange="changeSemesterViewInModal()"
+                                    class="border border-gray-300 rounded px-2 py-1 text-xs bg-white">
+                                ${availableSemesters
+                                    .filter(s => s.year === currentSemesterView.year)
+                                    .map(s => `<option value="${s.semester}" ${s.semester === currentSemesterView.semester ? 'selected' : ''}>${s.semester}학기${s.hasPlan ? ' ✓' : ''}</option>`)
+                                    .join('')}
+                            </select>
+                        </div>
+                        <button onclick="saveAllWeekPlans()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded text-xs font-medium">
+                            전체 저장
+                        </button>
+                        <button onclick="approveSemesterPlan()"
+                                class="bg-green-600 hover:bg-green-700 text-white px-4 py-1.5 rounded text-xs font-medium">
+                            계획 승인
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 주차별 지도 계획 및 실적 -->
-        ${renderWeeklyCards(weeks, advisors, currentProf, currentPlan)}
+            <!-- 주차별 테이블 (스크롤 가능) -->
+            <div class="p-6" style="max-height: calc(100vh - 200px); overflow-y: auto;">
+                ${renderWeeklyCards(weeks, advisors, currentProf, currentPlan)}
+            </div>
+        </div>
     `;
 }
 
@@ -199,42 +337,56 @@ function generateEmptyWeeks(count) {
     return weeks;
 }
 
-// 학기 선택 변경
-function changeSemesterView() {
+// 모달 내 학기 선택 변경
+function changeSemesterViewInModal() {
     const year = parseInt(document.getElementById('select-year').value);
     const semester = parseInt(document.getElementById('select-semester').value);
 
     currentSemesterView = { year, semester };
 
-    // 화면 새로고침
-    showSemesterGuidanceDetail(currentStudentIdV2);
+    // 모달 내용 새로고침
+    refreshModalContent();
 }
 
-// ==================== 주차별 테이블 렌더링 (계획 유무 무관) ====================
-function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
-    // 주차가 없으면 안내 메시지 표시
-    if (weeks.length === 0) {
-        return `
-            <div class="space-y-4">
-                <div class="mb-4">
-                    <h3 class="text-lg font-bold text-gray-800">주차별 지도 계획 및 실적</h3>
-                </div>
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg mb-2">📅 이 학기의 지도 계획이 아직 생성되지 않았습니다.</p>
-                        <p class="text-sm">상단의 "계획 생성" 버튼을 클릭하여 계획을 생성하세요.</p>
-                    </div>
-                </div>
-            </div>
-        `;
+// 모달 내 계획 초기화
+function resetTotalWeeksInModal() {
+    const semesterPlan = DataService.getSemesterPlan(
+        currentStudentIdV2,
+        currentSemesterView.year,
+        currentSemesterView.semester
+    );
+    const currentWeeks = semesterPlan?.totalWeeks || 0;
+    const plans = semesterPlan?.plans || [];
+
+    if (!confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`)) {
+        return;
     }
 
+    // 초기화 후 생성 폼 표시
+    const modal = document.getElementById('semester-guidance-modal');
+    if (!modal) return;
+
+    const student = DataService.getStudentDetail(currentStudentIdV2);
+    if (!student) return;
+
+    // 데이터 삭제
+    DataService.resetSemesterPlan(
+        currentStudentIdV2,
+        currentSemesterView.year,
+        currentSemesterView.semester,
+        0 // 0으로 설정하여 계획 완전 삭제
+    );
+
+    // 생성 폼으로 전환
+    modal.innerHTML = renderPlanCreationForm(student);
+
+    showToast('계획이 초기화되었습니다. 새로운 주차 수를 입력하세요.', 'success');
+}
+
+// ==================== 주차별 테이블 렌더링 ====================
+function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
     return `
         <div class="space-y-4">
-            <div class="mb-4">
-                <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
-            </div>
-
             <!-- Desktop Table View -->
             <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
@@ -480,9 +632,9 @@ function addExecutionV2(weekNumber) {
 
         showToast(`${weekNumber}주차 실적이 추가되었습니다.`, 'success');
 
-        // 화면 새로고침
+        // 모달 내용 새로고침
         setTimeout(() => {
-            showSemesterGuidanceDetail(currentStudentIdV2);
+            refreshModalContent();
         }, 300);
 
     } catch (error) {
@@ -498,8 +650,9 @@ function deleteExecutionV2(studentId, year, semester, week, executionId) {
         DataService.deleteExecution(studentId, year, semester, week, executionId);
         showToast(`${week}주차 실적이 삭제되었습니다.`, 'success');
 
+        // 모달 내용 새로고침
         setTimeout(() => {
-            showSemesterGuidanceDetail(studentId);
+            refreshModalContent();
         }, 300);
 
     } catch (error) {
@@ -534,9 +687,9 @@ function saveWeekPlan(weekNumber) {
 
         showToast(`${weekNumber}주차 계획이 저장되었습니다.`, 'success');
 
-        // 화면 새로고침
+        // 모달 내용 새로고침
         setTimeout(() => {
-            showSemesterGuidanceDetail(currentStudentIdV2);
+            refreshModalContent();
         }, 300);
 
     } catch (error) {
@@ -598,107 +751,15 @@ function saveAllWeekPlans() {
 
     showToast(`총 ${savedCount}개 주차 계획이 저장되었습니다.`, 'success');
 
-    // 화면 새로고침
+    // 모달 내용 새로고침
     setTimeout(() => {
-        showSemesterGuidanceDetail(currentStudentIdV2);
+        refreshModalContent();
     }, 500);
 }
 
-// ==================== 주차 설정/초기화 ====================
-function resetTotalWeeks() {
-    const semesterPlan = DataService.getSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester
-    );
-    const currentWeeks = semesterPlan?.totalWeeks || 0;
-    const hasPlans = currentWeeks > 0;
-
-    // 주차 선택 옵션 생성 (1~15)
-    const weekOptions = Array.from({ length: 15 }, (_, i) => i + 1)
-        .map(week => `<option value="${week}" ${week === currentWeeks || (!hasPlans && week === 15) ? 'selected' : ''}>${week}주</option>`)
-        .join('');
-
-    const modalTitle = hasPlans ? '계획 초기화' : '계획 생성';
-
-    const modalContent = `
-        <form id="reset-weeks-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">${hasPlans ? '새로운 총 주차 선택' : '총 주차 선택'} *</label>
-                <select name="newTotalWeeks" class="w-full border border-gray-300 rounded px-3 py-2 text-sm" required>
-                    ${weekOptions}
-                </select>
-                ${hasPlans ? `<p class="text-xs text-gray-500 mt-1">현재: ${currentWeeks}주</p>` : ''}
-            </div>
-
-            ${hasPlans ? `
-            <div class="bg-blue-50 p-3 rounded-lg">
-                <p class="text-xs text-blue-800">
-                    💡 초기화하면 해당 학기의 계획과 실적이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
-                </p>
-            </div>
-            ` : ''}
-        </form>
-    `;
-
-    window.openModal(modalTitle, modalContent, hasPlans ? '초기화 실행' : '생성', () => executeResetWeeks(), true);
-}
-
-// 주차 설정/초기화 실행
-function executeResetWeeks() {
-    const form = document.getElementById('reset-weeks-form');
-    const formData = new FormData(form);
-    const newTotalWeeks = parseInt(formData.get('newTotalWeeks'));
-
-    if (!newTotalWeeks || newTotalWeeks < 1 || newTotalWeeks > 15) {
-        showToast('올바른 주차 수를 선택해주세요 (1~15주)', 'warning');
-        window.closeModal();
-        return;
-    }
-
-    const semesterPlan = DataService.getSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester
-    );
-    const currentWeeks = semesterPlan?.totalWeeks || 0;
-    const plans = semesterPlan?.plans || [];
-    const hasPlans = currentWeeks > 0;
-
-    // 최종 확인
-    if (hasPlans && plans.length > 0) {
-        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n새로운 ${newTotalWeeks}주 구조로 초기화됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
-        if (!confirmed) {
-            window.closeModal();
-            return;
-        }
-    }
-
-    // DataService를 통해 초기화
-    DataService.resetSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester,
-        newTotalWeeks
-    );
-
-    // 모달 강제 닫기
-    const modal = document.getElementById('universal-modal');
-    const backdrop = document.getElementById('modal-backdrop');
-    if (modal) modal.classList.add('hidden');
-    if (backdrop) backdrop.classList.add('hidden');
-
-    const message = hasPlans
-        ? `지도 계획이 ${newTotalWeeks}주로 초기화되었습니다.`
-        : `지도 계획이 ${newTotalWeeks}주로 생성되었습니다.`;
-
-    showToast(message, 'success');
-
-    // 화면 새로고침
-    setTimeout(() => {
-        showSemesterGuidanceDetail(currentStudentIdV2);
-    }, 500);
-}
+// ==================== 주차 설정/초기화 (더 이상 사용하지 않음 - 모달 내부에서 처리) ====================
+// 이전 버전의 resetTotalWeeks와 executeResetWeeks 함수는 모달 팝업 방식으로 인해 사용하지 않습니다.
+// 대신 resetTotalWeeksInModal과 executeCreatePlan 함수를 사용합니다.
 
 // ==================== 학기 계획 승인 ====================
 function approveSemesterPlan() {
@@ -707,6 +768,8 @@ function approveSemesterPlan() {
     }
 
     try {
+        const currentProf = DataService.getCurrentProfessor();
+
         // DataService에 승인 처리 추가 필요
         // 현재는 간단히 상태 업데이트만 수행
         const approvalData = {
@@ -725,9 +788,9 @@ function approveSemesterPlan() {
 
         showToast('학기 계획이 승인되었습니다.', 'success');
 
-        // 화면 새로고침
+        // 모달 내용 새로고침
         setTimeout(() => {
-            showSemesterGuidanceDetail(currentStudentIdV2);
+            refreshModalContent();
         }, 500);
 
     } catch (error) {
@@ -835,30 +898,22 @@ function expandAllTextareas() {
     });
 }
 
-// 학기 계획 상세 화면 렌더링 후 textarea 확장 적용
-const originalShowSemesterDetail = showSemesterGuidanceDetail;
-showSemesterGuidanceDetail = function(studentId) {
-    originalShowSemesterDetail(studentId);
-    // 렌더링 후 약간의 지연을 두고 확장 적용
-    setTimeout(() => {
-        expandAllTextareas();
-    }, 100);
-};
-
 // 초기화 실행
 initAutoExpandTextareas();
 
 // Export
 window.showSemesterGuidanceDetail = showSemesterGuidanceDetail;
-window.changeSemesterView = changeSemesterView;
+window.closeSemesterGuidanceModal = closeSemesterGuidanceModal;
+window.changeSemesterViewInModal = changeSemesterViewInModal;
+window.resetTotalWeeksInModal = resetTotalWeeksInModal;
+window.executeCreatePlan = executeCreatePlan;
+window.refreshModalContent = refreshModalContent;
 window.addExecutionV2 = addExecutionV2;
 window.deleteExecutionV2 = deleteExecutionV2;
 window.saveWeekPlan = saveWeekPlan;
 window.saveAllWeekPlans = saveAllWeekPlans;
 window.approveSemesterPlan = approveSemesterPlan;
-window.resetTotalWeeks = resetTotalWeeks;
-window.executeResetWeeks = executeResetWeeks;
 window.autoExpandTextarea = autoExpandTextarea;
 window.expandAllTextareas = expandAllTextareas;
 
-console.log('✅ 학기별 논문지도 계획 V2 모듈 로드 완료 (댓글 방식)');
+console.log('✅ 학기별 논문지도 계획 V2 모듈 로드 완료 (모달 팝업 방식)');
