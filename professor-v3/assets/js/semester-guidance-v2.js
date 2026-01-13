@@ -497,6 +497,50 @@ function changeSemesterViewInModal() {
     refreshModalContent();
 }
 
+// ==================== 주차 추가 ====================
+function addNewWeek() {
+    console.log('📝 주차 추가 시작');
+
+    // 현재 계획 조회
+    const allPlans = DataService.getAllSemesterPlans(currentStudentIdV2);
+    const currentPlan = allPlans.find(p =>
+        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
+    );
+
+    if (!currentPlan) {
+        showToast('계획을 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    // 다음 주차 번호 계산
+    const nextWeekNumber = (currentPlan.weeks?.length || 0) + 1;
+
+    // 새로운 주차 추가
+    const newWeek = {
+        week: nextWeekNumber,
+        plannedDate: null,
+        plannedContent: '',
+        plannedMethod: 'meeting',
+        executions: []
+    };
+
+    // weeks 배열이 없으면 생성
+    if (!currentPlan.weeks) {
+        currentPlan.weeks = [];
+    }
+
+    currentPlan.weeks.push(newWeek);
+
+    // totalWeeks도 업데이트
+    currentPlan.totalWeeks = nextWeekNumber;
+
+    console.log(`✅ ${nextWeekNumber}주차 추가 완료`);
+    showToast(`${nextWeekNumber}주차가 추가되었습니다.`, 'success');
+
+    // 화면 새로고침
+    refreshModalContent();
+}
+
 // 모달 내 계획 초기화
 async function resetTotalWeeksInModal() {
     console.log('🔄 resetTotalWeeksInModal 호출됨');
@@ -614,11 +658,27 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan) {
                         </tbody>
                     </table>
                 </div>
+
+                <!-- 주차 추가 버튼 -->
+                <div class="px-4 py-3 bg-gray-50 border-t border-gray-300">
+                    <button onclick="addNewWeek()"
+                            class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center gap-2">
+                        <i class="fas fa-plus"></i> 주차 추가
+                    </button>
+                </div>
             </div>
 
             <!-- Mobile Card View -->
             <div class="block md:hidden space-y-4">
                 ${weeks.map(week => renderWeekCardMobile(week, advisors, currentProf, existingPlan, currentStudentIdV2)).join('')}
+
+                <!-- 주차 추가 버튼 (모바일) -->
+                <div class="px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg">
+                    <button onclick="addNewWeek()"
+                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center justify-center gap-2">
+                        <i class="fas fa-plus"></i> 주차 추가
+                    </button>
+                </div>
             </div>
         </div>
     `;
@@ -1130,6 +1190,7 @@ initAutoExpandTextareas();
 window.showSemesterGuidanceDetail = showSemesterGuidanceDetail;
 window.closeSemesterGuidanceModal = closeSemesterGuidanceModal;
 window.changeSemesterViewInModal = changeSemesterViewInModal;
+window.addNewWeek = addNewWeek;
 window.resetTotalWeeksInModal = resetTotalWeeksInModal;
 window.executeCreatePlan = executeCreatePlan;
 window.refreshModalContent = refreshModalContent;
