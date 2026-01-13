@@ -239,7 +239,7 @@ function openAdminJournalReviewDetail(journalId) {
     detailScreen.dataset.journalId = journalId;
 
     // 동적 타이틀 생성 (관리자는 항상 읽기 전용이므로 타이틀만 표시)
-    const modalTitle = '[학술지 논문 심사 조회]';
+    const modalTitle = '학술지 논문 심사 조회';
 
     detailScreen.innerHTML = `
         <div class="review-detail-content-wrapper">

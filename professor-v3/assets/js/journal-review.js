@@ -417,7 +417,7 @@ function openJournalReviewDetail(journalId, viewType) {
     detailScreen.dataset.viewType = viewType || 'member';
 
     // 동적 타이틀 생성
-    const modalTitle = viewType === 'chair' ? '[학술지 논문 심사 승인]' : '[학술지 논문 심사]';
+    const modalTitle = viewType === 'chair' ? '학술지 논문 심사 승인' : '학술지 논문 심사';
 
     detailScreen.innerHTML = `
         <div class="review-detail-content-wrapper">
