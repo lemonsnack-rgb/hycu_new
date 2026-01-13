@@ -1930,12 +1930,23 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
         const roleText = committee.role === 'chair' ? '위원장' : '위원';
 
         if (evaluation && evaluation.overallComment) {
+            // overallComment가 객체인 경우 처리
+            let commentText = '';
+            if (typeof evaluation.overallComment === 'object') {
+                const comment = evaluation.overallComment;
+                if (comment.strengths) commentText += `<strong>강점:</strong> ${comment.strengths}<br>`;
+                if (comment.improvements) commentText += `<strong>개선사항:</strong> ${comment.improvements}<br>`;
+                if (comment.conclusion) commentText += `<strong>결론:</strong> ${comment.conclusion}`;
+            } else {
+                commentText = evaluation.overallComment;
+            }
+
             html += `
                 <div class="bg-gray-50 border border-gray-300 rounded-lg p-4">
                     <p class="text-sm font-semibold text-gray-700 mb-2">
                         ${committee.professorName} (${roleText})
                     </p>
-                    <p class="text-sm text-gray-700">${evaluation.overallComment}</p>
+                    <p class="text-sm text-gray-700">${commentText}</p>
             `;
 
             // 첨부파일 표시 (있는 경우에만)
@@ -2001,13 +2012,13 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
         const systemDecision = allPassed ? '통과' : '불통과';
 
         html += `
-            <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
+            <div class="bg-[#FAF6F1] border-2 border-[#E8DED2] rounded-lg p-4 mb-6">
                 <div class="flex justify-between items-center mb-3">
-                    <p class="font-bold text-[#4A001C]">전체 평균 점수</p>
+                    <p class="font-bold text-[#5C4A33]">전체 평균 점수</p>
                     <p class="text-2xl font-bold text-[#6A0028]">${avgScore.toFixed(1)}점</p>
                 </div>
-                <div class="flex justify-between items-center pt-3 border-t border-[#F8BBD9]">
-                    <p class="font-bold text-[#4A001C]">시스템 판정 결과</p>
+                <div class="flex justify-between items-center pt-3 border-t border-[#E8DED2]">
+                    <p class="font-bold text-[#5C4A33]">시스템 판정 결과</p>
                     <div class="flex items-center gap-2">
                         <span class="text-sm text-gray-600">(${passedCount}/${detail.allEvaluations.length}명 통과)</span>
                         <span class="inline-block px-4 py-2 rounded-lg font-bold ${
@@ -2042,48 +2053,7 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
         `;
     }
 
-    // 최종심사평 파일 업로드 영역 (종합의견 하단)
-    const existingFiles = result?.chairDecisionFiles || [];
-
-    if (!isAdminMode && allSubmitted && !chairSubmitted) {
-        // 교수 화면: 파일 업로드 가능 (제출 전)
-        html += `
-            <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
-                <h4 class="font-bold text-gray-800 mb-3">최종심사평 파일</h4>
-                <p class="text-sm text-gray-600 mb-3">최종심사평 파일을 업로드해주세요. (선택사항)</p>
-
-                <div class="mb-3">
-                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
-                        <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L9 8m4-4v12"></path>
-                        </svg>
-                        파일 선택
-                        <input type="file"
-                               id="chair-decision-file-input"
-                               onchange="handleChairDecisionFileSelect(event)"
-                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
-                               multiple
-                               class="hidden">
-                    </label>
-                    <span class="ml-3 text-xs text-gray-500">허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt (최대 30MB)</span>
-                </div>
-
-                <div id="chair-decision-file-list" class="space-y-2">
-                    <p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>
-                </div>
-            </div>
-        `;
-    } else if (existingFiles.length > 0) {
-        // 파일이 업로드되어 있으면 표시 (제출 후 또는 관리자 모드)
-        html += `
-            <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
-                <h4 class="font-bold text-gray-800 mb-3">최종심사평 파일</h4>
-                <div class="space-y-2">
-                    ${renderUploadedFileList(existingFiles)}
-                </div>
-            </div>
-        `;
-    }
+    // 최종심사평 파일은 각 교수별 종합의견 하단에 표시됨 (별도 영역 불필요)
 
     // 최종 승인 영역 - 항상 표시 (평가 미완료 시 또는 제출 후 비활성화)
     const isDisabled = !allSubmitted || chairSubmitted;
@@ -2135,7 +2105,49 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                           class="w-full border border-gray-300 rounded px-3 py-2 text-sm ${chairSubmitted ? 'bg-white text-gray-900' : isDisabled ? 'bg-gray-100 text-gray-500' : 'bg-white'}"
                           placeholder="${!allSubmitted ? '모든 심사위원의 평가가 완료되면 입력할 수 있습니다' : chairSubmitted ? '' : '최종 심사 의견을 입력하세요'}">${chairComment}</textarea>
             </div>
+    `;
 
+    // 최종 결정 첨부파일 영역
+    const existingFiles = result?.chairDecisionFiles || [];
+
+    if (!isAdminMode && allSubmitted && !chairSubmitted) {
+        // 교수 화면: 파일 업로드 가능 (제출 전)
+        html += `
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">첨부파일 (선택사항)</label>
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L9 8m4-4v12"></path>
+                        </svg>
+                        파일 선택
+                        <input type="file"
+                               id="chair-decision-file-input"
+                               onchange="handleChairDecisionFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple
+                               class="hidden">
+                    </label>
+                    <span class="ml-3 text-xs text-gray-500">허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt (최대 30MB)</span>
+                </div>
+                <div id="chair-decision-file-list" class="space-y-2">
+                    <p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>
+                </div>
+            </div>
+        `;
+    } else if (existingFiles.length > 0) {
+        // 파일이 업로드되어 있으면 표시 (제출 후 또는 관리자 모드)
+        html += `
+            <div class="mb-6">
+                <label class="block text-sm font-semibold text-gray-700 mb-2">첨부파일</label>
+                <div class="space-y-2">
+                    ${renderUploadedFileList(existingFiles)}
+                </div>
+            </div>
+        `;
+    }
+
+    html += `
             <div class="flex justify-end">
                 <button onclick="submitChairDecision()" ${disabledAttr}
                         class="btn btn-primary ${submitBtnDisabledClass}">
@@ -2556,6 +2568,6 @@ window.renderChairDecisionFileList = renderChairDecisionFileList;
 window.getFileIcon = getFileIcon;
 window.downloadFile = downloadFile;
 
-console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-13-002');
+console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-13-005');
 console.log('   renderEvaluationForm:', typeof renderEvaluationForm);
 console.log('   renderReviewDetail:', typeof renderReviewDetail);

@@ -5,6 +5,7 @@
 
 // 전역 변수
 let currentFilters = {
+    department: 'all',
     title: ''
 };
 
@@ -27,6 +28,7 @@ function filterNoticeList() {
     console.log('🔍 filterNoticeList 호출됨');
 
     // 필터 값 수집
+    currentFilters.department = document.getElementById('filter-notice-department')?.value || 'all';
     currentFilters.title = document.getElementById('filter-notice-title')?.value.trim() || '';
 
     console.log('📊 현재 필터:', currentFilters);
@@ -35,7 +37,20 @@ function filterNoticeList() {
     let data = getAllNotices();
     console.log('📦 전체 데이터 개수:', data.length);
 
-    // 필터 적용
+    // 학과 필터 적용
+    if (currentFilters.department !== 'all') {
+        data = data.filter(item => {
+            if (item.visibility === 'all') return true;
+            if (item.visibility === 'specific') {
+                if (!item.targetDepartments || item.targetDepartments.length === 0) return false;
+                if (item.targetDepartments.includes('all')) return true;
+                return item.targetDepartments.includes(currentFilters.department);
+            }
+            return true;
+        });
+    }
+
+    // 제목 필터 적용
     if (currentFilters.title) {
         data = data.filter(item =>
             item.title.toLowerCase().includes(currentFilters.title.toLowerCase())
@@ -78,7 +93,7 @@ function renderNoticeTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="text-center py-12">
+                <td colspan="6" class="text-center py-12">
                     <div class="text-6xl mb-4">📋</div>
                     <h3 class="text-lg font-semibold text-gray-600 mb-2">등록된 공지사항이 없습니다</h3>
                     <p class="text-gray-500">공지사항을 등록하면 이곳에 표시됩니다.</p>
@@ -113,9 +128,11 @@ function renderNoticeTable(data) {
  * 필터 초기화
  */
 function resetNoticeFilters() {
+    document.getElementById('filter-notice-department').value = 'all';
     document.getElementById('filter-notice-title').value = '';
 
     currentFilters = {
+        department: 'all',
         title: ''
     };
 
@@ -257,8 +274,6 @@ function showNoticeCreateForm() {
             <!-- 본문 -->
             <div class="review-detail-body">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">공지사항 작성</h2>
-
                     <form id="notice-form" onsubmit="saveNoticeData(event)">
                         <!-- 제목 -->
                         <div class="mb-6">
@@ -272,26 +287,41 @@ function showNoticeCreateForm() {
 
                         <!-- 공개 대상 학과 -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                공개 대상 학과 <span class="text-red-600">*</span>
-                            </label>
-                            <div class="space-y-3">
+                            <div class="flex items-center gap-4">
+                                <!-- 레이블 -->
+                                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    공개 대상 학과 <span class="text-red-600">*</span>
+                                </label>
+
+                                <!-- 전체 공개 라디오 -->
                                 <div class="flex items-center gap-2">
                                     <input type="radio" id="visibility-all" name="visibility" value="all" checked
-                                           onclick="toggleDepartmentSelection(false)"
+                                           onclick="toggleDepartmentDropdown(false)"
                                            class="text-[#6A0028] focus:ring-[#6A0028]">
-                                    <label for="visibility-all" class="text-sm text-gray-700">전체 공개 (모든 학과)</label>
+                                    <label for="visibility-all" class="text-sm text-gray-700 whitespace-nowrap">
+                                        전체 공개 (모든 학과)
+                                    </label>
                                 </div>
-                                <div class="flex items-start gap-2">
+
+                                <!-- 특정 학과 라디오 -->
+                                <div class="flex items-center gap-2">
                                     <input type="radio" id="visibility-specific" name="visibility" value="specific"
-                                           onclick="toggleDepartmentSelection(true)"
-                                           class="mt-0.5 text-[#6A0028] focus:ring-[#6A0028]">
-                                    <div class="flex-1">
-                                        <label for="visibility-specific" class="text-sm text-gray-700 block mb-2">특정 학과만 공개</label>
-                                        <div id="department-checkboxes" class="pl-6 space-y-2" style="display: none;">
-                                            ${DepartmentUtils.generateDepartmentCheckboxes([])}
-                                        </div>
-                                    </div>
+                                           onclick="toggleDepartmentDropdown(true)"
+                                           class="text-[#6A0028] focus:ring-[#6A0028]">
+                                    <label for="visibility-specific" class="text-sm text-gray-700 whitespace-nowrap">
+                                        특정 학과만 공개
+                                    </label>
+                                </div>
+
+                                <!-- 학과 선택 드롭다운 -->
+                                <div class="flex-1">
+                                    <select id="department-dropdown-specific" disabled
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028] bg-gray-100 cursor-not-allowed">
+                                        <option value="">학과 선택</option>
+                                        ${DepartmentUtils.getAllDepartments().map(dept =>
+                                            `<option value="${dept}">${dept}</option>`
+                                        ).join('')}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -345,14 +375,10 @@ function showNoticeCreateForm() {
                             </label>
                             <input type="file" id="notice-files" multiple accept="*/*"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028]">
-                            <p class="text-xs text-gray-500 mt-1">※ 파일은 실제로 업로드되지 않으며, 시뮬레이션 데이터로 저장됩니다.</p>
                         </div>
 
                         <!-- 버튼 영역 -->
                         <div class="flex justify-end gap-2 pt-6 border-t">
-                            <button type="button" onclick="backToNoticeList()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                                취소
-                            </button>
                             <button type="submit" class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020] transition-colors">
                                 <i class="fas fa-save mr-1"></i> 저장
                             </button>
@@ -399,8 +425,6 @@ function showNoticeEditForm(noticeId) {
             <!-- 본문 -->
             <div class="review-detail-body">
                 <div class="bg-white rounded-lg shadow-md p-6">
-                    <h2 class="text-xl font-bold text-gray-900 mb-6">공지사항 수정</h2>
-
                     <form id="notice-form" onsubmit="saveNoticeData(event)">
                         <!-- 제목 -->
                         <div class="mb-6">
@@ -414,28 +438,43 @@ function showNoticeEditForm(noticeId) {
 
                         <!-- 공개 대상 학과 -->
                         <div class="mb-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-3">
-                                공개 대상 학과 <span class="text-red-600">*</span>
-                            </label>
-                            <div class="space-y-3">
+                            <div class="flex items-center gap-4">
+                                <!-- 레이블 -->
+                                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                    공개 대상 학과 <span class="text-red-600">*</span>
+                                </label>
+
+                                <!-- 전체 공개 라디오 -->
                                 <div class="flex items-center gap-2">
                                     <input type="radio" id="visibility-all" name="visibility" value="all"
                                            ${notice.visibility === 'all' ? 'checked' : ''}
-                                           onclick="toggleDepartmentSelection(false)"
+                                           onclick="toggleDepartmentDropdown(false)"
                                            class="text-[#6A0028] focus:ring-[#6A0028]">
-                                    <label for="visibility-all" class="text-sm text-gray-700">전체 공개 (모든 학과)</label>
+                                    <label for="visibility-all" class="text-sm text-gray-700 whitespace-nowrap">
+                                        전체 공개 (모든 학과)
+                                    </label>
                                 </div>
-                                <div class="flex items-start gap-2">
+
+                                <!-- 특정 학과 라디오 -->
+                                <div class="flex items-center gap-2">
                                     <input type="radio" id="visibility-specific" name="visibility" value="specific"
                                            ${notice.visibility === 'specific' ? 'checked' : ''}
-                                           onclick="toggleDepartmentSelection(true)"
-                                           class="mt-0.5 text-[#6A0028] focus:ring-[#6A0028]">
-                                    <div class="flex-1">
-                                        <label for="visibility-specific" class="text-sm text-gray-700 block mb-2">특정 학과만 공개</label>
-                                        <div id="department-checkboxes" class="pl-6 space-y-2" style="display: ${notice.visibility === 'specific' ? 'block' : 'none'};">
-                                            ${DepartmentUtils.generateDepartmentCheckboxes(notice.targetDepartments || [])}
-                                        </div>
-                                    </div>
+                                           onclick="toggleDepartmentDropdown(true)"
+                                           class="text-[#6A0028] focus:ring-[#6A0028]">
+                                    <label for="visibility-specific" class="text-sm text-gray-700 whitespace-nowrap">
+                                        특정 학과만 공개
+                                    </label>
+                                </div>
+
+                                <!-- 학과 선택 드롭다운 -->
+                                <div class="flex-1">
+                                    <select id="department-dropdown-specific" ${notice.visibility === 'specific' ? '' : 'disabled'}
+                                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028] ${notice.visibility === 'specific' ? '' : 'bg-gray-100 cursor-not-allowed'}">
+                                        <option value="">학과 선택</option>
+                                        ${DepartmentUtils.getAllDepartments().map(dept =>
+                                            `<option value="${dept}" ${notice.targetDepartments && notice.targetDepartments.includes(dept) ? 'selected' : ''}>${dept}</option>`
+                                        ).join('')}
+                                    </select>
                                 </div>
                             </div>
                         </div>
@@ -488,7 +527,6 @@ function showNoticeEditForm(noticeId) {
                             </label>
                             <input type="file" id="notice-files" multiple accept="*/*"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028]">
-                            <p class="text-xs text-gray-500 mt-1">※ 파일은 실제로 업로드되지 않으며, 시뮬레이션 데이터로 저장됩니다.</p>
                             ${notice.attachments.length > 0 ? `
                                 <div class="mt-3 p-3 bg-gray-50 rounded-lg">
                                     <p class="text-xs font-medium text-gray-700 mb-2">기존 첨부파일:</p>
@@ -501,9 +539,6 @@ function showNoticeEditForm(noticeId) {
 
                         <!-- 버튼 영역 -->
                         <div class="flex justify-end gap-2 pt-6 border-t">
-                            <button type="button" onclick="showNoticeDetail('${noticeId}')" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                                취소
-                            </button>
                             <button type="submit" class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020] transition-colors">
                                 <i class="fas fa-save mr-1"></i> 저장
                             </button>
@@ -540,12 +575,20 @@ function formatNoticeText(command) {
 }
 
 /**
- * 학과 선택 영역 토글
+ * 학과 드롭다운 토글
  */
-function toggleDepartmentSelection(show) {
-    const checkboxContainer = document.getElementById('department-checkboxes');
-    if (checkboxContainer) {
-        checkboxContainer.style.display = show ? 'block' : 'none';
+function toggleDepartmentDropdown(enableSpecific) {
+    const dropdown = document.getElementById('department-dropdown-specific');
+
+    if (dropdown) {
+        if (enableSpecific) {
+            dropdown.disabled = false;
+            dropdown.classList.remove('bg-gray-100', 'cursor-not-allowed');
+        } else {
+            dropdown.disabled = true;
+            dropdown.classList.add('bg-gray-100', 'cursor-not-allowed');
+            dropdown.value = ''; // 선택 초기화
+        }
     }
 }
 
@@ -565,12 +608,14 @@ function saveNoticeData(event) {
     let targetDepartments = ['all'];
 
     if (visibility === 'specific') {
-        const checkboxes = document.querySelectorAll('input[name="targetDepartments"]:checked');
-        if (checkboxes.length === 0) {
-            alert('특정 학과 공개를 선택한 경우, 최소 1개 이상의 학과를 선택해주세요.');
+        const dropdown = document.getElementById('department-dropdown-specific');
+        const selectedValue = dropdown?.value;
+
+        if (!selectedValue || selectedValue === '') {
+            alert('특정 학과 공개를 선택한 경우, 학과를 선택해주세요.');
             return;
         }
-        targetDepartments = Array.from(checkboxes).map(cb => cb.value);
+        targetDepartments = [selectedValue];
     }
 
     // 유효성 검사
@@ -657,7 +702,7 @@ window.backToNoticeList = backToNoticeList;
 window.showNoticeCreateForm = showNoticeCreateForm;
 window.showNoticeEditForm = showNoticeEditForm;
 window.formatNoticeText = formatNoticeText;
-window.toggleDepartmentSelection = toggleDepartmentSelection;
+window.toggleDepartmentDropdown = toggleDepartmentDropdown;
 window.saveNoticeData = saveNoticeData;
 window.deleteNoticeConfirm = deleteNoticeConfirm;
 

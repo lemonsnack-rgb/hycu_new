@@ -8,9 +8,14 @@
  */
 const DepartmentUtils = {
     /**
-     * 전체 학과 목록 조회
+     * localStorage 키
      */
-    getAllDepartments() {
+    STORAGE_KEY: 'department_list',
+
+    /**
+     * 초기 학과 목록
+     */
+    getDefaultDepartments() {
         return [
             '컴퓨터공학과',
             '경영학과',
@@ -18,6 +23,63 @@ const DepartmentUtils = {
             '심리학과',
             '사회복지학과'
         ];
+    },
+
+    /**
+     * 전체 학과 목록 조회
+     */
+    getAllDepartments() {
+        const stored = localStorage.getItem(this.STORAGE_KEY);
+        if (stored) {
+            return JSON.parse(stored);
+        } else {
+            // 초기 데이터 저장
+            const defaultDepts = this.getDefaultDepartments();
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(defaultDepts));
+            return defaultDepts;
+        }
+    },
+
+    /**
+     * 학과 추가
+     */
+    addDepartment(departmentName) {
+        if (!departmentName || departmentName.trim() === '') {
+            console.error('학과명이 비어있습니다.');
+            return false;
+        }
+
+        const depts = this.getAllDepartments();
+
+        // 중복 체크
+        if (depts.includes(departmentName)) {
+            console.warn('이미 존재하는 학과입니다:', departmentName);
+            return false;
+        }
+
+        // 추가
+        depts.push(departmentName);
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(depts));
+        console.log('학과 추가 완료:', departmentName);
+        return true;
+    },
+
+    /**
+     * 학과 삭제
+     */
+    removeDepartment(departmentName) {
+        const depts = this.getAllDepartments();
+        const index = depts.indexOf(departmentName);
+
+        if (index > -1) {
+            depts.splice(index, 1);
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(depts));
+            console.log('학과 삭제 완료:', departmentName);
+            return true;
+        }
+
+        console.warn('존재하지 않는 학과입니다:', departmentName);
+        return false;
     },
 
     /**

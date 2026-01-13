@@ -4,6 +4,7 @@
 const ContentListManagement = {
     currentContentType: null, // 'ethics', 'schedule', 'procedure'
     currentFilters: {
+        department: 'all',
         title: ''
     },
 
@@ -31,6 +32,7 @@ const ContentListManagement = {
      */
     filterContentList() {
         // 필터 값 수집
+        this.currentFilters.department = document.getElementById('filter-content-department')?.value || 'all';
         this.currentFilters.title = document.getElementById('filter-content-title')?.value.trim() || '';
         this.loadContentList();
     },
@@ -40,6 +42,21 @@ const ContentListManagement = {
      */
     loadContentList() {
         let contentList = getContentList(this.currentContentType);
+
+        // 학과 필터 적용
+        if (this.currentFilters.department !== 'all') {
+            contentList = contentList.filter(item => {
+                if (item.visibility === 'all' || item.department === 'all') return true;
+                if (item.visibility === 'specific' && item.targetDepartments) {
+                    if (item.targetDepartments.includes('all')) return true;
+                    return item.targetDepartments.includes(this.currentFilters.department);
+                }
+                if (item.department) {
+                    return item.department === this.currentFilters.department;
+                }
+                return true;
+            });
+        }
 
         // 제목 필터 적용
         if (this.currentFilters.title) {
@@ -60,20 +77,11 @@ const ContentListManagement = {
             countDisplay.textContent = `(총 ${contentList.length}건)`;
         }
 
-        // 관리자 여부 확인
-        const isAdmin = typeof AuthUtils !== 'undefined' ? AuthUtils.isAdmin() : true;
-
-        // 신규 등록 버튼 show/hide
-        const createBtn = document.querySelector('.table-header-right button');
-        if (createBtn) {
-            createBtn.style.display = isAdmin ? 'inline-flex' : 'none';
-        }
-
         // 등록된 콘텐츠만 테이블에 표시
         if (contentList.length === 0) {
             tableBody.innerHTML = `
                 <tr>
-                    <td colspan="6" class="text-center py-12">
+                    <td colspan="5" class="text-center py-12">
                         <p class="text-gray-600">등록된 게시물이 없습니다</p>
                     </td>
                 </tr>
@@ -91,18 +99,6 @@ const ContentListManagement = {
                     <td>${deptDisplay}</td>
                     <td>${content.createdAt || content.lastModified || '-'}</td>
                     <td>${content.author || content.modifiedBy || '-'}</td>
-                    ${isAdmin ? `
-                        <td onclick="event.stopPropagation();">
-                            <button onclick="ContentListManagement.editContent('${content.id}')"
-                                    class="action-btn action-btn-edit">
-                                <i class="fas fa-edit"></i> 수정
-                            </button>
-                            <button onclick="ContentListManagement.deleteContent('${content.id}')"
-                                    class="action-btn action-btn-delete">
-                                <i class="fas fa-trash"></i> 삭제
-                            </button>
-                        </td>
-                    ` : '<td></td>'}
                 </tr>
             `;
         });
