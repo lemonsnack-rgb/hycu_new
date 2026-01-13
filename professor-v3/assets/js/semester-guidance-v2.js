@@ -469,11 +469,24 @@ function resetTotalWeeksInModal() {
 
     console.log('  - 총 계획/실적 건수:', totalItems);
 
-    // setTimeout으로 확인 대화상자 실행을 지연시켜 이벤트 전파 문제 방지
+    // 모달의 z-index를 임시로 낮춰서 confirm 대화상자가 표시되도록 함
+    const modal = document.getElementById('semester-guidance-modal');
+    const originalZIndex = modal ? modal.style.zIndex : '500';
+
+    if (modal) {
+        modal.style.zIndex = '0';
+    }
+
+    // setTimeout으로 확인 대화상자 실행을 지연
     setTimeout(() => {
         const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
 
         console.log('  - 사용자 확인 결과:', confirmed);
+
+        // z-index 복원
+        if (modal) {
+            modal.style.zIndex = originalZIndex;
+        }
 
         if (!confirmed) {
             console.log('❌ 사용자가 초기화 취소');
@@ -906,9 +919,32 @@ function saveAllWeekPlans() {
 
 // ==================== 학기 계획 승인 ====================
 function approveSemesterPlan() {
-    if (!confirm('이 학기의 지도 계획을 승인하시겠습니까?')) {
-        return;
+    // 모달의 z-index를 임시로 낮춰서 confirm 대화상자가 표시되도록 함
+    const modal = document.getElementById('semester-guidance-modal');
+    const originalZIndex = modal ? modal.style.zIndex : '500';
+
+    if (modal) {
+        modal.style.zIndex = '0';
     }
+
+    setTimeout(() => {
+        const confirmed = confirm('이 학기의 지도 계획을 승인하시겠습니까?');
+
+        // z-index 복원
+        if (modal) {
+            modal.style.zIndex = originalZIndex;
+        }
+
+        if (!confirmed) {
+            return;
+        }
+
+        executeApprovePlan();
+    }, 100);
+}
+
+// 실제 승인 실행 함수
+function executeApprovePlan() {
 
     try {
         const currentProf = DataService.getCurrentProfessor();
