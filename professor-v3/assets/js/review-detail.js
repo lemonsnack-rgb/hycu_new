@@ -1817,6 +1817,49 @@ function renderChairApprovalScreen(detail, allSubmitted) {
         `;
     }
 
+    // 최종심사평 파일 업로드 영역 (종합의견 하단)
+    const existingFiles = result?.chairDecisionFiles || [];
+
+    if (!isAdminMode && allSubmitted && !chairSubmitted) {
+        // 교수 화면: 파일 업로드 가능 (제출 전)
+        html += `
+            <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-gray-800 mb-3">최종심사평 파일</h4>
+                <p class="text-sm text-gray-600 mb-3">최종심사평 파일을 업로드해주세요. (선택사항)</p>
+
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        <svg class="w-4 h-4 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L9 8m4-4v12"></path>
+                        </svg>
+                        파일 선택
+                        <input type="file"
+                               id="chair-decision-file-input"
+                               onchange="handleChairDecisionFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple
+                               class="hidden">
+                    </label>
+                    <span class="ml-3 text-xs text-gray-500">허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt (최대 30MB)</span>
+                </div>
+
+                <div id="chair-decision-file-list" class="space-y-2">
+                    <p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>
+                </div>
+            </div>
+        `;
+    } else if (existingFiles.length > 0) {
+        // 파일이 업로드되어 있으면 표시 (제출 후 또는 관리자 모드)
+        html += `
+            <div class="bg-white border border-gray-300 rounded-lg p-4 mb-6">
+                <h4 class="font-bold text-gray-800 mb-3">최종심사평 파일</h4>
+                <div class="space-y-2">
+                    ${renderUploadedFileList(existingFiles)}
+                </div>
+            </div>
+        `;
+    }
+
     // 최종 승인 영역 - 항상 표시 (평가 미완료 시 또는 제출 후 비활성화)
     const chairSubmitted = isApproved;
     const isDisabled = !allSubmitted || chairSubmitted;
@@ -1928,6 +1971,39 @@ function submitChairDecision() {
         return;
     }
 
+    // 파일 업로드 처리 (Mock - 실제로는 서버 API 호출)
+    const uploadedFiles = [];
+    if (chairDecisionFiles.length > 0) {
+        console.log('📤 파일 업로드 시작:', chairDecisionFiles.length, '개');
+
+        // Mock: 파일을 FormData로 변환하여 서버에 전송하는 로직
+        // 실제 구현 시:
+        // const formData = new FormData();
+        // chairDecisionFiles.forEach((fileItem, index) => {
+        //     formData.append(`files[${index}]`, fileItem.file);
+        // });
+        // const uploadResponse = await fetch('/api/review/upload-decision-files', {
+        //     method: 'POST',
+        //     body: formData
+        // });
+        // const uploadResult = await uploadResponse.json();
+
+        // Mock: 파일 정보만 저장
+        chairDecisionFiles.forEach(fileItem => {
+            uploadedFiles.push({
+                id: fileItem.id,
+                fileName: fileItem.name,
+                fileSize: fileItem.size,
+                fileType: fileItem.type,
+                uploadedAt: new Date().toISOString(),
+                uploadedBy: 'P003', // 현재 교수 ID
+                fileUrl: `/uploads/review/${currentAssignmentId}/${fileItem.name}` // Mock URL
+            });
+        });
+
+        console.log('✅ 파일 업로드 완료 (Mock):', uploadedFiles);
+    }
+
     // 데이터 저장
     const assignment = ReviewService.getAssignmentById(currentAssignmentId);
     if (assignment) {
@@ -1950,7 +2026,8 @@ function submitChairDecision() {
         assignmentId: currentAssignmentId,
         finalDecision: selectedDecision,
         chairComment: comment,
-        decisionDate: new Date().toISOString().split('T')[0]
+        decisionDate: new Date().toISOString().split('T')[0],
+        chairDecisionFiles: uploadedFiles // 업로드된 파일 정보 추가
     };
 
     // REVIEW_RESULTS에 저장 (Mock)
@@ -1961,7 +2038,10 @@ function submitChairDecision() {
         REVIEW_RESULTS.push(result);
     }
 
-    showToast(`최종 결정(${selectedDecision})이 제출되었습니다`, 'success');
+    // 파일 목록 초기화
+    chairDecisionFiles = [];
+
+    showToast(`최종 결정(${selectedDecision})이 제출되었습니다${uploadedFiles.length > 0 ? ` (파일 ${uploadedFiles.length}개 업로드)` : ''}`, 'success');
 
     // 화면 새로고침
     setTimeout(() => {
@@ -1969,10 +2049,147 @@ function submitChairDecision() {
     }, 1000);
 }
 
+// ==================== 파일 업로드 관련 함수 ====================
+// 선택된 파일 목록 저장 (전역)
+let chairDecisionFiles = [];
+
+/**
+ * 파일 선택 처리
+ */
+function handleChairDecisionFileSelect(event) {
+    const files = Array.from(event.target.files);
+
+    // 파일 확장자 검증
+    const allowedExtensions = ['hwp', 'hwpx', 'doc', 'docx', 'ppt', 'pptx', 'pdf', 'txt'];
+    const maxFileSize = 30 * 1024 * 1024; // 30MB in bytes
+
+    for (const file of files) {
+        // 확장자 체크
+        const fileName = file.name.toLowerCase();
+        const extension = fileName.split('.').pop();
+
+        if (!allowedExtensions.includes(extension)) {
+            showToast(`허용되지 않은 파일 형식입니다: ${file.name}\n허용 형식: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt`, 'error');
+            continue;
+        }
+
+        // 파일 크기 체크
+        if (file.size > maxFileSize) {
+            showToast(`파일 크기가 30MB를 초과합니다: ${file.name}`, 'error');
+            continue;
+        }
+
+        // 중복 체크
+        const isDuplicate = chairDecisionFiles.some(f => f.name === file.name && f.size === file.size);
+        if (isDuplicate) {
+            showToast(`이미 선택된 파일입니다: ${file.name}`, 'warning');
+            continue;
+        }
+
+        // 파일 추가
+        chairDecisionFiles.push({
+            id: `file_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+            file: file,
+            name: file.name,
+            size: file.size,
+            type: extension
+        });
+    }
+
+    // 파일 input 초기화 (같은 파일 재선택 가능하도록)
+    event.target.value = '';
+
+    // UI 업데이트
+    renderChairDecisionFileList();
+}
+
+/**
+ * 파일 목록 렌더링
+ */
+function renderChairDecisionFileList() {
+    const container = document.getElementById('chair-decision-file-list');
+    if (!container) return;
+
+    if (chairDecisionFiles.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-500">선택된 파일이 없습니다.</p>';
+        return;
+    }
+
+    const html = chairDecisionFiles.map(fileItem => {
+        const sizeInMB = (fileItem.size / (1024 * 1024)).toFixed(2);
+        return `
+            <div class="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900 truncate" title="${fileItem.name}">${fileItem.name}</p>
+                        <p class="text-xs text-gray-500">${sizeInMB} MB</p>
+                    </div>
+                </div>
+                <button onclick="removeChairDecisionFile('${fileItem.id}')"
+                        class="text-red-600 hover:text-red-800 p-1 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+        `;
+    }).join('');
+
+    container.innerHTML = html;
+}
+
+/**
+ * 파일 제거
+ */
+function removeChairDecisionFile(fileId) {
+    chairDecisionFiles = chairDecisionFiles.filter(f => f.id !== fileId);
+    renderChairDecisionFileList();
+}
+
+/**
+ * 업로드된 파일 목록 렌더링 (읽기 전용 - 관리자용)
+ */
+function renderUploadedFileList(files) {
+    if (!files || files.length === 0) {
+        return '<p class="text-sm text-gray-500">업로드된 파일이 없습니다.</p>';
+    }
+
+    return files.map(file => {
+        const sizeInMB = (file.fileSize / (1024 * 1024)).toFixed(2);
+        const uploadDate = file.uploadedAt ? new Date(file.uploadedAt).toLocaleString('ko-KR') : '-';
+
+        return `
+            <div class="flex items-center justify-between p-2 bg-gray-50 rounded border border-gray-200">
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                    </svg>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-sm text-gray-900 truncate" title="${file.fileName}">${file.fileName}</p>
+                        <p class="text-xs text-gray-500">${sizeInMB} MB · ${uploadDate}</p>
+                    </div>
+                </div>
+                <a href="${file.fileUrl || '#'}" download="${file.fileName}"
+                   class="text-[#6A0028] hover:text-[#8A0034] p-1 flex-shrink-0">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                </a>
+            </div>
+        `;
+    }).join('');
+}
+
 window.renderReviewDetail = renderReviewDetail;
 window.selectDecision = selectDecision;
 window.submitChairDecision = submitChairDecision;
+window.handleChairDecisionFileSelect = handleChairDecisionFileSelect;
+window.removeChairDecisionFile = removeChairDecisionFile;
+window.renderChairDecisionFileList = renderChairDecisionFileList;
 
-console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-19-002');
+console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-13-001');
 console.log('   renderEvaluationForm:', typeof renderEvaluationForm);
 console.log('   renderReviewDetail:', typeof renderReviewDetail);

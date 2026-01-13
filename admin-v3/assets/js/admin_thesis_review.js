@@ -343,9 +343,13 @@ function makeAllInputsReadonly() {
         btn.style.pointerEvents = 'none';
     });
 
-    // 파일 업로드 버튼 숨기기 (file 셀렉터 제거 - 다운로드 버튼과 충돌)
+    // 파일 업로드 버튼 숨기기 (file input과 label 제거 - 다운로드 버튼과 충돌)
     container.querySelectorAll('button[onclick*="upload"], input[type="file"]').forEach(el => {
         el.style.display = 'none';
+        // label도 함께 숨기기 (input의 부모가 label인 경우)
+        if (el.tagName === 'INPUT' && el.type === 'file' && el.parentElement.tagName === 'LABEL') {
+            el.parentElement.style.display = 'none';
+        }
     });
 
     console.log('✅ Read-only mode applied');
