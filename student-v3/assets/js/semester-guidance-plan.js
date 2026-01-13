@@ -1,6 +1,6 @@
 /**
  * 학생용 학기별 지도 계획
- * Version: 20260113001
+ * Version: 20260113002
  *
  * 기능:
  * - 본인의 학기별 지도 계획 조회
@@ -8,6 +8,13 @@
  * - 교수 실적 조회 (읽기 전용)
  * - 실적 입력 불가 (교수 전용 기능 제외)
  * - 승인 후 수정 불가
+ *
+ * 변경사항 (v20260113002):
+ * - UI를 관리자/교수 화면과 완전히 동기화
+ * - 승인 배지 스타일 변경 (rounded-full)
+ * - 테이블 컬럼 사이즈 통일 (80px, 35%, 50%, 100px)
+ * - 학기 정보 영역 레이아웃 표준화 (px-6 py-3, gap-6)
+ * - 버튼 아이콘 제거하여 간결화
  *
  * 변경사항 (v20260113001):
  * - 학년도 동적 생성 (최근 5년)
@@ -274,13 +281,12 @@ function showStudentSemesterPlanDetail() {
             </div>
         </div>
 
-        <!-- 학기 정보 -->
+        <!-- 학기 정보 (교수/관리자 화면과 UI 동기화) -->
         <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="px-6 py-4 bg-gray-50">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">학기 정보</h4>
-                <div class="flex items-center gap-6 text-sm">
+            <div class="px-6 py-3 bg-white border-b">
+                <div class="flex items-center gap-6">
                     <div class="flex items-center gap-2">
-                        <label class="text-gray-600 min-w-[60px]">학년도:</label>
+                        <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
                         <select id="student-select-year" onchange="changeStudentSemesterView()"
                                 class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
                             ${Array.from(new Set(availableSemesters.map(s => s.year)))
@@ -289,7 +295,7 @@ function showStudentSemesterPlanDetail() {
                         </select>
                     </div>
                     <div class="flex items-center gap-2">
-                        <label class="text-gray-600 min-w-[60px]">학기:</label>
+                        <label class="text-sm text-gray-600 min-w-[60px]">학기:</label>
                         <select id="student-select-semester" onchange="changeStudentSemesterView()"
                                 class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
                             ${availableSemesters
@@ -298,28 +304,21 @@ function showStudentSemesterPlanDetail() {
                                 .join('')}
                         </select>
                     </div>
-                    ${totalWeeks > 0 ? `
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-600">총 주차:</span>
-                        <span class="text-gray-900 font-medium">${totalWeeks}주</span>
-                    </div>
                     ${isApproved ? `
-                    <div class="flex items-center gap-2">
-                        <span class="text-green-600 font-medium">✓ 승인완료</span>
-                    </div>
+                        <div class="flex items-center gap-2 text-sm">
+                            <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
+                                ✓ 승인됨
+                            </span>
+                        </div>
+                    ` : totalWeeks === 0 ? `
+                        <div class="flex items-center gap-2">
+                            <span class="text-orange-600 text-sm">⚠ 아직 지도 계획이 생성되지 않았습니다.</span>
+                        </div>
                     ` : ''}
-                    ` : `
-                    <div class="flex items-center gap-2">
-                        <span class="text-orange-600 text-sm">⚠ 아직 지도 계획이 생성되지 않았습니다.</span>
-                    </div>
-                    `}
-                    <div class="ml-auto">
+                    <div class="flex items-center gap-3 ml-auto">
                         <button onclick="${isApproved ? 'alertStudentApprovedPlanEdit()' : 'resetStudentTotalWeeks()'}"
-                                class="${isApproved ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#6A0028] hover:bg-[#8A0034]'} text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2"
+                                class="${isApproved ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#6A0028] hover:bg-[#8A0034]'} text-white px-4 py-2 rounded text-sm font-medium"
                                 ${isApproved ? 'disabled' : ''}>
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
-                            </svg>
                             ${totalWeeks > 0 ? '계획 초기화' : '계획 생성'}
                         </button>
                     </div>
@@ -391,15 +390,15 @@ function renderStudentWeeklyCards(weeks) {
                 <h3 class="text-lg font-bold text-gray-800">학기별 지도 계획</h3>
             </div>
 
-            <!-- Desktop Table View -->
+            <!-- Desktop Table View (교수/관리자 화면과 컬럼 사이즈 동기화) -->
             <div class="hidden md:block bg-white rounded-lg shadow-md overflow-hidden">
                 <div class="overflow-x-auto">
                     <table class="min-w-full border-collapse border border-gray-300">
                         <thead>
                             <tr class="bg-gray-50">
                                 <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 80px;">주차</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">계획내용</th>
-                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700">실행내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 35%;">계획내용</th>
+                                <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 50%;">실행내용</th>
                                 <th class="border border-gray-300 px-3 py-2 text-xs font-semibold text-gray-700" style="width: 100px;">교수명</th>
                             </tr>
                         </thead>
