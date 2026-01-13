@@ -439,23 +439,22 @@ function resetTotalWeeksInModal() {
     console.log('  - currentStudentIdV2:', currentStudentIdV2);
     console.log('  - currentSemesterView:', currentSemesterView);
 
-    // getSemesterPlan을 사용하여 현재 학기 계획 조회
-    const semesterPlan = DataService.getSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester
+    // getAllSemesterPlans로 현재 계획 조회 (저장되지 않은 데이터도 포함)
+    const allPlans = DataService.getAllSemesterPlans(currentStudentIdV2);
+    const currentPlan = allPlans.find(p =>
+        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
     );
 
-    console.log('  - semesterPlan:', semesterPlan);
+    console.log('  - currentPlan:', currentPlan);
 
-    // 주차 수 계산 (totalWeeks 사용)
-    const weekCount = semesterPlan?.totalWeeks || 0;
-    console.log('  - 주차 수 (totalWeeks):', weekCount);
+    // 주차 수 계산 (weeks 배열 길이 사용)
+    const weekCount = currentPlan?.weeks?.length || 0;
+    console.log('  - 주차 수:', weekCount);
 
     // 계획과 실적 건수 계산
     let totalItems = 0;
-    if (semesterPlan?.weeks) {
-        semesterPlan.weeks.forEach(week => {
+    if (currentPlan?.weeks) {
+        currentPlan.weeks.forEach(week => {
             // 계획이 있으면 +1
             if (week.plannedContent && week.plannedContent.trim()) {
                 totalItems++;
