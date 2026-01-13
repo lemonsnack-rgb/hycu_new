@@ -387,19 +387,36 @@ function resetTotalWeeksInModal() {
     console.log('  - currentStudentIdV2:', currentStudentIdV2);
     console.log('  - currentSemesterView:', currentSemesterView);
 
-    const semesterPlan = DataService.getSemesterPlan(
-        currentStudentIdV2,
-        currentSemesterView.year,
-        currentSemesterView.semester
+    // 현재 학기 계획 조회
+    const allPlans = DataService.getAllSemesterPlans(currentStudentIdV2);
+    const currentPlan = allPlans.find(p =>
+        p.year === currentSemesterView.year && p.semester === currentSemesterView.semester
     );
-    console.log('  - semesterPlan:', semesterPlan);
 
-    const currentWeeks = semesterPlan?.totalWeeks || 0;
-    const plans = semesterPlan?.plans || [];
-    console.log('  - currentWeeks:', currentWeeks);
-    console.log('  - plans.length:', plans.length);
+    console.log('  - currentPlan:', currentPlan);
 
-    if (!confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`)) {
+    // 주차 수 계산
+    const weekCount = currentPlan?.weeks?.length || 0;
+    console.log('  - 주차 수:', weekCount);
+
+    // 계획과 실적 건수 계산
+    let totalItems = 0;
+    if (currentPlan?.weeks) {
+        currentPlan.weeks.forEach(week => {
+            // 계획이 있으면 +1
+            if (week.plannedContent && week.plannedContent.trim()) {
+                totalItems++;
+            }
+            // 실적이 있으면 각각 +1
+            if (week.executions && week.executions.length > 0) {
+                totalItems += week.executions.length;
+            }
+        });
+    }
+
+    console.log('  - 총 계획/실적 건수:', totalItems);
+
+    if (!confirm(`⚠️ 계획 초기화 확인\n\n현재 ${weekCount}주차 구조와 입력된 모든 계획 및 실적(총 ${totalItems}건)이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`)) {
         console.log('❌ 사용자가 초기화 취소');
         return;
     }
