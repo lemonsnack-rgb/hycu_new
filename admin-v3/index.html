@@ -1011,6 +1011,18 @@
                     console.log('  - filter-notice-title:', !!document.getElementById('filter-notice-title'));
                 }
 
+                // 논문 제출 요건 관리 화면인 경우 초기화
+                if (viewName === 'requirementManagement') {
+                    setTimeout(() => {
+                        if (typeof RequirementManagement !== 'undefined') {
+                            console.log('🎯 RequirementManagement 초기화 시작 (from renderAdminView)');
+                            RequirementManagement.init();
+                        } else {
+                            console.error('❌ RequirementManagement가 로드되지 않았습니다');
+                        }
+                    }, 100);
+                }
+
                 // 특정 뷰에 대한 후처리
                 if (viewName === 'stageManagement' && typeof renderStageManagementContent === 'function') {
                     setTimeout(() => {
@@ -1195,6 +1207,7 @@
     <script src="assets/js/content-data.js"></script>
     <script src="assets/js/notice-data.js"></script>
     <script src="assets/js/department-utils.js"></script>
+    <script src="assets/js/requirement-management.js"></script>
     <script src="assets/js/admin_main.js"></script>
     <script src="assets/js/admin_views.js"></script>
     <script src="assets/js/admin_modals.js"></script>

@@ -1786,75 +1786,126 @@ const views = {
 
     // ========== 논문 제출 요건 관리 ==========
     requirementManagement: () => {
-        const data = appData.requirements;
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
-                    <div class="flex justify-between items-center mb-4">
+                    <div class="flex justify-between items-center">
                         <h3 class="text-lg font-bold text-gray-800">논문 제출 요건 관리</h3>
-                        <button onclick="openRequirementModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
-                            등록
+                        <button onclick="RequirementManagement.showAddDepartmentModal()"
+                                class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                            <i class="fas fa-plus mr-1"></i> 학과/전공 추가
                         </button>
                     </div>
-                    
-                    <!-- 검색 영역 -->
-                    <div class="search-container">
-                        <div class="search-grid">
-                            <select id="requirement-search-major" class="search-select" onchange="searchRequirement()">
-                                <option value="">전공 전체</option>
-                                <option value="교육공학">교육공학</option>
-                                <option value="경영학">경영학</option>
-                                <option value="컴퓨터공학">컴퓨터공학</option>
-                            </select>
-                            <select id="requirement-search-degree" class="search-select" onchange="searchRequirement()">
-                                <option value="">학위과정 전체</option>
-                                <option value="석사">석사</option>
-                                <option value="박사">박사</option>
-                            </select>
-                        </div>
-                        <div class="search-buttons">
-                            <button onclick="searchRequirement()" class="search-btn search-btn-primary">
-                                <i class="fas fa-search"></i> 검색
-                            </button>
-                            <button onclick="resetRequirementSearch()" class="search-btn search-btn-secondary">
-                                <i class="fas fa-redo"></i> 초기화
-                            </button>
-                        </div>
+                </div>
+
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">논문 제출 요건 목록</h3>
+                        <span class="table-count" id="requirement-count-display">(총 0건)</span>
                     </div>
                 </div>
-                <div class="overflow-x-auto">
-                    <table id="requirement-table" class="min-w-full table-fixed">
+
+                <div class="table-scroll" style="overflow-x: auto;">
+                    <table id="requirement-table" class="min-w-full table-auto">
                         <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">최소학점</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문필수</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술지논문</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학술대회논문</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">관리</th>
-                            </tr>
+                            <!-- 헤더는 RequirementManagement.renderTable()에서 동적 생성 -->
                         </thead>
                         <tbody class="divide-y divide-gray-200">
-                            ${data.map(item => `
-                                <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.major}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.degree}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.minCredits}학점</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.thesisRequired ? 'O' : 'X'}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.journalPapers}편</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">${item.conferencePapers}편</td>
-                                    <td class="py-3 px-4 space-x-2">
-                                        <button onclick="viewRequirementDetail(${item.id})" class="text-blue-600 hover:underline text-sm">상세</button>
-                                        <button onclick="editRequirement(${item.id})" class="text-green-600 hover:underline text-sm">수정</button>
-                                        <button onclick="deleteRequirement(${item.id})" class="text-red-600 hover:underline text-sm">삭제</button>
-                                    </td>
-                                </tr>
-                            `).join('')}
+                            <!-- 바디는 RequirementManagement.renderTable()에서 동적 생성 -->
                         </tbody>
                     </table>
                 </div>
             </div>
+
+            <!-- 학과/전공 추가 모달 -->
+            <div id="add-department-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
+                    <!-- 모달 헤더 -->
+                    <div class="flex items-center justify-between p-6 border-b">
+                        <h3 class="text-lg font-bold text-gray-800">학과/전공 추가</h3>
+                        <button onclick="RequirementManagement.closeAddDepartmentModal()"
+                                class="text-gray-400 hover:text-gray-600">
+                            <i class="fas fa-times text-xl"></i>
+                        </button>
+                    </div>
+
+                    <!-- 모달 바디 -->
+                    <div class="p-6">
+                        <form id="add-department-form" onsubmit="RequirementManagement.submitAddDepartment(event)">
+                            <!-- 학과/전공 선택 -->
+                            <div class="mb-6">
+                                <label for="select-department" class="block text-sm font-medium text-gray-700 mb-2">
+                                    학과/전공 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="select-department"
+                                        required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6A0028]">
+                                    <option value="">선택하세요</option>
+                                </select>
+                            </div>
+
+                            <!-- 학위과정 선택 -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-gray-700 mb-3">
+                                    학위과정 <span class="text-red-600">*</span>
+                                </label>
+                                <div class="flex gap-4">
+                                    <div class="flex items-center">
+                                        <input type="radio"
+                                               id="degree-master"
+                                               name="degreeProgram"
+                                               value="석사"
+                                               checked
+                                               class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028]">
+                                        <label for="degree-master" class="ml-2 text-sm text-gray-700">석사</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio"
+                                               id="degree-doctor"
+                                               name="degreeProgram"
+                                               value="박사"
+                                               class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028]">
+                                        <label for="degree-doctor" class="ml-2 text-sm text-gray-700">박사</label>
+                                    </div>
+                                    <div class="flex items-center">
+                                        <input type="radio"
+                                               id="degree-integrated"
+                                               name="degreeProgram"
+                                               value="통합과정"
+                                               class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028]">
+                                        <label for="degree-integrated" class="ml-2 text-sm text-gray-700">통합과정</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 버튼 영역 -->
+                            <div class="flex justify-end gap-2">
+                                <button type="button"
+                                        onclick="RequirementManagement.closeAddDepartmentModal()"
+                                        class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                                    취소
+                                </button>
+                                <button type="submit"
+                                        class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#550020]">
+                                    <i class="fas fa-plus mr-1"></i> 추가하기
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // DOM이 준비된 후 초기화
+                setTimeout(() => {
+                    if (typeof RequirementManagement !== 'undefined') {
+                        console.log('🎯 RequirementManagement 초기화 시작');
+                        RequirementManagement.init();
+                    } else {
+                        console.error('❌ RequirementManagement가 로드되지 않았습니다');
+                    }
+                }, 100);
+            </script>
         `;
     },
 
@@ -2701,6 +2752,11 @@ const views = {
 
                 <!-- 테이블 -->
                 <div class="bg-white rounded-lg shadow-md">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">최종 논문 제목 등록 목록</h3>
+                        </div>
+                    </div>
                     <div class="overflow-x-auto">
                         <table class="min-w-full table-fixed">
                             <thead class="bg-gray-50">
@@ -5335,11 +5391,24 @@ views.ethicsList = () => {
     <!-- 검색 영역 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-4">
         <div class="flex items-center gap-3">
-            <!-- 제목 검색 -->
+            <!-- 학과/전공 -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                <select id="filter-content-department"
+                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                        style="height: 34px;">
+                    <option value="all">전체</option>
+                    ${DepartmentUtils.getAllDepartments().map(dept =>
+                        `<option value="${dept}">${dept}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <!-- 제목 -->
             <div class="flex items-center gap-2 flex-1">
                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
                 <input type="text" id="filter-content-title" placeholder="제목"
-                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                       onkeypress="if(event.key === 'Enter') ContentListManagement.filterContentList()">
             </div>
             <!-- 조회 버튼 -->
             <button onclick="ContentListManagement.filterContentList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
@@ -5369,7 +5438,6 @@ views.ethicsList = () => {
                         <th style="width: 150px;">대상학과</th>
                         <th style="width: 150px;">작성일</th>
                         <th style="width: 120px;">작성자</th>
-                        <th style="width: 150px;">관리</th>
                     </tr>
                 </thead>
                 <tbody id="content-table-body">
@@ -5388,11 +5456,24 @@ views.scheduleList = () => {
     <!-- 검색 영역 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-4">
         <div class="flex items-center gap-3">
-            <!-- 제목 검색 -->
+            <!-- 학과/전공 -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                <select id="filter-content-department"
+                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                        style="height: 34px;">
+                    <option value="all">전체</option>
+                    ${DepartmentUtils.getAllDepartments().map(dept =>
+                        `<option value="${dept}">${dept}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <!-- 제목 -->
             <div class="flex items-center gap-2 flex-1">
                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
                 <input type="text" id="filter-content-title" placeholder="제목"
-                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                       onkeypress="if(event.key === 'Enter') ContentListManagement.filterContentList()">
             </div>
             <!-- 조회 버튼 -->
             <button onclick="ContentListManagement.filterContentList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
@@ -5422,7 +5503,6 @@ views.scheduleList = () => {
                         <th style="width: 150px;">대상학과</th>
                         <th style="width: 150px;">작성일</th>
                         <th style="width: 120px;">작성자</th>
-                        <th style="width: 150px;">관리</th>
                     </tr>
                 </thead>
                 <tbody id="content-table-body">
@@ -5441,11 +5521,24 @@ views.procedureList = () => {
     <!-- 검색 영역 -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-4">
         <div class="flex items-center gap-3">
-            <!-- 제목 검색 -->
+            <!-- 학과/전공 -->
+            <div class="flex items-center gap-2 flex-1">
+                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                <select id="filter-content-department"
+                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                        style="height: 34px;">
+                    <option value="all">전체</option>
+                    ${DepartmentUtils.getAllDepartments().map(dept =>
+                        `<option value="${dept}">${dept}</option>`
+                    ).join('')}
+                </select>
+            </div>
+            <!-- 제목 -->
             <div class="flex items-center gap-2 flex-1">
                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
                 <input type="text" id="filter-content-title" placeholder="제목"
-                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                       class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                       onkeypress="if(event.key === 'Enter') ContentListManagement.filterContentList()">
             </div>
             <!-- 조회 버튼 -->
             <button onclick="ContentListManagement.filterContentList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
@@ -5475,7 +5568,6 @@ views.procedureList = () => {
                         <th style="width: 150px;">대상학과</th>
                         <th style="width: 150px;">작성일</th>
                         <th style="width: 120px;">작성자</th>
-                        <th style="width: 150px;">관리</th>
                     </tr>
                 </thead>
                 <tbody id="content-table-body">
@@ -5506,11 +5598,24 @@ views.noticeManagement = () => `
         <!-- 검색 영역 -->
         <div class="bg-white rounded-lg shadow-md p-6 mb-4">
             <div class="flex items-center gap-3">
-                <!-- 제목 검색 -->
+                <!-- 학과/전공 -->
+                <div class="flex items-center gap-2 flex-1">
+                    <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/전공</label>
+                    <select id="filter-notice-department"
+                            class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                            style="height: 34px;">
+                        <option value="all">전체</option>
+                        ${DepartmentUtils.getAllDepartments().map(dept =>
+                            `<option value="${dept}">${dept}</option>`
+                        ).join('')}
+                    </select>
+                </div>
+                <!-- 제목 -->
                 <div class="flex items-center gap-2 flex-1">
                     <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">제목</label>
                     <input type="text" id="filter-notice-title" placeholder="제목"
-                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                           class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;"
+                           onkeypress="if(event.key === 'Enter') filterNoticeList()">
                 </div>
                 <!-- 조회 버튼 -->
                 <button onclick="filterNoticeList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
