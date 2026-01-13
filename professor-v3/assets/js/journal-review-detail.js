@@ -455,13 +455,13 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
                 const systemDecision = allPassed ? '통과' : '불통과';
 
                 content += `
-                    <div class="bg-[#FCE4EC] border-2 border-[#F8BBD9] rounded-lg p-4 mb-6">
+                    <div class="bg-[#FAF6F1] border-2 border-[#E8DED2] rounded-lg p-4 mb-6">
                         <div class="flex justify-between items-center mb-3">
-                            <p class="font-bold text-[#4A001C]">전체 평균 점수</p>
+                            <p class="font-bold text-[#5C4A33]">전체 평균 점수</p>
                             <p class="text-2xl font-bold text-[#6A0028]">${avgScore}점</p>
                         </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-[#F8BBD9]">
-                            <p class="font-bold text-[#4A001C]">시스템 판정 결과</p>
+                        <div class="flex justify-between items-center pt-3 border-t border-[#E8DED2]">
+                            <p class="font-bold text-[#5C4A33]">시스템 판정 결과</p>
                             <div class="flex items-center gap-2">
                                 <span class="text-sm text-gray-600">(${passedCount}/${journal.reviewers.length}명 통과)</span>
                                 <span class="inline-block px-4 py-2 rounded-lg font-bold ${
@@ -516,14 +516,14 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
         const chairComment = chairSubmitted ? journal.chairDecision.comment || '' : '';
 
         // 결정 버튼 스타일 - 제출 후에도 선택된 항목이 명확히 보이도록 색상 강조
-        const approveSelected = chairDecision === 'approve' ? 'border-2 border-green-600 bg-green-100' : 'border border-gray-300 bg-white';
-        const holdSelected = chairDecision === 'hold' ? 'border-2 border-yellow-600 bg-yellow-100' : 'border border-gray-300 bg-white';
-        const rejectSelected = chairDecision === 'reject' ? 'border-2 border-red-600 bg-red-100' : 'border border-gray-300 bg-white';
+        const passSelected = chairDecision === '합격' ? 'border-2 border-green-600 bg-green-100' : 'border border-gray-300 bg-white';
+        const conditionalSelected = chairDecision === '조건부합격' ? 'border-2 border-yellow-600 bg-yellow-100' : 'border border-gray-300 bg-white';
+        const failSelected = chairDecision === '불합격' ? 'border-2 border-red-600 bg-red-100' : 'border border-gray-300 bg-white';
 
         // 선택된 버튼의 텍스트 색상
-        const approveTextColor = chairDecision === 'approve' ? 'text-green-700' : 'text-gray-700';
-        const holdTextColor = chairDecision === 'hold' ? 'text-yellow-700' : 'text-gray-700';
-        const rejectTextColor = chairDecision === 'reject' ? 'text-red-700' : 'text-gray-700';
+        const passTextColor = chairDecision === '합격' ? 'text-green-700' : 'text-gray-700';
+        const conditionalTextColor = chairDecision === '조건부합격' ? 'text-yellow-700' : 'text-gray-700';
+        const failTextColor = chairDecision === '불합격' ? 'text-red-700' : 'text-gray-700';
 
         // 비활성화 시 opacity는 제출 버튼에만 적용
         const buttonDisabledClass = chairSubmitted ? 'cursor-not-allowed' : isDisabled ? 'opacity-50 cursor-not-allowed' : '';
@@ -536,20 +536,20 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
                     <div class="mb-4">
                         <label class="block text-sm font-semibold text-gray-700 mb-2">결정 선택 *</label>
                         <div class="flex gap-3">
-                            <button id="decision-approve"
-                                    onclick="selectJournalDecision('approve')" ${disabledAttr}
-                                    class="flex-1 py-2 rounded ${approveSelected} ${!chairSubmitted ? 'hover:border-green-500 hover:bg-green-50' : ''} transition-colors ${buttonDisabledClass}">
-                                <span class="text-sm font-medium ${approveTextColor}">✓ 승인</span>
+                            <button id="decision-pass"
+                                    onclick="selectJournalDecision('합격')" ${disabledAttr}
+                                    class="flex-1 py-2 rounded ${passSelected} ${!chairSubmitted ? 'hover:border-green-500 hover:bg-green-50' : ''} transition-colors ${buttonDisabledClass}">
+                                <span class="text-sm font-medium ${passTextColor}">✓ 합격</span>
                             </button>
-                            <button id="decision-hold"
-                                    onclick="selectJournalDecision('hold')" ${disabledAttr}
-                                    class="flex-1 py-2 rounded ${holdSelected} ${!chairSubmitted ? 'hover:border-yellow-500 hover:bg-yellow-50' : ''} transition-colors ${buttonDisabledClass}">
-                                <span class="text-sm font-medium ${holdTextColor}">⊙ 보류</span>
+                            <button id="decision-conditional"
+                                    onclick="selectJournalDecision('조건부합격')" ${disabledAttr}
+                                    class="flex-1 py-2 rounded ${conditionalSelected} ${!chairSubmitted ? 'hover:border-yellow-500 hover:bg-yellow-50' : ''} transition-colors ${buttonDisabledClass}">
+                                <span class="text-sm font-medium ${conditionalTextColor}">⊙ 조건부합격</span>
                             </button>
-                            <button id="decision-reject"
-                                    onclick="selectJournalDecision('reject')" ${disabledAttr}
-                                    class="flex-1 py-2 rounded ${rejectSelected} ${!chairSubmitted ? 'hover:border-red-500 hover:bg-red-50' : ''} transition-colors ${buttonDisabledClass}">
-                                <span class="text-sm font-medium ${rejectTextColor}">✗ 반려</span>
+                            <button id="decision-fail"
+                                    onclick="selectJournalDecision('불합격')" ${disabledAttr}
+                                    class="flex-1 py-2 rounded ${failSelected} ${!chairSubmitted ? 'hover:border-red-500 hover:bg-red-50' : ''} transition-colors ${buttonDisabledClass}">
+                                <span class="text-sm font-medium ${failTextColor}">✗ 불합격</span>
                             </button>
                         </div>
                     </div>
@@ -829,22 +829,28 @@ function selectJournalDecision(decision) {
     journalSelectedDecision = decision;
 
     // 모든 버튼 초기화
-    ['approve', 'hold', 'reject'].forEach(d => {
+    ['pass', 'conditional', 'fail'].forEach(d => {
         const btn = document.getElementById(`decision-${d}`);
         if (btn) {
-            btn.className = 'flex-1 py-3 rounded-lg border-2 border-gray-300 hover:border-gray-400 transition-colors';
+            btn.className = 'flex-1 py-2 rounded border border-gray-300 bg-white hover:border-gray-400 transition-colors';
         }
     });
 
     // 선택된 버튼 강조
-    const selectedBtn = document.getElementById(`decision-${decision}`);
+    const decisionIdMap = {
+        '합격': 'pass',
+        '조건부합격': 'conditional',
+        '불합격': 'fail'
+    };
+
+    const selectedBtn = document.getElementById(`decision-${decisionIdMap[decision]}`);
     if (selectedBtn) {
         const colorMap = {
-            'approve': 'border-green-500 bg-green-50',
-            'hold': 'border-yellow-500 bg-yellow-50',
-            'reject': 'border-red-500 bg-red-50'
+            '합격': 'border-2 border-green-600 bg-green-100',
+            '조건부합격': 'border-2 border-yellow-600 bg-yellow-100',
+            '불합격': 'border-2 border-red-600 bg-red-100'
         };
-        selectedBtn.className = `flex-1 py-3 rounded-lg border-2 ${colorMap[decision]} transition-colors`;
+        selectedBtn.className = `flex-1 py-2 rounded ${colorMap[decision]} transition-colors`;
     }
 }
 
@@ -857,14 +863,8 @@ function submitJournalChairDecision(journalId) {
 
     const comment = document.getElementById('journal-chair-comment').value.trim();
 
-    const decisionText = {
-        'approve': '승인',
-        'hold': '보류',
-        'reject': '반려'
-    };
-
     // 제출 확인 (수정 불가 경고 포함)
-    const confirmMsg = `최종 심사 결정을 제출하시겠습니까?\n\n결정 내용: ${decisionText[journalSelectedDecision]}\n\n※ 제출 후에는 수정이 불가능합니다.`;
+    const confirmMsg = `최종 심사 결정을 제출하시겠습니까?\n\n결정 내용: ${journalSelectedDecision}\n\n※ 제출 후에는 수정이 불가능합니다.`;
     if (!confirm(confirmMsg)) {
         return;
     }
@@ -881,7 +881,7 @@ function submitJournalChairDecision(journalId) {
     const journal = getJournalReviews().find(j => j.id === journalId);
     if (journal) {
         journal.chairDecision = {
-            decision: journalSelectedDecision,  // 영어 값으로 저장 (approve/hold/reject)
+            decision: journalSelectedDecision,  // 한글 값으로 저장 (합격/조건부합격/불합격)
             comment: comment,
             files: fileData  // 파일 데이터 포함
         };
@@ -905,9 +905,9 @@ function submitJournalChairDecision(journalId) {
     }
 
     if (typeof showToast === 'function') {
-        showToast(`최종 결정(${decisionText[journalSelectedDecision]})이 제출되었습니다`, 'success');
+        showToast(`최종 결정(${journalSelectedDecision})이 제출되었습니다`, 'success');
     } else {
-        alert(`최종 결정(${decisionText[journalSelectedDecision]})이 제출되었습니다.`);
+        alert(`최종 결정(${journalSelectedDecision})이 제출되었습니다.`);
     }
 
     // 목록 새로고침

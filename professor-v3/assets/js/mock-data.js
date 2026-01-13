@@ -1620,7 +1620,7 @@ const journalReviews = [
             }
         ],
         chairDecision: {
-            decision: 'approve',
+            decision: '합격',
             comment: '모든 심사위원의 평가가 우수함. 수정 사항 반영 후 게재 승인합니다.',
             files: [
                 {
@@ -1859,7 +1859,7 @@ const journalReviews = [
             }
         ],
         chairDecision: {
-            decision: '보류',
+            decision: '조건부합격',
             comment: '전반적으로 우수한 연구이나, 일부 실험 결과에 대한 추가 검증이 필요합니다. 수정 후 재제출을 권장합니다.'
         },
         rubric: {
@@ -1918,7 +1918,7 @@ const journalReviews = [
             }
         ],
         chairDecision: {
-            decision: '반려',
+            decision: '불합격',
             comment: '연구 방법론과 실증적 분석이 미흡합니다. 연구 설계를 전면 수정한 후 재제출하시기 바랍니다.'
         },
         rubric: {

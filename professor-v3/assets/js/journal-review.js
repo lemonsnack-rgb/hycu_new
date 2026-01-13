@@ -113,9 +113,9 @@ function renderJournalReviewList() {
                             <option value="심사대기">심사대기</option>
                             <option value="심사중">심사중</option>
                             <option value="심사완료">심사완료</option>
-                            <option value="승인">승인</option>
-                            <option value="보류">보류</option>
-                            <option value="반려">반려</option>
+                            <option value="합격">합격</option>
+                            <option value="조건부합격">조건부합격</option>
+                            <option value="불합격">불합격</option>
                         </select>
                     </div>
                     <div class="col-span-3"></div>
