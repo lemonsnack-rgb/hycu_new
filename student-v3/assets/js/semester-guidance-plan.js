@@ -304,24 +304,39 @@ function showStudentSemesterPlanDetail() {
                                 .join('')}
                         </select>
                     </div>
+                    ${totalWeeks === 0 ? `
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm text-gray-600 min-w-[80px]">총 주차 수:</label>
+                            <select id="student-new-total-weeks" class="border border-gray-300 rounded px-3 py-2 text-sm bg-white">
+                                ${Array.from({ length: 15 }, (_, i) => i + 1)
+                                    .map(week => `<option value="${week}" ${week === 15 ? 'selected' : ''}>${week}주</option>`)
+                                    .join('')}
+                            </select>
+                            <button onclick="executeStudentCreatePlan()"
+                                    class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-5 py-2 rounded text-sm font-medium">
+                                계획 생성
+                            </button>
+                        </div>
+                    ` : ''}
                     ${isApproved ? `
                         <div class="flex items-center gap-2 text-sm">
                             <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full font-medium">
                                 ✓ 승인됨
                             </span>
                         </div>
-                    ` : totalWeeks === 0 ? `
-                        <div class="flex items-center gap-2">
-                            <span class="text-orange-600 text-sm">⚠ 아직 지도 계획이 생성되지 않았습니다.</span>
+                    ` : ''}
+                    ${!isApproved && totalWeeks > 0 ? `
+                        <div class="flex items-center gap-3 ml-auto">
+                            <button onclick="saveAllStudentWeekPlans()"
+                                    class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-5 py-2 rounded text-sm font-medium">
+                                전체 저장
+                            </button>
+                            <button onclick="event.stopPropagation(); resetStudentTotalWeeks();"
+                                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
+                                계획 초기화
+                            </button>
                         </div>
                     ` : ''}
-                    <div class="flex items-center gap-3 ml-auto">
-                        <button onclick="${isApproved ? 'alertStudentApprovedPlanEdit()' : 'resetStudentTotalWeeks()'}"
-                                class="${isApproved ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#6A0028] hover:bg-[#8A0034]'} text-white px-4 py-2 rounded text-sm font-medium"
-                                ${isApproved ? 'disabled' : ''}>
-                            ${totalWeeks > 0 ? '계획 초기화' : '계획 생성'}
-                        </button>
-                    </div>
                 </div>
             </div>
         </div>
@@ -589,76 +604,52 @@ function changeStudentSemesterView() {
     showStudentSemesterPlanDetail();
 }
 
-// 계획 생성/초기화
-function resetStudentTotalWeeks() {
-    // 전역 semesterPlan 변수 업데이트
-    semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
-    const currentWeeks = semesterPlan?.totalWeeks || 0;
-    const hasPlans = currentWeeks > 0;
+// 계획 생성 (인라인 방식 - 모달 없이)
+function executeStudentCreatePlan() {
+    console.log('🟡 executeStudentCreatePlan 시작');
 
-    // 주차 선택 옵션 생성 (1~15)
-    const weekOptions = Array.from({ length: 15 }, (_, i) => i + 1)
-        .map(week => `<option value="${week}" ${week === currentWeeks || (!hasPlans && week === 15) ? 'selected' : ''}>${week}주</option>`)
-        .join('');
+    const selectEl = document.getElementById('student-new-total-weeks');
+    if (!selectEl) {
+        alert('주차 선택 요소를 찾을 수 없습니다.');
+        return;
+    }
 
-    const modalTitle = hasPlans ? '계획 초기화' : '계획 생성';
-    const modalContent = `
-        <form id="reset-weeks-form" class="space-y-4">
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">총 주차 수</label>
-                <select name="newTotalWeeks" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
-                    ${weekOptions}
-                </select>
-                <p class="mt-2 text-xs text-gray-500">
-                    학기별 지도 계획의 총 주차 수를 선택하세요 (1~15주)
-                </p>
-            </div>
-
-            ${hasPlans ? `
-            <div class="bg-yellow-50 border border-yellow-200 rounded-md p-3">
-                <p class="text-xs text-yellow-800">
-                    💡 초기화하면 해당 학기의 계획과 실적이 삭제됩니다. 이 작업은 되돌릴 수 없습니다.
-                </p>
-            </div>
-            ` : ''}
-        </form>
-    `;
-
-    openStudentModal(modalTitle, modalContent, hasPlans ? '초기화 실행' : '생성', () => executeStudentResetWeeks());
-}
-
-// 계획 초기화/생성 실행
-function executeStudentResetWeeks() {
-    console.log('🟡 executeStudentResetWeeks 시작');
-
-    const form = document.getElementById('reset-weeks-form');
-    const formData = new FormData(form);
-    const newTotalWeeks = parseInt(formData.get('newTotalWeeks'));
+    const newTotalWeeks = parseInt(selectEl.value);
 
     if (!newTotalWeeks || newTotalWeeks < 1 || newTotalWeeks > 15) {
         alert('올바른 주차 수를 선택해주세요 (1~15주)');
         return;
     }
 
+    // DataService를 통해 계획 생성
+    DataService.resetStudentSemesterPlan(studentCurrentYear, studentCurrentSemester, newTotalWeeks);
+
+    // 화면 새로고침
+    setTimeout(() => {
+        showStudentSemesterPlanDetail();
+    }, 100);
+}
+
+// 계획 초기화
+function resetStudentTotalWeeks() {
+    console.log('🟡 resetStudentTotalWeeks 시작');
+
     const semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
     const currentWeeks = semesterPlan?.totalWeeks || 0;
     const plans = semesterPlan?.plans || [];
-    const hasPlans = currentWeeks > 0;
 
     // 최종 확인
-    if (hasPlans && plans.length > 0) {
-        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n새로운 ${newTotalWeeks}주 구조로 초기화됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
+    if (currentWeeks > 0 && plans.length > 0) {
+        const confirmed = confirm(`⚠️ 계획 초기화 확인\n\n현재 입력된 모든 계획 및 실적 ${plans.length}건이 삭제됩니다.\n\n이 작업은 되돌릴 수 없습니다.\n정말 초기화하시겠습니까?`);
         if (!confirmed) {
             return;
         }
     }
 
-    // DataService를 통해 초기화
-    DataService.resetStudentSemesterPlan(studentCurrentYear, studentCurrentSemester, newTotalWeeks);
+    // DataService를 통해 초기화 (주차 수 0으로 설정)
+    DataService.resetStudentSemesterPlan(studentCurrentYear, studentCurrentSemester, 0);
 
-    // 모달 닫고 화면 갱신
-    closeStudentModal();
-
+    // 화면 새로고침
     setTimeout(() => {
         showStudentSemesterPlanDetail();
     }, 100);
@@ -735,6 +726,59 @@ showStudentSemesterPlanDetail = function() {
     }, 100);
 };
 
+// ==================== 학생용 주차별 계획 전체 저장 ====================
+function saveAllStudentWeekPlans() {
+    // 현재 학기의 주차 수를 동적으로 가져오기
+    const semesterPlan = DataService.getStudentSemesterPlan(studentCurrentYear, studentCurrentSemester);
+    const totalWeeks = semesterPlan?.totalWeeks || 15;
+    let savedCount = 0;
+    let emptyCount = 0;
+
+    for (let week = 1; week <= totalWeeks; week++) {
+        const contentEl = document.getElementById(`student-plan-content-${week}`);
+
+        if (!contentEl) continue;
+
+        const content = contentEl.value.trim();
+
+        // 빈 주차는 건너뜀
+        if (!content) {
+            emptyCount++;
+            continue;
+        }
+
+        const planData = {
+            plannedTopic: '', // 주제 필드 제거
+            plannedContent: content,
+            plannedMethod: 'zoom', // 기본값
+            plannedDate: null
+        };
+
+        try {
+            StudentDataService.updateWeekPlan(
+                studentCurrentYear,
+                studentCurrentSemester,
+                week,
+                planData
+            );
+            savedCount++;
+        } catch (error) {
+            console.error(`${week}주차 저장 실패:`, error);
+        }
+    }
+
+    if (savedCount > 0) {
+        alert(`${savedCount}개 주차의 계획이 저장되었습니다.${emptyCount > 0 ? `\n(${emptyCount}개 주차는 내용이 비어있어 건너뛰었습니다.)` : ''}`);
+
+        // 화면 새로고침
+        setTimeout(() => {
+            showStudentSemesterPlanDetail();
+        }, 300);
+    } else {
+        alert('저장할 계획 내용이 없습니다.\n최소 1개 이상의 주차에 계획을 입력해주세요.');
+    }
+}
+
 // ==================== 학생용 주차별 계획 저장 ====================
 function saveStudentWeekPlan(weekNumber) {
     const content = document.getElementById(`student-plan-content-${weekNumber}`).value.trim();
@@ -753,8 +797,8 @@ function saveStudentWeekPlan(weekNumber) {
 
     try {
         StudentDataService.updateWeekPlan(
-            currentStudentSemester.year,
-            currentStudentSemester.semester,
+            studentCurrentYear,
+            studentCurrentSemester,
             weekNumber,
             planData
         );
@@ -779,8 +823,9 @@ window.initStudentSemesterGuidancePlan = initStudentSemesterGuidancePlan;
 window.showStudentSemesterPlanDetail = showStudentSemesterPlanDetail;
 window.changeStudentSemesterView = changeStudentSemesterView;
 window.resetStudentTotalWeeks = resetStudentTotalWeeks;
-window.executeStudentResetWeeks = executeStudentResetWeeks;
+window.executeStudentCreatePlan = executeStudentCreatePlan;
 window.scrollToWeek = scrollToWeek;
+window.saveAllStudentWeekPlans = saveAllStudentWeekPlans;
 window.saveStudentWeekPlan = saveStudentWeekPlan;
 window.autoExpandTextarea = autoExpandTextarea;
 window.expandAllTextareas = expandAllTextareas;
