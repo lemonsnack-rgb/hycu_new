@@ -2060,18 +2060,18 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
     const disabledAttr = isDisabled ? 'disabled' : '';
 
     // 제출된 결정이 있으면 해당 값 사용
-    const chairDecision = chairSubmitted ? result.finalDecision || '승인' : '';
+    const chairDecision = chairSubmitted ? result.finalDecision || '합격' : '';
     const chairComment = chairSubmitted ? result.chairComment || '' : '';
 
     // 결정 버튼 스타일 - 제출 후에도 선택된 항목이 명확히 보이도록 색상 강조
-    const approveSelected = chairDecision === '승인' ? 'border-2 border-green-600 bg-green-100' : 'border border-gray-300 bg-white';
-    const holdSelected = chairDecision === '보류' ? 'border-2 border-yellow-600 bg-yellow-100' : 'border border-gray-300 bg-white';
-    const rejectSelected = chairDecision === '반려' ? 'border-2 border-red-600 bg-red-100' : 'border border-gray-300 bg-white';
+    const passSelected = chairDecision === '합격' ? 'border-2 border-green-600 bg-green-100' : 'border border-gray-300 bg-white';
+    const conditionalSelected = chairDecision === '조건부합격' ? 'border-2 border-yellow-600 bg-yellow-100' : 'border border-gray-300 bg-white';
+    const failSelected = chairDecision === '불합격' ? 'border-2 border-red-600 bg-red-100' : 'border border-gray-300 bg-white';
 
     // 선택된 버튼의 텍스트 색상
-    const approveTextColor = chairDecision === '승인' ? 'text-green-700' : 'text-gray-700';
-    const holdTextColor = chairDecision === '보류' ? 'text-yellow-700' : 'text-gray-700';
-    const rejectTextColor = chairDecision === '반려' ? 'text-red-700' : 'text-gray-700';
+    const passTextColor = chairDecision === '합격' ? 'text-green-700' : 'text-gray-700';
+    const conditionalTextColor = chairDecision === '조건부합격' ? 'text-yellow-700' : 'text-gray-700';
+    const failTextColor = chairDecision === '불합격' ? 'text-red-700' : 'text-gray-700';
 
     // 비활성화 시 opacity는 제출 버튼에만 적용
     const buttonDisabledClass = chairSubmitted ? 'cursor-not-allowed' : isDisabled ? 'opacity-50 cursor-not-allowed' : '';
@@ -2084,19 +2084,38 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
             <div class="mb-4">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">결정 선택 *</label>
                 <div class="flex gap-3">
-                    <button onclick="selectDecision('승인')" id="btn-approve" ${disabledAttr}
-                            class="flex-1 py-2 rounded ${approveSelected} ${!chairSubmitted ? 'hover:border-green-500 hover:bg-green-50' : ''} transition-colors ${buttonDisabledClass}">
-                        <span class="text-sm font-medium ${approveTextColor}">✓ 승인</span>
+                    <button onclick="selectDecision('합격')" id="btn-pass" ${disabledAttr}
+                            class="flex-1 py-3 rounded ${passSelected} ${!chairSubmitted ? 'hover:border-green-500 hover:bg-green-50' : ''} transition-colors ${buttonDisabledClass}">
+                        <div class="text-sm font-medium ${passTextColor}">
+                            <div class="mb-1">✓ 합격</div>
+                            <div class="text-xs opacity-75">학위수여 권장</div>
+                        </div>
                     </button>
-                    <button onclick="selectDecision('보류')" id="btn-hold" ${disabledAttr}
-                            class="flex-1 py-2 rounded ${holdSelected} ${!chairSubmitted ? 'hover:border-yellow-500 hover:bg-yellow-50' : ''} transition-colors ${buttonDisabledClass}">
-                        <span class="text-sm font-medium ${holdTextColor}">⊙ 보류</span>
+                    <button onclick="selectDecision('조건부합격')" id="btn-conditional" ${disabledAttr}
+                            class="flex-1 py-3 rounded ${conditionalSelected} ${!chairSubmitted ? 'hover:border-yellow-500 hover:bg-yellow-50' : ''} transition-colors ${buttonDisabledClass}">
+                        <div class="text-sm font-medium ${conditionalTextColor}">
+                            <div class="mb-1">⊙ 조건부합격</div>
+                            <div class="text-xs opacity-75">재제출 허용</div>
+                        </div>
                     </button>
-                    <button onclick="selectDecision('반려')" id="btn-reject" ${disabledAttr}
-                            class="flex-1 py-2 rounded ${rejectSelected} ${!chairSubmitted ? 'hover:border-red-500 hover:bg-red-50' : ''} transition-colors ${buttonDisabledClass}">
-                        <span class="text-sm font-medium ${rejectTextColor}">✗ 반려</span>
+                    <button onclick="selectDecision('불합격')" id="btn-fail" ${disabledAttr}
+                            class="flex-1 py-3 rounded ${failSelected} ${!chairSubmitted ? 'hover:border-red-500 hover:bg-red-50' : ''} transition-colors ${buttonDisabledClass}">
+                        <div class="text-sm font-medium ${failTextColor}">
+                            <div class="mb-1">✗ 불합격</div>
+                            <div class="text-xs opacity-75">재제출 불허</div>
+                        </div>
                     </button>
                 </div>
+            </div>
+
+            <!-- 재제출 정책 안내 -->
+            <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-xs text-blue-800">
+                    <strong>재제출 정책:</strong><br>
+                    • <strong>합격</strong>: 학위 수여 권장<br>
+                    • <strong>조건부합격</strong>: 지적사항 보완 후 재제출 허용 (현재 기간 내)<br>
+                    • <strong>불합격</strong>: 재제출 불허 (다음 논문 제출 기간에 새로 제출)
+                </p>
             </div>
 
             <div class="mb-6">
@@ -2168,23 +2187,41 @@ function selectDecision(decision) {
     selectedDecision = decision;
 
     // 버튼 스타일 업데이트
-    document.querySelectorAll('#btn-approve, #btn-hold, #btn-reject').forEach(btn => {
-        btn.classList.remove('border-green-500', 'bg-green-50', 'border-yellow-500', 'bg-yellow-50', 'border-red-500', 'bg-red-50');
-        btn.classList.add('border-gray-300');
+    document.querySelectorAll('#btn-pass, #btn-conditional, #btn-fail').forEach(btn => {
+        btn.classList.remove('border-2', 'border-green-600', 'bg-green-100', 'border-yellow-600', 'bg-yellow-100', 'border-red-600', 'bg-red-100');
+        btn.classList.add('border', 'border-gray-300', 'bg-white');
     });
 
-    if (decision === '승인') {
-        const btn = document.getElementById('btn-approve');
-        btn.classList.remove('border-gray-300');
-        btn.classList.add('border-green-500', 'bg-green-50');
-    } else if (decision === '보류') {
-        const btn = document.getElementById('btn-hold');
-        btn.classList.remove('border-gray-300');
-        btn.classList.add('border-yellow-500', 'bg-yellow-50');
-    } else if (decision === '반려') {
-        const btn = document.getElementById('btn-reject');
-        btn.classList.remove('border-gray-300');
-        btn.classList.add('border-red-500', 'bg-red-50');
+    // 텍스트 색상 초기화
+    document.querySelectorAll('#btn-pass div, #btn-conditional div, #btn-fail div').forEach(div => {
+        div.classList.remove('text-green-700', 'text-yellow-700', 'text-red-700');
+        div.classList.add('text-gray-700');
+    });
+
+    if (decision === '합격') {
+        const btn = document.getElementById('btn-pass');
+        btn.classList.remove('border', 'border-gray-300', 'bg-white');
+        btn.classList.add('border-2', 'border-green-600', 'bg-green-100');
+        btn.querySelectorAll('div').forEach(div => {
+            div.classList.remove('text-gray-700');
+            div.classList.add('text-green-700');
+        });
+    } else if (decision === '조건부합격') {
+        const btn = document.getElementById('btn-conditional');
+        btn.classList.remove('border', 'border-gray-300', 'bg-white');
+        btn.classList.add('border-2', 'border-yellow-600', 'bg-yellow-100');
+        btn.querySelectorAll('div').forEach(div => {
+            div.classList.remove('text-gray-700');
+            div.classList.add('text-yellow-700');
+        });
+    } else if (decision === '불합격') {
+        const btn = document.getElementById('btn-fail');
+        btn.classList.remove('border', 'border-gray-300', 'bg-white');
+        btn.classList.add('border-2', 'border-red-600', 'bg-red-100');
+        btn.querySelectorAll('div').forEach(div => {
+            div.classList.remove('text-gray-700');
+            div.classList.add('text-red-700');
+        });
     }
 }
 

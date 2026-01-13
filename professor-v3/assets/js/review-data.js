@@ -1423,8 +1423,8 @@ const REVIEW_RESULTS = [
         systemDecision: '합격',
         systemDecisionReason: '평균 점수 83.3점으로 합격 기준 75점 이상',
 
-        chairDecision: '승인',
-        chairComment: '모든 심사위원의 평가가 우수함. 지적사항 보완 후 최종 논문 진행 승인',
+        chairDecision: '합격',
+        chairComment: '모든 심사위원의 평가가 우수함. 지적사항 보완 후 최종 논문 진행 권장',
         chairDecidedAt: '2025-11-17 16:00:00',
         chairDecidedBy: 'P003',
 
@@ -1450,7 +1450,7 @@ const REVIEW_RESULTS = [
             }
         ],
 
-        finalDecision: '승인',
+        finalDecision: '합격',
         
         notifiedAt: '2025-11-17 16:05:00',
         
