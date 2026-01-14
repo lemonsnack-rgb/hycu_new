@@ -1678,6 +1678,94 @@ const mockApplicationSchedules = [
     }
 ];
 
+// =============================================================================
+// 업무일정등록 데이터
+// =============================================================================
+
+// 관리자 업무 유형 정의
+const mockAdminWorkTypes = [
+    { code: 'committee_assignment', name: '심사위원 배정' },
+    { code: 'committee_modification', name: '심사위원 수정' }
+];
+
+// 업무 일정 (통합)
+const mockWorkSchedules = [
+    // 유형 A: 심사/제출/신청 일정
+    {
+        id: 'WS001',
+        scheduleType: 'processPhase',      // 'processPhase' | 'admin'
+        stageTypeId: 'ST007',              // 연구제안서 심사
+        stageName: '연구제안서 심사',
+        processPhase: 'application',       // 'application' | 'submission' | 'review'
+        examTypeName: '논문 작성 계획서',
+        year: '2025',
+        semester: '1',
+        startDateTime: '2025-01-01 09:00',
+        endDateTime: '2025-01-31 18:00',
+        description: '연구제안서 논문 신청 기간',
+        createdDate: '2025-01-01',
+        createdBy: 'admin'
+    },
+    {
+        id: 'WS002',
+        scheduleType: 'processPhase',
+        stageTypeId: 'ST002',              // 예비심사
+        stageName: '예비심사',
+        processPhase: 'review',
+        examTypeName: '중간논문',
+        year: '2025',
+        semester: '1',
+        startDateTime: '2025-02-01 09:00',
+        endDateTime: '2025-02-28 18:00',
+        description: '예비심사 진행 기간',
+        createdDate: '2025-01-01',
+        createdBy: 'admin'
+    },
+    {
+        id: 'WS003',
+        scheduleType: 'processPhase',
+        stageTypeId: 'ST003',              // 본심사
+        stageName: '본심사',
+        processPhase: 'review',
+        examTypeName: '최종논문',
+        year: '2025',
+        semester: '1',
+        startDateTime: '2025-03-01 09:00',
+        endDateTime: '2025-03-31 18:00',
+        description: '본심사 진행 기간',
+        createdDate: '2025-01-01',
+        createdBy: 'admin'
+    },
+
+    // 유형 B: 관리자 업무 일정
+    {
+        id: 'WS004',
+        scheduleType: 'admin',
+        workType: 'committee_assignment',
+        workName: '예비심사 심사위원 배정',
+        year: '2025',
+        semester: '1',
+        startDateTime: '2025-01-15 09:00',
+        endDateTime: '2025-01-31 18:00',
+        description: '예비심사 심사위원 배정 가능 기간',
+        createdDate: '2025-01-01',
+        createdBy: 'admin'
+    },
+    {
+        id: 'WS005',
+        scheduleType: 'admin',
+        workType: 'committee_modification',
+        workName: '본심사 심사위원 수정',
+        year: '2025',
+        semester: '1',
+        startDateTime: '2025-02-15 09:00',
+        endDateTime: '2025-02-28 18:00',
+        description: '본심사 심사위원 수정 가능 기간',
+        createdDate: '2025-01-01',
+        createdBy: 'admin'
+    }
+];
+
 // 전역으로 노출 (window 객체에 할당)
 if (typeof window !== 'undefined') {
     // 기본 데이터
@@ -1712,6 +1800,10 @@ if (typeof window !== 'undefined') {
     // 학생용 논문 신청 데이터
     window.mockThesisApplications = mockThesisApplications;
     window.mockApplicationSchedules = mockApplicationSchedules;
+
+    // 업무일정등록 데이터
+    window.mockAdminWorkTypes = mockAdminWorkTypes;
+    window.mockWorkSchedules = mockWorkSchedules;
 
     // 디버그: 로드 확인
     console.log('✅ mockData.js 로드 완료');

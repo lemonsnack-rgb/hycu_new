@@ -5627,6 +5627,20 @@ views.procedureList = () => {
     `;
 };
 
+// ========== 업무일정등록 ==========
+views.workScheduleManagement = () => {
+    // work-schedule-management.js의 initWorkScheduleManagement()를 호출하여 렌더링
+    setTimeout(() => {
+        if (typeof window.initWorkScheduleManagement === 'function') {
+            window.initWorkScheduleManagement();
+        } else {
+            console.error('❌ initWorkScheduleManagement 함수를 찾을 수 없습니다.');
+        }
+    }, 0);
+
+    return `<div id="work-schedule-management-content"></div>`;
+};
+
 // 전역 함수: ContentListManagement로 라우팅
 window.navigateToContentList = function(contentType) {
     const viewMap = {
