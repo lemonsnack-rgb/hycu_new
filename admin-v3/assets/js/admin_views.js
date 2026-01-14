@@ -4763,6 +4763,7 @@ views.stageTypeManagement = () => {
                         <tr>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 80px;">순번</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도 단계 유형명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 110px;">일정 관리<br>구분</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">문서 제출</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">발표</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 140px;">심사유형</th>
@@ -4774,10 +4775,32 @@ views.stageTypeManagement = () => {
                             const examType = mockExamTypes.find(et => et.id === item.examTypeId);
                             const examTypeName = examType ? examType.name : '-';
 
+                            // 일정 관리 구분 텍스트 생성 (배지 제거)
+                            let processPhaseText = '';
+                            switch(item.processPhase) {
+                                case 'application':
+                                    processPhaseText = '신청';
+                                    break;
+                                case 'submission':
+                                    processPhaseText = '제출';
+                                    break;
+                                case 'review':
+                                    processPhaseText = '심사';
+                                    break;
+                                case 'none':
+                                    processPhaseText = '해당없음';
+                                    break;
+                                default:
+                                    processPhaseText = '-';
+                            }
+
                             return `
                             <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('stageTypeEdit', '${item.id}')">
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${idx + 1}</td>
                                 <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
+                                <td class="py-3 px-4 text-center text-sm text-gray-700">
+                                    ${processPhaseText}
+                                </td>
                                 <td class="py-3 px-4 text-center text-sm text-gray-700">
                                     ${item.requiresDocument ? '필요' : '불필요'}
                                 </td>
@@ -4808,21 +4831,26 @@ views.stageTypeCreate = (id = null) => {
         description: ''
     };
 
-    return `
-        <div class="bg-white rounded-lg shadow-md">
-            <!-- 헤더 -->
-            <div class="p-6 border-b">
-                <button onclick="switchView('stageTypeManagement')"
-                        class="text-gray-600 hover:text-gray-800 flex items-center">
-                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
-            </div>
+    const modalTitle = isEdit ? '지도 단계 유형 수정' : '지도 단계 유형 등록';
 
-            <!-- 폼 -->
-            <form onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="p-6 space-y-6">
+    return `
+        <!-- 모달 오버레이 -->
+        <div id="stage-type-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStageTypeModal(event)">
+            <!-- 모달 컨테이너 -->
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+                <!-- 모달 헤더 -->
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h3 class="text-xl font-bold text-gray-900">${modalTitle}</h3>
+                    <button onclick="closeStageTypeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 모달 바디 (스크롤 영역) -->
+                <div class="overflow-y-auto" style="max-height: calc(90vh - 180px);">
+                    <form id="stage-type-form" onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="p-6 space-y-6">
                 <!-- 유형명 + 설명 -->
                 <div class="flex items-center gap-8">
                     <!-- 좌측: 유형명 -->
@@ -4851,37 +4879,38 @@ views.stageTypeCreate = (id = null) => {
                     </div>
                 </div>
 
-                <!-- 지도 및 심사 유형 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">
-                        지도 및 심사 유형
-                    </label>
-                    <div style="display: flex; align-items: center; gap: 24px;">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   id="requires-document"
-                                   ${item.requiresDocument ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-gray-900">문서 제출</span>
-                        </label>
+                <!-- 구분선 -->
+                <div class="border-t-2 border-gray-300 my-6"></div>
 
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+                <!-- ========== 영역 1: 제출 요건 ========== -->
+                <div class="border-2 border-gray-300 rounded-lg p-4">
+                    <h4 class="text-base font-bold text-gray-900 mb-3">제출 요건</h4>
+                    <p class="text-xs text-gray-600 mb-3">학생의 활동 요건과 평가 방식을 설정하세요</p>
+                    <div class="space-y-4">
+                        <div style="display: flex; align-items: center; gap: 24px;">
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox"
+                                       id="requires-document"
+                                       ${item.requiresDocument ? 'checked' : ''}
+                                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="ml-2 text-sm font-medium text-gray-900">문서 제출 필요</span>
+                            </label>
 
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   id="requires-presentation"
-                                   ${item.requiresPresentation ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-gray-900">발표</span>
-                        </label>
+                            <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
 
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+                            <label class="flex items-center cursor-pointer">
+                                <input type="checkbox"
+                                       id="requires-presentation"
+                                       ${item.requiresPresentation ? 'checked' : ''}
+                                       class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                <span class="ml-2 text-sm font-medium text-gray-900">발표 필요</span>
+                            </label>
+                        </div>
 
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <label class="text-sm font-medium text-gray-900">심사유형(심사 필요 시)</label>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">심사 유형</label>
                             <select id="exam-type-id"
-                                    class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    style="width: 200px;">
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
                                 ${mockExamTypes.sort((a, b) => {
                                     const order = { 'EXAM_TYPE_NONE': 0, 'EXAM_TYPE_001': 1, 'EXAM_TYPE_002': 2, 'EXAM_TYPE_003': 3 };
                                     return (order[a.id] || 99) - (order[b.id] || 99);
@@ -4895,30 +4924,49 @@ views.stageTypeCreate = (id = null) => {
                     </div>
                 </div>
 
-                <!-- 버튼 -->
-                <div class="flex justify-between pt-4 border-t">
+                <!-- 구분선 -->
+                <div class="border-t-2 border-gray-300 my-6"></div>
+
+                <!-- ========== 영역 2: 일정 관리 구분 ========== -->
+                <div class="border-2 border-gray-300 rounded-lg p-4">
+                    <h4 class="text-base font-bold text-gray-900 mb-3">일정 관리 구분</h4>
+                    <p class="text-xs text-gray-600 mb-3">일정(신청/제출/심사 기간) 제어가 필요한 단계를 선택하세요</p>
+                    <select id="process-phase"
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="none" ${(!item.processPhase || item.processPhase === 'none') ? 'selected' : ''}>해당없음 (일정 제어 불필요)</option>
+                        <option value="application" ${item.processPhase === 'application' ? 'selected' : ''}>신청 단계 (신청 기간)</option>
+                        <option value="submission" ${item.processPhase === 'submission' ? 'selected' : ''}>제출 단계 (제출 기간)</option>
+                        <option value="review" ${item.processPhase === 'review' ? 'selected' : ''}>심사 단계 (심사 기간)</option>
+                    </select>
+                </div>
+                    </form>
+                </div>
+
+                <!-- 모달 푸터 (버튼) -->
+                <div class="flex justify-between items-center p-6 border-t bg-gray-50">
                     <div>
                         ${isEdit ? `
                             <button type="button"
                                     onclick="deleteStageType('${id}')"
-                                    class="px-7 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
+                                    class="px-6 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
                                 삭제
                             </button>
                         ` : ''}
                     </div>
                     <div class="flex gap-3">
                         <button type="button"
-                                onclick="switchView('stageTypeManagement')"
-                                class="px-7 py-2.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-semibold text-sm">
+                                onclick="closeStageTypeModal()"
+                                class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-semibold text-sm">
                             취소
                         </button>
                         <button type="submit"
-                                class="px-7 py-2.5 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold text-sm">
+                                form="stage-type-form"
+                                class="px-6 py-2.5 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold text-sm">
                             ${isEdit ? '수정' : '등록'}
                         </button>
                     </div>
                 </div>
-            </form>
+            </div>
         </div>
     `;
 };
