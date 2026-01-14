@@ -1694,45 +1694,45 @@ const mockWorkSchedules = [
     {
         id: 'WS001',
         scheduleType: 'processPhase',      // 'processPhase' | 'admin'
-        stageTypeId: 'ST007',              // 연구제안서 심사
-        stageName: '연구제안서 심사',
+        stageTypeId: null,                 // 지도단계 유형과 연결하지 않음
+        stageName: '논문 작성 계획서 신청',
         processPhase: 'application',       // 'application' | 'submission' | 'review'
         examTypeName: '논문 작성 계획서',
         year: '2025',
         semester: '1',
         startDateTime: '2025-01-01 09:00',
         endDateTime: '2025-01-31 18:00',
-        description: '연구제안서 논문 신청 기간',
+        description: '논문 작성 계획서 신청 기간',
         createdDate: '2025-01-01',
         createdBy: 'admin'
     },
     {
         id: 'WS002',
         scheduleType: 'processPhase',
-        stageTypeId: 'ST002',              // 예비심사
-        stageName: '예비심사',
+        stageTypeId: null,
+        stageName: '중간논문 심사',
         processPhase: 'review',
         examTypeName: '중간논문',
         year: '2025',
         semester: '1',
         startDateTime: '2025-02-01 09:00',
         endDateTime: '2025-02-28 18:00',
-        description: '예비심사 진행 기간',
+        description: '중간논문 심사 진행 기간',
         createdDate: '2025-01-01',
         createdBy: 'admin'
     },
     {
         id: 'WS003',
         scheduleType: 'processPhase',
-        stageTypeId: 'ST003',              // 본심사
-        stageName: '본심사',
+        stageTypeId: null,
+        stageName: '최종논문 심사',
         processPhase: 'review',
         examTypeName: '최종논문',
         year: '2025',
         semester: '1',
         startDateTime: '2025-03-01 09:00',
         endDateTime: '2025-03-31 18:00',
-        description: '본심사 진행 기간',
+        description: '최종논문 심사 진행 기간',
         createdDate: '2025-01-01',
         createdBy: 'admin'
     },

@@ -273,9 +273,6 @@ function openProcessPhaseModal(scheduleId = null) {
     const isEdit = !!scheduleId;
     const schedule = isEdit ? window.mockWorkSchedules.find(s => s.id === scheduleId) : null;
 
-    // 지도단계 유형 목록 (processPhase가 있는 것만)
-    const stageTypes = window.mockStepTypes.filter(st => st.processPhase && st.processPhase !== 'none');
-
     const modalHtml = `
         <div id="schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeScheduleModal(event)">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
@@ -292,24 +289,33 @@ function openProcessPhaseModal(scheduleId = null) {
                 <!-- 모달 바디 -->
                 <div class="overflow-y-auto p-6 space-y-4" style="max-height: calc(90vh - 180px);">
                     <form id="schedule-form" onsubmit="saveProcessPhaseSchedule(event, ${isEdit ? `'${scheduleId}'` : 'null'})">
-                        <!-- 지도단계 유형 -->
+                        <!-- 심사유형 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
-                                지도단계 유형 <span class="text-red-600">*</span>
+                                심사유형 <span class="text-red-600">*</span>
                             </label>
-                            <select id="schedule-stage-type" required
+                            <select id="schedule-exam-type" required
                                     class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                     ${isEdit ? 'disabled' : ''}>
                                 <option value="">선택하세요</option>
-                                ${stageTypes.map(st => `
-                                    <option value="${st.id}"
-                                            data-stage-name="${st.name}"
-                                            data-exam-type="${st.examTypeName || ''}"
-                                            data-process-phase="${st.processPhase}"
-                                            ${schedule && schedule.stageTypeId === st.id ? 'selected' : ''}>
-                                        ${st.name} (${st.examTypeName || '-'}) - ${getProcessPhaseText(st.processPhase)}
-                                    </option>
-                                `).join('')}
+                                <option value="논문 작성 계획서" ${schedule && schedule.examTypeName === '논문 작성 계획서' ? 'selected' : ''}>논문 작성 계획서</option>
+                                <option value="중간논문" ${schedule && schedule.examTypeName === '중간논문' ? 'selected' : ''}>중간논문</option>
+                                <option value="최종논문" ${schedule && schedule.examTypeName === '최종논문' ? 'selected' : ''}>최종논문</option>
+                            </select>
+                        </div>
+
+                        <!-- 일정구분 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                일정구분 <span class="text-red-600">*</span>
+                            </label>
+                            <select id="schedule-process-phase" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                    ${isEdit ? 'disabled' : ''}>
+                                <option value="">선택하세요</option>
+                                <option value="application" ${schedule && schedule.processPhase === 'application' ? 'selected' : ''}>신청</option>
+                                <option value="submission" ${schedule && schedule.processPhase === 'submission' ? 'selected' : ''}>제출</option>
+                                <option value="review" ${schedule && schedule.processPhase === 'review' ? 'selected' : ''}>심사</option>
                             </select>
                         </div>
 
@@ -528,13 +534,8 @@ function closeScheduleModal(event) {
 function saveProcessPhaseSchedule(event, scheduleId) {
     event.preventDefault();
 
-    const stageTypeSelect = document.getElementById('schedule-stage-type');
-    const selectedOption = stageTypeSelect.options[stageTypeSelect.selectedIndex];
-
-    const stageTypeId = stageTypeSelect.value;
-    const stageName = selectedOption.dataset.stageName;
-    const examTypeName = selectedOption.dataset.examType;
-    const processPhase = selectedOption.dataset.processPhase;
+    const examTypeName = document.getElementById('schedule-exam-type').value;
+    const processPhase = document.getElementById('schedule-process-phase').value;
     const year = document.getElementById('schedule-year').value.trim();
     const semester = document.getElementById('schedule-semester').value;
     const startDateTime = document.getElementById('schedule-start').value.replace('T', ' ');
@@ -542,7 +543,7 @@ function saveProcessPhaseSchedule(event, scheduleId) {
     const description = document.getElementById('schedule-description').value.trim();
 
     // 유효성 검사
-    if (!stageTypeId || !year || !semester || !startDateTime || !endDateTime) {
+    if (!examTypeName || !processPhase || !year || !semester || !startDateTime || !endDateTime) {
         alert('모든 필수 항목을 입력해주세요.');
         return;
     }
@@ -554,6 +555,14 @@ function saveProcessPhaseSchedule(event, scheduleId) {
         alert('종료일시는 시작일시보다 이후여야 합니다.');
         return;
     }
+
+    // 지도단계명 생성 (심사유형 + 일정구분)
+    const phaseTextMap = {
+        'application': '신청',
+        'submission': '제출',
+        'review': '심사'
+    };
+    const stageName = `${examTypeName} ${phaseTextMap[processPhase]}`;
 
     if (scheduleId) {
         // 수정
@@ -574,7 +583,7 @@ function saveProcessPhaseSchedule(event, scheduleId) {
         const newSchedule = {
             id: newId,
             scheduleType: 'processPhase',
-            stageTypeId: stageTypeId,
+            stageTypeId: null,  // 지도단계 유형과 연결하지 않음
             stageName: stageName,
             processPhase: processPhase,
             examTypeName: examTypeName,
