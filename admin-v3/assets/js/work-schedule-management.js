@@ -106,7 +106,8 @@ function renderProcessPhaseScheduleList() {
                         <tr>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">순번</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 150px;">심사유형</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">일정구분</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">일정구분</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">기간유형</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학년도</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학기</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">시작일시</th>
@@ -117,7 +118,7 @@ function renderProcessPhaseScheduleList() {
                     <tbody class="divide-y divide-gray-200">
                         ${schedules.length === 0 ? `
                             <tr>
-                                <td colspan="8" class="py-8 text-center text-gray-500">
+                                <td colspan="9" class="py-8 text-center text-gray-500">
                                     등록된 일정이 없습니다.
                                 </td>
                             </tr>
@@ -126,6 +127,7 @@ function renderProcessPhaseScheduleList() {
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${schedule.examTypeName || '-'}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${getProcessPhaseText(schedule.processPhase)}</td>
+                                <td class="py-3 px-4 text-sm text-gray-600 text-center">${getActionTypeText(schedule.actionType)}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.year}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.semester}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.startDateTime}</td>
@@ -180,18 +182,17 @@ function renderAdminWorkScheduleList() {
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">시작일시</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">종료일시</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">상태</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-200">
                         ${schedules.length === 0 ? `
                             <tr>
-                                <td colspan="8" class="py-8 text-center text-gray-500">
+                                <td colspan="7" class="py-8 text-center text-gray-500">
                                     등록된 일정이 없습니다.
                                 </td>
                             </tr>
                         ` : schedules.map((schedule, index) => `
-                            <tr class="hover:bg-blue-50">
+                            <tr class="hover:bg-blue-50 cursor-pointer" onclick="openAdminWorkDetailModal('${schedule.id}')">
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
                                 <td class="py-3 px-4 text-sm text-gray-800">${schedule.workName || '-'}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.year}</td>
@@ -199,18 +200,6 @@ function renderAdminWorkScheduleList() {
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.startDateTime}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.endDateTime}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${getScheduleStatus(schedule)}</td>
-                                <td class="py-3 px-4 text-center">
-                                    <div class="flex gap-2 justify-center">
-                                        <button onclick="openAdminWorkModal('${schedule.id}')"
-                                                class="text-[#6A0028] hover:underline text-xs font-medium">
-                                            수정
-                                        </button>
-                                        <button onclick="deleteSchedule('${schedule.id}')"
-                                                class="text-red-600 hover:underline text-xs font-medium">
-                                            삭제
-                                        </button>
-                                    </div>
-                                </td>
                             </tr>
                         `).join('')}
                     </tbody>
@@ -232,6 +221,17 @@ function getProcessPhaseText(phase) {
         'review': '심사'
     };
     return phaseMap[phase] || '-';
+}
+
+/**
+ * actionType 텍스트 변환 (기간유형)
+ */
+function getActionTypeText(actionType) {
+    const actionMap = {
+        'register': '등록',
+        'withdraw': '철회'
+    };
+    return actionMap[actionType] || '-';
 }
 
 /**
@@ -279,14 +279,29 @@ function openProcessPhaseModal(scheduleId = null) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 심사유형 <span class="text-red-600">*</span>
                             </label>
-                            <select id="schedule-exam-type" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    ${isEdit ? 'disabled' : ''}>
-                                <option value="">선택하세요</option>
-                                <option value="논문 작성 계획서" ${schedule && schedule.examTypeName === '논문 작성 계획서' ? 'selected' : ''}>논문 작성 계획서</option>
-                                <option value="중간논문" ${schedule && schedule.examTypeName === '중간논문' ? 'selected' : ''}>중간논문</option>
-                                <option value="최종논문" ${schedule && schedule.examTypeName === '최종논문' ? 'selected' : ''}>최종논문</option>
-                            </select>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-exam-type" value="논문 작성 계획서" required
+                                           ${schedule && schedule.examTypeName === '논문 작성 계획서' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>논문 작성 계획서</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-exam-type" value="중간논문" required
+                                           ${schedule && schedule.examTypeName === '중간논문' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>중간논문</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-exam-type" value="최종논문" required
+                                           ${schedule && schedule.examTypeName === '최종논문' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>최종논문</span>
+                                </label>
+                            </div>
                         </div>
 
                         <!-- 일정구분 -->
@@ -294,14 +309,52 @@ function openProcessPhaseModal(scheduleId = null) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 일정구분 <span class="text-red-600">*</span>
                             </label>
-                            <select id="schedule-process-phase" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    ${isEdit ? 'disabled' : ''}>
-                                <option value="">선택하세요</option>
-                                <option value="application" ${schedule && schedule.processPhase === 'application' ? 'selected' : ''}>신청</option>
-                                <option value="submission" ${schedule && schedule.processPhase === 'submission' ? 'selected' : ''}>제출</option>
-                                <option value="review" ${schedule && schedule.processPhase === 'review' ? 'selected' : ''}>심사</option>
-                            </select>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="application" required
+                                           ${schedule && schedule.processPhase === 'application' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>신청</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="submission" required
+                                           ${schedule && schedule.processPhase === 'submission' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>제출</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="review" required
+                                           ${schedule && schedule.processPhase === 'review' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>심사</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 기간유형 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                기간유형 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-action-type" value="register" required
+                                           ${schedule && schedule.actionType === 'register' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>등록</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-action-type" value="withdraw" required
+                                           ${schedule && schedule.actionType === 'withdraw' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>철회</span>
+                                </label>
+                            </div>
                         </div>
 
                         <!-- 학년도 -->
@@ -309,10 +362,13 @@ function openProcessPhaseModal(scheduleId = null) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 학년도 <span class="text-red-600">*</span>
                             </label>
-                            <input type="text" id="schedule-year" required
-                                   placeholder="예: 2025"
-                                   value="${schedule ? schedule.year : '2025'}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="schedule-year" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                            </select>
                         </div>
 
                         <!-- 학기 -->
@@ -414,10 +470,13 @@ function openAdminWorkModal(scheduleId = null) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 학년도 <span class="text-red-600">*</span>
                             </label>
-                            <input type="text" id="schedule-year" required
-                                   placeholder="예: 2025"
-                                   value="${schedule ? schedule.year : '2025'}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="schedule-year" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                            </select>
                         </div>
 
                         <!-- 학기 -->
@@ -514,10 +573,26 @@ function openProcessPhaseDetailModal(scheduleId) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 심사유형 <span class="text-red-600">*</span>
                             </label>
-                            <select id="schedule-exam-type" required disabled
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
-                                <option value="${schedule.examTypeName}">${schedule.examTypeName}</option>
-                            </select>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-exam-type" value="논문 작성 계획서" required
+                                           ${schedule.examTypeName === '논문 작성 계획서' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>논문 작성 계획서</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-exam-type" value="중간논문" required
+                                           ${schedule.examTypeName === '중간논문' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>중간논문</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-exam-type" value="최종논문" required
+                                           ${schedule.examTypeName === '최종논문' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>최종논문</span>
+                                </label>
+                            </div>
                         </div>
 
                         <!-- 일정구분 -->
@@ -525,10 +600,47 @@ function openProcessPhaseDetailModal(scheduleId) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 일정구분 <span class="text-red-600">*</span>
                             </label>
-                            <select id="schedule-process-phase" required disabled
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
-                                <option value="${schedule.processPhase}">${getProcessPhaseText(schedule.processPhase)}</option>
-                            </select>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="application" required
+                                           ${schedule.processPhase === 'application' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>신청</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="submission" required
+                                           ${schedule.processPhase === 'submission' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>제출</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="review" required
+                                           ${schedule.processPhase === 'review' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>심사</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 기간유형 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                기간유형 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-action-type" value="register" required
+                                           ${schedule.actionType === 'register' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>등록</span>
+                                </label>
+                                <label class="flex items-center">
+                                    <input type="radio" name="schedule-action-type" value="withdraw" required
+                                           ${schedule.actionType === 'withdraw' ? 'checked' : ''} disabled
+                                           class="mr-2">
+                                    <span>철회</span>
+                                </label>
+                            </div>
                         </div>
 
                         <!-- 학년도 -->
@@ -536,9 +648,13 @@ function openProcessPhaseDetailModal(scheduleId) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 학년도 <span class="text-red-600">*</span>
                             </label>
-                            <input type="text" id="schedule-year" required
-                                   value="${schedule.year}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="schedule-year" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="2025" ${schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                <option value="2024" ${schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                <option value="2023" ${schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                <option value="2022" ${schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                            </select>
                         </div>
 
                         <!-- 학기 -->
@@ -605,15 +721,16 @@ function openProcessPhaseDetailModal(scheduleId) {
 function saveProcessPhaseSchedule(event, scheduleId) {
     event.preventDefault();
 
-    const examTypeName = document.getElementById('schedule-exam-type').value;
-    const processPhase = document.getElementById('schedule-process-phase').value;
-    const year = document.getElementById('schedule-year').value.trim();
+    const examTypeName = document.querySelector('input[name="schedule-exam-type"]:checked')?.value;
+    const processPhase = document.querySelector('input[name="schedule-process-phase"]:checked')?.value;
+    const actionType = document.querySelector('input[name="schedule-action-type"]:checked')?.value;
+    const year = document.getElementById('schedule-year').value;
     const semester = document.getElementById('schedule-semester').value;
     const startDateTime = document.getElementById('schedule-start').value.replace('T', ' ');
     const endDateTime = document.getElementById('schedule-end').value.replace('T', ' ');
 
     // 유효성 검사
-    if (!examTypeName || !processPhase || !year || !semester || !startDateTime || !endDateTime) {
+    if (!examTypeName || !processPhase || !actionType || !year || !semester || !startDateTime || !endDateTime) {
         alert('모든 필수 항목을 입력해주세요.');
         return;
     }
@@ -626,13 +743,17 @@ function saveProcessPhaseSchedule(event, scheduleId) {
         return;
     }
 
-    // 지도단계명 생성 (심사유형 + 일정구분)
+    // 지도단계명 생성 (심사유형 + 일정구분 + 기간유형)
     const phaseTextMap = {
         'application': '신청',
         'submission': '제출',
         'review': '심사'
     };
-    const stageName = `${examTypeName} ${phaseTextMap[processPhase]}`;
+    const actionTextMap = {
+        'register': '',
+        'withdraw': '철회'
+    };
+    const stageName = `${examTypeName} ${phaseTextMap[processPhase]}${actionTextMap[actionType] ? ' ' + actionTextMap[actionType] : ''}`;
 
     if (scheduleId) {
         // 수정
@@ -655,6 +776,7 @@ function saveProcessPhaseSchedule(event, scheduleId) {
             stageTypeId: null,  // 지도단계 유형과 연결하지 않음
             stageName: stageName,
             processPhase: processPhase,
+            actionType: actionType,
             examTypeName: examTypeName,
             year: year,
             semester: semester,
@@ -675,16 +797,132 @@ function saveProcessPhaseSchedule(event, scheduleId) {
 }
 
 /**
+ * Tab 2: 관리자 업무 일정 상세 모달 열기 (조회 + 수정 + 삭제)
+ */
+function openAdminWorkDetailModal(scheduleId) {
+    const schedule = window.mockWorkSchedules.find(s => s.id === scheduleId);
+    if (!schedule) return;
+
+    const modalHtml = `
+        <div id="schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeScheduleModal(event)">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
+                <!-- 모달 헤더 -->
+                <div class="flex items-center justify-between p-6 border-b">
+                    <h3 class="text-xl font-bold text-gray-900">관리자 업무 일정 상세</h3>
+                    <button onclick="closeScheduleModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- 모달 바디 -->
+                <div class="overflow-y-auto p-6 space-y-4" style="max-height: calc(90vh - 180px);">
+                    <form id="schedule-form" onsubmit="saveAdminWorkSchedule(event, '${scheduleId}')">
+                        <!-- 업무유형 (읽기전용) -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                업무유형 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="text" value="${schedule.workName}" readonly
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
+                            <input type="hidden" id="schedule-work-type" value="${schedule.workType}">
+                        </div>
+
+                        <!-- 학년도 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                학년도 <span class="text-red-600">*</span>
+                            </label>
+                            <select id="schedule-year" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="2025" ${schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                <option value="2024" ${schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                <option value="2023" ${schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                <option value="2022" ${schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                            </select>
+                        </div>
+
+                        <!-- 학기 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                학기 <span class="text-red-600">*</span>
+                            </label>
+                            <select id="schedule-semester" required
+                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="1" ${schedule.semester === '1' ? 'selected' : ''}>1학기</option>
+                                <option value="2" ${schedule.semester === '2' ? 'selected' : ''}>2학기</option>
+                            </select>
+                        </div>
+
+                        <!-- 시작일시 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                시작일시 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="datetime-local" id="schedule-start" required
+                                   value="${schedule.startDateTime.replace(' ', 'T')}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <!-- 종료일시 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                종료일시 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="datetime-local" id="schedule-end" required
+                                   value="${schedule.endDateTime.replace(' ', 'T')}"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 모달 푸터 -->
+                <div class="flex justify-between items-center gap-3 p-6 border-t bg-gray-50">
+                    <button type="button" onclick="deleteSchedule('${scheduleId}')"
+                            class="px-6 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
+                        삭제
+                    </button>
+                    <div class="flex gap-3">
+                        <button type="button" onclick="closeScheduleModal()"
+                                class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-semibold text-sm">
+                            취소
+                        </button>
+                        <button type="submit" form="schedule-form"
+                                class="px-6 py-2.5 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold text-sm">
+                            수정
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+/**
  * Tab 2: 관리자 업무 일정 저장
  */
 function saveAdminWorkSchedule(event, scheduleId) {
     event.preventDefault();
 
-    const workTypeSelect = document.getElementById('schedule-work-type');
-    const selectedOption = workTypeSelect.options[workTypeSelect.selectedIndex];
-    const workType = workTypeSelect.value;
-    const workName = selectedOption.dataset.workName;
-    const year = document.getElementById('schedule-year').value.trim();
+    const workTypeInput = document.getElementById('schedule-work-type');
+    const workType = workTypeInput.value;
+
+    // scheduleId가 있으면 수정 모드이므로 기존 schedule에서 workName 가져오기
+    let workName = '';
+    if (scheduleId) {
+        const existingSchedule = window.mockWorkSchedules.find(s => s.id === scheduleId);
+        workName = existingSchedule ? existingSchedule.workName : '';
+    } else {
+        // 신규 등록 모드일 때는 select에서 가져오기
+        const workTypeSelect = document.getElementById('schedule-work-type');
+        const selectedOption = workTypeSelect.options[workTypeSelect.selectedIndex];
+        workName = selectedOption.dataset.workName;
+    }
+
+    const year = document.getElementById('schedule-year').value;
     const semester = document.getElementById('schedule-semester').value;
     const startDateTime = document.getElementById('schedule-start').value.replace('T', ' ');
     const endDateTime = document.getElementById('schedule-end').value.replace('T', ' ');
@@ -770,6 +1008,7 @@ window.switchScheduleTab = switchScheduleTab;
 window.openProcessPhaseModal = openProcessPhaseModal;
 window.openProcessPhaseDetailModal = openProcessPhaseDetailModal;
 window.openAdminWorkModal = openAdminWorkModal;
+window.openAdminWorkDetailModal = openAdminWorkDetailModal;
 window.closeScheduleModal = closeScheduleModal;
 window.saveProcessPhaseSchedule = saveProcessPhaseSchedule;
 window.saveAdminWorkSchedule = saveAdminWorkSchedule;
