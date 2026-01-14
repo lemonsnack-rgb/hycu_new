@@ -361,14 +361,6 @@ function openProcessPhaseModal(scheduleId = null) {
                                    value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
-
-                        <!-- 설명 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
-                            <textarea id="schedule-description" rows="3"
-                                      placeholder="일정에 대한 설명을 입력하세요"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">${schedule ? schedule.description || '' : ''}</textarea>
-                        </div>
                     </form>
                 </div>
 
@@ -432,17 +424,6 @@ function openAdminWorkModal(scheduleId = null) {
                             </select>
                         </div>
 
-                        <!-- 업무명 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                업무명 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="text" id="schedule-work-name" required
-                                   placeholder="예: 예비심사 심사위원 배정"
-                                   value="${schedule ? schedule.workName : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-
                         <!-- 학년도 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -484,14 +465,6 @@ function openAdminWorkModal(scheduleId = null) {
                             <input type="datetime-local" id="schedule-end" required
                                    value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
-
-                        <!-- 설명 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">설명</label>
-                            <textarea id="schedule-description" rows="3"
-                                      placeholder="일정에 대한 설명을 입력하세요"
-                                      class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">${schedule ? schedule.description || '' : ''}</textarea>
                         </div>
                     </form>
                 </div>
@@ -540,7 +513,6 @@ function saveProcessPhaseSchedule(event, scheduleId) {
     const semester = document.getElementById('schedule-semester').value;
     const startDateTime = document.getElementById('schedule-start').value.replace('T', ' ');
     const endDateTime = document.getElementById('schedule-end').value.replace('T', ' ');
-    const description = document.getElementById('schedule-description').value.trim();
 
     // 유효성 검사
     if (!examTypeName || !processPhase || !year || !semester || !startDateTime || !endDateTime) {
@@ -572,7 +544,6 @@ function saveProcessPhaseSchedule(event, scheduleId) {
             schedule.semester = semester;
             schedule.startDateTime = startDateTime;
             schedule.endDateTime = endDateTime;
-            schedule.description = description;
 
             console.log('일정 수정:', schedule);
             alert('일정이 수정되었습니다.');
@@ -591,7 +562,7 @@ function saveProcessPhaseSchedule(event, scheduleId) {
             semester: semester,
             startDateTime: startDateTime,
             endDateTime: endDateTime,
-            description: description,
+            description: null,
             createdDate: new Date().toISOString().split('T')[0],
             createdBy: 'admin'
         };
@@ -612,16 +583,16 @@ function saveAdminWorkSchedule(event, scheduleId) {
     event.preventDefault();
 
     const workTypeSelect = document.getElementById('schedule-work-type');
+    const selectedOption = workTypeSelect.options[workTypeSelect.selectedIndex];
     const workType = workTypeSelect.value;
-    const workName = document.getElementById('schedule-work-name').value.trim();
+    const workName = selectedOption.dataset.workName;
     const year = document.getElementById('schedule-year').value.trim();
     const semester = document.getElementById('schedule-semester').value;
     const startDateTime = document.getElementById('schedule-start').value.replace('T', ' ');
     const endDateTime = document.getElementById('schedule-end').value.replace('T', ' ');
-    const description = document.getElementById('schedule-description').value.trim();
 
     // 유효성 검사
-    if (!workType || !workName || !year || !semester || !startDateTime || !endDateTime) {
+    if (!workType || !year || !semester || !startDateTime || !endDateTime) {
         alert('모든 필수 항목을 입력해주세요.');
         return;
     }
@@ -638,12 +609,10 @@ function saveAdminWorkSchedule(event, scheduleId) {
         // 수정
         const schedule = window.mockWorkSchedules.find(s => s.id === scheduleId);
         if (schedule) {
-            schedule.workName = workName;
             schedule.year = year;
             schedule.semester = semester;
             schedule.startDateTime = startDateTime;
             schedule.endDateTime = endDateTime;
-            schedule.description = description;
 
             console.log('일정 수정:', schedule);
             alert('일정이 수정되었습니다.');
@@ -660,7 +629,7 @@ function saveAdminWorkSchedule(event, scheduleId) {
             semester: semester,
             startDateTime: startDateTime,
             endDateTime: endDateTime,
-            description: description,
+            description: null,
             createdDate: new Date().toISOString().split('T')[0],
             createdBy: 'admin'
         };
