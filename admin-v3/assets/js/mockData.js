@@ -1732,6 +1732,10 @@ if (typeof window !== 'undefined') {
     window.mockNotices = mockNotices;
     window.mockGuides = mockGuides;
 
+    // 학위논문 관련 데이터
+    window.mockStepTypes = mockStepTypes;
+    window.mockExamTypes = mockExamTypes;
+
     // 학생용 논문 신청 데이터
     window.mockThesisApplications = mockThesisApplications;
     window.mockApplicationSchedules = mockApplicationSchedules;
