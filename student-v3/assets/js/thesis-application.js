@@ -107,25 +107,18 @@ function renderApplicationRow(data, index) {
     }
 
     // 신청 상태
-    let statusHtml = '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">미신청</span>';
-    let actionButton = `<button onclick="openApplicationModal('${stage.id}')"
-                                class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-3 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
+    let statusText = '미신청';
+    let actionButton = `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
+                           class="text-[#6A0028] hover:underline text-xs font-medium">
                             신청
-                        </button>`;
+                        </a>`;
 
-    if (application) {
-        if (application.status === 'submitted') {
-            statusHtml = '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800">신청완료</span>';
-        } else if (application.status === 'approved') {
-            statusHtml = '<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-800">승인</span>';
-        } else if (application.status === 'rejected') {
-            statusHtml = '<span class="px-2 py-1 rounded text-xs bg-red-100 text-red-800">반려</span>';
-        }
-
-        actionButton = `<button onclick="viewApplicationDetail('${application.id}')"
-                                class="text-[#6A0028] hover:text-[#6A0028] text-xs font-medium px-3 py-1 border border-[#F8BBD9] rounded hover:bg-[#FCE4EC]">
-                            상세
-                        </button>`;
+    if (application && application.status === 'submitted') {
+        statusText = '신청완료';
+        actionButton = `<a href="#" onclick="viewApplicationDetail('${application.id}'); return false;"
+                           class="text-[#6A0028] hover:underline text-xs font-medium">
+                            보기
+                        </a>`;
     }
 
     return `
@@ -133,7 +126,7 @@ function renderApplicationRow(data, index) {
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
             <td class="py-3 px-4 text-sm font-medium text-gray-800">${stage.name}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${periodText}</td>
-            <td class="py-3 px-4 text-center">${statusHtml}</td>
+            <td class="py-3 px-4 text-sm text-gray-600 text-center">${statusText}</td>
             <td class="py-3 px-4 text-center">${actionButton}</td>
         </tr>
     `;
@@ -278,16 +271,8 @@ function viewApplicationDetail(applicationId) {
     const stage = window.mockStepTypes.find(s => s.id === application.stageTypeId);
 
     let statusText = '미신청';
-    let statusClass = 'bg-gray-100 text-gray-600';
     if (application.status === 'submitted') {
         statusText = '신청완료';
-        statusClass = 'bg-blue-100 text-blue-800';
-    } else if (application.status === 'approved') {
-        statusText = '승인';
-        statusClass = 'bg-green-100 text-green-800';
-    } else if (application.status === 'rejected') {
-        statusText = '반려';
-        statusClass = 'bg-red-100 text-red-800';
     }
 
     const modalHtml = `
@@ -329,26 +314,16 @@ function viewApplicationDetail(applicationId) {
 
                     <div class="border-b pb-4">
                         <label class="block text-sm font-medium text-gray-500 mb-1">신청 상태</label>
-                        <span class="px-3 py-1 rounded text-sm ${statusClass}">${statusText}</span>
+                        <p class="text-base text-gray-900">${statusText}</p>
                     </div>
-
-                    ${application.reviewComment ? `
-                        <div class="border-b pb-4">
-                            <label class="block text-sm font-medium text-gray-500 mb-1">검토 의견</label>
-                            <p class="text-base text-gray-900">${application.reviewComment}</p>
-                        </div>
-                    ` : ''}
-
-                    ${application.approvedDate ? `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-500 mb-1">승인일</label>
-                            <p class="text-base text-gray-900">${application.approvedDate}</p>
-                        </div>
-                    ` : ''}
                 </div>
 
                 <!-- 모달 푸터 -->
-                <div class="flex justify-end items-center gap-3 p-6 border-t bg-gray-50">
+                <div class="flex justify-between items-center gap-3 p-6 border-t bg-gray-50">
+                    <button type="button" onclick="cancelApplication('${applicationId}')"
+                            class="px-6 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
+                        논문 신청 철회
+                    </button>
                     <button type="button" onclick="closeDetailModal()"
                             class="px-6 py-2.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 font-semibold text-sm">
                         닫기
@@ -359,6 +334,28 @@ function viewApplicationDetail(applicationId) {
     `;
 
     document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+/**
+ * 신청 철회
+ */
+function cancelApplication(applicationId) {
+    if (confirm('논문 신청을 철회하시겠습니까?')) {
+        // mockThesisApplications에서 해당 항목 삭제
+        const index = window.mockThesisApplications.findIndex(app => app.id === applicationId);
+        if (index > -1) {
+            window.mockThesisApplications.splice(index, 1);
+        }
+
+        // 성공 메시지
+        alert('논문 신청 내역이 초기화되었습니다.');
+
+        // 모달 닫기
+        closeDetailModal();
+
+        // 목록 재렌더링 (미신청 상태로 표시)
+        renderApplicationListScreen();
+    }
 }
 
 /**
@@ -382,6 +379,7 @@ window.openApplicationModal = openApplicationModal;
 window.closeApplicationModal = closeApplicationModal;
 window.submitApplication = submitApplication;
 window.viewApplicationDetail = viewApplicationDetail;
+window.cancelApplication = cancelApplication;
 window.closeDetailModal = closeDetailModal;
 
 console.log('✅ thesis-application.js 로드 완료');
