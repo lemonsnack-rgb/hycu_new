@@ -234,6 +234,10 @@
                     </div>
                     <!-- 2depth 메뉴 -->
                     <div id="submission-submenu" class="pl-12 mt-1 space-y-1">
+                        <a href="#" onclick="showScreen('thesis-application'); return false;" data-screen="thesis-application"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>논문 신청</span>
+                        </a>
                         <a href="#" onclick="showScreen('thesis-submission'); return false;" data-screen="thesis-submission"
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>학위 논문 제출</span>
@@ -433,6 +437,12 @@
             </section>
 
             <!-- 논문 제출 메뉴 화면들 -->
+            <section id="thesis-application-screen" class="content-screen">
+                <div id="thesis-application-content">
+                    <!-- JavaScript로 동적 렌더링 -->
+                </div>
+            </section>
+
             <section id="thesis-submission-screen" class="content-screen">
                 <div id="thesis-submission-content">
                     <!-- JavaScript로 동적 렌더링 -->
@@ -555,7 +565,9 @@
             updateBreadcrumb(screenId);
 
             // 화면별 초기화 함수 호출
-            if (screenId === 'thesis-submission' && typeof initThesisSubmission === 'function') {
+            if (screenId === 'thesis-application' && typeof initThesisApplication === 'function') {
+                initThesisApplication();
+            } else if (screenId === 'thesis-submission' && typeof initThesisSubmission === 'function') {
                 initThesisSubmission();
             } else if (screenId === 'journal-submission' && typeof initJournalSubmission === 'function') {
                 initJournalSubmission();
@@ -728,6 +740,7 @@
     <script src="assets/js/student-content.js"></script>
 
     <script src="assets/js/app.js?v=20260107007"></script>
+    <script src="assets/js/thesis-application.js?v=20260114001"></script>
     <script src="assets/js/thesis-submission.js?v=20260107011"></script>
     <script src="assets/js/journal-submission.js?v=20260107006"></script>
     <script src="assets/js/title-modification.js?v=20260107001"></script>

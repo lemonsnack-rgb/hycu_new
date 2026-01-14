@@ -1658,6 +1658,53 @@ const mockGuides = [
     }
 ];
 
+// =============================================================================
+// 학생용 논문 신청 데이터
+// =============================================================================
+
+// 논문 신청 내역
+const mockThesisApplications = [
+    {
+        id: 'APP001',
+        studentId: 'S2024001',
+        studentName: '홍길동',
+        stageTypeId: 'ST007',  // 연구제안서 심사 (processPhase: 'application')
+        thesisTitle: 'AI 기반 추천 시스템의 성능 개선에 관한 연구',
+        thesisTitleEn: 'A Study on Performance Improvement of AI-based Recommendation Systems',
+        applicationDate: '2025-01-10',
+        status: 'submitted',  // submitted, approved, rejected
+        reviewComment: null,
+        approvedDate: null,
+        createdDate: '2025-01-10'
+    },
+    {
+        id: 'APP002',
+        studentId: 'S2024002',
+        studentName: '김영희',
+        stageTypeId: 'ST007',
+        thesisTitle: '블록체인 기반 전자투표 시스템 설계 및 구현',
+        thesisTitleEn: 'Design and Implementation of Blockchain-based Electronic Voting System',
+        applicationDate: '2025-01-12',
+        status: 'approved',
+        reviewComment: '연구 주제가 적절하며 실현 가능성이 높습니다.',
+        approvedDate: '2025-01-13',
+        createdDate: '2025-01-12'
+    }
+];
+
+// 논문 신청 일정 (임시 데이터 - 추후 업무일정등록 메뉴에서 관리)
+const mockApplicationSchedules = [
+    {
+        id: 'SCH001',
+        stageTypeId: 'ST007',  // 연구제안서 심사
+        year: '2025',
+        semester: '1',
+        startDate: '2025-01-01',
+        endDate: '2025-01-31',
+        isActive: true
+    }
+];
+
 // 전역으로 노출 (window 객체에 할당)
 if (typeof window !== 'undefined') {
     // 기본 데이터
@@ -1684,6 +1731,10 @@ if (typeof window !== 'undefined') {
     // 게시판 데이터
     window.mockNotices = mockNotices;
     window.mockGuides = mockGuides;
+
+    // 학생용 논문 신청 데이터
+    window.mockThesisApplications = mockThesisApplications;
+    window.mockApplicationSchedules = mockApplicationSchedules;
 
     // 디버그: 로드 확인
     console.log('✅ mockData.js 로드 완료');
