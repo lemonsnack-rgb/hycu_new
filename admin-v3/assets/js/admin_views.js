@@ -1709,48 +1709,6 @@ const views = {
                             <p class="mt-1 text-xs text-gray-500">학기 구분이 필요한 경우 입력하세요 (선택사항)</p>
                         </div>
 
-                        <!-- 제출 기간 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                제출 기간 <span class="text-red-600">*</span>
-                            </label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">제출 시작일</label>
-                                    <input type="date" id="schedule-submission-start"
-                                           value="${item.submissionStartDate || item.startDate || ''}"
-                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">제출 마감일</label>
-                                    <input type="date" id="schedule-submission-end"
-                                           value="${item.submissionEndDate || item.endDate || ''}"
-                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 심사 기간 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                심사 기간 <span class="text-red-600">*</span>
-                            </label>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">심사 시작일</label>
-                                    <input type="date" id="schedule-review-start"
-                                           value="${item.reviewStartDate || ''}"
-                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
-                                </div>
-                                <div>
-                                    <label class="block text-xs text-gray-600 mb-1">심사 종료일</label>
-                                    <input type="date" id="schedule-review-end"
-                                           value="${item.reviewEndDate || ''}"
-                                           class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8] focus:border-transparent">
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- 설명 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
@@ -3489,10 +3447,10 @@ const views = {
                 <!-- Workflow Basic Info -->
                 <div class="p-6 border-b bg-gray-50">
                     <div class="flex items-center gap-6">
-                        <!-- 좌측: 심사 단계 이름 -->
+                        <!-- 좌측: 지도 단계명 -->
                         <div class="flex items-center gap-4 flex-1">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
-                                심사 단계 이름 *
+                                지도 단계명 *
                             </label>
                             <input type="text"
                                    id="workflow-name"
@@ -4831,26 +4789,27 @@ views.stageTypeCreate = (id = null) => {
         description: ''
     };
 
-    const modalTitle = isEdit ? '지도 단계 유형 수정' : '지도 단계 유형 등록';
+    const pageTitle = isEdit ? '지도 단계 유형 수정' : '지도 단계 유형 등록';
 
     return `
-        <!-- 모달 오버레이 -->
-        <div id="stage-type-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onclick="closeStageTypeModal(event)">
-            <!-- 모달 컨테이너 -->
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-3xl max-h-[90vh] overflow-hidden" onclick="event.stopPropagation()">
-                <!-- 모달 헤더 -->
-                <div class="flex items-center justify-between p-6 border-b">
-                    <h3 class="text-xl font-bold text-gray-900">${modalTitle}</h3>
-                    <button onclick="closeStageTypeModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                </div>
+        <!-- 페이지 컨테이너 -->
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 페이지 헤더 -->
+            <div class="p-6 border-b">
+                <!-- [목록으로 돌아가기] 버튼 -->
+                <button onclick="switchView('stageTypeManagement')"
+                        class="inline-flex items-center text-gray-600 hover:text-gray-900 mb-4 text-sm">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                    </svg>
+                    목록으로 돌아가기
+                </button>
+                <h3 class="text-xl font-bold text-gray-900">${pageTitle}</h3>
+            </div>
 
-                <!-- 모달 바디 (스크롤 영역) -->
-                <div class="overflow-y-auto" style="max-height: calc(90vh - 180px);">
-                    <form id="stage-type-form" onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="p-6 space-y-6">
+            <!-- 페이지 바디 -->
+            <div class="p-6">
+                <form id="stage-type-form" onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="space-y-6">
                 <!-- 유형명 + 설명 -->
                 <div class="flex items-center gap-8">
                     <!-- 좌측: 유형명 -->
@@ -4942,29 +4901,28 @@ views.stageTypeCreate = (id = null) => {
                     </form>
                 </div>
 
-                <!-- 모달 푸터 (버튼) -->
-                <div class="flex justify-between items-center p-6 border-t bg-gray-50">
-                    <div>
-                        ${isEdit ? `
-                            <button type="button"
-                                    onclick="deleteStageType('${id}')"
-                                    class="px-6 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
-                                삭제
-                            </button>
-                        ` : ''}
-                    </div>
-                    <div class="flex gap-3">
+            <!-- 페이지 푸터 (버튼) -->
+            <div class="flex justify-between items-center p-6 border-t bg-gray-50">
+                <div>
+                    ${isEdit ? `
                         <button type="button"
-                                onclick="closeStageTypeModal()"
-                                class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-semibold text-sm">
-                            취소
+                                onclick="deleteStageType('${id}')"
+                                class="px-6 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
+                            삭제
                         </button>
-                        <button type="submit"
-                                form="stage-type-form"
-                                class="px-6 py-2.5 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold text-sm">
-                            ${isEdit ? '수정' : '등록'}
-                        </button>
-                    </div>
+                    ` : ''}
+                </div>
+                <div class="flex gap-3">
+                    <button type="button"
+                            onclick="switchView('stageTypeManagement')"
+                            class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-semibold text-sm">
+                        취소
+                    </button>
+                    <button type="submit"
+                            form="stage-type-form"
+                            class="px-6 py-2.5 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold text-sm">
+                        ${isEdit ? '수정' : '등록'}
+                    </button>
                 </div>
             </div>
         </div>
