@@ -328,37 +328,152 @@ function renderJournalSubmissionForm() {
         </div>
 
         <div class="bg-white rounded-lg shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-900 mb-6">학술지 논문 제출</h3>
+
             <div class="space-y-4">
-                <!-- 논문제목 -->
-                <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목 *</label>
-                    <input type="text" id="journal-title" value="${data.title || ''}"
-                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
-                           placeholder="논문 제목을 입력하세요">
+                <!-- 논문지도교수 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">논문지도교수</label>
+                    <input type="text" id="journal-advisor" value="${data.advisor || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="논문지도교수명을 입력하세요">
                 </div>
 
-                <!-- 희망심사일 -->
-                <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">희망심사일 *</label>
-                    <input type="date" id="journal-desired-exam-date" value="${data.desiredExamDate || ''}"
-                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
+                <!-- 논문제목(한글) -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">논문제목(한글)</label>
+                    <div class="flex-1">
+                        <p class="text-xs text-red-600 mb-2">* 반드시 본인이 제1저자 또는 교신저자이며, 공저자에는 지도교수가 포함되어야 함</p>
+                        <input type="text" id="journal-title-korean" value="${data.titleKorean || ''}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                               placeholder="논문 제목을 입력하세요">
+                    </div>
                 </div>
 
-                <!-- 파일업로드 -->
-                <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">파일 업로드 *</label>
-                    <div class="flex-1 flex items-center gap-3">
-                        <input type="file" id="journal-file" class="hidden" accept=".pdf">
-                        <button type="button" data-action="select-file"
-                                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            파일 선택
-                        </button>
-                        <span class="text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</span>
-                        <div id="file-info" class="text-sm text-gray-600">
+                <!-- 저자명(전체) -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">저자명(전체)</label>
+                    <input type="text" id="journal-authors" value="${data.authors || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="모든 저자명을 입력하세요">
+                </div>
+
+                <!-- 학술지명 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">학술지명</label>
+                    <input type="text" id="journal-name" value="${data.journalName || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="학술지명을 입력하세요">
+                </div>
+
+                <!-- 학술지 구분 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">학술지 구분</label>
+                    <div class="flex-1">
+                        <p class="text-xs text-red-600 mb-2">* 한국연구재단(www.kci.go.kr)에서 확인 가능</p>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-type" value="KCI" ${data.journalType === 'KCI' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">KCI 등재(후보지)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-type" value="SCI_SSCI_AHCI" ${data.journalType === 'SCI_SSCI_AHCI' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">SCI/SSCI/A&HCI</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-type" value="SCIE" ${data.journalType === 'SCIE' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">SCIE</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-type" value="SCOPUS" ${data.journalType === 'SCOPUS' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">SCOPUS</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-type" value="DOMESTIC" ${data.journalType === 'DOMESTIC' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">기타(국내)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-type" value="INTERNATIONAL" ${data.journalType === 'INTERNATIONAL' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">기타(국외)</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 발행기관 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">발행기관</label>
+                    <input type="text" id="journal-publisher" value="${data.publisher || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="발행기관을 입력하세요">
+                </div>
+
+                <!-- 집/권/호 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">집/권/호</label>
+                    <input type="text" id="journal-volume-issue" value="${data.volumeIssue || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="예: 10권 2호">
+                </div>
+
+                <!-- 발행년월일 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">발행년월일</label>
+                    <input type="date" id="journal-publish-date" value="${data.publishDate || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
+                </div>
+
+                <!-- 수록 Page -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">수록 Page</label>
+                    <input type="text" id="journal-pages" value="${data.pages || ''}"
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
+                           placeholder="예: 123-145">
+                </div>
+
+                <!-- 증빙서류 -->
+                <div class="flex items-start gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">증빙서류<br>(심사평가)</label>
+                    <div class="flex-1">
+                        <p class="text-xs text-red-600 mb-2">* 승인서류는 첨부파일 또는 우편/팩스로 제출 필수</p>
+                        <div class="space-y-2 mb-3">
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-proof-type" value="confirmation" ${data.proofDocType === 'confirmation' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">논문게재 확인서</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-proof-type" value="scheduled" ${data.proofDocType === 'scheduled' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">논문게재 예정증명서</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="journal-proof-type" value="proof" ${data.proofDocType === 'proof' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]">
+                                <span class="ml-2 text-sm text-gray-900">논문게재 증빙서</span>
+                            </label>
+                        </div>
+
+                        <!-- 파일업로드 -->
+                        <div class="flex items-center gap-3">
+                            <input type="file" id="journal-file" class="hidden" accept=".pdf">
+                            <button type="button" data-action="select-file"
+                                    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
+                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                                </svg>
+                                파일 선택
+                            </button>
+                            <span class="text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</span>
+                        </div>
+                        <div id="file-info" class="text-sm text-gray-600 mt-2">
                             ${data.fileName ? `
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -372,14 +487,14 @@ function renderJournalSubmissionForm() {
                 </div>
 
                 <!-- 제출 버튼 -->
-                <div class="flex justify-end gap-3 pt-4">
+                <div class="flex justify-end gap-3 pt-6 border-t">
                     <button data-action="back-to-list"
                             class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
                         취소
                     </button>
                     <button data-action="save-journal"
                             class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
-                        ${isEdit ? '저장' : '제출하기'}
+                        심사신청
                     </button>
                 </div>
             </div>
