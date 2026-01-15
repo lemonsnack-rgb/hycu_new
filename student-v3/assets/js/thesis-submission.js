@@ -14,6 +14,7 @@ const thesisSubmissions = [
         stage: 'proposal',
         stageName: '연구계획서',
         attemptNumber: 1,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-01-01',
             end: '2025-01-31'
@@ -34,6 +35,7 @@ const thesisSubmissions = [
         stage: 'interim',
         stageName: '중간논문',
         attemptNumber: 1,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-03-01',
             end: '2025-03-31'
@@ -48,6 +50,7 @@ const thesisSubmissions = [
         stage: 'main',
         stageName: '본심사',
         attemptNumber: 1,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-05-01',
             end: '2025-05-31'
@@ -68,6 +71,7 @@ const thesisSubmissions = [
         stage: 'main',
         stageName: '본심사',
         attemptNumber: 2,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-06-01',
             end: '2025-06-30'
@@ -323,14 +327,17 @@ function renderThesisSubmissionForm() {
 
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="space-y-4">
-                <!-- 심사단계 + 희망심사일 -->
+                <!-- 지도교수명 출력 (읽기 전용) -->
+                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">지도교수</label>
+                    <div class="flex-1 text-sm text-gray-900 font-medium">${submission.advisorName || '홍길동 교수'}</div>
+                </div>
+
+                <!-- 심사단계 -->
                 <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
                     <input type="text" value="${stageDisplay}" readonly
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">희망심사일 *</label>
-                    <input type="date" id="desired-exam-date" value="${data.desiredExamDate || ''}"
-                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]">
                 </div>
 
                 <!-- 논문제목 -->
@@ -414,12 +421,16 @@ function renderThesisDetailView() {
             </div>
 
             <div class="space-y-4">
-                <!-- 심사단계 + 희망심사일 -->
+                <!-- 지도교수명 출력 (읽기 전용) -->
+                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">지도교수</label>
+                    <div class="flex-1 text-sm text-gray-900 font-medium">${submission.advisorName || '홍길동 교수'}</div>
+                </div>
+
+                <!-- 심사단계 -->
                 <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
                     <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${stageDisplay}</div>
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">희망심사일</label>
-                    <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${data.desiredExamDate}</div>
                 </div>
 
                 <!-- 논문제목 -->
@@ -489,7 +500,6 @@ function handleFileSelect(event) {
 // 논문 제출/수정 저장
 function saveThesisSubmission() {
     const title = document.getElementById('thesis-title').value.trim();
-    const desiredDate = document.getElementById('desired-exam-date').value;
     const file = document.getElementById('thesis-file').files[0];
 
     const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
@@ -497,11 +507,6 @@ function saveThesisSubmission() {
 
     if (!title) {
         alert('논문 제목을 입력해주세요.');
-        return;
-    }
-
-    if (!desiredDate) {
-        alert('희망심사일을 선택해주세요.');
         return;
     }
 
@@ -516,7 +521,6 @@ function saveThesisSubmission() {
         submission.status = 'submitted';
         submission.submittedData = {
             title: title,
-            desiredExamDate: desiredDate,
             fileName: file ? file.name : submission.submittedData.fileName,
             fileSize: file ? file.size : submission.submittedData.fileSize,
             submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {

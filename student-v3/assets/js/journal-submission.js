@@ -14,6 +14,7 @@ const journalSubmissions = [
         id: 1,
         stageName: '1차 제출',
         attemptNumber: 1,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-01-01',
             end: '2025-01-31'
@@ -32,6 +33,7 @@ const journalSubmissions = [
         id: 2,
         stageName: '2차 제출',
         attemptNumber: 1,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-03-01',
             end: '2025-03-31'
@@ -50,6 +52,7 @@ const journalSubmissions = [
         id: 3,
         stageName: '2차 제출',
         attemptNumber: 2,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-04-01',
             end: '2025-04-30'
@@ -62,6 +65,7 @@ const journalSubmissions = [
         id: 4,
         stageName: '3차 제출',
         attemptNumber: 1,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-05-01',
             end: '2025-05-31'
@@ -80,6 +84,7 @@ const journalSubmissions = [
         id: 5,
         stageName: '3차 제출',
         attemptNumber: 2,
+        advisorName: '홍길동 교수',
         submissionPeriod: {
             start: '2025-06-01',
             end: '2025-06-30'
@@ -331,6 +336,12 @@ function renderJournalSubmissionForm() {
             <h3 class="text-lg font-bold text-gray-900 mb-6">학술지 논문 제출</h3>
 
             <div class="space-y-4">
+                <!-- 지도교수명 출력 (읽기 전용) -->
+                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0">지도교수</label>
+                    <div class="flex-1 text-sm text-gray-900 font-medium">${submission.advisorName || '홍길동 교수'}</div>
+                </div>
+
                 <!-- 논문지도교수 -->
                 <div class="flex items-start gap-4">
                     <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">논문지도교수</label>
