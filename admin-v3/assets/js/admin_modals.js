@@ -6602,11 +6602,6 @@ function saveUnifiedWorkflow() {
             alert(`단계 ${i + 1}: 단계 이름을 입력해주세요.`);
             return;
         }
-        // 제출 기간은 선택사항으로 변경 - 검증 제거
-        if (stage.evaluationTemplateId && (!stage.reviewStartDate || !stage.reviewEndDate)) {
-            alert(`단계 ${i + 1}: 평가표를 선택한 경우 심사 기간을 입력해주세요.`);
-            return;
-        }
     }
 
     const isEdit = window.currentWorkflowId !== null;

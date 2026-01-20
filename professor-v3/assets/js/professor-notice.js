@@ -239,20 +239,22 @@ function showProfessorNoticeDetail(noticeId) {
 
     // 상세 내용 렌더링
     detailView.innerHTML = `
-        <div class="review-detail-content-wrapper">
-            <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="backToProfessorNoticeList()" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
+        <div class="table-container">
+            <!-- 헤더: 뒤로가기 버튼 -->
+            <div class="table-header" style="margin-bottom: 1.5rem;">
+                <div class="table-header-left">
+                    <button onclick="backToProfessorNoticeList()"
+                            style="display: flex; align-items: center; gap: 0.5rem; color: #6A0028; background: none; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 500;">
+                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>목록으로 돌아가기</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- 본문 -->
-            <div class="review-detail-body">
-                <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- 본문 카드 -->
+            <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
                     <!-- 제목 -->
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">${notice.title}</h2>
 
@@ -260,7 +262,6 @@ function showProfessorNoticeDetail(noticeId) {
                     <div class="flex gap-4 text-sm text-gray-600 pb-4 border-b mb-6">
                         <span><i class="fas fa-user mr-1"></i> ${notice.author}</span>
                         <span><i class="fas fa-calendar mr-1"></i> ${notice.createdAt}</span>
-                        <span><i class="fas fa-eye mr-1"></i> 조회수 ${notice.viewCount}</span>
                     </div>
 
                     <!-- 본문 -->
@@ -272,14 +273,6 @@ function showProfessorNoticeDetail(noticeId) {
 
                     <!-- 첨부파일 -->
                     ${attachmentsHTML}
-
-                    <!-- 버튼 영역 -->
-                    <div class="flex justify-end gap-2 mt-6 pt-6 border-t">
-                        <button onclick="backToProfessorNoticeList()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                            목록
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     `;

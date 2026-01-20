@@ -273,20 +273,22 @@ function showStudentContentDetail(contentType, contentId) {
 
     // 상세 내용 렌더링
     detailView.innerHTML = `
-        <div class="review-detail-content-wrapper">
-            <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="backToStudentContentList('${contentType}')" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
+        <div class="table-container">
+            <!-- 헤더: 뒤로가기 버튼 -->
+            <div class="table-header" style="margin-bottom: 1.5rem;">
+                <div class="table-header-left">
+                    <button onclick="backToStudentContentList('${contentType}')"
+                            style="display: flex; align-items: center; gap: 0.5rem; color: #6A0028; background: none; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 500;">
+                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>목록으로 돌아가기</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- 본문 -->
-            <div class="review-detail-body">
-                <div class="bg-white rounded-lg shadow-md p-6">
+            <!-- 본문 카드 -->
+            <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
                     <!-- 제목 -->
                     <h2 class="text-2xl font-bold text-gray-900 mb-4">${content.title}</h2>
 
@@ -303,14 +305,6 @@ function showStudentContentDetail(contentType, contentId) {
                             ${content.content || content.body || '<p class="text-gray-500">내용이 없습니다.</p>'}
                         </div>
                     </div>
-
-                    <!-- 버튼 영역 -->
-                    <div class="flex justify-end gap-2 mt-6 pt-6 border-t">
-                        <button onclick="backToStudentContentList('${contentType}')" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                            목록
-                        </button>
-                    </div>
-                </div>
             </div>
         </div>
     `;

@@ -5481,6 +5481,7 @@ window.saveStageType = (event, id) => {
     const requiresPresentation = document.getElementById('requires-presentation').checked;
     const examTypeId = document.getElementById('exam-type-id').value;
     const description = document.getElementById('stage-type-description').value.trim();
+    const processPhase = document.getElementById('process-phase')?.value || 'none';
 
     // 유효성 검사
     if (!name) {
@@ -5501,6 +5502,7 @@ window.saveStageType = (event, id) => {
             stageType.requiresDocument = requiresDocument;
             stageType.requiresPresentation = requiresPresentation;
             stageType.examTypeId = examTypeId;  // 심사 유형 저장
+            stageType.processPhase = processPhase;  // 프로세스 단계 저장
             stageType.description = description;
         }
         alert('단계 유형이 수정되었습니다.');
@@ -5511,6 +5513,7 @@ window.saveStageType = (event, id) => {
             id: newId,
             name: name,
             type: requiresPresentation ? 'review' : 'submission', // 발표가 필요하면 심사, 아니면 제출
+            processPhase: processPhase,  // 프로세스 단계 저장
             requiresDocument: requiresDocument,
             requiresPresentation: requiresPresentation,
             examTypeId: examTypeId,  // 심사 유형 저장

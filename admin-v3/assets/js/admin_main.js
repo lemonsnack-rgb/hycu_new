@@ -5355,37 +5355,6 @@ function renderStageCard(stage, index) {
                 </select>
             </div>
 
-            <!-- (2) 제출 기간 + 심사 기간 -->
-            <div class="stage-field-row-dates">
-                <label class="stage-field-label">제출기간</label>
-                <div class="date-range-compact">
-                    <input type="date"
-                           value="${stage.submissionStartDate || ''}"
-                           onchange="updateStageField(${index}, 'submissionStartDate', this.value)"
-                           class="stage-input">
-                    <span class="text-gray-400 text-sm">~</span>
-                    <input type="date"
-                           value="${stage.submissionEndDate || ''}"
-                           onchange="updateStageField(${index}, 'submissionEndDate', this.value)"
-                           class="stage-input">
-                </div>
-
-                <label class="stage-field-label">심사기간</label>
-                <div class="date-range-compact">
-                    <input type="date"
-                           value="${stage.reviewStartDate || ''}"
-                           ${reviewDisabled ? 'disabled' : ''}
-                           onchange="updateStageField(${index}, 'reviewStartDate', this.value)"
-                           class="stage-input">
-                    <span class="text-gray-400 text-sm">~</span>
-                    <input type="date"
-                           value="${stage.reviewEndDate || ''}"
-                           ${reviewDisabled ? 'disabled' : ''}
-                           onchange="updateStageField(${index}, 'reviewEndDate', this.value)"
-                           class="stage-input">
-                </div>
-            </div>
-
             <!-- (6) 설명 -->
             <div class="stage-field-row" style="align-items: start;">
                 <label class="stage-field-label" style="margin-top: 6px;">설명</label>
@@ -5412,11 +5381,7 @@ function addNewStageCard() {
         name: '',
         requiresDocument: false,  // 유형 선택 시 자동 설정됨
         requiresPresentation: false,  // 유형 선택 시 자동 설정됨
-        submissionStartDate: '',
-        submissionEndDate: '',
         evaluationTemplateId: '',
-        reviewStartDate: '',
-        reviewEndDate: '',
         description: ''
     });
     refreshStageCards();
@@ -5478,17 +5443,10 @@ function updateStageField(index, field, value) {
     }
 }
 
-// 평가표 업데이트 (심사 기간 활성화/비활성화 처리)
+// 평가표 업데이트
 function updateStageEvaluationTemplate(index, templateId) {
     if (window.composedStages[index]) {
         window.composedStages[index].evaluationTemplateId = templateId;
-
-        // 평가표가 없으면 심사 기간 초기화
-        if (!templateId) {
-            window.composedStages[index].reviewStartDate = '';
-            window.composedStages[index].reviewEndDate = '';
-        }
-
         refreshStageCards();
     }
 }

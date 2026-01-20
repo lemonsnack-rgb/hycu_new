@@ -182,52 +182,51 @@ function showNoticeDetail(noticeId) {
 
     const detailView = document.getElementById('notice-detail-view');
     detailView.innerHTML = `
-        <div class="review-detail-content-wrapper">
-            <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="backToNoticeList()" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
+        <div class="table-container">
+            <!-- 헤더: 뒤로가기 버튼 -->
+            <div class="table-header" style="margin-bottom: 1.5rem;">
+                <div class="table-header-left">
+                    <button onclick="backToNoticeList()"
+                            style="display: flex; align-items: center; gap: 0.5rem; color: #6A0028; background: none; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 500;">
+                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>목록으로 돌아가기</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- 본문 -->
-            <div class="review-detail-body">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <!-- 제목 -->
-                    <h2 class="text-2xl font-bold text-gray-900 mb-4">${notice.title}</h2>
+            <!-- 본문 카드 -->
+            <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
+                <!-- 제목 -->
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: #111827; margin-bottom: 1rem;">
+                    ${notice.title}
+                </h2>
 
-                    <!-- 메타 정보 -->
-                    <div class="flex gap-4 text-sm text-gray-600 pb-4 border-b mb-6">
-                        <span><i class="fas fa-user mr-1"></i> ${notice.author}</span>
-                        <span><i class="fas fa-calendar mr-1"></i> ${notice.createdAt}</span>
-                        <span><i class="fas fa-eye mr-1"></i> 조회수 ${notice.viewCount}</span>
-                    </div>
+                <!-- 메타 정보 -->
+                <div style="display: flex; gap: 1rem; font-size: 0.875rem; color: #6B7280; padding-bottom: 1rem; border-bottom: 1px solid #E5E7EB; margin-bottom: 1.5rem;">
+                    <span><i class="fas fa-user" style="margin-right: 0.25rem;"></i> ${notice.author}</span>
+                    <span><i class="fas fa-calendar" style="margin-right: 0.25rem;"></i> ${notice.createdAt}</span>
+                </div>
 
-                    <!-- 본문 -->
-                    <div class="prose prose-sm max-w-none">
-                        <div style="line-height: 1.8; font-size: 14px; color: #333;">
-                            ${notice.content}
-                        </div>
-                    </div>
+                <!-- 본문 -->
+                <div style="line-height: 1.8; font-size: 0.875rem; color: #333;">
+                    ${notice.content}
+                </div>
 
-                    <!-- 첨부파일 -->
-                    ${attachmentsHTML}
+                <!-- 첨부파일 -->
+                ${attachmentsHTML}
 
-                    <!-- 버튼 영역 -->
-                    <div class="flex justify-end gap-2 mt-6 pt-6 border-t">
-                        <button onclick="backToNoticeList()" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
-                            목록
-                        </button>
-                        <button onclick="showNoticeEditForm('${notice.id}')" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-                            <i class="fas fa-edit mr-1"></i> 수정
-                        </button>
-                        <button onclick="deleteNoticeConfirm('${notice.id}')" class="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                            <i class="fas fa-trash mr-1"></i> 삭제
-                        </button>
-                    </div>
+                <!-- 버튼 영역 -->
+                <div style="display: flex; justify-content: flex-end; gap: 0.5rem; margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #E5E7EB;">
+                    <button onclick="showNoticeEditForm('${notice.id}')"
+                            style="padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background: #3B82F6; color: white; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2s;">
+                        <i class="fas fa-edit" style="margin-right: 0.25rem;"></i> 수정
+                    </button>
+                    <button onclick="deleteNoticeConfirm('${notice.id}')"
+                            style="padding: 0.5rem 1rem; border: none; border-radius: 0.5rem; background: #EF4444; color: white; cursor: pointer; font-size: 0.875rem; transition: background-color 0.2s;">
+                        <i class="fas fa-trash" style="margin-right: 0.25rem;"></i> 삭제
+                    </button>
                 </div>
             </div>
         </div>
@@ -260,21 +259,23 @@ function showNoticeCreateForm() {
 
     const detailView = document.getElementById('notice-detail-view');
     detailView.innerHTML = `
-        <div class="review-detail-content-wrapper">
-            <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="backToNoticeList()" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    목록으로 돌아가기
-                </button>
+        <div class="table-container">
+            <!-- 헤더: 뒤로가기 버튼 -->
+            <div class="table-header" style="margin-bottom: 1.5rem;">
+                <div class="table-header-left">
+                    <button onclick="backToNoticeList()"
+                            style="display: flex; align-items: center; gap: 0.5rem; color: #6A0028; background: none; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 500;">
+                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>목록으로 돌아가기</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- 본문 -->
-            <div class="review-detail-body">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <form id="notice-form" onsubmit="saveNoticeData(event)">
+            <!-- 본문 카드 -->
+            <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
+                <form id="notice-form" onsubmit="saveNoticeData(event)">
                         <!-- 제목 -->
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -384,7 +385,6 @@ function showNoticeCreateForm() {
                             </button>
                         </div>
                     </form>
-                </div>
             </div>
         </div>
     `;
@@ -411,21 +411,23 @@ function showNoticeEditForm(noticeId) {
 
     const detailView = document.getElementById('notice-detail-view');
     detailView.innerHTML = `
-        <div class="review-detail-content-wrapper">
-            <!-- 헤더 -->
-            <div class="review-detail-header" style="padding: 12px 24px;">
-                <button onclick="showNoticeDetail('${noticeId}')" class="back-to-list-btn">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
-                    </svg>
-                    상세보기로 돌아가기
-                </button>
+        <div class="table-container">
+            <!-- 헤더: 뒤로가기 버튼 -->
+            <div class="table-header" style="margin-bottom: 1.5rem;">
+                <div class="table-header-left">
+                    <button onclick="showNoticeDetail('${noticeId}')"
+                            style="display: flex; align-items: center; gap: 0.5rem; color: #6A0028; background: none; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 500;">
+                        <svg style="width: 1rem; height: 1rem;" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                        </svg>
+                        <span>상세보기로 돌아가기</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- 본문 -->
-            <div class="review-detail-body">
-                <div class="bg-white rounded-lg shadow-md p-6">
-                    <form id="notice-form" onsubmit="saveNoticeData(event)">
+            <!-- 본문 카드 -->
+            <div style="background: white; border-radius: 0.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1); padding: 1.5rem;">
+                <form id="notice-form" onsubmit="saveNoticeData(event)">
                         <!-- 제목 -->
                         <div class="mb-6">
                             <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -544,7 +546,6 @@ function showNoticeEditForm(noticeId) {
                             </button>
                         </div>
                     </form>
-                </div>
             </div>
         </div>
     `;

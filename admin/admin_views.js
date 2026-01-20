@@ -4350,8 +4350,10 @@ views.stageTypeManagement = () => {
                         <tr>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 80px;">번호</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유형명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">프로세스<br>단계</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">문서 제출</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">발표 필요</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">심사 유형</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">설명</th>
                         </tr>
                     </thead>
@@ -4361,16 +4363,44 @@ views.stageTypeManagement = () => {
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${idx + 1}</td>
                                 <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                 <td class="py-3 px-4 text-center">
+                                    ${(() => {
+                                        switch(item.processPhase) {
+                                            case 'application':
+                                                return '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">신청</span>';
+                                            case 'submission':
+                                                return '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">제출</span>';
+                                            case 'review':
+                                                return '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-800 font-medium">심사</span>';
+                                            case 'none':
+                                                return '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">해당없음</span>';
+                                            default:
+                                                return '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">-</span>';
+                                        }
+                                    })()}
+                                </td>
+                                <td class="py-3 px-4 text-center">
                                     ${item.requiresDocument
-                                        ? '<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-700">필요</span>'
+                                        ? '<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-800 font-medium">필요</span>'
                                         : '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">불필요</span>'
                                     }
                                 </td>
                                 <td class="py-3 px-4 text-center">
                                     ${item.requiresPresentation
-                                        ? '<span class="px-2 py-1 rounded text-xs bg-blue-100 text-blue-700">필요</span>'
+                                        ? '<span class="px-2 py-1 rounded text-xs bg-green-100 text-green-800 font-medium">필요</span>'
                                         : '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">불필요</span>'
                                     }
+                                </td>
+                                <td class="py-3 px-4 text-center">
+                                    ${(() => {
+                                        const examType = mockExamTypes.find(t => t.id === item.examTypeId);
+                                        if (!examType) return '<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">-</span>';
+
+                                        if (examType.id === 'EXAM_TYPE_NONE') {
+                                            return `<span class="px-2 py-1 rounded text-xs bg-gray-100 text-gray-600">${examType.name}</span>`;
+                                        } else {
+                                            return `<span class="px-2 py-1 rounded text-xs bg-purple-100 text-purple-800 font-medium">${examType.name}</span>`;
+                                        }
+                                    })()}
                                 </td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${item.description || '-'}</td>
                             </tr>
@@ -4412,6 +4442,7 @@ views.stageTypeCreate = (id = null) => {
 
             <!-- 폼 -->
             <form onsubmit="saveStageType(event, ${isEdit ? `'${id}'` : 'null'})" class="p-6 space-y-6">
+
                 <!-- 유형명 -->
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">
@@ -4425,37 +4456,72 @@ views.stageTypeCreate = (id = null) => {
                            required>
                 </div>
 
-                <!-- 제출 요건 -->
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-3">
-                        제출 요건
-                    </label>
-                    <div style="display: flex; align-items: center; gap: 24px;">
+                <!-- 구분선 -->
+                <div class="border-t-2 border-gray-300 my-6"></div>
+
+                <!-- ========== 영역 1: 프로세스 단계 구분 (일정 트리거) ========== -->
+                <div class="border-2 border-blue-300 rounded-lg p-4 bg-blue-50">
+                    <div class="flex items-center mb-3">
+                        <svg class="w-5 h-5 text-blue-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h4 class="text-base font-bold text-gray-900">프로세스 단계 구분</h4>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-3">일정(신청/제출/심사 기간) 제어가 필요한 단계를 선택하세요</p>
+                    <select id="process-phase"
+                            class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="none" ${!item.processPhase || item.processPhase === 'none' ? 'selected' : ''}>
+                            해당없음 (일정 제어 불필요)
+                        </option>
+                        <option value="application" ${item.processPhase === 'application' ? 'selected' : ''}>
+                            신청 단계 (신청 기간)
+                        </option>
+                        <option value="submission" ${item.processPhase === 'submission' ? 'selected' : ''}>
+                            제출 단계 (제출 기간)
+                        </option>
+                        <option value="review" ${item.processPhase === 'review' ? 'selected' : ''}>
+                            심사 단계 (심사 기간)
+                        </option>
+                    </select>
+                </div>
+
+                <!-- 구분선 -->
+                <div class="border-t-2 border-gray-300 my-6"></div>
+
+                <!-- ========== 영역 2: 지도 및 심사 유형 ========== -->
+                <div class="border-2 border-purple-300 rounded-lg p-4 bg-purple-50">
+                    <div class="flex items-center mb-3">
+                        <svg class="w-5 h-5 text-purple-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <h4 class="text-base font-bold text-gray-900">지도 및 심사 유형</h4>
+                    </div>
+                    <p class="text-xs text-gray-600 mb-3">학생의 활동 요건과 평가 방식을 설정하세요</p>
+
+                    <div class="space-y-4">
+                        <!-- 문서 제출 필요 -->
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox"
                                    id="requires-document"
                                    ${item.requiresDocument ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
                             <span class="ml-2 text-sm font-medium text-gray-900">문서 제출 필요</span>
                         </label>
 
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
-
+                        <!-- 발표 필요 -->
                         <label class="flex items-center cursor-pointer">
                             <input type="checkbox"
                                    id="requires-presentation"
                                    ${item.requiresPresentation ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                                   class="w-4 h-4 text-purple-600 border-gray-300 rounded focus:ring-purple-500">
                             <span class="ml-2 text-sm font-medium text-gray-900">발표 필요</span>
                         </label>
 
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
-
-                        <div style="display: flex; align-items: center; gap: 12px;">
-                            <label class="text-sm font-medium text-gray-900">심사 유형</label>
+                        <!-- 심사 유형 선택 -->
+                        <div>
+                            <label class="block text-sm font-medium text-gray-900 mb-2">심사 유형</label>
                             <select id="exam-type-id"
-                                    class="px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                    style="width: 200px;">
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-purple-500">
                                 ${mockExamTypes.sort((a, b) => {
                                     const order = { 'EXAM_TYPE_NONE': 0, 'EXAM_TYPE_001': 1, 'EXAM_TYPE_002': 2, 'EXAM_TYPE_003': 3 };
                                     return (order[a.id] || 99) - (order[b.id] || 99);
@@ -4468,6 +4534,9 @@ views.stageTypeCreate = (id = null) => {
                         </div>
                     </div>
                 </div>
+
+                <!-- 구분선 -->
+                <div class="border-t-2 border-gray-300 my-6"></div>
 
                 <!-- 설명 -->
                 <div>

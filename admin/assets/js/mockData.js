@@ -628,6 +628,7 @@ const mockStepTypes = [
         id: 'ST001',
         name: '연구계획서 제출',
         type: 'submission', // 'submission' | 'review'
+        processPhase: 'submission',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: false,
         examTypeId: 'EXAM_TYPE_001',  // 심사 유형
@@ -639,6 +640,7 @@ const mockStepTypes = [
         id: 'ST002',
         name: '예비심사',
         type: 'review',
+        processPhase: 'review',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: true,
         examTypeId: 'EXAM_TYPE_002',  // 심사 유형
@@ -650,6 +652,7 @@ const mockStepTypes = [
         id: 'ST003',
         name: '본심사',
         type: 'review',
+        processPhase: 'review',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: true,
         examTypeId: 'EXAM_TYPE_003',  // 심사 유형
@@ -661,6 +664,7 @@ const mockStepTypes = [
         id: 'ST004',
         name: '선행연구 검토',
         type: 'submission',
+        processPhase: 'submission',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: false,
         examTypeId: 'EXAM_TYPE_NONE',  // 심사 유형
@@ -672,6 +676,7 @@ const mockStepTypes = [
         id: 'ST005',
         name: '연구 수행',
         type: 'submission',
+        processPhase: 'none',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: false,
         examTypeId: 'EXAM_TYPE_NONE',  // 심사 유형
@@ -683,6 +688,7 @@ const mockStepTypes = [
         id: 'ST006',
         name: '논문 작성',
         type: 'submission',
+        processPhase: 'submission',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: false,
         examTypeId: 'EXAM_TYPE_NONE',  // 심사 유형
@@ -694,6 +700,7 @@ const mockStepTypes = [
         id: 'ST007',
         name: '연구제안서 심사',
         type: 'review',
+        processPhase: 'review',  // 'none' | 'application' | 'submission' | 'review'
         requiresDocument: true,
         requiresPresentation: true,
         examTypeId: 'EXAM_TYPE_001',  // 심사 유형

@@ -3376,11 +3376,7 @@ const views = {
             examTypeId: '',   // 신규: 심사 유형 ID
             name: '',
             // requiresDocument, requiresPresentation는 stageType에서 자동 상속되므로 제거
-            submissionStartDate: '',
-            submissionEndDate: '',
             evaluationTemplateId: '',
-            reviewStartDate: '',
-            reviewEndDate: '',
             description: ''
         }];
         window.currentWorkflowId = id;
@@ -3408,14 +3404,6 @@ const views = {
                 }
                 if (!stage.name.trim()) {
                     alert(`단계 ${i + 1}: 단계 이름을 입력해주세요.`);
-                    return;
-                }
-                if (!stage.submissionStartDate || !stage.submissionEndDate) {
-                    alert(`단계 ${i + 1}: 제출 기간을 입력해주세요.`);
-                    return;
-                }
-                if (stage.evaluationTemplateId && (!stage.reviewStartDate || !stage.reviewEndDate)) {
-                    alert(`단계 ${i + 1}: 평가표를 선택한 경우 심사 기간을 입력해주세요.`);
                     return;
                 }
             }
