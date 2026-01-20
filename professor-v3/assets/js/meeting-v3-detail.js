@@ -284,7 +284,7 @@ const MeetingDetail = {
                     <div class="px-8 py-6 border-b border-gray-200">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">완료 정보</h3>
 
-                        <div class="grid grid-cols-3 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">완료 날짜</label>
                                 <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
@@ -293,54 +293,13 @@ const MeetingDetail = {
                             </div>
 
                             <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">실제 소요 시간</label>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Zoom 비밀번호</label>
                                 <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
-                                    <p class="text-gray-900">${MeetingUtils.formatDuration(meeting.actualDuration)}</p>
-                                </div>
-                            </div>
-
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">녹화 여부</label>
-                                <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
-                                    ${meeting.recordingId ? `
-                                        <p class="text-green-600 font-medium">녹화됨</p>
-                                    ` : `
-                                        <p class="text-gray-500">녹화 없음</p>
-                                    `}
+                                    <p class="text-gray-900 font-mono">${meeting.meetingType === 'online' ? (meeting.videoPassword || '-') : '-'}</p>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- 녹화 재생 -->
-                    ${meeting.recordingUrl ? `
-                        <div class="px-8 py-6 border-b border-gray-200">
-                            <h3 class="text-lg font-semibold text-gray-900 mb-4">녹화 영상</h3>
-
-                            <div class="bg-gray-100 rounded-lg p-4">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div>
-                                        <p class="text-sm text-gray-700">
-                                            <span class="font-medium">녹화 ID:</span> ${meeting.recordingId}
-                                        </p>
-                                        <p class="text-sm text-gray-600">
-                                            소요시간: ${MeetingUtils.formatDuration(meeting.recordingDuration)} |
-                                            파일크기: ${meeting.recordingSize}
-                                        </p>
-                                    </div>
-
-                                    <a href="${meeting.recordingUrl}" target="_blank"
-                                       class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] flex items-center gap-2">
-                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                        </svg>
-                                        재생
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    ` : ''}
                 </div>
             </div>
         `;
