@@ -1314,9 +1314,19 @@ const views = {
                                    onkeypress="if(event.key==='Enter') searchGuidanceProgress()">
                         </div>
 
-                        <!-- 3행: 조회 버튼 -->
+                        <!-- 3행: 피드백 상태 + 조회 버튼 -->
+                        <!-- 11. 피드백 상태 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">피드백 상태</label>
+                            <select id="progress-search-feedback-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="대기">대기</option>
+                                <option value="진행중">진행중</option>
+                                <option value="완료">완료</option>
+                            </select>
+                        </div>
                         <!-- 빈 공간 -->
-                        <div class="col-span-4"></div>
+                        <div class="col-span-3"></div>
                         <!-- 조회 버튼 -->
                         <div class="flex items-center justify-end">
                             <button onclick="searchGuidanceProgress()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">

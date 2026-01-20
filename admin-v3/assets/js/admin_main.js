@@ -591,7 +591,8 @@ function searchGuidanceProgress() {
         semesterCount: document.getElementById('progress-search-semester-count')?.value || '',
         status: document.getElementById('progress-search-status')?.value || '',
         studentId: document.getElementById('progress-search-student-id')?.value.toLowerCase().trim() || '',
-        studentName: document.getElementById('progress-search-student-name')?.value.toLowerCase().trim() || ''
+        studentName: document.getElementById('progress-search-student-name')?.value.toLowerCase().trim() || '',
+        feedbackStatus: document.getElementById('progress-search-feedback-status')?.value || ''
     };
 
     // 원본 데이터 백업
@@ -627,13 +628,21 @@ function searchGuidanceProgress() {
         filtered = filtered.filter(item => String(item.semesterCount) === filters.semesterCount);
     }
 
-    // 피드백상태 (답변 대기중 → 대기, 피드백 완료 → 완료 변환 고려)
+    // 학적상태 필터 (이 부분이 맞는 위치)
     if (filters.status) {
+        filtered = filtered.filter(item => {
+            // 학적상태 필터링 로직 필요 시 추가
+            return true; // 현재는 모든 항목 통과
+        });
+    }
+
+    // 피드백상태 (답변 대기중 → 대기, 피드백 완료 → 완료 변환 고려)
+    if (filters.feedbackStatus) {
         filtered = filtered.filter(item => {
             let itemStatus = item.feedbackStatus || '대기';
             if (itemStatus === '답변 대기중') itemStatus = '대기';
             if (itemStatus === '피드백 완료') itemStatus = '완료';
-            return itemStatus === filters.status;
+            return itemStatus === filters.feedbackStatus;
         });
     }
 

@@ -221,9 +221,10 @@ function getCurrentFeedbackFilters() {
         college: document.getElementById('feedback-filter-college')?.value || '',
         undergraduate: document.getElementById('feedback-filter-undergraduate')?.value || '',
         major: document.getElementById('feedback-filter-major')?.value || '',
-        program: document.getElementById('feedback-filter-program')?.value || '',
-        academicStatus: document.getElementById('feedback-filter-academic-status')?.value || '',
-        studentSearch: document.getElementById('feedback-filter-student-search')?.value || '',
+        degree: document.getElementById('feedback-filter-degree')?.value || '',
+        status: document.getElementById('feedback-filter-status')?.value || '',
+        studentId: document.getElementById('feedback-filter-student-id')?.value || '',
+        studentName: document.getElementById('feedback-filter-student-name')?.value || '',
         professor: document.getElementById('feedback-filter-professor')?.value || '',
         feedbackStatus: document.getElementById('feedback-filter-feedback-status')?.value || ''
     };
@@ -262,31 +263,34 @@ function filterFeedbackRequests(requests, filters) {
         }
 
         // 학위과정 필터
-        if (filters.program && req.program !== filters.program) {
+        if (filters.degree && req.program !== filters.degree) {
             return false;
         }
 
         // 학적상태 필터
-        if (filters.academicStatus) {
+        if (filters.status) {
             const statusText = req.status === 'active' ? '재학' :
                              req.status === 'leave' ? '휴학' :
                              req.status === 'completed' ? '수료' :
                              req.status === 'graduated' ? '졸업' : '재학';
 
-            if (statusText !== filters.academicStatus) {
+            if (statusText !== filters.status) {
                 return false;
             }
         }
 
-        // 학번/성명 통합 검색
-        if (filters.studentSearch) {
-            const keyword = filters.studentSearch.toLowerCase();
-            const searchText = [
-                req.studentNumber,
-                req.studentName
-            ].join(' ').toLowerCase();
+        // 학번 필터 (분리)
+        if (filters.studentId) {
+            const studentNumber = req.studentNumber || '';
+            if (!studentNumber.includes(filters.studentId)) {
+                return false;
+            }
+        }
 
-            if (!searchText.includes(keyword)) {
+        // 성명 필터 (분리)
+        if (filters.studentName) {
+            const studentName = req.studentName || '';
+            if (!studentName.includes(filters.studentName)) {
                 return false;
             }
         }
@@ -333,9 +337,10 @@ function resetFeedbackSearch() {
         'feedback-filter-college',
         'feedback-filter-undergraduate',
         'feedback-filter-major',
-        'feedback-filter-program',
-        'feedback-filter-academic-status',
-        'feedback-filter-student-search',
+        'feedback-filter-degree',
+        'feedback-filter-status',
+        'feedback-filter-student-id',
+        'feedback-filter-student-name',
         'feedback-filter-professor',
         'feedback-filter-feedback-status'
     ];
