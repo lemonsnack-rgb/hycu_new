@@ -1021,15 +1021,17 @@ const DataServiceV3 = {
             meeting.actualDuration = data.actualDuration;
             meeting.meetingSummary = data.meetingSummary;
 
-            // Zoom 녹화 확인
-            if (meeting.meetingType === 'online' && data.checkRecording) {
+            // 비밀번호 저장 (온라인 미팅만)
+            if (meeting.meetingType === 'online' && data.videoPassword) {
+                meeting.videoPassword = data.videoPassword;
+
+                // Zoom 녹화 확인 (온라인 미팅이면 자동으로 체크)
                 const recordingInfo = this.checkZoomRecording(meeting);
                 if (recordingInfo) {
                     Object.assign(meeting, recordingInfo);
                 }
             }
 
-            
             return meeting;
         }
         return null;
@@ -1140,9 +1142,12 @@ const DataServiceV3 = {
     checkZoomRecording(meeting) {
         // 50% 확률로 녹화본 있음
         if (Math.random() > 0.5) {
+            const recordingUrl = `https://zoom.us/rec/share/${Math.random().toString(36).substring(2, 15)}`;
             return {
                 recordingId: 'REC' + String(Math.floor(Math.random() * 1000)).padStart(3, '0'),
-                recordingUrl: `https://zoom.us/rec/share/${Math.random().toString(36).substring(2, 15)}`,
+                recordingUrl: recordingUrl,
+                recordingPlayUrl: recordingUrl,
+                recordingDownloadUrl: recordingUrl + '/download',
                 recordingDuration: meeting.actualDuration || meeting.duration,
                 recordingSize: Math.floor((meeting.actualDuration || meeting.duration) * 4.5) + ' MB'
             };
