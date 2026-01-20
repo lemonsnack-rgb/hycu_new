@@ -905,39 +905,6 @@ const CompleteMeetingModal = {
      * 모달 렌더링
      */
     render(meeting) {
-        // 온라인 미팅인 경우에만 비밀번호 생성, 오프라인은 "해당 없음"
-        let passwordValue = '해당 없음';
-        let helperText = '오프라인 미팅은 비밀번호가 필요하지 않습니다.';
-
-        if (meeting.meetingType === 'online') {
-            // 자동 비밀번호 생성 (8자리: 대문자, 소문자, 숫자, 특수문자)
-            const generatePassword = () => {
-                const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                const lower = 'abcdefghijklmnopqrstuvwxyz';
-                const numbers = '0123456789';
-                const special = '!@#$%';
-                const allChars = upper + lower + numbers + special;
-
-                let password = '';
-                // 각 카테고리에서 최소 1개씩 포함
-                password += upper[Math.floor(Math.random() * upper.length)];
-                password += lower[Math.floor(Math.random() * lower.length)];
-                password += numbers[Math.floor(Math.random() * numbers.length)];
-                password += special[Math.floor(Math.random() * special.length)];
-
-                // 나머지 4자리는 랜덤
-                for (let i = 0; i < 4; i++) {
-                    password += allChars[Math.floor(Math.random() * allChars.length)];
-                }
-
-                // 문자열 섞기
-                return password.split('').sort(() => Math.random() - 0.5).join('');
-            };
-
-            passwordValue = generatePassword();
-            helperText = '시스템에서 자동 생성된 비밀번호입니다.';
-        }
-
         return ModalBase.renderContainer('complete-meeting-modal', `
             <!-- 헤더 -->
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -958,19 +925,6 @@ const CompleteMeetingModal = {
                     <input type="date" id="complete-date"
                            value="${new Date().toISOString().split('T')[0]}"
                            class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
-                </div>
-
-                <div class="mb-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">
-                        영상 재생/다운로드용 비밀번호
-                    </label>
-                    <input type="text" id="video-password"
-                           value="${passwordValue}"
-                           disabled
-                           class="w-full px-3 py-2 border border-gray-300 rounded-lg bg-gray-100 text-gray-700">
-                    <p class="text-xs text-gray-500 mt-1">
-                        ${helperText}
-                    </p>
                 </div>
             </div>
 
@@ -1024,7 +978,6 @@ const CompleteMeetingModal = {
      */
     confirm() {
         const completedDate = document.getElementById('complete-date').value;
-        const videoPassword = document.getElementById('video-password').value;
 
         // 검증 (완료 날짜만 필수)
         const validation = ValidationUtils.validateRequired({
@@ -1034,6 +987,35 @@ const CompleteMeetingModal = {
         if (!validation.isValid) {
             alert(validation.message);
             return;
+        }
+
+        // 미팅 정보 가져오기
+        const meeting = DataServiceV3.getMeetingById(this.currentMeetingId);
+
+        // 비밀번호 자동 생성 (온라인 미팅만)
+        let videoPassword = null;
+        if (meeting.meetingType === 'online') {
+            const generatePassword = () => {
+                const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                const lower = 'abcdefghijklmnopqrstuvwxyz';
+                const numbers = '0123456789';
+                const special = '!@#$%';
+                const allChars = upper + lower + numbers + special;
+
+                let password = '';
+                password += upper[Math.floor(Math.random() * upper.length)];
+                password += lower[Math.floor(Math.random() * lower.length)];
+                password += numbers[Math.floor(Math.random() * numbers.length)];
+                password += special[Math.floor(Math.random() * special.length)];
+
+                for (let i = 0; i < 4; i++) {
+                    password += allChars[Math.floor(Math.random() * allChars.length)];
+                }
+
+                return password.split('').sort(() => Math.random() - 0.5).join('');
+            };
+
+            videoPassword = generatePassword();
         }
 
         const data = {
