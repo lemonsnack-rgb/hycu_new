@@ -20,6 +20,9 @@
     <!-- Layout System v3 (NEW) - Crimson Layout -->
     <link rel="stylesheet" href="../professor-v3/assets/css/layout-v3.css?v=20241229001">
 
+    <!-- Dashboard CSS -->
+    <link rel="stylesheet" href="assets/css/dashboard.css?v=20260120001">
+
     <!-- 기존 기능 유지를 위한 CSS (특수 기능용) -->
     <link rel="stylesheet" href="../professor-v3/assets/css/style.css">
 
@@ -398,9 +401,93 @@
 
             <!-- 대시보드 화면 -->
             <section id="dashboard-screen" class="content-screen active">
-                <div class="bg-white rounded-lg shadow-md p-8">
-                    <div class="text-center text-gray-500">
-                        <p class="text-lg">대시보드 콘텐츠 준비 중입니다.</p>
+                <!-- 메인 콘텐츠 영역 -->
+                <div class="dashboard-main-grid">
+                    <!-- 좌측 컬럼 (60%) -->
+                    <div class="dashboard-left-column">
+                        <!-- 나의 정보 -->
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h2 class="dashboard-card-title">나의 정보</h2>
+                            </div>
+                            <div class="dashboard-card-body">
+                                <div id="student-status-table"></div>
+                            </div>
+                        </div>
+
+                        <!-- 학위 논문 청구 요건 -->
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h2 class="dashboard-card-title">학위 논문 청구 요건</h2>
+                            </div>
+                            <div class="dashboard-card-body">
+                                <div id="requirements-list" class="requirements-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- 공지사항 -->
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h2 class="dashboard-card-title">공지사항</h2>
+                                <a href="#" onclick="showScreen('notice'); return false;" class="dashboard-view-all">
+                                    전체 공지 보기
+                                    <svg class="dashboard-arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                                    </svg>
+                                </a>
+                            </div>
+                            <div class="dashboard-card-body">
+                                <div id="notice-list" class="notice-list"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 우측 컬럼 (40%) -->
+                    <div class="dashboard-right-column">
+                        <!-- 알림 -->
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h2 class="dashboard-card-title">알림</h2>
+                            </div>
+                            <div class="dashboard-card-body">
+                                <div id="activity-list" class="activity-list"></div>
+                            </div>
+                        </div>
+
+                        <!-- 일정 -->
+                        <div class="dashboard-card">
+                            <div class="dashboard-card-header">
+                                <h2 class="dashboard-card-title">일정</h2>
+                            </div>
+                            <div class="dashboard-card-body">
+                                <!-- 주요 일정 (대학원 전체) -->
+                                <div class="schedule-section">
+                                    <div class="schedule-section-header">
+                                        <h3 class="schedule-section-title">주요 일정</h3>
+                                        <span class="schedule-badge">온라인</span>
+                                    </div>
+                                    <div id="main-schedule-list" class="schedule-items"></div>
+                                </div>
+
+                                <!-- 승인 대기 중인 지도 일정 -->
+                                <div class="schedule-section">
+                                    <div class="schedule-section-header">
+                                        <h3 class="schedule-section-title">승인 대기 중인 지도 일정</h3>
+                                        <span class="schedule-badge">온라인</span>
+                                    </div>
+                                    <div id="pending-schedule-list" class="schedule-items"></div>
+                                </div>
+
+                                <!-- 다가오는 지도 일정 -->
+                                <div class="schedule-section">
+                                    <div class="schedule-section-header">
+                                        <h3 class="schedule-section-title">다가오는 지도 일정</h3>
+                                        <span class="schedule-badge">온라인</span>
+                                    </div>
+                                    <div id="upcoming-schedule-list" class="schedule-items"></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -770,6 +857,9 @@
     <script src="assets/js/student-meeting-data.js?v=20260108004"></script>
     <script src="assets/js/student-meeting-list.js?v=20260108004"></script>
     <script src="assets/js/student-meeting-modals.js?v=20260108004"></script>
+
+    <!-- 대시보드 관련 -->
+    <script src="assets/js/dashboard.js?v=20260120001"></script>
 
 </body>
 </html>
