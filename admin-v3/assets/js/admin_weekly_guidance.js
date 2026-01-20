@@ -28,6 +28,65 @@ let adminAvailableSemesters = [];
 // 학기별 계획 데이터 저장소 (관리자용)
 const adminSemesterPlansStorage = {};
 
+// ==================== 커스텀 확인 대화상자 (관리자용) ====================
+function showCustomConfirmAdmin(title, message, confirmText = '확인', cancelText = '취소', type = 'danger') {
+    return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-confirm-overlay';
+
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-confirm-dialog';
+
+        const confirmBtnClass = type === 'danger' ? 'custom-confirm-btn-confirm' : 'custom-confirm-btn-primary';
+
+        dialog.innerHTML = `
+            <div class="custom-confirm-header">
+                <h3 class="custom-confirm-title">${title}</h3>
+            </div>
+            <div class="custom-confirm-body">
+                <p class="custom-confirm-message">${message}</p>
+            </div>
+            <div class="custom-confirm-footer">
+                <button class="custom-confirm-btn custom-confirm-btn-cancel" data-action="cancel">
+                    ${cancelText}
+                </button>
+                <button class="custom-confirm-btn ${confirmBtnClass}" data-action="confirm">
+                    ${confirmText}
+                </button>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        const handleClick = (e) => {
+            const action = e.target.dataset.action;
+            if (action === 'confirm' || action === 'cancel') {
+                overlay.remove();
+                resolve(action === 'confirm');
+            }
+        };
+
+        dialog.addEventListener('click', handleClick);
+
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                overlay.remove();
+                document.removeEventListener('keydown', handleEscape);
+                resolve(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                resolve(false);
+            }
+        });
+    });
+}
+
 // DataService 확장 - 학기별 계획 관리 함수 (관리자용)
 if (typeof DataService === 'undefined') {
     window.DataService = {};
@@ -720,6 +779,14 @@ function renderAdminSemesterDetailContent(student, allPlans, currentPlan, totalW
                         ${weeks.map(week => renderAdminWeekRow(week, isApproved)).join('')}
                     </tbody>
                 </table>
+                ${!isApproved ? `
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-300">
+                        <button onclick="addNewWeekAdmin()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center gap-2">
+                            <i class="fas fa-plus"></i> 주차 추가
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
@@ -749,7 +816,18 @@ function renderAdminWeekRow(week, isApproved) {
     // 첫 번째 행
     let firstRow = `
         <tr id="admin-week-row-${week.week}">
-            <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">${week.week}주</td>
+            <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">
+                <div class="flex flex-col items-center gap-1">
+                    <span>${week.week}주</span>
+                    ${!isApproved ? `
+                        <button onclick="event.stopPropagation(); deleteWeekAdmin(${week.week})"
+                                class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
+                                title="주차 삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
             <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
                 <textarea id="admin-plan-content-${week.week}"
                           placeholder="계획 내용 입력"
@@ -949,6 +1027,124 @@ function alertAdminApprovedPlanEdit() {
     alert('⚠️ 교수님이 승인한 계획은 수정할 수 없습니다.\n\n계획 수정이 필요한 경우 담당 교수님께 문의하세요.');
 }
 
+// ==================== 주차 추가 (관리자용) ====================
+function addNewWeekAdmin() {
+    console.log('📝 관리자: 주차 추가 시작');
+
+    const allPlans = DataService.getAllSemesterPlans(currentAdminStudentId);
+    const currentPlan = allPlans.find(p =>
+        p.year === currentAdminSemesterView.year && p.semester === currentAdminSemesterView.semester
+    );
+
+    if (!currentPlan) {
+        alert('계획을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 승인된 계획은 수정 불가
+    if (currentPlan.approved === true) {
+        alert('승인된 계획은 수정할 수 없습니다.');
+        return;
+    }
+
+    // 주차 추가 전에 현재 화면의 입력 내용을 먼저 저장
+    if (currentPlan.weeks && currentPlan.weeks.length > 0) {
+        currentPlan.weeks.forEach(week => {
+            const contentTextarea = document.getElementById(`admin-plan-content-${week.week}`);
+            if (contentTextarea) {
+                week.plannedContent = contentTextarea.value.trim();
+            }
+        });
+    }
+
+    const nextWeekNumber = (currentPlan.weeks?.length || 0) + 1;
+
+    const newWeek = {
+        week: nextWeekNumber,
+        plannedContent: '',
+        executions: []
+    };
+
+    currentPlan.weeks.push(newWeek);
+    currentPlan.totalWeeks = nextWeekNumber;
+
+    console.log(`✅ 관리자: ${nextWeekNumber}주차 추가 완료`);
+    alert(`${nextWeekNumber}주차가 추가되었습니다.`);
+
+    refreshAdminModalContent();
+}
+
+// ==================== 주차 삭제 (관리자용) ====================
+async function deleteWeekAdmin(weekNumber) {
+    console.log(`🗑️ 관리자: 주차 삭제 시작: ${weekNumber}주`);
+
+    const allPlans = DataService.getAllSemesterPlans(currentAdminStudentId);
+    const currentPlan = allPlans.find(p =>
+        p.year === currentAdminSemesterView.year && p.semester === currentAdminSemesterView.semester
+    );
+
+    if (!currentPlan) {
+        alert('계획을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 승인된 계획은 수정 불가
+    if (currentPlan.approved === true) {
+        alert('승인된 계획은 수정할 수 없습니다.');
+        return;
+    }
+
+    const weekToDelete = currentPlan.weeks.find(w => w.week === weekNumber);
+    if (!weekToDelete) {
+        alert('해당 주차를 찾을 수 없습니다.');
+        return;
+    }
+
+    const hasPlanContent = weekToDelete.plannedContent && weekToDelete.plannedContent.trim();
+
+    let message = `${weekNumber}주차를 삭제하시겠습니까?`;
+    if (hasPlanContent) {
+        message += '\n\n입력된 계획 내용이 함께 삭제됩니다.';
+    }
+    message += '\n\n이 작업은 되돌릴 수 없습니다.';
+
+    const confirmed = await showCustomConfirmAdmin(
+        '⚠️ 주차 삭제 확인',
+        message,
+        '삭제',
+        '취소',
+        'danger'
+    );
+
+    if (!confirmed) {
+        console.log('❌ 관리자: 사용자가 삭제 취소');
+        return;
+    }
+
+    // 주차 삭제
+    currentPlan.weeks = currentPlan.weeks.filter(w => w.week !== weekNumber);
+
+    // 주차 번호 재정렬
+    currentPlan.weeks.forEach((week, index) => {
+        week.week = index + 1;
+    });
+
+    currentPlan.totalWeeks = currentPlan.weeks.length;
+
+    DataService.saveSemesterPlan(
+        currentAdminStudentId,
+        currentAdminSemesterView.year,
+        currentAdminSemesterView.semester,
+        currentPlan.totalWeeks,
+        currentPlan.weeks
+    );
+
+    console.log(`✅ 관리자: ${weekNumber}주차 삭제 완료`);
+    alert(`${weekNumber}주차가 삭제되었습니다.`);
+
+    refreshAdminModalContent();
+}
+
 // ==================== Helper 함수들 ====================
 function getDegreeText(degree) {
     const degreeMap = {
@@ -1032,5 +1228,7 @@ window.alertAdminApprovedPlanEdit = alertAdminApprovedPlanEdit;
 window.filterGuidancePairs = filterGuidancePairs;
 window.toggleSelectAllPairs = toggleSelectAllPairs;
 window.sendNotificationToSelectedPairs = sendNotificationToSelectedPairs;
+window.addNewWeekAdmin = addNewWeekAdmin;
+window.deleteWeekAdmin = deleteWeekAdmin;
 
 console.log('✅ 관리자용 학기별 지도 계획 모듈 로드 완료 (모달 팝업 방식)');

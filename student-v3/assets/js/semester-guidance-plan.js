@@ -47,6 +47,174 @@ let currentStudentSemester = {
 };
 let semesterPlan = null;
 
+// ==================== 커스텀 확인 대화상자 ====================
+function showCustomConfirmStudent(title, message, confirmText = '확인', cancelText = '취소', type = 'danger') {
+    return new Promise((resolve) => {
+        // 오버레이 생성
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-confirm-overlay';
+
+        // 다이얼로그 생성
+        const dialog = document.createElement('div');
+        dialog.className = 'custom-confirm-dialog';
+
+        const confirmBtnClass = type === 'danger' ? 'custom-confirm-btn-confirm' : 'custom-confirm-btn-primary';
+
+        dialog.innerHTML = `
+            <div class="custom-confirm-header">
+                <h3 class="custom-confirm-title">${title}</h3>
+            </div>
+            <div class="custom-confirm-body">
+                <p class="custom-confirm-message">${message}</p>
+            </div>
+            <div class="custom-confirm-footer">
+                <button class="custom-confirm-btn custom-confirm-btn-cancel" data-action="cancel">
+                    ${cancelText}
+                </button>
+                <button class="custom-confirm-btn ${confirmBtnClass}" data-action="confirm">
+                    ${confirmText}
+                </button>
+            </div>
+        `;
+
+        overlay.appendChild(dialog);
+        document.body.appendChild(overlay);
+
+        // 버튼 클릭 핸들러
+        const handleClick = (e) => {
+            const action = e.target.dataset.action;
+            if (action === 'confirm' || action === 'cancel') {
+                overlay.remove();
+                resolve(action === 'confirm');
+            }
+        };
+
+        dialog.addEventListener('click', handleClick);
+
+        // ESC 키로 닫기
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                overlay.remove();
+                document.removeEventListener('keydown', handleEscape);
+                resolve(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
+
+        // 오버레이 클릭으로 닫기
+        overlay.addEventListener('click', (e) => {
+            if (e.target === overlay) {
+                overlay.remove();
+                resolve(false);
+            }
+        });
+    });
+}
+
+// ==================== 주차 추가 ====================
+function addNewWeekStudent() {
+    console.log('📝 주차 추가 시작');
+
+    // Get current plan
+    if (!semesterPlan) {
+        alert('계획을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 승인된 계획은 수정 불가
+    if (semesterPlan.approved === true) {
+        alert('승인된 계획은 수정할 수 없습니다.');
+        return;
+    }
+
+    // Save current inputs before adding
+    if (semesterPlan.weeks && semesterPlan.weeks.length > 0) {
+        semesterPlan.weeks.forEach(week => {
+            const contentTextarea = document.getElementById(`student-plan-content-${week.week}`);
+            const contentMobileTextarea = document.getElementById(`student-plan-content-mobile-${week.week}`);
+            if (contentTextarea) {
+                week.plannedContent = contentTextarea.value.trim();
+            } else if (contentMobileTextarea) {
+                week.plannedContent = contentMobileTextarea.value.trim();
+            }
+        });
+    }
+
+    const nextWeekNumber = (semesterPlan.weeks?.length || 0) + 1;
+
+    const newWeek = {
+        week: nextWeekNumber,
+        plannedContent: '',
+        executions: []
+    };
+
+    semesterPlan.weeks.push(newWeek);
+    semesterPlan.totalWeeks = nextWeekNumber;
+
+    console.log(`✅ ${nextWeekNumber}주차 추가 완료`);
+    alert(`${nextWeekNumber}주차가 추가되었습니다.`);
+
+    renderStudentSemesterPlan();
+}
+
+// ==================== 주차 삭제 ====================
+async function deleteWeekStudent(weekNumber) {
+    console.log(`🗑️ 주차 삭제 시작: ${weekNumber}주`);
+
+    if (!semesterPlan) {
+        alert('계획을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 승인된 계획은 수정 불가
+    if (semesterPlan.approved === true) {
+        alert('승인된 계획은 수정할 수 없습니다.');
+        return;
+    }
+
+    const weekToDelete = semesterPlan.weeks.find(w => w.week === weekNumber);
+    if (!weekToDelete) {
+        alert('해당 주차를 찾을 수 없습니다.');
+        return;
+    }
+
+    const hasPlanContent = weekToDelete.plannedContent && weekToDelete.plannedContent.trim();
+
+    let message = `${weekNumber}주차를 삭제하시겠습니까?`;
+    if (hasPlanContent) {
+        message += '\n\n입력된 계획 내용이 함께 삭제됩니다.';
+    }
+    message += '\n\n이 작업은 되돌릴 수 없습니다.';
+
+    const confirmed = await showCustomConfirmStudent(
+        '⚠️ 주차 삭제 확인',
+        message,
+        '삭제',
+        '취소',
+        'danger'
+    );
+
+    if (!confirmed) {
+        console.log('❌ 사용자가 삭제 취소');
+        return;
+    }
+
+    // Delete week
+    semesterPlan.weeks = semesterPlan.weeks.filter(w => w.week !== weekNumber);
+
+    // Re-number weeks
+    semesterPlan.weeks.forEach((week, index) => {
+        week.week = index + 1;
+    });
+
+    semesterPlan.totalWeeks = semesterPlan.weeks.length;
+
+    console.log(`✅ ${weekNumber}주차 삭제 완료`);
+    alert(`${weekNumber}주차가 삭제되었습니다.`);
+
+    renderStudentSemesterPlan();
+}
+
 // DataService 확장 - 학생용 학기별 계획 관리
 if (typeof DataService === 'undefined') {
     window.DataService = {};
@@ -419,6 +587,8 @@ function renderStudentWeeklyCards(weeks) {
         `;
     }
 
+    const isApproved = semesterPlan && semesterPlan.approved === true;
+
     return `
         <div class="space-y-4">
             <div class="mb-4">
@@ -442,6 +612,27 @@ function renderStudentWeeklyCards(weeks) {
                         </tbody>
                     </table>
                 </div>
+                ${!isApproved ? `
+                    <div class="px-4 py-3 bg-gray-50 border-t border-gray-300">
+                        <button onclick="addNewWeekStudent()"
+                                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center gap-2">
+                            <i class="fas fa-plus"></i> 주차 추가
+                        </button>
+                    </div>
+                ` : ''}
+            </div>
+
+            <!-- Mobile Card View -->
+            <div class="md:hidden space-y-4">
+                ${weeks.map(week => renderStudentWeekCardMobile(week)).join('')}
+                ${!isApproved ? `
+                    <div class="bg-white rounded-lg shadow-md p-4">
+                        <button onclick="addNewWeekStudent()"
+                                class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center justify-center gap-2">
+                            <i class="fas fa-plus"></i> 주차 추가
+                        </button>
+                    </div>
+                ` : ''}
             </div>
         </div>
     `;
@@ -459,7 +650,18 @@ function renderStudentWeekCard(week) {
     // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
         <tr id="week-card-${week.week}">
-            <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">${week.week}주</td>
+            <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">
+                <div class="flex flex-col items-center gap-1">
+                    <span>${week.week}주</span>
+                    ${!isApproved ? `
+                        <button onclick="event.stopPropagation(); deleteWeekStudent(${week.week})"
+                                class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
+                                title="주차 삭제">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    ` : ''}
+                </div>
+            </td>
             <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
                 <textarea id="student-plan-content-${week.week}"
                           placeholder="계획 내용 입력"
@@ -522,8 +724,15 @@ function renderStudentWeekCardMobile(week) {
     return `
         <div id="week-card-mobile-${week.week}" class="bg-white border border-gray-200 rounded-lg">
             <!-- 주차 헤더 -->
-            <div class="p-4 bg-gray-50 border-b border-gray-200">
+            <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                 <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
+                ${!isApproved ? `
+                    <button onclick="event.stopPropagation(); deleteWeekStudent(${week.week})"
+                            class="text-xs px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
+                            title="주차 삭제">
+                        <i class="fas fa-trash"></i> 삭제
+                    </button>
+                ` : ''}
             </div>
 
             <!-- 계획 내용 -->
@@ -867,5 +1076,7 @@ window.saveAllStudentWeekPlans = saveAllStudentWeekPlans;
 window.saveStudentWeekPlan = saveStudentWeekPlan;
 window.autoExpandTextarea = autoExpandTextarea;
 window.expandAllTextareas = expandAllTextareas;
+window.addNewWeekStudent = addNewWeekStudent;
+window.deleteWeekStudent = deleteWeekStudent;
 
 console.log('✅ 학생용 학기별 지도 계획 모듈 로드 완료');
