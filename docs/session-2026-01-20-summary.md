@@ -542,8 +542,9 @@ docs/
 - ✅ PDF 뷰어 피드백 비교 기술 분석 완료
 - ✅ 세션 요약 문서 작성 완료
 - ✅ 학생용 학기별 지도 계획 주차 추가/삭제 기능 추가 완료
+- ✅ 관리자용 학기별 지도 계획 주차 추가/삭제 기능 추가 완료
 
-**마지막 커밋:** `789170a` (2026-01-20)
+**마지막 커밋:** `a55f88e` (2026-01-20)
 **브랜치:** main
 **원격 저장소:** 동기화 완료
 
@@ -692,5 +693,136 @@ window.deleteWeekStudent = deleteWeekStudent;
 | 주차 삭제 | ✅ | ✅ | 동일 |
 | 계획 내용 입력 | ✅ | ✅ | 동일 |
 | 실적 입력 | ✅ | ❌ | 교수만 가능 |
-| 계획 승인 | ✅ | ❌ | 교수/관리자만 가능 |
+| 계획 승인 | ✅ | ❌ | 교수만 가능 |
 | 승인 후 수정 제한 | ✅ | ✅ | 동일 |
+
+---
+
+## 8. 관리자용 학기별 지도 계획 주차 추가/삭제 기능 추가 (2026-01-20 추가)
+
+### 8.1 작업 배경
+
+**요구사항:**
+- 관리자용 학기별 지도 계획 화면에 주차 추가/삭제 기능 추가
+- 학생/교수 화면과 동일한 기능 제공
+- **중요:** 교수-학생-관리자의 차이는 실적 입력 가능여부, 계획승인 가능여부 차이만 있을 뿐 이외 기능은 동일해야 함
+- 계획 승인 이후에는 계획 수정 불가능
+- 계획 승인은 교수만 가능 (관리자는 승인 불가)
+
+### 8.2 구현 내용
+
+#### 파일: `admin-v3/assets/js/admin_weekly_guidance.js`
+
+**1. 커스텀 확인 대화상자 함수 추가 (line 31-88)**
+```javascript
+function showCustomConfirmAdmin(title, message, confirmText = '확인', cancelText = '취소', type = 'danger')
+```
+- Promise 기반 확인 대화상자
+- 주차 삭제 시 사용자 확인을 위해 사용
+- `type` 파라미터로 버튼 스타일 변경 가능 (danger/primary)
+- ESC 키 및 오버레이 클릭으로 닫기 지원
+
+**2. 주차 추가 함수 (line 1011-1056)**
+```javascript
+function addNewWeekAdmin()
+```
+- `DataService.getAllSemesterPlans(currentAdminStudentId)`로 현재 계획 조회
+- 승인된 계획은 수정 불가 (alert로 경고)
+- 기존 주차 내용 저장 후 새 주차 추가
+- 새 주차 객체 구조: `{ week: number, plannedContent: '', executions: [] }`
+- `refreshAdminModalContent()` 호출하여 모달 새로고침
+
+**3. 주차 삭제 함수 (line 1058-1127)**
+```javascript
+async function deleteWeekAdmin(weekNumber)
+```
+- 지정된 주차 삭제
+- 승인된 계획은 수정 불가 (alert로 경고)
+- 계획 내용이 있으면 경고 메시지 추가
+- 커스텀 확인 대화상자로 사용자 확인
+- 삭제 후 주차 번호 재정렬
+- DataService에 저장 후 모달 새로고침
+
+**4. UI 수정 - 테이블 하단에 주차 추가 버튼 (line 782-789)**
+```javascript
+${!isApproved ? `
+    <div class="px-4 py-3 bg-gray-50 border-t border-gray-300">
+        <button onclick="addNewWeekAdmin()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center gap-2">
+            <i class="fas fa-plus"></i> 주차 추가
+        </button>
+    </div>
+` : ''}
+```
+- 테이블 하단에 "주차 추가" 버튼 추가
+- 승인되지 않은 경우에만 표시
+
+**5. UI 수정 - 주차 셀에 삭제 버튼 (line 819-830)**
+```javascript
+<td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">
+    <div class="flex flex-col items-center gap-1">
+        <span>${week.week}주</span>
+        ${!isApproved ? `
+            <button onclick="event.stopPropagation(); deleteWeekAdmin(${week.week})"
+                    class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
+                    title="주차 삭제">
+                <i class="fas fa-trash"></i>
+            </button>
+        ` : ''}
+    </div>
+</td>
+```
+- 주차 번호 셀에 삭제 버튼 추가
+- 승인되지 않은 경우에만 표시
+
+**6. 전역 함수 노출 (line 1231-1232)**
+```javascript
+window.addNewWeekAdmin = addNewWeekAdmin;
+window.deleteWeekAdmin = deleteWeekAdmin;
+```
+- HTML onclick 이벤트에서 함수 호출 가능하도록 전역 노출
+
+### 8.3 기술적 특징
+
+**승인 상태 체크:**
+- `currentPlan.approved === true`이면 모든 수정 기능 비활성화
+- UI 버튼 자체가 렌더링되지 않음 (`!isApproved` 조건)
+- 함수 실행 시에도 승인 상태 재확인 후 alert 표시
+
+**데이터 무결성:**
+- 주차 삭제 시 자동으로 주차 번호 재정렬
+- 기존 입력 내용 보존 (추가 전 저장)
+- `totalWeeks` 카운터 자동 업데이트
+- DataService에 명시적 저장
+
+**사용자 경험:**
+- 삭제 전 커스텀 확인 대화상자로 확인
+- 입력된 내용이 있으면 추가 경고 메시지 표시
+- 작업 완료 후 자동 모달 새로고침
+
+**모달 팝업 구조:**
+- 관리자 화면은 모달 팝업 방식 (학생은 페이지, 교수도 모달)
+- `currentAdminStudentId` 변수로 현재 선택된 학생 관리
+- `refreshAdminModalContent()` 함수로 모달 내용 갱신
+
+**CSS 스타일:**
+- 커스텀 확인 대화상자 CSS는 `professor-v3/assets/css/components-v3.css`에 정의
+- 관리자 화면에서도 동일한 CSS 사용
+
+### 8.4 변경 파일
+
+- `admin-v3/assets/js/admin_weekly_guidance.js`
+
+### 8.5 최종 기능 비교: 교수 vs 학생 vs 관리자
+
+| 기능 | 교수 화면 | 학생 화면 | 관리자 화면 | 비고 |
+|------|----------|----------|------------|------|
+| **화면 형태** | 모달 팝업 | 페이지 전체 | 모달 팝업 | - |
+| **주차 추가** | ✅ | ✅ | ✅ | 동일 |
+| **주차 삭제** | ✅ | ✅ | ✅ | 동일 |
+| **계획 내용 입력** | ✅ (승인 전) | ✅ (승인 전) | ✅ (승인 전) | 동일 |
+| **실적 입력** | ✅ | ❌ | ❌ | 교수만 가능 |
+| **계획 승인** | ✅ | ❌ | ❌ | 교수만 가능 |
+| **승인 후 수정 제한** | ✅ | ✅ | ✅ | 동일 |
+
+**결론:** 학생-교수-관리자 세 화면 모두 주차 관리 기능이 완전히 동일하게 구현되었습니다. 차이점은 의도된 권한 차이(실적 입력, 승인 권한)만 남아있습니다.
