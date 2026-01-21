@@ -136,7 +136,7 @@ const StudentMeetingModals = {
                 </div>
 
                 <!-- 본문 -->
-                <div class="px-6 py-4">
+                <div class="px-6 py-4 space-y-4">
                     <!-- 선택된 시간 정보 -->
                     <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
                         <h4 class="font-medium text-gray-900 mb-2">선택하신 지도 시간</h4>
@@ -147,6 +147,17 @@ const StudentMeetingModals = {
                             <p><strong>소요시간:</strong> ${durationText}</p>
                             <p><strong>지도교수:</strong> ${slot.professorName || '-'}</p>
                         </div>
+                    </div>
+
+                    <!-- 신청 메모 입력 -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">
+                            신청 메모 (선택사항)
+                        </label>
+                        <textarea id="apply-memo"
+                                  rows="4"
+                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028] focus:border-[#6A0028] text-sm"
+                                  placeholder="지도받고 싶은 내용이나 논의하고 싶은 주제를 간단히 작성해주세요."></textarea>
                     </div>
                 </div>
 
@@ -181,7 +192,11 @@ const StudentMeetingModals = {
      * 신청 제출
      */
     submitApplication(slotId) {
-        const result = StudentMeetingDataService.applyForSlot(slotId);
+        // 메모 입력값 가져오기
+        const memo = document.getElementById('apply-memo')?.value?.trim() || '';
+
+        // 신청 처리
+        const result = StudentMeetingDataService.applyForSlot(slotId, memo);
 
         if (result) {
             alert('지도 예약 신청이 완료되었습니다.');
