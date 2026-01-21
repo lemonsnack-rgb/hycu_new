@@ -367,50 +367,53 @@ function renderProcessPhaseFormPage() {
                             </div>
                         </div>
 
-                        <!-- 학년도 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학년도 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-year" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
-                                <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
-                                <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
-                                <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
-                            </select>
-                        </div>
+                        <!-- 학년도 / 학기 / 시작일시 / 종료일시 -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <!-- 학년도 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학년도 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-year" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                    <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                    <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                    <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                                </select>
+                            </div>
 
-                        <!-- 학기 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학기 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-semester" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
-                                <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
-                            </select>
-                        </div>
+                            <!-- 학기 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학기 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-semester" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
+                                    <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
+                                </select>
+                            </div>
 
-                        <!-- 시작일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                시작일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-start" required
-                                   value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+                            <!-- 시작일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    시작일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-start" required
+                                       value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
 
-                        <!-- 종료일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                종료일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-end" required
-                                   value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <!-- 종료일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    종료일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-end" required
+                                       value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -528,50 +531,53 @@ function renderAdminWorkFormPage() {
                             `}
                         </div>
 
-                        <!-- 학년도 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학년도 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-year" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
-                                <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
-                                <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
-                                <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
-                            </select>
-                        </div>
+                        <!-- 학년도 / 학기 / 시작일시 / 종료일시 -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <!-- 학년도 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학년도 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-year" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                    <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                    <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                    <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                                </select>
+                            </div>
 
-                        <!-- 학기 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학기 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-semester" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
-                                <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
-                            </select>
-                        </div>
+                            <!-- 학기 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학기 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-semester" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
+                                    <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
+                                </select>
+                            </div>
 
-                        <!-- 시작일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                시작일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-start" required
-                                   value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+                            <!-- 시작일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    시작일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-start" required
+                                       value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
 
-                        <!-- 종료일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                종료일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-end" required
-                                   value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <!-- 종료일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    종료일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-end" required
+                                       value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -692,50 +698,53 @@ function openProcessPhaseModal(scheduleId = null) {
                             </div>
                         </div>
 
-                        <!-- 학년도 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학년도 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-year" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
-                                <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
-                                <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
-                                <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
-                            </select>
-                        </div>
+                        <!-- 학년도 / 학기 / 시작일시 / 종료일시 -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <!-- 학년도 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학년도 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-year" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                    <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                    <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                    <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                                </select>
+                            </div>
 
-                        <!-- 학기 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학기 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-semester" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
-                                <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
-                            </select>
-                        </div>
+                            <!-- 학기 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학기 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-semester" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
+                                    <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
+                                </select>
+                            </div>
 
-                        <!-- 시작일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                시작일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-start" required
-                                   value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+                            <!-- 시작일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    시작일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-start" required
+                                       value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
 
-                        <!-- 종료일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                종료일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-end" required
-                                   value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <!-- 종료일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    종료일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-end" required
+                                       value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -800,50 +809,53 @@ function openAdminWorkModal(scheduleId = null) {
                             </select>
                         </div>
 
-                        <!-- 학년도 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학년도 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-year" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
-                                <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
-                                <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
-                                <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
-                            </select>
-                        </div>
+                        <!-- 학년도 / 학기 / 시작일시 / 종료일시 -->
+                        <div class="grid grid-cols-4 gap-4">
+                            <!-- 학년도 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학년도 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-year" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="2025" ${!schedule || schedule.year === '2025' ? 'selected' : ''}>2025</option>
+                                    <option value="2024" ${schedule && schedule.year === '2024' ? 'selected' : ''}>2024</option>
+                                    <option value="2023" ${schedule && schedule.year === '2023' ? 'selected' : ''}>2023</option>
+                                    <option value="2022" ${schedule && schedule.year === '2022' ? 'selected' : ''}>2022</option>
+                                </select>
+                            </div>
 
-                        <!-- 학기 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                학기 <span class="text-red-600">*</span>
-                            </label>
-                            <select id="schedule-semester" required
-                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
-                                <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
-                            </select>
-                        </div>
+                            <!-- 학기 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    학기 <span class="text-red-600">*</span>
+                                </label>
+                                <select id="schedule-semester" required
+                                        class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                    <option value="1" ${schedule && schedule.semester === '1' ? 'selected' : ''}>1학기</option>
+                                    <option value="2" ${schedule && schedule.semester === '2' ? 'selected' : ''}>2학기</option>
+                                </select>
+                            </div>
 
-                        <!-- 시작일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                시작일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-start" required
-                                   value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        </div>
+                            <!-- 시작일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    시작일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-start" required
+                                       value="${schedule ? schedule.startDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
 
-                        <!-- 종료일시 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                종료일시 <span class="text-red-600">*</span>
-                            </label>
-                            <input type="datetime-local" id="schedule-end" required
-                                   value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <!-- 종료일시 -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    종료일시 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="datetime-local" id="schedule-end" required
+                                       value="${schedule ? schedule.endDateTime.replace(' ', 'T') : ''}"
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            </div>
                         </div>
                     </form>
                 </div>
