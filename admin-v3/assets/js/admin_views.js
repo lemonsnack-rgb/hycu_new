@@ -4887,14 +4887,46 @@ views.stageTypeCreate = (id = null) => {
                 <!-- ========== 영역 2: 일정 관리 구분 ========== -->
                 <div class="border-2 border-gray-300 rounded-lg p-4">
                     <h4 class="text-base font-bold text-gray-900 mb-3">일정 관리 구분</h4>
-                    <p class="text-xs text-gray-600 mb-3">일정(신청/제출/심사 기간) 제어가 필요한 단계를 선택하세요</p>
-                    <select id="process-phase"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
-                        <option value="none" ${(!item.processPhase || item.processPhase === 'none') ? 'selected' : ''}>해당없음 (일정 제어 불필요)</option>
-                        <option value="application" ${item.processPhase === 'application' ? 'selected' : ''}>신청 단계 (신청 기간)</option>
-                        <option value="submission" ${item.processPhase === 'submission' ? 'selected' : ''}>제출 단계 (제출 기간)</option>
-                        <option value="review" ${item.processPhase === 'review' ? 'selected' : ''}>심사 단계 (심사 기간)</option>
-                    </select>
+                    <p class="text-xs text-gray-600 mb-3">일정(신청/신청 철회/제출/심사 기간) 제어가 필요한 단계를 선택하세요</p>
+                    <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   id="schedule-application"
+                                   ${item.scheduleTypes?.includes('application') ? 'checked' : ''}
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm font-medium text-gray-900">신청</span>
+                        </label>
+
+                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   id="schedule-withdrawal"
+                                   ${item.scheduleTypes?.includes('withdrawal') ? 'checked' : ''}
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm font-medium text-gray-900">신청 철회</span>
+                        </label>
+
+                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   id="schedule-submission"
+                                   ${item.scheduleTypes?.includes('submission') ? 'checked' : ''}
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm font-medium text-gray-900">제출</span>
+                        </label>
+
+                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   id="schedule-review"
+                                   ${item.scheduleTypes?.includes('review') ? 'checked' : ''}
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm font-medium text-gray-900">심사</span>
+                        </label>
+                    </div>
                 </div>
                     </form>
                 </div>

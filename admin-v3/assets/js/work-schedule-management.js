@@ -137,7 +137,6 @@ function renderProcessPhaseScheduleList() {
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">순번</th>
                             <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 150px;">심사유형</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">일정구분</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">기간유형</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학년도</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">학기</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">시작일시</th>
@@ -148,7 +147,7 @@ function renderProcessPhaseScheduleList() {
                     <tbody class="divide-y divide-gray-200">
                         ${schedules.length === 0 ? `
                             <tr>
-                                <td colspan="9" class="py-8 text-center text-gray-500">
+                                <td colspan="8" class="py-8 text-center text-gray-500">
                                     등록된 일정이 없습니다.
                                 </td>
                             </tr>
@@ -157,7 +156,6 @@ function renderProcessPhaseScheduleList() {
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600">${schedule.examTypeName || '-'}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${getProcessPhaseText(schedule.processPhase)}</td>
-                                <td class="py-3 px-4 text-sm text-gray-600 text-center">${getActionTypeText(schedule.actionType)}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.year}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.semester}</td>
                                 <td class="py-3 px-4 text-sm text-gray-600 text-center">${schedule.startDateTime}</td>
@@ -247,21 +245,11 @@ function renderAdminWorkScheduleList() {
 function getProcessPhaseText(phase) {
     const phaseMap = {
         'application': '신청',
+        'withdrawal': '신청 철회',
         'submission': '제출',
         'review': '심사'
     };
     return phaseMap[phase] || '-';
-}
-
-/**
- * actionType 텍스트 변환 (기간유형)
- */
-function getActionTypeText(actionType) {
-    const actionMap = {
-        'register': '등록',
-        'withdraw': '철회'
-    };
-    return actionMap[actionType] || '-';
 }
 
 /**
@@ -356,6 +344,13 @@ function renderProcessPhaseFormPage() {
                                     <span>신청</span>
                                 </label>
                                 <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="withdrawal" required
+                                           ${schedule && schedule.processPhase === 'withdrawal' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>신청 철회</span>
+                                </label>
+                                <label class="flex items-center">
                                     <input type="radio" name="schedule-process-phase" value="submission" required
                                            ${schedule && schedule.processPhase === 'submission' ? 'checked' : ''}
                                            ${isEdit ? 'disabled' : ''}
@@ -368,29 +363,6 @@ function renderProcessPhaseFormPage() {
                                            ${isEdit ? 'disabled' : ''}
                                            class="mr-2">
                                     <span>심사</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- 기간유형 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                기간유형 <span class="text-red-600">*</span>
-                            </label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center">
-                                    <input type="radio" name="schedule-action-type" value="register" required
-                                           ${schedule && schedule.actionType === 'register' ? 'checked' : ''}
-                                           ${isEdit ? 'disabled' : ''}
-                                           class="mr-2">
-                                    <span>등록</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="schedule-action-type" value="withdraw" required
-                                           ${schedule && schedule.actionType === 'withdraw' ? 'checked' : ''}
-                                           ${isEdit ? 'disabled' : ''}
-                                           class="mr-2">
-                                    <span>철회</span>
                                 </label>
                             </div>
                         </div>
@@ -697,6 +669,13 @@ function openProcessPhaseModal(scheduleId = null) {
                                     <span>신청</span>
                                 </label>
                                 <label class="flex items-center">
+                                    <input type="radio" name="schedule-process-phase" value="withdrawal" required
+                                           ${schedule && schedule.processPhase === 'withdrawal' ? 'checked' : ''}
+                                           ${isEdit ? 'disabled' : ''}
+                                           class="mr-2">
+                                    <span>신청 철회</span>
+                                </label>
+                                <label class="flex items-center">
                                     <input type="radio" name="schedule-process-phase" value="submission" required
                                            ${schedule && schedule.processPhase === 'submission' ? 'checked' : ''}
                                            ${isEdit ? 'disabled' : ''}
@@ -709,29 +688,6 @@ function openProcessPhaseModal(scheduleId = null) {
                                            ${isEdit ? 'disabled' : ''}
                                            class="mr-2">
                                     <span>심사</span>
-                                </label>
-                            </div>
-                        </div>
-
-                        <!-- 기간유형 -->
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">
-                                기간유형 <span class="text-red-600">*</span>
-                            </label>
-                            <div class="flex gap-4">
-                                <label class="flex items-center">
-                                    <input type="radio" name="schedule-action-type" value="register" required
-                                           ${schedule && schedule.actionType === 'register' ? 'checked' : ''}
-                                           ${isEdit ? 'disabled' : ''}
-                                           class="mr-2">
-                                    <span>등록</span>
-                                </label>
-                                <label class="flex items-center">
-                                    <input type="radio" name="schedule-action-type" value="withdraw" required
-                                           ${schedule && schedule.actionType === 'withdraw' ? 'checked' : ''}
-                                           ${isEdit ? 'disabled' : ''}
-                                           class="mr-2">
-                                    <span>철회</span>
                                 </label>
                             </div>
                         </div>
@@ -1102,14 +1058,13 @@ function saveProcessPhaseSchedule(event, scheduleId) {
 
     const examTypeName = document.querySelector('input[name="schedule-exam-type"]:checked')?.value;
     const processPhase = document.querySelector('input[name="schedule-process-phase"]:checked')?.value;
-    const actionType = document.querySelector('input[name="schedule-action-type"]:checked')?.value;
     const year = document.getElementById('schedule-year').value;
     const semester = document.getElementById('schedule-semester').value;
     const startDateTime = document.getElementById('schedule-start').value.replace('T', ' ');
     const endDateTime = document.getElementById('schedule-end').value.replace('T', ' ');
 
     // 유효성 검사
-    if (!examTypeName || !processPhase || !actionType || !year || !semester || !startDateTime || !endDateTime) {
+    if (!examTypeName || !processPhase || !year || !semester || !startDateTime || !endDateTime) {
         alert('모든 필수 항목을 입력해주세요.');
         return;
     }
@@ -1122,17 +1077,14 @@ function saveProcessPhaseSchedule(event, scheduleId) {
         return;
     }
 
-    // 지도단계명 생성 (심사유형 + 일정구분 + 기간유형)
+    // 지도단계명 생성 (심사유형 + 일정구분)
     const phaseTextMap = {
         'application': '신청',
+        'withdrawal': '신청 철회',
         'submission': '제출',
         'review': '심사'
     };
-    const actionTextMap = {
-        'register': '',
-        'withdraw': '철회'
-    };
-    const stageName = `${examTypeName} ${phaseTextMap[processPhase]}${actionTextMap[actionType] ? ' ' + actionTextMap[actionType] : ''}`;
+    const stageName = `${examTypeName} ${phaseTextMap[processPhase]}`;
 
     if (scheduleId) {
         // 수정
@@ -1155,7 +1107,6 @@ function saveProcessPhaseSchedule(event, scheduleId) {
             stageTypeId: null,  // 지도단계 유형과 연결하지 않음
             stageName: stageName,
             processPhase: processPhase,
-            actionType: actionType,
             examTypeName: examTypeName,
             year: year,
             semester: semester,
