@@ -175,36 +175,55 @@ const ZoomUtils = {
                     <h4 class="text-lg font-semibold text-gray-900">Zoom 미팅 정보</h4>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600 whitespace-nowrap">미팅 ID:</span>
-                    <span class="font-mono font-medium text-gray-900">${meeting.zoomMeetingId}</span>
+                <div class="space-y-3">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <span class="text-sm text-gray-600">미팅 ID:</span>
+                            <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono">
+                                ${meeting.zoomMeetingId}
+                            </div>
+                        </div>
+                        <div>
+                            <span class="text-sm text-gray-600">비밀번호:</span>
+                            <div class="mt-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono">
+                                ${meeting.zoomPassword || '-'}
+                            </div>
+                        </div>
+                    </div>
 
-                    <span class="text-sm text-gray-600 whitespace-nowrap ml-4">비밀번호:</span>
-                    <span class="font-mono font-medium text-gray-900">${meeting.zoomPassword || '-'}</span>
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm text-gray-600">참여 링크:</span>
+                            ${showActions ? `
+                                <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomJoinUrl}')"
+                                        class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm">
+                                    복사
+                                </button>
+                            ` : ''}
+                        </div>
+                        <input type="text" value="${meeting.zoomJoinUrl}" readonly
+                               class="w-full px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono">
+                    </div>
 
-                    <span class="text-sm text-gray-600 whitespace-nowrap ml-4">참여 링크:</span>
-                    <input type="text" value="${meeting.zoomJoinUrl}" readonly
-                           class="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono" style="min-width: 200px;">
-                    ${showActions ? `
-                        <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomJoinUrl}')"
-                                class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm whitespace-nowrap">
-                            복사
-                        </button>
-                    ` : ''}
-
-                    <span class="text-sm text-gray-600 whitespace-nowrap ml-4">시작 링크:</span>
-                    <input type="text" value="${meeting.zoomStartUrl}" readonly
-                           class="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono" style="min-width: 200px;">
-                    ${showActions ? `
-                        <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomStartUrl}')"
-                                class="px-3 py-1 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] text-sm whitespace-nowrap">
-                            복사
-                        </button>
-                        <a href="${meeting.zoomStartUrl}" target="_blank"
-                           class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm whitespace-nowrap">
-                            시작
-                        </a>
-                    ` : ''}
+                    <div>
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-sm text-gray-600">시작 링크:</span>
+                            <div class="flex gap-2">
+                                ${showActions ? `
+                                    <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomStartUrl}')"
+                                            class="px-3 py-1 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] text-sm">
+                                        복사
+                                    </button>
+                                    <a href="${meeting.zoomStartUrl}" target="_blank"
+                                       class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm">
+                                        시작
+                                    </a>
+                                ` : ''}
+                            </div>
+                        </div>
+                        <input type="text" value="${meeting.zoomStartUrl}" readonly
+                               class="w-full px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono">
+                    </div>
                 </div>
             </div>
         `;
