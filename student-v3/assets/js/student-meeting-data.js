@@ -111,6 +111,20 @@ const StudentMeetingDataService = {
 
         const currentStudent = this.getCurrentStudent();
 
+        // 중복 신청 방지: 동일 슬롯에 이미 신청한 내역이 있는지 확인
+        const duplicateApplication = MEETING_REQUESTS_V3.find(meeting =>
+            meeting.studentNumber === currentStudent.studentNumber &&
+            meeting.slotId === slotId &&
+            meeting.status !== 'cancelled' &&   // 취소된 건은 제외
+            meeting.status !== 'rejected'       // 거절된 건은 제외
+        );
+
+        if (duplicateApplication) {
+            console.warn('이미 신청한 시간입니다.', duplicateApplication);
+            alert('이미 신청한 시간입니다.');
+            return null;
+        }
+
         // 신청 데이터 생성
         const applicationData = {
             slotId: slotId,

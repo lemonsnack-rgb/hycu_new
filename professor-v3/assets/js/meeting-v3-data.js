@@ -14,12 +14,12 @@ const AVAILABLE_SLOTS_V3 = [
         professorName: '김교수',
         type: 'oneTime',
         dayOfWeek: null,
-        date: '2026-01-10',
+        date: '2026-01-25',
         time: '14:00',
         duration: 60,
         meetingType: 'online',
-        startDate: '2026-01-10',
-        endDate: '2026-01-10',
+        startDate: '2026-01-25',
+        endDate: '2026-01-25',
         status: 'active'
     },
     {
@@ -28,12 +28,12 @@ const AVAILABLE_SLOTS_V3 = [
         professorName: '김교수',
         type: 'oneTime',
         dayOfWeek: null,
-        date: '2026-01-13',
+        date: '2026-01-28',
         time: '10:00',
         duration: 60,
         meetingType: 'offline',
-        startDate: '2026-01-13',
-        endDate: '2026-01-13',
+        startDate: '2026-01-28',
+        endDate: '2026-01-28',
         status: 'active'
     },
     {
@@ -42,12 +42,12 @@ const AVAILABLE_SLOTS_V3 = [
         professorName: '김교수',
         type: 'oneTime',
         dayOfWeek: null,
-        date: '2026-01-15',
+        date: '2026-02-01',
         time: '15:00',
         duration: 90,
         meetingType: 'online',
-        startDate: '2026-01-15',
-        endDate: '2026-01-15',
+        startDate: '2026-02-01',
+        endDate: '2026-02-01',
         status: 'active'
     },
     {
@@ -56,12 +56,12 @@ const AVAILABLE_SLOTS_V3 = [
         professorName: '박교수',
         type: 'oneTime',
         dayOfWeek: null,
-        date: '2026-01-17',
+        date: '2026-02-03',
         time: '16:00',
         duration: 60,
         meetingType: 'online',
-        startDate: '2026-01-17',
-        endDate: '2026-01-17',
+        startDate: '2026-02-03',
+        endDate: '2026-02-03',
         status: 'active'
     },
     {
@@ -70,12 +70,12 @@ const AVAILABLE_SLOTS_V3 = [
         professorName: '박교수',
         type: 'oneTime',
         dayOfWeek: null,
-        date: '2026-01-20',
+        date: '2026-02-05',
         time: '11:00',
         duration: 60,
         meetingType: 'offline',
-        startDate: '2026-01-20',
-        endDate: '2026-01-20',
+        startDate: '2026-02-05',
+        endDate: '2026-02-05',
         status: 'active'
     }
 ];
