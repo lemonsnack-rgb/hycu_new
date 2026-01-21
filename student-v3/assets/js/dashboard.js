@@ -62,43 +62,78 @@ const DashboardData = {
         }
     ],
 
-    // 주요 일정 (대학원 전체)
+    // 주요 일정 (대학원 학사 일정)
     mainSchedules: [
         {
             id: 1,
-            title: '[예비]시스템 점검 마감',
-            dday: 'D-3',
-            date: '11월 28일 (월) 14:00 ~ 15:00',
-            location: '본심사 온라인 상담'
+            title: '논문 제출 마감',
+            dday: 'D-15',
+            date: '2024-12-20 17:00',
+            location: ''
         },
         {
             id: 2,
-            title: '[대사]임청수',
-            dday: 'D-7',
-            date: '11월 30일 (토) 14:00',
-            location: '논문지도 논문지도'
+            title: '학위논문 심사 일정',
+            dday: 'D-20',
+            date: '2024-12-25 14:00',
+            location: ''
+        },
+        {
+            id: 3,
+            title: '겨울방학 시작',
+            dday: 'D-27',
+            date: '2025-01-02 00:00',
+            location: ''
         }
     ],
 
-    // 승인 대기 중인 지도 일정
-    pendingSchedules: [
+    // 실시간 지도 예약 현황
+    meetingSchedules: [
         {
             id: 1,
-            title: '[지사]분석수',
-            dday: 'D-1',
-            date: '11월 28일 (월) 10:00 ~ 11:30',
-            location: '논문 방향성 논의'
+            title: '김철수 교수',
+            dday: 'D-3',
+            date: '2024-11-28 10:00',
+            location: ''
+        },
+        {
+            id: 2,
+            title: '이영희 교수',
+            dday: 'D-6',
+            date: '2024-12-01 15:00',
+            location: ''
+        },
+        {
+            id: 3,
+            title: '박지성 교수',
+            dday: 'D-10',
+            date: '2024-12-05 09:00',
+            location: ''
         }
     ],
 
-    // 다가오는 지도 일정
-    upcomingSchedules: [
+    // 논문 지도 현황
+    feedbackSchedules: [
         {
             id: 1,
-            title: '[예시]강세인',
-            dday: 'D-4',
-            date: '11월 19일 (월) 14:00 ~ 15:00',
-            location: '본심사 심사'
+            title: '연구계획서',
+            dday: '',
+            date: '피드백 등록: 2024-11-25 09:30',
+            location: ''
+        },
+        {
+            id: 2,
+            title: '중간논문',
+            dday: '',
+            date: '피드백 등록: 2024-11-20 14:15',
+            location: ''
+        },
+        {
+            id: 3,
+            title: '최종논문',
+            dday: '',
+            date: '피드백 등록: 2024-11-15 16:45',
+            location: ''
         }
     ],
 
@@ -507,7 +542,7 @@ function renderActivityList() {
 /**
  * 일정 섹션 렌더링 (공통 함수)
  */
-function renderScheduleSection(containerId, schedules) {
+function renderScheduleSection(containerId, schedules, showLocation = true) {
     const container = document.getElementById(containerId);
     if (!container) return;
 
@@ -522,7 +557,7 @@ function renderScheduleSection(containerId, schedules) {
                 <div>
                     <div class="schedule-item-title">${schedule.title}</div>
                 </div>
-                <div class="schedule-item-dday">${schedule.dday}</div>
+                ${schedule.dday ? `<div class="schedule-item-dday">${schedule.dday}</div>` : ''}
             </div>
             <div class="schedule-item-info">
                 <div class="schedule-item-row">
@@ -532,6 +567,7 @@ function renderScheduleSection(containerId, schedules) {
                     </svg>
                     <span class="schedule-item-text">${schedule.date}</span>
                 </div>
+                ${showLocation && schedule.location ? `
                 <div class="schedule-item-row">
                     <svg class="schedule-item-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -541,6 +577,7 @@ function renderScheduleSection(containerId, schedules) {
                     </svg>
                     <span class="schedule-item-text">${schedule.location}</span>
                 </div>
+                ` : ''}
             </div>
         </div>
     `).join('');
@@ -550,9 +587,9 @@ function renderScheduleSection(containerId, schedules) {
  * 모든 일정 렌더링
  */
 function renderSchedules() {
-    renderScheduleSection('main-schedule-list', DashboardData.mainSchedules);
-    renderScheduleSection('pending-schedule-list', DashboardData.pendingSchedules);
-    renderScheduleSection('upcoming-schedule-list', DashboardData.upcomingSchedules);
+    renderScheduleSection('main-schedule-list', DashboardData.mainSchedules, false);
+    renderScheduleSection('meeting-schedule-list', DashboardData.meetingSchedules, false);
+    renderScheduleSection('feedback-schedule-list', DashboardData.feedbackSchedules, false);
 }
 
 /**
