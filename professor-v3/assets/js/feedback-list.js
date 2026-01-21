@@ -61,7 +61,6 @@ function renderFeedbackList() {
                                 <th style="width: 90px; text-align: center;">학번</th>
                                 <th style="width: 80px; text-align: center;">성명</th>
                                 <th style="min-width: 250px; text-align: center;">논문명</th>
-                                <th style="width: 100px; text-align: center;">지도교수명</th>
                                 <th style="width: 120px; text-align: center;">제출일시</th>
                                 <th style="width: 120px; text-align: center;">피드백 희망일자</th>
                                 <th style="width: 120px; text-align: center;">지도단계</th>
@@ -71,7 +70,7 @@ function renderFeedbackList() {
                         <tbody id="feedback-list-body">
                             ${filteredRequests.length > 0
                                 ? filteredRequests.map((req, idx) => renderFeedbackRow(req, idx + 1)).join('')
-                                : '<tr><td colspan="18" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
+                                : '<tr><td colspan="17" style="text-align: center; padding: 24px 12px;">검색 결과가 없습니다</td></tr>'
                             }
                         </tbody>
                     </table>
@@ -132,7 +131,6 @@ function renderFeedbackRow(request, idx) {
                     ${request.thesisTitle || request.file}
                 </div>
             </td>
-            <td style="text-align: center;">${request.professorName || '-'}</td>
             <td style="text-align: center;">${request.uploadDate || '-'}</td>
             <td style="text-align: center;">${request.desiredDate || '-'}</td>
             <td style="text-align: center;">${request.guidanceStage || '연구계획서'}</td>
@@ -225,7 +223,6 @@ function getCurrentFeedbackFilters() {
         status: document.getElementById('feedback-filter-status')?.value || '',
         studentId: document.getElementById('feedback-filter-student-id')?.value || '',
         studentName: document.getElementById('feedback-filter-student-name')?.value || '',
-        professor: document.getElementById('feedback-filter-professor')?.value || '',
         feedbackStatus: document.getElementById('feedback-filter-feedback-status')?.value || ''
     };
 }
@@ -295,14 +292,6 @@ function filterFeedbackRequests(requests, filters) {
             }
         }
 
-        // 지도교수명 필터
-        if (filters.professor) {
-            const professorName = req.professorName || '';
-            if (!professorName.includes(filters.professor)) {
-                return false;
-            }
-        }
-
         // 피드백상태 필터
         if (filters.feedbackStatus) {
             const commentCount = req.commentCount || 0;
@@ -341,7 +330,6 @@ function resetFeedbackSearch() {
         'feedback-filter-status',
         'feedback-filter-student-id',
         'feedback-filter-student-name',
-        'feedback-filter-professor',
         'feedback-filter-feedback-status'
     ];
 
