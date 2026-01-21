@@ -77,13 +77,6 @@ const DashboardData = {
             dday: 'D-20',
             date: '2024-12-25 14:00',
             location: ''
-        },
-        {
-            id: 3,
-            title: '겨울방학 시작',
-            dday: 'D-27',
-            date: '2025-01-02 00:00',
-            location: ''
         }
     ],
 
