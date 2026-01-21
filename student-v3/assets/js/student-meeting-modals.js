@@ -319,6 +319,49 @@ const StudentMeetingModals = {
                         </div>
                     ` : ''}
 
+                    <!-- 완료 정보 (완료된 경우) -->
+                    ${meeting.status === 'completed' ? `
+                        <div class="border-t border-gray-200 pt-6">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">완료 정보</h4>
+
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">완료 날짜</label>
+                                    <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <p class="text-gray-900">${meeting.completedDate ? MeetingUtils.formatDate(meeting.completedDate) : '-'}</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Zoom 비밀번호</label>
+                                    <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                                        <p class="text-gray-900 font-mono">${meeting.meetingType === 'online' ? (meeting.videoPassword || '-') : '-'}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${meeting.meetingType === 'online' && meeting.videoPassword ? `
+                                <div class="flex gap-3">
+                                    <button onclick="window.open('${meeting.recordingPlayUrl || '#'}', '_blank')"
+                                            class="flex-1 px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        재생
+                                    </button>
+                                    <button onclick="window.open('${meeting.recordingDownloadUrl || '#'}', '_blank')"
+                                            class="flex-1 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 flex items-center justify-center gap-2">
+                                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        다운로드
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    ` : ''}
+
                     <!-- Zoom 정보 -->
                     ${zoomInfo}
                 </div>
