@@ -35,10 +35,10 @@
     --badge-min-width: 64px;
 }
 
-/* ==================== Main Grid (65% : 35%) ==================== */
+/* ==================== Main Grid (60% : 40%) ==================== */
 .dashboard-main-grid {
     display: grid;
-    grid-template-columns: 65fr 35fr;
+    grid-template-columns: 60fr 40fr;
     gap: 1.5rem;
 }
 
@@ -95,13 +95,13 @@
 
 .dashboard-card-body {
     padding: 1.5rem;
-    overflow-x: auto;
 }
 
 /* ==================== 지도학생 현황 테이블 ==================== */
 .student-status-table {
-    width: 100%;
-    table-layout: fixed;
+    width: 100% !important;
+    min-width: auto !important;
+    table-layout: fixed !important;
     border-collapse: collapse;
 }
 
@@ -135,7 +135,7 @@
 }
 
 .student-status-table th {
-    padding: 0.875rem 1rem;
+    padding: 0.75rem 0.5rem;
     text-align: center;
     font-size: 0.875rem;
     font-weight: 600;
@@ -144,7 +144,7 @@
 }
 
 .student-status-table td {
-    padding: 1rem;
+    padding: 0.75rem 0.5rem;
     text-align: center;
     font-size: 0.875rem;
     color: var(--gray-900);
