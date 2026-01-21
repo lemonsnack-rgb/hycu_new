@@ -31,20 +31,6 @@ function showStudentList() {
                 <div class="grid grid-cols-5 gap-4">
                     <!-- 1행 -->
                     <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
-                        <select id="filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                            <option value="">전체</option>
-                            <option value="2025">2025</option>
-                            <option value="2024">2024</option>
-                            <option value="2023">2023</option>
-                        </select>
-                        <select id="filter-semester" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                            <option value="">전체</option>
-                            <option value="1">1학기</option>
-                            <option value="2">2학기</option>
-                        </select>
-                    </div>
-                    <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
                         <select id="filter-college-type" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                             <option value="">전체</option>
@@ -158,8 +144,6 @@ function showStudentList() {
                                        class="rounded">
                             </th>
                             <th style="width: 60px;">순번</th>
-                            <th style="width: 80px;">학년도</th>
-                            <th style="width: 80px;">학기</th>
                             <th style="width: 100px;">대학구분</th>
                             <th style="width: 100px;">계열/대학원</th>
                             <th style="width: 120px;">학부(과)전공</th>
@@ -180,8 +164,6 @@ function showStudentList() {
                                                value="${student.studentId}" data-name="${student.name}">
                                     </td>
                                     <td>${idx + 1}</td>
-                                    <td>2024</td>
-                                    <td>${student.semester || '-'}학기</td>
                                     <td>일반대학원</td>
                                     <td>일반대학원</td>
                                     <td>-</td>

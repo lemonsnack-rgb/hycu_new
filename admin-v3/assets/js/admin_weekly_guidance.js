@@ -202,24 +202,7 @@ function showGuidancePairsList() {
             <div class="p-6 border-b">
                 <div class="grid grid-cols-5 gap-3">
                     <!-- 1행: 5개 필드 -->
-                    <!-- 1. 학년도/학기 -->
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
-                        <div class="flex gap-2 flex-1">
-                            <select id="yearFilter" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="2025" selected>2025</option>
-                                <option value="2024">2024</option>
-                                <option value="2023">2023</option>
-                            </select>
-                            <select id="semesterFilter" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                                <option value="">전체</option>
-                                <option value="1" selected>1학기</option>
-                                <option value="2">2학기</option>
-                            </select>
-                        </div>
-                    </div>
-                    <!-- 2. 대학구분 -->
+                    <!-- 1. 대학구분 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">대학구분</label>
                         <select id="graduateFilter" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
@@ -326,8 +309,6 @@ function showGuidancePairsList() {
                                            class="rounded border-gray-300">
                                 </th>
                                 <th style="width: 60px;">순번</th>
-                                <th style="width: 80px;">학년도</th>
-                                <th style="width: 60px;">학기</th>
                                 <th style="width: 100px;">대학구분</th>
                                 <th style="width: 100px;">계열/대학원</th>
                                 <th style="width: 120px;">학부(과)전공</th>
@@ -353,8 +334,6 @@ function showGuidancePairsList() {
                                                value="${pair.student.studentId}" data-name="${pair.student.name}">
                                     </td>
                                     <td>${index + 1}</td>
-                                    <td>2025</td>
-                                    <td>1학기</td>
                                     <td>일반대학원</td>
                                     <td>일반대학원</td>
                                     <td>${pair.student.major || '-'}</td>
