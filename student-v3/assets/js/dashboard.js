@@ -67,14 +67,12 @@ const DashboardData = {
         {
             id: 1,
             title: '논문 제출 마감',
-            dday: 'D-15',
             date: '2024-12-20 17:00',
             location: ''
         },
         {
             id: 2,
             title: '학위논문 심사 일정',
-            dday: 'D-20',
             date: '2024-12-25 14:00',
             location: ''
         }
@@ -85,21 +83,18 @@ const DashboardData = {
         {
             id: 1,
             title: '김철수 교수',
-            dday: 'D-3',
             date: '2024-11-28 10:00',
             location: ''
         },
         {
             id: 2,
             title: '이영희 교수',
-            dday: 'D-6',
             date: '2024-12-01 15:00',
             location: ''
         },
         {
             id: 3,
             title: '박지성 교수',
-            dday: 'D-10',
             date: '2024-12-05 09:00',
             location: ''
         }
@@ -110,21 +105,18 @@ const DashboardData = {
         {
             id: 1,
             title: '연구계획서',
-            dday: '',
             date: '피드백 등록: 2024-11-25 09:30',
             location: ''
         },
         {
             id: 2,
             title: '중간논문',
-            dday: '',
             date: '피드백 등록: 2024-11-20 14:15',
             location: ''
         },
         {
             id: 3,
             title: '최종논문',
-            dday: '',
             date: '피드백 등록: 2024-11-15 16:45',
             location: ''
         }
@@ -550,7 +542,6 @@ function renderScheduleSection(containerId, schedules, showLocation = true) {
                 <div>
                     <div class="schedule-item-title">${schedule.title}</div>
                 </div>
-                ${schedule.dday ? `<div class="schedule-item-dday">${schedule.dday}</div>` : ''}
             </div>
             <div class="schedule-item-info">
                 <div class="schedule-item-row">
