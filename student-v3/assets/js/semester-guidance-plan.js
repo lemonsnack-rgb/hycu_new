@@ -40,6 +40,34 @@ let studentCurrentSemester = 1;
 // 학기별 계획 데이터 저장소 (임시)
 const studentSemesterPlansStorage = {};
 
+// 목업 데이터 초기화 - 승인 대기 중인 학생 계획
+studentSemesterPlansStorage['S001_2025_1'] = {
+    studentId: 'S001',
+    year: 2025,
+    semester: 1,
+    totalWeeks: 15,
+    approved: 'pending_approval',
+    requestedDate: '2025-01-20T14:30:00.000Z',
+    weeks: [
+        { week: 1, plannedDate: '2025-03-03', plannedContent: '연구 주제 선정 및 문헌 조사 시작', plannedMethod: 'meeting', executions: [] },
+        { week: 2, plannedDate: '2025-03-10', plannedContent: '선행 연구 분석 및 연구 방향 설정', plannedMethod: 'meeting', executions: [] },
+        { week: 3, plannedDate: '2025-03-17', plannedContent: '연구 계획서 초안 작성', plannedMethod: 'zoom', executions: [] },
+        { week: 4, plannedDate: '2025-03-24', plannedContent: '연구 방법론 검토 및 설문지 설계', plannedMethod: 'meeting', executions: [] },
+        { week: 5, plannedDate: '2025-03-31', plannedContent: '설문지 수정 및 사전 테스트', plannedMethod: 'email', executions: [] },
+        { week: 6, plannedDate: '2025-04-07', plannedContent: '데이터 수집 방법 확정 및 IRB 신청', plannedMethod: 'meeting', executions: [] },
+        { week: 7, plannedDate: '2025-04-14', plannedContent: '중간 점검 및 진행 상황 보고', plannedMethod: 'zoom', executions: [] },
+        { week: 8, plannedDate: '2025-04-21', plannedContent: '데이터 수집 진행 상황 점검', plannedMethod: 'meeting', executions: [] },
+        { week: 9, plannedDate: '2025-04-28', plannedContent: '수집된 데이터 정리 및 분석 준비', plannedMethod: 'meeting', executions: [] },
+        { week: 10, plannedDate: '2025-05-05', plannedContent: '통계 분석 방법 논의 및 분석 시작', plannedMethod: 'zoom', executions: [] },
+        { week: 11, plannedDate: '2025-05-12', plannedContent: '분석 결과 검토 및 해석', plannedMethod: 'meeting', executions: [] },
+        { week: 12, plannedDate: '2025-05-19', plannedContent: '논문 초고 작성 시작', plannedMethod: 'meeting', executions: [] },
+        { week: 13, plannedDate: '2025-05-26', plannedContent: '논문 초고 1차 피드백', plannedMethod: 'zoom', executions: [] },
+        { week: 14, plannedDate: '2025-06-02', plannedContent: '논문 수정 및 보완', plannedMethod: 'meeting', executions: [] },
+        { week: 15, plannedDate: '2025-06-09', plannedContent: '최종 논문 검토 및 제출 준비', plannedMethod: 'meeting', executions: [] }
+    ],
+    plans: []
+};
+
 // 현재 학기 계획 (전역 변수)
 let currentStudentSemester = {
     year: 2025,
@@ -121,9 +149,9 @@ function addNewWeekStudent() {
         return;
     }
 
-    // 승인된 계획은 수정 불가
-    if (semesterPlan.approved === true) {
-        alert('승인된 계획은 수정할 수 없습니다.');
+    // 승인된 계획 또는 승인 대기 중인 계획은 수정 불가
+    if (semesterPlan.approved === true || semesterPlan.approved === 'pending_approval') {
+        alert('승인 신청 후에는 계획을 수정할 수 없습니다.');
         return;
     }
 
@@ -166,9 +194,9 @@ async function deleteWeekStudent(weekNumber) {
         return;
     }
 
-    // 승인된 계획은 수정 불가
-    if (semesterPlan.approved === true) {
-        alert('승인된 계획은 수정할 수 없습니다.');
+    // 승인된 계획 또는 승인 대기 중인 계획은 수정 불가
+    if (semesterPlan.approved === true || semesterPlan.approved === 'pending_approval') {
+        alert('승인 신청 후에는 계획을 수정할 수 없습니다.');
         return;
     }
 
@@ -291,6 +319,24 @@ DataService.updateStudentWeekPlan = function(year, semester, weekNumber, planDat
     week.plannedContent = planData.plannedContent || '';
 
     console.log(`✅ 학생: ${weekNumber}주차 계획 저장 완료`);
+    return true;
+};
+
+// 승인 신청
+DataService.requestSemesterPlanApproval = function(year, semester) {
+    const student = window.currentStudent || { id: 'S2024001' };
+    const key = `${student.id}_${year}_${semester}`;
+    const plan = studentSemesterPlansStorage[key];
+
+    if (!plan) {
+        throw new Error('학기 계획이 존재하지 않습니다.');
+    }
+
+    // 승인 신청 상태로 변경
+    plan.approved = 'pending_approval';
+    plan.requestedDate = new Date().toISOString();
+
+    console.log(`✅ 학생: 승인 신청 완료: ${key}`);
     return true;
 };
 
@@ -545,15 +591,35 @@ function showStudentSemesterPlanDetail() {
                             </button>
                         </div>
                     ` : ''}
-                    ${!isApproved && totalWeeks > 0 ? `
+                    ${totalWeeks > 0 && (semesterPlan.approved === false || semesterPlan.approved === 'rejected') ? `
                         <div class="flex items-center gap-3 ml-auto">
                             <button onclick="saveAllStudentWeekPlans()"
                                     class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-5 py-2 rounded text-sm font-medium">
                                 전체 저장
                             </button>
+                            <button onclick="requestApproval()"
+                                    id="approval-request-btn"
+                                    class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium ${canRequestApproval() ? '' : 'opacity-50 cursor-not-allowed'}"
+                                    ${canRequestApproval() ? '' : 'disabled'}>
+                                승인 신청
+                            </button>
                             <button onclick="event.stopPropagation(); resetStudentTotalWeeks();"
                                     class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
                                 계획 초기화
+                            </button>
+                        </div>
+                    ` : ''}
+                    ${totalWeeks > 0 && semesterPlan.approved === 'pending_approval' ? `
+                        <div class="flex items-center gap-3 ml-auto">
+                            <div class="flex items-center gap-2 text-sm">
+                                <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full font-medium">
+                                    승인 대기 중
+                                </span>
+                            </div>
+                            <button onclick="requestApproval()"
+                                    class="bg-gray-400 text-white px-5 py-2 rounded text-sm font-medium cursor-not-allowed"
+                                    disabled>
+                                승인 신청
                             </button>
                         </div>
                     ` : ''}
@@ -612,7 +678,7 @@ function renderStudentWeeklyCards(weeks) {
                         </tbody>
                     </table>
                 </div>
-                ${!isApproved ? `
+                ${!isApproved && semesterPlan.approved !== 'pending_approval' ? `
                     <div class="px-4 py-3 bg-gray-50 border-t border-gray-300">
                         <button onclick="addNewWeekStudent()"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center gap-2">
@@ -625,7 +691,7 @@ function renderStudentWeeklyCards(weeks) {
             <!-- Mobile Card View -->
             <div class="md:hidden space-y-4">
                 ${weeks.map(week => renderStudentWeekCardMobile(week)).join('')}
-                ${!isApproved ? `
+                ${!isApproved && semesterPlan.approved !== 'pending_approval' ? `
                     <div class="bg-white rounded-lg shadow-md p-4">
                         <button onclick="addNewWeekStudent()"
                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center justify-center gap-2">
@@ -642,10 +708,10 @@ function renderStudentWeeklyCards(weeks) {
 function renderStudentWeekCard(week) {
     const hasExecutions = week.executions && week.executions.length > 0;
     const rowCount = hasExecutions ? week.executions.length : 1;
-    const isApproved = semesterPlan && semesterPlan.approved === true;
-    const readonlyAttr = isApproved ? 'readonly' : '';
-    const bgClass = isApproved ? 'bg-gray-100' : '';
-    const clickEvent = isApproved ? 'onclick="alertStudentApprovedPlanEdit()"' : '';
+    const isReadonly = semesterPlan && (semesterPlan.approved === true || semesterPlan.approved === 'pending_approval');
+    const readonlyAttr = isReadonly ? 'readonly' : '';
+    const bgClass = isReadonly ? 'bg-gray-100' : '';
+    const clickEvent = isReadonly ? 'onclick="alertStudentApprovedPlanEdit()"' : '';
 
     // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
@@ -653,7 +719,7 @@ function renderStudentWeekCard(week) {
             <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">
                 <div class="flex flex-col items-center gap-1">
                     <span>${week.week}주</span>
-                    ${!isApproved ? `
+                    ${!isReadonly ? `
                         <button onclick="event.stopPropagation(); deleteWeekStudent(${week.week})"
                                 class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
                                 title="주차 삭제">
@@ -668,7 +734,7 @@ function renderStudentWeekCard(week) {
                           ${readonlyAttr}
                           ${clickEvent}
                           class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea ${bgClass}"
-                          style="min-height: 40px; overflow-y: hidden; ${isApproved ? 'cursor: not-allowed;' : ''}">${week.plannedContent || ''}</textarea>
+                          style="min-height: 40px; overflow-y: hidden; ${isReadonly ? 'cursor: not-allowed;' : ''}">${week.plannedContent || ''}</textarea>
             </td>`;
 
     if (hasExecutions) {
@@ -717,16 +783,16 @@ function renderStudentWeekCard(week) {
 // 모바일 카드 뷰 렌더링 (학생용)
 function renderStudentWeekCardMobile(week) {
     const hasExecutions = week.executions && week.executions.length > 0;
-    const isApproved = semesterPlan && semesterPlan.approved === true;
-    const readonlyAttr = isApproved ? 'readonly' : '';
-    const bgClass = isApproved ? 'bg-gray-100' : '';
+    const isReadonly = semesterPlan && (semesterPlan.approved === true || semesterPlan.approved === 'pending_approval');
+    const readonlyAttr = isReadonly ? 'readonly' : '';
+    const bgClass = isReadonly ? 'bg-gray-100' : '';
 
     return `
         <div id="week-card-mobile-${week.week}" class="bg-white border border-gray-200 rounded-lg">
             <!-- 주차 헤더 -->
             <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                 <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
-                ${!isApproved ? `
+                ${!isReadonly ? `
                     <button onclick="event.stopPropagation(); deleteWeekStudent(${week.week})"
                             class="text-xs px-3 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
                             title="주차 삭제">
@@ -1062,6 +1128,82 @@ function saveStudentWeekPlan(weekNumber) {
     }
 }
 
+// ==================== 승인 신청 관련 함수 ====================
+
+/**
+ * 승인 신청 가능 여부 확인
+ * 모든 주차의 계획내용이 입력되어 있어야 함
+ */
+function canRequestApproval() {
+    if (!semesterPlan || !semesterPlan.weeks || semesterPlan.weeks.length === 0) {
+        return false;
+    }
+
+    // 모든 주차의 plannedContent가 비어있지 않은지 확인
+    return semesterPlan.weeks.every(week => {
+        return week.plannedContent && week.plannedContent.trim() !== '';
+    });
+}
+
+/**
+ * 승인 신청 실행
+ */
+async function requestApproval() {
+    console.log('🟢 승인 신청 시작');
+
+    if (!semesterPlan) {
+        alert('계획을 찾을 수 없습니다.');
+        return;
+    }
+
+    // 승인 신청 가능 여부 재확인
+    if (!canRequestApproval()) {
+        alert('모든 주차의 계획내용을 입력해야 승인 신청이 가능합니다.');
+        return;
+    }
+
+    // 확인 메시지
+    const confirmed = await showCustomConfirmStudent(
+        '승인 신청 확인',
+        '지도교수님께 계획 승인을 신청하시겠습니까?\n\n승인 신청 후에는 계획을 수정할 수 없습니다.',
+        '신청',
+        '취소',
+        'primary'
+    );
+
+    if (!confirmed) {
+        console.log('❌ 사용자가 승인 신청 취소');
+        return;
+    }
+
+    // 승인 신청 처리
+    try {
+        // DataService를 통해 승인 신청 상태로 변경
+        if (typeof DataService.requestSemesterPlanApproval === 'function') {
+            DataService.requestSemesterPlanApproval(
+                studentCurrentYear,
+                studentCurrentSemester
+            );
+        } else {
+            // DataService에 함수가 없으면 직접 처리
+            semesterPlan.approved = 'pending_approval';
+            semesterPlan.requestedDate = new Date().toISOString();
+        }
+
+        console.log('✅ 승인 신청 완료');
+        alert('승인 신청이 완료되었습니다.\n지도교수님의 승인을 기다려주세요.');
+
+        // 화면 새로고침
+        setTimeout(() => {
+            showStudentSemesterPlanDetail();
+        }, 300);
+
+    } catch (error) {
+        console.error('승인 신청 오류:', error);
+        alert(error.message || '승인 신청에 실패했습니다.');
+    }
+}
+
 // 초기화 실행
 initAutoExpandTextareas();
 
@@ -1078,5 +1220,7 @@ window.autoExpandTextarea = autoExpandTextarea;
 window.expandAllTextareas = expandAllTextareas;
 window.addNewWeekStudent = addNewWeekStudent;
 window.deleteWeekStudent = deleteWeekStudent;
+window.canRequestApproval = canRequestApproval;
+window.requestApproval = requestApproval;
 
 console.log('✅ 학생용 학기별 지도 계획 모듈 로드 완료');

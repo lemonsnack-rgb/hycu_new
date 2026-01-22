@@ -243,9 +243,9 @@ function renderPlanCreationForm(student) {
                 </div>
             </div>
 
-            <!-- 학기 선택 및 주차 설정 -->
+            <!-- 학기 선택 -->
             <div class="px-6 py-4 bg-white border-b">
-                <h4 class="text-sm font-semibold text-gray-700 mb-3">학기 선택 및 주차 설정</h4>
+                <h4 class="text-sm font-semibold text-gray-700 mb-3">학기 선택</h4>
                 <div class="flex items-center gap-4">
                     <div class="flex items-center gap-2">
                         <label class="text-sm text-gray-600 min-w-[60px]">학년도:</label>
@@ -266,29 +266,15 @@ function renderPlanCreationForm(student) {
                                 .join('')}
                         </select>
                     </div>
-                    <div class="flex items-center gap-2 ml-auto">
-                        <label class="text-sm text-gray-700 font-medium">주차 수:</label>
-                        <select id="week-count-select"
-                                class="border border-gray-300 rounded px-4 py-2 text-sm bg-white">
-                            ${Array.from({length: 20}, (_, i) => i + 1).map(week =>
-                                `<option value="${week}" ${week === 15 ? 'selected' : ''}>${week}주</option>`
-                            ).join('')}
-                        </select>
-                        <button onclick="executeCreatePlan()"
-                                class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
-                            계획 생성
-                        </button>
-                    </div>
                 </div>
             </div>
 
             <!-- 안내 메시지 -->
             <div class="p-8">
                 <div class="max-w-2xl mx-auto text-center">
-                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-8">
-                        <p class="text-lg text-gray-600 mb-2">📋 등록된 학기별 지도계획이 없습니다</p>
-                        <p class="text-sm text-gray-500">위에서 주차 수를 선택하고 '계획 생성' 버튼을 클릭하세요</p>
-                    </div>
+                    <p class="text-base text-gray-600">
+                        승인 요청된 학기별 지도 계획이 없습니다. 학생이 지도 계획을 승인 신청한 이후 데이터가 표시됩니다.
+                    </p>
                 </div>
             </div>
         </div>
@@ -482,13 +468,9 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
                     ${approvalInfo}
                     <div class="flex items-center gap-3 ml-auto">
                         ${isApproved ? `
-                            <!-- 승인된 상태: 승인 취소만 가능 -->
-                            <button onclick="cancelSemesterApproval()"
-                                    class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2 rounded text-sm font-medium">
-                                승인 취소
-                            </button>
-                        ` : `
-                            <!-- 미승인 상태: 저장, 승인, 초기화 가능 -->
+                            <!-- 승인된 상태: 버튼 표시하지 않음 -->
+                        ` : currentPlan?.approved === 'pending_approval' ? `
+                            <!-- 승인 대기 상태: 승인/반려 가능 -->
                             <button onclick="saveAllWeekPlans()"
                                     class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded text-sm font-medium">
                                 전체 저장
@@ -497,10 +479,15 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
                                     class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded text-sm font-medium">
                                 계획 승인
                             </button>
-                            <button onclick="event.stopPropagation(); resetTotalWeeksInModal();"
-                                    class="bg-gray-600 hover:bg-gray-700 text-white px-4 py-2 rounded text-sm font-medium">
-                                계획 초기화
+                            <button onclick="rejectSemesterPlan()"
+                                    class="bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded text-sm font-medium">
+                                계획 반려
                             </button>
+                        ` : `
+                            <!-- 학생 미작성 상태: 수정 불가 -->
+                            <div class="text-sm text-gray-500">
+                                학생이 계획을 작성하고 승인 신청할 때까지 기다려주세요
+                            </div>
                         `}
                     </div>
                 </div>
@@ -801,13 +788,24 @@ function executeResetPlan() {
 
 // ==================== 주차별 테이블 렌더링 ====================
 function renderWeeklyCards(weeks, advisors, currentProf, existingPlan, isApproved = false) {
+    // 학생이 승인 신청한 상태인지 확인
+    const isPendingApproval = existingPlan?.approved === 'pending_approval';
+    const canEditPlan = isPendingApproval; // 승인 대기 중일 때만 교수가 계획 수정 가능
+
     return `
         <div class="space-y-4">
             ${isApproved ? `
-                <div class="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                    <p class="text-sm text-yellow-800">
+                <div class="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p class="text-sm text-green-800">
+                        <i class="fas fa-check-circle mr-2"></i>
+                        승인된 계획입니다. 승인 후에는 수정할 수 없습니다.
+                    </p>
+                </div>
+            ` : isPendingApproval ? `
+                <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                    <p class="text-sm text-blue-800">
                         <i class="fas fa-info-circle mr-2"></i>
-                        승인된 계획입니다. 수정하려면 먼저 승인을 취소해주세요.
+                        학생이 승인 신청한 계획입니다. 검토 후 승인 또는 반려해주세요.
                     </p>
                 </div>
             ` : ''}
@@ -825,13 +823,13 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan, isApprove
                             </tr>
                         </thead>
                         <tbody>
-                            ${weeks.map(week => renderWeekCard(week, advisors, currentProf, existingPlan, currentStudentIdV2, isApproved)).join('')}
+                            ${weeks.map(week => renderWeekCard(week, advisors, currentProf, existingPlan, currentStudentIdV2, isApproved, canEditPlan)).join('')}
                         </tbody>
                     </table>
                 </div>
 
-                ${!isApproved ? `
-                    <!-- 주차 추가 버튼 (미승인 상태에만 표시) -->
+                ${canEditPlan && !isApproved ? `
+                    <!-- 주차 추가 버튼 (승인 대기 중에만 표시) -->
                     <div class="px-4 py-3 bg-gray-50 border-t border-gray-300">
                         <button onclick="addNewWeek()"
                                 class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center gap-2">
@@ -843,10 +841,10 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan, isApprove
 
             <!-- Mobile Card View -->
             <div class="block md:hidden space-y-4">
-                ${weeks.map(week => renderWeekCardMobile(week, advisors, currentProf, existingPlan, currentStudentIdV2, isApproved)).join('')}
+                ${weeks.map(week => renderWeekCardMobile(week, advisors, currentProf, existingPlan, currentStudentIdV2, isApproved, canEditPlan)).join('')}
 
-                ${!isApproved ? `
-                    <!-- 주차 추가 버튼 (모바일, 미승인 상태에만 표시) -->
+                ${canEditPlan && !isApproved ? `
+                    <!-- 주차 추가 버튼 (모바일, 승인 대기 중에만 표시) -->
                     <div class="px-4 py-3 bg-gray-50 border border-gray-300 rounded-lg">
                         <button onclick="addNewWeek()"
                                 class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm font-medium inline-flex items-center justify-center gap-2">
@@ -860,11 +858,14 @@ function renderWeeklyCards(weeks, advisors, currentProf, existingPlan, isApprove
 }
 
 // 개별 주차 테이블 행 렌더링 (교수용 - 수정 가능)
-function renderWeekCard(week, advisors, currentProf, plan, studentId, isApproved = false) {
+function renderWeekCard(week, advisors, currentProf, plan, studentId, isApproved = false, canEditPlan = false) {
     const hasExecutions = week.executions && week.executions.length > 0;
 
     // rowspan 계산: 실적 수 + 입력 행 1개
     const rowCount = hasExecutions ? week.executions.length + 1 : 1;
+
+    // 계획 수정 가능 여부
+    const isReadonly = isApproved || !canEditPlan;
 
     // 첫 번째 행 (주차와 계획내용은 rowspan 적용)
     let firstRow = `
@@ -872,7 +873,7 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId, isApproved
             <td class="border border-gray-300 px-2 py-2 text-center font-semibold" rowspan="${rowCount}">
                 <div class="flex flex-col items-center gap-2">
                     <span>${week.week}주</span>
-                    ${!isApproved ? `
+                    ${canEditPlan && !isApproved ? `
                         <button onclick="event.stopPropagation(); deleteWeek(${week.week})"
                                 class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
                                 title="주차 삭제">
@@ -883,9 +884,9 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId, isApproved
             </td>
             <td class="border border-gray-300 px-2 py-2" rowspan="${rowCount}">
                 <textarea id="plan-content-${week.week}"
-                          placeholder="계획 내용 입력"
-                          ${isApproved ? 'readonly onclick="alertApprovedPlanEdit()"' : ''}
-                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea ${isApproved ? 'bg-gray-50 cursor-not-allowed' : ''}"
+                          placeholder="${canEditPlan ? '계획 내용 입력' : '학생 승인 신청 후 수정 가능'}"
+                          ${isReadonly ? 'readonly onclick="alertApprovedPlanEdit()"' : ''}
+                          class="w-full border border-gray-300 rounded px-2 py-1 text-sm resize-none focus:outline-none auto-expand-textarea ${isReadonly ? 'bg-gray-50 cursor-not-allowed' : ''}"
                           style="min-height: 40px; overflow-y: hidden;">${week.plannedContent || ''}</textarea>
             </td>`;
 
@@ -989,16 +990,16 @@ function renderWeekCard(week, advisors, currentProf, plan, studentId, isApproved
 }
 
 // 모바일 카드 뷰 렌더링 (교수용)
-function renderWeekCardMobile(week, advisors, currentProf, plan, studentId, isApproved = false) {
+function renderWeekCardMobile(week, advisors, currentProf, plan, studentId, isApproved = false, canEditPlan = false) {
     const hasExecutions = week.executions && week.executions.length > 0;
-    const hasPlan = week.plannedContent && week.plannedContent.trim() !== '';
+    const isReadonly = isApproved || !canEditPlan;
 
     return `
         <div class="bg-white border border-gray-200 rounded-lg">
             <!-- 주차 헤더 -->
             <div class="p-4 bg-gray-50 border-b border-gray-200 flex justify-between items-center">
                 <span class="text-base font-semibold text-gray-800">${week.week}주차</span>
-                ${!isApproved ? `
+                ${canEditPlan && !isApproved ? `
                     <button onclick="deleteWeek(${week.week})"
                             class="text-xs px-2 py-1 bg-red-500 hover:bg-red-600 text-white rounded"
                             title="주차 삭제">
@@ -1010,18 +1011,11 @@ function renderWeekCardMobile(week, advisors, currentProf, plan, studentId, isAp
             <!-- 계획 내용 -->
             <div class="p-4 border-b border-gray-200">
                 <span class="text-sm font-semibold text-gray-700">계획 내용:</span>
-                ${hasPlan || isApproved ? `
-                    <textarea id="plan-content-${week.week}"
-                              placeholder="계획 내용 입력"
-                              ${isApproved ? 'readonly onclick="alertApprovedPlanEdit()"' : ''}
-                              class="w-full border border-gray-300 rounded px-2 py-2 text-sm resize-none mt-2 ${isApproved ? 'bg-gray-50 cursor-not-allowed' : ''}"
-                              style="min-height: 60px;">${week.plannedContent || ''}</textarea>
-                ` : `
-                    <textarea id="plan-content-${week.week}"
-                              placeholder="계획 내용 입력"
-                              class="w-full border border-gray-300 rounded px-2 py-2 text-sm resize-none mt-2"
-                              style="min-height: 60px;">${week.plannedContent || ''}</textarea>
-                `}
+                <textarea id="plan-content-${week.week}"
+                          placeholder="${canEditPlan ? '계획 내용 입력' : '학생 승인 신청 후 수정 가능'}"
+                          ${isReadonly ? 'readonly onclick="alertApprovedPlanEdit()"' : ''}
+                          class="w-full border border-gray-300 rounded px-2 py-2 text-sm resize-none mt-2 ${isReadonly ? 'bg-gray-50 cursor-not-allowed' : ''}"
+                          style="min-height: 60px;">${week.plannedContent || ''}</textarea>
             </div>
 
             <!-- 실적 목록 -->
@@ -1342,7 +1336,7 @@ async function approveSemesterPlan() {
     // 커스텀 확인 대화상자 표시
     const confirmed = await showCustomConfirm(
         '계획 승인 확인',
-        '이 학기의 지도 계획을 승인하시겠습니까?',
+        '승인 후에는 계획을 수정할 수 없습니다.\n\n계획을 승인하시겠습니까?',
         '승인',
         '취소',
         'primary'
@@ -1415,14 +1409,14 @@ function executeApprovePlan() {
     }
 }
 
-// 승인 취소 함수
-async function cancelSemesterApproval() {
+// ==================== 학기 계획 반려 ====================
+async function rejectSemesterPlan() {
     // 커스텀 확인 대화상자 표시
     const confirmed = await showCustomConfirm(
-        '⚠️ 승인 취소 확인',
-        '계획 승인을 취소하시겠습니까?\n\n승인을 취소하면 계획을 수정할 수 있습니다.',
-        '승인 취소',
-        '닫기',
+        '계획 반려 확인',
+        '반려하시겠습니까?\n\n반려하면 학생이 계획을 다시 수정할 수 있습니다.',
+        '반려',
+        '취소',
         'danger'
     );
 
@@ -1430,11 +1424,11 @@ async function cancelSemesterApproval() {
         return;
     }
 
-    executeCancelApproval();
+    executeRejectPlan();
 }
 
-// 실제 승인 취소 실행 함수
-function executeCancelApproval() {
+// 실제 반려 실행 함수
+function executeRejectPlan() {
     try {
         const allPlans = DataService.getAllSemesterPlans(currentStudentIdV2);
         const currentPlan = allPlans.find(p =>
@@ -1446,10 +1440,12 @@ function executeCancelApproval() {
             return;
         }
 
-        // 승인 상태 제거
-        currentPlan.approved = false;
-        currentPlan.approvedBy = null;
-        currentPlan.approvedDate = null;
+        // 반려 상태 업데이트
+        currentPlan.approved = 'rejected';
+        currentPlan.rejectedDate = new Date().toISOString();
+        // 승인 관련 필드 초기화
+        delete currentPlan.approvedBy;
+        delete currentPlan.approvedDate;
 
         // DataService에 저장
         DataService.saveSemesterPlan(
@@ -1459,13 +1455,15 @@ function executeCancelApproval() {
             currentPlan
         );
 
-        console.log('승인 취소 처리:', {
+        console.log('반려 처리:', {
             studentId: currentStudentIdV2,
             year: currentSemesterView.year,
-            semester: currentSemesterView.semester
+            semester: currentSemesterView.semester,
+            approved: currentPlan.approved,
+            rejectedDate: currentPlan.rejectedDate
         });
 
-        showToast('계획 승인이 취소되었습니다.', 'success');
+        showToast('학기 계획이 반려되었습니다. 학생이 다시 수정할 수 있습니다.', 'success');
 
         // 모달 내용 새로고침
         setTimeout(() => {
@@ -1476,6 +1474,7 @@ function executeCancelApproval() {
         showToast(error.message, 'error');
     }
 }
+
 
 // ==================== 유틸리티 ====================
 function getTodayDate() {
@@ -1596,7 +1595,7 @@ window.deleteExecutionV2 = deleteExecutionV2;
 window.saveWeekPlan = saveWeekPlan;
 window.saveAllWeekPlans = saveAllWeekPlans;
 window.approveSemesterPlan = approveSemesterPlan;
-window.cancelSemesterApproval = cancelSemesterApproval;
+window.rejectSemesterPlan = rejectSemesterPlan;
 window.alertApprovedPlanEdit = alertApprovedPlanEdit;
 window.autoExpandTextarea = autoExpandTextarea;
 window.expandAllTextareas = expandAllTextareas;

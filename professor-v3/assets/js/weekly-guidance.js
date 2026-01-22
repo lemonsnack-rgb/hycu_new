@@ -9,11 +9,46 @@ let currentSemester = 1;
 // 학기별 계획 데이터 저장소 (임시)
 const semesterPlansStorage = {};
 
+// 목업 데이터 초기화 - 승인 대기 중인 학생 계획
+const mockPlanData = {
+    year: 2025,
+    semester: 1,
+    totalWeeks: 15,
+    approved: 'pending_approval',
+    requestedDate: '2025-01-20T14:30:00.000Z',
+    weeks: [
+        { week: 1, plannedDate: '2025-03-03', plannedContent: '연구 주제 선정 및 문헌 조사 시작', plannedMethod: 'meeting', executions: [] },
+        { week: 2, plannedDate: '2025-03-10', plannedContent: '선행 연구 분석 및 연구 방향 설정', plannedMethod: 'meeting', executions: [] },
+        { week: 3, plannedDate: '2025-03-17', plannedContent: '연구 계획서 초안 작성', plannedMethod: 'zoom', executions: [] },
+        { week: 4, plannedDate: '2025-03-24', plannedContent: '연구 방법론 검토 및 설문지 설계', plannedMethod: 'meeting', executions: [] },
+        { week: 5, plannedDate: '2025-03-31', plannedContent: '설문지 수정 및 사전 테스트', plannedMethod: 'email', executions: [] },
+        { week: 6, plannedDate: '2025-04-07', plannedContent: '데이터 수집 방법 확정 및 IRB 신청', plannedMethod: 'meeting', executions: [] },
+        { week: 7, plannedDate: '2025-04-14', plannedContent: '중간 점검 및 진행 상황 보고', plannedMethod: 'zoom', executions: [] },
+        { week: 8, plannedDate: '2025-04-21', plannedContent: '데이터 수집 진행 상황 점검', plannedMethod: 'meeting', executions: [] },
+        { week: 9, plannedDate: '2025-04-28', plannedContent: '수집된 데이터 정리 및 분석 준비', plannedMethod: 'meeting', executions: [] },
+        { week: 10, plannedDate: '2025-05-05', plannedContent: '통계 분석 방법 논의 및 분석 시작', plannedMethod: 'zoom', executions: [] },
+        { week: 11, plannedDate: '2025-05-12', plannedContent: '분석 결과 검토 및 해석', plannedMethod: 'meeting', executions: [] },
+        { week: 12, plannedDate: '2025-05-19', plannedContent: '논문 초고 작성 시작', plannedMethod: 'meeting', executions: [] },
+        { week: 13, plannedDate: '2025-05-26', plannedContent: '논문 초고 1차 피드백', plannedMethod: 'zoom', executions: [] },
+        { week: 14, plannedDate: '2025-06-02', plannedContent: '논문 수정 및 보완', plannedMethod: 'meeting', executions: [] },
+        { week: 15, plannedDate: '2025-06-09', plannedContent: '최종 논문 검토 및 제출 준비', plannedMethod: 'meeting', executions: [] }
+    ],
+    plans: []
+};
+
+// S001 키로 저장 (mock-data.js의 학생 ID)
+semesterPlansStorage['S001_2025_1'] = { ...mockPlanData, studentId: 'S001' };
+
+// 2024001 키로도 저장 (교수 화면 테이블에서 실제 사용되는 ID)
+semesterPlansStorage['2024001_2025_1'] = { ...mockPlanData, studentId: '2024001' };
+
 // DataService 확장 - 학기별 계획 관리 함수
 if (typeof DataService !== 'undefined') {
     // 학기별 계획 조회
     DataService.getSemesterPlan = function(studentId, year, semester) {
         const key = `${studentId}_${year}_${semester}`;
+        console.log(`🔍 getSemesterPlan 호출: ${key}`, semesterPlansStorage[key]);
+        console.log('📦 전체 저장소:', Object.keys(semesterPlansStorage));
         return semesterPlansStorage[key] || null;
     };
 
@@ -25,6 +60,7 @@ if (typeof DataService !== 'undefined') {
                 plans.push(semesterPlansStorage[key]);
             }
         }
+        console.log(`🔍 getAllSemesterPlans 호출: ${studentId}`, plans);
         return plans;
     };
 
