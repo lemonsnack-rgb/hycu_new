@@ -351,6 +351,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
     const disabledClass = isViewMode ? 'bg-gray-100 cursor-not-allowed' : '';
 
     return `
+        ${!isViewMode ? `
         <div class="mb-4">
             <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -359,6 +360,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
                 목록으로
             </button>
         </div>
+        ` : ''}
 
         <div class="bg-white rounded-lg shadow-md p-6">
             <h3 class="text-lg font-bold text-gray-900 mb-6">학술지 논문 제출</h3>
