@@ -130,8 +130,10 @@ const mockThesisStages = [
     {
         id: 'TS001',
         name: '석사 표준 과정',
+        departmentName: '컴퓨터공학과',
         degreeType: 'master',
         thesisType: 'degree',
+        isValidStage: 'Y',
         stageCount: 5,
         createdDate: '2025-01-01',
         stages: [
@@ -150,7 +152,12 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '연구 주제 및 방법을 문서로 제출'
+                description: '연구 주제 및 방법을 문서로 제출',
+                scheduleTypes: ['application', 'submission'],
+                schedules: [
+                    { type: 'application', startDate: '2025-03-01T09:00', endDate: '2025-03-31T18:00' },
+                    { type: 'submission', startDate: '2025-03-01T09:00', endDate: '2025-03-31T18:00' }
+                ]
             },
             {
                 id: 'STAGE_TS001_002',
@@ -167,7 +174,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '관련 선행연구 검토 및 요약'
+                description: '관련 선행연구 검토 및 요약',
+                scheduleTypes: ['general', 'submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS001_003',
@@ -184,7 +193,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '실제 연구 수행 및 데이터 수집'
+                description: '실제 연구 수행 및 데이터 수집',
+                scheduleTypes: ['submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS001_004',
@@ -201,7 +212,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '연구 결과를 논문으로 작성'
+                description: '연구 결과를 논문으로 작성',
+                scheduleTypes: ['submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS001_005',
@@ -218,15 +231,19 @@ const mockThesisStages = [
                 evaluationTemplateId: 'EVAL002',
                 reviewStartDate: '2025-11-20',
                 reviewEndDate: '2025-12-05',
-                description: '최종 논문 본심사'
+                description: '최종 논문 본심사',
+                scheduleTypes: ['submission', 'review'],
+                schedules: []
             }
         ]
     },
     {
         id: 'TS002',
         name: '박사 표준 과정',
+        departmentName: '경영학과',
         degreeType: 'phd',
         thesisType: 'degree',
+        isValidStage: 'Y',
         stageCount: 7,
         createdDate: '2025-01-01',
         stages: [
@@ -245,7 +262,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '연구 주제 및 방법을 문서로 제출'
+                description: '연구 주제 및 방법을 문서로 제출',
+                scheduleTypes: ['application', 'submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS002_002',
@@ -262,7 +281,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '관련 선행연구 검토 및 요약'
+                description: '관련 선행연구 검토 및 요약',
+                scheduleTypes: ['general', 'submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS002_003',
@@ -279,7 +300,9 @@ const mockThesisStages = [
                 evaluationTemplateId: 'EVAL003',
                 reviewStartDate: '2025-05-20',
                 reviewEndDate: '2025-06-05',
-                description: '박사과정 연구제안서 심사'
+                description: '박사과정 연구제안서 심사',
+                scheduleTypes: ['submission', 'review'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS002_004',
@@ -296,7 +319,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '실제 연구 수행 및 데이터 수집'
+                description: '실제 연구 수행 및 데이터 수집',
+                scheduleTypes: ['submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS002_005',
@@ -313,7 +338,9 @@ const mockThesisStages = [
                 evaluationTemplateId: 'EVAL001',
                 reviewStartDate: '2025-10-20',
                 reviewEndDate: '2025-11-05',
-                description: '논문 초안 예비심사'
+                description: '논문 초안 예비심사',
+                scheduleTypes: ['submission', 'review'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS002_006',
@@ -330,7 +357,9 @@ const mockThesisStages = [
                 evaluationTemplateId: '',
                 reviewStartDate: '',
                 reviewEndDate: '',
-                description: '연구 결과를 논문으로 작성'
+                description: '연구 결과를 논문으로 작성',
+                scheduleTypes: ['submission'],
+                schedules: []
             },
             {
                 id: 'STAGE_TS002_007',
@@ -347,7 +376,9 @@ const mockThesisStages = [
                 evaluationTemplateId: 'EVAL002',
                 reviewStartDate: '2026-01-15',
                 reviewEndDate: '2026-01-30',
-                description: '최종 논문 본심사'
+                description: '최종 논문 본심사',
+                scheduleTypes: ['submission', 'review'],
+                schedules: []
             }
         ]
     }

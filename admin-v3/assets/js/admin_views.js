@@ -3320,20 +3320,26 @@ const views = {
                             <tr>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도 단계명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과명</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유효 지도단계</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">일정관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
                             ${data.map((item, idx) => {
                                 const degreeLabel = item.degreeType === 'master' ? '석사' : '박사';
+                                const departmentLabel = item.departmentName || '-';
+                                const isValidLabel = item.isValidStage === 'Y' ? 'Y' : 'N';
 
                                 return `
-                                <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('workflowCreateUnified', '${item.id}')">
-                                    <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
-                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-700">${degreeLabel}</td>
-                                    <td class="py-3 px-4 text-sm text-gray-600">
+                                <tr class="hover:bg-blue-50">
+                                    <td class="py-3 px-4 text-sm text-gray-600" onclick="switchView('workflowCreateUnified', '${item.id}')">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800 cursor-pointer" onclick="switchView('workflowCreateUnified', '${item.id}')">${item.name}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-700" onclick="switchView('workflowCreateUnified', '${item.id}')">${departmentLabel}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-700" onclick="switchView('workflowCreateUnified', '${item.id}')">${degreeLabel}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600" onclick="switchView('workflowCreateUnified', '${item.id}')">
                                         <div class="flex items-center gap-1 flex-wrap">
                                             ${item.stages.map((stage, stepIdx) => {
                                                 const stepType = mockStepTypes.find(st => st.id === stage.stepTypeId);
@@ -3348,6 +3354,13 @@ const views = {
                                                 `;
                                             }).join('')}
                                         </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600 text-center" onclick="switchView('workflowCreateUnified', '${item.id}')">${isValidLabel}</td>
+                                    <td class="py-3 px-4 text-sm text-center">
+                                        <button onclick="event.stopPropagation(); openScheduleModal('${item.id}')"
+                                                class="text-blue-600 hover:text-blue-800 hover:underline">
+                                            상세보기
+                                        </button>
                                     </td>
                                 </tr>
                             `}).join('')}
@@ -3387,21 +3400,34 @@ const views = {
             name: '',
             // requiresDocument, requiresPresentation는 stageType에서 자동 상속되므로 제거
             evaluationTemplateId: '',
-            description: ''
+            description: '',
+            scheduleTypes: []  // 일정 관리 구분
         }];
         window.currentWorkflowId = id;
 
         const handleSave = () => {
             const name = document.getElementById('workflow-name').value;
+            const department = document.getElementById('workflow-department').value;
             const degreeCheckboxes = document.querySelectorAll('input[name="workflow-degree"]:checked');
+            const isValidCheckbox = document.querySelector('input[name="workflow-is-valid"]:checked');
 
             if (!name.trim()) {
                 alert('워크플로우 이름을 입력해주세요.');
                 return;
             }
 
+            if (!department) {
+                alert('학과명을 선택해주세요.');
+                return;
+            }
+
             if (degreeCheckboxes.length === 0) {
                 alert('학위 과정을 최소 1개 이상 선택해주세요.');
+                return;
+            }
+
+            if (!isValidCheckbox) {
+                alert('유효 지도단계 여부를 선택해주세요.');
                 return;
             }
 
@@ -3444,7 +3470,8 @@ const views = {
 
                 <!-- Workflow Basic Info -->
                 <div class="p-6 border-b bg-gray-50">
-                    <div class="flex items-center gap-6">
+                    <!-- 첫 번째 행: 지도 단계명, 학과명 -->
+                    <div class="flex items-center gap-6 mb-4">
                         <!-- 좌측: 지도 단계명 -->
                         <div class="flex items-center gap-4 flex-1">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
@@ -3457,7 +3484,24 @@ const views = {
                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
 
-                        <!-- 중앙: 학위 과정 -->
+                        <!-- 우측: 학과명 -->
+                        <div class="flex items-center gap-4 flex-1">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
+                                학과명 *
+                            </label>
+                            <select id="workflow-department"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">학과 선택</option>
+                                ${mockDepartmentNames.map(dept => `
+                                    <option value="${dept}" ${isEdit && item.departmentName === dept ? 'selected' : ''}>${dept}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- 두 번째 행: 학위 과정, 논문 유형, 유효 지도단계 여부 -->
+                    <div class="flex items-center gap-6">
+                        <!-- 학위 과정 -->
                         <div class="flex items-center gap-4 flex-1">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
                                 학위 과정 *
@@ -3484,7 +3528,7 @@ const views = {
                             </div>
                         </div>
 
-                        <!-- 우측: 논문 유형 -->
+                        <!-- 논문 유형 -->
                         <div class="flex items-center gap-4 flex-1">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
                                 논문 유형 *
@@ -3501,6 +3545,27 @@ const views = {
                                            ${isEdit && item.thesisType === 'journal' ? 'checked' : ''}
                                            class="mr-2 w-4 h-4 cursor-pointer">
                                     <span class="text-sm text-gray-700">학술지 논문</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- 유효 지도단계 여부 -->
+                        <div class="flex items-center gap-4 flex-1">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
+                                유효 지도단계 *
+                            </label>
+                            <div class="flex items-center gap-6">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="workflow-is-valid" value="Y"
+                                           ${isEdit && item.isValidStage === 'Y' ? 'checked' : (!isEdit ? 'checked' : '')}
+                                           class="mr-2 w-4 h-4 cursor-pointer">
+                                    <span class="text-sm text-gray-700">Y</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="workflow-is-valid" value="N"
+                                           ${isEdit && item.isValidStage === 'N' ? 'checked' : ''}
+                                           class="mr-2 w-4 h-4 cursor-pointer">
+                                    <span class="text-sm text-gray-700">N</span>
                                 </label>
                             </div>
                         </div>
@@ -4878,54 +4943,6 @@ views.stageTypeCreate = (id = null) => {
                                 `).join('')}
                             </select>
                         </div>
-                    </div>
-                </div>
-
-                <!-- 구분선 -->
-                <div class="border-t-2 border-gray-300 my-6"></div>
-
-                <!-- ========== 영역 2: 일정 관리 구분 ========== -->
-                <div class="border-2 border-gray-300 rounded-lg p-4">
-                    <h4 class="text-base font-bold text-gray-900 mb-3">일정 관리 구분</h4>
-                    <p class="text-xs text-gray-600 mb-3">일정(신청/신청 철회/제출/심사 기간) 제어가 필요한 단계를 선택하세요</p>
-                    <div style="display: flex; align-items: center; gap: 24px; flex-wrap: wrap;">
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   id="schedule-application"
-                                   ${item.scheduleTypes?.includes('application') ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-gray-900">신청</span>
-                        </label>
-
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
-
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   id="schedule-withdrawal"
-                                   ${item.scheduleTypes?.includes('withdrawal') ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-gray-900">신청 철회</span>
-                        </label>
-
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
-
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   id="schedule-submission"
-                                   ${item.scheduleTypes?.includes('submission') ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-gray-900">제출</span>
-                        </label>
-
-                        <div style="width: 1px; height: 24px; background-color: #D1D5DB;"></div>
-
-                        <label class="flex items-center cursor-pointer">
-                            <input type="checkbox"
-                                   id="schedule-review"
-                                   ${item.scheduleTypes?.includes('review') ? 'checked' : ''}
-                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
-                            <span class="ml-2 text-sm font-medium text-gray-900">심사</span>
-                        </label>
                     </div>
                 </div>
                     </form>

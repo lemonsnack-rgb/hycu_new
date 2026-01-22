@@ -6567,12 +6567,19 @@ function refreshComposedStagesUnified() {
 // 워크플로우 저장
 function saveUnifiedWorkflow() {
     const name = document.getElementById('workflow-name').value.trim();
+    const department = document.getElementById('workflow-department').value;
     const degreeCheckboxes = document.querySelectorAll('input[name="workflow-degree"]:checked');
     const selectedDegrees = Array.from(degreeCheckboxes).map(cb => cb.value);
     const thesisType = document.querySelector('input[name="workflow-thesis-type"]:checked')?.value;
+    const isValidStage = document.querySelector('input[name="workflow-is-valid"]:checked')?.value;
 
     if (!name) {
         alert('워크플로우 이름을 입력해주세요.');
+        return;
+    }
+
+    if (!department) {
+        alert('학과명을 선택해주세요.');
         return;
     }
 
@@ -6583,6 +6590,11 @@ function saveUnifiedWorkflow() {
 
     if (!thesisType) {
         alert('논문 유형을 선택해주세요.');
+        return;
+    }
+
+    if (!isValidStage) {
+        alert('유효 지도단계 여부를 선택해주세요.');
         return;
     }
 
@@ -6611,8 +6623,10 @@ function saveUnifiedWorkflow() {
         const workflow = mockThesisStages.find(s => s.id === window.currentWorkflowId);
         if (workflow) {
             workflow.name = name;
+            workflow.departmentName = department;
             workflow.degreeType = selectedDegrees[0]; // 첫 번째 선택값 사용
             workflow.thesisType = thesisType;
+            workflow.isValidStage = isValidStage;
             workflow.stageCount = window.composedStages.length;
             workflow.stages = JSON.parse(JSON.stringify(window.composedStages));
 
@@ -6663,8 +6677,10 @@ function saveUnifiedWorkflow() {
         mockThesisStages.push({
             id: newId,
             name: name,
+            departmentName: department,
             degreeType: selectedDegrees[0], // 첫 번째 선택값 사용
             thesisType: thesisType,
+            isValidStage: isValidStage,
             stageCount: newStages.length,
             createdDate: new Date().toISOString().split('T')[0],
             stages: newStages
@@ -7559,3 +7575,202 @@ window.previewGuideContent = previewGuideContent;
 window.saveGuideContent = saveGuideContent;
 window.applyFormat = applyFormat;
 window.insertLink = insertLink;
+
+// ====================================================================
+// 일정 관리 모달
+// ====================================================================
+
+// 일정관리 구분 한글 라벨 매핑
+const scheduleTypeLabels = {
+    'general': '일반 일정',
+    'application': '신청',
+    'withdrawal': '신청 철회',
+    'submission': '제출',
+    'review': '심사'
+};
+
+// 일정 관리 모달 열기
+function openScheduleModal(workflowId) {
+    const workflow = mockThesisStages.find(w => w.id === workflowId);
+    if (!workflow) {
+        alert('지도단계를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 일정관리 구분이 있는지 확인
+    const hasScheduleTypes = workflow.stages.some(stage =>
+        stage.scheduleTypes && stage.scheduleTypes.length > 0
+    );
+
+    const modalHtml = `
+        <div id="schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+             onclick="if(event.target.id === 'schedule-modal') closeScheduleModal()">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-6xl max-h-[90vh] overflow-hidden"
+                 onclick="event.stopPropagation()">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center bg-gray-50">
+                    <h3 class="text-lg font-bold text-gray-900">지도단계 일정 관리</h3>
+                    <button onclick="closeScheduleModal()"
+                            class="text-gray-400 hover:text-gray-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    ${hasScheduleTypes ? renderScheduleTable(workflow) : `
+                        <div class="text-center py-12">
+                            <p class="text-gray-600">지도단계에 일정 구분이 등록되지 않았습니다.</p>
+                        </div>
+                    `}
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-3 bg-gray-50">
+                    ${hasScheduleTypes ? `
+                        <button onclick="closeScheduleModal()"
+                                class="px-6 py-2 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50">
+                            취소
+                        </button>
+                        <button onclick="saveSchedules('${workflowId}')"
+                                class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
+                            저장
+                        </button>
+                    ` : `
+                        <button onclick="closeScheduleModal()"
+                                class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700">
+                            닫기
+                        </button>
+                    `}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// 일정 테이블 렌더링
+function renderScheduleTable(workflow) {
+    let tableRows = '';
+
+    workflow.stages.forEach(stage => {
+        // scheduleTypes가 없거나 빈 배열이면 건너뛰기
+        if (!stage.scheduleTypes || stage.scheduleTypes.length === 0) {
+            return;
+        }
+
+        // 각 scheduleType에 대해 행 생성
+        stage.scheduleTypes.forEach(scheduleType => {
+            // 기존 일정 데이터 찾기
+            const existingSchedule = stage.schedules?.find(s => s.type === scheduleType);
+            const startDate = existingSchedule?.startDate || '';
+            const endDate = existingSchedule?.endDate || '';
+
+            tableRows += `
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 text-sm text-gray-900 border-b">${stage.name}</td>
+                    <td class="py-3 px-4 text-sm text-gray-700 border-b">${scheduleTypeLabels[scheduleType] || scheduleType}</td>
+                    <td class="py-3 px-4 border-b">
+                        <input type="datetime-local"
+                               data-stage-id="${stage.id}"
+                               data-schedule-type="${scheduleType}"
+                               data-field="startDate"
+                               value="${startDate}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                    </td>
+                    <td class="py-3 px-4 border-b">
+                        <input type="datetime-local"
+                               data-stage-id="${stage.id}"
+                               data-schedule-type="${scheduleType}"
+                               data-field="endDate"
+                               value="${endDate}"
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                    </td>
+                </tr>
+            `;
+        });
+    });
+
+    return `
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 border-b">단계명</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 border-b">일정관리 구분</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 border-b">시작일시</th>
+                        <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600 border-b">종료일시</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${tableRows}
+                </tbody>
+            </table>
+        </div>
+    `;
+}
+
+// 일정 저장
+function saveSchedules(workflowId) {
+    const workflow = mockThesisStages.find(w => w.id === workflowId);
+    if (!workflow) {
+        alert('지도단계를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 모든 datetime-local input 값 수집
+    const inputs = document.querySelectorAll('#schedule-modal input[type="datetime-local"]');
+
+    // 각 stage의 schedules 업데이트
+    workflow.stages.forEach(stage => {
+        if (!stage.scheduleTypes || stage.scheduleTypes.length === 0) {
+            return;
+        }
+
+        // schedules 배열 초기화
+        if (!stage.schedules) {
+            stage.schedules = [];
+        }
+
+        // 각 scheduleType에 대한 입력값 수집
+        stage.scheduleTypes.forEach(scheduleType => {
+            const startInput = document.querySelector(
+                `input[data-stage-id="${stage.id}"][data-schedule-type="${scheduleType}"][data-field="startDate"]`
+            );
+            const endInput = document.querySelector(
+                `input[data-stage-id="${stage.id}"][data-schedule-type="${scheduleType}"][data-field="endDate"]`
+            );
+
+            if (startInput && endInput) {
+                // 기존 schedule 찾기 또는 새로 생성
+                let schedule = stage.schedules.find(s => s.type === scheduleType);
+                if (!schedule) {
+                    schedule = { type: scheduleType, startDate: '', endDate: '' };
+                    stage.schedules.push(schedule);
+                }
+
+                schedule.startDate = startInput.value;
+                schedule.endDate = endInput.value;
+            }
+        });
+    });
+
+    alert('일정이 저장되었습니다.');
+    closeScheduleModal();
+}
+
+// 일정 관리 모달 닫기
+function closeScheduleModal() {
+    const modal = document.getElementById('schedule-modal');
+    if (modal) {
+        modal.remove();
+    }
+}
+
+// 전역으로 노출
+window.openScheduleModal = openScheduleModal;
+window.closeScheduleModal = closeScheduleModal;
+window.saveSchedules = saveSchedules;

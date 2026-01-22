@@ -5364,14 +5364,72 @@ function renderStageCard(stage, index) {
                 </select>
             </div>
 
+            <!-- 일정 관리 구분 -->
+            <div class="my-3">
+                <div class="stage-field-row">
+                    <label class="stage-field-label" style="margin-top: 6px;">일정관리구분</label>
+                    <div class="flex flex-wrap gap-4">
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   ${stage.scheduleTypes?.includes('general') ? 'checked' : ''}
+                                   onchange="updateStageScheduleType(${index}, 'general', this.checked)"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">일반 일정</span>
+                        </label>
+
+                        <div style="width: 1px; height: 20px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   ${stage.scheduleTypes?.includes('application') ? 'checked' : ''}
+                                   onchange="updateStageScheduleType(${index}, 'application', this.checked)"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">신청</span>
+                        </label>
+
+                        <div style="width: 1px; height: 20px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   ${stage.scheduleTypes?.includes('withdrawal') ? 'checked' : ''}
+                                   onchange="updateStageScheduleType(${index}, 'withdrawal', this.checked)"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">신청 철회</span>
+                        </label>
+
+                        <div style="width: 1px; height: 20px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   ${stage.scheduleTypes?.includes('submission') ? 'checked' : ''}
+                                   onchange="updateStageScheduleType(${index}, 'submission', this.checked)"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">제출</span>
+                        </label>
+
+                        <div style="width: 1px; height: 20px; background-color: #D1D5DB;"></div>
+
+                        <label class="flex items-center cursor-pointer">
+                            <input type="checkbox"
+                                   ${stage.scheduleTypes?.includes('review') ? 'checked' : ''}
+                                   onchange="updateStageScheduleType(${index}, 'review', this.checked)"
+                                   class="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500">
+                            <span class="ml-2 text-sm text-gray-700">심사</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- (6) 설명 -->
-            <div class="stage-field-row" style="align-items: start;">
-                <label class="stage-field-label" style="margin-top: 6px;">설명</label>
-                <textarea onchange="updateStageField(${index}, 'description', this.value)"
-                          placeholder="단계에 대한 추가 설명 (선택)"
-                          class="w-full px-2 py-1 border border-gray-300 rounded text-xs"
-                          rows="2"
-                          style="font-size: 13px; resize: vertical;">${stage.description || ''}</textarea>
+            <div class="my-3">
+                <div class="stage-field-row" style="align-items: start;">
+                    <label class="stage-field-label" style="margin-top: 6px;">설명</label>
+                    <textarea onchange="updateStageField(${index}, 'description', this.value)"
+                              placeholder="단계에 대한 추가 설명 (선택)"
+                              class="w-full px-2 py-1 border border-gray-300 rounded text-xs"
+                              rows="2"
+                              style="font-size: 13px; resize: vertical;">${stage.description || ''}</textarea>
+                </div>
             </div>
         </div>
     `;
@@ -5391,7 +5449,8 @@ function addNewStageCard() {
         requiresDocument: false,  // 유형 선택 시 자동 설정됨
         requiresPresentation: false,  // 유형 선택 시 자동 설정됨
         evaluationTemplateId: '',
-        description: ''
+        description: '',
+        scheduleTypes: []       // 일정 관리 구분
     });
     refreshStageCards();
 }
@@ -5551,6 +5610,22 @@ function updateStageEvaluationTemplate(index, templateId) {
 
 // 전역 함수로 export
 window.renderStageCards = renderStageCards;
+// 단계 일정 관리 구분 업데이트
+function updateStageScheduleType(index, type, checked) {
+    if (!window.composedStages[index].scheduleTypes) {
+        window.composedStages[index].scheduleTypes = [];
+    }
+
+    if (checked) {
+        if (!window.composedStages[index].scheduleTypes.includes(type)) {
+            window.composedStages[index].scheduleTypes.push(type);
+        }
+    } else {
+        window.composedStages[index].scheduleTypes =
+            window.composedStages[index].scheduleTypes.filter(t => t !== type);
+    }
+}
+
 window.renderStageCard = renderStageCard;
 window.addNewStageCard = addNewStageCard;
 window.deleteStageCard = deleteStageCard;
@@ -5560,6 +5635,7 @@ window.updateStageField = updateStageField;
 window.updateStageType = updateStageType;
 // window.updateStageExamType = updateStageExamType;  // DEPRECATED - 제거됨
 window.updateStageEvaluationTemplate = updateStageEvaluationTemplate;
+window.updateStageScheduleType = updateStageScheduleType;
 window.refreshStageCards = refreshStageCards;
 
 console.log('✅ 신규 단계 카드 관리 함수 로드 완료');
@@ -5631,13 +5707,6 @@ window.saveStageType = (event, id) => {
     const examTypeId = document.getElementById('exam-type-id').value;
     const description = document.getElementById('stage-type-description').value.trim();
 
-    // 일정 관리 구분 체크박스 값 수집
-    const scheduleTypes = [];
-    if (document.getElementById('schedule-application')?.checked) scheduleTypes.push('application');
-    if (document.getElementById('schedule-withdrawal')?.checked) scheduleTypes.push('withdrawal');
-    if (document.getElementById('schedule-submission')?.checked) scheduleTypes.push('submission');
-    if (document.getElementById('schedule-review')?.checked) scheduleTypes.push('review');
-
     // 유효성 검사
     if (!name) {
         alert('유형명을 입력해주세요.');
@@ -5657,7 +5726,6 @@ window.saveStageType = (event, id) => {
             stageType.requiresDocument = requiresDocument;
             stageType.requiresPresentation = requiresPresentation;
             stageType.examTypeId = examTypeId;  // 심사 유형 저장
-            stageType.scheduleTypes = scheduleTypes;  // 일정 관리 구분 저장 (배열)
             stageType.description = description;
         }
         alert('단계 유형이 수정되었습니다.');
@@ -5668,7 +5736,6 @@ window.saveStageType = (event, id) => {
             id: newId,
             name: name,
             type: requiresPresentation ? 'review' : 'submission', // 발표가 필요하면 심사, 아니면 제출
-            scheduleTypes: scheduleTypes,  // 일정 관리 구분 저장 (배열)
             requiresDocument: requiresDocument,
             requiresPresentation: requiresPresentation,
             examTypeId: examTypeId,  // 심사 유형 저장
