@@ -94,7 +94,8 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         isCompleted: false,
         lastModified: '2025-01-07 16:00',
         lastModifiedBy: null,
-        date: '2025-01-07 16:00'
+        date: '2025-01-07 16:00',
+        memo: '이전 피드백 반영하여 연구문제 부분을 수정했습니다.\n확인 부탁드립니다.'
     },
     {
         id: 'gs-001-v3',
@@ -126,7 +127,8 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         isCompleted: false,
         lastModified: '2025-01-09 10:30',
         lastModifiedBy: null,
-        date: '2025-01-09 10:30'
+        date: '2025-01-09 10:30',
+        memo: '최종 버전입니다. 참고문헌도 모두 추가했습니다.'
     },
     {
         id: 'gs-002',
@@ -167,7 +169,8 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         isCompleted: true,
         lastModified: '2025-01-04 16:45',
         lastModifiedBy: 'P001',
-        date: '2025-01-03 09:15'
+        date: '2025-01-03 09:15',
+        memo: '서론 부분 연구 배경 보강했습니다.'
     },
     {
         id: 'gs-003',
@@ -199,7 +202,8 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         isCompleted: false,
         lastModified: '2024-12-15 11:20',
         lastModifiedBy: null,
-        date: '2024-12-15 11:20'
+        date: '2024-12-15 11:20',
+        memo: '선행연구 부분이 부족한 것 같아 추가 문헌을 더 찾아볼 예정입니다.'
     }
 ];
 

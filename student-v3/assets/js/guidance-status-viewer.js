@@ -259,16 +259,15 @@ function createFeedbackModal(request, feedbackData) {
                 <!-- 오른쪽: 코멘트 패널 (ID 40: 탭 구분, ID 43: 용어 변경) -->
                 <div class="comment-panel">
                     <div class="p-4 border-b bg-gray-50">
-                        <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
-                            피드백
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-bold text-gray-700">피드백</h4>
                             <button id="student-memo-btn"
                                     onclick="toggleStudentMemo()"
-                                    title="학생 메모 보기"
                                     style="display: none;"
-                                    class="text-yellow-500 hover:text-yellow-600 transition-colors">
-                                <i class="fas fa-sticky-note"></i>
+                                    class="text-xs px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 transition-colors">
+                                메모
                             </button>
-                        </h4>
+                        </div>
                         <!-- 개선된 탭 UI -->
                         <div class="tabs" role="tablist" id="feedback-tabs-container">
                             <button id="tab-general" role="tab" aria-selected="true" 

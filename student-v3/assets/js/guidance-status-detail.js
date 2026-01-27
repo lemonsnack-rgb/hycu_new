@@ -39,6 +39,31 @@ function openStudentGuidanceStatusDetail(requestId) {
     };
     document.addEventListener('keydown', handleEscape);
 
+    // 메모 버튼 표시 로직
+    setTimeout(() => {
+        const memo = request.memo || '';
+        const memoBtn = document.getElementById('student-memo-btn');
+        console.log('🔍 [메모 버튼 체크]', {
+            requestId: request.id,
+            hasMemo: !!memo,
+            memoLength: memo ? memo.length : 0,
+            memoContent: memo,
+            buttonFound: !!memoBtn
+        });
+        if (memoBtn) {
+            if (memo && memo.trim() !== '') {
+                memoBtn.style.display = 'inline-block';
+                memoBtn.setAttribute('data-memo', memo);
+                console.log('✅ 메모 버튼 표시됨');
+            } else {
+                memoBtn.style.display = 'none';
+                console.log('⚠️ 메모 없음 - 버튼 숨김');
+            }
+        } else {
+            console.error('❌ student-memo-btn 요소를 찾을 수 없습니다!');
+        }
+    }, 100);
+
     // PDF 로드
     setTimeout(() => {
         // 교수용 viewer/tools가 사용하는 전역 변수 설정
