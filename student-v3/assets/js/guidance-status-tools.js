@@ -369,6 +369,7 @@ function setupTextSelection(elements) {
             // 그룹으로 묶기
             const group = new fabric.Group(rects, {
                 customType: 'comment',
+                userType: 'student',  // 학생 주석
                 authorId: CURRENT_USER.id,
                 authorName: CURRENT_USER.name,
                 selectable: false,
@@ -577,6 +578,7 @@ eraserRect.set({
             const newRect = new fabric.Rect({
                 ...tempRect.toObject(),
                 customType: 'comment',
+                userType: 'student',  // 학생 주석
                 authorId: CURRENT_USER.id,
                 authorName: CURRENT_USER.name,
                 selectable: false,
@@ -685,11 +687,16 @@ function redrawMarkersForPage(num) {
                     marker.textContent = commentCounter;
                     marker.style.left = `${left}px`;
                     marker.style.top = `${top}px`;
-                    
+
                     console.log(`    ✅ Marker ${commentCounter} 생성:`, { left, top });
-                    
-                    // 작성자 색상 적용
-                    if (comment.authorId) {
+
+                    // userType에 따른 색상 적용 (학생: 파란색, 교수: 빨간색)
+                    if (comment.userType === 'student') {
+                        marker.style.backgroundColor = '#3B82F6';  // 파란색
+                    } else if (comment.userType === 'professor') {
+                        marker.style.backgroundColor = '#DC2626';  // 빨간색
+                    } else if (comment.authorId) {
+                        // userType이 없는 경우 기존 로직 사용
                         const user = FeedbackDataService.getUserById(comment.authorId);
                         if (user && user.colors) {
                             marker.style.backgroundColor = user.colors.comment.replace('0.1', '0.9');
@@ -926,7 +933,7 @@ function renderCommentCard(comment, pageNum) {
                     <span class="text-xs font-bold text-gray-700">${pageNum}페이지 💬 ${commentNumber}</span>
                     ${author ? `
                         <span class="text-xs px-2 py-0.5 rounded-full ${author.role === 'main' ? 'bg-red-100 text-red-700' : 'bg-[#FCE4EC] text-[#6A0028]'}">
-                            ${author.name} (${roleText})
+                            ${author.name} (${roleText})${comment.userType === 'student' ? ' (학생)' : ''}
                         </span>
                     ` : ''}
                 </div>

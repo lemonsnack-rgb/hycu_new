@@ -58,6 +58,7 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         feedbackDate: '2025-01-06 10:20',
         commentCount: 3,
         isCompleted: false,
+        studentReflectionCompleted: false,  // 학생 피드백 반영 완료 여부
         lastModified: '2025-01-06 10:20',
         lastModifiedBy: 'P001',
         date: '2025-01-05 14:30',
@@ -92,6 +93,7 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         feedbackDate: null,
         commentCount: 0,
         isCompleted: false,
+        studentReflectionCompleted: false,  // 학생 피드백 반영 완료 여부
         lastModified: '2025-01-07 16:00',
         lastModifiedBy: null,
         date: '2025-01-07 16:00',
@@ -510,6 +512,19 @@ const StudentGuidanceDataService = {
     getProfessorById(profId) {
         return GUIDANCE_STATUS_PROFESSORS[profId] ?
             {...GUIDANCE_STATUS_PROFESSORS[profId]} : null;
+    },
+
+    // 학생 피드백 반영 완료 표시
+    markStudentReflectionCompleted(requestId) {
+        const request = STUDENT_GUIDANCE_SUBMISSIONS.find(r => r.id === requestId);
+        if (!request) return false;
+
+        request.studentReflectionCompleted = true;
+        request.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        request.lastModifiedBy = CURRENT_STUDENT.id;
+
+        console.log('학생 피드백 반영 완료:', requestId);
+        return true;
     }
 };
 

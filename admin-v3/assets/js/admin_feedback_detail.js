@@ -525,6 +525,14 @@ function initPDFViewerReadOnly(feedbackId, fileUrl, feedbackData) {
                 marker.style.top = `${annot.top}px`;
                 marker.textContent = commentIndex;
                 marker.title = '첨삭 보기';
+
+                // userType에 따른 마커 색상 지정
+                if (annot.userType === 'student') {
+                    marker.style.backgroundColor = '#3B82F6';  // 파란색
+                } else if (annot.userType === 'professor') {
+                    marker.style.backgroundColor = '#DC2626';  // 빨간색
+                }
+
                 marker.onclick = () => {
                     // 첨삭 탭으로 전환
                     switchFeedbackTabReadOnly('inline');
@@ -565,14 +573,18 @@ function initPDFViewerReadOnly(feedbackId, fileUrl, feedbackData) {
                 const mainComment = annot.comments[0];
                 const replies = annot.comments.slice(1);
 
+                // userType에 따른 테두리 색상 및 라벨
+                const userTypeLabel = annot.userType === 'student' ? ' (학생)' : '';
+                const borderColor = annot.userType === 'student' ? '#3B82F6' : '#DC2626';
+
                 card.innerHTML = `
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-xs font-bold text-gray-700">첨삭 #${commentIndex}</span>
                         <span class="text-xs text-gray-500">페이지 ${num}</span>
                     </div>
-                    <div class="mb-2">
+                    <div class="mb-2 border-l-4 pl-2" style="border-color: ${borderColor};">
                         <div class="text-sm text-gray-800 whitespace-pre-wrap">${escapeHtmlReadOnly(mainComment.text)}</div>
-                        <div class="text-xs text-gray-500 mt-1">${mainComment.authorName} · ${mainComment.timestamp || ''}</div>
+                        <div class="text-xs text-gray-500 mt-1">${mainComment.authorName}${userTypeLabel} · ${mainComment.timestamp || ''}</div>
                     </div>
                     ${replies.length > 0 ? `
                         <div class="ml-4 pl-4 border-l-2 border-gray-300 mt-2 space-y-2">

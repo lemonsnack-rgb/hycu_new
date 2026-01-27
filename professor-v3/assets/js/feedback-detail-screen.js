@@ -51,12 +51,22 @@ function openFeedbackDetailScreen(feedbackId) {
 
     // PDF 로드
     setTimeout(() => {
-        window._currentFeedbackCtx = {id: feedbackId, fileUrl: request.fileUrl, data: feedbackData};
+        window._currentFeedbackCtx = {
+            id: feedbackId,
+            fileUrl: request.fileUrl,
+            data: feedbackData,
+            studentReflectionCompleted: request.studentReflectionCompleted || false
+        };
 
         // 제출 이력 사이드바 생성
         ensureSubmissionSidebar();
 
         initPDFViewer(feedbackId, request.fileUrl, feedbackData);
+
+        // 학생이 피드백 반영 완료를 하지 않았으면 도구 비활성화
+        if (!request.studentReflectionCompleted) {
+            disableAnnotationTools();
+        }
 
         // placeholder fix
         const ph = document.querySelector('#inline-feedback textarea, .inline-comment-input');
@@ -77,6 +87,17 @@ function createFeedbackDetailScreen(request, feedbackData) {
                            feedbackData.lastModifiedBy !== CURRENT_USER.id
         ? renderConflictWarning(feedbackData)
         : '';
+
+    // 학생 피드백 반영 완료 여부 확인
+    const studentReflectionCompleted = request.studentReflectionCompleted || false;
+    const reflectionWarning = !studentReflectionCompleted ? `
+        <div class="mx-6 mt-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg flex items-start gap-2">
+            <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
+            <div class="flex-1 text-sm text-yellow-800">
+                <strong>안내:</strong> 학생이 아직 피드백 반영을 완료하지 않았습니다. 학생이 "피드백 반영 완료" 버튼을 누른 후에 새로운 피드백을 등록할 수 있습니다.
+            </div>
+        </div>
+    ` : '';
 
     screen.innerHTML = `
         <div class="feedback-detail-content">
@@ -119,6 +140,7 @@ function createFeedbackDetailScreen(request, feedbackData) {
             </div>
 
             ${conflictWarning}
+            ${reflectionWarning}
 
             <!-- 3단 레이아웃 -->
             <div class="feedback-layout">
@@ -626,6 +648,28 @@ function toggleStudentMemo() {
     }
 }
 
+// ==================== 주석 도구 비활성화 ====================
+function disableAnnotationTools() {
+    console.log('[교수] 학생이 피드백 반영을 완료하지 않아 주석 도구를 비활성화합니다.');
+
+    // 도구 버튼들 비활성화
+    const toolButtons = document.querySelectorAll('#comment-tool, #drawing-tool, #highlight-tool');
+    toolButtons.forEach(btn => {
+        btn.disabled = true;
+        btn.style.opacity = '0.5';
+        btn.style.cursor = 'not-allowed';
+        btn.title = '학생이 피드백 반영을 완료한 후 사용 가능합니다';
+    });
+
+    // 클릭 이벤트 차단
+    toolButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            alert('학생이 "피드백 반영 완료"를 완료한 후에 새로운 피드백을 등록할 수 있습니다.');
+        }, true);
+    });
+}
+
 // Export
 window.openFeedbackDetailScreen = openFeedbackDetailScreen;
 window.closeFeedbackDetailScreen = closeFeedbackDetailScreen;
@@ -634,3 +678,4 @@ window.ensureSubmissionSidebar = ensureSubmissionSidebar;
 window.switchToSubmissionVersion = switchToSubmissionVersion;
 window.updateStudentInfoSection = updateStudentInfoSection;
 window.toggleStudentMemo = toggleStudentMemo;
+window.disableAnnotationTools = disableAnnotationTools;

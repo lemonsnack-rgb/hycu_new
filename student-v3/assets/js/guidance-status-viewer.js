@@ -132,11 +132,11 @@ function createFeedbackModal(request, feedbackData) {
                     </div>
                 </div>
                 <div class="flex items-center gap-2">
-                    <!-- 피드백 완료 버튼 추가 -->
-                    <button onclick="completeFeedback()" 
+                    <!-- 피드백 반영 완료 버튼 (학생용) -->
+                    <button onclick="completeStudentReflection()"
                             class="text-sm bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-2 font-semibold transition-colors">
                         <i class="fas fa-check-double"></i>
-                        <span>피드백 완료</span>
+                        <span>피드백 반영 완료</span>
                     </button>
                     <button onclick="closeFeedbackModal()" class="text-gray-500 hover:text-gray-700 transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +192,7 @@ function createFeedbackModal(request, feedbackData) {
                         
                         <div class="w-px h-6 bg-gray-300"></div>
                         
-                        <!-- 도구 -->
+                        <!-- 도구 (학생은 선택 및 첨삭 영역만 가능) -->
                         <div class="flex items-center gap-1">
                             <button id="select-tool" class="pdf-toolbar-btn active" title="선택 및 텍스트 드래그">
                                 <svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor">
@@ -202,22 +202,6 @@ function createFeedbackModal(request, feedbackData) {
                             <button id="comment-tool" class="pdf-toolbar-btn" title="첨삭 영역 추가">
                                 <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
                                     <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM9 9a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                            <button id="drawing-tool" class="pdf-toolbar-btn" title="판서">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.5L15.232 5.232z" />
-                                </svg>
-                            </button>
-                            <button id="highlight-tool" class="pdf-toolbar-btn" title="하이라이트">
-                                <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                                    <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                            <button id="eraser-tool" class="pdf-toolbar-btn" title="지우개">
-                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2M3 12l6.414 6.414a2 2 0 002.828 0L21 9.656a2 2 0 000-2.828L15.172 1a2 2 0 00-2.828 0L3 12z" />
                                 </svg>
                             </button>
                         </div>
@@ -915,5 +899,36 @@ function toggleStudentMemo() {
     }
 }
 
+// ==================== 피드백 반영 완료 처리 (학생용) ====================
+function completeStudentReflection() {
+    if (!window._currentPdfViewContext || !window._currentPdfViewContext.feedbackId) {
+        alert('제출 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    const feedbackId = window._currentPdfViewContext.feedbackId;
+
+    // 확인 대화상자
+    if (!confirm('피드백 반영을 완료하시겠습니까?\n완료 후 교수님이 다음 피드백을 등록할 수 있게 됩니다.')) {
+        return;
+    }
+
+    // 데이터 서비스를 통해 상태 업데이트
+    const success = StudentGuidanceDataService.markStudentReflectionCompleted(feedbackId);
+
+    if (success) {
+        alert('피드백 반영이 완료되었습니다.');
+        closeFeedbackModal();
+
+        // 목록 새로고침
+        if (typeof renderStudentGuidanceStatusList === 'function') {
+            renderStudentGuidanceStatusList();
+        }
+    } else {
+        alert('피드백 반영 완료 처리 중 오류가 발생했습니다.');
+    }
+}
+
 // Export
 window.toggleStudentMemo = toggleStudentMemo;
+window.completeStudentReflection = completeStudentReflection;
