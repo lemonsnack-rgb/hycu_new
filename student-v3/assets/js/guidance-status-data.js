@@ -246,6 +246,7 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
                 {
                     type: 'group',
                     customType: 'comment',
+                    userType: 'professor',  // 교수 주석
                     id: 'anno-gs001-c1',
                     authorId: 'P001',
                     authorName: '박교수',
@@ -284,6 +285,7 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
                 {
                     type: 'path',
                     customType: 'drawing',
+                    userType: 'professor',  // 교수 판서
                     id: 'anno-gs001-d1',
                     authorId: 'P001',
                     authorName: '박교수',
@@ -303,12 +305,42 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
                         ['L', 150, 430],
                         ['L', 150, 350]
                     ]
+                },
+                {
+                    type: 'rect',
+                    customType: 'comment',
+                    userType: 'student',  // 학생 주석
+                    id: 'anno-gs001-c1-student',
+                    authorId: 'S2024001',
+                    authorName: '김철수',
+                    left: 320,
+                    top: 180,
+                    width: 150,
+                    height: 35,
+                    fill: 'rgba(59, 130, 246, 0.1)',
+                    stroke: 'rgba(59, 130, 246, 0.8)',
+                    strokeWidth: 2,
+                    selectable: false,
+                    evented: false,
+                    comments: [
+                        {
+                            id: 'cm-gs001-1-student-1',
+                            authorId: 'S2024001',
+                            authorName: '김철수',
+                            authorRole: 'student',
+                            text: '이 부분은 교수님 피드백 반영하여 "AI 기반 맞춤형 학습 시스템이 대학생의 학업 성취도 및 학습 만족도에 미치는 영향"으로 수정했습니다.',
+                            audio: null,
+                            timestamp: '2025-01-07 14:20',
+                            attachments: []
+                        }
+                    ]
                 }
             ],
             '2': [
                 {
                     type: 'group',
                     customType: 'comment',
+                    userType: 'professor',  // 교수 주석
                     id: 'anno-gs001-c2',
                     authorId: 'P001',
                     authorName: '박교수',
@@ -330,6 +362,35 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
                             text: '선행연구 부분을 좀 더 보강해주세요.\n최근 3년 이내의 연구를 5편 이상 인용해주시기 바랍니다.',
                             audio: null,
                             timestamp: '2025-01-06 10:30',
+                            attachments: []
+                        }
+                    ]
+                },
+                {
+                    type: 'rect',
+                    customType: 'comment',
+                    userType: 'student',  // 학생 주석
+                    id: 'anno-gs001-c2-student',
+                    authorId: 'S2024001',
+                    authorName: '김철수',
+                    left: 100,
+                    top: 450,
+                    width: 200,
+                    height: 40,
+                    fill: 'rgba(59, 130, 246, 0.1)',
+                    stroke: 'rgba(59, 130, 246, 0.8)',
+                    strokeWidth: 2,
+                    selectable: false,
+                    evented: false,
+                    comments: [
+                        {
+                            id: 'cm-gs001-2-student-1',
+                            authorId: 'S2024001',
+                            authorName: '김철수',
+                            authorRole: 'student',
+                            text: '교수님 말씀대로 2022-2024년 최신 논문 7편 추가했습니다. 표로 정리하여 비교분석도 포함했습니다.',
+                            audio: null,
+                            timestamp: '2025-01-07 15:45',
                             attachments: []
                         }
                     ]
