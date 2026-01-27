@@ -257,9 +257,17 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                 <!-- 오른쪽: 코멘트 패널 -->
                 <div class="comment-panel">
                     <div class="p-4 border-b bg-gray-50">
-                        <h4 class="text-sm font-bold text-gray-700 mb-3">피드백</h4>
+                        <div class="flex items-center justify-between mb-3">
+                            <h4 class="text-sm font-bold text-gray-700">피드백</h4>
+                            <button id="student-memo-btn"
+                                    onclick="toggleStudentMemo()"
+                                    style="display: none;"
+                                    class="text-xs px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 transition-colors">
+                                메모
+                            </button>
+                        </div>
                         <!-- 탭 UI -->
-                        <div class="tabs" role="tablist">
+                        <div class="tabs" role="tablist" id="feedback-tabs-container">
                             <button id="tab-general" role="tab" aria-selected="true"
                                     class="tab active" onclick="switchStudentFeedbackTab('general')">
                                 전체 평가
