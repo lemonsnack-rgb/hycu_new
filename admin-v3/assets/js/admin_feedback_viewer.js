@@ -261,7 +261,6 @@ function createFeedbackModal(request, feedbackData) {
                             <h4 class="text-sm font-bold text-gray-700">피드백</h4>
                             <button id="student-memo-btn"
                                     onclick="toggleStudentMemo()"
-                                    style="display: none;"
                                     class="text-xs px-2 py-1 border border-gray-300 text-gray-600 rounded hover:bg-gray-50 transition-colors">
                                 메모
                             </button>
