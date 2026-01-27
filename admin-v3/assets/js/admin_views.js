@@ -5736,15 +5736,13 @@ views.userManagement = () => {
 
     // 필터링을 위한 고유 값 추출
     const userTypes = ['전체', ...new Set(users.map(u => u.userType))];
-    const departments = ['전체', ...new Set(users.map(u => u.department))];
-    const academicStatuses = ['전체', '재학', '휴학', '졸업', '제적', '수료', '재직'];
 
     return `
         <div class="bg-white rounded-lg shadow-md">
             <!-- 조회 영역 -->
             <div class="bg-white rounded-lg shadow-md p-6 mb-4">
                 <div class="grid grid-cols-5 gap-3">
-                    <!-- 1행: 4개 필드 -->
+                    <!-- 1행: 3개 필드 -->
                     <!-- 1. 사용자 구분 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">사용자 구분</label>
@@ -5752,32 +5750,21 @@ views.userManagement = () => {
                             ${userTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
                         </select>
                     </div>
-                    <!-- 2. 학과/부서 -->
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/부서</label>
-                        <select id="filter-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                            ${departments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
-                        </select>
-                    </div>
-                    <!-- 3. 학적상태 -->
-                    <div class="flex items-center gap-2">
-                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
-                        <select id="filter-academicStatus" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
-                            ${academicStatuses.map(status => `<option value="${status}">${status}</option>`).join('')}
-                        </select>
-                    </div>
-                    <!-- 4. 학번/사번 -->
+                    <!-- 2. 학번/사번 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번/사번</label>
                         <input type="text" id="filter-idNumber" placeholder="학번/사번"
                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                     </div>
-                    <!-- 5. 이름 -->
+                    <!-- 3. 이름 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">이름</label>
                         <input type="text" id="filter-userName" placeholder="이름"
                                class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                     </div>
+                    <!-- 4-5. 빈 칸 -->
+                    <div></div>
+                    <div></div>
 
                     <!-- 2행: 조회 버튼만 -->
                     <div></div>

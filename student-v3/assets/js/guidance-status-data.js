@@ -60,7 +60,8 @@ const STUDENT_GUIDANCE_SUBMISSIONS = [
         isCompleted: false,
         lastModified: '2025-01-06 10:20',
         lastModifiedBy: 'P001',
-        date: '2025-01-05 14:30'
+        date: '2025-01-05 14:30',
+        memo: '3장 연구방법론 부분에 대한 피드백을 특히 부탁드립니다.\n통계 분석 방법이 적절한지 확인 부탁드립니다.\n참고문헌은 다음 버전에 추가 예정입니다.'
     },
     // doc-001의 v2, v3 (테스트용)
     {
@@ -512,5 +513,26 @@ const StudentGuidanceDataService = {
 window.StudentGuidanceDataService = StudentGuidanceDataService;
 window.CURRENT_STUDENT = CURRENT_STUDENT;
 window.GUIDANCE_STATUS_PROFESSORS = GUIDANCE_STATUS_PROFESSORS;
+
+// Alias for compatibility with viewer
+window.FeedbackDataService = {
+    getFeedbackRequestById(id) {
+        return StudentGuidanceDataService.getStudentGuidanceRequestById(id);
+    },
+    getFeedbackData(id) {
+        return StudentGuidanceDataService.getStudentGuidanceFeedbackData(id);
+    },
+    getUserById(userId) {
+        return StudentGuidanceDataService.getProfessorById(userId) || CURRENT_STUDENT;
+    },
+    addAnnotation(feedbackId, pageNum, annotationData) {
+        // 학생은 주석 추가 불가 (뷰어용)
+        return false;
+    },
+    addComment(feedbackId, commentId, comment, isMain) {
+        // 학생은 댓글만 가능
+        return StudentGuidanceDataService.addStudentComment(feedbackId, commentId, comment);
+    }
+};
 
 console.log('✅ 학생용 논문 지도 현황 데이터 서비스 로드 완료');

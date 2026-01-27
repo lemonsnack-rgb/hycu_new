@@ -6783,15 +6783,11 @@ function renderUserTable() {
  */
 function applyUserFilters() {
     const userType = document.getElementById('filter-userType')?.value || '전체';
-    const department = document.getElementById('filter-department')?.value || '전체';
-    const academicStatus = document.getElementById('filter-academicStatus')?.value || '전체';
     const idNumber = document.getElementById('filter-idNumber')?.value.trim() || '';
     const userName = document.getElementById('filter-userName')?.value.trim() || '';
 
     filteredUsers = appData.users.filter(user => {
         if (userType !== '전체' && user.userType !== userType) return false;
-        if (department !== '전체' && user.department !== department) return false;
-        if (academicStatus !== '전체' && user.academicStatus !== academicStatus) return false;
         if (idNumber && !user.idNumber.includes(idNumber)) return false;
         if (userName && !user.name.includes(userName)) return false;
         return true;
@@ -6806,8 +6802,6 @@ function applyUserFilters() {
  */
 function resetUserFilters() {
     document.getElementById('filter-userType').value = '전체';
-    document.getElementById('filter-department').value = '전체';
-    document.getElementById('filter-academicStatus').value = '전체';
     document.getElementById('filter-idNumber').value = '';
     document.getElementById('filter-userName').value = '';
 

@@ -39,10 +39,24 @@ function openFeedbackViewer(feedbackId) {
         createQuickMarkPopover();
     }
     
+    // 메모 버튼 표시 로직
+    setTimeout(() => {
+        const memo = request.memo || '';
+        const memoBtn = document.getElementById('student-memo-btn');
+        if (memoBtn) {
+            if (memo && memo.trim() !== '') {
+                memoBtn.style.display = 'inline-block';
+                memoBtn.setAttribute('data-memo', memo);
+            } else {
+                memoBtn.style.display = 'none';
+            }
+        }
+    }, 50);
+
     // PDF 로드
     setTimeout(() => {
         window._currentFeedbackCtx = {id: feedbackId, fileUrl: request.fileUrl, data: feedbackData};
-        
+
 // injected: submission history sidebar (left)
 (function ensureSubmissionSidebar(){
   if (document.getElementById('submission-history')) return;
@@ -245,9 +259,18 @@ function createFeedbackModal(request, feedbackData) {
                 <!-- 오른쪽: 코멘트 패널 (ID 40: 탭 구분, ID 43: 용어 변경) -->
                 <div class="comment-panel">
                     <div class="p-4 border-b bg-gray-50">
-                        <h4 class="text-sm font-bold text-gray-700 mb-3">피드백</h4>
+                        <h4 class="text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                            피드백
+                            <button id="student-memo-btn"
+                                    onclick="toggleStudentMemo()"
+                                    title="학생 메모 보기"
+                                    style="display: none;"
+                                    class="text-yellow-500 hover:text-yellow-600 transition-colors">
+                                <i class="fas fa-sticky-note"></i>
+                            </button>
+                        </h4>
                         <!-- 개선된 탭 UI -->
-                        <div class="tabs" role="tablist">
+                        <div class="tabs" role="tablist" id="feedback-tabs-container">
                             <button id="tab-general" role="tab" aria-selected="true" 
                                     class="tab active" onclick="switchFeedbackTab('general')">
                                 전체 평가
@@ -849,3 +872,51 @@ function switchPdfVersion(ver){
     }
   });
 })();
+
+// ==================== 학생 메모 토글 ====================
+function toggleStudentMemo() {
+    const existingPanel = document.getElementById('student-memo-panel');
+
+    // 토글: 이미 열려있으면 닫기
+    if (existingPanel) {
+        existingPanel.remove();
+        return;
+    }
+
+    // 메모 내용 가져오기
+    const memoBtn = document.getElementById('student-memo-btn');
+    const memo = memoBtn ? memoBtn.getAttribute('data-memo') : '';
+
+    if (!memo || memo.trim() === '') {
+        alert('메모가 없습니다.');
+        return;
+    }
+
+    // 메모 패널 생성
+    const panel = document.createElement('div');
+    panel.id = 'student-memo-panel';
+    panel.className = 'bg-yellow-50 border border-yellow-200 rounded p-3 mx-4 mt-3 mb-3';
+    panel.innerHTML = `
+        <div class="flex items-start gap-2">
+            <i class="fas fa-sticky-note text-yellow-500 mt-0.5"></i>
+            <div class="flex-1">
+                <div class="font-semibold text-gray-800 mb-1 text-xs">학생 메모</div>
+                <div class="text-sm text-gray-700 whitespace-pre-wrap max-h-48 overflow-y-auto">${escapeHtml(memo)}</div>
+            </div>
+            <button onclick="toggleStudentMemo()"
+                    class="text-gray-400 hover:text-gray-600 transition-colors"
+                    title="닫기">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    `;
+
+    // 탭 컨테이너 바로 다음에 삽입
+    const tabsContainer = document.getElementById('feedback-tabs-container');
+    if (tabsContainer && tabsContainer.parentElement) {
+        tabsContainer.parentElement.insertAdjacentElement('afterend', panel);
+    }
+}
+
+// Export
+window.toggleStudentMemo = toggleStudentMemo;

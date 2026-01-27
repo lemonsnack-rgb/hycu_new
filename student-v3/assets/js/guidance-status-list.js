@@ -184,6 +184,19 @@ function showStudentGuidanceRequestModal() {
                             </p>
                         </div>
 
+                        <!-- 메모 -->
+                        <div style="margin-bottom: 1.5rem;">
+                            <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
+                                메모
+                            </label>
+                            <textarea id="student-guidance-memo" rows="4"
+                                      style="width: 100%; padding: 0.5rem 0.75rem; border: 1px solid #D1D5DB; border-radius: 0.375rem; font-size: 0.875rem; resize: vertical;"
+                                      placeholder="논문 지도와 관련된 메모나 특이사항을 입력하세요"></textarea>
+                            <p style="font-size: 0.75rem; color: #6B7280; margin-top: 0.25rem;">
+                                선택 사항입니다
+                            </p>
+                        </div>
+
                         <!-- 피드백 희망일자 -->
                         <div style="margin-bottom: 1.5rem;">
                             <label style="display: block; font-weight: 600; color: #374151; margin-bottom: 0.5rem; font-size: 0.875rem;">
@@ -248,6 +261,7 @@ function submitStudentGuidanceRequest(event) {
     const stage = document.getElementById('student-guidance-stage').value;
     const file = document.getElementById('student-guidance-file').files[0];
     const desiredDate = document.getElementById('student-guidance-desired-date').value;
+    const memo = document.getElementById('student-guidance-memo').value;
 
     if (!file) {
         alert('파일을 선택해주세요');
@@ -273,7 +287,7 @@ function submitStudentGuidanceRequest(event) {
     }
 
     // 실제로는 서버로 전송
-    console.log('논문 지도 요청:', { title, stage, file: file.name, desiredDate });
+    console.log('논문 지도 요청:', { title, stage, file: file.name, desiredDate, memo });
 
     alert('논문 지도 요청이 완료되었습니다');
     closeStudentGuidanceRequestModal();
