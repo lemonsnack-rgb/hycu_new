@@ -137,7 +137,8 @@ const FEEDBACK_REQUESTS = [
         commentCount: 0,
         isCompleted: false,
         lastModified: '2025-11-20 09:00',
-        lastModifiedBy: null
+        lastModifiedBy: null,
+        memo: '연구 방법론 부분에 대한 피드백을 특히 부탁드립니다.\n이론적 배경이 충분한지 확인 부탁드립니다.'
     },
     {
         id: 'fb-002',
@@ -173,7 +174,8 @@ const FEEDBACK_REQUESTS = [
         commentCount: 5,
         isCompleted: true,
         lastModified: '2025-11-19 15:30',
-        lastModifiedBy: 'P001'
+        lastModifiedBy: 'P001',
+        memo: '이전 피드백 반영하여 연구 범위를 수정했습니다.\n참고문헌 추가 필요 여부 확인 부탁드립니다.'
     },
     {
         id: 'fb-003',
@@ -185,7 +187,7 @@ const FEEDBACK_REQUESTS = [
         major: '전자공학',
         graduate: '일반대학원',
         semester: 5,
-        thesisTitle: '5G 네트워크 최적화 알고리즘 연구',
+        thesisTitle: '5G 네트워크 최적化 알고리즘 연구',
         file: '2장_이론적_배경_v1.pdf',
         fileUrl: 'https://mozilla.github.io/pdf.js/web/compressed.tracemonkey-pldi-09.pdf',
         stage: '2장',
@@ -200,7 +202,8 @@ const FEEDBACK_REQUESTS = [
         commentCount: 0,
         isCompleted: false,
         lastModified: '2025-11-18 10:00',
-        lastModifiedBy: null
+        lastModifiedBy: null,
+        memo: '표절률이 높게 나왔는데, 인용 표시를 제대로 했는지 확인 부탁드립니다.'
     },
     // 김철수 학생의 v2, v3 (테스트용)
     {
@@ -228,7 +231,8 @@ const FEEDBACK_REQUESTS = [
         commentCount: 0,
         isCompleted: false,
         lastModified: '2025-11-22 14:00',
-        lastModifiedBy: null
+        lastModifiedBy: null,
+        memo: 'v1 피드백 반영했습니다. 연구 범위 축소했으니 확인 부탁드립니다.'
     },
     {
         id: 'fb-001-v3',
@@ -255,7 +259,8 @@ const FEEDBACK_REQUESTS = [
         commentCount: 0,
         isCompleted: false,
         lastModified: '2025-11-24 10:00',
-        lastModifiedBy: null
+        lastModifiedBy: null,
+        memo: 'v2 피드백 모두 반영 완료했습니다. 최종 확인 부탁드립니다.'
     },
     {
         id: 'fb-004',

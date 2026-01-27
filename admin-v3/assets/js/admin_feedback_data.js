@@ -142,7 +142,8 @@ const FEEDBACK_REQUESTS = [
         lastModified: '2025-03-13 14:20',
         lastModifiedBy: 'P001',
         advisor: '김교수',
-        advisorId: 'PROF001'
+        advisorId: 'PROF001',
+        memo: '블록체인 구조 부분에 대한 상세 설명이 필요합니다.\n참고문헌 최신화 부탁드립니다.'
     },
     // STU003 - 박학생 (경영학과 석사)
     {
@@ -183,7 +184,8 @@ const FEEDBACK_REQUESTS = [
         lastModified: '2025-04-19 15:30',
         lastModifiedBy: 'P001',
         advisor: '박교수',
-        advisorId: 'PROF003'
+        advisorId: 'PROF003',
+        memo: '이전 피드백 반영하여 서론을 다시 작성했습니다.\n연구 문제가 명확해졌는지 확인 부탁드립니다.'
     },
     // STU005 - 정학생 (교육학과 석사)
     {
@@ -215,7 +217,8 @@ const FEEDBACK_REQUESTS = [
         lastModified: '2025-05-10 09:30',
         lastModifiedBy: null,
         advisor: '정교수',
-        advisorId: 'PROF005'
+        advisorId: 'PROF005',
+        memo: '온라인 교육 효과성 측정 방법에 대한 피드백이 필요합니다.\n설문 문항 검토 부탁드립니다.'
     },
     // STU007 - 조학생 (심리학과 석사)
     {
@@ -247,7 +250,8 @@ const FEEDBACK_REQUESTS = [
         lastModified: '2025-05-15 11:20',
         lastModifiedBy: null,
         advisor: '조교수',
-        advisorId: 'PROF007'
+        advisorId: 'PROF007',
+        memo: 'SNS 유형별 영향 분석이 필요할 것 같습니다.\n연구 범위 조정 필요 여부 확인 부탁드립니다.'
     },
     // STU009 - 장학생 (사회복지학과 석사)
     {
@@ -279,7 +283,8 @@ const FEEDBACK_REQUESTS = [
         lastModified: '2025-05-22 16:10',
         lastModifiedBy: 'P001',
         advisor: '장교수',
-        advisorId: 'PROF009'
+        advisorId: 'PROF009',
+        memo: '연구방법론 부분 통계 분석 방법 검토 부탁드립니다.\n표본 크기가 적절한지 확인 필요합니다.'
     },
     // STU011 - 한학생 (컴퓨터공학과 박사)
     {
