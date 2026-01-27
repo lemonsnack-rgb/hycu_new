@@ -1468,6 +1468,148 @@ const appData = {
         { id: 20, year: '2025', semester: '1', collegeType: '특수대학원', college: '부동산대학원', faculty: '부동산학부', major: '부동산학', degree: '석사', status: '재학', studentId: '2024004001', studentName: '진서연', professor: '강교수', stage: '연구계획서', registrationStatus: '미등록' },
         { id: 21, year: '2025', semester: '1', collegeType: '일반대학원', college: '일반대학원', faculty: '예체능학부', major: '체육학', degree: '석사', status: '재학', studentId: '2024001500', studentName: '고민석', professor: '이교수', stage: '중간보고서', registrationStatus: '등록완료' },
         { id: 22, year: '2024', semester: '2', collegeType: '일반대학원', college: '일반대학원', faculty: '인문사회학부', major: '교육학', degree: '석사', status: '재학', studentId: '2023002100', studentName: '표지훈', professor: '박교수', stage: '중간보고서', registrationStatus: '등록완료' }
+    ],
+    users: [
+        // 학생
+        {
+            id: '2024001',
+            idNumber: '2024001',
+            userType: '학생',
+            name: '김철수',
+            department: '교육공학',
+            departmentFull: '일반대학원 교육공학과',
+            grade: 1,
+            academicStatus: '재학',
+            email: 'kim.cs@student.hycu.ac.kr',
+            phone: '010-2345-6789',
+            loginUrl: '../student-v3/index.html'
+        },
+        {
+            id: '2024002',
+            idNumber: '2024002',
+            userType: '학생',
+            name: '이영희',
+            department: '경영학',
+            departmentFull: '일반대학원 경영학과',
+            grade: 1,
+            academicStatus: '재학',
+            email: 'lee.yh@student.hycu.ac.kr',
+            phone: '010-3456-7890',
+            loginUrl: '../student-v3/index.html'
+        },
+        {
+            id: '2023005',
+            idNumber: '2023005',
+            userType: '학생',
+            name: '박민수',
+            department: '교육공학',
+            departmentFull: '일반대학원 교육공학과',
+            grade: 2,
+            academicStatus: '재학',
+            email: 'park.ms@student.hycu.ac.kr',
+            phone: '010-4567-8901',
+            loginUrl: '../student-v3/index.html'
+        },
+        {
+            id: '2023010',
+            idNumber: '2023010',
+            userType: '학생',
+            name: '최지훈',
+            department: 'IT MBA',
+            departmentFull: '경영대학원 IT MBA',
+            grade: 2,
+            academicStatus: '휴학',
+            email: 'choi.jh@student.hycu.ac.kr',
+            phone: '010-5678-9012',
+            loginUrl: '../student-v3/index.html'
+        },
+        {
+            id: '2021100',
+            idNumber: '2021100',
+            userType: '학생',
+            name: '정수연',
+            department: '상담심리학',
+            departmentFull: '특수대학원 상담심리학과',
+            grade: 4,
+            academicStatus: '졸업',
+            email: 'jung.sy@student.hycu.ac.kr',
+            phone: '010-6789-0123',
+            loginUrl: '../student-v3/index.html'
+        },
+        // 교수
+        {
+            id: 'P2020001',
+            idNumber: 'P2020001',
+            userType: '교수',
+            name: '홍길동',
+            department: '교육공학',
+            departmentFull: '일반대학원 교육공학과',
+            academicStatus: '재직',
+            email: 'hong.gd@hycu.ac.kr',
+            phone: '02-1234-5678',
+            loginUrl: '../professor-v3/index.html'
+        },
+        {
+            id: 'P2019002',
+            idNumber: 'P2019002',
+            userType: '교수',
+            name: '박교수',
+            department: '경영학',
+            departmentFull: '일반대학원 경영학과',
+            academicStatus: '재직',
+            email: 'park.prof@hycu.ac.kr',
+            phone: '02-2345-6789',
+            loginUrl: '../professor-v3/index.html'
+        },
+        {
+            id: 'P2021003',
+            idNumber: 'P2021003',
+            userType: '교수',
+            name: '김교수',
+            department: 'IT MBA',
+            departmentFull: '경영대학원 IT MBA',
+            academicStatus: '재직',
+            email: 'kim.prof@hycu.ac.kr',
+            phone: '02-3456-7890',
+            loginUrl: '../professor-v3/index.html'
+        },
+        {
+            id: 'P2018004',
+            idNumber: 'P2018004',
+            userType: '교수',
+            name: '이교수',
+            department: '상담심리학',
+            departmentFull: '특수대학원 상담심리학과',
+            academicStatus: '재직',
+            email: 'lee.prof@hycu.ac.kr',
+            phone: '02-4567-8901',
+            loginUrl: '../professor-v3/index.html'
+        },
+        // 관리자
+        {
+            id: 'A2020001',
+            idNumber: 'A2020001',
+            userType: '관리자',
+            name: '시스템관리자',
+            department: '대학원행정팀',
+            departmentFull: '대학원행정팀',
+            academicStatus: '재직',
+            email: 'admin@hycu.ac.kr',
+            phone: '02-5678-9012',
+            loginUrl: './index.html'
+        },
+        {
+            id: 'A2021002',
+            idNumber: 'A2021002',
+            userType: '관리자',
+            name: '김관리',
+            department: '학사지원팀',
+            departmentFull: '학사지원팀',
+            academicStatus: '재직',
+            email: 'kim.admin@hycu.ac.kr',
+            phone: '02-6789-0123',
+            loginUrl: './index.html'
+        }
     ]
 };
 

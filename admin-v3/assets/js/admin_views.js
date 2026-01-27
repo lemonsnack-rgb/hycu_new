@@ -5730,9 +5730,108 @@ views.noticeManagement = () => `
     </div>
 `;
 
+// ========== 사용자 관리 ==========
+views.userManagement = () => {
+    const users = appData.users || [];
+
+    // 필터링을 위한 고유 값 추출
+    const userTypes = ['전체', ...new Set(users.map(u => u.userType))];
+    const departments = ['전체', ...new Set(users.map(u => u.department))];
+    const academicStatuses = ['전체', '재학', '휴학', '졸업', '제적', '수료', '재직'];
+
+    return `
+        <div class="bg-white rounded-lg shadow-md">
+            <!-- 조회 영역 -->
+            <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                <div class="grid grid-cols-5 gap-3">
+                    <!-- 1행: 4개 필드 -->
+                    <!-- 1. 사용자 구분 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">사용자 구분</label>
+                        <select id="filter-userType" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            ${userTypes.map(type => `<option value="${type}">${type}</option>`).join('')}
+                        </select>
+                    </div>
+                    <!-- 2. 학과/부서 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학과/부서</label>
+                        <select id="filter-department" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            ${departments.map(dept => `<option value="${dept}">${dept}</option>`).join('')}
+                        </select>
+                    </div>
+                    <!-- 3. 학적상태 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학적상태</label>
+                        <select id="filter-academicStatus" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                            ${academicStatuses.map(status => `<option value="${status}">${status}</option>`).join('')}
+                        </select>
+                    </div>
+                    <!-- 4. 학번/사번 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학번/사번</label>
+                        <input type="text" id="filter-idNumber" placeholder="학번/사번"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+                    <!-- 5. 이름 -->
+                    <div class="flex items-center gap-2">
+                        <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">이름</label>
+                        <input type="text" id="filter-userName" placeholder="이름"
+                               class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                    </div>
+
+                    <!-- 2행: 조회 버튼만 -->
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <div></div>
+                    <!-- 조회 버튼 (2행 5번째) -->
+                    <div class="flex items-center justify-end">
+                        <button onclick="applyUserFilters()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">
+                            <i class="fas fa-search mr-1"></i>조회
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 테이블 타이틀 -->
+            <div class="px-6 py-3 border-b bg-gray-50">
+                <h4 class="text-sm font-bold text-gray-800">사용자목록</h4>
+            </div>
+
+            <!-- 테이블 -->
+            <div class="overflow-x-auto">
+                <table class="w-full table-auto">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 40px;">
+                                <input type="checkbox"
+                                       id="selectAll-users"
+                                       onchange="toggleAllUsers(this.checked)"
+                                       class="rounded border-gray-300">
+                            </th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">사용자 구분</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">학과/부서</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">학번/사번</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">이름</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 80px;">학년</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">학적상태</th>
+                            <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="userTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- 데이터는 JavaScript로 동적 렌더링 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+};
+
 // 디버깅: 콘텐츠 관리 뷰가 제대로 등록되었는지 확인
 console.log('✅ admin_views.js 로드 완료');
 console.log('✅ views.ethicsContentMgmt:', typeof views.ethicsContentMgmt);
 console.log('✅ views.scheduleContentMgmt:', typeof views.scheduleContentMgmt);
 console.log('✅ views.procedureContentMgmt:', typeof views.procedureContentMgmt);
 console.log('✅ views.noticeManagement:', typeof views.noticeManagement);
+console.log('✅ views.userManagement:', typeof views.userManagement);

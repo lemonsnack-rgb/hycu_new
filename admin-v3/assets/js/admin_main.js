@@ -6717,3 +6717,144 @@ console.log('✅ 심사위원 배정 함수 로드 완료');
 function showScheduleDetail(scheduleId) {
     alert('일정 상세 화면 (ID: ' + scheduleId + ')\n\n상세 화면은 추후 구현 예정입니다.');
 }
+
+// ========== 사용자 관리 ==========
+
+// 전역 변수
+let filteredUsers = [];
+
+/**
+ * 사용자 관리 초기화
+ */
+function initUserManagement() {
+    filteredUsers = [...appData.users];
+    renderUserTable();
+}
+
+/**
+ * 사용자 테이블 렌더링
+ */
+function renderUserTable() {
+    const tbody = document.getElementById('userTableBody');
+    if (!tbody) return;
+
+    if (filteredUsers.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="9" class="px-4 py-8 text-center text-gray-500">
+                    조회 결과가 없습니다.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    tbody.innerHTML = filteredUsers.map((user, index) => {
+        const globalIndex = index + 1;
+        const gradeDisplay = user.userType === '학생' ? (user.grade || '-') : '-';
+
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox"
+                           class="user-checkbox rounded border-gray-300"
+                           value="${user.id}">
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${globalIndex}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.userType}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.department}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.idNumber}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.name}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${gradeDisplay}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.academicStatus}</td>
+                <td class="px-4 py-3 text-center">
+                    <button onclick="loginAsUser('${user.id}')"
+                            class="px-4 py-1.5 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition-colors text-sm">
+                        로그인
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+/**
+ * 조회 필터 적용
+ */
+function applyUserFilters() {
+    const userType = document.getElementById('filter-userType')?.value || '전체';
+    const department = document.getElementById('filter-department')?.value || '전체';
+    const academicStatus = document.getElementById('filter-academicStatus')?.value || '전체';
+    const idNumber = document.getElementById('filter-idNumber')?.value.trim() || '';
+    const userName = document.getElementById('filter-userName')?.value.trim() || '';
+
+    filteredUsers = appData.users.filter(user => {
+        if (userType !== '전체' && user.userType !== userType) return false;
+        if (department !== '전체' && user.department !== department) return false;
+        if (academicStatus !== '전체' && user.academicStatus !== academicStatus) return false;
+        if (idNumber && !user.idNumber.includes(idNumber)) return false;
+        if (userName && !user.name.includes(userName)) return false;
+        return true;
+    });
+
+    renderUserTable();
+    showAlert(`조회 결과: ${filteredUsers.length}건`);
+}
+
+/**
+ * 조회 필터 초기화
+ */
+function resetUserFilters() {
+    document.getElementById('filter-userType').value = '전체';
+    document.getElementById('filter-department').value = '전체';
+    document.getElementById('filter-academicStatus').value = '전체';
+    document.getElementById('filter-idNumber').value = '';
+    document.getElementById('filter-userName').value = '';
+
+    filteredUsers = [...appData.users];
+    renderUserTable();
+    showAlert('조회 조건이 초기화되었습니다.');
+}
+
+/**
+ * 전체 선택/해제
+ */
+function toggleAllUsers(checked) {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.checked = checked;
+    });
+}
+
+/**
+ * 사용자로 로그인
+ */
+function loginAsUser(userId) {
+    const user = appData.users.find(u => u.id === userId);
+    if (!user) {
+        showAlert('사용자를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    const confirmMsg = `${user.name}(${user.idNumber})님으로 로그인하시겠습니까?\n로그인 후 해당 사용자의 화면으로 이동됩니다.`;
+
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    showAlert(`${user.name}님으로 로그인합니다...`);
+
+    // 사용자 유형별 화면으로 리다이렉트
+    setTimeout(() => {
+        window.location.href = user.loginUrl;
+    }, 500);
+}
+
+// Export functions
+window.initUserManagement = initUserManagement;
+window.renderUserTable = renderUserTable;
+window.applyUserFilters = applyUserFilters;
+window.resetUserFilters = resetUserFilters;
+window.toggleAllUsers = toggleAllUsers;
+window.loginAsUser = loginAsUser;
+
+console.log('✅ 사용자 관리 함수 로드 완료');

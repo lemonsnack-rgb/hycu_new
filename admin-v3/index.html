@@ -370,6 +370,10 @@
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>권한관리</span>
                         </a>
+                        <a href="#" onclick="showScreen('userManagement'); return false;" data-screen="userManagement"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>사용자관리</span>
+                        </a>
                         <a href="#" onclick="showScreen('statistics'); return false;" data-screen="statistics"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>통계</span>
@@ -816,6 +820,10 @@
                 <div id="permission-management-content"></div>
             </section>
 
+            <section id="userManagement-screen" class="content-screen">
+                <div id="user-management-content"></div>
+            </section>
+
             <section id="proxyLogin-screen" class="content-screen">
                 <div id="proxy-login-content"></div>
             </section>
@@ -979,6 +987,7 @@
                 'titleChangeRequests': 'title-change-requests-content',
                 'workScheduleManagement': 'work-schedule-management-content',
                 'permissionManagement': 'permission-management-content',
+                'userManagement': 'user-management-content',
                 'proxyLogin': 'proxy-login-content',
                 'notice': 'notice-content',
                 'board': 'board-content',
@@ -1048,6 +1057,13 @@
                 }
                 if (viewName === 'procedureContentMgmt' && typeof initProcedureContentManagement === 'function') {
                     setTimeout(() => initProcedureContentManagement(), 0);
+                }
+
+                // 사용자 관리 화면 후처리
+                if (viewName === 'userManagement' && typeof initUserManagement === 'function') {
+                    setTimeout(() => {
+                        initUserManagement();
+                    }, 0);
                 }
 
                 // 콘텐츠 목록 관리 화면 후처리
@@ -1137,6 +1153,7 @@
                 'journalReview': { menu: '논문 심사', submenu: '학술지논문심사' },
                 'workScheduleManagement': { menu: '시스템 설정', submenu: '업무일정등록' },
                 'permissionManagement': { menu: '시스템 설정', submenu: '권한관리' },
+                'userManagement': { menu: '시스템 설정', submenu: '사용자관리' },
                 'statistics': { menu: '시스템 설정', submenu: '통계' },
                 'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' },
                 'noticeManagement': { menu: '논문 안내', submenu: '공지사항' },
