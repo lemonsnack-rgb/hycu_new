@@ -131,7 +131,7 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
             <div class="px-6 py-3 border-b bg-white">
                 <div class="flex items-center justify-between">
                     <!-- 좌측: 논문 정보 -->
-                    <div class="text-xs text-gray-700 flex-1 mr-4">
+                    <div class="text-sm text-gray-700 flex-1 mr-4">
                         <span class="font-semibold">논문명:</span>
                         <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
@@ -295,7 +295,6 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                     <div class="flex-1 overflow-y-auto p-4" id="comment-panel-content">
                         <!-- 전체 평가 탭 -->
                         <div id="general-feedback-tab">
-                            <h5 class="text-xs font-bold text-gray-700 mb-2">💬 전체 평가</h5>
                             <div id="general-feedback-thread" class="space-y-2 mb-3">
                                 <!-- 동적 렌더링 -->
                             </div>
@@ -303,7 +302,6 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
 
                         <!-- 첨삭 탭 -->
                         <div id="inline-feedback-tab" style="display: none;">
-                            <h5 class="text-xs font-bold text-gray-700 mb-2">📍 첨삭</h5>
                             <div id="inline-feedback" class="space-y-2">
                                 <!-- 동적 렌더링 -->
                             </div>
@@ -467,6 +465,7 @@ function updateStudentInfoSection(request) {
         return;
     }
 
+    infoSection.className = 'text-sm text-gray-700 flex-1 mr-4';
     infoSection.innerHTML = `
         <span class="font-semibold">논문명:</span>
         <span title="${request.thesisTitle || request.documentTitle}">${

@@ -106,6 +106,15 @@ function openFeedbackDetailScreen(feedbackId) {
         createQuickMarkPopover();
     }
 
+    // 전역 컨텍스트 즉시 설정 (setTimeout 전에 설정하여 빠른 클릭에도 대응)
+    window._currentFeedbackCtx = {
+        id: feedbackId,
+        fileUrl: request.fileUrl,
+        data: feedbackData,
+        studentReflectionCompleted: request.studentReflectionCompleted || false
+    };
+    console.log('[openFeedbackDetailScreen] _currentFeedbackCtx 설정 완료:', window._currentFeedbackCtx);
+
     // 메모 버튼 표시 로직
     setTimeout(() => {
         const memo = request.memo || '';
@@ -122,12 +131,6 @@ function openFeedbackDetailScreen(feedbackId) {
 
     // PDF 로드
     setTimeout(() => {
-        window._currentFeedbackCtx = {
-            id: feedbackId,
-            fileUrl: request.fileUrl,
-            data: feedbackData,
-            studentReflectionCompleted: request.studentReflectionCompleted || false
-        };
 
         // 제출 이력 사이드바 생성
         ensureSubmissionSidebar();
@@ -160,7 +163,7 @@ function createFeedbackDetailScreen(request, feedbackData) {
             <div class="px-6 py-3 border-b bg-white">
                 <div class="flex items-center justify-between">
                     <!-- 좌측: 논문 정보 -->
-                    <div class="text-xs text-gray-700 flex-1 mr-4">
+                    <div class="text-sm text-gray-700 flex-1 mr-4">
                         <span class="font-semibold">논문명:</span>
                         <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
@@ -341,7 +344,6 @@ function createFeedbackDetailScreen(request, feedbackData) {
                     <div class="flex-1 overflow-y-auto p-4" id="comment-panel-content">
                         <!-- ID 43: 총평 → 전체 평가 탭 -->
                         <div id="general-feedback-tab">
-                            <h5 class="text-xs font-bold text-gray-700 mb-2">💬 전체 평가</h5>
                             <div id="general-feedback-thread" class="space-y-2 mb-3">
                                 <!-- 동적 렌더링 -->
                             </div>
@@ -370,7 +372,6 @@ function createFeedbackDetailScreen(request, feedbackData) {
 
                         <!-- ID 43: 페이지 코멘트 → 첨삭 탭 -->
                         <div id="inline-feedback-tab" style="display: none;">
-                            <h5 class="text-xs font-bold text-gray-700 mb-2">📍 첨삭</h5>
                             <div id="inline-feedback" class="space-y-2">
                                 <!-- 동적 렌더링 -->
                             </div>
@@ -529,6 +530,7 @@ function updateStudentInfoSection(request) {
         return;
     }
 
+    infoSection.className = 'text-sm text-gray-700 flex-1 mr-4';
     infoSection.innerHTML = `
         <span class="font-semibold">논문명:</span>
         <span title="${request.thesisTitle || request.documentTitle}">${
