@@ -39,19 +39,15 @@ function openStudentGuidanceStatusDetail(requestId) {
     };
     document.addEventListener('keydown', handleEscape);
 
-    // 메모 버튼 표시 로직
+    // 메모 버튼 표시 로직 - 항상 표시
     setTimeout(() => {
         const memo = request.memo || '';
         const memoBtn = document.getElementById('student-memo-btn');
         if (memoBtn) {
-            if (memo && memo.trim() !== '') {
-                memoBtn.style.display = 'inline-block';
-                memoBtn.style.visibility = 'visible';
-                memoBtn.style.opacity = '1';
-                memoBtn.setAttribute('data-memo', memo);
-            } else {
-                memoBtn.style.display = 'none';
-            }
+            memoBtn.style.display = 'inline-block';
+            memoBtn.style.visibility = 'visible';
+            memoBtn.style.opacity = '1';
+            memoBtn.setAttribute('data-memo', memo);
         }
     }, 100);
 
