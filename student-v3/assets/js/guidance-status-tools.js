@@ -862,12 +862,12 @@ function renderCommentPanel() {
     
     // 페이지 순서로 정렬
     items.sort((a, b) => a.pageNum - b.pageNum);
-    
+
     if (items.length === 0) {
-        container.innerHTML = ''; // 안내 텍스트 제거
+        container.innerHTML = '<div class="text-sm text-gray-500 text-center py-4">첨삭 기록이 없습니다.</div>';
         return;
     }
-    
+
     // 렌더링
     container.innerHTML = items.map(item => {
         if (item.type === 'comment') {
@@ -1028,7 +1028,7 @@ function renderCommentCard(comment, pageNum) {
                                             <i class="fas fa-edit"></i>
                                             <span>수정</span>
                                         </button>
-                                        <button onclick="event.stopPropagation(); deleteMainComment('${comment.id}')"
+                                        <button onclick="deleteMainComment('${comment.id}')"
                                                 class="text-xs text-red-600 hover:text-red-800 flex items-center gap-1">
                                             <i class="fas fa-trash"></i>
                                             <span>삭제</span>
@@ -1097,11 +1097,17 @@ function renderCommentCard(comment, pageNum) {
                                 </button>
                             </div>
                             <div class="flex gap-2 flex-wrap mt-2">
-                                <!-- 등록 버튼만 표시 (완료는 모달 헤더로 이동) -->
+                                <!-- 등록 버튼 -->
                                 <button onclick="addMainComment('${comment.id}')"
                                         class="text-xs bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-1 font-semibold">
                                     <i class="fas fa-check"></i>
                                     <span>등록</span>
+                                </button>
+                                <!-- 취소 버튼 (신규) -->
+                                <button onclick="cancelAnnotation('${comment.id}')"
+                                        class="text-xs bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300 flex items-center gap-1 font-semibold">
+                                    <i class="fas fa-times"></i>
+                                    <span>취소</span>
                                 </button>
                             </div>
                         </div>
@@ -2299,23 +2305,115 @@ function deleteMainComment(annotationId) {
     showToast('첨삭과 영역이 삭제되었습니다.', 'success');
 }
 
+// ==================== 영역 지정 취소 (신규) ====================
+function cancelAnnotation(annotationId) {
+    console.log('🟡 [cancelAnnotation] 시작, annotationId:', annotationId);
+
+    // 1. 로컬 annotations에서 해당 페이지 찾기
+    let targetPage = null;
+    let targetAnnotation = null;
+
+    for (const pageKey in annotations) {
+        const pageAnnotations = annotations[pageKey];
+        const found = pageAnnotations.find(a => a.id === annotationId);
+        if (found) {
+            targetPage = parseInt(pageKey);
+            targetAnnotation = found;
+            break;
+        }
+    }
+
+    if (!targetPage || !targetAnnotation) {
+        console.error('❌ [cancelAnnotation] annotation을 찾을 수 없음!');
+        return;
+    }
+
+    // 2. 이미 텍스트가 입력된 상태인지 확인
+    const hasText = targetAnnotation.comments &&
+                    targetAnnotation.comments.length > 0 &&
+                    targetAnnotation.comments[0].text.trim();
+
+    if (hasText) {
+        // 텍스트가 이미 입력된 경우 → 삭제 함수로 리다이렉트
+        console.log('⚠️ [cancelAnnotation] 텍스트가 이미 입력됨, deleteMainComment로 전환');
+        showToast('첨삭 내용이 입력되어 있습니다. 삭제 버튼을 사용하세요.', 'warning');
+        return;
+    }
+
+    console.log('🟡 [cancelAnnotation] 영역만 지정된 상태, 취소 진행...');
+
+    // 3. Canvas에서 영역 제거
+    if (fabricCanvas) {
+        const objects = fabricCanvas.getObjects();
+        for (const obj of objects) {
+            if (obj.id === annotationId) {
+                console.log('🟡 [cancelAnnotation] 캔버스 객체 제거:', obj.id);
+                fabricCanvas.remove(obj);
+                break;
+            }
+        }
+        fabricCanvas.renderAll();
+    }
+
+    // 4. 로컬 annotations에서 제거
+    if (annotations[targetPage]) {
+        const index = annotations[targetPage].findIndex(a => a.id === annotationId);
+        if (index !== -1) {
+            annotations[targetPage].splice(index, 1);
+            console.log('🟡 [cancelAnnotation] 로컬에서 제거 완료, index:', index);
+
+            // 페이지에 annotation이 없으면 키 삭제
+            if (annotations[targetPage].length === 0) {
+                delete annotations[targetPage];
+            }
+        }
+    }
+
+    // 5. FEEDBACK_DATA에서 제거 (학생용은 deleteComment 사용)
+    const feedbackId = window._currentStudentGuidanceCtx?.id || currentFeedbackId;
+    FeedbackDataService.deleteComment(feedbackId, annotationId);
+
+    // 5-1. FEEDBACK_DATA와 로컬 annotations 동기화 (중요!)
+    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    if (feedbackData && feedbackData.annotations) {
+        annotations = JSON.parse(JSON.stringify(feedbackData.annotations));
+        console.log('🟡 [cancelAnnotation] annotations 동기화 완료:', annotations);
+    }
+
+    // 6. UI 업데이트
+    renderCommentPanel();
+    refreshInlineTabMarker();
+
+    if (fabricCanvas) {
+        redrawMarkersForPage(pageNum);
+    }
+
+    console.log('🟡 [cancelAnnotation] ============ 완료! ============');
+    showToast('영역 지정이 취소되었습니다.', 'success');
+
+    // 7. 학생 화면 전용: 삭제 버튼 상태 업데이트
+    if (typeof updateDeleteButtonState === 'function') {
+        updateDeleteButtonState(feedbackId);
+    }
+}
+
 function deleteReply(annotationId, replyId) {
     console.log('🔴 [deleteReply] ============ 시작 ============');
     console.log('🔴 [deleteReply] annotationId:', annotationId);
     console.log('🔴 [deleteReply] replyId:', replyId);
-    
+
     if (!confirm('⚠️ 정말로 이 댓글을 삭제하시겠습니까?\n\n이 작업은 되돌릴 수 없습니다.\n\n삭제하려면 [확인] 버튼을 눌러주세요.')) {
         console.log('🔴 [deleteReply] 사용자가 취소함');
         return;
     }
-    
+
     console.log('🔴 [deleteReply] 삭제 진행...');
-    
+
     // 삭제 실행
     const success = FeedbackDataService.deleteComment(currentFeedbackId, annotationId, replyId);
-    
+
     console.log('🔴 [deleteReply] FeedbackDataService.deleteComment 결과:', success);
-    
+
     if (success) {
         // 로컬 annotations 동기화
         const feedbackData = FeedbackDataService.getFeedbackData(currentFeedbackId);
@@ -2326,11 +2424,11 @@ function deleteReply(annotationId, replyId) {
                 console.log('🔴 [deleteReply] annotations 동기화 완료');
             }
         }
-        
+
         // UI 업데이트
         renderCommentPanel();
         refreshInlineTabMarker();
-        
+
         console.log('🔴 [deleteReply] ============ 완료! ============');
         showToast('댓글이 삭제되었습니다.', 'success');
     } else {
@@ -2456,6 +2554,7 @@ window.cancelReplyEdit = cancelReplyEdit;
 window.addMainComment = addMainComment;
 window.completeFeedback = completeFeedback;
 window.deleteMainComment = deleteMainComment;
+window.cancelAnnotation = cancelAnnotation;
 window.deleteReply = deleteReply;
 window.uploadReplyAttachment = uploadReplyAttachment;
 window.uploadEditAttachment = uploadEditAttachment;
