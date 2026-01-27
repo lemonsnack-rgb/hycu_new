@@ -1,0 +1,166 @@
+﻿대분류,중분류,소분류,항목명,상세내용,구분,우선순위,비고
+데이터구조,ExaminationHistory,테이블 생성,ExaminationHistory 테이블,심사 이력을 기록하는 테이블. 학생별/단계별로 모든 심사 시도(초기 심사 + 재심)를 기록,신규,P0,Phase 1 필수
+데이터구조,ExaminationHistory,기본 필드,id,심사 이력 고유 ID,신규,P0,
+데이터구조,ExaminationHistory,기본 필드,studentId,학생 ID,신규,P0,
+데이터구조,ExaminationHistory,기본 필드,stageOrder,단계 순서 (워크플로우 템플릿의 order),신규,P0,
+데이터구조,ExaminationHistory,기본 필드,stageName,단계명 (예: 본심사),신규,P0,
+데이터구조,ExaminationHistory,기본 필드,examRound,심사 차수 (1: 초기, 2: 1차 재심, 3: 2차 재심),신규,P0,핵심 필드
+데이터구조,ExaminationHistory,기본 필드,examType,"심사 유형 ('initial' | 'reexam')",신규,P0,
+데이터구조,ExaminationHistory,심사 정보,committeeChair,심사위원장 교수 ID,신규,P0,
+데이터구조,ExaminationHistory,심사 정보,committeeMembers,심사위원 교수 ID 배열,신규,P0,
+데이터구조,ExaminationHistory,심사 정보,submissionDate,논문 제출일,신규,P1,
+데이터구조,ExaminationHistory,심사 정보,evaluationDate,평가 완료일,신규,P0,
+데이터구조,ExaminationHistory,심사 정보,semester,학기 (예: 2026-1),신규,P1,
+데이터구조,ExaminationHistory,평가 결과,result,"평가 결과 ('합격' | '조건부합격' | '불합격')",신규,P0,핵심 필드
+데이터구조,ExaminationHistory,재심 정보,reexamInfo,재심 정보 객체 (조건부합격인 경우만),신규,P0,핵심 필드
+데이터구조,ExaminationHistory,재심 정보 - method,reexamInfo.method,"재심 방식 ('대면' | '서면')",신규,P0,초기 구현: UI에서 선택
+데이터구조,ExaminationHistory,재심 정보 - evaluationType,reexamInfo.evaluationType,"평가자 유형 ('full': 전체 심사위원 | 'chair_only': 위원장만)",신규,P0,초기 구현: method 기반 자동 설정
+데이터구조,ExaminationHistory,재심 정보 - deadline,reexamInfo.deadline,재심 논문 제출 기한 (날짜),신규,P0,
+데이터구조,ExaminationHistory,재심 정보 - requirements,reexamInfo.requirements,보완 요구사항 (텍스트),신규,P0,
+데이터구조,ExaminationHistory,재심 정보 - status,reexamInfo.status,"재심 상태 ('pending': 대기 | 'submitted': 제출 완료 | 'completed': 평가 완료)",신규,P0,
+데이터구조,ExaminationHistory,인덱스,idx_student_stage,"studentId + stageOrder 복합 인덱스",신규,P1,조회 성능 최적화
+데이터구조,ThesisStage,워크플로우 템플릿,stages[].allowReexam,각 단계별 재심 허용 여부 (boolean),수정,P1,관리자 설정
+데이터구조,StudentThesisStage,학생 단계 정보,currentStageOrder,학생의 현재 단계 순서 (워크플로우 템플릿과 동일),확인,P0,재심 중에도 변경 없음
+데이터구조,StudentThesisStage,학생 단계 정보,currentStageName,학생의 현재 단계명,확인,P0,
+데이터구조,StudentThesisStage,재신청 관련,canProceed,다음 단계 진행 가능 여부 (boolean),신규,P0,불합격 시 false
+데이터구조,StudentThesisStage,재신청 관련,needsReapplication,재신청 필요 여부 (boolean),신규,P0,불합격 시 true
+데이터구조,StudentThesisStage,재신청 관련,reapplicationStage,재신청이 필요한 단계 순서 (number),신규,P0,불합격 시 설정
+데이터구조,ThesisApplication,논문 신청 테이블,ThesisApplication 테이블,논문 신청부터 평가까지의 전체 라이프사이클 관리. 재신청 시 새로운 레코드 생성,신규,P1,재신청 프로세스 필수
+데이터구조,ThesisApplication,기본 정보,id,신청 고유 ID,신규,P1,
+데이터구조,ThesisApplication,기본 정보,studentId,학생 ID,신규,P1,
+데이터구조,ThesisApplication,기본 정보,stageOrder,어느 단계의 신청인지,신규,P1,
+데이터구조,ThesisApplication,기본 정보,semester,신청 학기,신규,P1,
+데이터구조,ThesisApplication,기본 정보,applicationDate,신청 접수일,신규,P1,
+데이터구조,ThesisApplication,재신청 구분,isReapplication,재신청 여부 (boolean),신규,P1,
+데이터구조,ThesisApplication,재신청 구분,previousApplications,이전 신청 ID 배열,신규,P1,이력 추적
+데이터구조,ThesisApplication,논문 정보,title,논문 제목 (학생이 신청 시 입력),신규,P1,재신청 시 재입력
+데이터구조,ThesisApplication,논문 정보,abstract,논문 초록 (학생이 신청 시 입력),신규,P1,재신청 시 재입력
+데이터구조,ThesisApplication,논문 정보,keywords,키워드 배열 (학생이 신청 시 입력),신규,P1,재신청 시 재입력
+데이터구조,ThesisApplication,심사위원 구성,committeeChair,심사위원장 교수 ID,신규,P1,관리자/지도교수 지정
+데이터구조,ThesisApplication,심사위원 구성,committeeMembers,심사위원 교수 ID 배열,신규,P1,관리자/지도교수 지정
+데이터구조,ThesisApplication,심사위원 구성,committeeAssignedAt,심사위원 구성 완료 일시,신규,P2,
+데이터구조,ThesisApplication,논문 제출,thesisPdfUrl,논문 PDF URL (학생이 업로드),신규,P1,재신청 시 새로 업로드
+데이터구조,ThesisApplication,논문 제출,attachments,첨부 서류 배열 (수정전후대비표 등),신규,P1,
+데이터구조,ThesisApplication,논문 제출,submittedAt,논문 제출 완료 일시,신규,P2,
+데이터구조,ThesisApplication,심사 일정,examDate,심사 예정 일자,신규,P1,심사위원장 설정
+데이터구조,ThesisApplication,심사 일정,examLocation,심사 장소 (대면/온라인),신규,P1,심사위원장 설정
+데이터구조,ThesisApplication,심사 일정,examScheduledAt,심사 일정 확정 일시,신규,P2,
+데이터구조,ThesisApplication,신청 상태,status,"신청 상태 ('application_submitted' | 'committee_assigned' | 'thesis_submitted' | 'exam_scheduled' | 'under_evaluation' | 'completed' | 'failed')",신규,P1,상태 기반 워크플로우
+데이터구조,ThesisApplication,종료 정보,closedAt,신청 종료 일시 (완료/실패 시),신규,P2,
+프로세스,재심 프로세스,조건부합격 처리,processEvaluationResult() 함수,평가 결과에 따라 합격/조건부합격/불합격 처리하는 핵심 함수,신규,P0,Phase 1 필수
+프로세스,재심 프로세스,조건부합격 처리 - 1단계,evaluationType 자동 설정,"초기 구현: method === '대면' → evaluationType = 'full', method === '서면' → evaluationType = 'chair_only'",신규,P0,향후 확장 시 제거
+프로세스,재심 프로세스,조건부합격 처리 - 2단계,examRound 계산,해당 학생/단계의 심사 이력 조회 → 최대 차수 + 1,신규,P0,getNextExamRound() 함수
+프로세스,재심 프로세스,조건부합격 처리 - 3단계,ExaminationHistory 저장,"result, reexamInfo 포함하여 심사 이력 저장",신규,P0,
+프로세스,재심 프로세스,조건부합격 처리 - 4단계,currentStageOrder 유지,학생의 현재 단계 순서는 변경하지 않음 (재심 대기 상태),신규,P0,핵심 로직
+프로세스,재심 프로세스,조건부합격 처리 - 5단계,학생 알림 발송,"재심 방식, 제출 기한, 보완 요구사항 포함한 알림 발송",신규,P0,
+프로세스,재심 프로세스,합격 처리,currentStageOrder 증가,합격 시 다음 단계(stageOrder + 1)로 이동,확인,P0,기존 로직 유지
+프로세스,재심 프로세스,불합격 처리,재신청 플래그 설정,canProceed = false / needsReapplication = true 설정,신규,P0,
+프로세스,재심 프로세스,재심 차수 계산,getNextExamRound() 함수,"학생ID + 단계로 심사 이력 조회 → 최대 examRound + 1 반환, 이력 없으면 1 반환",신규,P0,
+프로세스,재심 프로세스,학생 상태 조회,getStudentExamStatus() 함수,"현재 단계의 최신 심사 이력 조회 → 상태 반환 (not_started | reexam_pending | reexam_submitted | passed | failed)",신규,P1,학생 화면 표시용
+프로세스,재심 프로세스,재심 평가 권한,canEvaluateReexam() 함수,"재심 유형(full/chair_only)에 따라 교수의 평가 권한 확인",신규,P1,교수 화면 버튼 제어
+프로세스,재신청 프로세스,불합격 처리,handleFailureForNextSemester() 함수,"불합격 시: 심사 이력 저장 → ThesisApplication 종료(status='failed') → 재신청 플래그 설정 → 알림 발송",신규,P1,Phase 2
+프로세스,재신청 프로세스,재신청 가능 여부 확인,재신청 자격 검증,"needsReapplication === true && 다음 학기 도래",신규,P1,
+프로세스,재신청 프로세스,재신청 처리,processReapplication() 함수,"1) 자격 검증 → 2) 재신청 플래그 초기화 → 3) 새 ThesisApplication 생성(status='application_submitted') → 4) 학생/관리자 알림 발송",신규,P1,핵심 로직
+프로세스,재신청 프로세스,ThesisApplication 생성,신규 신청 레코드 생성,"isReapplication=true, previousApplications 설정, 제목/초록/키워드는 학생 입력, 심사위원/논문/일정은 null",신규,P1,
+프로세스,재신청 프로세스,전체 프로세스 재실행,"신청 접수 → 심사위원 구성 → 논문 제출 → 심사 일정 설정 → 평가 → 결과",재신청 시 논문 신청부터 평가까지 모든 단계 재실행,신규,P1,
+프로세스,재신청 프로세스,examRound 초기화,재신청 후 examRound,"새 ThesisApplication 기반 심사이므로 examRound = 1로 시작",신규,P1,재심과 구분
+프로세스,재신청 프로세스,상태 전환,ThesisApplication 상태 관리,"application_submitted → committee_assigned → thesis_submitted → exam_scheduled → under_evaluation → completed/failed",신규,P1,
+프로세스,재신청 프로세스,이전 이력 조회,previousApplications 조회,재신청 시 이전 신청 이력 참조 가능,신규,P2,
+UI/화면,학생 화면,재심 안내,재심 진행 중 배지 표시,"현재 단계명 옆에 ""(재심 진행 중)"" 텍스트 표시",신규,P0,Phase 1
+UI/화면,학생 화면,재심 안내,재심 정보 표시 영역,"재심 방식(대면/서면), 평가자(전체/위원장만), 재심 일정, 보완 요구사항 표시",신규,P0,
+UI/화면,학생 화면,재심 안내,수정논문 제출 버튼,재심 대기 상태에서 수정논문 제출 가능,신규,P0,
+UI/화면,학생 화면,재심 안내,진행 단계 다이어그램,"워크플로우의 현재 단계는 그대로, 재심 상태를 별도 표시",신규,P1,
+UI/화면,학생 화면,불합격 안내,불합격 상태 표시,"현재 단계에 ✗(불합격) 마크 표시",신규,P1,Phase 2
+UI/화면,학생 화면,불합격 안내,재신청 안내 문구,"불합격으로 다음 학기 재신청 필요, 재신청 가능 학기 표시",신규,P1,
+UI/화면,학생 화면,불합격 안내,재신청 버튼,"다음 학기 도래 시 활성화, 이전 학기에는 비활성",신규,P1,
+UI/화면,학생 화면,재신청 신청서,재신청 화면,논문 제목/초록/키워드 입력 폼 + 이전 신청 정보 표시,신규,P1,
+UI/화면,학생 화면,재신청 신청서,이전 심사 이력 표시,"이전 신청 학기, 심사 결과, 심사 일자 등 표시",신규,P2,
+UI/화면,학생 화면,재신청 진행 상황,재신청 프로세스 진행 표시,"신청 → 위원 구성 → 논문 제출 → 심사 → 결과 단계 시각화",신규,P1,
+UI/화면,학생 화면,재신청 진행 상황,현재 단계 강조 표시,현재 진행 중인 단계 강조 + 다음 단계 안내,신규,P2,
+UI/화면,교수 화면,조건부합격 판정,재심 정보 설정 모달,조건부합격 판정 시 재심 정보 입력 화면,신규,P0,Phase 1
+UI/화면,교수 화면,조건부합격 판정 - 재심 방식,"재심 방식 선택 라디오 버튼","대면 재심 / 서면 재심 선택",신규,P0,초기 구현
+UI/화면,교수 화면,조건부합격 판정 - 설명,"재심 방식 설명 문구","대면: 전체 심사위원이 모여서 회의하며 재심사 진행 / 서면: 심사위원장만 수정논문을 서면으로 확인하여 승인",신규,P0,
+UI/화면,교수 화면,조건부합격 판정 - 재심 일정,재심 일정 선택,날짜 선택 (Datepicker),신규,P0,
+UI/화면,교수 화면,조건부합격 판정 - 보완 요구사항,보완 요구사항 입력,"Textarea, 필수 입력",신규,P0,
+UI/화면,교수 화면,조건부합격 판정 - 버튼,"취소 / 재심 설정 완료 버튼",버튼,신규,P0,
+UI/화면,교수 화면,재심 평가,재심 평가 화면,재심 제출 완료된 학생에 대한 평가 화면,신규,P1,Phase 2
+UI/화면,교수 화면,재심 평가,심사 이력 타임라인,"1차 심사 결과 → 재심 요구사항 → 재심 제출 상태 표시",신규,P1,
+UI/화면,교수 화면,재심 평가,재심 평가 버튼 권한,"evaluationType='full': 모든 위원, evaluationType='chair_only': 위원장만 버튼 표시",신규,P1,
+UI/화면,교수 화면,재심 평가,재심 평가 입력,평가 점수/의견 입력 폼,신규,P1,
+UI/화면,관리자 화면,논문지도 현황,재심 상태 표시,"학생 목록에서 재심 진행 중인 학생 ""재심중"" 배지 표시",신규,P1,Phase 2
+UI/화면,관리자 화면,논문지도 현황,재신청 상태 표시,"재신청 필요 학생 ""재신청필요"" 배지 / 재신청 진행 중 ""재신청진행중"" 배지 표시",신규,P1,
+UI/화면,관리자 화면,학생 상세,심사 이력 조회,학생별 모든 심사 이력(ExaminationHistory) 조회 화면,신규,P1,
+UI/화면,관리자 화면,학생 상세,재신청 이력 조회,학생별 모든 신청 이력(ThesisApplication) 조회 화면,신규,P2,
+UI/화면,관리자 화면,심사위원 구성,재신청 심사위원 구성,재신청 건에 대한 심사위원 구성 기능,신규,P1,
+UI/화면,관리자 화면,통계,재심 통계,"재심 진행 현황, 재심율 등 통계",신규,P2,
+UI/화면,관리자 화면,통계,재신청 통계,"재신청 건수, 재신청율 등 통계",신규,P2,
+UI/화면,관리자 화면,워크플로우 관리,allowReexam 설정,단계별 재심 허용 여부 설정 UI,신규,P1,
+알림,학생 알림,재심 관련,조건부합격 알림,"재심 필요 알림, 재심 방식/일정/요구사항 포함",신규,P0,
+알림,학생 알림,재심 관련,재심 제출 완료 알림,재심 논문 제출 완료 확인 알림,신규,P1,
+알림,학생 알림,재심 관련,재심 평가 완료 알림,재심 평가 완료 알림 (합격/불합격),신규,P1,
+알림,학생 알림,재신청 관련,불합격 알림,"불합격 알림, 다음 학기 재신청 안내 포함",신규,P1,
+알림,학생 알림,재신청 관련,재신청 접수 알림,재신청 접수 확인 + 다음 단계(심사위원 구성) 안내,신규,P1,
+알림,학생 알림,재신청 관련,심사위원 구성 완료 알림,재신청 건 심사위원 구성 완료 + 논문 제출 안내,신규,P1,
+알림,교수 알림,재심 관련,재심 논문 제출 알림,"학생이 재심 논문 제출 시 심사위원/위원장에게 알림",신규,P1,
+알림,교수 알림,재신청 관련,재신청 심사 요청 알림,재신청 건 심사위원 구성 완료 시 심사위원들에게 알림,신규,P1,
+알림,관리자 알림,재신청 관련,재신청 접수 알림,"재신청 접수 시 관리자에게 알림, 심사위원 구성 필요 안내",신규,P1,
+알림,관리자 알림,재심 관련,재심 완료 통계 알림,주간/월간 재심 완료 통계 알림,신규,P3,
+개발계획,Phase 1,필수 기능,ExaminationHistory 테이블 생성,테이블 생성 + 기본 CRUD,신규,P0,0.5일
+개발계획,Phase 1,필수 기능,워크플로우 allowReexam 추가,ThesisStage에 allowReexam 필드 추가,신규,P1,0.5일
+개발계획,Phase 1,필수 기능,조건부합격 처리 로직,"processEvaluationResult() 함수, evaluationType 자동 설정 로직 포함",신규,P0,1.5일
+개발계획,Phase 1,필수 기능,재심 차수 관리,getNextExamRound() 함수 + 심사 이력 조회 로직,신규,P0,1일
+개발계획,Phase 1,필수 기능,학생 재심 상태 표시,"학생 화면 재심 안내 영역, 수정논문 제출 기능",신규,P0,1.5일
+개발계획,Phase 1,필수 기능,교수 재심 정보 설정,"조건부합격 판정 시 재심 정보 입력 모달",신규,P0,1일 (Phase 1 포함)
+개발계획,Phase 1,소계,Phase 1 총 개발 기간,필수 기능,신규,P0,5일
+개발계획,Phase 2,개선 사항,교수 재심 평가 화면,"심사 이력 타임라인, 재심 평가 화면, 평가 권한 제어",신규,P1,1일
+개발계획,Phase 2,개선 사항,관리자 재심 통계,"재심 진행 현황, 재심 이력 조회",신규,P1,1일
+개발계획,Phase 2,개선 사항,불합격 후 재신청 프로세스 - 불합격 처리,handleFailureForNextSemester() 함수,신규,P1,0.5일
+개발계획,Phase 2,개선 사항,불합격 후 재신청 프로세스 - ThesisApplication 테이블,테이블 생성 + 기본 CRUD,신규,P1,0.5일
+개발계획,Phase 2,개선 사항,불합격 후 재신청 프로세스 - 재신청 처리,processReapplication() 함수,신규,P1,0.5일
+개발계획,Phase 2,개선 사항,불합격 후 재신청 프로세스 - 학생 화면,"불합격 안내, 재신청 버튼, 재신청 신청서 화면, 재신청 진행 상황 화면",신규,P1,1일
+개발계획,Phase 2,개선 사항,불합격 후 재신청 프로세스 - 관리자 화면,재신청 심사위원 구성 기능,신규,P1,0.5일
+개발계획,Phase 2,개선 사항,불합격 후 재신청 프로세스 - 알림,학생/교수/관리자 알림 발송,신규,P1,0.5일
+개발계획,Phase 2,소계,Phase 2 총 개발 기간,개선 사항,신규,P1,4.5일
+개발계획,Phase 3,향후 확장,4가지 조합 확장 - UI 수정,재심 정보 설정 모달에 evaluationType 선택 필드 추가,확장,P3,0.5일
+개발계획,Phase 3,향후 확장,4가지 조합 확장 - 로직 수정,processEvaluationResult()에서 자동 설정 로직 제거,확장,P3,0.5일
+개발계획,Phase 3,소계,Phase 3 총 개발 기간,향후 확장 (필요 시),확장,P3,1일
+개발계획,전체,총 개발 기간,전체 합계,Phase 1 + Phase 2 + Phase 3 = 10.5일,신규,P0-P3,
+비즈니스 규칙,재심 규칙,재심 발생 조건,조건부합격,평가 결과가 '조건부합격'인 경우에만 재심 발생,확인,P0,
+비즈니스 규칙,재심 규칙,재심 시기,같은 학기 내,재심은 같은 학기 내에서 진행,확인,P0,
+비즈니스 규칙,재심 규칙,재심 차수,examRound 증가,"초기 심사: examRound=1, 1차 재심: examRound=2, 2차 재심: examRound=3...",확인,P0,
+비즈니스 규칙,재심 규칙,단계 이동,currentStageOrder 유지,재심 중에는 currentStageOrder 변경 없음. 최종 합격 시에만 다음 단계로 이동,확인,P0,핵심 규칙
+비즈니스 규칙,재심 규칙,워크플로우 무결성,템플릿 변경 금지,"워크플로우 템플릿(ThesisStage)은 학생별로 변경되지 않음, 모든 학생이 동일한 템플릿 사용",확인,P0,핵심 원칙
+비즈니스 규칙,재심 규칙,재심 방식 - 초기 구현,대면/서면 2가지,"대면 → evaluationType='full', 서면 → evaluationType='chair_only'",신규,P0,
+비즈니스 규칙,재심 규칙,재심 방식 - 향후 확장,4가지 조합 지원,"대면×full, 대면×chair_only, 서면×full, 서면×chair_only",확장,P3,데이터 구조는 이미 지원
+비즈니스 규칙,재심 규칙,재심 평가 권한,evaluationType 기반 권한 제어,"evaluationType='full': 모든 심사위원 평가 가능, evaluationType='chair_only': 심사위원장만 평가 가능",신규,P1,
+비즈니스 규칙,재신청 규칙,재신청 발생 조건,불합격,평가 결과가 '불합격'인 경우 재신청 필요,확인,P1,
+비즈니스 규칙,재신청 규칙,재신청 시기,다음 학기,재신청은 다음 학기에만 가능,확인,P1,
+비즈니스 규칙,재신청 규칙,재신청 프로세스,전체 프로세스 재실행,"논문 신청 → 심사위원 구성 → 논문 제출 → 심사 일정 → 평가 → 결과 전 단계 재실행",확인,P1,핵심 규칙
+비즈니스 규칙,재신청 규칙,ThesisApplication,새 레코드 생성,"재신청 시 ThesisApplication 새로 생성, isReapplication=true 설정",신규,P1,
+비즈니스 규칙,재신청 규칙,examRound 초기화,1로 리셋,"재신청 후 첫 심사는 examRound=1 (새로운 신청이므로)",확인,P1,
+비즈니스 규칙,재신청 규칙,단계 이동,currentStageOrder 유지,"재신청 중에도 currentStageOrder 변경 없음, 불합격한 단계에서 재신청 진행",확인,P1,
+비즈니스 규칙,재신청 규칙,심사위원 구성,새로 구성 가능,재신청 시 심사위원은 기존과 동일하거나 새로 구성 가능,확인,P1,
+비즈니스 규칙,재신청 규칙,이전 이력,previousApplications,재신청 시 이전 신청 ID를 previousApplications 배열에 기록,신규,P1,
+비즈니스 규칙,학교 규정,석사 본심사,본심 1회 + 조건부합격자만 재심,"합격 → 최종합격 / 조건부합격 → 재심(대면 또는 서면) / 불합격 → 최종불합격(다음학기 재신청)",확인,P0,한양대 메일 기준
+비즈니스 규칙,학교 규정,박사 본심사,본심 2회,"1차: 합격→2차진행, 조건부합격→2차진행(재심), 불합격→재신청 / 2차: 합격→최종합격, 조건부합격→재심(서면), 불합격→재신청",확인,P0,한양대 메일 기준
+비즈니스 규칙,학교 규정,재심 - 대면,심사위원 전원 대면 회의,"심사위원장이 재심 일정 설정, 심사위원 전원 대면 회의하여 평가",확인,P0,
+비즈니스 규칙,학교 규정,재심 - 서면,심사위원장 또는 지도교수 승인,"심사위원장이 재심 논문 제출 기간 설정, 심사위원장이 승인하거나 지도교수에게 위임하여 승인 가능",확인,P0,
+테스트,단위 테스트,ExaminationHistory,examRound 계산 테스트,"getNextExamRound() 함수: 이력 없으면 1, 있으면 max+1 반환 확인",신규,P0,
+테스트,단위 테스트,ExaminationHistory,evaluationType 자동 설정 테스트,"method='대면' → evaluationType='full', method='서면' → evaluationType='chair_only' 확인",신규,P0,
+테스트,단위 테스트,재심 프로세스,조건부합격 처리 테스트,"조건부합격 시 ExaminationHistory 생성, reexamInfo 저장, currentStageOrder 유지 확인",신규,P0,
+테스트,단위 테스트,재심 프로세스,재심 평가 권한 테스트,"canEvaluateReexam() 함수: full일 때 모든 위원, chair_only일 때 위원장만 확인",신규,P1,
+테스트,단위 테스트,재신청 프로세스,불합격 처리 테스트,"불합격 시 needsReapplication=true, canProceed=false, ThesisApplication.status='failed' 확인",신규,P1,
+테스트,단위 테스트,재신청 프로세스,재신청 처리 테스트,"재신청 시 ThesisApplication 새로 생성, isReapplication=true, examRound=1 확인",신규,P1,
+테스트,통합 테스트,재심 시나리오,석사 본심사 재심 시나리오,"1차 심사 → 조건부합격 → 재심 제출 → 재심 평가 → 합격 → 다음 단계 이동 전체 플로우 테스트",신규,P1,
+테스트,통합 테스트,재심 시나리오,재심 불합격 후 재신청 시나리오,"1차 심사 → 조건부합격 → 재심 → 불합격 → 재신청 접수 → 심사위원 구성 → 논문 제출 → 평가 → 합격 전체 플로우 테스트",신규,P1,
+테스트,통합 테스트,재신청 시나리오,직접 불합격 후 재신청 시나리오,"1차 심사 → 불합격 → 다음 학기 재신청 → 전체 프로세스 재실행 → 합격 전체 플로우 테스트",신규,P1,
+테스트,통합 테스트,박사 본심사,박사 본심사 2회 시나리오,"본심 1차 → 조건부합격 → 본심 2차 진행 확인 (재심 아님, 다음 단계로 이동)",신규,P1,박사는 1차-2차가 다른 단계
+테스트,E2E 테스트,학생 화면,재심 진행 전체 플로우,"학생 로그인 → 조건부합격 알림 확인 → 재심 정보 확인 → 수정논문 제출 → 평가 대기 → 합격 확인 E2E 테스트",신규,P2,
+테스트,E2E 테스트,학생 화면,재신청 진행 전체 플로우,"학생 로그인 → 불합격 확인 → 재신청 버튼 클릭 → 신청서 작성 → 제출 → 심사위원 구성 대기 → 논문 제출 → 평가 → 결과 확인 E2E 테스트",신규,P2,
+테스트,E2E 테스트,교수 화면,조건부합격 판정 전체 플로우,"교수 로그인 → 평가 입력 → 조건부합격 선택 → 재심 정보 입력(방식/일정/요구사항) → 제출 → 학생 알림 확인 E2E 테스트",신규,P2,
+테스트,E2E 테스트,교수 화면,재심 평가 전체 플로우,"교수 로그인 → 재심 제출 알림 확인 → 재심 평가 화면 진입 → 평가 입력 → 합격 처리 → 학생 다음 단계 이동 확인 E2E 테스트",신규,P2,
+확인필요,비즈니스 규칙,재심 횟수 제한,재심 최대 횟수,재심은 몇 회까지 허용되는지 학교 정책 확인 필요,확인필요,P1,학교 측 확인 필요
+확인필요,비즈니스 규칙,재신청 횟수 제한,재신청 최대 횟수,같은 단계에서 재신청은 몇 회까지 허용되는지 학교 정책 확인 필요,확인필요,P1,학교 측 확인 필요
+확인필요,UI/화면,교수 화면,지도교수 위임 기능,"서면 재심 시 ""지도교수에게 위임"" 옵션 필요 여부 확인",확인필요,P2,한양대 메일에 언급됨
+확인필요,비즈니스 규칙,심사위원 변경,재심 시 심사위원 변경 가능 여부,"재심 시 심사위원(특히 chair_only가 아닌 full인 경우) 변경 가능한지 확인",확인필요,P2,
+확인필요,알림,알림 채널,알림 발송 방법,"이메일, SMS, 시스템 알림 중 어느 채널을 사용할지 확인",확인필요,P2,

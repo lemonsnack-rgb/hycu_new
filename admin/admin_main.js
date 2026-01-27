@@ -84,6 +84,13 @@ function switchView(viewName, param = null) {
             initEvaluationTypeChangeListener();
         }
     }
+
+    if (viewName === 'userManagement') {
+        // 사용자 관리 화면 렌더링 후 데이터 로드
+        setTimeout(() => {
+            initUserManagement();
+        }, 0);
+    }
 }
 
 // ========== 이벤트 리스너 초기화 ==========
@@ -5554,3 +5561,273 @@ window.deleteStageType = (id) => {
 };
 
 console.log('✅ 단계 유형 관리 함수 로드 완료');
+
+// ========== 사용자 관리 ==========
+
+// 전역 변수
+let currentUserPage = 1;
+let userPageSize = 10;
+let filteredUsers = [];
+
+/**
+ * 사용자 관리 초기화
+ */
+function initUserManagement() {
+    currentUserPage = 1;
+    filteredUsers = [...appData.users];
+    renderUserTable();
+}
+
+/**
+ * 사용자 테이블 렌더링
+ */
+function renderUserTable() {
+    const tbody = document.getElementById('userTableBody');
+    if (!tbody) return;
+
+    const start = (currentUserPage - 1) * userPageSize;
+    const end = start + userPageSize;
+    const pageUsers = filteredUsers.slice(start, end);
+
+    if (pageUsers.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="10" class="px-4 py-8 text-center text-gray-500">
+                    조회 결과가 없습니다.
+                </td>
+            </tr>
+        `;
+        renderUserPagination();
+        return;
+    }
+
+    tbody.innerHTML = pageUsers.map((user, index) => {
+        const globalIndex = start + index + 1;
+        const gradeDisplay = user.userType === '학생' ? (user.grade || '-') : '-';
+
+        return `
+            <tr class="hover:bg-gray-50">
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox"
+                           class="user-checkbox rounded border-gray-300"
+                           value="${user.id}">
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${globalIndex}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.userType}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.department}</td>
+                <td class="px-4 py-3 text-left text-sm text-gray-900">${user.departmentFull}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.idNumber}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.name}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${gradeDisplay}</td>
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${user.academicStatus}</td>
+                <td class="px-4 py-3 text-center">
+                    <button onclick="loginAsUser('${user.id}')"
+                            class="px-4 py-1.5 border border-blue-600 text-blue-600 rounded hover:bg-blue-50 transition-colors text-sm">
+                        로그인
+                    </button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    renderUserPagination();
+}
+
+/**
+ * 사용자 페이징 렌더링
+ */
+function renderUserPagination() {
+    const paginationDiv = document.getElementById('userPagination');
+    if (!paginationDiv) return;
+
+    const totalPages = Math.ceil(filteredUsers.length / userPageSize);
+
+    if (totalPages <= 1) {
+        paginationDiv.innerHTML = `
+            <div class="flex justify-center items-center gap-2">
+                <span class="text-sm text-gray-600">
+                    전체 ${filteredUsers.length}건
+                </span>
+            </div>
+        `;
+        return;
+    }
+
+    const pageButtons = [];
+    const maxButtons = 10;
+    let startPage = Math.max(1, currentUserPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+
+    if (endPage - startPage < maxButtons - 1) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+
+    for (let i = startPage; i <= endPage; i++) {
+        pageButtons.push(`
+            <button onclick="goToUserPage(${i})"
+                    class="px-3 py-1 text-sm ${i === currentUserPage
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-white text-gray-700 hover:bg-gray-100'} border border-gray-300 rounded">
+                ${i}
+            </button>
+        `);
+    }
+
+    paginationDiv.innerHTML = `
+        <div class="flex justify-center items-center gap-2">
+            <button onclick="goToUserPage(${currentUserPage - 1})"
+                    ${currentUserPage === 1 ? 'disabled' : ''}
+                    class="px-3 py-1 text-sm bg-white text-gray-700 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                이전
+            </button>
+            ${pageButtons.join('')}
+            <button onclick="goToUserPage(${currentUserPage + 1})"
+                    ${currentUserPage === totalPages ? 'disabled' : ''}
+                    class="px-3 py-1 text-sm bg-white text-gray-700 border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed">
+                다음
+            </button>
+            <span class="ml-4 text-sm text-gray-600">
+                전체 ${filteredUsers.length}건 / ${currentUserPage} of ${totalPages} 페이지
+            </span>
+        </div>
+    `;
+}
+
+/**
+ * 페이지 이동
+ */
+function goToUserPage(page) {
+    const totalPages = Math.ceil(filteredUsers.length / userPageSize);
+    if (page < 1 || page > totalPages) return;
+
+    currentUserPage = page;
+    renderUserTable();
+}
+
+/**
+ * 페이지 크기 변경
+ */
+function changeUserPageSize(size) {
+    userPageSize = parseInt(size);
+    currentUserPage = 1;
+    renderUserTable();
+}
+
+/**
+ * 조회 필터 적용
+ */
+function applyUserFilters() {
+    const userType = document.getElementById('filter-userType')?.value || '전체';
+    const department = document.getElementById('filter-department')?.value || '전체';
+    const academicStatus = document.getElementById('filter-academicStatus')?.value || '전체';
+    const idNumber = document.getElementById('filter-idNumber')?.value.trim() || '';
+
+    filteredUsers = appData.users.filter(user => {
+        if (userType !== '전체' && user.userType !== userType) return false;
+        if (department !== '전체' && user.department !== department) return false;
+        if (academicStatus !== '전체' && user.academicStatus !== academicStatus) return false;
+        if (idNumber && !user.idNumber.includes(idNumber)) return false;
+        return true;
+    });
+
+    currentUserPage = 1;
+    renderUserTable();
+    showAlert(`조회 결과: ${filteredUsers.length}건`);
+}
+
+/**
+ * 조회 필터 초기화
+ */
+function resetUserFilters() {
+    document.getElementById('filter-userType').value = '전체';
+    document.getElementById('filter-department').value = '전체';
+    document.getElementById('filter-academicStatus').value = '전체';
+    document.getElementById('filter-idNumber').value = '';
+
+    filteredUsers = [...appData.users];
+    currentUserPage = 1;
+    renderUserTable();
+    showAlert('조회 조건이 초기화되었습니다.');
+}
+
+/**
+ * 전체 선택/해제
+ */
+function toggleAllUsers(checked) {
+    document.querySelectorAll('.user-checkbox').forEach(checkbox => {
+        checkbox.checked = checked;
+    });
+}
+
+/**
+ * 사용자로 로그인
+ */
+function loginAsUser(userId) {
+    const user = appData.users.find(u => u.id === userId);
+    if (!user) {
+        showAlert('사용자를 찾을 수 없습니다.', 'error');
+        return;
+    }
+
+    const confirmMsg = `${user.name}(${user.idNumber})님으로 로그인하시겠습니까?\n로그인 후 해당 사용자의 화면으로 이동됩니다.`;
+
+    if (!confirm(confirmMsg)) {
+        return;
+    }
+
+    // 현재 관리자 세션 저장
+    saveAdminSession();
+
+    // 사용자 세션으로 전환
+    switchUserSession(user);
+
+    // 사용자 유형별 화면으로 리다이렉트
+    setTimeout(() => {
+        window.location.href = user.loginUrl;
+    }, 500);
+}
+
+/**
+ * 관리자 세션 저장
+ */
+function saveAdminSession() {
+    const adminSession = {
+        returnUrl: window.location.href,
+        returnTime: new Date().toISOString(),
+        adminId: 'A2020001', // 현재 로그인한 관리자 ID (실제로는 세션에서 가져와야 함)
+        adminName: '시스템관리자'
+    };
+
+    localStorage.setItem('adminSession', JSON.stringify(adminSession));
+    localStorage.setItem('isAdminMode', 'true');
+}
+
+/**
+ * 사용자 세션으로 전환
+ */
+function switchUserSession(user) {
+    const userSession = {
+        userId: user.id,
+        userName: user.name,
+        userType: user.userType,
+        department: user.department,
+        loginTime: new Date().toISOString(),
+        fromAdminMode: true
+    };
+
+    localStorage.setItem('currentUser', JSON.stringify(userSession));
+
+    showAlert(`${user.name}님으로 로그인합니다...`);
+}
+
+// Export functions
+window.initUserManagement = initUserManagement;
+window.renderUserTable = renderUserTable;
+window.goToUserPage = goToUserPage;
+window.changeUserPageSize = changeUserPageSize;
+window.applyUserFilters = applyUserFilters;
+window.resetUserFilters = resetUserFilters;
+window.toggleAllUsers = toggleAllUsers;
+window.loginAsUser = loginAsUser;
+
+console.log('✅ 사용자 관리 함수 로드 완료');

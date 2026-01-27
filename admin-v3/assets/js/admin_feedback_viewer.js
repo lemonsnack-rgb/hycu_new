@@ -29,11 +29,16 @@ function openFeedbackViewer(feedbackId) {
     setTimeout(() => {
         const memo = request.memo || '';
         const memoBtn = document.getElementById('student-memo-btn');
+        console.log('[관리자 메모 버튼] 찾기 시도:', memoBtn);
         if (memoBtn) {
+            console.log('[관리자 메모 버튼] 버튼 찾음, 표시 설정');
             memoBtn.style.display = 'inline-block';
             memoBtn.style.visibility = 'visible';
             memoBtn.style.opacity = '1';
             memoBtn.setAttribute('data-memo', memo);
+            console.log('[관리자 메모 버튼] 스타일 적용 완료:', memoBtn.style.display);
+        } else {
+            console.error('[관리자 메모 버튼] 버튼을 찾을 수 없습니다!');
         }
     }, 50);
 
