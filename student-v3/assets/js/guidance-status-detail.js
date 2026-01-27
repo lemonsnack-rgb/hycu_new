@@ -43,36 +43,15 @@ function openStudentGuidanceStatusDetail(requestId) {
     setTimeout(() => {
         const memo = request.memo || '';
         const memoBtn = document.getElementById('student-memo-btn');
-        console.log('🔍 [메모 버튼 체크]', {
-            requestId: request.id,
-            hasMemo: !!memo,
-            memoLength: memo ? memo.length : 0,
-            memoContent: memo,
-            buttonFound: !!memoBtn
-        });
         if (memoBtn) {
             if (memo && memo.trim() !== '') {
-                // 강제로 표시 (중요한 스타일들을 명시적으로 설정)
                 memoBtn.style.display = 'inline-block';
                 memoBtn.style.visibility = 'visible';
                 memoBtn.style.opacity = '1';
                 memoBtn.setAttribute('data-memo', memo);
-
-                // 실제 적용된 스타일 확인
-                const computedStyle = window.getComputedStyle(memoBtn);
-                console.log('✅ 메모 버튼 표시됨', {
-                    display: computedStyle.display,
-                    visibility: computedStyle.visibility,
-                    opacity: computedStyle.opacity,
-                    width: computedStyle.width,
-                    height: computedStyle.height
-                });
             } else {
                 memoBtn.style.display = 'none';
-                console.log('⚠️ 메모 없음 - 버튼 숨김');
             }
-        } else {
-            console.error('❌ student-memo-btn 요소를 찾을 수 없습니다!');
         }
     }, 100);
 
