@@ -1,6 +1,7 @@
 
 // injected: CURRENT_USER bootstrap (safe defaults)
-// 안전한 초기화: CURRENT_USER가 없거나 role이 없으면 기본값 설정
+// 안전한 초기화: CURRENT_USER가 없을 때만 기본값 설정
+// 학생용 화면에서는 이미 CURRENT_STUDENT가 설정되어 있으므로 덮어쓰지 않음
 if (!window.CURRENT_USER) {
   window.CURRENT_USER = {
     id: 'prof1',
@@ -8,20 +9,10 @@ if (!window.CURRENT_USER) {
     role: 'main',
     colors: { comment: 'rgba(255, 230, 150, 0.35)', drawing: '#3366ff' }
   };
+  console.log('⚠️ CURRENT_USER가 없어서 기본값(교수)으로 초기화');
 } else {
-  // CURRENT_USER는 있는데 role이나 colors가 없으면 추가
-  if (!window.CURRENT_USER.role) {
-    window.CURRENT_USER.role = 'main';
-  }
-  if (!window.CURRENT_USER.colors) {
-    window.CURRENT_USER.colors = { comment: 'rgba(255, 230, 150, 0.35)', drawing: '#3366ff' };
-  }
-  if (!window.CURRENT_USER.id) {
-    window.CURRENT_USER.id = 'prof1';
-  }
-  if (!window.CURRENT_USER.name) {
-    window.CURRENT_USER.name = '교수';
-  }
+  console.log('✅ CURRENT_USER 이미 설정됨:', window.CURRENT_USER);
+  // CURRENT_USER가 있으면 그대로 사용 (덮어쓰지 않음)
 }
 
 // Phase 4: 온라인피드백 관리 - PDF 도구 및 코멘트
@@ -144,11 +135,27 @@ function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
         
         if (annotations[num]) {
             fabric.util.enlivenObjects(annotations[num], (objects) => {
-                objects.forEach((obj) => {
-                    obj.set({
-                        selectable: currentTool === 'select',
-                        evented: currentTool === 'select'
-                    });
+                objects.forEach((obj, index) => {
+                    // Custom 속성 복원 (enlivenObjects가 누락하는 속성들)
+                    const originalData = annotations[num][index];
+                    if (originalData) {
+                        obj.set({
+                            customType: originalData.customType,
+                            userType: originalData.userType,
+                            authorId: originalData.authorId,
+                            authorName: originalData.authorName,
+                            id: originalData.id,
+                            comments: originalData.comments,
+                            linkedComments: originalData.linkedComments,
+                            selectable: currentTool === 'select',
+                            evented: currentTool === 'select'
+                        });
+                    } else {
+                        obj.set({
+                            selectable: currentTool === 'select',
+                            evented: currentTool === 'select'
+                        });
+                    }
                     fabricCanvas.add(obj);
                 });
                 fabricCanvas.renderAll();
@@ -372,6 +379,7 @@ function setupTextSelection(elements) {
                 userType: 'student',  // 학생 주석
                 authorId: CURRENT_USER.id,
                 authorName: CURRENT_USER.name,
+                comments: [],  // 빈 배열로 초기화
                 selectable: false,
                 evented: false
             });
@@ -643,10 +651,11 @@ function redrawMarkersForPage(num) {
         const pageInt = parseInt(pageKey);
         if (annotations[pageKey]) {
             const pageComments = annotations[pageKey].filter(a => a.customType === 'comment');
-            
+
             if (pageInt < num) {
                 commentCounter += pageComments.length;
             } else if (pageInt === num) {
+                console.log(`  페이지 ${num}의 comment 수:`, pageComments.length);
                 pageComments.forEach(comment => {
                     // 논리 좌표 → 화면 픽셀 좌표 변환
                     let left = comment.left * currentScale;
@@ -733,7 +742,7 @@ function addAnnotation(obj, type) {
         }
         
         // 객체 데이터 저장
-        const annotationData = obj.toObject(['customType', 'authorId', 'authorName', 'id']);
+        const annotationData = obj.toObject(['customType', 'userType', 'authorId', 'authorName', 'id']);
         
         if (type === 'comment') {
             annotationData.comments = [];
@@ -751,6 +760,7 @@ function addAnnotation(obj, type) {
             const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
             if (feedbackData && feedbackData.annotations) {
                 annotations = JSON.parse(JSON.stringify(feedbackData.annotations));
+                console.log('🔄 동기화된 annotations:', annotations);
             }
         } else {
             console.error('❌ feedbackId가 없어서 FEEDBACK_DATA에 저장 실패!');
@@ -759,7 +769,8 @@ function addAnnotation(obj, type) {
         }
         
         console.log(`✅ Added annotation: type=${type}, id=${id}, page=${pageNum}`);
-        console.log('   좌표:', { 
+        console.log('   annotationData 전체:', annotationData);
+        console.log('   좌표:', {
             left: annotationData.left, 
             top: annotationData.top, 
             type: annotationData.type 
@@ -865,6 +876,11 @@ function renderCommentPanel() {
             return renderPageMarker(item.pageNum, item.count);
         }
     }).join('');
+
+    // 삭제 버튼 상태 업데이트
+    if (typeof updateDeleteButtonState === 'function' && window._currentFeedbackCtx) {
+        updateDeleteButtonState(window._currentFeedbackCtx.id);
+    }
 }
 
 // ==================== 코멘트 카드 렌더링 (완전 재작성) ====================
@@ -878,6 +894,10 @@ function renderCommentCard(comment, pageNum) {
     // 디버깅용 콘솔 출력
     console.log('renderCommentCard:', {
         commentId: comment.id,
+        userType: comment.userType,
+        authorId: comment.authorId,
+        author: author,
+        'author.role': author ? author.role : 'null',
         CURRENT_USER: CURRENT_USER,
         isProfessor: isProfessor,
         isOwner: isOwner,
@@ -889,8 +909,10 @@ function renderCommentCard(comment, pageNum) {
     });
     
     // 첨삭 내용 (첫 번째 코멘트만)
-    const mainComment = comment.comments && comment.comments.length > 0 ? comment.comments[0] : null;
-    const replies = comment.comments && comment.comments.length > 1 ? comment.comments.slice(1) : [];
+    // comments 배열이 없으면 빈 배열로 초기화
+    if (!comment.comments) comment.comments = [];
+    const mainComment = comment.comments.length > 0 ? comment.comments[0] : null;
+    const replies = comment.comments.length > 1 ? comment.comments.slice(1) : [];
     
     console.log('mainComment 체크:', {
         mainComment: mainComment,
@@ -926,14 +948,25 @@ function renderCommentCard(comment, pageNum) {
     }
     
     // ==================== 첨삭 카드 (분리) ====================
+    // 배지 색상 결정 (인라인 스타일 사용 - CSS 덮어쓰기 방지)
+    let badgeStyle = 'background: #FCE4EC; color: #6A0028;';  // 기본값 (공동지도)
+    let badgeLabel = roleText;
+
+    if (comment.userType === 'student') {
+        badgeStyle = 'background: #3B82F6; color: white;';  // 파란색
+        badgeLabel = '학생';
+    } else if (author && author.role === 'main') {
+        badgeStyle = 'background: #FEE2E2; color: #991B1B;';  // 빨간색
+    }
+
     let commentCardHtml = `
         <div class="comment-card" data-comment-id="${comment.id}">
             <div class="flex justify-between items-start mb-2">
                 <div class="flex items-center gap-2">
                     <span class="text-xs font-bold text-gray-700">${pageNum}페이지 💬 ${commentNumber}</span>
                     ${author ? `
-                        <span class="text-xs px-2 py-0.5 rounded-full ${author.role === 'main' ? 'bg-red-100 text-red-700' : 'bg-[#FCE4EC] text-[#6A0028]'}">
-                            ${author.name} (${roleText})${comment.userType === 'student' ? ' (학생)' : ''}
+                        <span class="text-xs px-2 py-0.5 rounded-full" style="${badgeStyle}">
+                            ${author.name} (${badgeLabel})
                         </span>
                     ` : ''}
                 </div>
@@ -1040,11 +1073,11 @@ function renderCommentCard(comment, pageNum) {
                         </div>
                     </div>
                 ` : `
-                    ${isOwner ? `
+                    ${(isOwner || comment.userType === 'student') ? `
                         <div class="space-y-2">
-                            <textarea id="main-comment-${comment.id}" 
-                                      class="w-full p-2 border rounded-md text-xs resize-none" 
-                                      rows="3" 
+                            <textarea id="main-comment-${comment.id}"
+                                      class="w-full p-2 border rounded-md text-xs resize-none"
+                                      rows="3"
                                       placeholder="첨삭 내용을 입력하세요."></textarea>
                             <div class="flex gap-2 flex-wrap">
                                 <!-- 첫 번째 줄: 보조 기능 -->
@@ -1056,7 +1089,7 @@ function renderCommentCard(comment, pageNum) {
                                     <i class="fas fa-paperclip"></i>
                                     <span>첨부</span>
                                 </button>
-                                <button onclick="startVoiceRecording('${comment.id}')" 
+                                <button onclick="startVoiceRecording('${comment.id}')"
                                         class="record-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
                                     <i class="fas fa-microphone"></i>
                                     <i class="fas fa-stop" style="display:none;"></i>
@@ -1065,7 +1098,7 @@ function renderCommentCard(comment, pageNum) {
                             </div>
                             <div class="flex gap-2 flex-wrap mt-2">
                                 <!-- 등록 버튼만 표시 (완료는 모달 헤더로 이동) -->
-                                <button onclick="addMainComment('${comment.id}')" 
+                                <button onclick="addMainComment('${comment.id}')"
                                         class="text-xs bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-1 font-semibold">
                                     <i class="fas fa-check"></i>
                                     <span>등록</span>

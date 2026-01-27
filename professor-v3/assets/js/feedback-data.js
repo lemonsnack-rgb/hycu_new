@@ -229,7 +229,7 @@ const FEEDBACK_REQUESTS = [
         feedbackDate: null,
         status: '피드백 대기',
         commentCount: 0,
-        isCompleted: false,
+        isCompleted: true,  // 학생이 첨삭 등록 완료한 상태
         lastModified: '2025-11-22 14:00',
         lastModifiedBy: null,
         memo: 'v1 피드백 반영했습니다. 연구 범위 축소했으니 확인 부탁드립니다.'
@@ -488,9 +488,9 @@ const QUICK_MARKS = [
 
 // ==================== 데이터 서비스 ====================
 const FeedbackDataService = {
-    // 제출물 목록
+    // 제출물 목록 (학생이 첨삭 등록 완료한 것만)
     getFeedbackRequests() {
-        return [...FEEDBACK_REQUESTS];
+        return FEEDBACK_REQUESTS.filter(req => req.isCompleted === true);
     },
     
     getFeedbackRequestById(id) {

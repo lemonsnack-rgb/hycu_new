@@ -19,8 +19,8 @@ function renderStudentGuidanceStatusList() {
         return;
     }
 
-    // 학생은 본인 것만 보므로 필터링 불필요
-    const filteredRequests = requests;
+    // 학생은 본인 것만 보고, hidden이 아닌 것만 표시
+    const filteredRequests = requests.filter(r => !r.hidden);
 
     contentArea.innerHTML = `
         <div class="table-container">

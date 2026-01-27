@@ -1,5 +1,76 @@
 // Phase 4: 온라인피드백 관리 - 상세 화면 (페이지 전환 방식)
 
+// ==================== 커스텀 다이얼로그 시스템 ====================
+function showCustomAlert(message) {
+    return new Promise((resolve) => {
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
+
+        const dialog = document.createElement('div');
+        dialog.style.cssText = 'background: white; border-radius: 8px; padding: 24px; max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);';
+
+        dialog.innerHTML = `
+            <div style="margin-bottom: 16px; font-size: 16px; color: #1F2937; white-space: pre-wrap; line-height: 1.5;">${message}</div>
+            <div style="display: flex; justify-content: flex-end;">
+                <button id="custom-alert-ok" style="background: #6A0028; color: white; padding: 8px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">확인</button>
+            </div>
+        `;
+
+        backdrop.appendChild(dialog);
+        document.body.appendChild(backdrop);
+
+        const okBtn = dialog.querySelector('#custom-alert-ok');
+        const closeDialog = () => {
+            backdrop.remove();
+            resolve();
+        };
+
+        okBtn.addEventListener('click', closeDialog);
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) closeDialog();
+        });
+
+        okBtn.focus();
+    });
+}
+
+function showCustomConfirm(message) {
+    return new Promise((resolve) => {
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
+
+        const dialog = document.createElement('div');
+        dialog.style.cssText = 'background: white; border-radius: 8px; padding: 24px; max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);';
+
+        dialog.innerHTML = `
+            <div style="margin-bottom: 20px; font-size: 16px; color: #1F2937; white-space: pre-wrap; line-height: 1.5;">${message}</div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button id="custom-confirm-cancel" style="background: white; color: #374151; padding: 8px 24px; border: 1px solid #D1D5DB; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">취소</button>
+                <button id="custom-confirm-ok" style="background: #6A0028; color: white; padding: 8px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">확인</button>
+            </div>
+        `;
+
+        backdrop.appendChild(dialog);
+        document.body.appendChild(backdrop);
+
+        const okBtn = dialog.querySelector('#custom-confirm-ok');
+        const cancelBtn = dialog.querySelector('#custom-confirm-cancel');
+
+        const closeDialog = (result) => {
+            backdrop.remove();
+            resolve(result);
+        };
+
+        okBtn.addEventListener('click', () => closeDialog(true));
+        cancelBtn.addEventListener('click', () => closeDialog(false));
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) closeDialog(false);
+        });
+
+        okBtn.focus();
+    });
+}
+
 // ==================== 상세 화면 열기 (페이지 전환) ====================
 function openFeedbackDetailScreen(feedbackId) {
     const request = FeedbackDataService.getFeedbackRequestById(feedbackId);
@@ -63,11 +134,6 @@ function openFeedbackDetailScreen(feedbackId) {
 
         initPDFViewer(feedbackId, request.fileUrl, feedbackData);
 
-        // 학생이 피드백 반영 완료를 하지 않았으면 도구 비활성화
-        if (!request.studentReflectionCompleted) {
-            disableAnnotationTools();
-        }
-
         // placeholder fix
         const ph = document.querySelector('#inline-feedback textarea, .inline-comment-input');
         if (ph) ph.setAttribute('placeholder','첨삭 내용을 입력하세요.');
@@ -88,17 +154,6 @@ function createFeedbackDetailScreen(request, feedbackData) {
         ? renderConflictWarning(feedbackData)
         : '';
 
-    // 학생 피드백 반영 완료 여부 확인
-    const studentReflectionCompleted = request.studentReflectionCompleted || false;
-    const reflectionWarning = !studentReflectionCompleted ? `
-        <div class="mx-6 mt-3 p-3 bg-yellow-50 border border-yellow-300 rounded-lg flex items-start gap-2">
-            <i class="fas fa-exclamation-triangle text-yellow-600 mt-0.5"></i>
-            <div class="flex-1 text-sm text-yellow-800">
-                <strong>안내:</strong> 학생이 아직 피드백 반영을 완료하지 않았습니다. 학생이 "피드백 반영 완료" 버튼을 누른 후에 새로운 피드백을 등록할 수 있습니다.
-            </div>
-        </div>
-    ` : '';
-
     screen.innerHTML = `
         <div class="feedback-detail-content">
             <!-- 헤더: 논문 정보 + 표절률 + 버튼들 -->
@@ -109,7 +164,7 @@ function createFeedbackDetailScreen(request, feedbackData) {
                         <span class="font-semibold">논문명:</span>
                         <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
-                        <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
+                        <span class="font-semibold">지도단계:</span> <span class="text-[#6A0028]">${request.stage || '연구계획서'}</span>
                         <span class="mx-2 text-gray-400">|</span>
                         <span class="font-semibold">학번:</span> ${request.studentNumber || request.studentId || '-'}
                         <span class="mx-2 text-gray-400">|</span>
@@ -140,7 +195,6 @@ function createFeedbackDetailScreen(request, feedbackData) {
             </div>
 
             ${conflictWarning}
-            ${reflectionWarning}
 
             <!-- 3단 레이아웃 -->
             <div class="feedback-layout">
@@ -279,7 +333,7 @@ function createFeedbackDetailScreen(request, feedbackData) {
                             </button>
                             <button id="tab-inline" role="tab" aria-selected="false"
                                     class="tab" onclick="switchFeedbackTab('inline')">
-                                첨삭 <span id="tab-inline-badge" class="tab-badge hidden">0</span>
+                                첨삭 기록 <span id="tab-inline-badge" class="tab-badge hidden">0</span>
                             </button>
                         </div>
                     </div>
@@ -483,7 +537,7 @@ function updateStudentInfoSection(request) {
                 : request.thesisTitle || request.documentTitle || '논문명'
         }</span>
         <span class="mx-2 text-gray-400">|</span>
-        <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
+        <span class="font-semibold">지도단계:</span> <span class="text-[#6A0028]">${request.stage || '연구계획서'}</span>
         <span class="mx-2 text-gray-400">|</span>
         <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
         <span class="mx-2 text-gray-400">|</span>
@@ -494,7 +548,46 @@ function updateStudentInfoSection(request) {
 }
 
 // ==================== 상세 화면 닫기 (모달 닫기) ====================
-function closeFeedbackDetailScreen() {
+async function closeFeedbackDetailScreen() {
+    // 빈 첨삭 검사 (feedback-tools.js의 annotations 전역 변수 사용)
+    const emptyComments = [];
+
+    if (window.annotations) {
+        let globalCommentIndex = 1;
+
+        // 모든 페이지 순회
+        for (const pageNum in window.annotations) {
+            const pageAnnotations = window.annotations[pageNum];
+            if (!pageAnnotations) continue;
+
+            // 각 페이지의 첨삭 검사
+            pageAnnotations.forEach(annot => {
+                // customType이 'comment'인 첨삭 영역만 검사
+                if (annot.customType === 'comment') {
+                    // comments 배열이 없거나 비어있으면 빈 첨삭
+                    if (!annot.comments || annot.comments.length === 0) {
+                        emptyComments.push(`페이지 ${pageNum} - 첨삭 #${globalCommentIndex}`);
+                    } else {
+                        // comments[0].text가 비어있으면 빈 첨삭
+                        const mainText = annot.comments[0]?.text || '';
+                        if (!mainText.trim()) {
+                            emptyComments.push(`페이지 ${pageNum} - 첨삭 #${globalCommentIndex}`);
+                        }
+                    }
+                    globalCommentIndex++;
+                }
+            });
+        }
+    }
+
+    // 빈 첨삭이 있으면 경고
+    if (emptyComments.length > 0) {
+        const confirmed = await showCustomConfirm(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n\n${emptyComments.join('\n')}\n\n그래도 닫으시겠습니까?`);
+        if (!confirmed) {
+            return;
+        }
+    }
+
     const screen = document.getElementById('feedback-detail-screen');
     if (screen) {
         screen.remove();
@@ -523,11 +616,11 @@ function closeFeedbackDetailScreen() {
 }
 
 // ==================== 피드백 완료 (상세 화면용) ====================
-function completeFeedbackDetail() {
+async function completeFeedbackDetail() {
     // 현재 피드백 ID 가져오기
     const feedbackId = window._currentFeedbackCtx?.id;
     if (!feedbackId) {
-        alert('피드백 정보를 찾을 수 없습니다.');
+        await showCustomAlert('피드백 정보를 찾을 수 없습니다.');
         return;
     }
 
@@ -564,12 +657,13 @@ function completeFeedbackDetail() {
 
     // 빈 첨삭이 있으면 경고
     if (emptyComments.length > 0) {
-        alert(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n\n${emptyComments.join('\n')}`);
+        await showCustomAlert(`저장되지 않은 첨삭이 있습니다.\n\n다음 항목의 내용을 입력해주세요:\n\n${emptyComments.join('\n')}`);
         return;
     }
 
     // 완료 확인
-    if (!confirm('피드백을 완료 처리하시겠습니까?\n완료 후에는 목록에서 "완료" 상태로 표시됩니다.')) {
+    const confirmed = await showCustomConfirm('피드백을 완료 처리하시겠습니까?\n완료 후에는 목록에서 "완료" 상태로 표시됩니다.');
+    if (!confirmed) {
         return;
     }
 
@@ -577,7 +671,7 @@ function completeFeedbackDetail() {
     const success = FeedbackDataService.completeFeedbackRequest(feedbackId);
 
     if (success) {
-        alert('피드백이 완료 처리되었습니다.');
+        await showCustomAlert('피드백이 완료 처리되었습니다.');
         closeFeedbackDetailScreen();
 
         // 목록 새로고침
@@ -585,7 +679,7 @@ function completeFeedbackDetail() {
             window.renderFeedbackList();
         }
     } else {
-        alert('피드백 완료 처리 중 오류가 발생했습니다.');
+        await showCustomAlert('피드백 완료 처리 중 오류가 발생했습니다.');
     }
 }
 

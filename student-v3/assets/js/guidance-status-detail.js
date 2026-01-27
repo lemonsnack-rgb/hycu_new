@@ -97,6 +97,13 @@ function openStudentGuidanceStatusDetail(requestId) {
             console.log('✅ 전체 평가 데이터 매핑 완료:', window._generalComments[requestId]);
         }
 
+        // 학생용 전역 컨텍스트 설정
+        window._currentStudentGuidanceCtx = {
+            id: requestId,
+            fileUrl: request.fileUrl,
+            data: feedbackData
+        };
+
         // 제출 이력 사이드바 생성
         ensureStudentSubmissionSidebar(request);
 
@@ -105,6 +112,9 @@ function openStudentGuidanceStatusDetail(requestId) {
 
         renderGeneralThread(requestId);
         refreshInlineTabMarker();
+
+        // 삭제 버튼 상태 업데이트
+        updateDeleteButtonState(requestId);
     }, 100);
 }
 
@@ -113,6 +123,7 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
     const screen = document.createElement('div');
     screen.className = 'feedback-detail-screen';
     screen.id = 'student-guidance-detail-screen';
+    const requestId = request.id;  // requestId 변수 정의
 
     screen.innerHTML = `
         <div class="feedback-detail-content">
@@ -124,7 +135,7 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                         <span class="font-semibold">논문명:</span>
                         <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
-                        <span class="font-semibold text-[#6A0028]">${request.stage || '연구계획서'}</span>
+                        <span class="font-semibold">지도단계:</span> <span class="text-[#6A0028]">${request.stage || request.guidanceStage || '연구계획서'}</span>
                         <span class="mx-2 text-gray-400">|</span>
                         <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
                         <span class="mx-2 text-gray-400">|</span>
@@ -133,8 +144,18 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                         <span class="font-semibold">성명:</span> ${request.studentName || '-'}
                     </div>
 
-                    <!-- 우측: 닫기 버튼 (학생은 피드백 완료 버튼 없음) -->
+                    <!-- 우측: 삭제 버튼 + 첨삭 등록 완료 버튼 + 닫기 버튼 -->
                     <div class="flex items-center gap-3 flex-shrink-0">
+                        <button id="delete-submission-btn" onclick="deleteStudentSubmission('${requestId}')"
+                                class="text-sm px-4 py-2 rounded-md flex items-center gap-2 font-semibold transition-colors">
+                            <i class="fas fa-trash-alt"></i>
+                            <span>삭제</span>
+                        </button>
+                        <button id="complete-annotation-btn" onclick="completeStudentAnnotation()"
+                                class="text-sm bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-2 font-semibold transition-colors">
+                            <i class="fas fa-check-double"></i>
+                            <span>첨삭 등록 완료</span>
+                        </button>
                         <button onclick="closeStudentGuidanceStatusDetail()"
                                 class="text-gray-500 hover:text-gray-700 p-2 rounded-full hover:bg-gray-100 transition-colors">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -200,11 +221,16 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
 
                         <div class="w-px h-6 bg-gray-300"></div>
 
-                        <!-- 🔒 학생은 선택 도구만 표시 -->
+                        <!-- 학생: 선택 + 첨삭 영역 추가 -->
                         <div class="flex items-center gap-1">
                             <button id="select-tool" class="pdf-toolbar-btn active" title="선택 및 텍스트 드래그">
                                 <svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor">
                                     <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
+                                </svg>
+                            </button>
+                            <button id="comment-tool" class="pdf-toolbar-btn" title="첨삭 영역 추가">
+                                <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM9 9a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
                                 </svg>
                             </button>
                         </div>
@@ -261,7 +287,7 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                             </button>
                             <button id="tab-inline" role="tab" aria-selected="false"
                                     class="tab" onclick="switchStudentFeedbackTab('inline')">
-                                첨삭 <span id="tab-inline-badge" class="tab-badge hidden">0</span>
+                                첨삭 기록 <span id="tab-inline-badge" class="tab-badge hidden">0</span>
                             </button>
                         </div>
                     </div>
@@ -449,7 +475,7 @@ function updateStudentInfoSection(request) {
                 : request.thesisTitle || request.documentTitle || '논문명'
         }</span>
         <span class="mx-2 text-gray-400">|</span>
-        <span class="font-semibold text-[#6A0028]">${request.stage || request.guidanceStage || '연구계획서'}</span>
+        <span class="font-semibold">지도단계:</span> <span class="text-[#6A0028]">${request.stage || request.guidanceStage || '연구계획서'}</span>
         <span class="mx-2 text-gray-400">|</span>
         <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
         <span class="mx-2 text-gray-400">|</span>
@@ -555,6 +581,102 @@ function switchStudentFeedbackTab(tab) {
     }
 }
 
+// ==================== 삭제 버튼 상태 업데이트 ====================
+function updateDeleteButtonState(requestId) {
+    const deleteBtn = document.getElementById('delete-submission-btn');
+    const completeBtn = document.getElementById('complete-annotation-btn');
+    if (!deleteBtn) return;
+
+    // 피드백 데이터에서 모든 annotation 개수 확인
+    const feedbackData = FeedbackDataService.getFeedbackData(requestId);
+    const request = FeedbackDataService.getFeedbackRequestById(requestId);
+    let totalAnnotations = 0;
+
+    if (feedbackData && feedbackData.annotations) {
+        // 모든 페이지의 annotation 개수 합산
+        Object.values(feedbackData.annotations).forEach(pageAnnotations => {
+            totalAnnotations += pageAnnotations.length;
+        });
+    }
+
+    // 첨삭 등록 완료 여부 확인
+    const isCompleted = request && request.isCompleted;
+
+    console.log('버튼 상태 업데이트:', {
+        requestId: requestId,
+        totalAnnotations: totalAnnotations,
+        isCompleted: isCompleted,
+        canDelete: totalAnnotations === 0 && !isCompleted
+    });
+
+    // 삭제 버튼: 첨삭이 0개이고 완료되지 않았을 때만 활성화
+    if (totalAnnotations === 0 && !isCompleted) {
+        deleteBtn.disabled = false;
+        deleteBtn.className = 'text-sm px-4 py-2 rounded-md flex items-center gap-2 font-semibold transition-colors bg-red-600 text-white hover:bg-red-700 cursor-pointer';
+    } else {
+        deleteBtn.disabled = true;
+        deleteBtn.className = 'text-sm px-4 py-2 rounded-md flex items-center gap-2 font-semibold bg-gray-300 text-gray-500 cursor-not-allowed';
+    }
+
+    // 첨삭 등록 완료 버튼: 이미 완료되었으면 비활성화
+    if (completeBtn) {
+        if (isCompleted) {
+            completeBtn.disabled = true;
+            completeBtn.className = 'text-sm px-4 py-2 rounded-md flex items-center gap-2 font-semibold bg-gray-300 text-gray-500 cursor-not-allowed';
+        } else {
+            completeBtn.disabled = false;
+            completeBtn.className = 'text-sm bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] flex items-center gap-2 font-semibold transition-colors cursor-pointer';
+        }
+    }
+}
+
+// ==================== 제출 취소 (삭제) ====================
+function deleteStudentSubmission(requestId) {
+    // 확인 다이얼로그
+    if (!confirm('제출한 논문을 삭제하시겠습니까?\n삭제 후에는 목록에서 보이지 않습니다.')) {
+        return;
+    }
+
+    // 삭제 처리 (목록에서만 숨김, DB는 유지)
+    const success = StudentGuidanceDataService.hideStudentRequest(requestId);
+
+    if (success) {
+        alert('제출이 삭제되었습니다.');
+        closeStudentGuidanceStatusDetail();
+        // 목록 화면 새로고침
+        if (typeof renderStudentGuidanceStatusList === 'function') {
+            renderStudentGuidanceStatusList();
+        }
+    } else {
+        alert('삭제 중 오류가 발생했습니다.');
+    }
+}
+
+// ==================== 첨삭 등록 완료 ====================
+function completeStudentAnnotation() {
+    const requestId = window._currentStudentGuidanceCtx?.id;
+    if (!requestId) {
+        alert('요청 정보를 찾을 수 없습니다.');
+        return;
+    }
+
+    // 확인 다이얼로그
+    if (!confirm('첨삭 등록을 완료하시겠습니까?\n완료 후에는 교수님께서 확인하실 수 있습니다.')) {
+        return;
+    }
+
+    // 완료 처리
+    const success = StudentGuidanceDataService.completeStudentAnnotation(requestId);
+
+    if (success) {
+        alert('첨삭 등록이 완료되었습니다.');
+        // 버튼 상태 업데이트
+        updateDeleteButtonState(requestId);
+    } else {
+        alert('첨삭 등록 완료 처리 중 오류가 발생했습니다.');
+    }
+}
+
 // Export
 window.openStudentGuidanceStatusDetail = openStudentGuidanceStatusDetail;
 window.closeStudentGuidanceStatusDetail = closeStudentGuidanceStatusDetail;
@@ -563,5 +685,8 @@ window.switchStudentFeedbackTab = switchStudentFeedbackTab;
 window.ensureStudentSubmissionSidebar = ensureStudentSubmissionSidebar;
 window.switchToStudentSubmissionVersion = switchToStudentSubmissionVersion;
 window.updateStudentInfoSection = updateStudentInfoSection;
+window.updateDeleteButtonState = updateDeleteButtonState;
+window.deleteStudentSubmission = deleteStudentSubmission;
+window.completeStudentAnnotation = completeStudentAnnotation;
 
 console.log('✅ 학생용 논문 지도 현황 상세 화면 로드 완료');

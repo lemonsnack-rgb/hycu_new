@@ -11,8 +11,16 @@ const CURRENT_STUDENT = {
     role: 'student',
     major: '컴퓨터공학',
     program: '박사',
-    advisorName: '박교수'
+    advisorName: '박교수',
+    colors: {
+        comment: 'rgba(59, 130, 246, 0.1)',  // 파란색 (학생)
+        drawing: '#3B82F6',  // 파란색
+        highlight: 'rgba(59, 130, 246, 0.3)'
+    }
 };
+
+// 즉시 window.CURRENT_USER에도 할당 (tools.js가 로드되기 전에 설정)
+window.CURRENT_USER = CURRENT_STUDENT;
 
 // ==================== 교수 정보 ====================
 const GUIDANCE_STATUS_PROFESSORS = {
@@ -432,6 +440,26 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
         annotations: {}
     },
 
+    'gs-001-v2': {
+        version: 2,
+        lastModified: null,
+        lastModifiedBy: null,
+
+        generalFeedbackThread: [],
+
+        annotations: {}
+    },
+
+    'gs-001-v3': {
+        version: 3,
+        lastModified: null,
+        lastModifiedBy: null,
+
+        generalFeedbackThread: [],
+
+        annotations: {}
+    },
+
     'gs-003': {
         version: 1,
         lastModified: '2024-12-15 11:20',
@@ -586,6 +614,79 @@ const StudentGuidanceDataService = {
 
         console.log('학생 피드백 반영 완료:', requestId);
         return true;
+    },
+
+    // 학생이 주석(annotation) 추가
+    addStudentAnnotation(requestId, pageNum, annotationData) {
+        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
+        if (!data) return false;
+
+        if (!data.annotations) {
+            data.annotations = {};
+        }
+        if (!data.annotations[pageNum]) {
+            data.annotations[pageNum] = [];
+        }
+
+        data.annotations[pageNum].push(annotationData);
+        console.log(`✅ 학생 주석 추가: requestId=${requestId}, page=${pageNum}`, annotationData);
+        return true;
+    },
+
+    // 학생이 자신의 annotation 삭제
+    deleteStudentAnnotation(requestId, annotationId) {
+        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
+        if (!data || !data.annotations) return false;
+
+        // 모든 페이지를 순회하며 해당 annotation 찾아서 삭제
+        for (const pageNum in data.annotations) {
+            const pageAnnotations = data.annotations[pageNum];
+            const index = pageAnnotations.findIndex(a => a.id === annotationId);
+
+            if (index !== -1) {
+                // 학생이 만든 annotation인지 확인
+                if (pageAnnotations[index].userType === 'student' &&
+                    pageAnnotations[index].authorId === CURRENT_STUDENT.id) {
+                    pageAnnotations.splice(index, 1);
+                    console.log(`✅ 학생 주석 삭제: requestId=${requestId}, annotationId=${annotationId}`);
+                    return true;
+                } else {
+                    console.error('❌ 본인이 작성한 주석만 삭제할 수 있습니다');
+                    return false;
+                }
+            }
+        }
+
+        console.error('❌ 주석을 찾을 수 없습니다:', annotationId);
+        return false;
+    },
+
+    // 학생 제출 숨기기 (목록에서만 안 보이도록)
+    hideStudentRequest(requestId) {
+        const request = STUDENT_GUIDANCE_SUBMISSIONS.find(r => r.id === requestId);
+        if (!request) {
+            console.error('❌ 요청을 찾을 수 없습니다:', requestId);
+            return false;
+        }
+
+        // hidden 플래그 추가
+        request.hidden = true;
+        console.log('✅ 제출 숨김 처리:', requestId);
+        return true;
+    },
+
+    // 학생 첨삭 등록 완료
+    completeStudentAnnotation(requestId) {
+        const request = STUDENT_GUIDANCE_SUBMISSIONS.find(r => r.id === requestId);
+        if (!request) {
+            console.error('❌ 요청을 찾을 수 없습니다:', requestId);
+            return false;
+        }
+
+        // isCompleted 플래그 설정
+        request.isCompleted = true;
+        console.log('✅ 첨삭 등록 완료 처리:', requestId);
+        return true;
     }
 };
 
@@ -606,12 +707,16 @@ window.FeedbackDataService = {
         return StudentGuidanceDataService.getProfessorById(userId) || CURRENT_STUDENT;
     },
     addAnnotation(feedbackId, pageNum, annotationData) {
-        // 학생은 주석 추가 불가 (뷰어용)
-        return false;
+        // 학생의 주석 추가 처리
+        return StudentGuidanceDataService.addStudentAnnotation(feedbackId, pageNum, annotationData);
     },
     addComment(feedbackId, commentId, comment, isMain) {
         // 학생은 댓글만 가능
         return StudentGuidanceDataService.addStudentComment(feedbackId, commentId, comment);
+    },
+    deleteComment(feedbackId, annotationId) {
+        // 학생이 자신의 annotation 삭제
+        return StudentGuidanceDataService.deleteStudentAnnotation(feedbackId, annotationId);
     }
 };
 

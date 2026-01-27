@@ -47,6 +47,9 @@ function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
         ? JSON.parse(JSON.stringify(feedbackData.annotations))
         : {};
 
+    // annotations를 window 객체에도 할당 (다른 파일에서 접근 가능하도록)
+    window.annotations = annotations;
+
     elements = {
         canvas: document.getElementById('pdf-canvas'),
         textLayer: document.getElementById('text-layer'),
