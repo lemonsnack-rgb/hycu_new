@@ -1295,7 +1295,18 @@
 
     <script src="assets/js/zoom-api.js?v=20251218002"></script>
     <script src="assets/js/review-data.js?v=20251218002"></script>
-    <script src="assets/js/common.js?v=20251218002"></script>
+    <script src="assets/js/common.js?v=99999999999999"></script>
+    <script>
+    // 네이티브 confirm 강제 복원 (iframe을 통해 덮어쓰기)
+    (function() {
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        document.body.appendChild(iframe);
+        window.confirm = iframe.contentWindow.confirm.bind(window);
+        document.body.removeChild(iframe);
+        console.log('✅ window.confirm 네이티브로 복원 완료');
+    })();
+    </script>
     <script src="assets/js/app.js?v=20251219008"></script>
     <script src="assets/js/dashboard.js?v=20251218002"></script>
     <script src="assets/js/journal-review.js?v=20251219002"></script>
@@ -1305,9 +1316,9 @@
     <script src="assets/js/semester-guidance-v2.js?v=20260122006"></script>
     <script src="assets/js/feedback-data.js?v=20260127182634"></script>
     <script src="assets/js/feedback-list.js?v=20251219004"></script>
-    <script src="assets/js/feedback-viewer.js?v=20260127001"></script>
-    <script src="assets/js/feedback-tools.js?v=20260127192000"></script>
-    <script src="assets/js/feedback-detail-screen.js?v=20260127200500"></script>
+    <script src="assets/js/feedback-viewer.js?v=20260128001000"></script>
+    <script src="assets/js/feedback-tools.js?v=20260128001000"></script>
+    <script src="assets/js/feedback-detail-screen.js?v=20260127215500"></script>
     <script src="assets/js/review-list.js?v=20251219012"></script>
     <script src="assets/js/review-detail.js?v=20260113001"></script>
     <script src="assets/js/board.js?v=20251218003"></script>
