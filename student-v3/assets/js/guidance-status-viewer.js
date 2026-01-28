@@ -271,42 +271,50 @@ function createFeedbackModal(request, feedbackData) {
                                 <!-- 동적 렌더링 -->
                             </div>
                             <!-- 입력창은 조건부 표시 -->
-                            <div id="general-feedback-input-section" class="relative">
-                                <textarea id="general-feedback-input"
-                                          class="w-full p-2 border rounded-md text-sm resize-none"
-                                          rows="3"
-                                          placeholder="전체 평가를 입력하세요..."></textarea>
+                            ${!request.isCompleted ? `
+                                <div id="general-feedback-input-section" class="relative">
+                                    <textarea id="general-feedback-input"
+                                              class="w-full p-2 border rounded-md text-sm resize-none"
+                                              rows="3"
+                                              placeholder="전체 평가를 입력하세요..."></textarea>
 
-                                <!-- 첨부파일 미리보기 영역 -->
-                                <div id="general-attach-preview" class="mt-2 hidden">
-                                    <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-paperclip text-gray-500"></i>
-                                            <span id="general-attach-filename" class="text-sm text-gray-700"></span>
-                                            <span id="general-attach-filesize" class="text-xs text-gray-500"></span>
+                                    <!-- 첨부파일 미리보기 영역 -->
+                                    <div id="general-attach-preview" class="mt-2 hidden">
+                                        <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-paperclip text-gray-500"></i>
+                                                <span id="general-attach-filename" class="text-sm text-gray-700"></span>
+                                                <span id="general-attach-filesize" class="text-xs text-gray-500"></span>
+                                            </div>
+                                            <button onclick="removeGeneralAttachment()"
+                                                    class="text-red-600 hover:text-red-700 text-sm">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
-                                        <button onclick="removeGeneralAttachment()"
-                                                class="text-red-600 hover:text-red-700 text-sm">
-                                            <i class="fas fa-times"></i>
+                                    </div>
+
+                                    <div class="flex gap-2 mt-2 flex-wrap">
+                                        <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
+                                            <i class="fas fa-paper-plane"></i>
+                                            <span>등록</span>
+                                        </button>
+                                        <button class="quickmark-btn text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1" data-target="general-feedback-input">
+                                            <i class="fas fa-star"></i>
+                                            <span>자주 쓰는 코멘트</span>
+                                        </button>
+                                        <button onclick="uploadAttachmentForGeneral()" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
+                                            <i class="fas fa-paperclip"></i>
+                                            <span>첨부</span>
                                         </button>
                                     </div>
                                 </div>
-
-                                <div class="flex gap-2 mt-2 flex-wrap">
-                                    <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-                                        <i class="fas fa-paper-plane"></i>
-                                        <span>등록</span>
-                                    </button>
-                                    <button class="quickmark-btn text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1" data-target="general-feedback-input">
-                                        <i class="fas fa-star"></i>
-                                        <span>자주 쓰는 코멘트</span>
-                                    </button>
-                                    <button onclick="uploadAttachmentForGeneral()" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
-                                        <i class="fas fa-paperclip"></i>
-                                        <span>첨부</span>
-                                    </button>
+                            ` : `
+                                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-center">
+                                    <i class="fas fa-lock text-yellow-600 text-lg mb-2"></i>
+                                    <p class="text-sm text-gray-700 font-medium">피드백이 완료되었습니다.</p>
+                                    <p class="text-xs text-gray-600 mt-1">새로운 버전을 제출하여 추가 피드백을 받으세요.</p>
                                 </div>
-                            </div>
+                            `}
                         </div>
                         
                         <!-- ID 43: 페이지 코멘트 → 첨삭 탭 -->
@@ -570,8 +578,9 @@ function renderGeneralThread(feedbackId){
   // 첫 번째는 메인 평가, 나머지는 댓글
   const mainFeedback = items[0];
   const replies = items.slice(1);
-  
+
   const isOwner = mainFeedback.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
+  const isCompleted = window._currentFeedbackCtx?.isCompleted || false;
   const att = (mainFeedback.attach && mainFeedback.attach.length > 0) ?
             `<div class="mt-2 flex items-center gap-2 p-2 bg-white border border-gray-200 rounded">
               <i class="fas fa-paperclip text-gray-500 text-xs"></i>
@@ -590,8 +599,8 @@ function renderGeneralThread(feedbackId){
           ${att}
           <div class="flex items-center justify-between">
             <div class="text-[11px] text-gray-500">${new Date(mainFeedback.ts).toLocaleString()}</div>
-            ${isOwner ? `
-              <button onclick="editGeneralMain()" 
+            ${isOwner && !isCompleted ? `
+              <button onclick="editGeneralMain()"
                       class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
                 <i class="fas fa-edit"></i>
                 <span>수정</span>
@@ -663,8 +672,8 @@ function renderGeneralThread(feedbackId){
                   ${replyAtt ? '<div class="text-xs text-gray-600 mb-1">'+replyAtt+'</div>' : ''}
                   <div class="flex items-center justify-between">
                     <div class="text-[11px] text-gray-400">${new Date(reply.ts).toLocaleString()}</div>
-                    ${replyOwner ? `
-                      <button onclick="editGeneralReply(${idx+1})" 
+                    ${replyOwner && !isCompleted ? `
+                      <button onclick="editGeneralReply(${idx+1})"
                               class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
                         <i class="fas fa-edit"></i>
                         <span>수정</span>
@@ -694,25 +703,27 @@ function renderGeneralThread(feedbackId){
           }).join('')}
         </div>
       ` : ''}
-      
+
       <!-- ✅ 댓글 입력창 (신규 추가) -->
-      <div class="general-reply-input">
-        <textarea id="general-reply-textarea" 
-                  class="w-full p-2 border rounded-md text-xs resize-none" 
-                  rows="2"
-                  placeholder="댓글을 입력하세요..."></textarea>
-        <div class="flex gap-2 mt-2">
-          <button onclick="addGeneralReply('${feedbackId}')" 
-                  class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-            <i class="fas fa-paper-plane"></i>
-            <span>댓글 등록</span>
-          </button>
-          <button class="quickmark-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1" data-target="general-reply-textarea">
-            <i class="fas fa-star"></i>
-            <span>자주쓰는</span>
-          </button>
+      ${!isCompleted ? `
+        <div class="general-reply-input">
+          <textarea id="general-reply-textarea"
+                    class="w-full p-2 border rounded-md text-xs resize-none"
+                    rows="2"
+                    placeholder="댓글을 입력하세요..."></textarea>
+          <div class="flex gap-2 mt-2">
+            <button onclick="addGeneralReply('${feedbackId}')"
+                    class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
+              <i class="fas fa-paper-plane"></i>
+              <span>댓글 등록</span>
+            </button>
+            <button class="quickmark-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1" data-target="general-reply-textarea">
+              <i class="fas fa-star"></i>
+              <span>자주쓰는</span>
+            </button>
+          </div>
         </div>
-      </div>
+      ` : ''}
     </div>
   `;
 }

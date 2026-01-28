@@ -132,12 +132,12 @@ const FEEDBACK_REQUESTS = [
         gptKillerReportUrl: 'https://gptkiller.hanyang.ac.kr/report/fb-001',
         uploadDate: '2025-11-20',
         desiredDate: '2025-11-25',
-        feedbackDate: null,
-        status: '피드백 대기',
-        commentCount: 0,
+        feedbackDate: '2025-11-20 09:30',
+        status: '피드백 진행 중',
+        commentCount: 3,
         isCompleted: false,
-        lastModified: '2025-11-20 09:00',
-        lastModifiedBy: null,
+        lastModified: '2025-11-20 11:00',
+        lastModifiedBy: 'P001',
         memo: '연구 방법론 부분에 대한 피드백을 특히 부탁드립니다.\n이론적 배경이 충분한지 확인 부탁드립니다.'
     },
     {
@@ -312,18 +312,32 @@ const FEEDBACK_DATA = {
     'fb-001': {
         version: 1,
         lastModified: '2025-11-20 09:00',
-        lastModifiedBy: null,
-        
+        lastModifiedBy: 'P001',
+
         generalFeedbackThread: [
             {
                 id: 'gf-fb001-1',
                 authorId: 'P001',
                 authorName: '박교수',
                 authorRole: 'main',
-                text: '전반적인 연구 계획이 잘 작성되었습니다. 다만 몇 가지 보완이 필요한 부분이 있어 첨삭을 남겼습니다.',
+                text: '전반적인 연구 계획이 잘 작성되었습니다. 다만 몇 가지 보완이 필요한 부분이 있어 첨삭을 남겼습니다.\n\n특히 연구 방법론 부분을 더 구체화해 주세요.',
                 audio: null,
                 timestamp: '2025-11-20 09:30',
-                attachments: []
+                attachments: [],
+                ts: new Date('2025-11-20 09:30').getTime(),
+                attach: []
+            },
+            {
+                id: 'gf-fb001-2',
+                authorId: 'S001',
+                authorName: '김철수',
+                authorRole: 'student',
+                text: '감사합니다 교수님. 지적하신 부분 확인하고 수정하겠습니다.',
+                audio: null,
+                timestamp: '2025-11-20 10:00',
+                attachments: [],
+                ts: new Date('2025-11-20 10:00').getTime(),
+                attach: []
             }
         ],
         
@@ -371,6 +385,16 @@ const FEEDBACK_DATA = {
                             audio: null,
                             timestamp: '2025-11-20 09:35',
                             attachments: []
+                        },
+                        {
+                            id: 'cm-fb001-1-2',
+                            authorId: 'S001',
+                            authorName: '김철수',
+                            authorRole: 'student',
+                            text: '네, 연구 문제를 다음 버전에서 더 구체화하겠습니다.',
+                            audio: null,
+                            timestamp: '2025-11-20 11:00',
+                            attachments: []
                         }
                     ],
                     linkedComments: [],
@@ -409,17 +433,19 @@ const FEEDBACK_DATA = {
         version: 2,
         lastModified: '2025-11-19 15:30',
         lastModifiedBy: 'P001',
-        
+
         generalFeedbackThread: [
             {
                 id: 'gf-fb002-1',
                 authorId: 'P001',
                 authorName: '박교수',
                 authorRole: 'main',
-                text: '서론이 잘 작성되었습니다. 피드백 반영 확인했습니다.',
+                text: '서론이 잘 작성되었습니다. 피드백 반영 확인했습니다.\n\n이전 버전에서 지적한 연구 배경 부분이 잘 보완되었습니다. 다음 장으로 진행하셔도 좋습니다.',
                 audio: null,
                 timestamp: '2025-11-19 15:30',
-                attachments: []
+                attachments: [],
+                ts: new Date('2025-11-19 15:30').getTime(),
+                attach: []
             },
             {
                 id: 'gf-fb002-2',
@@ -429,11 +455,73 @@ const FEEDBACK_DATA = {
                 text: '감사합니다 교수님. 지적하신 부분 모두 수정했습니다.',
                 audio: null,
                 timestamp: '2025-11-19 16:00',
-                attachments: []
+                attachments: [],
+                ts: new Date('2025-11-19 16:00').getTime(),
+                attach: []
             }
         ],
-        
-        annotations: {}
+
+        annotations: {
+            '1': [
+                {
+                    type: 'path',
+                    customType: 'highlight',
+                    id: 'anno-fb002-h1',
+                    authorId: 'P001',
+                    authorName: '박교수',
+                    originX: 'left',
+                    originY: 'top',
+                    left: 120,
+                    top: 180,
+                    width: 280,
+                    height: 15,
+                    fill: null,
+                    stroke: 'rgba(255, 255, 0, 0.4)',
+                    strokeWidth: 15,
+                    path: [['M', 120, 187.5], ['L', 400, 187.5]]
+                },
+                {
+                    type: 'rect',
+                    customType: 'comment',
+                    id: 'anno-fb002-c1',
+                    authorId: 'P001',
+                    authorName: '박교수',
+                    left: 120,
+                    top: 220,
+                    width: 200,
+                    height: 50,
+                    fill: 'rgba(106, 0, 40, 0.1)',
+                    stroke: 'rgba(106, 0, 40, 0.8)',
+                    strokeWidth: 2,
+                    selectable: false,
+                    evented: false,
+                    comments: [
+                        {
+                            id: 'cm-fb002-1-1',
+                            authorId: 'P001',
+                            authorName: '박교수',
+                            authorRole: 'main',
+                            text: '이 부분 잘 수정되었습니다.',
+                            audio: null,
+                            timestamp: '2025-11-19 15:25',
+                            attachments: []
+                        },
+                        {
+                            id: 'cm-fb002-1-2',
+                            authorId: 'S002',
+                            authorName: '이영희',
+                            authorRole: 'student',
+                            text: '감사합니다!',
+                            audio: null,
+                            timestamp: '2025-11-19 16:05',
+                            attachments: []
+                        }
+                    ],
+                    linkedComments: [],
+                    commentAudio: null
+                }
+            ]
+        }
     },
     
     'fb-003': {
@@ -488,9 +576,9 @@ const QUICK_MARKS = [
 
 // ==================== 데이터 서비스 ====================
 const FeedbackDataService = {
-    // 제출물 목록 (학생이 첨삭 등록 완료한 것만)
+    // 제출물 목록 (모든 피드백 요청)
     getFeedbackRequests() {
-        return FEEDBACK_REQUESTS.filter(req => req.isCompleted === true);
+        return FEEDBACK_REQUESTS;
     },
     
     getFeedbackRequestById(id) {

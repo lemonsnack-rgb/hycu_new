@@ -96,7 +96,13 @@ function openFeedbackViewer(feedbackId) {
     
     // PDF 로드
     setTimeout(() => {
-        window._currentFeedbackCtx = {id: feedbackId, fileUrl: request.fileUrl, data: feedbackData};
+        window._currentFeedbackCtx = {
+            id: feedbackId,
+            fileUrl: request.fileUrl,
+            data: feedbackData,
+            isCompleted: request.isCompleted || false,
+            studentReflectionCompleted: request.studentReflectionCompleted || false
+        };
         
 // injected: submission history sidebar (left)
 (function ensureSubmissionSidebar(){
@@ -439,15 +445,19 @@ function completeFeedback() {
         return;
     }
 
-    // 빈 첨삭 검사 (feedback-tools.js의 annotations 전역 변수 사용)
+    // 빈 첨삭 검사 (FEEDBACK_DATA에서 직접 가져와서 최신 상태로 검증)
     const emptyComments = [];
 
-    if (window.annotations) {
+    // FEEDBACK_DATA에서 최신 annotations 가져오기
+    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    const latestAnnotations = feedbackData ? feedbackData.annotations : null;
+
+    if (latestAnnotations) {
         let globalCommentIndex = 1;
 
         // 모든 페이지 순회
-        for (const pageNum in window.annotations) {
-            const pageAnnotations = window.annotations[pageNum];
+        for (const pageNum in latestAnnotations) {
+            const pageAnnotations = latestAnnotations[pageNum];
             if (!pageAnnotations) continue;
 
             // 각 페이지의 첨삭 검사
@@ -543,9 +553,21 @@ function createQuickMarkPopover() {
     document.body.appendChild(popover);
     console.log('[createQuickMarkPopover] 팝오버 DOM에 추가 완료');
 
-    // 이벤트 리스너
-    document.getElementById('add-quickmark-btn').addEventListener('click', addNewQuickMark);
-    document.getElementById('add-quickmark-from-text-btn').addEventListener('click', saveQuickMarkFromText);
+    // 이벤트 리스너 (window 객체에서 참조)
+    document.getElementById('add-quickmark-btn').addEventListener('click', () => {
+        if (window.addNewQuickMark) {
+            window.addNewQuickMark();
+        } else {
+            console.error('addNewQuickMark 함수를 찾을 수 없습니다.');
+        }
+    });
+    document.getElementById('add-quickmark-from-text-btn').addEventListener('click', () => {
+        if (window.saveQuickMarkFromText) {
+            window.saveQuickMarkFromText();
+        } else {
+            console.error('saveQuickMarkFromText 함수를 찾을 수 없습니다.');
+        }
+    });
     console.log('[createQuickMarkPopover] 이벤트 리스너 등록 완료');
 }
 
@@ -652,8 +674,9 @@ function renderGeneralThread(feedbackId){
   // 메인 평가는 내 평가만 표시
   const mainFeedback = myFeedback;
   const replies = []; // 댓글 기능은 제거 (교수 1명당 1개만 등록)
-  
+
   const isOwner = mainFeedback.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
+  const isCompleted = window._currentFeedbackCtx?.isCompleted || false;
   const att = (mainFeedback.attach && mainFeedback.attach.length > 0) ?
               `<div class="mt-2 flex items-center gap-2 p-2 bg-white border border-gray-200 rounded">
                 <i class="fas fa-paperclip text-gray-500 text-xs"></i>
@@ -672,7 +695,7 @@ function renderGeneralThread(feedbackId){
           ${att ? '<div class="text-xs text-gray-600 mb-2">'+att+'</div>' : ''}
           <div class="flex items-center justify-between">
             <div class="text-[11px] text-gray-500">${new Date(mainFeedback.ts).toLocaleString()}</div>
-            ${isOwner ? `
+            ${isOwner && !isCompleted ? `
               <div class="flex items-center gap-2">
                 <button onclick="window.editGeneralMain()"
                         class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">

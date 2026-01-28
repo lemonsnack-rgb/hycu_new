@@ -868,10 +868,13 @@ function renderCommentPanel() {
         return;
     }
 
+    // 완료 상태 확인
+    const isCompleted = window._currentFeedbackCtx?.isCompleted || false;
+
     // 렌더링
     container.innerHTML = items.map(item => {
         if (item.type === 'comment') {
-            return renderCommentCard(item.data, item.pageNum);
+            return renderCommentCard(item.data, item.pageNum, isCompleted);
         } else {
             return renderPageMarker(item.pageNum, item.count);
         }
@@ -884,7 +887,7 @@ function renderCommentPanel() {
 }
 
 // ==================== 코멘트 카드 렌더링 (완전 재작성) ====================
-function renderCommentCard(comment, pageNum) {
+function renderCommentCard(comment, pageNum, isCompleted = false) {
     const commentNumber = getCommentNumber(comment.id);
     const author = FeedbackDataService.getUserById(comment.authorId);
     const roleText = author ? (author.role === 'main' ? '주지도' : '공동지도') : '';
@@ -1154,26 +1157,28 @@ function renderCommentCard(comment, pageNum) {
                 <div class="comment-replies">
                     <h6 class="text-xs font-semibold text-gray-600 mb-2">💬 댓글 (${replies.length})</h6>
                     <div class="comment-thread">
-                        ${replies.map(c => renderCommentBubble(c, comment.id)).join('')}
+                        ${replies.map(c => renderCommentBubble(c, comment.id, isCompleted)).join('')}
                     </div>
-                    
-                    <div class="mt-3 space-y-2">
-                        <textarea id="reply-${comment.id}" 
-                                  class="w-full p-2 border rounded-md text-xs resize-none" 
-                                  rows="2" 
-                                  placeholder="댓글을 입력하세요..."></textarea>
-                        <div class="flex gap-2 flex-wrap">
-                            <button onclick="addCommentReply('${comment.id}')" 
-                                    class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-                                <i class="fas fa-paper-plane"></i>
-                                <span>댓글 등록</span>
-                            </button>
-                            <button onclick="uploadReplyAttachment('${comment.id}')" class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
-                                <i class="fas fa-paperclip"></i>
-                                <span>첨부</span>
-                            </button>
+
+                    ${!isCompleted ? `
+                        <div class="mt-3 space-y-2">
+                            <textarea id="reply-${comment.id}"
+                                      class="w-full p-2 border rounded-md text-xs resize-none"
+                                      rows="2"
+                                      placeholder="댓글을 입력하세요..."></textarea>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="addCommentReply('${comment.id}')"
+                                        class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>댓글 등록</span>
+                                </button>
+                                <button onclick="uploadReplyAttachment('${comment.id}')" class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
+                                    <i class="fas fa-paperclip"></i>
+                                    <span>첨부</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -1189,13 +1194,13 @@ function renderCommentCard(comment, pageNum) {
 }
 
 // ==================== 코멘트 말풍선 렌더링 ====================
-function renderCommentBubble(comment, parentCommentId) {
+function renderCommentBubble(comment, parentCommentId, isCompleted = false) {
     const author = FeedbackDataService.getUserById(comment.authorId);
-    const roleClass = author ? 
-        (author.role === 'main' ? 'professor-main' : 
-         author.role === 'co' ? 'professor-co' : 
+    const roleClass = author ?
+        (author.role === 'main' ? 'professor-main' :
+         author.role === 'co' ? 'professor-co' :
          'student-comment') : 'student-comment';
-    
+
     const isOwner = comment.authorId === CURRENT_USER.id;
     const audioHtml = comment.audio ? 
         `<audio controls class="w-full h-8 mt-2" src="${comment.audio}"></audio>` : '';
@@ -1210,7 +1215,7 @@ function renderCommentBubble(comment, parentCommentId) {
                 ${audioHtml}
                 <div class="flex items-center justify-between mt-2">
                     <div class="timestamp">${comment.timestamp}</div>
-                    ${isOwner ? `
+                    ${isOwner && !isCompleted ? `
                         <div class="flex gap-2">
                             <button onclick="event.stopPropagation(); editReply('${parentCommentId}', '${comment.id}')"
                                     class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">

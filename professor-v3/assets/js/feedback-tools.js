@@ -251,14 +251,22 @@ function initPDFViewer(feedbackId, pdfUrl, feedbackData) {
 
 // ==================== 도구 설정 ====================
 function setTool(tool) {
+    // 완료된 문서는 첨삭 도구 사용 불가
+    if (window._currentFeedbackCtx?.isCompleted) {
+        if (tool !== 'select') {
+            showToast('완료된 문서는 첨삭할 수 없습니다.', 'error');
+            return;
+        }
+    }
+
     currentTool = tool;
-    
+
     // 버튼 활성화 표시
     document.querySelectorAll('.pdf-toolbar-btn').forEach(btn => {
         btn.classList.remove('active');
     });
     document.getElementById(`${tool}-tool`).classList.add('active');
-    
+
     // 텍스트 레이어 활성화/비활성화 ✨ 추가
     const textLayer = document.getElementById('text-layer');
     if (textLayer) {
@@ -853,10 +861,13 @@ function renderCommentPanel() {
         return;
     }
     
+    // 완료 상태 확인
+    const isCompleted = window._currentFeedbackCtx?.isCompleted || false;
+
     // 렌더링
     container.innerHTML = items.map(item => {
         if (item.type === 'comment') {
-            return renderCommentCard(item.data, item.pageNum);
+            return renderCommentCard(item.data, item.pageNum, isCompleted);
         } else {
             return renderPageMarker(item.pageNum, item.count);
         }
@@ -864,7 +875,7 @@ function renderCommentPanel() {
 }
 
 // ==================== 코멘트 카드 렌더링 (완전 재작성) ====================
-function renderCommentCard(comment, pageNum) {
+function renderCommentCard(comment, pageNum, isCompleted = false) {
     const commentNumber = getCommentNumber(comment.id);
     const author = FeedbackDataService.getUserById(comment.authorId);
     const roleText = author ? (author.role === 'main' ? '주지도' : '공동지도') : '';
@@ -993,7 +1004,7 @@ function renderCommentCard(comment, pageNum) {
                             ` : ''}
                             <div class="flex items-center justify-between mt-2">
                                 <div class="timestamp">${mainComment.timestamp}</div>
-                                ${isOwner ? `
+                                ${isOwner && !isCompleted ? `
                                     <div class="flex gap-2">
                                         <button onclick="event.stopPropagation(); editMainComment('${comment.id}')"
                                                 class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
@@ -1062,11 +1073,11 @@ function renderCommentCard(comment, pageNum) {
                         </div>
                     </div>
                 ` : `
-                    ${isOwner ? `
+                    ${isOwner && !isCompleted ? `
                         <div class="space-y-2">
-                            <textarea id="main-comment-${comment.id}" 
-                                      class="w-full p-2 border rounded-md text-xs resize-none" 
-                                      rows="3" 
+                            <textarea id="main-comment-${comment.id}"
+                                      class="w-full p-2 border rounded-md text-xs resize-none"
+                                      rows="3"
                                       placeholder="첨삭 내용을 입력하세요."></textarea>
                             <div class="flex gap-2 flex-wrap">
                                 <!-- 첫 번째 줄: 보조 기능 -->
@@ -1078,7 +1089,7 @@ function renderCommentCard(comment, pageNum) {
                                     <i class="fas fa-paperclip"></i>
                                     <span>첨부</span>
                                 </button>
-                                <button onclick="startVoiceRecording('${comment.id}')" 
+                                <button onclick="startVoiceRecording('${comment.id}')"
                                         class="record-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
                                     <i class="fas fa-microphone"></i>
                                     <i class="fas fa-stop" style="display:none;"></i>
@@ -1100,6 +1111,10 @@ function renderCommentCard(comment, pageNum) {
                                 </button>
                             </div>
                         </div>
+                    ` : isCompleted ? `
+                        <div class="text-xs text-gray-500 italic p-2 bg-gray-50 rounded border border-gray-200 text-center">
+                            <i class="fas fa-lock"></i> 완료된 문서입니다
+                        </div>
                     ` : `
                         <p class="text-xs text-gray-500 italic">첨삭 대기 중...</p>
                     `}
@@ -1117,26 +1132,28 @@ function renderCommentCard(comment, pageNum) {
                 <div class="comment-replies">
                     <h6 class="text-xs font-semibold text-gray-600 mb-2">💬 댓글 (${replies.length})</h6>
                     <div class="comment-thread">
-                        ${replies.map(c => renderCommentBubble(c, comment.id)).join('')}
+                        ${replies.map(c => renderCommentBubble(c, comment.id, isCompleted)).join('')}
                     </div>
-                    
-                    <div class="mt-3 space-y-2">
-                        <textarea id="reply-${comment.id}" 
-                                  class="w-full p-2 border rounded-md text-xs resize-none" 
-                                  rows="2" 
-                                  placeholder="댓글을 입력하세요..."></textarea>
-                        <div class="flex gap-2 flex-wrap">
-                            <button onclick="addCommentReply('${comment.id}')" 
-                                    class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-                                <i class="fas fa-paper-plane"></i>
-                                <span>댓글 등록</span>
-                            </button>
-                            <button onclick="uploadReplyAttachment('${comment.id}')" class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
-                                <i class="fas fa-paperclip"></i>
-                                <span>첨부</span>
-                            </button>
+
+                    ${!isCompleted ? `
+                        <div class="mt-3 space-y-2">
+                            <textarea id="reply-${comment.id}"
+                                      class="w-full p-2 border rounded-md text-xs resize-none"
+                                      rows="2"
+                                      placeholder="댓글을 입력하세요..."></textarea>
+                            <div class="flex gap-2 flex-wrap">
+                                <button onclick="addCommentReply('${comment.id}')"
+                                        class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
+                                    <i class="fas fa-paper-plane"></i>
+                                    <span>댓글 등록</span>
+                                </button>
+                                <button onclick="uploadReplyAttachment('${comment.id}')" class="text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1">
+                                    <i class="fas fa-paperclip"></i>
+                                    <span>첨부</span>
+                                </button>
+                            </div>
                         </div>
-                    </div>
+                    ` : ''}
                 </div>
             </div>
         `;
@@ -1152,13 +1169,13 @@ function renderCommentCard(comment, pageNum) {
 }
 
 // ==================== 코멘트 말풍선 렌더링 ====================
-function renderCommentBubble(comment, parentCommentId) {
+function renderCommentBubble(comment, parentCommentId, isCompleted = false) {
     const author = FeedbackDataService.getUserById(comment.authorId);
-    const roleClass = author ? 
-        (author.role === 'main' ? 'professor-main' : 
-         author.role === 'co' ? 'professor-co' : 
+    const roleClass = author ?
+        (author.role === 'main' ? 'professor-main' :
+         author.role === 'co' ? 'professor-co' :
          'student-comment') : 'student-comment';
-    
+
     const isOwner = comment.authorId === CURRENT_USER.id;
     const audioHtml = comment.audio ? 
         `<audio controls class="w-full h-8 mt-2" src="${comment.audio}"></audio>` : '';
@@ -1173,7 +1190,7 @@ function renderCommentBubble(comment, parentCommentId) {
                 ${audioHtml}
                 <div class="flex items-center justify-between mt-2">
                     <div class="timestamp">${comment.timestamp}</div>
-                    ${isOwner ? `
+                    ${isOwner && !isCompleted ? `
                         <div class="flex gap-2">
                             <button onclick="event.stopPropagation(); editReply('${parentCommentId}', '${comment.id}')"
                                     class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
@@ -2176,13 +2193,20 @@ function addMainComment(commentId) {
 
 // ==================== 피드백 완료 (신규) ====================
 function completeFeedback() {
-    // 빈 첨삭 검사
+    // feedbackId 가져오기
+    const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
+
+    // 빈 첨삭 검사 (FEEDBACK_DATA에서 직접 가져와서 최신 상태로 검증)
     const emptyComments = [];
     let globalCommentIndex = 1;
 
+    // FEEDBACK_DATA에서 최신 annotations 가져오기
+    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    const latestAnnotations = feedbackData ? feedbackData.annotations : null;
+
     // 모든 페이지의 첨삭 검사
-    for (const pageNum in annotations) {
-        const pageAnnotations = annotations[pageNum];
+    for (const pageNum in latestAnnotations) {
+        const pageAnnotations = latestAnnotations[pageNum];
         if (!pageAnnotations) continue;
 
         // 각 annotation 검사
@@ -2215,7 +2239,7 @@ function completeFeedback() {
     }
 
     // ✅ 수정: 제출물 상태를 '피드백 완료'로 변경
-    const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
+    // feedbackId는 이미 위에서 선언됨 (line 2197)
 
     // FeedbackDataService의 completeFeedbackRequest 사용
     const success = FeedbackDataService.completeFeedbackRequest(feedbackId);
@@ -2229,8 +2253,7 @@ function completeFeedback() {
         }
     }
 
-    // FEEDBACK_DATA도 업데이트
-    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    // FEEDBACK_DATA도 업데이트 (feedbackData는 이미 위에서 선언됨)
     if (feedbackData) {
         feedbackData.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
         feedbackData.lastModifiedBy = CURRENT_USER.id;

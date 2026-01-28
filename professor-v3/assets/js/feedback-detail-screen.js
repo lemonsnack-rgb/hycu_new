@@ -111,6 +111,7 @@ function openFeedbackDetailScreen(feedbackId) {
         id: feedbackId,
         fileUrl: request.fileUrl,
         data: feedbackData,
+        isCompleted: request.isCompleted || false,
         studentReflectionCompleted: request.studentReflectionCompleted || false
     };
     console.log('[openFeedbackDetailScreen] _currentFeedbackCtx 설정 완료:', window._currentFeedbackCtx);
@@ -350,42 +351,50 @@ function createFeedbackDetailScreen(request, feedbackData) {
                                 <!-- 동적 렌더링 -->
                             </div>
                             <!-- 입력창은 조건부 표시 -->
-                            <div id="general-feedback-input-section" class="relative">
-                                <textarea id="general-feedback-input"
-                                          class="w-full p-2 border rounded-md text-sm resize-none"
-                                          rows="3"
-                                          placeholder="전체 평가를 입력하세요..."></textarea>
+                            ${!request.isCompleted ? `
+                                <div id="general-feedback-input-section" class="relative">
+                                    <textarea id="general-feedback-input"
+                                              class="w-full p-2 border rounded-md text-sm resize-none"
+                                              rows="3"
+                                              placeholder="전체 평가를 입력하세요..."></textarea>
 
-                                <!-- 첨부파일 미리보기 영역 -->
-                                <div id="general-attach-preview" class="mt-2 hidden">
-                                    <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
-                                        <div class="flex items-center gap-2">
-                                            <i class="fas fa-paperclip text-gray-500"></i>
-                                            <span id="general-attach-filename" class="text-sm text-gray-700"></span>
-                                            <span id="general-attach-filesize" class="text-xs text-gray-500"></span>
+                                    <!-- 첨부파일 미리보기 영역 -->
+                                    <div id="general-attach-preview" class="mt-2 hidden">
+                                        <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
+                                            <div class="flex items-center gap-2">
+                                                <i class="fas fa-paperclip text-gray-500"></i>
+                                                <span id="general-attach-filename" class="text-sm text-gray-700"></span>
+                                                <span id="general-attach-filesize" class="text-xs text-gray-500"></span>
+                                            </div>
+                                            <button onclick="removeGeneralAttachment()"
+                                                    class="text-red-600 hover:text-red-700 text-sm">
+                                                <i class="fas fa-times"></i>
+                                            </button>
                                         </div>
-                                        <button onclick="removeGeneralAttachment()"
-                                                class="text-red-600 hover:text-red-700 text-sm">
-                                            <i class="fas fa-times"></i>
+                                    </div>
+
+                                    <div class="flex gap-2 mt-2 flex-wrap">
+                                        <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
+                                            <i class="fas fa-paper-plane"></i>
+                                            <span>등록</span>
+                                        </button>
+                                        <button class="quickmark-btn text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1" data-target="general-feedback-input">
+                                            <i class="fas fa-star"></i>
+                                            <span>자주 쓰는 코멘트</span>
+                                        </button>
+                                        <button onclick="uploadAttachmentForGeneral()" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
+                                            <i class="fas fa-paperclip"></i>
+                                            <span>첨부</span>
                                         </button>
                                     </div>
                                 </div>
-
-                                <div class="flex gap-2 mt-2 flex-wrap">
-                                    <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-                                        <i class="fas fa-paper-plane"></i>
-                                        <span>등록</span>
-                                    </button>
-                                    <button class="quickmark-btn text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1" data-target="general-feedback-input">
-                                        <i class="fas fa-star"></i>
-                                        <span>자주 쓰는 코멘트</span>
-                                    </button>
-                                    <button onclick="uploadAttachmentForGeneral()" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
-                                        <i class="fas fa-paperclip"></i>
-                                        <span>첨부</span>
-                                    </button>
+                            ` : `
+                                <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-md text-center">
+                                    <i class="fas fa-lock text-yellow-600 text-lg mb-2"></i>
+                                    <p class="text-sm text-gray-700 font-medium">피드백이 완료되었습니다.</p>
+                                    <p class="text-xs text-gray-600 mt-1">새로운 버전을 제출하여 추가 피드백을 받으세요.</p>
                                 </div>
-                            </div>
+                            `}
                         </div>
 
                         <!-- ID 43: 페이지 코멘트 → 첨삭 탭 -->
@@ -509,7 +518,9 @@ function switchToSubmissionVersion(targetFeedbackId) {
     window._currentFeedbackCtx = {
         id: targetFeedbackId,
         fileUrl: targetRequest.fileUrl,
-        data: targetFeedbackData
+        data: targetFeedbackData,
+        isCompleted: targetRequest.isCompleted || false,
+        studentReflectionCompleted: targetRequest.studentReflectionCompleted || false
     };
 
     // 4. PDF 뷰어 재초기화
@@ -569,15 +580,30 @@ function updateStudentInfoSection(request) {
 
 // ==================== 상세 화면 닫기 (모달 닫기) ====================
 async function closeFeedbackDetailScreen() {
-    // 빈 첨삭 검사 (feedback-tools.js의 annotations 전역 변수 사용)
+    // 현재 피드백 ID 가져오기
+    const feedbackId = window._currentFeedbackCtx?.id;
+    if (!feedbackId) {
+        // feedbackId가 없으면 빈 첨삭 검사 없이 바로 닫기
+        const modal = document.getElementById('feedback-detail-modal');
+        if (modal) {
+            modal.remove();
+        }
+        return;
+    }
+
+    // 빈 첨삭 검사 (FEEDBACK_DATA에서 직접 가져와서 최신 상태로 검증)
     const emptyComments = [];
 
-    if (window.annotations) {
+    // FEEDBACK_DATA에서 최신 annotations 가져오기
+    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    const latestAnnotations = feedbackData ? feedbackData.annotations : null;
+
+    if (latestAnnotations) {
         let globalCommentIndex = 1;
 
         // 모든 페이지 순회
-        for (const pageNum in window.annotations) {
-            const pageAnnotations = window.annotations[pageNum];
+        for (const pageNum in latestAnnotations) {
+            const pageAnnotations = latestAnnotations[pageNum];
             if (!pageAnnotations) continue;
 
             // 각 페이지의 첨삭 검사
@@ -644,15 +670,19 @@ async function completeFeedbackDetail() {
         return;
     }
 
-    // 빈 첨삭 검사 (feedback-tools.js의 annotations 전역 변수 사용)
+    // 빈 첨삭 검사 (FEEDBACK_DATA에서 직접 가져와서 최신 상태로 검증)
     const emptyComments = [];
 
-    if (window.annotations) {
+    // FEEDBACK_DATA에서 최신 annotations 가져오기
+    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    const latestAnnotations = feedbackData ? feedbackData.annotations : null;
+
+    if (latestAnnotations) {
         let globalCommentIndex = 1;
 
         // 모든 페이지 순회
-        for (const pageNum in window.annotations) {
-            const pageAnnotations = window.annotations[pageNum];
+        for (const pageNum in latestAnnotations) {
+            const pageAnnotations = latestAnnotations[pageNum];
             if (!pageAnnotations) continue;
 
             // 각 페이지의 첨삭 검사
