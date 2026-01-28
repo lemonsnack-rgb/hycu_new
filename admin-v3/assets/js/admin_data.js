@@ -1130,7 +1130,8 @@ const appData = {
         { id: 'scheduleManagement', name: '논문지도 일정 관리', category: '프로세스 설정' },
         { id: 'requirementManagement', name: '논문 제출 요건 관리', category: '프로세스 설정' },
         { id: 'stageManagement', name: '논문지도 워크플로우 관리', category: '프로세스 설정' },
-        { id: 'typeManagement', name: '지도 단계 유형 관리', category: '프로세스 설정' },
+        { id: 'typeManagement', name: '지도 단계 등록', category: '프로세스 설정' },
+        { id: 'typeManagementNew', name: '지도 단계 등록(신규)', category: '프로세스 설정' },
         { id: 'evaluationCriteria', name: '평가 기준 관리', category: '프로세스 설정' },
         { id: 'permissionManagement', name: '권한 관리', category: '시스템 설정' }
     ],
@@ -1149,6 +1150,7 @@ const appData = {
         { adminId: 1, screenId: 'requirementManagement', hasAccess: true },
         { adminId: 1, screenId: 'stageManagement', hasAccess: true },
         { adminId: 1, screenId: 'typeManagement', hasAccess: true },
+        { adminId: 1, screenId: 'typeManagementNew', hasAccess: true },
         { adminId: 1, screenId: 'evaluationCriteria', hasAccess: true },
         { adminId: 1, screenId: 'permissionManagement', hasAccess: true },
 
@@ -1164,6 +1166,7 @@ const appData = {
         { adminId: 2, screenId: 'requirementManagement', hasAccess: false },
         { adminId: 2, screenId: 'stageManagement', hasAccess: false },
         { adminId: 2, screenId: 'typeManagement', hasAccess: false },
+        { adminId: 2, screenId: 'typeManagementNew', hasAccess: false },
         { adminId: 2, screenId: 'evaluationCriteria', hasAccess: false },
         { adminId: 2, screenId: 'permissionManagement', hasAccess: false },
 
@@ -1179,6 +1182,7 @@ const appData = {
         { adminId: 3, screenId: 'requirementManagement', hasAccess: false },
         { adminId: 3, screenId: 'stageManagement', hasAccess: false },
         { adminId: 3, screenId: 'typeManagement', hasAccess: false },
+        { adminId: 3, screenId: 'typeManagementNew', hasAccess: false },
         { adminId: 3, screenId: 'evaluationCriteria', hasAccess: false },
         { adminId: 3, screenId: 'permissionManagement', hasAccess: false }
     ],

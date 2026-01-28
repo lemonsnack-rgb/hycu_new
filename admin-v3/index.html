@@ -299,6 +299,10 @@
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>지도단계등록</span>
                         </a>
+                        <a href="#" onclick="showScreen('typeManagementNew'); return false;" data-screen="typeManagementNew"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>지도단계 등록(신규)</span>
+                        </a>
                         <a href="#" onclick="showScreen('advisorAssignment'); return false;" data-screen="advisorAssignment"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>지도교수배정</span>
@@ -906,6 +910,11 @@
                 targetScreenId = 'dashboard';
             }
 
+            // typeManagementNew와 typeManagementCreate는 typeManagement-screen을 사용
+            if (screenId === 'typeManagementNew' || screenId === 'typeManagementCreate') {
+                targetScreenId = 'typeManagement';
+            }
+
             // 선택된 화면 보이기
             const targetScreen = document.getElementById(targetScreenId + '-screen');
             if (targetScreen) {
@@ -970,7 +979,9 @@
                 'dashboard': 'content-area',
                 'stageManagement': 'stage-management-content',
                 'typeManagement': 'type-management-content',
-                'workflowCreateUnified': 'type-management-content', // 지도 단계 등록/수정
+                'typeManagementNew': 'type-management-content', // 지도 단계 목록 (신규)
+                'typeManagementCreate': 'type-management-content', // 지도 단계 등록 (계층형)
+                'workflowCreateUnified': 'type-management-content', // 지도 단계 등록/수정 (기존)
                 'stageTypeManagement': 'stage-type-management-content',
                 'stageTypeCreate': 'stage-type-management-content', // 지도 단계 유형 등록
                 'stageTypeEdit': 'stage-type-management-content', // 지도 단계 유형 수정

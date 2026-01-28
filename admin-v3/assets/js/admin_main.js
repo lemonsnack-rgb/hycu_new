@@ -33,7 +33,9 @@ function switchView(viewName, param = null) {
         requirementManagement: '논문 제출 요건 등록',
         titleChangeRequests: '최종 논문 제목 등록',
         stageManagement: '학생별 지도 단계 관리',
-        typeManagement: '지도 단계 등록',
+        typeManagement: '지도 단계 목록',
+        typeManagementNew: '지도 단계 목록 (신규)',
+        typeManagementCreate: '지도 단계 등록',
         stageTypeManagement: '지도 단계 유형 관리',
         committeeAssignment: '심사위원 배정',
         evaluationCriteria: '심사 기준 등록',
@@ -88,6 +90,19 @@ function switchView(viewName, param = null) {
                 updateTotalScore();
             }, 0);
         }
+    }
+
+    if (viewName === 'typeManagementNew') {
+        // 지도단계 목록(신규) 화면 - 아무것도 안함
+    }
+
+    if (viewName === 'typeManagementCreate') {
+        // 지도단계 등록 화면 렌더링 후 계층적 단계 초기화
+        setTimeout(() => {
+            if (typeof renderHierarchicalStages === 'function') {
+                renderHierarchicalStages();
+            }
+        }, 0);
     }
 }
 

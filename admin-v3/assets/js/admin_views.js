@@ -3615,6 +3615,166 @@ const views = {
         `;
     },
 
+    // ========== 지도단계 등록(신규) - 목록 화면 ==========
+    typeManagementNew: () => {
+        const data = mockThesisStages;
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">지도 단계 목록 (신규)</h3>
+                            <span class="table-count">(총 ${data.length}건)</span>
+                        </div>
+                        <div class="table-header-right">
+                            <button onclick="switchView('typeManagementCreate')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
+                                등록
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                    <table class="min-w-full table-fixed">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">순번</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도 단계명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학과명</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유효 지도단계</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200">
+                            ${data.map((item, idx) => {
+                                const degreeLabel = item.degreeType === 'master' ? '석사' : '박사';
+                                const departmentLabel = item.departmentName || '-';
+                                const isValidLabel = item.isValidStage === 'Y' ? 'Y' : 'N';
+
+                                return `
+                                <tr class="hover:bg-blue-50" onclick="switchView('typeManagementCreate', '${item.id}')" style="cursor: pointer;">
+                                    <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
+                                    <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-700">${departmentLabel}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-700">${degreeLabel}</td>
+                                    <td class="py-3 px-4 text-sm text-gray-600">
+                                        <div class="flex items-center gap-1 flex-wrap">
+                                            ${item.stages.map((stage, stepIdx) => {
+                                                const bgColor = stage.type === 'submission' ? 'bg-gray-100 text-gray-700' :
+                                                               (stage.evaluationRequired ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700');
+
+                                                return `
+                                                    <span class="px-2 py-1 rounded text-xs ${bgColor}">
+                                                        ${stage.order}. ${stage.name}
+                                                    </span>
+                                                    ${stepIdx < item.stages.length - 1 ? '<span class="text-gray-400">→</span>' : ''}
+                                                `;
+                                            }).join('')}
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4 text-sm text-gray-600 text-center">${isValidLabel}</td>
+                                </tr>
+                            `}).join('')}
+                        </tbody>
+                    </table>
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    // ========== 지도단계 등록 - 계층적 구조 ==========
+    typeManagementCreate: () => {
+        console.log('🎯 typeManagementCreate view rendering');
+
+        // 초기 데이터 구조: window.hierarchicalStages
+        // { basicStage: '논문 작성 계획서', subStages: [...] }
+        window.hierarchicalStages = window.hierarchicalStages || [];
+
+        // 학과명 목록 (mockDepartmentNames가 없을 경우 대비)
+        const departments = window.mockDepartmentNames || [
+            '컴퓨터공학과', '전자공학과', '기계공학과', '경영학과', '행정학과'
+        ];
+
+        console.log('🎯 Departments:', departments);
+
+        return `
+            <div class="bg-white rounded-lg shadow-md">
+                <!-- 헤더 -->
+                <div class="p-6 border-b">
+                    <h3 class="text-lg font-bold text-gray-800">지도 단계 등록(신규)</h3>
+                    <p class="text-sm text-gray-600 mt-1">기본단계 선택 후 세부단계를 추가하여 지도 단계를 등록합니다.</p>
+                </div>
+
+                <!-- 기본 정보 -->
+                <div class="p-6 border-b bg-gray-50">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
+                                지도 단계명 <span class="text-red-600">*</span>
+                            </label>
+                            <input type="text"
+                                   id="new-workflow-name"
+                                   placeholder="예: 석사 표준 과정"
+                                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
+                                학과명 <span class="text-red-600">*</span>
+                            </label>
+                            <select id="new-workflow-department"
+                                    class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="">학과 선택</option>
+                                ${departments.map(dept => `
+                                    <option value="${dept}">${dept}</option>
+                                `).join('')}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 계층적 단계 구성 -->
+                <div class="p-6">
+                    <div class="mb-4">
+                        <h4 class="text-md font-semibold text-gray-800 mb-2">단계 구성</h4>
+                        <p class="text-sm text-gray-600 mb-4">
+                            기본단계를 선택한 후, 각 기본단계마다 세부단계를 최소 1개 이상 추가해주세요.
+                        </p>
+                    </div>
+
+                    <!-- 기본단계 목록 -->
+                    <div id="hierarchical-stages-container" class="space-y-6">
+                        <!-- JavaScript로 동적 렌더링 -->
+                    </div>
+
+                    <!-- 기본단계 추가 버튼 -->
+                    <div class="flex justify-end mt-4">
+                        <button onclick="addBasicStage()"
+                                class="px-6 py-2.5 bg-white border border-gray-300 rounded-md text-gray-700 font-semibold hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center gap-2 text-sm">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <line x1="12" y1="5" x2="12" y2="19" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                                <line x1="5" y1="12" x2="19" y2="12" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+                            </svg>
+                            기본단계 추가
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 푸터 버튼 -->
+                <div class="p-6 border-t bg-gray-50 flex justify-end gap-3">
+                    <button onclick="switchView('typeManagementNew')"
+                            class="px-7 py-2.5 border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 font-semibold text-sm">
+                        목록으로
+                    </button>
+                    <button onclick="saveHierarchicalWorkflow()"
+                            class="px-7 py-2.5 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034] font-semibold text-sm">
+                        저장
+                    </button>
+                </div>
+            </div>
+        `;
+    },
+
     // ========== 사용자 관리 ==========
     userManagement: () => {
         const users = mockUsers;

@@ -7840,3 +7840,373 @@ function closeScheduleModal() {
 window.openScheduleModal = openScheduleModal;
 window.closeScheduleModal = closeScheduleModal;
 window.saveSchedules = saveSchedules;
+
+// ==================== 지도단계 등록(신규) - 계층적 구조 헬퍼 함수 ====================
+
+/**
+ * 기본단계 추가
+ */
+function addBasicStage() {
+    const newBasicStage = {
+        id: 'BASIC_' + Date.now(),
+        basicStage: '', // 드롭다운에서 선택
+        subStages: [
+            {
+                id: 'SUB_' + Date.now(),
+                order: 1,
+                name: '',
+                approvalAuthority: '지도교수', // 기본값
+                evaluationTemplateId: '',
+                type: '' // 기본단계에서 상속받음
+            }
+        ]
+    };
+
+    window.hierarchicalStages.push(newBasicStage);
+    renderHierarchicalStages();
+}
+
+/**
+ * 기본단계 삭제
+ */
+function removeBasicStage(basicStageId) {
+    if (!confirm('이 기본단계와 모든 세부단계를 삭제하시겠습니까?')) {
+        return;
+    }
+
+    window.hierarchicalStages = window.hierarchicalStages.filter(bs => bs.id !== basicStageId);
+    renderHierarchicalStages();
+}
+
+/**
+ * 기본단계 선택 변경
+ */
+function onBasicStageChange(basicStageId, selectedValue) {
+    const basicStage = window.hierarchicalStages.find(bs => bs.id === basicStageId);
+    if (!basicStage) return;
+
+    basicStage.basicStage = selectedValue;
+
+    // 모든 세부단계에 type 상속
+    basicStage.subStages.forEach(sub => {
+        sub.type = selectedValue;
+    });
+}
+
+/**
+ * 세부단계 추가
+ */
+function addSubStage(basicStageId) {
+    const basicStage = window.hierarchicalStages.find(bs => bs.id === basicStageId);
+    if (!basicStage) return;
+
+    const newOrder = basicStage.subStages.length + 1;
+    const newSubStage = {
+        id: 'SUB_' + Date.now(),
+        order: newOrder,
+        name: '',
+        approvalAuthority: '지도교수',
+        evaluationTemplateId: '',
+        type: basicStage.basicStage // 기본단계에서 상속
+    };
+
+    basicStage.subStages.push(newSubStage);
+    renderHierarchicalStages();
+}
+
+/**
+ * 세부단계 삭제
+ */
+function removeSubStage(basicStageId, subStageId) {
+    const basicStage = window.hierarchicalStages.find(bs => bs.id === basicStageId);
+    if (!basicStage) return;
+
+    if (basicStage.subStages.length === 1) {
+        alert('세부단계는 최소 1개 이상 필요합니다.');
+        return;
+    }
+
+    basicStage.subStages = basicStage.subStages.filter(sub => sub.id !== subStageId);
+
+    // 순서 재정렬
+    basicStage.subStages.forEach((sub, idx) => {
+        sub.order = idx + 1;
+    });
+
+    renderHierarchicalStages();
+}
+
+/**
+ * 세부단계 순서 변경 (위로)
+ */
+function moveSubStageUp(basicStageId, subStageId) {
+    const basicStage = window.hierarchicalStages.find(bs => bs.id === basicStageId);
+    if (!basicStage) return;
+
+    const index = basicStage.subStages.findIndex(sub => sub.id === subStageId);
+    if (index <= 0) return; // 첫 번째 항목이거나 찾지 못함
+
+    // 배열에서 위치 변경
+    [basicStage.subStages[index - 1], basicStage.subStages[index]] =
+    [basicStage.subStages[index], basicStage.subStages[index - 1]];
+
+    // 순서 재정렬
+    basicStage.subStages.forEach((sub, idx) => {
+        sub.order = idx + 1;
+    });
+
+    renderHierarchicalStages();
+}
+
+/**
+ * 세부단계 순서 변경 (아래로)
+ */
+function moveSubStageDown(basicStageId, subStageId) {
+    const basicStage = window.hierarchicalStages.find(bs => bs.id === basicStageId);
+    if (!basicStage) return;
+
+    const index = basicStage.subStages.findIndex(sub => sub.id === subStageId);
+    if (index < 0 || index >= basicStage.subStages.length - 1) return;
+
+    // 배열에서 위치 변경
+    [basicStage.subStages[index], basicStage.subStages[index + 1]] =
+    [basicStage.subStages[index + 1], basicStage.subStages[index]];
+
+    // 순서 재정렬
+    basicStage.subStages.forEach((sub, idx) => {
+        sub.order = idx + 1;
+    });
+
+    renderHierarchicalStages();
+}
+
+/**
+ * 세부단계 정보 업데이트
+ */
+function updateSubStageField(basicStageId, subStageId, field, value) {
+    const basicStage = window.hierarchicalStages.find(bs => bs.id === basicStageId);
+    if (!basicStage) return;
+
+    const subStage = basicStage.subStages.find(sub => sub.id === subStageId);
+    if (!subStage) return;
+
+    subStage[field] = value;
+}
+
+/**
+ * 계층적 단계 렌더링
+ */
+function renderHierarchicalStages() {
+    const container = document.getElementById('hierarchical-stages-container');
+    if (!container) return;
+
+    if (window.hierarchicalStages.length === 0) {
+        container.innerHTML = `
+            <div class="text-center py-8 text-gray-500">
+                <p>기본단계를 추가해주세요.</p>
+            </div>
+        `;
+        return;
+    }
+
+    // 기본단계 옵션
+    const basicStageOptions = [
+        { value: '', label: '기본단계 선택' },
+        { value: '논문 작성 계획서', label: '논문 작성 계획서' },
+        { value: '예비심사', label: '예비심사' },
+        { value: '본심사', label: '본심사' }
+    ];
+
+    container.innerHTML = window.hierarchicalStages.map((basicStage, bsIndex) => `
+        <div class="border border-gray-300 rounded-lg p-6 bg-gray-50">
+            <!-- 기본단계 헤더 -->
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-4 flex-1">
+                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
+                        기본단계 ${bsIndex + 1} <span class="text-red-600">*</span>
+                    </label>
+                    <select onchange="onBasicStageChange('${basicStage.id}', this.value)"
+                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        ${basicStageOptions.map(opt => `
+                            <option value="${opt.value}" ${basicStage.basicStage === opt.value ? 'selected' : ''}>
+                                ${opt.label}
+                            </option>
+                        `).join('')}
+                    </select>
+                </div>
+                <button onclick="removeBasicStage('${basicStage.id}')"
+                        class="ml-4 text-red-600 hover:text-red-800 text-sm font-medium">
+                    삭제
+                </button>
+            </div>
+
+            <!-- 세부단계 목록 -->
+            <div class="ml-6 space-y-3">
+                <div class="text-sm font-medium text-gray-700 mb-2">세부단계 (최소 1개 이상 필수)</div>
+                ${basicStage.subStages.map((subStage, ssIndex) => `
+                    <div class="bg-white border border-gray-200 rounded-md p-4">
+                        <!-- 세부단계 헤더 -->
+                        <div class="flex items-center justify-between mb-3">
+                            <div class="text-sm font-medium text-gray-700">
+                                세부단계 ${subStage.order}
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <!-- 순서 변경 버튼 -->
+                                <button onclick="moveSubStageUp('${basicStage.id}', '${subStage.id}')"
+                                        class="px-2 py-1 text-xs text-gray-600 hover:text-gray-800 border border-gray-300 rounded"
+                                        ${ssIndex === 0 ? 'disabled style="opacity: 0.3;"' : ''}>
+                                    ↑
+                                </button>
+                                <button onclick="moveSubStageDown('${basicStage.id}', '${subStage.id}')"
+                                        class="px-2 py-1 text-xs text-gray-600 hover:text-gray-800 border border-gray-300 rounded"
+                                        ${ssIndex === basicStage.subStages.length - 1 ? 'disabled style="opacity: 0.3;"' : ''}>
+                                    ↓
+                                </button>
+                                <!-- 삭제 버튼 -->
+                                <button onclick="removeSubStage('${basicStage.id}', '${subStage.id}')"
+                                        class="text-red-600 hover:text-red-800 text-sm">
+                                    삭제
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 세부단계 필드 -->
+                        <div class="grid grid-cols-3 gap-3">
+                            <!-- 단계명 -->
+                            <div>
+                                <label class="text-xs font-medium text-gray-600 mb-1 block">
+                                    단계명 <span class="text-red-600">*</span>
+                                </label>
+                                <input type="text"
+                                       value="${subStage.name}"
+                                       onchange="updateSubStageField('${basicStage.id}', '${subStage.id}', 'name', this.value)"
+                                       placeholder="예: 연구계획서 작성"
+                                       class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                            </div>
+
+                            <!-- 승인권한 -->
+                            <div>
+                                <label class="text-xs font-medium text-gray-600 mb-1 block">
+                                    승인권한 <span class="text-red-600">*</span>
+                                </label>
+                                <select onchange="updateSubStageField('${basicStage.id}', '${subStage.id}', 'approvalAuthority', this.value)"
+                                        class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                                    <option value="지도교수" ${subStage.approvalAuthority === '지도교수' ? 'selected' : ''}>지도교수</option>
+                                    <option value="심사위원회" ${subStage.approvalAuthority === '심사위원회' ? 'selected' : ''}>심사위원회</option>
+                                </select>
+                            </div>
+
+                            <!-- 평가표 유형 -->
+                            <div>
+                                <label class="text-xs font-medium text-gray-600 mb-1 block">
+                                    평가표 유형 <span class="text-red-600">*</span>
+                                </label>
+                                <select onchange="updateSubStageField('${basicStage.id}', '${subStage.id}', 'evaluationTemplateId', this.value)"
+                                        class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                                    <option value="">선택</option>
+                                    ${appData.evaluationCriteria.map(ec => `
+                                        <option value="${ec.id}" ${subStage.evaluationTemplateId === ec.id ? 'selected' : ''}>
+                                            ${ec.name}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                `).join('')}
+
+                <!-- 세부단계 추가 버튼 -->
+                <div class="flex justify-end">
+                    <button onclick="addSubStage('${basicStage.id}')"
+                            class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 text-sm">
+                        + 세부단계 추가
+                    </button>
+                </div>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * 계층적 워크플로우 저장
+ */
+function saveHierarchicalWorkflow() {
+    const name = document.getElementById('new-workflow-name').value.trim();
+    const department = document.getElementById('new-workflow-department').value;
+
+    // 기본 유효성 검사
+    if (!name) {
+        alert('지도 단계명을 입력해주세요.');
+        return;
+    }
+
+    if (!department) {
+        alert('학과명을 선택해주세요.');
+        return;
+    }
+
+    if (window.hierarchicalStages.length === 0) {
+        alert('기본단계를 최소 1개 이상 추가해주세요.');
+        return;
+    }
+
+    // 각 기본단계 및 세부단계 유효성 검사
+    for (let i = 0; i < window.hierarchicalStages.length; i++) {
+        const basicStage = window.hierarchicalStages[i];
+
+        if (!basicStage.basicStage) {
+            alert(`기본단계 ${i + 1}: 기본단계를 선택해주세요.`);
+            return;
+        }
+
+        if (basicStage.subStages.length === 0) {
+            alert(`기본단계 ${i + 1}: 세부단계를 최소 1개 이상 추가해주세요.`);
+            return;
+        }
+
+        for (let j = 0; j < basicStage.subStages.length; j++) {
+            const subStage = basicStage.subStages[j];
+
+            if (!subStage.name.trim()) {
+                alert(`기본단계 ${i + 1} - 세부단계 ${j + 1}: 단계명을 입력해주세요.`);
+                return;
+            }
+
+            if (!subStage.approvalAuthority) {
+                alert(`기본단계 ${i + 1} - 세부단계 ${j + 1}: 승인권한을 선택해주세요.`);
+                return;
+            }
+
+            if (!subStage.evaluationTemplateId) {
+                alert(`기본단계 ${i + 1} - 세부단계 ${j + 1}: 평가표 유형을 선택해주세요.`);
+                return;
+            }
+        }
+    }
+
+    // 저장 (프로토타입 - 콘솔 출력)
+    console.log('=== 계층적 워크플로우 저장 ===');
+    console.log('지도 단계명:', name);
+    console.log('학과명:', department);
+    console.log('계층적 단계 구성:', JSON.stringify(window.hierarchicalStages, null, 2));
+
+    alert('지도 단계가 저장되었습니다. (프로토타입 - 콘솔 확인)');
+
+    // 초기화
+    window.hierarchicalStages = [];
+
+    // 목록으로 이동
+    switchView('typeManagement');
+}
+
+// 전역으로 노출
+window.addBasicStage = addBasicStage;
+window.removeBasicStage = removeBasicStage;
+window.onBasicStageChange = onBasicStageChange;
+window.addSubStage = addSubStage;
+window.removeSubStage = removeSubStage;
+window.moveSubStageUp = moveSubStageUp;
+window.moveSubStageDown = moveSubStageDown;
+window.updateSubStageField = updateSubStageField;
+window.renderHierarchicalStages = renderHierarchicalStages;
+window.saveHierarchicalWorkflow = saveHierarchicalWorkflow;
