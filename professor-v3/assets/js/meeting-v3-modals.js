@@ -350,7 +350,7 @@ const DirectMeetingModal = {
         return ModalBase.renderContainer('direct-meeting-modal', `
             <!-- 헤더 -->
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="text-xl font-semibold text-gray-900">미팅 직접 생성</h3>
+                <h3 class="text-xl font-semibold text-gray-900">실시간 지도 등록</h3>
                 <button onclick="DirectMeetingModal.close()" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -364,15 +364,46 @@ const DirectMeetingModal = {
                     학생을 선택하여 미팅을 직접 생성합니다. (1명 = 1:1 미팅, 2명 이상 = 그룹 미팅)
                 </p>
 
+                <!-- 학생 검색 -->
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">학생 검색</label>
+                    <div class="flex gap-2">
+                        <select id="search-type" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028] text-sm" style="width: 120px;">
+                            <option value="name">이름</option>
+                            <option value="number">학번</option>
+                            <option value="department">학과</option>
+                        </select>
+
+                        <input type="text"
+                               id="search-keyword"
+                               placeholder="검색어를 입력하세요"
+                               onkeypress="if(event.key==='Enter') DirectMeetingModal.searchStudents()"
+                               class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028] text-sm">
+
+                        <button onclick="DirectMeetingModal.searchStudents()"
+                                class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] text-sm whitespace-nowrap">
+                            검색
+                        </button>
+                    </div>
+                </div>
+
                 <!-- 학생 선택 -->
                 <div class="mb-6">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
                         참여 학생 선택 <span class="text-red-600">*</span>
                     </label>
-                    <div class="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto">
+                    <div id="student-list-container" class="border border-gray-300 rounded-lg p-4 max-h-60 overflow-y-auto">
                         ${students.map(s => `
-                            <label class="flex items-center py-2 hover:bg-gray-50 cursor-pointer">
-                                <input type="checkbox" name="direct-meeting-students" value="${s.id}" class="mr-3">
+                            <label class="student-item flex items-center py-2 hover:bg-gray-50 cursor-pointer"
+                                   data-name="${s.name}"
+                                   data-number="${s.studentNumber}"
+                                   data-department="${s.department}">
+                                <input type="checkbox"
+                                       name="direct-meeting-students"
+                                       value="${s.id}"
+                                       data-student-name="${s.name}"
+                                       onchange="DirectMeetingModal.updateSelectedTags()"
+                                       class="mr-3">
                                 <div>
                                     <span class="font-medium">${s.name}</span>
                                     <span class="text-sm text-gray-600 ml-2">(${s.studentNumber})</span>
@@ -381,7 +412,14 @@ const DirectMeetingModal = {
                             </label>
                         `).join('')}
                     </div>
-                    <p class="text-xs text-gray-500 mt-2">선택된 학생: <span id="selected-count">0</span>명</p>
+
+                    <!-- 선택된 학생 태그 -->
+                    <div class="mt-3 p-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[60px]">
+                        <div class="text-xs font-medium text-gray-700 mb-2">선택된 학생</div>
+                        <div id="selected-students-tags" class="flex flex-wrap gap-2">
+                            <span class="text-sm text-gray-500">선택된 학생이 없습니다</span>
+                        </div>
+                    </div>
                 </div>
 
                 <!-- 미팅 정보 -->
@@ -462,15 +500,6 @@ const DirectMeetingModal = {
         document.getElementById('direct-meeting-date').value = today;
 
         ModalBase.open('direct-meeting-modal');
-
-        // 선택 카운트 업데이트
-        const checkboxes = document.querySelectorAll('input[name="direct-meeting-students"]');
-        checkboxes.forEach(cb => {
-            cb.addEventListener('change', () => {
-                const count = document.querySelectorAll('input[name="direct-meeting-students"]:checked').length;
-                document.getElementById('selected-count').textContent = count;
-            });
-        });
     },
 
     /**
@@ -536,6 +565,76 @@ const DirectMeetingModal = {
         // 목록 새로고침
         if (typeof MeetingList !== 'undefined' && typeof MeetingList.refresh === 'function') {
             MeetingList.refresh();
+        }
+    },
+
+    /**
+     * 학생 검색 (완전일치)
+     */
+    searchStudents() {
+        const searchType = document.getElementById('search-type').value;
+        const keyword = document.getElementById('search-keyword').value.trim();
+        const studentItems = document.querySelectorAll('.student-item');
+
+        // 검색어가 없으면 전체 표시
+        if (!keyword) {
+            studentItems.forEach(item => item.style.display = '');
+            return;
+        }
+
+        studentItems.forEach(item => {
+            const value = item.getAttribute(`data-${searchType}`);
+
+            // 완전일치 검색
+            if (value === keyword) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    },
+
+    /**
+     * 선택된 학생 태그 업데이트
+     */
+    updateSelectedTags() {
+        const checkboxes = document.querySelectorAll('input[name="direct-meeting-students"]:checked');
+        const container = document.getElementById('selected-students-tags');
+
+        if (checkboxes.length === 0) {
+            container.innerHTML = '<span class="text-sm text-gray-500">선택된 학생이 없습니다</span>';
+            return;
+        }
+
+        const tags = Array.from(checkboxes).map(cb => {
+            const studentId = cb.value;
+            const studentName = cb.getAttribute('data-student-name');
+
+            return `
+                <span class="inline-flex items-center gap-1 px-3 py-1 bg-[#6A0028] text-white rounded-full text-sm">
+                    ${studentName}
+                    <button onclick="DirectMeetingModal.removeStudent('${studentId}')"
+                            class="hover:bg-[#8A0034] rounded-full p-0.5 transition-colors"
+                            type="button">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                </span>
+            `;
+        }).join('');
+
+        container.innerHTML = tags;
+    },
+
+    /**
+     * 선택된 학생 제거 (태그 X 버튼 클릭 시)
+     */
+    removeStudent(studentId) {
+        const checkbox = document.querySelector(`input[name="direct-meeting-students"][value="${studentId}"]`);
+        if (checkbox) {
+            checkbox.checked = false;
+            this.updateSelectedTags();
         }
     }
 };
