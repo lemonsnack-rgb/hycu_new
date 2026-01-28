@@ -325,6 +325,74 @@ const appData = {
                 passRequired: true,
                 description: '모든 항목에서 Pass를 받아야 합격'
             }
+        },
+        {
+            id: 5,
+            name: '척도형 평가표 예시',
+            type: '석사',
+            evaluationType: 'rubric',
+            description: '5점 척도를 사용하는 루브릭형 평가표 (심사위원장 최종 판정)',
+            createdDate: '2025-01-27',
+            itemCount: 4,
+            items: [
+                {
+                    id: 1,
+                    name: '연구 주제의 명확성',
+                    description: '연구 주제가 명확하게 정의되고 연구 범위가 적절한가'
+                },
+                {
+                    id: 2,
+                    name: '연구 방법론의 적절성',
+                    description: '연구 목적에 부합하는 연구 방법론이 선택되었는가'
+                },
+                {
+                    id: 3,
+                    name: '선행연구 검토의 충실성',
+                    description: '관련 선행연구를 충분히 검토하고 연구 gap을 파악하였는가'
+                },
+                {
+                    id: 4,
+                    name: '연구 계획의 실현가능성',
+                    description: '제시된 연구 계획이 실제로 수행 가능한가'
+                }
+            ],
+            scaleLabels: ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'],
+            totalScore: null,
+            passCriteria: {
+                requiresChairDecision: true,
+                description: '심사위원장이 최종 판정'
+            }
+        },
+        {
+            id: 6,
+            name: '서술형 평가표 예시',
+            type: '석사',
+            evaluationType: 'descriptive',
+            description: '서술형 평가표 (점수 없이 서술 내용만 입력, 심사위원장 최종 판정)',
+            createdDate: '2025-01-27',
+            itemCount: 3,
+            items: [
+                {
+                    id: 1,
+                    name: '연구 진행 상황',
+                    description: '연구가 계획대로 진행되고 있는지 평가'
+                },
+                {
+                    id: 2,
+                    name: '연구 결과의 타당성',
+                    description: '도출된 연구 결과가 타당하고 신뢰할 수 있는지 평가'
+                },
+                {
+                    id: 3,
+                    name: '논문 작성 수준',
+                    description: '논문의 구성과 표현이 학술적 기준에 부합하는지 평가'
+                }
+            ],
+            totalScore: null,
+            passCriteria: {
+                requiresChairDecision: true,
+                description: '심사위원장이 최종 판정'
+            }
         }
     ],
     

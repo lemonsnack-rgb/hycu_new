@@ -141,6 +141,8 @@ function openFeedbackDetailScreen(feedbackId) {
         const ph = document.querySelector('#inline-feedback textarea, .inline-comment-input');
         if (ph) ph.setAttribute('placeholder','첨삭 내용을 입력하세요.');
 
+        // 자주 쓰는 코멘트 버튼은 feedback-tools.js의 전역 이벤트 위임으로 처리됨
+
         renderGeneralThread(feedbackId);
         refreshInlineTabMarker();
     }, 100);

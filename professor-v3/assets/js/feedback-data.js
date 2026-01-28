@@ -717,7 +717,25 @@ const FeedbackDataService = {
             ...mark
         });
     },
-    
+
+    updateQuickMark(id, updates) {
+        const mark = QUICK_MARKS.find(qm => qm.id === id);
+        if (mark) {
+            Object.assign(mark, updates);
+            return true;
+        }
+        return false;
+    },
+
+    deleteQuickMark(id) {
+        const index = QUICK_MARKS.findIndex(qm => qm.id === id);
+        if (index > -1) {
+            QUICK_MARKS.splice(index, 1);
+            return true;
+        }
+        return false;
+    },
+
     // 사용자 정보
     getCurrentUser() {
         return {...CURRENT_USER};

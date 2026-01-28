@@ -3,6 +3,44 @@
 // PDF.js 워커 설정
 pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js';
 
+// ==================== 커스텀 다이얼로그 ====================
+function showCustomConfirm(message) {
+    return new Promise((resolve) => {
+        const backdrop = document.createElement('div');
+        backdrop.style.cssText = 'position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99999; display: flex; align-items: center; justify-content: center;';
+
+        const dialog = document.createElement('div');
+        dialog.style.cssText = 'background: white; border-radius: 8px; padding: 24px; max-width: 500px; width: 90%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);';
+
+        dialog.innerHTML = `
+            <div style="margin-bottom: 20px; font-size: 16px; color: #1F2937; white-space: pre-wrap; line-height: 1.5;">${message}</div>
+            <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                <button id="custom-confirm-cancel" style="background: white; color: #374151; padding: 8px 24px; border: 1px solid #D1D5DB; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">취소</button>
+                <button id="custom-confirm-ok" style="background: #6A0028; color: white; padding: 8px 24px; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; font-weight: 500;">확인</button>
+            </div>
+        `;
+
+        backdrop.appendChild(dialog);
+        document.body.appendChild(backdrop);
+
+        const okBtn = dialog.querySelector('#custom-confirm-ok');
+        const cancelBtn = dialog.querySelector('#custom-confirm-cancel');
+
+        const closeDialog = (result) => {
+            backdrop.remove();
+            resolve(result);
+        };
+
+        okBtn.addEventListener('click', () => closeDialog(true));
+        cancelBtn.addEventListener('click', () => closeDialog(false));
+        backdrop.addEventListener('click', (e) => {
+            if (e.target === backdrop) closeDialog(false);
+        });
+
+        okBtn.focus();
+    });
+}
+
 // ==================== PDF 뷰어 열기 ====================
 function openFeedbackViewer(feedbackId) {
     const request = FeedbackDataService.getFeedbackRequestById(feedbackId);
@@ -286,7 +324,6 @@ function createFeedbackModal(request, feedbackData) {
                     <div class="flex-1 overflow-y-auto p-4" id="comment-panel-content">
                         <!-- ID 43: 총평 → 전체 평가 탭 -->
                         <div id="general-feedback-tab">
-                            <h5 class="text-xs font-bold text-gray-700 mb-2">💬 전체 평가</h5>
                             <div id="general-feedback-thread" class="space-y-2 mb-3">
                                 <!-- 동적 렌더링 -->
                             </div>
@@ -446,37 +483,40 @@ function completeFeedback() {
 
 // ==================== 자주 쓰는 코멘트 팝오버 추가 ====================
 function createQuickMarkPopover() {
+    console.log('[createQuickMarkPopover] 팝오버 생성 시작');
     const popover = document.createElement('div');
     popover.id = 'quickmark-popover';
-    popover.className = 'fixed hidden bg-white border rounded-lg shadow-xl z-[150]';
+    popover.className = 'fixed bg-white border rounded-lg shadow-xl';
     popover.style.width = '320px';
+    popover.style.display = 'none';
+    popover.style.zIndex = '9999';
     
     popover.innerHTML = `
         <div class="p-3 border-b">
             <h4 class="font-bold text-sm text-gray-800">자주 쓰는 코멘트 관리</h4>
         </div>
-        <div id="quickmark-list" class="max-h-48 overflow-y-auto p-2">
+        <div id="quickmark-list" class="max-h-64 overflow-y-auto p-2">
             <!-- 동적 렌더링 -->
         </div>
         <div class="p-3 bg-gray-50 border-t space-y-2">
             <div id="add-from-textarea-section" class="hidden">
-                <input type="text" id="quickmark-title-from-text" 
-                       placeholder="코멘트 제목 입력" 
+                <input type="text" id="quickmark-title-from-text"
+                       placeholder="코멘트 제목 입력"
                        class="w-full p-2 border rounded-md text-xs mb-2">
-                <button id="add-quickmark-from-text-btn" 
+                <button id="add-quickmark-from-text-btn"
                         class="w-full bg-yellow-100 text-red-900 px-3 py-1.5 rounded-md hover:bg-yellow-200 text-xs font-semibold">
                     이 내용 저장
                 </button>
             </div>
             <div>
                 <p class="text-xs font-semibold text-gray-700 mb-2">새 코멘트 직접 추가</p>
-                <input type="text" id="quickmark-new-title" 
-                       placeholder="코멘트 제목" 
+                <input type="text" id="quickmark-new-title"
+                       placeholder="코멘트 제목"
                        class="w-full p-2 border rounded-md text-xs mb-2">
-                <textarea id="quickmark-new-content" 
-                          placeholder="코멘트 내용" 
+                <textarea id="quickmark-new-content"
+                          placeholder="코멘트 내용"
                           class="w-full p-2 border rounded-md text-xs mb-2" rows="3"></textarea>
-                <button id="add-quickmark-btn" 
+                <button id="add-quickmark-btn"
                         class="w-full bg-red-900 text-white px-3 py-1.5 rounded-md hover:bg-red-800 text-xs font-semibold">
                     새 코멘트 추가
                 </button>
@@ -485,10 +525,12 @@ function createQuickMarkPopover() {
     `;
     
     document.body.appendChild(popover);
-    
+    console.log('[createQuickMarkPopover] 팝오버 DOM에 추가 완료');
+
     // 이벤트 리스너
     document.getElementById('add-quickmark-btn').addEventListener('click', addNewQuickMark);
     document.getElementById('add-quickmark-from-text-btn').addEventListener('click', saveQuickMarkFromText);
+    console.log('[createQuickMarkPopover] 이벤트 리스너 등록 완료');
 }
 
 // Export
@@ -553,27 +595,47 @@ window.downloadPlagiarismReport = downloadPlagiarismReport;
 window._generalComments = window._generalComments || {};
 
 function renderGeneralThread(feedbackId){
+  console.log('[renderGeneralThread] 시작 - feedbackId:', feedbackId);
+
   const listEl = document.getElementById('general-feedback-thread');
   const inputSection = document.getElementById('general-feedback-input-section');
-  
-  if (!listEl) return;
-  
+
+  console.log('[renderGeneralThread] listEl:', listEl, 'inputSection:', inputSection);
+
+  if (!listEl) {
+    console.error('[renderGeneralThread] listEl을 찾을 수 없습니다');
+    return;
+  }
+
   window._generalComments = window._generalComments || {};
   const items = window._generalComments[feedbackId] || [];
-  
-  // 등록된 평가가 없으면 입력창 표시
-  if (items.length === 0) {
-    listEl.innerHTML = ''; // 안내 텍스트 제거
+
+  console.log('[renderGeneralThread] window._generalComments:', window._generalComments);
+  console.log('[renderGeneralThread] items:', items);
+
+  const currentUserId = CURRENT_USER ? CURRENT_USER.id : 'prof1';
+  console.log('[renderGeneralThread] currentUserId:', currentUserId);
+
+  // 현재 로그인한 교수의 전체 평가 찾기
+  const myFeedback = items.find(f => f.authorId === currentUserId);
+  console.log('[renderGeneralThread] myFeedback:', myFeedback);
+
+  // 내 전체 평가가 없으면 입력창 표시
+  if (!myFeedback) {
+    console.log('[renderGeneralThread] myFeedback이 없어서 입력창 표시');
+    listEl.innerHTML = '';
     if (inputSection) inputSection.style.display = 'block';
     return;
   }
-  
-  // 등록된 평가가 있으면 입력창 숨김
+
+  console.log('[renderGeneralThread] myFeedback이 있어서 렌더링 시작');
+
+  // 내 전체 평가가 있으면 입력창 숨김
   if (inputSection) inputSection.style.display = 'none';
-  
-  // 첫 번째는 메인 평가, 나머지는 댓글
-  const mainFeedback = items[0];
-  const replies = items.slice(1);
+
+  // 메인 평가는 내 평가만 표시
+  const mainFeedback = myFeedback;
+  const replies = []; // 댓글 기능은 제거 (교수 1명당 1개만 등록)
   
   const isOwner = mainFeedback.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
   const att = (mainFeedback.attach && mainFeedback.attach.length) ? 
@@ -583,17 +645,24 @@ function renderGeneralThread(feedbackId){
     <!-- 메인 평가 -->
     <div class="general-main-feedback">
       <div id="general-main-display">
-        <div class="p-3 border-2 border-[#F8BBD9] rounded-lg bg-[#FCE4EC]">
+        <div class="p-3 border-2 border-[#FFE699] rounded-lg" style="background-color: #f5f1e9;">
           <div class="mb-2 text-gray-800 whitespace-pre-wrap">${escapeHtml(mainFeedback.text)}</div>
           ${att ? '<div class="text-xs text-gray-600 mb-2">'+att+'</div>' : ''}
           <div class="flex items-center justify-between">
             <div class="text-[11px] text-gray-500">${new Date(mainFeedback.ts).toLocaleString()}</div>
             ${isOwner ? `
-              <button onclick="editGeneralMain()" 
-                      class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
-                <i class="fas fa-edit"></i>
-                <span>수정</span>
-              </button>
+              <div class="flex items-center gap-2">
+                <button onclick="window.editGeneralMain()"
+                        class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
+                  <i class="fas fa-edit"></i>
+                  <span>수정</span>
+                </button>
+                <button onclick="window.deleteGeneralMain('${feedbackId}')"
+                        class="text-xs text-red-600 hover:text-red-700 flex items-center gap-1">
+                  <i class="fas fa-trash-alt"></i>
+                  <span>삭제</span>
+                </button>
+              </div>
             ` : ''}
           </div>
         </div>
@@ -626,99 +695,100 @@ function renderGeneralThread(feedbackId){
         </div>
       </div>
     </div>
-    
-    <!-- 댓글 영역 -->
-    <div class="general-replies mt-3 ml-4 pl-4 border-l-2 border-gray-300">
-      <h6 class="text-xs font-semibold text-gray-600 mb-2">💬 댓글 (${replies.length})</h6>
-      
-      <!-- 등록된 댓글 표시 -->
-      ${replies.length > 0 ? `
-        <div class="space-y-2 mb-3">
-          ${replies.map((reply, idx) => {
-            const replyOwner = reply.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
-            const replyAtt = (reply.attach && reply.attach.length) ? 
-                            reply.attach.map(a=>'<a class="text-[#6A0028] underline mr-2" href="#">'+a.name+'</a>').join('') : '';
-            return `
-              <div class="general-reply-bubble p-2 border rounded-lg bg-gray-50" data-reply-index="${idx+1}">
-                <div id="general-reply-display-${idx+1}">
-                  <div class="text-sm text-gray-800 mb-1 whitespace-pre-wrap">${escapeHtml(reply.text)}</div>
-                  ${replyAtt ? '<div class="text-xs text-gray-600 mb-1">'+replyAtt+'</div>' : ''}
-                  <div class="flex items-center justify-between">
-                    <div class="text-[11px] text-gray-400">${new Date(reply.ts).toLocaleString()}</div>
-                    ${replyOwner ? `
-                      <button onclick="editGeneralReply(${idx+1})" 
-                              class="text-xs text-[#6A0028] hover:text-[#6A0028] flex items-center gap-1">
-                        <i class="fas fa-edit"></i>
-                        <span>수정</span>
-                      </button>
-                    ` : ''}
-                  </div>
-                </div>
-                <div id="general-reply-edit-${idx+1}" style="display: none;">
-                  <textarea id="general-reply-textarea-${idx+1}" 
-                            class="w-full p-2 border rounded-md text-xs resize-none" 
-                            rows="2">${reply.text}</textarea>
-                  <div class="flex gap-2 mt-2">
-                    <button onclick="saveGeneralReplyEdit('${feedbackId}', ${idx+1})" 
-                            class="text-xs bg-[#6A0028] text-white px-3 py-1 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-                      <i class="fas fa-save"></i>
-                      <span>저장</span>
-                    </button>
-                    <button onclick="cancelGeneralReplyEdit(${idx+1})" 
-                            class="text-xs bg-gray-200 text-gray-700 px-3 py-1 rounded-md hover:bg-gray-300 flex items-center gap-1">
-                      <i class="fas fa-times"></i>
-                      <span>취소</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-            `;
-          }).join('')}
-        </div>
-      ` : ''}
-      
-      <!-- ✅ 댓글 입력창 (신규 추가) -->
-      <div class="general-reply-input">
-        <textarea id="general-reply-textarea" 
-                  class="w-full p-2 border rounded-md text-xs resize-none" 
-                  rows="2"
-                  placeholder="댓글을 입력하세요..."></textarea>
-        <div class="flex gap-2 mt-2">
-          <button onclick="addGeneralReply('${feedbackId}')" 
-                  class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
-            <i class="fas fa-paper-plane"></i>
-            <span>댓글 등록</span>
-          </button>
-          <button class="quickmark-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1" data-target="general-reply-textarea">
-            <i class="fas fa-star"></i>
-            <span>자주쓰는</span>
-          </button>
-        </div>
-      </div>
-    </div>
   `;
 }
 
 function addGeneralFeedback(feedbackId){
+  // feedbackId가 전달되지 않으면 현재 컨텍스트에서 가져오기
+  if (!feedbackId) {
+    feedbackId = window._currentFeedbackCtx?.id;
+    console.log('[addGeneralFeedback] feedbackId from context:', feedbackId, 'context:', window._currentFeedbackCtx);
+  }
+
+  if (!feedbackId) {
+    console.error('[addGeneralFeedback] feedbackId가 없습니다. window._currentFeedbackCtx:', window._currentFeedbackCtx);
+    alert('피드백 정보를 찾을 수 없습니다.');
+    return;
+  }
+
   const ta = document.getElementById('general-feedback-input');
   if (!ta) return;
   const v = ta.value.trim();
   if (!v) { alert('내용을 입력하세요.'); return; }
-  
+
   window._generalComments = window._generalComments || {};
   window._generalComments[feedbackId] = window._generalComments[feedbackId] || [];
-  
-  // authorId 추가
-  window._generalComments[feedbackId].push({
-    text: v, 
-    ts: Date.now(), 
-    attach: (window._pendingAttach||[]),
-    authorId: CURRENT_USER ? CURRENT_USER.id : 'prof1'
-  });
-  
+
+  const currentUserId = CURRENT_USER ? CURRENT_USER.id : 'prof1';
+
+  // 이미 내 전체 평가가 있는지 확인
+  const existingIndex = window._generalComments[feedbackId].findIndex(f => f.authorId === currentUserId);
+
+  if (existingIndex >= 0) {
+    // 기존 전체 평가 수정
+    window._generalComments[feedbackId][existingIndex] = {
+      text: v,
+      ts: Date.now(),
+      attach: (window._pendingAttach||[]),
+      authorId: currentUserId
+    };
+  } else {
+    // 새 전체 평가 추가
+    window._generalComments[feedbackId].push({
+      text: v,
+      ts: Date.now(),
+      attach: (window._pendingAttach||[]),
+      authorId: currentUserId
+    });
+  }
+
   window._pendingAttach = [];
   ta.value='';
   renderGeneralThread(feedbackId);
+}
+
+// 전체 평가 삭제
+function deleteGeneralMain(feedbackId){
+  if (!feedbackId) {
+    console.error('[deleteGeneralMain] feedbackId가 없습니다');
+    alert('피드백 정보를 찾을 수 없습니다.');
+    return;
+  }
+
+  if (!confirm('전체 평가를 삭제하시겠습니까?')) {
+    console.log('[deleteGeneralMain] 사용자가 취소함');
+    return;
+  }
+
+  console.log('[deleteGeneralMain] 사용자가 확인함 - 삭제 진행');
+  performDelete(feedbackId);
+}
+
+// 삭제 실행 함수
+function performDelete(feedbackId) {
+
+  const currentUserId = CURRENT_USER ? CURRENT_USER.id : 'prof1';
+  console.log('[deleteGeneralMain] currentUserId:', currentUserId);
+
+  window._generalComments = window._generalComments || {};
+  window._generalComments[feedbackId] = window._generalComments[feedbackId] || [];
+
+  console.log('[deleteGeneralMain] 삭제 전 comments:', window._generalComments[feedbackId]);
+
+  // 현재 사용자의 전체 평가 삭제
+  const index = window._generalComments[feedbackId].findIndex(f => f.authorId === currentUserId);
+  console.log('[deleteGeneralMain] 삭제할 index:', index);
+
+  if (index >= 0) {
+    window._generalComments[feedbackId].splice(index, 1);
+    console.log('[deleteGeneralMain] 삭제 후 comments:', window._generalComments[feedbackId]);
+    renderGeneralThread(feedbackId);
+    if (typeof showToast === 'function') {
+      showToast('전체 평가가 삭제되었습니다.', 'success');
+    }
+  } else {
+    console.error('[deleteGeneralMain] 삭제할 항목을 찾을 수 없습니다');
+  }
 }
 
 // ✅ 전체 평가 댓글 등록 (신규)
@@ -727,10 +797,10 @@ function addGeneralReply(feedbackId){
   if (!ta) return;
   const v = ta.value.trim();
   if (!v) { alert('댓글을 입력하세요.'); return; }
-  
+
   window._generalComments = window._generalComments || {};
   window._generalComments[feedbackId] = window._generalComments[feedbackId] || [];
-  
+
   // 댓글 추가
   window._generalComments[feedbackId].push({
     text: v,
@@ -738,7 +808,7 @@ function addGeneralReply(feedbackId){
     attach: [],
     authorId: CURRENT_USER ? CURRENT_USER.id : 'prof1'
   });
-  
+
   ta.value = '';
   renderGeneralThread(feedbackId);
   showToast('댓글이 등록되었습니다.', 'success');
@@ -749,9 +819,24 @@ window.addGeneralReply = addGeneralReply;
 
 // 전체 평가 메인 수정
 function editGeneralMain(){
-  document.getElementById('general-main-display').style.display = 'none';
-  document.getElementById('general-main-edit').style.display = 'block';
-  document.getElementById('general-main-textarea').focus();
+  console.log('[editGeneralMain] 호출됨');
+  const displayEl = document.getElementById('general-main-display');
+  const editEl = document.getElementById('general-main-edit');
+  const textareaEl = document.getElementById('general-main-textarea');
+
+  console.log('[editGeneralMain] displayEl:', displayEl);
+  console.log('[editGeneralMain] editEl:', editEl);
+  console.log('[editGeneralMain] textareaEl:', textareaEl);
+
+  if (!displayEl || !editEl || !textareaEl) {
+    console.error('[editGeneralMain] 필요한 요소를 찾을 수 없습니다');
+    return;
+  }
+
+  displayEl.style.display = 'none';
+  editEl.style.display = 'block';
+  textareaEl.focus();
+  console.log('[editGeneralMain] 수정 모드로 전환 완료');
 }
 
 function saveGeneralMainEdit(feedbackId){
@@ -901,6 +986,8 @@ function toggleStudentMemo() {
     }
 }
 window.toggleStudentMemo = toggleStudentMemo;
+window.deleteGeneralMain = deleteGeneralMain;
+window.editGeneralMain = editGeneralMain;
 
 // injected: autosave on input
 (function attachAutosave(){

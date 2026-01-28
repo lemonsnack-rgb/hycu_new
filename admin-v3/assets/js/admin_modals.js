@@ -120,22 +120,49 @@ function initEvaluationTypeChangeListener() {
 
             // 통과 기준 필드 업데이트 함수
             const updatePassCriteriaFields = (newType) => {
-                const requiredCommitteeInput = document.getElementById('pass-required-committee');
-                const minScoreInput = document.getElementById('pass-min-score');
+                const passCriteriaSection = document.getElementById('pass-criteria-section');
 
-                if (requiredCommitteeInput && minScoreInput) {
-                    if (newType === 'passfail') {
-                        // Pass/Fail형으로 변경 시 비활성화 및 빈 값
-                        requiredCommitteeInput.value = '';
-                        requiredCommitteeInput.disabled = true;
-                        minScoreInput.value = '';
-                        minScoreInput.disabled = true;
-                    } else if (newType === 'score') {
-                        // 점수형으로 변경 시 활성화 및 기본값
-                        requiredCommitteeInput.value = '2';
-                        requiredCommitteeInput.disabled = false;
-                        minScoreInput.value = '70';
-                        minScoreInput.disabled = false;
+                if (passCriteriaSection) {
+                    if (newType === 'rubric' || newType === 'descriptive') {
+                        // 척도형/서술형: 심사위원장 최종 판정 안내 표시
+                        const message = newType === 'rubric'
+                            ? '척도형 평가표는 시스템 자동 계산 없이 심사위원장이 모든 심사위원의 평가를 검토한 후 최종 판정을 내립니다.'
+                            : '서술형 평가표는 점수 없이 서술 내용만 작성하며, 심사위원장이 모든 심사위원의 평가를 검토한 후 최종 판정을 내립니다.';
+
+                        passCriteriaSection.innerHTML = `
+                            <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
+                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                <div class="flex items-start gap-3">
+                                    <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    <div>
+                                        <h5 class="text-sm font-semibold text-blue-900 mb-1">심사위원장 최종 판정</h5>
+                                        <p class="text-sm text-blue-800">${message}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        // 점수형/Pass/Fail형: 기존 입력 필드 표시
+                        const requiredCommitteeInput = document.getElementById('pass-required-committee');
+                        const minScoreInput = document.getElementById('pass-min-score');
+
+                        if (requiredCommitteeInput && minScoreInput) {
+                            if (newType === 'passfail') {
+                                // Pass/Fail형으로 변경 시 비활성화 및 빈 값
+                                requiredCommitteeInput.value = '';
+                                requiredCommitteeInput.disabled = true;
+                                minScoreInput.value = '';
+                                minScoreInput.disabled = true;
+                            } else if (newType === 'score') {
+                                // 점수형으로 변경 시 활성화 및 기본값
+                                requiredCommitteeInput.value = '2';
+                                requiredCommitteeInput.disabled = false;
+                                minScoreInput.value = '70';
+                                minScoreInput.disabled = false;
+                            }
+                        }
                     }
                 }
             };
@@ -164,11 +191,12 @@ function initEvaluationTypeChangeListener() {
                         </tr>
                     `;
                 } else {
+                    const descriptionLabel = (type === 'rubric' || type === 'descriptive') ? '평가 기준' : '항목설명';
                     thead.innerHTML = `
                         <tr>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-16">순번</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목명 <span class="text-red-600">*</span></th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목설명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">${descriptionLabel}</th>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 w-20">관리</th>
                         </tr>
                     `;
@@ -4065,6 +4093,8 @@ function saveEvaluationCriteria(criteriaId) {
         }
     }
 
+    // 척도형과 서술형은 통과 기준 검증 불필요 (심사위원장이 최종 판정)
+
     // Save or update
     if (criteriaId) {
         // Update existing criteria
@@ -4091,6 +4121,25 @@ function saveEvaluationCriteria(criteriaId) {
                     passScore: minScore,
                     description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
                 };
+            } else if (evaluationType === 'passfail') {
+                criteria.totalScore = null;
+                criteria.passCriteria = {
+                    passRequired: true,
+                    description: '모든 항목에서 Pass를 받아야 합격'
+                };
+            } else if (evaluationType === 'rubric') {
+                criteria.totalScore = null;
+                criteria.scaleLabels = ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'];
+                criteria.passCriteria = {
+                    requiresChairDecision: true,
+                    description: '심사위원장이 최종 판정'
+                };
+            } else if (evaluationType === 'descriptive') {
+                criteria.totalScore = null;
+                criteria.passCriteria = {
+                    requiresChairDecision: true,
+                    description: '심사위원장이 최종 판정'
+                };
             }
         }
         showToast('평가표가 수정되었습니다.', 'success');
@@ -4112,10 +4161,15 @@ function saveEvaluationCriteria(criteriaId) {
                 passScore: minScore,
                 description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
             };
-        } else {
+        } else if (evaluationType === 'passfail') {
             passCriteria = {
                 passRequired: true,
                 description: '모든 항목에서 Pass를 받아야 합격'
+            };
+        } else if (evaluationType === 'rubric' || evaluationType === 'descriptive') {
+            passCriteria = {
+                requiresChairDecision: true,
+                description: '심사위원장이 최종 판정'
             };
         }
 
@@ -4130,6 +4184,12 @@ function saveEvaluationCriteria(criteriaId) {
             totalScore: totalScore,
             passCriteria: passCriteria
         };
+
+        // 척도형인 경우 scaleLabels 추가
+        if (evaluationType === 'rubric') {
+            newCriteria.scaleLabels = ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'];
+        }
+
         appData.evaluationCriteria.push(newCriteria);
         showToast('새 평가표가 등록되었습니다.', 'success');
     }
@@ -4143,6 +4203,12 @@ function deleteEvaluationCriteriaConfirm(id) {
         showToast('평가표가 삭제되었습니다.', 'success');
         switchView('evaluationCriteria');
     });
+}
+
+function handleEvaluationTypeChange() {
+    // 기존 initEvaluationTypeChangeListener를 호출하여 이벤트 리스너 재설정
+    // 이미 admin_views.js에서 onchange로 호출되므로, 실제 처리는 initEvaluationTypeChangeListener에서 진행
+    // 여기서는 빈 함수로 두거나 필요시 추가 로직 구현
 }
 
 

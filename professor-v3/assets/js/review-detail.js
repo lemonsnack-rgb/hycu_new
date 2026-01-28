@@ -166,7 +166,7 @@ function renderThesisInfo(assignment) {
 
 // ==================== 평가표 (심플 버전 + Pass/Fail 지원) ====================
 function renderEvaluationForm(template, existingEvaluation) {
-    const savedData = existingEvaluation || { scores: [], passFailResults: [], gradeResults: [] };
+    const savedData = existingEvaluation || { scores: [], passFailResults: [], gradeResults: [], rubricResults: [], descriptiveResults: [] };
 
     // Pass/Fail 방식
     if (template.evaluationType === 'passfail') {
@@ -176,6 +176,16 @@ function renderEvaluationForm(template, existingEvaluation) {
     // 등급형 방식
     if (template.evaluationType === 'grade') {
         return renderGradeForm(template, savedData);
+    }
+
+    // 척도형 방식 (Rubric)
+    if (template.evaluationType === 'rubric') {
+        return renderRubricForm(template, savedData);
+    }
+
+    // 서술형 방식 (Descriptive)
+    if (template.evaluationType === 'descriptive') {
+        return renderDescriptiveForm(template, savedData);
     }
 
     // 점수형 방식 (기존)
@@ -576,6 +586,304 @@ function renderGradeForm(template, savedData) {
             </div>
         </div>
     `;
+}
+
+// ==================== 척도형 평가표 (Rubric) ====================
+function renderRubricForm(template, savedData) {
+    const scaleLabels = template.scaleLabels || ['매우 아니다', '아니다', '보통', '그렇다', '매우 그렇다'];
+
+    return `
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
+
+            <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-6">
+                <p class="text-sm text-[#6A0028]">
+                    <strong>안내:</strong> 각 평가 항목에 대해 5점 척도로 평가해주세요. 최종 판정은 심사위원장이 결정합니다.
+                </p>
+            </div>
+
+            <!-- 데스크톱 테이블 -->
+            <div class="evaluation-table-desktop hidden md:block">
+                <div class="table-scroll">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 300px;">척도 평가</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${template.items.map((item, index) => {
+                                const savedResult = savedData.rubricResults?.find(r => r.itemId === item.id);
+                                const currentScale = savedResult?.scale || 0;
+                                const currentComment = savedResult?.comment || '';
+
+                                return `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center text-gray-700 text-sm">${index + 1}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 font-medium text-gray-900 text-sm">${item.name}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-xs text-gray-600">${item.description || '-'}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5">
+                                            <div class="flex justify-center gap-2">
+                                                ${scaleLabels.map((label, scaleIndex) => `
+                                                    <label class="flex flex-col items-center gap-1 cursor-pointer">
+                                                        <input type="radio"
+                                                               name="rubric-${item.id}"
+                                                               value="${scaleIndex + 1}"
+                                                               class="rubric-radio"
+                                                               data-item-id="${item.id}"
+                                                               ${currentScale === (scaleIndex + 1) ? 'checked' : ''}>
+                                                        <span class="text-xs text-gray-700">${scaleIndex + 1}</span>
+                                                        <span class="text-xs text-gray-500">${label}</span>
+                                                    </label>
+                                                `).join('')}
+                                            </div>
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-1">
+                                            <textarea class="rubric-comment w-full border border-gray-300 rounded p-1 text-xs"
+                                                      rows="2"
+                                                      placeholder="평가 의견"
+                                                      data-item-id="${item.id}">${currentComment}</textarea>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 모바일 카드 뷰 -->
+            <div class="evaluation-table-mobile block md:hidden">
+                ${template.items.map((item, index) => {
+                    const savedResult = savedData.rubricResults?.find(r => r.itemId === item.id);
+                    const currentScale = savedResult?.scale || 0;
+                    const currentComment = savedResult?.comment || '';
+
+                    return `
+                        <div class="bg-white border-2 border-gray-200 rounded-lg p-4 mb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="font-bold text-gray-800">${index + 1}. ${item.name}</div>
+                            </div>
+                            <div class="text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded">
+                                ${item.description || '-'}
+                            </div>
+                            <div class="mb-3">
+                                <label class="text-xs font-medium text-gray-700 block mb-2">척도 평가:</label>
+                                <div class="grid grid-cols-5 gap-1">
+                                    ${scaleLabels.map((label, scaleIndex) => `
+                                        <label class="flex flex-col items-center gap-1 cursor-pointer border rounded p-1 ${currentScale === (scaleIndex + 1) ? 'border-[#6A0028] bg-[#FCE4EC]' : 'border-gray-300'}">
+                                            <input type="radio"
+                                                   name="rubric-mobile-${item.id}"
+                                                   value="${scaleIndex + 1}"
+                                                   class="rubric-radio"
+                                                   data-item-id="${item.id}"
+                                                   ${currentScale === (scaleIndex + 1) ? 'checked' : ''}>
+                                            <span class="text-xs font-bold">${scaleIndex + 1}</span>
+                                            <span class="text-xs text-center">${label}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-700 block mb-1">평가 의견:</label>
+                                <textarea class="rubric-comment w-full border border-gray-300 rounded p-2 text-xs"
+                                          rows="2"
+                                          placeholder="평가 의견을 입력하세요"
+                                          data-item-id="${item.id}">${currentComment}</textarea>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <!-- 종합 의견 -->
+            <div class="mt-6">
+                <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
+                <textarea id="rubric-overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                          rows="4"
+                          placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
+            </div>
+
+            <!-- 평가 파일 업로드 -->
+            <div class="mt-6 bg-white border border-gray-300 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가 파일 첨부</h4>
+                <p class="text-sm text-gray-600 mb-3">평가와 관련된 파일을 첨부할 수 있습니다. (선택사항)</p>
+                <p class="text-xs text-gray-500 mb-3">
+                    허용 파일: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt | 최대 용량: 30MB/파일
+                </p>
+
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        파일 선택
+                        <input type="file" id="evaluation-file-input"
+                               onchange="handleEvaluationFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple class="hidden">
+                    </label>
+                </div>
+
+                <div id="evaluation-file-list"></div>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="save-draft-btn" class="btn btn-secondary">
+                    임시저장
+                </button>
+                <button id="submit-evaluation-btn" class="btn btn-primary">
+                    최종 제출
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// ==================== 서술형 평가표 (Descriptive) ====================
+function renderDescriptiveForm(template, savedData) {
+    return `
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
+
+            <div class="bg-[#FCE4EC] border border-[#F8BBD9] rounded-lg p-4 mb-6">
+                <p class="text-sm text-[#6A0028]">
+                    <strong>안내:</strong> 각 평가 항목에 대해 서술형으로 평가 내용을 작성해주세요. 최종 판정은 심사위원장이 결정합니다.
+                </p>
+            </div>
+
+            <!-- 데스크톱 테이블 -->
+            <div class="evaluation-table-desktop hidden md:block">
+                <div class="table-scroll">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 400px;">상세 내용</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${template.items.map((item, index) => {
+                                const savedResult = savedData.descriptiveResults?.find(r => r.itemId === item.id);
+                                const currentContent = savedResult?.content || '';
+                                const charCount = currentContent.length;
+
+                                return `
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center text-gray-700 text-sm">${index + 1}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 font-medium text-gray-900 text-sm">${item.name}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-xs text-gray-600">${item.description || '-'}</td>
+                                        <td class="border border-gray-300 px-2 py-1">
+                                            <textarea class="descriptive-content w-full border border-gray-300 rounded p-2 text-sm"
+                                                      rows="4"
+                                                      placeholder="상세 내용을 입력하세요"
+                                                      data-item-id="${item.id}"
+                                                      oninput="updateCharCount(this)">${currentContent}</textarea>
+                                            <div class="text-xs text-gray-500 text-right mt-1">
+                                                <span class="char-count">${charCount}</span> / 1000자
+                                            </div>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 모바일 카드 뷰 -->
+            <div class="evaluation-table-mobile block md:hidden">
+                ${template.items.map((item, index) => {
+                    const savedResult = savedData.descriptiveResults?.find(r => r.itemId === item.id);
+                    const currentContent = savedResult?.content || '';
+                    const charCount = currentContent.length;
+
+                    return `
+                        <div class="bg-white border-2 border-gray-200 rounded-lg p-4 mb-4">
+                            <div class="flex justify-between items-start mb-3">
+                                <div class="font-bold text-gray-800">${index + 1}. ${item.name}</div>
+                            </div>
+                            <div class="text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded">
+                                ${item.description || '-'}
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-700 block mb-1">상세 내용:</label>
+                                <textarea class="descriptive-content w-full border border-gray-300 rounded p-2 text-sm"
+                                          rows="4"
+                                          placeholder="상세 내용을 입력하세요"
+                                          data-item-id="${item.id}"
+                                          oninput="updateCharCount(this)">${currentContent}</textarea>
+                                <div class="text-xs text-gray-500 text-right mt-1">
+                                    <span class="char-count">${charCount}</span> / 1000자
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            </div>
+
+            <!-- 종합 의견 -->
+            <div class="mt-6">
+                <h4 class="text-sm font-bold text-gray-800 mb-3">종합 의견</h4>
+                <textarea id="descriptive-overall-comment" class="w-full border border-gray-300 rounded-lg p-3 text-sm"
+                          rows="4"
+                          placeholder="평가에 대한 종합 의견을 작성해주세요">${savedData.overallComment || ''}</textarea>
+            </div>
+
+            <!-- 평가 파일 업로드 -->
+            <div class="mt-6 bg-white border border-gray-300 rounded-lg p-4">
+                <h4 class="font-bold text-gray-800 mb-3">평가 파일 첨부</h4>
+                <p class="text-sm text-gray-600 mb-3">평가와 관련된 파일을 첨부할 수 있습니다. (선택사항)</p>
+                <p class="text-xs text-gray-500 mb-3">
+                    허용 파일: hwp, hwpx, doc, docx, ppt, pptx, pdf, txt | 최대 용량: 30MB/파일
+                </p>
+
+                <div class="mb-3">
+                    <label class="inline-block px-4 py-2 bg-[#6A0028] text-white rounded cursor-pointer hover:bg-[#8A0034] transition-colors">
+                        파일 선택
+                        <input type="file" id="evaluation-file-input"
+                               onchange="handleEvaluationFileSelect(event)"
+                               accept=".hwp,.hwpx,.doc,.docx,.ppt,.pptx,.pdf,.txt"
+                               multiple class="hidden">
+                    </label>
+                </div>
+
+                <div id="evaluation-file-list"></div>
+            </div>
+
+            <!-- 버튼 -->
+            <div class="mt-6 flex justify-end gap-3">
+                <button id="save-draft-btn" class="btn btn-secondary">
+                    임시저장
+                </button>
+                <button id="submit-evaluation-btn" class="btn btn-primary">
+                    최종 제출
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// 글자 수 카운트 업데이트 함수
+function updateCharCount(textarea) {
+    const charCount = textarea.value.length;
+    const maxLength = 1000;
+
+    // 최대 길이 제한
+    if (charCount > maxLength) {
+        textarea.value = textarea.value.substring(0, maxLength);
+        return;
+    }
+
+    // 글자 수 표시 업데이트
+    const countSpan = textarea.parentElement.querySelector('.char-count');
+    if (countSpan) {
+        countSpan.textContent = charCount;
+    }
 }
 
 // ==================== 제출된 평가 표시 (읽기 모드) ====================
@@ -1606,6 +1914,51 @@ function collectEvaluationData() {
         };
     }
 
+    // 척도형 방식 (Rubric)
+    if (template && template.evaluationType === 'rubric') {
+        const rubricResults = [];
+
+        // 모든 radio 버튼에서 선택된 값 수집
+        template.items.forEach(item => {
+            const selected = document.querySelector(`.rubric-radio[data-item-id="${item.id}"]:checked`);
+            const comment = document.querySelector(`.rubric-comment[data-item-id="${item.id}"]`);
+
+            rubricResults.push({
+                itemId: item.id,
+                scale: selected ? parseInt(selected.value) : null,
+                comment: comment ? comment.value.trim() : ''
+            });
+        });
+
+        return {
+            evaluationType: 'rubric',
+            rubricResults,
+            overallComment: document.getElementById('rubric-overall-comment')?.value.trim() || '',
+            files: evaluationFiles.map(f => ({ id: f.id, name: f.name, size: f.size, type: f.type }))
+        };
+    }
+
+    // 서술형 방식 (Descriptive)
+    if (template && template.evaluationType === 'descriptive') {
+        const descriptiveResults = [];
+
+        template.items.forEach(item => {
+            const content = document.querySelector(`.descriptive-content[data-item-id="${item.id}"]`);
+
+            descriptiveResults.push({
+                itemId: item.id,
+                content: content ? content.value.trim() : ''
+            });
+        });
+
+        return {
+            evaluationType: 'descriptive',
+            descriptiveResults,
+            overallComment: document.getElementById('descriptive-overall-comment')?.value.trim() || '',
+            files: evaluationFiles.map(f => ({ id: f.id, name: f.name, size: f.size, type: f.type }))
+        };
+    }
+
     // 점수형 방식
     const scores = [];
     let total = 0;
@@ -1666,6 +2019,42 @@ function validateEvaluationData(data, template) {
         const allEvaluated = data.gradeResults.every(r => r.grade !== null);
         if (!allEvaluated) {
             showToast('모든 항목에 등급을 선택해주세요', 'error');
+            return false;
+        }
+
+        // 종합 의견 확인
+        if (!data.overallComment) {
+            showToast('종합 의견을 입력해주세요', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    // 척도형 방식 (Rubric)
+    if (data.evaluationType === 'rubric') {
+        // 모든 항목 평가 완료 확인
+        const allEvaluated = data.rubricResults.every(r => r.scale !== null);
+        if (!allEvaluated) {
+            showToast('모든 항목에 척도를 선택해주세요', 'error');
+            return false;
+        }
+
+        // 종합 의견 확인
+        if (!data.overallComment) {
+            showToast('종합 의견을 입력해주세요', 'error');
+            return false;
+        }
+
+        return true;
+    }
+
+    // 서술형 방식 (Descriptive)
+    if (data.evaluationType === 'descriptive') {
+        // 모든 항목 내용 입력 확인
+        const allFilled = data.descriptiveResults.every(r => r.content !== '');
+        if (!allFilled) {
+            showToast('모든 항목에 내용을 입력해주세요', 'error');
             return false;
         }
 
