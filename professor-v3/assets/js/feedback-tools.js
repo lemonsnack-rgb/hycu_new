@@ -1631,33 +1631,50 @@ function showToast(message, type = 'info') {
 
 // ==================== 자주 쓰는 코멘트 관리 ====================
 function showQuickMarkPopover(button) {
+    console.log('[showQuickMarkPopover] 호출됨, button:', button);
     const targetId = button.dataset.target;
+    console.log('[showQuickMarkPopover] targetId:', targetId);
     const popover = document.getElementById('quickmark-popover');
-    if (!popover) return;
+    console.log('[showQuickMarkPopover] popover:', popover);
+    if (!popover) {
+        console.error('[showQuickMarkPopover] popover를 찾을 수 없습니다!');
+        return;
+    }
     
     popover.dataset.target = targetId;
     
     const rect = button.getBoundingClientRect();
     const popoverHeight = 500; // 예상 높이
     const popoverWidth = 320;
-    
-    // 화면 아래로 나가는지 확인
+
+    // 세로 위치: 화면 아래로 나가는지 확인
     let top = rect.bottom + 5;
-    let left = rect.left;
-    
     if (top + popoverHeight > window.innerHeight) {
         // 버튼 위에 표시
         top = rect.top - popoverHeight - 5;
     }
-    
-    // 화면 오른쪽으로 나가는지 확인
-    if (left + popoverWidth > window.innerWidth) {
-        left = window.innerWidth - popoverWidth - 10;
+
+    // 가로 위치: 버튼의 오른쪽 끝을 기준으로 팝오버를 왼쪽에 배치
+    // 버튼이 화면 오른쪽에 있으면 팝오버를 버튼 왼쪽에 표시
+    let left = rect.right - popoverWidth;
+
+    // 왼쪽으로 너무 나가면 버튼 왼쪽부터 시작
+    if (left < 10) {
+        left = rect.left;
+        // 그래도 화면 밖으로 나가면 최소 여백만 확보
+        if (left + popoverWidth > window.innerWidth) {
+            left = Math.max(10, window.innerWidth - popoverWidth - 10);
+        }
     }
-    
+
+    // 강제 스타일 적용
     popover.style.top = `${top}px`;
     popover.style.left = `${left}px`;
-    
+    popover.style.display = 'block';
+    popover.style.visibility = 'visible';
+    popover.style.opacity = '1';
+    popover.style.pointerEvents = 'auto';
+
     // 현재 텍스트가 있으면 "이 내용 저장" 섹션 표시
     const textarea = document.getElementById(targetId);
     const addFromTextSection = document.getElementById('add-from-textarea-section');
@@ -1666,41 +1683,75 @@ function showQuickMarkPopover(button) {
     } else {
         addFromTextSection.classList.add('hidden');
     }
-    
+
+    console.log('[showQuickMarkPopover] 팝오버 표시');
+    console.log('[showQuickMarkPopover] 스타일:', {
+        display: popover.style.display,
+        top: popover.style.top,
+        left: popover.style.left,
+        zIndex: window.getComputedStyle(popover).zIndex,
+        visibility: popover.style.visibility
+    });
     popover.classList.remove('hidden');
+    console.log('[showQuickMarkPopover] renderQuickMarkList 호출 전');
     renderQuickMarkList();
+    console.log('[showQuickMarkPopover] renderQuickMarkList 호출 후');
+
+    // ESC 키로 닫기 (외부 클릭은 이미 전역 이벤트 리스너에서 처리)
+    const escHandler = (e) => {
+        if (e.key === 'Escape') {
+            hideQuickMarkPopover();
+            document.removeEventListener('keydown', escHandler);
+            popover._escHandler = null;
+        }
+    };
+    document.addEventListener('keydown', escHandler);
+    popover._escHandler = escHandler;
 }
 
 function hideQuickMarkPopover() {
     const popover = document.getElementById('quickmark-popover');
     if (popover) {
+        popover.style.display = 'none';
         popover.classList.add('hidden');
+
+        // ESC 키 이벤트 리스너 정리
+        if (popover._escHandler) {
+            document.removeEventListener('keydown', popover._escHandler);
+            popover._escHandler = null;
+        }
     }
 }
 
 function renderQuickMarkList() {
+    console.log('[renderQuickMarkList] 시작');
     const quickMarks = FeedbackDataService.getQuickMarks();
+    console.log('[renderQuickMarkList] quickMarks:', quickMarks);
     const listEl = document.getElementById('quickmark-list');
-    if (!listEl) return;
+    console.log('[renderQuickMarkList] listEl:', listEl);
+    if (!listEl) {
+        console.error('[renderQuickMarkList] quickmark-list 요소를 찾을 수 없습니다!');
+        return;
+    }
     
     if (quickMarks.length === 0) {
         listEl.innerHTML = '<p class="text-xs text-gray-500 text-center p-4">저장된 코멘트가 없습니다</p>';
         return;
     }
     
-    listEl.innerHTML = quickMarks.map(qm => `
+    const html = quickMarks.map(qm => `
         <div class="quickmark-item p-2 hover:bg-gray-100 rounded-md" data-id="${qm.id}">
             <div class="flex items-start gap-2">
                 <div class="flex-1 cursor-pointer" onclick="insertQuickMark('${qm.content.replace(/'/g, "\\'")}')">
                     <p class="text-xs font-semibold text-gray-800">${qm.title}</p>
-                    <p class="text-xs text-gray-600 truncate">${qm.content}</p>
+                    <p class="text-xs text-gray-600 break-words">${qm.content}</p>
                 </div>
-                <div class="flex gap-1">
-                    <button class="text-[#6A0028] hover:text-[#6A0028] p-1" 
+                <div class="flex gap-1 flex-shrink-0">
+                    <button class="text-[#6A0028] hover:text-[#6A0028] p-1 text-sm" style="opacity: 1 !important;"
                             onclick="event.stopPropagation(); editQuickMark('${qm.id}')" title="수정">
                         <i class="fas fa-edit"></i>
                     </button>
-                    <button class="text-red-500 hover:text-red-700 p-1" 
+                    <button class="text-red-500 hover:text-red-700 p-1 text-sm" style="opacity: 1 !important;"
                             onclick="event.stopPropagation(); deleteQuickMark('${qm.id}')" title="삭제">
                         <i class="fas fa-trash"></i>
                     </button>
@@ -1708,6 +1759,9 @@ function renderQuickMarkList() {
             </div>
         </div>
     `).join('');
+
+    console.log('[renderQuickMarkList] 렌더링된 HTML 샘플:', html.substring(0, 500));
+    listEl.innerHTML = html;
 }
 
 function editQuickMark(id) {
@@ -1742,17 +1796,13 @@ function editQuickMark(id) {
 function saveEditQuickMark(id) {
     const title = document.getElementById(`edit-qm-title-${id}`).value.trim();
     const content = document.getElementById(`edit-qm-content-${id}`).value.trim();
-    
+
     if (!title || !content) {
         alert('제목과 내용을 모두 입력하세요.');
         return;
     }
-    
-    const quickMarks = FeedbackDataService.getQuickMarks();
-    const mark = quickMarks.find(qm => qm.id === id);
-    if (mark) {
-        mark.title = title;
-        mark.content = content;
+
+    if (FeedbackDataService.updateQuickMark(id, { title, content })) {
         renderQuickMarkList();
         showToast('자주 쓰는 코멘트가 수정되었습니다.', 'success');
     }
@@ -1773,11 +1823,8 @@ function insertQuickMark(content) {
 
 function deleteQuickMark(id) {
     if (!confirm('이 자주 쓰는 코멘트를 삭제하시겠습니까?')) return;
-    
-    const quickMarks = FeedbackDataService.getQuickMarks();
-    const index = quickMarks.findIndex(qm => qm.id === id);
-    if (index > -1) {
-        quickMarks.splice(index, 1);
+
+    if (FeedbackDataService.deleteQuickMark(id)) {
         renderQuickMarkList();
         showToast('자주 쓰는 코멘트가 삭제되었습니다.', 'success');
     }
@@ -1837,13 +1884,15 @@ function saveQuickMarkFromText() {
 document.addEventListener('click', (e) => {
     const quickmarkBtn = e.target.closest('.quickmark-btn');
     if (quickmarkBtn) {
+        console.log('[QuickMark] 버튼 클릭 감지:', quickmarkBtn);
+        console.log('[QuickMark] data-target:', quickmarkBtn.dataset.target);
         showQuickMarkPopover(quickmarkBtn);
         return;
     }
-    
+
     // 팝오버 외부 클릭 시 닫기
     const popover = document.getElementById('quickmark-popover');
-    if (popover && !popover.classList.contains('hidden') &&
+    if (popover && popover.style.display !== 'none' &&
         !e.target.closest('#quickmark-popover') &&
         !e.target.closest('.quickmark-btn')) {
         hideQuickMarkPopover();
@@ -2341,6 +2390,13 @@ function cancelAnnotation(annotationId) {
     const feedbackId = window._currentFeedbackCtx?.id || currentFeedbackId;
     FeedbackDataService.deleteAnnotation(feedbackId, targetPage, annotationId);
 
+    // 5-1. FEEDBACK_DATA와 로컬 annotations 동기화 (중요!)
+    const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
+    if (feedbackData && feedbackData.annotations) {
+        annotations = JSON.parse(JSON.stringify(feedbackData.annotations));
+        console.log('🟡 [cancelAnnotation] annotations 동기화 완료:', annotations);
+    }
+
     // 6. UI 업데이트
     renderCommentPanel();
     refreshInlineTabMarker();
@@ -2688,4 +2744,6 @@ window.saveEditQuickMark = saveEditQuickMark;
 window.updateGeneralFeedback = updateGeneralFeedback;
 window.goToLinkedComment = goToLinkedComment;
 window.findCommentPage = findCommentPage;
+
+console.log('✅ feedback-tools.js 로드 완료 - QuickMark 이벤트 리스너 등록됨');
 
