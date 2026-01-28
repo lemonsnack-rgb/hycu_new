@@ -814,6 +814,57 @@ const GROUP_MEETINGS_V3 = [
         recordingUrl: null,
         recordingDuration: null,
         recordingSize: null
+    },
+    // 거절된 미팅 예시
+    {
+        id: 'MEET-REJECTED-001',
+        type: 'slot_based',
+        studentId: 'STU002',
+        studentName: '박민수',
+        studentNumber: '20221234',
+        collegeType: '학부',
+        division: '인문사회',
+        undergradMajor: '경영학',
+        department: '경영학과',
+        degreeType: '학사',
+        enrollmentStatus: '재학',
+        advisorName: '김철수',
+
+        selectedDate: '2026-01-15',
+        selectedTime: '14:00',
+        duration: 60,
+        meetingType: 'online',
+        topic: '졸업논문 주제 상담 요청',
+
+        status: 'rejected',
+        rejectedDate: '2026-01-10',
+        rejectionReason: '학생의 연구 준비가 부족하여 추가 준비 후 재신청 요망합니다. 선행연구 최소 5편 이상 검토 후 다시 신청해주세요.',
+
+        // 거절 전 승인되었던 정보 (완료 정보 표시용)
+        approvedDate: '2026-01-09',
+        professorComment: '주제 선정을 위한 상담입니다.',
+        zoomMeetingId: '444555666',
+        zoomJoinUrl: 'https://zoom.us/j/444555666?pwd=aaa111',
+        zoomPassword: 'aaa111',
+        zoomStartUrl: 'https://zoom.us/s/444555666?zak=bbb222',
+
+        // 완료 정보는 null (거절되어 진행 안 됨)
+        completedDate: null,
+        actualDuration: null,
+        meetingSummary: null,
+        videoPassword: null,
+        recordingId: null,
+        recordingUrl: null,
+        recordingPlayUrl: null,
+        recordingDownloadUrl: null,
+        recordingDuration: null,
+        recordingSize: null,
+
+        createdBy: 'student',
+        createdAt: '2026-01-08T11:30:00',
+        cancelledAt: null,
+        cancelledBy: null,
+        cancelReason: null
     }
 ];
 

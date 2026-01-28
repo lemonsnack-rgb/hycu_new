@@ -34,6 +34,7 @@ const MeetingList = {
                                     <option value="pending">대기</option>
                                     <option value="approved,confirmed">확정</option>
                                     <option value="completed">완료</option>
+                                    <option value="rejected">거절</option>
                                     <option value="cancelled">취소</option>
                                 </select>
                             </div>

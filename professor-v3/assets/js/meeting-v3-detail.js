@@ -28,6 +28,8 @@ const MeetingDetail = {
             detailHtml = this.renderPendingDetail(meeting);
         } else if (meeting.status === 'completed') {
             detailHtml = this.renderCompletedDetail(meeting);
+        } else if (meeting.status === 'rejected') {
+            detailHtml = this.renderRejectedDetail(meeting);
         } else {
             // approved, confirmed
             if (meeting.type === 'group' || meeting.type === 'direct_individual') {
@@ -319,6 +321,134 @@ const MeetingDetail = {
                                 </button>
                             </div>
                         ` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+    },
+
+    /**
+     * 거절된 미팅 상세
+     */
+    renderRejectedDetail(meeting) {
+        const isGroup = meeting.type === 'group' || (meeting.participants && meeting.participants.length >= 2);
+
+        return `
+            <div class="meeting-v3-detail">
+                <div class="bg-white rounded-lg shadow-md">
+                    <div class="px-6 py-3 border-b">
+                        <button onclick="MeetingDetail.backToList()" class="back-to-list-btn">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                            </svg>
+                            목록으로 돌아가기
+                        </button>
+                    </div>
+
+                    <!-- 학생 정보 -->
+                    ${isGroup ?
+                        meeting.participants.map((student, index) => `
+                            <div class="px-6 py-4 border-b bg-gray-50">
+                                <h4 class="text-sm font-semibold text-gray-700 mb-3">학생 정보 (${index + 1}/${meeting.participantCount})</h4>
+                                <div class="grid grid-cols-4 gap-x-6 gap-y-3 text-sm">
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">대학구분:</span>
+                                        <span class="text-gray-900 font-medium">${student.collegeType || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">계열/대학원:</span>
+                                        <span class="text-gray-900 font-medium">${student.division || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">학부(과)전공:</span>
+                                        <span class="text-gray-900 font-medium">${student.undergradMajor || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">학과/전공:</span>
+                                        <span class="text-gray-900 font-medium">${student.department || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">학위과정:</span>
+                                        <span class="text-gray-900 font-medium">${student.degreeType || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">학적상태:</span>
+                                        <span class="text-gray-900 font-medium">${student.enrollmentStatus || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">학번:</span>
+                                        <span class="text-gray-900 font-medium">${student.studentNumber || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">성명:</span>
+                                        <span class="text-gray-900 font-medium">${student.studentName || '-'}</span>
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
+                                        <span class="text-gray-900 font-medium">${student.advisorName || '-'}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')
+                    : this.renderStudentInfo(meeting)}
+
+                    <!-- 미팅 정보 -->
+                    ${this.renderMeetingInfo(meeting)}
+
+                    <!-- 완료 정보 (비활성화 상태) -->
+                    <div class="px-8 py-6 border-b border-gray-200 bg-gray-50 opacity-60">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">완료 정보 (미진행)</h3>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">완료 날짜</label>
+                                <div class="px-4 py-3 bg-gray-100 rounded-lg border border-gray-200">
+                                    <p class="text-gray-500">-</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-500 mb-2">Zoom 비밀번호</label>
+                                <div class="px-4 py-3 bg-gray-100 rounded-lg border border-gray-200">
+                                    <p class="text-gray-500">-</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex gap-3">
+                            <button disabled class="flex-1 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                </svg>
+                                재생
+                            </button>
+                            <button disabled class="flex-1 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                </svg>
+                                다운로드
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 거절 정보 -->
+                    <div class="px-8 py-6 border-b border-gray-200">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">거절 정보</h3>
+
+                        <div class="mb-4">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">거절 날짜</label>
+                            <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <p class="text-gray-900">${MeetingUtils.formatDate(meeting.rejectedDate)}</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">거절 사유</label>
+                            <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                                <p class="text-gray-900 whitespace-pre-wrap">${meeting.rejectionReason || '-'}</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
