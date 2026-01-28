@@ -1,4 +1,4 @@
-// Mock 데이터 - 프로토타입용 (업데이트됨 - 희망지도교수, 부지도교수 무제한)
+// Mock 데이터 - 프로토타입용 (업데이트됨 - 희망지도교수, 공동지도교수 무제한)
 
 // 학과 목록 (간단한 문자열 배열)
 const mockDepartmentNames = [
@@ -80,7 +80,7 @@ const mockAdvisorAssignments = mockResearchProposals.map((rp, index) => {
         const professorIndex = index % mockProfessors.length;
         const professor = mockProfessors[professorIndex];
 
-        // 부지도교수는 랜덤하게 0~3명 배정
+        // 공동지도교수는 랜덤하게 0~3명 배정
         const coAdvisorCount = Math.floor(Math.random() * 4);
         const coAdvisors = [];
         for (let i = 0; i < coAdvisorCount; i++) {

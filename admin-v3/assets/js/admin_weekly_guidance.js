@@ -319,12 +319,12 @@ function showGuidancePairsList() {
                                 <th style="width: 80px;">성명</th>
                                 <th style="width: 100px;">지도단계</th>
                                 <th style="width: 100px;">지도교수</th>
-                                <th style="width: 100px;">부지도교수</th>
+                                <th style="width: 100px;">공동지도교수</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${data.guidancePairs.map((pair, index) => {
-                                // 지도교수와 부지도교수 분리
+                                // 지도교수와 공동지도교수 분리
                                 const primaryAdvisor = pair.student.advisors?.find(a => a.role === 'primary');
                                 const subAdvisor = pair.student.advisors?.find(a => a.role === 'sub');
 

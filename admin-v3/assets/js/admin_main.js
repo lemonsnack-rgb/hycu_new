@@ -4868,11 +4868,11 @@ function renderAdvisorAssignmentModal(student, type) {
     let content = '';
 
     if (isBoth) {
-        // 좌우 2분할 레이아웃 (주지도교수 + 부지도교수 동시 배정)
+        // 좌우 2분할 레이아웃 (주지도교수 + 공동지도교수 동시 배정)
         content = `
             <div class="mb-4">
                 <h3 class="font-semibold text-gray-900 mb-2">${student.name} 학생의 지도교수 배정</h3>
-                <p class="text-sm text-gray-600">주지도교수는 1명, 부지도교수는 여러 명 선택할 수 있습니다.</p>
+                <p class="text-sm text-gray-600">주지도교수는 1명, 공동지도교수는 여러 명 선택할 수 있습니다.</p>
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; height: 500px; margin-bottom: 20px;">
@@ -4911,9 +4911,9 @@ function renderAdvisorAssignmentModal(student, type) {
                     </div>
                 </div>
 
-                <!-- 오른쪽: 부지도교수 -->
+                <!-- 오른쪽: 공동지도교수 -->
                 <div style="padding-left: 24px; display: flex; flex-direction: column;">
-                    <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">부지도교수 (복수 선택 가능)</h4>
+                    <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">공동지도교수 (복수 선택 가능)</h4>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
                         <div>
@@ -4958,7 +4958,7 @@ function renderAdvisorAssignmentModal(student, type) {
         `;
     } else {
         // 기존 단일 컬럼 레이아웃 (주 또는 부 단독 배정)
-        const advisorType = isMain ? '지도교수' : '부지도교수';
+        const advisorType = isMain ? '지도교수' : '공동지도교수';
 
         content = `
             <div class="mb-4">
@@ -4966,7 +4966,7 @@ function renderAdvisorAssignmentModal(student, type) {
                     ${student.name} 학생의 ${advisorType} ${isMain ? '배정' : '선택'}
                 </h3>
                 <p class="text-sm text-gray-600">
-                    ${isMain ? '지도교수는 1명만 선택할 수 있습니다.' : '부지도교수는 여러 명 선택할 수 있습니다.'}
+                    ${isMain ? '지도교수는 1명만 선택할 수 있습니다.' : '공동지도교수는 여러 명 선택할 수 있습니다.'}
                 </p>
             </div>
 
@@ -5109,7 +5109,7 @@ function updateSaveButtonState() {
     let hasSelection = false;
 
     if (currentAssignmentContext?.type === 'both') {
-        // 'both' 타입: 주지도교수만 필수 (부지도교수는 선택사항)
+        // 'both' 타입: 주지도교수만 필수 (공동지도교수는 선택사항)
         hasSelection = selectedMainAdvisor !== null;
     } else if (currentAssignmentContext?.type === 'main') {
         hasSelection = selectedMainAdvisor !== null;
@@ -5141,13 +5141,13 @@ function saveAdvisorAssignment() {
     }
 
     if (type === 'both') {
-        // 주지도교수 + 부지도교수 동시 배정
+        // 주지도교수 + 공동지도교수 동시 배정
         assignment.mainAdvisor = selectedMainAdvisor;
         assignment.coAdvisors = [...selectedCoAdvisors];
 
         let message = `${student.name} 학생의 지도교수를 ${selectedMainAdvisor.name} 교수로 배정했습니다.`;
         if (selectedCoAdvisors.length > 0) {
-            message += ` (부지도교수 ${selectedCoAdvisors.length}명)`;
+            message += ` (공동지도교수 ${selectedCoAdvisors.length}명)`;
         }
         showNotification(message, 'success');
     } else if (type === 'main') {
@@ -5155,7 +5155,7 @@ function saveAdvisorAssignment() {
         showNotification(`${student.name} 학생의 지도교수를 ${selectedMainAdvisor.name} 교수로 배정했습니다.`, 'success');
     } else {
         assignment.coAdvisors = [...selectedCoAdvisors];
-        showNotification(`${student.name} 학생의 부지도교수 ${selectedCoAdvisors.length}명을 선택했습니다.`, 'success');
+        showNotification(`${student.name} 학생의 공동지도교수 ${selectedCoAdvisors.length}명을 선택했습니다.`, 'success');
     }
 
     // 모달 닫기

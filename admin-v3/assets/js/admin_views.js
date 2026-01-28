@@ -3218,7 +3218,7 @@ const views = {
                                     <th style="width: 100px;">학번</th>
                                     <th style="width: 100px;">성명</th>
                                     <th style="width: 120px;">지도교수</th>
-                                    <th style="width: 150px;">부지도교수</th>
+                                    <th style="width: 150px;">공동지도교수</th>
                                 </tr>
                             </thead>
                             <tbody>

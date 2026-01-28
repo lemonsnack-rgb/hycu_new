@@ -438,7 +438,7 @@ function openAddPlanModal() {
                                    ${advisor.id === currentProf.id ? 'checked' : ''}
                                    class="rounded border-gray-300 mr-2">
                             <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-[#6A0028]' : 'text-gray-800'}">
-                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '공동지도교수'})
                             </span>
                         </label>
                     `).join('')}
@@ -783,7 +783,7 @@ function openEditPlanModal(planId) {
                                    ${advisor.id === plan.advisor.id ? 'checked' : ''}
                                    class="rounded border-gray-300 mr-2">
                             <span class="text-sm ${advisor.id === currentProf.id ? 'font-semibold text-[#6A0028]' : 'text-gray-800'}">
-                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '부지도교수'})
+                                ${advisor.name} (${advisor.role === 'primary' ? '주지도교수' : '공동지도교수'})
                             </span>
                         </label>
                     `).join('')}
