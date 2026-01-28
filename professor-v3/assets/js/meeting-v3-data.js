@@ -332,6 +332,64 @@ const MEETING_REQUESTS_V3 = [
         createdBy: 'student',
         createdAt: '2026-01-03T08:00:00'
     },
+    // 거절된 미팅 (학생 2023001 - 홍길동)
+    {
+        id: 'REQ003-REJECTED',
+        type: 'individual',
+        slotId: 'SLOT002',
+        studentId: 'S999',
+        studentNumber: '2023001',
+        studentName: '홍길동',
+        academicYear: '2025',
+        semester: '1',
+        collegeType: '일반대학원',
+        division: '일반대학원',
+        undergradMajor: '컴퓨터공학부',
+        department: '컴퓨터공학',
+        degreeType: '석사',
+        enrollmentStatus: '재학',
+        advisorName: '김교수',
+
+        requestDate: '2026-01-12',
+        selectedDate: '2026-01-20',
+        selectedTime: '16:00',
+        duration: 60,
+        meetingType: 'online',
+        topic: '논문 구조 검토 요청',
+        description: '논문 구조에 대한 피드백을 받고 싶습니다.',
+        status: 'rejected',
+
+        cancelledAt: null,
+        cancelledBy: null,
+        cancelReason: null,
+
+        // 거절 전 승인 정보
+        approvedDate: '2026-01-13',
+        professorComment: '논문 구조 검토 일정입니다.',
+        zoomMeetingId: '555666777',
+        zoomJoinUrl: 'https://zoom.us/j/555666777?pwd=xyz999',
+        zoomPassword: 'xyz999',
+        zoomStartUrl: 'https://zoom.us/s/555666777?zak=abc999',
+
+        // 완료 정보는 null (거절되어 진행 안 됨)
+        completedDate: null,
+        actualDuration: null,
+        meetingSummary: null,
+        videoPassword: null,
+        recordingId: null,
+        recordingUrl: null,
+        recordingPlayUrl: null,
+        recordingDownloadUrl: null,
+        recordingDuration: null,
+        recordingSize: null,
+
+        // 거절 정보
+        rejectedDate: '2026-01-14',
+        rejectionReason: '논문 구조 검토를 위해서는 최소한의 초안이 필요합니다. 각 장별로 핵심 내용을 작성한 후 다시 신청해주세요. 현재 단계에서는 개요만으로는 구체적인 피드백이 어렵습니다.',
+
+        createdBy: 'student',
+        createdAt: '2026-01-12T14:30:00'
+    },
     {
         id: 'REQ004',
         type: 'individual',

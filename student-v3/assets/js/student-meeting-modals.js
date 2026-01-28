@@ -309,12 +309,60 @@ const StudentMeetingModals = {
                         </div>
                     ` : ''}
 
-                    <!-- 거절 사유 (거절된 경우) -->
-                    ${meeting.status === 'rejected' && meeting.rejectionReason ? `
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">거절 사유</label>
-                            <div class="px-4 py-3 bg-red-50 border border-red-200 rounded text-sm text-red-900">
-                                ${meeting.rejectionReason}
+                    <!-- 완료 정보 (거절된 경우 - 비활성화) -->
+                    ${meeting.status === 'rejected' ? `
+                        <div class="border-t border-gray-200 pt-6 bg-gray-50 opacity-60">
+                            <h4 class="text-lg font-semibold text-gray-700 mb-4">완료 정보 (미진행)</h4>
+
+                            <div class="grid grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-2">완료 날짜</label>
+                                    <div class="px-4 py-3 bg-gray-100 rounded-lg border border-gray-200">
+                                        <p class="text-gray-500">-</p>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-500 mb-2">Zoom 비밀번호</label>
+                                    <div class="px-4 py-3 bg-gray-100 rounded-lg border border-gray-200">
+                                        <p class="text-gray-500">-</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-3">
+                                <button disabled class="flex-1 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    </svg>
+                                    재생
+                                </button>
+                                <button disabled class="flex-1 px-4 py-2 bg-gray-300 text-gray-500 rounded-lg cursor-not-allowed flex items-center justify-center gap-2">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                    </svg>
+                                    다운로드
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 거절 정보 -->
+                        <div class="border-t border-gray-200 pt-6">
+                            <h4 class="text-lg font-semibold text-gray-900 mb-4">거절 정보</h4>
+
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium text-gray-700 mb-2">거절 날짜</label>
+                                <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <p class="text-gray-900">${meeting.rejectedDate ? MeetingUtils.formatDate(meeting.rejectedDate) : '-'}</p>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">거절 사유</label>
+                                <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                                    <p class="text-gray-900 whitespace-pre-wrap">${meeting.rejectionReason || '-'}</p>
+                                </div>
                             </div>
                         </div>
                     ` : ''}
