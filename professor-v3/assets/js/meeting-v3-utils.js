@@ -172,39 +172,82 @@ const ZoomUtils = {
                     <h4 class="text-lg font-semibold text-gray-900">Zoom 미팅 정보</h4>
                 </div>
 
-                <div class="flex items-center gap-2">
-                    <span class="text-sm text-gray-600 whitespace-nowrap">미팅 ID:</span>
-                    <span class="font-mono font-medium text-gray-900">${meeting.zoomMeetingId}</span>
+                <div class="space-y-3">
+                    <!-- 미팅 ID와 비밀번호 (수정 가능) -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600 whitespace-nowrap" style="width: 100px;">미팅 ID:</span>
+                        <input type="text"
+                               id="zoom-meeting-id-${meeting.id}"
+                               value="${meeting.zoomMeetingId}"
+                               class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#6A0028]"
+                               style="width: 200px;">
 
-                    <span class="text-sm text-gray-600 whitespace-nowrap ml-4">비밀번호:</span>
-                    <span class="font-mono font-medium text-gray-900">${meeting.zoomPassword || '-'}</span>
+                        <span class="text-sm text-gray-600 whitespace-nowrap ml-4" style="width: 100px;">비밀번호:</span>
+                        <input type="text"
+                               id="zoom-password-${meeting.id}"
+                               value="${meeting.zoomPassword || ''}"
+                               placeholder="비밀번호 입력"
+                               class="px-3 py-2 bg-white border border-gray-300 rounded-lg text-sm font-mono focus:ring-2 focus:ring-[#6A0028]"
+                               style="width: 200px;">
+                    </div>
 
-                    <span class="text-sm text-gray-600 whitespace-nowrap ml-4">참여 링크:</span>
-                    <input type="text" value="${meeting.zoomJoinUrl}" readonly
-                           class="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono" style="min-width: 200px;">
+                    <!-- 참여 링크 (읽기 전용) -->
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm text-gray-600 whitespace-nowrap" style="width: 100px;">참여 링크:</span>
+                        <input type="text" value="${meeting.zoomJoinUrl}" readonly
+                               class="flex-1 px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg text-sm font-mono">
+                        ${showActions ? `
+                            <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomJoinUrl}')"
+                                    class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm whitespace-nowrap">
+                                복사
+                            </button>
+                        ` : ''}
+                    </div>
+
                     ${showActions ? `
-                        <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomJoinUrl}')"
-                                class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-sm whitespace-nowrap">
-                            복사
-                        </button>
-                    ` : ''}
-
-                    <span class="text-sm text-gray-600 whitespace-nowrap ml-4">시작 링크:</span>
-                    <input type="text" value="${meeting.zoomStartUrl}" readonly
-                           class="flex-1 px-2 py-1 bg-white border border-gray-300 rounded text-sm font-mono" style="min-width: 200px;">
-                    ${showActions ? `
-                        <button onclick="ZoomUtils.copyZoomLink('${meeting.zoomStartUrl}')"
-                                class="px-3 py-1 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] text-sm whitespace-nowrap">
-                            복사
-                        </button>
-                        <a href="${meeting.zoomStartUrl}" target="_blank"
-                           class="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 text-sm whitespace-nowrap">
-                            시작
-                        </a>
+                        <!-- 저장 버튼 -->
+                        <div class="flex justify-end mt-4">
+                            <button onclick="ZoomUtils.saveZoomInfo('${meeting.id}')"
+                                    class="px-6 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] text-sm font-medium">
+                                저장
+                            </button>
+                        </div>
                     ` : ''}
                 </div>
             </div>
         `;
+    },
+
+    /**
+     * Zoom 정보 저장
+     */
+    saveZoomInfo(meetingId) {
+        const meetingIdInput = document.getElementById(`zoom-meeting-id-${meetingId}`);
+        const passwordInput = document.getElementById(`zoom-password-${meetingId}`);
+
+        const newMeetingId = meetingIdInput?.value.trim();
+        const newPassword = passwordInput?.value.trim();
+
+        if (!newMeetingId) {
+            alert('미팅 ID를 입력해주세요.');
+            return;
+        }
+
+        // DataService를 통해 Zoom 정보 업데이트
+        const success = DataServiceV3.updateZoomInfo(meetingId, {
+            zoomMeetingId: newMeetingId,
+            zoomPassword: newPassword
+        });
+
+        if (success) {
+            alert('Zoom 정보가 저장되었습니다.');
+            // 상세화면 새로고침
+            if (typeof MeetingDetail !== 'undefined' && typeof MeetingDetail.show === 'function') {
+                MeetingDetail.show(meetingId);
+            }
+        } else {
+            alert('저장 중 오류가 발생했습니다.');
+        }
     }
 };
 

@@ -117,14 +117,6 @@ const MeetingDetail = {
                             ${ZoomUtils.renderZoomInfoCard(meeting, true)}
                         </div>
                     ` : ''}
-
-                    <!-- 액션 버튼 -->
-                    <div class="px-8 py-6 flex justify-end gap-3">
-                        <button onclick="CompleteMeetingModal.open('${meeting.id}')"
-                                class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] text-sm">
-                            완료 처리
-                        </button>
-                    </div>
                 </div>
             </div>
         `;
@@ -202,14 +194,6 @@ const MeetingDetail = {
                             ${ZoomUtils.renderZoomInfoCard(meeting, true)}
                         </div>
                     ` : ''}
-
-                    <!-- 액션 버튼 -->
-                    <div class="px-8 py-6 flex justify-end gap-3">
-                        <button onclick="CompleteMeetingModal.open('${meeting.id}')"
-                                class="px-4 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034] text-sm">
-                            완료 처리
-                        </button>
-                    </div>
                 </div>
             </div>
         `;

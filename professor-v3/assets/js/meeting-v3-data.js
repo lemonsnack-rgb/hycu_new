@@ -1006,6 +1006,31 @@ const DataServiceV3 = {
     },
 
     /**
+     * Zoom 정보 업데이트
+     */
+    updateZoomInfo(meetingId, zoomInfo) {
+        // MEETING_REQUESTS_V3에서 찾기
+        let meeting = MEETING_REQUESTS_V3.find(m => m.id === meetingId);
+
+        // 없으면 GROUP_MEETINGS_V3에서 찾기
+        if (!meeting) {
+            meeting = GROUP_MEETINGS_V3.find(m => m.id === meetingId);
+        }
+
+        if (!meeting) {
+            console.error('❌ 미팅을 찾을 수 없습니다:', meetingId);
+            return false;
+        }
+
+        // Zoom 정보 업데이트
+        meeting.zoomMeetingId = zoomInfo.zoomMeetingId;
+        meeting.zoomPassword = zoomInfo.zoomPassword;
+
+        console.log('✅ Zoom 정보 업데이트:', meetingId, zoomInfo);
+        return true;
+    },
+
+    /**
      * 미팅 통계
      */
     getMeetingStats() {
