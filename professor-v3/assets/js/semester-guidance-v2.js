@@ -240,6 +240,10 @@ function renderPlanCreationForm(student) {
                         <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
                         <span class="text-gray-900 font-medium">${advisors.map(a => a.name).join(', ')}</span>
                     </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도단계:</span>
+                        <span class="text-gray-900 font-medium">${student.currentStage || '-'}</span>
+                    </div>
                 </div>
             </div>
 
@@ -439,6 +443,10 @@ function renderSemesterDetailContent(student, allPlans, currentPlan, totalWeeks)
                     <div class="flex gap-2">
                         <span class="text-gray-600 min-w-[80px]">지도교수명:</span>
                         <span class="text-gray-900 font-medium">${advisors.map(a => a.name).join(', ')}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">지도단계:</span>
+                        <span class="text-gray-900 font-medium">${student.currentStage || '-'}</span>
                     </div>
                 </div>
             </div>
