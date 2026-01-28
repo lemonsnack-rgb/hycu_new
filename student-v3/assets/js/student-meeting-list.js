@@ -11,30 +11,65 @@ const StudentMeetingList = {
      */
     render() {
         return `
-            <div class="table-container">
-                <!-- 테이블 헤더 -->
-                <div class="table-header">
-                    <div class="table-header-left">
-                        <h3 class="table-title">내 신청 내역</h3>
-                        <span class="table-count" id="student-meeting-count">(총 0건)</span>
-                    </div>
-                    <div class="table-header-right">
-                        <button onclick="StudentMeetingModals.openAvailableSlotsModal()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2">
-                            <i class="fas fa-plus"></i>지도 신청
-                        </button>
+            <!-- 검색 영역 -->
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="p-4 bg-gray-50">
+                    <div class="grid grid-cols-3 gap-4">
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">지도방식</label>
+                            <select id="student-meeting-filter-method" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="online">온라인</option>
+                                <option value="offline">오프라인</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">상태</label>
+                            <select id="student-meeting-filter-status" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="pending">대기</option>
+                                <option value="approved,confirmed">확정</option>
+                                <option value="completed">완료</option>
+                                <option value="rejected">거절</option>
+                                <option value="cancelled">취소</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-end">
+                            <button onclick="StudentMeetingList.applyFilters()" class="px-3 bg-[#6A0028] text-white rounded hover:bg-[#4A001C] text-xs font-medium" style="height: 34px;">
+                                <i class="fas fa-search mr-1"></i>조회
+                            </button>
+                        </div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 테이블 -->
-                <div class="table-scroll">
-                    <table class="min-w-full">
-                        <thead id="student-meeting-table-head">
-                            <!-- JavaScript로 동적 렌더링 -->
-                        </thead>
-                        <tbody id="student-meeting-table-body">
-                            <!-- JavaScript로 동적 렌더링 -->
-                        </tbody>
-                    </table>
+            <!-- 테이블 영역 -->
+            <div class="bg-white rounded-lg shadow-md">
+                <div class="table-container">
+                    <!-- 테이블 헤더 -->
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">실시간지도예약목록</h3>
+                            <span class="table-count" id="student-meeting-count">(총 0건)</span>
+                        </div>
+                        <div class="table-header-right">
+                            <button onclick="StudentMeetingModals.openAvailableSlotsModal()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-2">
+                                <i class="fas fa-plus"></i>지도 신청
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 테이블 -->
+                    <div class="table-scroll">
+                        <table class="min-w-full">
+                            <thead id="student-meeting-table-head">
+                                <!-- JavaScript로 동적 렌더링 -->
+                            </thead>
+                            <tbody id="student-meeting-table-body">
+                                <!-- JavaScript로 동적 렌더링 -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         `;
@@ -51,105 +86,66 @@ const StudentMeetingList = {
         }
 
         contentArea.innerHTML = this.render();
-        this.showMyApplications();
+        this.applyFilters();
     },
 
     /**
-     * 지도가능 시간 목록 표시
+     * 필터 적용 및 테이블 렌더링
      */
-    showAvailableSlots() {
-        this.currentView = 'available';
+    applyFilters() {
+        const filters = {
+            meetingType: document.getElementById('student-meeting-filter-method')?.value || '',
+            status: []
+        };
 
-        const thead = document.getElementById('student-meeting-table-head');
-        const tbody = document.getElementById('student-meeting-table-body');
-        const countSpan = document.getElementById('student-meeting-count');
-        const titleEl = document.querySelector('.table-title');
-
-        if (!thead || !tbody) return;
-
-        // 타이틀 변경
-        if (titleEl) {
-            titleEl.textContent = '지도가능 시간';
+        // 상태 필터 처리
+        const statusFilter = document.getElementById('student-meeting-filter-status')?.value || '';
+        if (statusFilter) {
+            filters.status = statusFilter.split(',');
         }
 
-        // 헤더 렌더링
-        thead.innerHTML = `
-            <tr>
-                <th style="width: 60px;">순번</th>
-                <th style="width: 200px;">미팅일시</th>
-                <th style="width: 120px;">지도교수명</th>
-                <th style="width: 100px;">지도방식</th>
-                <th style="width: 100px;">신청</th>
-            </tr>
-        `;
+        // 데이터 가져오기 및 필터링
+        let applications = StudentMeetingDataService.getMyApplications();
 
-        // 데이터 가져오기
-        const slots = StudentMeetingDataService.getAvailableSlots();
-        countSpan.textContent = `(총 ${slots.length}건)`;
-
-        if (slots.length === 0) {
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="5" class="text-center text-gray-500 py-8">
-                        신청 가능한 지도 시간이 없습니다.
-                    </td>
-                </tr>
-            `;
-            return;
+        if (filters.meetingType) {
+            applications = applications.filter(app => app.meetingType === filters.meetingType);
         }
 
-        // 테이블 행 렌더링
-        tbody.innerHTML = slots.map((slot, index) => {
-            const dateTimeText = MeetingUtils.formatDateTime(slot.date, slot.time);
-            const methodText = MeetingTypeUtils.getMeetingMethodText(slot.meetingType);
+        if (filters.status.length > 0) {
+            applications = applications.filter(app => filters.status.includes(app.status));
+        }
 
-            return `
-                <tr class="hover:bg-gray-50">
-                    <td class="text-center">${index + 1}</td>
-                    <td class="text-center">${dateTimeText}</td>
-                    <td class="text-center">${slot.professorName || '-'}</td>
-                    <td class="text-center">${methodText}</td>
-                    <td class="text-center">
-                        <button onclick="StudentMeetingModals.openApplyModal('${slot.id}')"
-                                class="px-4 py-2 bg-[#6A0028] text-white rounded hover:bg-[#8A0034] text-sm">
-                            신청
-                        </button>
-                    </td>
-                </tr>
-            `;
-        }).join('');
+        this.renderTable(applications);
     },
 
     /**
-     * 내 신청 내역 표시
+     * 테이블 렌더링
      */
-    showMyApplications() {
+    renderTable(applications) {
         const thead = document.getElementById('student-meeting-table-head');
         const tbody = document.getElementById('student-meeting-table-body');
         const countSpan = document.getElementById('student-meeting-count');
 
         if (!thead || !tbody) return;
 
-        // 헤더 렌더링
+        // 헤더 렌더링 (교수용과 동일한 구조)
         thead.innerHTML = `
             <tr>
-                <th style="width: 60px;">순번</th>
-                <th style="width: 200px;">미팅일시</th>
-                <th style="width: 120px;">지도교수명</th>
-                <th style="width: 100px;">지도방식</th>
-                <th style="width: 100px;">상태</th>
+                <th>순번</th>
+                <th>미팅일시</th>
+                <th>지도방식</th>
+                <th>참여인원</th>
+                <th>상태</th>
             </tr>
         `;
 
-        // 데이터 가져오기
-        const applications = StudentMeetingDataService.getMyApplications();
         countSpan.textContent = `(총 ${applications.length}건)`;
 
         if (applications.length === 0) {
             tbody.innerHTML = `
                 <tr>
                     <td colspan="5" class="text-center text-gray-500 py-8">
-                        신청 내역이 없습니다.
+                        검색 결과가 없습니다.
                     </td>
                 </tr>
             `;
@@ -162,25 +158,45 @@ const StudentMeetingList = {
             const methodText = MeetingTypeUtils.getMeetingMethodText(app.meetingType);
             const statusText = MeetingStatusUtils.getStatusText(app.status);
 
+            // 참여인원 표시: 교수용과 동일한 로직
+            let participantText = '';
+            if (app.participants && app.participants.length > 0) {
+                // 가나다순 정렬
+                const sortedParticipants = [...app.participants].sort((a, b) =>
+                    a.name.localeCompare(b.name, 'ko-KR')
+                );
+
+                const firstName = sortedParticipants[0].name;
+                const remainingCount = sortedParticipants.length - 1;
+
+                if (remainingCount > 0) {
+                    participantText = `${firstName} 외 ${remainingCount}명`;
+                } else {
+                    participantText = firstName;
+                }
+            } else {
+                // 1:1 미팅인 경우
+                participantText = app.studentName || '-';
+            }
+
             return `
-                <tr class="hover:bg-gray-50 cursor-pointer" onclick="StudentMeetingModals.openDetailModal('${app.id}')">
-                    <td class="text-center">${index + 1}</td>
-                    <td class="text-center">${dateTimeText}</td>
-                    <td class="text-center">${app.advisorName || '-'}</td>
-                    <td class="text-center">${methodText}</td>
-                    <td class="text-center">
-                        <span class="font-medium">${statusText}</span>
-                    </td>
+                <tr onclick="StudentMeetingModals.openDetailModal('${app.id}')" style="cursor: pointer;">
+                    <td>${index + 1}</td>
+                    <td>${dateTimeText}</td>
+                    <td>${methodText}</td>
+                    <td>${participantText}</td>
+                    <td>${statusText}</td>
                 </tr>
             `;
         }).join('');
     },
 
+
     /**
      * 새로고침
      */
     refresh() {
-        this.showMyApplications();
+        this.applyFilters();
     }
 };
 

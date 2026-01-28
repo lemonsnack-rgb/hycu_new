@@ -149,10 +149,10 @@ const StudentMeetingModals = {
                         </div>
                     </div>
 
-                    <!-- 신청 메모 입력 -->
+                    <!-- 미팅 주제 입력 -->
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">
-                            신청 메모 (선택사항)
+                            미팅 주제 (선택사항)
                         </label>
                         <textarea id="apply-memo"
                                   rows="4"
@@ -299,10 +299,10 @@ const StudentMeetingModals = {
                         </div>
                     </div>
 
-                    <!-- 신청 메모 -->
+                    <!-- 미팅 주제 -->
                     ${meeting.topic && meeting.topic !== '지도 예약 신청' ? `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">신청 메모</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">미팅 주제</label>
                             <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded text-sm text-gray-900">
                                 ${meeting.topic}
                             </div>
