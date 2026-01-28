@@ -317,6 +317,7 @@ function showGuidancePairsList() {
                                 <th style="width: 80px;">학적상태</th>
                                 <th style="width: 90px;">학번</th>
                                 <th style="width: 80px;">성명</th>
+                                <th style="width: 100px;">지도단계</th>
                                 <th style="width: 100px;">지도교수</th>
                                 <th style="width: 100px;">부지도교수</th>
                             </tr>
@@ -342,6 +343,7 @@ function showGuidancePairsList() {
                                     <td>재학</td>
                                     <td>${pair.student.studentId}</td>
                                     <td class="font-medium">${pair.student.name}</td>
+                                    <td>${pair.student.currentStage || '-'}</td>
                                     <td>${primaryAdvisor ? primaryAdvisor.name : (pair.professor?.name || '-')}</td>
                                     <td>${subAdvisor ? subAdvisor.name : '-'}</td>
                                 </tr>
