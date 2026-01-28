@@ -52,7 +52,7 @@ const MeetingList = {
                     <div class="table-container">
                         <div class="table-header">
                             <div class="table-header-left">
-                                <h3 class="table-title">미팅 목록</h3>
+                                <h3 class="table-title">실시간지도예약목록</h3>
                                 <span class="table-count" id="meeting-count">(총 0건)</span>
                             </div>
                             <div class="table-header-right">
@@ -158,9 +158,26 @@ const MeetingList = {
             const meetingMethodText = MeetingTypeUtils.getMeetingMethodText(meeting.meetingType);
             const dateTimeText = MeetingUtils.formatDateTime(meeting.selectedDate || meeting.date, meeting.selectedTime || meeting.startTime);
 
-            // 참여인원 계산
-            const participantCount = meeting.participants?.length || 1;
-            const participantText = `${participantCount}명`;
+            // 참여인원 표시: "첫 번째 학생 이름 외 n명" 형식
+            let participantText = '';
+            if (meeting.participants && meeting.participants.length > 0) {
+                // 가나다순 정렬
+                const sortedParticipants = [...meeting.participants].sort((a, b) =>
+                    a.name.localeCompare(b.name, 'ko-KR')
+                );
+
+                const firstName = sortedParticipants[0].name;
+                const remainingCount = sortedParticipants.length - 1;
+
+                if (remainingCount > 0) {
+                    participantText = `${firstName} 외 ${remainingCount}명`;
+                } else {
+                    participantText = firstName;
+                }
+            } else {
+                // 1:1 미팅인 경우 (학생 신청 미팅)
+                participantText = meeting.studentName || '-';
+            }
 
             return `
                 <tr onclick="MeetingList.showDetail('${meeting.id}')" style="cursor: pointer;">
