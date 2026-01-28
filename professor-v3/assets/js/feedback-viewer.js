@@ -329,10 +329,26 @@ function createFeedbackModal(request, feedbackData) {
                             </div>
                             <!-- 입력창은 조건부 표시 -->
                             <div id="general-feedback-input-section" class="relative">
-                                <textarea id="general-feedback-input" 
+                                <textarea id="general-feedback-input"
                                           class="w-full p-2 border rounded-md text-sm resize-none"
                                           rows="3"
                                           placeholder="전체 평가를 입력하세요..."></textarea>
+
+                                <!-- 첨부파일 미리보기 영역 -->
+                                <div id="general-attach-preview" class="mt-2 hidden">
+                                    <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-paperclip text-gray-500"></i>
+                                            <span id="general-attach-filename" class="text-sm text-gray-700"></span>
+                                            <span id="general-attach-filesize" class="text-xs text-gray-500"></span>
+                                        </div>
+                                        <button onclick="removeGeneralAttachment()"
+                                                class="text-red-600 hover:text-red-700 text-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div class="flex gap-2 mt-2 flex-wrap">
                                     <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
                                         <i class="fas fa-paper-plane"></i>
@@ -342,7 +358,7 @@ function createFeedbackModal(request, feedbackData) {
                                         <i class="fas fa-star"></i>
                                         <span>자주 쓰는 코멘트</span>
                                     </button>
-                                    <button onclick="uploadAttachment('general')" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
+                                    <button onclick="uploadAttachmentForGeneral()" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
                                         <i class="fas fa-paperclip"></i>
                                         <span>첨부</span>
                                     </button>
@@ -638,8 +654,14 @@ function renderGeneralThread(feedbackId){
   const replies = []; // 댓글 기능은 제거 (교수 1명당 1개만 등록)
   
   const isOwner = mainFeedback.authorId === (CURRENT_USER ? CURRENT_USER.id : 'prof1');
-  const att = (mainFeedback.attach && mainFeedback.attach.length) ? 
-              mainFeedback.attach.map(a=>'<a class="text-[#6A0028] underline mr-2" href="#">'+a.name+'</a>').join('') : '';
+  const att = (mainFeedback.attach && mainFeedback.attach.length > 0) ?
+              `<div class="mt-2 flex items-center gap-2 p-2 bg-white border border-gray-200 rounded">
+                <i class="fas fa-paperclip text-gray-500 text-xs"></i>
+                <a class="text-[#6A0028] hover:underline text-sm" href="#" onclick="downloadAttachment('${mainFeedback.attach[0].name}'); return false;">
+                  ${mainFeedback.attach[0].name}
+                </a>
+                <span class="text-xs text-gray-500">(${formatFileSize(mainFeedback.attach[0].size)})</span>
+              </div>` : '';
   
   listEl.innerHTML = `
     <!-- 메인 평가 -->
@@ -668,9 +690,41 @@ function renderGeneralThread(feedbackId){
         </div>
       </div>
       <div id="general-main-edit" style="display: none;">
-        <textarea id="general-main-textarea" 
-                  class="w-full p-2 border rounded-md text-sm resize-none" 
+        <textarea id="general-main-textarea"
+                  class="w-full p-2 border rounded-md text-sm resize-none"
                   rows="4">${mainFeedback.text}</textarea>
+
+        <!-- 기존 첨부파일 표시 -->
+        ${mainFeedback.attach && mainFeedback.attach.length > 0 ? `
+          <div id="edit-existing-attach-general" class="mt-2 p-2 bg-gray-50 border border-gray-300 rounded-md">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <i class="fas fa-paperclip text-gray-500"></i>
+                <span class="text-sm text-gray-700">${mainFeedback.attach[0].name}</span>
+                <span class="text-xs text-gray-500">(${formatFileSize(mainFeedback.attach[0].size)})</span>
+              </div>
+              <button onclick="removeExistingEditAttachmentGeneral()" class="text-red-600 hover:text-red-700 text-sm">
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+          </div>
+        ` : ''}
+
+        <!-- 새 첨부파일 미리보기 -->
+        <div id="general-edit-attach-preview" class="mt-2 hidden">
+          <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
+            <div class="flex items-center gap-2">
+              <i class="fas fa-paperclip text-gray-500"></i>
+              <span id="general-edit-attach-filename" class="text-sm text-gray-700"></span>
+              <span id="general-edit-attach-filesize" class="text-xs text-gray-500"></span>
+            </div>
+            <button onclick="removeEditAttachment()"
+                    class="text-red-600 hover:text-red-700 text-sm">
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+        </div>
+
         <div class="flex gap-2 mt-2 flex-wrap">
           <button class="quickmark-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1" data-target="general-main-textarea">
             <i class="fas fa-star"></i>
@@ -682,12 +736,12 @@ function renderGeneralThread(feedbackId){
           </button>
         </div>
         <div class="flex gap-2 mt-2">
-          <button onclick="saveGeneralMainEdit('${feedbackId}')" 
+          <button onclick="saveGeneralMainEdit('${feedbackId}')"
                   class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
             <i class="fas fa-save"></i>
             <span>저장</span>
           </button>
-          <button onclick="cancelGeneralMainEdit()" 
+          <button onclick="cancelGeneralMainEdit()"
                   class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
             <i class="fas fa-times"></i>
             <span>취소</span>
@@ -744,6 +798,10 @@ function addGeneralFeedback(feedbackId){
 
   window._pendingAttach = [];
   ta.value='';
+
+  // UI 미리보기 제거
+  removeGeneralAttachment();
+
   renderGeneralThread(feedbackId);
 }
 
@@ -843,12 +901,17 @@ function saveGeneralMainEdit(feedbackId){
   const ta = document.getElementById('general-main-textarea');
   const v = ta.value.trim();
   if (!v) { alert('내용을 입력하세요.'); return; }
-  
+
   if (window._generalComments[feedbackId] && window._generalComments[feedbackId][0]) {
     window._generalComments[feedbackId][0].text = v;
     window._generalComments[feedbackId][0].ts = Date.now();
+    // 편집 시 첨부파일이 있으면 업데이트
+    if (window._editAttach && window._editAttach.length > 0) {
+      window._generalComments[feedbackId][0].attach = window._editAttach;
+      window._editAttach = [];
+    }
   }
-  
+
   renderGeneralThread(feedbackId);
   showToast('전체 평가가 수정되었습니다.', 'success');
 }
@@ -856,6 +919,8 @@ function saveGeneralMainEdit(feedbackId){
 function cancelGeneralMainEdit(){
   document.getElementById('general-main-display').style.display = 'block';
   document.getElementById('general-main-edit').style.display = 'none';
+  // 편집 취소 시 임시 첨부파일 초기화
+  window._editAttach = [];
   // 입력창은 숨긴 상태 유지
 }
 
@@ -893,24 +958,227 @@ window.editGeneralReply = editGeneralReply;
 window.saveGeneralReplyEdit = saveGeneralReplyEdit;
 window.cancelGeneralReplyEdit = cancelGeneralReplyEdit;
 window.uploadEditAttachmentGeneral = function(){
-  // 구현 예정
-  showToast('첨부 기능 준비 중', 'info');
-};
+  console.log('[uploadEditAttachmentGeneral] 함수 호출됨');
 
-function uploadAttachmentForGeneral(){
-  let inp = document.getElementById('general-attach-input');
+  let inp = document.getElementById('general-edit-attach-input');
   if (!inp){
+    console.log('[uploadEditAttachmentGeneral] input 요소 생성');
     inp = document.createElement('input');
-    inp.type='file'; inp.id='general-attach-input'; inp.multiple=true; inp.accept='.png,.jpg,.jpeg,.pdf';
+    inp.type='file';
+    inp.id='general-edit-attach-input';
+    inp.multiple = false;  // 1개만 선택 가능
+    inp.accept='.png,.jpg,.jpeg,.pdf,.doc,.docx';
     inp.style.display='none';
     document.body.appendChild(inp);
     inp.addEventListener('change', ()=>{
-      const files = Array.from(inp.files||[]).map(f=>({name:f.name, size:f.size}));
-      window._pendingAttach = files;
-      alert(files.length+'개 파일 선택됨');
+      console.log('[uploadEditAttachmentGeneral] 파일 선택됨:', inp.files);
+      const file = inp.files[0];
+      if (!file) {
+        console.log('[uploadEditAttachmentGeneral] 파일 없음');
+        return;
+      }
+
+      console.log('[uploadEditAttachmentGeneral] 선택된 파일:', file.name, file.size);
+
+      // 파일 크기 제한 (10MB)
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert('파일 크기는 10MB를 초과할 수 없습니다.');
+        inp.value = '';
+        return;
+      }
+
+      // 편집용 첨부파일 저장
+      window._editAttach = [{
+        name: file.name,
+        size: file.size,
+        file: file
+      }];
+
+      console.log('[uploadEditAttachmentGeneral] window._editAttach 설정됨');
+      console.log('[uploadEditAttachmentGeneral] showEditAttachPreview 호출');
+
+      // 미리보기 표시
+      showEditAttachPreview(file);
+
+      inp.value = '';
     });
   }
+
+  console.log('[uploadEditAttachmentGeneral] input.click() 호출');
   inp.click();
+};
+
+function uploadAttachmentForGeneral(){
+  console.log('[uploadAttachmentForGeneral] 함수 호출됨');
+
+  let inp = document.getElementById('general-attach-input');
+  if (!inp){
+    console.log('[uploadAttachmentForGeneral] input 요소 생성');
+    inp = document.createElement('input');
+    inp.type='file';
+    inp.id='general-attach-input';
+    inp.multiple = false;  // 1개만 선택
+    inp.accept='.png,.jpg,.jpeg,.pdf,.doc,.docx';
+    inp.style.display='none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', ()=>{
+      console.log('[uploadAttachmentForGeneral] 파일 선택됨:', inp.files);
+      const file = inp.files[0];
+      if (!file) {
+        console.log('[uploadAttachmentForGeneral] 파일 없음');
+        return;
+      }
+
+      console.log('[uploadAttachmentForGeneral] 선택된 파일:', file.name, file.size);
+
+      // 파일 크기 제한 (10MB)
+      const maxSize = 10 * 1024 * 1024;
+      if (file.size > maxSize) {
+        alert('파일 크기는 10MB를 초과할 수 없습니다.');
+        inp.value = '';
+        return;
+      }
+
+      // window._pendingAttach에 1개만 저장
+      window._pendingAttach = [{
+        name: file.name,
+        size: file.size,
+        file: file
+      }];
+
+      console.log('[uploadAttachmentForGeneral] window._pendingAttach 설정됨');
+
+      // UI 업데이트
+      console.log('[uploadAttachmentForGeneral] showGeneralAttachPreview 호출');
+      showGeneralAttachPreview(file);
+
+      // input 초기화 (같은 파일 재선택 가능하도록)
+      inp.value = '';
+    });
+  }
+
+  console.log('[uploadAttachmentForGeneral] input.click() 호출');
+  inp.click();
+}
+
+/**
+ * 전체 평가 첨부파일 미리보기 표시
+ */
+function showGeneralAttachPreview(file) {
+    console.log('[showGeneralAttachPreview] 함수 호출됨, file=', file.name);
+
+    const previewContainer = document.getElementById('general-attach-preview');
+    const filenameEl = document.getElementById('general-attach-filename');
+    const filesizeEl = document.getElementById('general-attach-filesize');
+
+    console.log('[showGeneralAttachPreview] previewContainer=', previewContainer ? 'found' : 'NOT FOUND');
+    console.log('[showGeneralAttachPreview] filenameEl=', filenameEl ? 'found' : 'NOT FOUND');
+    console.log('[showGeneralAttachPreview] filesizeEl=', filesizeEl ? 'found' : 'NOT FOUND');
+
+    if (!previewContainer || !filenameEl || !filesizeEl) {
+        console.error('[showGeneralAttachPreview] ❌ 요소를 찾을 수 없음');
+        return;
+    }
+
+    // 파일 정보 표시
+    filenameEl.textContent = file.name;
+    filesizeEl.textContent = `(${formatFileSize(file.size)})`;
+
+    // 미리보기 영역 표시
+    previewContainer.classList.remove('hidden');
+
+    console.log('[showGeneralAttachPreview] ✅ 미리보기 표시 완료');
+}
+
+function showEditAttachPreview(file) {
+    console.log('[showEditAttachPreview] 함수 호출됨, file=', file.name);
+
+    const previewContainer = document.getElementById('general-edit-attach-preview');
+    const filenameEl = document.getElementById('general-edit-attach-filename');
+    const filesizeEl = document.getElementById('general-edit-attach-filesize');
+
+    console.log('[showEditAttachPreview] previewContainer=', previewContainer ? 'found' : 'NOT FOUND');
+    console.log('[showEditAttachPreview] filenameEl=', filenameEl ? 'found' : 'NOT FOUND');
+    console.log('[showEditAttachPreview] filesizeEl=', filesizeEl ? 'found' : 'NOT FOUND');
+
+    if (!previewContainer || !filenameEl || !filesizeEl) {
+        console.error('[showEditAttachPreview] ❌ 요소를 찾을 수 없음');
+        return;
+    }
+
+    filenameEl.textContent = file.name;
+    filesizeEl.textContent = `(${formatFileSize(file.size)})`;
+    previewContainer.classList.remove('hidden');
+
+    console.log('[showEditAttachPreview] ✅ 편집 미리보기 표시 완료');
+}
+
+/**
+ * 파일 크기 포맷팅
+ */
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+}
+
+/**
+ * 전체 평가 첨부파일 제거
+ */
+function removeGeneralAttachment() {
+    window._pendingAttach = [];
+
+    const previewContainer = document.getElementById('general-attach-preview');
+    if (previewContainer) {
+        previewContainer.classList.add('hidden');
+    }
+
+    // input 파일 초기화
+    const inp = document.getElementById('general-attach-input');
+    if (inp) {
+        inp.value = '';
+    }
+}
+
+function removeEditAttachment() {
+    console.log('[removeEditAttachment] 호출됨');
+    window._editAttach = [];
+    const previewContainer = document.getElementById('general-edit-attach-preview');
+    if (previewContainer) {
+        previewContainer.classList.add('hidden');
+    }
+    const inp = document.getElementById('general-edit-attach-input');
+    if (inp) {
+        inp.value = '';
+    }
+    console.log('[removeEditAttachment] 편집 첨부파일 제거 완료');
+}
+
+function removeExistingEditAttachmentGeneral() {
+    console.log('[removeExistingEditAttachmentGeneral] 호출됨');
+
+    // 데이터에서 첨부파일 제거
+    const feedbackId = window._currentFeedbackCtx?.id;
+    if (feedbackId && window._generalComments && window._generalComments[feedbackId]) {
+        const currentUserId = CURRENT_USER ? CURRENT_USER.id : 'prof1';
+        const myFeedback = window._generalComments[feedbackId].find(f => f.authorId === currentUserId);
+        if (myFeedback) {
+            myFeedback.attach = [];
+            console.log('[removeExistingEditAttachmentGeneral] 데이터에서 첨부파일 제거 완료');
+        }
+    }
+
+    // UI에서 첨부파일 제거
+    const attachEl = document.getElementById('edit-existing-attach-general');
+    if (attachEl) {
+        attachEl.remove();
+        console.log('[removeExistingEditAttachmentGeneral] ✅ UI에서 첨부파일 제거 완료');
+    }
+
+    alert('첨부파일이 제거되었습니다.');
 }
 
 function refreshInlineTabMarker(){
@@ -988,6 +1256,15 @@ function toggleStudentMemo() {
 window.toggleStudentMemo = toggleStudentMemo;
 window.deleteGeneralMain = deleteGeneralMain;
 window.editGeneralMain = editGeneralMain;
+window.showGeneralAttachPreview = showGeneralAttachPreview;
+window.showEditAttachPreview = showEditAttachPreview;
+window.removeGeneralAttachment = removeGeneralAttachment;
+window.removeEditAttachment = removeEditAttachment;
+window.removeExistingEditAttachmentGeneral = removeExistingEditAttachmentGeneral;
+window.formatFileSize = formatFileSize;
+window.uploadAttachmentForGeneral = uploadAttachmentForGeneral;
+window.addGeneralFeedback = addGeneralFeedback;
+window.renderGeneralThread = renderGeneralThread;
 
 // injected: autosave on input
 (function attachAutosave(){

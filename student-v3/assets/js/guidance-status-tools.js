@@ -1019,6 +1019,15 @@ function renderCommentCard(comment, pageNum) {
                         <div class="comment-bubble ${author ? (author.role === 'main' ? 'professor-main' : author.role === 'co' ? 'professor-co' : 'student-comment') : 'student-comment'}">
                             <p>${mainComment.text}</p>
                             ${mainComment.audio ? `<audio controls class="w-full h-8 mt-2" src="${mainComment.audio}"></audio>` : ''}
+                            ${mainComment.attachments && mainComment.attachments.length > 0 ? `
+                                <div class="mt-2 p-2 bg-gray-50 border border-gray-300 rounded-md">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-paperclip text-gray-500"></i>
+                                        <span class="text-sm text-gray-700">${mainComment.attachments[0].name}</span>
+                                        <span class="text-xs text-gray-500">(${formatFileSize(mainComment.attachments[0].size)})</span>
+                                    </div>
+                                </div>
+                            ` : ''}
                             <div class="flex items-center justify-between mt-2">
                                 <div class="timestamp">${mainComment.timestamp}</div>
                                 ${isOwner ? `
@@ -1039,9 +1048,26 @@ function renderCommentCard(comment, pageNum) {
                         </div>
                     </div>
                     <div id="main-comment-edit-${comment.id}" style="display: none;">
-                        <textarea id="main-comment-textarea-${comment.id}" 
-                                  class="w-full p-2 border rounded-md text-xs resize-none" 
+                        <textarea id="main-comment-textarea-${comment.id}"
+                                  class="w-full p-2 border rounded-md text-xs resize-none"
                                   rows="4">${mainComment.text}</textarea>
+
+                        <!-- 기존 첨부파일 표시 -->
+                        ${mainComment.attachments && mainComment.attachments.length > 0 ? `
+                            <div id="edit-existing-attach-${comment.id}" class="mt-2 p-2 bg-gray-50 border border-gray-300 rounded-md">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <i class="fas fa-paperclip text-gray-500"></i>
+                                        <span class="text-sm text-gray-700">${mainComment.attachments[0].name}</span>
+                                        <span class="text-xs text-gray-500">(${formatFileSize(mainComment.attachments[0].size)})</span>
+                                    </div>
+                                    <button onclick="removeExistingEditAttachment('${comment.id}')" class="text-red-600 hover:text-red-700 text-sm">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        ` : ''}
+
                         <!-- 수정 모드 보조 기능 추가 -->
                         <div class="flex gap-2 flex-wrap mt-2">
                             <button class="quickmark-btn text-xs bg-gray-100 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-200 flex items-center gap-1" data-target="main-comment-textarea-${comment.id}">
@@ -2055,6 +2081,13 @@ function addMainComment(commentId) {
         return;
     }
     
+    // 첨부파일 확인: _commentAttachments[commentId] 또는 _pendingMainAttachments
+    const attachments = (window._commentAttachments && window._commentAttachments[commentId])
+        ? window._commentAttachments[commentId]
+        : (window._pendingMainAttachments || []);
+
+    console.log('🔵 [addMainComment] attachments:', attachments);
+
     const newComment = {
         id: `cm-${Date.now()}`,
         authorId: CURRENT_USER.id,
@@ -2063,7 +2096,7 @@ function addMainComment(commentId) {
         text: text,
         audio: null,
         timestamp: new Date().toISOString().slice(0, 16).replace('T', ' '),
-        attachments: window._pendingMainAttachments || []
+        attachments: attachments
     };
     
     console.log('🔵 [addMainComment] newComment 생성:', JSON.stringify(newComment, null, 2));
@@ -2107,13 +2140,22 @@ function addMainComment(commentId) {
     // UI 즉시 업데이트
     textarea.value = '';
     window._pendingMainAttachments = [];
-    
+
+    // 첨부파일 미리보기 제거
+    if (window._commentAttachments && window._commentAttachments[commentId]) {
+        delete window._commentAttachments[commentId];
+        const previewEl = document.getElementById(`attach-preview-${commentId}`);
+        if (previewEl) {
+            previewEl.remove();
+        }
+    }
+
     console.log('🔵 [addMainComment] UI 업데이트 시작');
     console.log('🔵 [addMainComment] renderCommentPanel 호출 전');
     renderCommentPanel();
     console.log('🔵 [addMainComment] renderCommentPanel 호출 후');
     refreshInlineTabMarker();
-    
+
     console.log('🔵 [addMainComment] ============ 완료! ============');
     showToast('첨삭이 등록되었습니다.', 'success');
 }
@@ -2615,17 +2657,143 @@ function saveFeedbackFinal() {
 
 // ==================== 첨부파일 업로드 ====================
 function uploadAttachment(targetId) {
+    console.log('[uploadAttachment] 호출됨, targetId=', targetId);
+
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*,.pdf,.doc,.docx';
+    input.multiple = false; // 단일 파일만
+
     input.onchange = (e) => {
         const file = e.target.files[0];
-        if (!file) return;
-        
-        // 실제 구현 시 서버 업로드
-        showToast(`파일 "${file.name}" 첨부 준비됨 (구현 예정)`, 'info');
+        if (!file) {
+            console.log('[uploadAttachment] 파일 선택 안됨');
+            return;
+        }
+
+        console.log('[uploadAttachment] 파일 선택됨:', file.name, file.size);
+
+        // 파일 크기 제한 (10MB)
+        const maxSize = 10 * 1024 * 1024;
+        if (file.size > maxSize) {
+            alert('파일 크기는 10MB를 초과할 수 없습니다.');
+            return;
+        }
+
+        // 코멘트별 첨부파일 저장
+        window._commentAttachments = window._commentAttachments || {};
+        window._commentAttachments[targetId] = [{
+            name: file.name,
+            size: file.size,
+            file: file
+        }];
+
+        console.log('[uploadAttachment] 첨부파일 저장됨:', window._commentAttachments[targetId]);
+
+        // 미리보기 표시
+        showCommentAttachPreview(targetId, file);
     };
     input.click();
+}
+
+// 코멘트 첨부파일 미리보기 표시
+function showCommentAttachPreview(targetId, file) {
+    console.log('[showCommentAttachPreview] 호출됨, targetId=', targetId, 'file=', file.name);
+
+    const previewId = `attach-preview-${targetId}`;
+    let previewEl = document.getElementById(previewId);
+
+    if (!previewEl) {
+        // 미리보기 요소 생성
+        const commentCard = document.querySelector(`[data-comment-id="${targetId}"]`);
+        if (!commentCard) {
+            console.error('[showCommentAttachPreview] 코멘트 카드를 찾을 수 없음');
+            return;
+        }
+
+        // 텍스트 에어리어 찾기
+        const textarea = commentCard.querySelector('textarea');
+        if (!textarea) {
+            console.error('[showCommentAttachPreview] textarea를 찾을 수 없음');
+            return;
+        }
+
+        // 미리보기 HTML 삽입
+        previewEl = document.createElement('div');
+        previewEl.id = previewId;
+        previewEl.className = 'mt-2 p-2 bg-gray-50 border border-gray-300 rounded-md flex items-center justify-between';
+        previewEl.innerHTML = `
+            <div class="flex items-center gap-2">
+                <i class="fas fa-paperclip text-gray-500"></i>
+                <span class="text-sm text-gray-700">${file.name}</span>
+                <span class="text-xs text-gray-500">(${formatFileSize(file.size)})</span>
+            </div>
+            <button onclick="removeCommentAttachment('${targetId}')" class="text-red-600 hover:text-red-700 text-sm">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+
+        // 텍스트 에어리어 바로 다음에 삽입
+        textarea.parentNode.insertBefore(previewEl, textarea.nextSibling);
+        console.log('[showCommentAttachPreview] ✅ 미리보기 생성 완료 (textarea 바로 아래)');
+    } else {
+        // 기존 미리보기 업데이트
+        previewEl.querySelector('.text-gray-700').textContent = file.name;
+        previewEl.querySelector('.text-gray-500').textContent = `(${formatFileSize(file.size)})`;
+        console.log('[showCommentAttachPreview] ✅ 미리보기 업데이트 완료');
+    }
+}
+
+// 코멘트 첨부파일 제거
+function removeCommentAttachment(targetId) {
+    console.log('[removeCommentAttachment] 호출됨, targetId=', targetId);
+
+    if (window._commentAttachments) {
+        delete window._commentAttachments[targetId];
+    }
+
+    const previewEl = document.getElementById(`attach-preview-${targetId}`);
+    if (previewEl) {
+        previewEl.remove();
+        console.log('[removeCommentAttachment] ✅ 미리보기 제거 완료');
+    }
+}
+
+// 수정 모드에서 기존 첨부파일 제거
+function removeExistingEditAttachment(commentId) {
+    console.log('[removeExistingEditAttachment] 호출됨, commentId=', commentId);
+
+    // 데이터에서 첨부파일 제거
+    const feedbackData = FeedbackDataService.getFeedbackData(currentFeedbackId);
+    if (feedbackData && feedbackData.annotations) {
+        for (const pageNum in feedbackData.annotations) {
+            const pageAnnotations = feedbackData.annotations[pageNum];
+            pageAnnotations.forEach(annot => {
+                if (annot.id === commentId && annot.comments && annot.comments[0]) {
+                    annot.comments[0].attachments = [];
+                    console.log('[removeExistingEditAttachment] 데이터에서 첨부파일 제거 완료');
+                }
+            });
+        }
+    }
+
+    // UI에서 첨부파일 제거
+    const attachEl = document.getElementById(`edit-existing-attach-${commentId}`);
+    if (attachEl) {
+        attachEl.remove();
+        console.log('[removeExistingEditAttachment] ✅ UI에서 첨부파일 제거 완료');
+    }
+
+    showToast('첨부파일이 제거되었습니다.', 'success');
+}
+
+// formatFileSize 함수 (없을 경우 추가)
+function formatFileSize(bytes) {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
 // ==================== 코멘트 연결 (개선) ====================
@@ -2732,4 +2900,5 @@ window.saveEditQuickMark = saveEditQuickMark;
 window.updateGeneralFeedback = updateGeneralFeedback;
 window.goToLinkedComment = goToLinkedComment;
 window.findCommentPage = findCommentPage;
+window.removeExistingEditAttachment = removeExistingEditAttachment;
 

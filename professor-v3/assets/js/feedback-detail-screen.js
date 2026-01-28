@@ -355,6 +355,22 @@ function createFeedbackDetailScreen(request, feedbackData) {
                                           class="w-full p-2 border rounded-md text-sm resize-none"
                                           rows="3"
                                           placeholder="전체 평가를 입력하세요..."></textarea>
+
+                                <!-- 첨부파일 미리보기 영역 -->
+                                <div id="general-attach-preview" class="mt-2 hidden">
+                                    <div class="flex items-center justify-between p-2 bg-gray-50 border border-gray-300 rounded-md">
+                                        <div class="flex items-center gap-2">
+                                            <i class="fas fa-paperclip text-gray-500"></i>
+                                            <span id="general-attach-filename" class="text-sm text-gray-700"></span>
+                                            <span id="general-attach-filesize" class="text-xs text-gray-500"></span>
+                                        </div>
+                                        <button onclick="removeGeneralAttachment()"
+                                                class="text-red-600 hover:text-red-700 text-sm">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div class="flex gap-2 mt-2 flex-wrap">
                                     <button onclick="addGeneralFeedback()" class="text-xs bg-[#6A0028] text-white px-3 py-1.5 rounded-md hover:bg-[#8A0034] flex items-center gap-1">
                                         <i class="fas fa-paper-plane"></i>
@@ -364,7 +380,7 @@ function createFeedbackDetailScreen(request, feedbackData) {
                                         <i class="fas fa-star"></i>
                                         <span>자주 쓰는 코멘트</span>
                                     </button>
-                                    <button onclick="uploadAttachment('general')" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
+                                    <button onclick="uploadAttachmentForGeneral()" class="text-xs bg-gray-200 text-gray-700 px-3 py-1.5 rounded-md hover:bg-gray-300 flex items-center gap-1">
                                         <i class="fas fa-paperclip"></i>
                                         <span>첨부</span>
                                     </button>
