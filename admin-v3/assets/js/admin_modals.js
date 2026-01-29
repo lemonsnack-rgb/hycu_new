@@ -8319,7 +8319,13 @@ function openHeadquartersScheduleModal() {
 
                 <!-- Body -->
                 <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
-                    <table class="w-full border-collapse">
+                    <table class="w-full border-collapse" style="table-layout: fixed;">
+                        <colgroup>
+                            <col style="width: 25%;">
+                            <col style="width: 15%;">
+                            <col style="width: 30%;">
+                            <col style="width: 30%;">
+                        </colgroup>
                         <thead class="bg-gray-100">
                             <tr>
                                 <th class="py-2 px-3 border text-left text-sm font-semibold">기본단계</th>
