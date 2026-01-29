@@ -3625,9 +3625,6 @@ const views = {
                             <button onclick="openHeadquartersScheduleModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm ml-2">
                                 본부일정관리
                             </button>
-                            <button onclick="alert('지도단계를 먼저 선택해주세요.')" id="stage-task-management-btn" class="bg-[#0D8B63] text-white px-4 py-2 rounded-md hover:bg-[#0A6D4E] text-sm ml-2">
-                                단계별업무관리
-                            </button>
                         </div>
                     </div>
                     <div class="table-scroll">
@@ -3640,6 +3637,7 @@ const views = {
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학위과정</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">단계 구성</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">유효 지도단계</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600">단계별업무관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -3649,7 +3647,7 @@ const views = {
                                 const isValidLabel = item.isValidStage === 'Y' ? 'Y' : 'N';
 
                                 return `
-                                <tr class="hover:bg-blue-50" onclick="selectWorkflowForTaskManagement('${item.id}')" style="cursor: pointer;">
+                                <tr class="hover:bg-blue-50">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                     <td class="py-3 px-4 text-sm text-gray-700">${departmentLabel}</td>
@@ -3670,6 +3668,12 @@ const views = {
                                         </div>
                                     </td>
                                     <td class="py-3 px-4 text-sm text-gray-600 text-center">${isValidLabel}</td>
+                                    <td class="py-3 px-4 text-center">
+                                        <button onclick="event.stopPropagation(); openStageTaskManagementModal('${item.id}')"
+                                                class="bg-[#0D8B63] text-white px-3 py-1.5 rounded hover:bg-[#0A6D4E] text-xs">
+                                            관리
+                                        </button>
+                                    </td>
                                 </tr>
                             `}).join('')}
                         </tbody>

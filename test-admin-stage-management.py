@@ -150,21 +150,31 @@ class TestAdminStageManagement:
 
         print("[PASS] 본부일정관리 데이터 저장 확인")
 
-    def test_04_stage_task_button_exists(self):
-        """테스트 4: 단계별업무관리 버튼이 표시되는지 확인"""
-        print("\n[Test 4] 단계별업무관리 버튼 표시 확인")
+    def test_04_stage_task_column_exists(self):
+        """테스트 4: 단계별업무관리 컬럼이 테이블에 표시되는지 확인"""
+        print("\n[Test 4] 단계별업무관리 컬럼 표시 확인")
 
         self.driver.execute_script("switchView('typeManagementNew')")
         time.sleep(1)
 
-        btn = self.driver.find_element(By.ID, "stage-task-management-btn")
-        assert btn is not None, "단계별업무관리 버튼이 없습니다"
+        # Check table has 7 columns (including new management column)
+        headers = self.driver.find_elements(By.CSS_SELECTOR, "thead th")
+        assert len(headers) == 7, \
+            f"테이블 헤더가 7개가 아닙니다: {len(headers)}"
+        print(f"  [OK] 테이블 헤더: {len(headers)}개")
 
-        btn_text = btn.text
-        print(f"  [OK] 버튼 텍스트: {btn_text}")
-        assert btn_text == "단계별업무관리", f"버튼 텍스트가 다릅니다: {btn_text}"
+        last_header = headers[6]
+        assert "단계별업무관리" in last_header.text, \
+            f"마지막 헤더가 '단계별업무관리'가 아닙니다: {last_header.text}"
+        print(f"  [OK] 마지막 헤더: {last_header.text}")
 
-        print("[PASS] 단계별업무관리 버튼 표시 확인")
+        # Check old header button is removed
+        old_btns = self.driver.find_elements(By.ID, "stage-task-management-btn")
+        assert len(old_btns) == 0, \
+            "상단의 단계별업무관리 버튼이 제거되지 않았습니다"
+        print("  [OK] 상단 단계별업무관리 버튼 제거됨")
+
+        print("[PASS] 단계별업무관리 컬럼 표시 확인")
 
     def test_05_select_workflow_and_open_task_modal(self):
         """테스트 5: 테이블 행 선택 후 단계별업무관리 모달 열기"""
@@ -190,18 +200,19 @@ class TestAdminStageManagement:
 
         print(f"  [OK] Workflow ID: {workflow_id}")
 
-        # Select workflow
-        self.driver.execute_script(f"selectWorkflowForTaskManagement('{workflow_id}')")
-        time.sleep(0.5)
+        # Find first row's "관리" button
+        management_btns = self.driver.find_elements(By.XPATH,
+            "//button[contains(@onclick, 'openStageTaskManagementModal')]")
 
-        # Check selected workflow ID stored
-        selected_id = self.driver.execute_script("return window.selectedWorkflowId;")
-        assert selected_id == workflow_id, "선택된 workflow ID가 다릅니다"
-        print(f"  [OK] 선택된 workflow 저장됨")
+        assert len(management_btns) > 0, "관리 버튼을 찾을 수 없습니다"
+        print(f"  [OK] 관리 버튼 {len(management_btns)}개 발견")
 
-        # Open modal via button
-        btn = self.driver.find_element(By.ID, "stage-task-management-btn")
-        btn.click()
+        first_btn = management_btns[0]
+        assert first_btn.text == "관리", f"버튼 텍스트가 '관리'가 아닙니다: {first_btn.text}"
+        print("  [OK] 버튼 텍스트 확인: 관리")
+
+        # Click the button
+        first_btn.click()
         time.sleep(1)
 
         # Check modal exists
@@ -397,3 +408,121 @@ class TestAdminStageManagement:
         self.driver.execute_script("closeHeadquartersScheduleModal()")
 
         print("[PASS] 날짜 검증 확인")
+
+    def test_09_headquarters_modal_styling(self):
+        """테스트 9: 본부일정관리 모달 스타일 개선 확인"""
+        print("\n[Test 9] 본부일정관리 모달 스타일 개선 확인")
+
+        self.driver.execute_script("switchView('typeManagementNew')")
+        time.sleep(1)
+
+        # Open modal
+        self.driver.execute_script("openHeadquartersScheduleModal()")
+        time.sleep(1)
+
+        modal = self.driver.find_element(By.ID, "headquarters-schedule-modal")
+
+        # Check 일정구분 header is center-aligned
+        headers = modal.find_elements(By.CSS_SELECTOR, "thead th")
+        schedule_type_header = headers[1]  # Second column
+        header_classes = schedule_type_header.get_attribute("class")
+        assert "text-center" in header_classes, \
+            f"일정구분 헤더가 가운데정렬되지 않았습니다: {header_classes}"
+        print("  [OK] 일정구분 헤더 가운데정렬 확인")
+
+        # Check 일정구분 cells are center-aligned (find cells containing "신청" or "신청철회")
+        tbody = modal.find_element(By.TAG_NAME, "tbody")
+        schedule_type_cells = tbody.find_elements(By.XPATH, "//td[text()='신청' or text()='신청철회']")
+        assert len(schedule_type_cells) > 0, "일정구분 셀을 찾을 수 없습니다"
+        for i, cell in enumerate(schedule_type_cells):
+            cell_classes = cell.get_attribute("class")
+            assert "text-center" in cell_classes, \
+                f"일정구분 셀 {i+1}이 가운데정렬되지 않았습니다: {cell.text} / {cell_classes}"
+        print(f"  [OK] 일정구분 셀 {len(schedule_type_cells)}개 모두 가운데정렬 확인")
+
+        # Check datetime inputs have fixed width (not w-full)
+        datetime_inputs = modal.find_elements(By.CSS_SELECTOR, "input[type='datetime-local']")
+        for i, input_el in enumerate(datetime_inputs):
+            classes = input_el.get_attribute("class")
+            assert "w-full" not in classes, \
+                f"datetime input {i+1}이 여전히 w-full을 사용합니다"
+            assert "w-48" in classes, \
+                f"datetime input {i+1}에 w-48이 설정되지 않았습니다: {classes}"
+        print(f"  [OK] datetime input {len(datetime_inputs)}개 모두 w-48 고정 폭 확인")
+
+        # Close modal
+        self.driver.execute_script("closeHeadquartersScheduleModal()")
+
+        print("[PASS] 본부일정관리 스타일 개선 확인")
+
+    def test_10_stage_task_column_button_detailed(self):
+        """테스트 10: 단계별업무관리 컬럼 버튼 상세 확인"""
+        print("\n[Test 10] 단계별업무관리 컬럼 버튼 상세 확인")
+
+        self.driver.execute_script("switchView('typeManagementNew')")
+        time.sleep(1)
+
+        # Check table has 7 columns
+        headers = self.driver.find_elements(By.CSS_SELECTOR, "thead th")
+        assert len(headers) == 7, \
+            f"테이블 헤더가 7개가 아닙니다: {len(headers)}"
+        print(f"  [OK] 테이블 헤더: {len(headers)}개")
+
+        last_header = headers[6]
+        assert "단계별업무관리" in last_header.text, \
+            f"마지막 헤더가 '단계별업무관리'가 아닙니다: {last_header.text}"
+        print(f"  [OK] 마지막 헤더: {last_header.text}")
+
+        # Check each row has a management button
+        rows = self.driver.find_elements(By.CSS_SELECTOR, "tbody tr")
+        print(f"  [OK] 테이블 행: {len(rows)}개")
+
+        for i, row in enumerate(rows):
+            btns = row.find_elements(By.XPATH,
+                ".//button[contains(@onclick, 'openStageTaskManagementModal')]")
+            assert len(btns) > 0, f"행 {i+1}에 관리 버튼이 없습니다"
+            btn = btns[0]
+            assert btn.text == "관리", f"버튼 텍스트가 '관리'가 아닙니다: {btn.text}"
+
+        print(f"  [OK] 모든 행에 '관리' 버튼 존재 확인")
+
+        # Check old header button is removed
+        old_btns = self.driver.find_elements(By.ID, "stage-task-management-btn")
+        assert len(old_btns) == 0, \
+            "상단의 단계별업무관리 버튼이 제거되지 않았습니다"
+        print("  [OK] 상단 단계별업무관리 버튼 제거 확인")
+
+        # Click first row's button and verify modal opens (or alert if no sub-stages)
+        first_row = rows[0]
+        first_btn = first_row.find_element(By.XPATH,
+            ".//button[contains(@onclick, 'openStageTaskManagementModal')]")
+
+        # Get workflow ID from button's onclick
+        onclick_attr = first_btn.get_attribute("onclick")
+        print(f"  [OK] 버튼 onclick: {onclick_attr[:50]}...")
+
+        # Capture alerts
+        self.driver.execute_script("""
+            window.alertMessages = [];
+            window.alert = function(msg) {
+                window.alertMessages.push(msg);
+            };
+        """)
+
+        first_btn.click()
+        time.sleep(1)
+
+        # Check modal or alert
+        modals = self.driver.find_elements(By.ID, "stage-task-modal")
+        alerts = self.driver.execute_script("return window.alertMessages || []")
+
+        if len(modals) > 0:
+            print("  [OK] 모달이 열렸습니다")
+            # Close modal
+            self.driver.execute_script("closeStageTaskModal()")
+        elif len(alerts) > 0:
+            print(f"  [OK] 알림 표시됨: {alerts[0]}")
+        else:
+            assert False, "모달도 열리지 않고 알림도 표시되지 않았습니다"
+
+        print("[PASS] 단계별업무관리 컬럼 버튼 상세 확인")

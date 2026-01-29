@@ -8323,7 +8323,7 @@ function openHeadquartersScheduleModal() {
                         <thead class="bg-gray-100">
                             <tr>
                                 <th class="py-3 px-4 border text-left">기본단계</th>
-                                <th class="py-3 px-4 border text-left">일정구분</th>
+                                <th class="py-3 px-4 border text-center">일정구분</th>
                                 <th class="py-3 px-4 border text-left">시작일시</th>
                                 <th class="py-3 px-4 border text-left">종료일시</th>
                             </tr>
@@ -8333,38 +8333,38 @@ function openHeadquartersScheduleModal() {
                                 <!-- 신청 일정 -->
                                 <tr class="hover:bg-gray-50">
                                     <td class="py-3 px-4 border" rowspan="2">${stage}</td>
-                                    <td class="py-3 px-4 border">신청</td>
+                                    <td class="py-3 px-4 border text-center">신청</td>
                                     <td class="py-3 px-4 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="application"
                                                data-field="startDate"
-                                               class="w-full px-3 py-2 border rounded">
+                                               class="w-48 px-3 py-2 border rounded">
                                     </td>
                                     <td class="py-3 px-4 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="application"
                                                data-field="endDate"
-                                               class="w-full px-3 py-2 border rounded">
+                                               class="w-48 px-3 py-2 border rounded">
                                     </td>
                                 </tr>
                                 <!-- 신청철회 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 border">신청철회</td>
+                                    <td class="py-3 px-4 border text-center">신청철회</td>
                                     <td class="py-3 px-4 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="withdrawal"
                                                data-field="startDate"
-                                               class="w-full px-3 py-2 border rounded">
+                                               class="w-48 px-3 py-2 border rounded">
                                     </td>
                                     <td class="py-3 px-4 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="withdrawal"
                                                data-field="endDate"
-                                               class="w-full px-3 py-2 border rounded">
+                                               class="w-48 px-3 py-2 border rounded">
                                     </td>
                                 </tr>
                             `).join('')}
