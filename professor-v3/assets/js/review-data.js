@@ -258,6 +258,38 @@ const EVALUATION_TEMPLATES = {
         autoCalculate: false,
         requiresChairDecision: true,
         createdAt: '2025-01-27'
+    },
+    'TMPL_PASSFAIL': {
+        id: 'TMPL_PASSFAIL',
+        name: 'IRB 심사 평가표',
+        type: '공통',
+        description: 'IRB 연구윤리심사 평가표 (Pass/Fail 방식)',
+        evaluationType: 'passfail',
+        items: [
+            {
+                id: 'IRB001',
+                name: '연구윤리 준수',
+                description: '연구 계획이 연구윤리 규정을 준수하는가?',
+                weight: 0
+            },
+            {
+                id: 'IRB002',
+                name: '피험자 보호',
+                description: '연구 참여자의 안전과 권리가 적절히 보호되는가?',
+                weight: 0
+            },
+            {
+                id: 'IRB003',
+                name: '위험/이익 평가',
+                description: '연구의 위험과 이익이 적절히 평가되었는가?',
+                weight: 0
+            }
+        ],
+        passCriteria: {
+            type: 'all_pass',
+            description: '모든 항목이 Pass여야 최종 승인',
+            requiresChairDecision: true
+        }
     }
 };
 
@@ -808,6 +840,184 @@ const REVIEW_ASSIGNMENTS = [
         status: '진행중',
         
         createdAt: '2025-11-07 09:45:00'
+    },
+    // ==================== 척도형 평가표 사용 심사 ====================
+    {
+        id: 'RA_RUBRIC_001',
+        studentId: 'S011',
+        studentName: '이서연',
+        studentNumber: '2024005',
+        major: '컴퓨터공학과',
+        degree: '석사',
+
+        submissionId: 'SUB_RUBRIC_001',
+        submissionType: '연구계획서',
+        submissionDate: '2025-11-10',
+
+        advisorId: 'P001',
+        advisorName: '박교수',
+
+        thesisTitle: '딥러닝 기반 음성 합성 시스템 연구',
+        thesisFile: {
+            name: '이서연_연구계획서_v3.pdf',
+            size: 2845000,
+            uploadedAt: '2025-11-10 14:30:00'
+        },
+
+        copyKillerScore: 92,
+        gptKillerScore: 88,
+
+        committee: [
+            {
+                id: 'C017',
+                professorId: 'P003',
+                professorName: '김교수',
+                role: 'chair',
+                department: '인공지능학과',
+                assignedDate: '2025-11-10'
+            },
+            {
+                id: 'C018',
+                professorId: 'P002',
+                professorName: '이교수',
+                role: 'member',
+                department: '전자공학과',
+                assignedDate: '2025-11-10'
+            },
+            {
+                id: 'C019',
+                professorId: 'P003',
+                professorName: '최교수',
+                role: 'member',
+                department: '컴퓨터공학과',
+                assignedDate: '2025-11-10'
+            }
+        ],
+
+        templateId: 'TMPL_RUBRIC',  // 척도형 평가표 사용
+        dueDate: '2025-11-20',
+        status: '진행중',
+
+        createdAt: '2025-11-10 10:00:00'
+    },
+    // ==================== 서술형 평가표 사용 심사 ====================
+    {
+        id: 'RA_DESCRIPTIVE_001',
+        studentId: 'S012',
+        studentName: '강민준',
+        studentNumber: '2024006',
+        major: '경영학과',
+        degree: '박사',
+
+        submissionId: 'SUB_DESCRIPTIVE_001',
+        submissionType: '중간논문',
+        submissionDate: '2025-11-12',
+
+        advisorId: 'P004',
+        advisorName: '김교수',
+
+        thesisTitle: '디지털 전환 시대의 조직 혁신 전략 연구',
+        thesisFile: {
+            name: '강민준_중간논문_v2.pdf',
+            size: 3120000,
+            uploadedAt: '2025-11-12 16:45:00'
+        },
+
+        copyKillerScore: 95,
+        gptKillerScore: 91,
+
+        committee: [
+            {
+                id: 'C020',
+                professorId: 'P003',
+                professorName: '김교수',
+                role: 'chair',
+                department: '인공지능학과',
+                assignedDate: '2025-11-12'
+            },
+            {
+                id: 'C021',
+                professorId: 'P004',
+                professorName: '정교수',
+                role: 'member',
+                department: '경영학과',
+                assignedDate: '2025-11-12'
+            },
+            {
+                id: 'C022',
+                professorId: 'P005',
+                professorName: '정교수',
+                role: 'member',
+                department: '경영학과',
+                assignedDate: '2025-11-12'
+            }
+        ],
+
+        templateId: 'TMPL_DESCRIPTIVE',  // 서술형 평가표 사용
+        dueDate: '2025-11-25',
+        status: '진행중',
+
+        createdAt: '2025-11-12 11:00:00'
+    },
+
+    // ==================== Pass/Fail형 평가표 사용 심사 ====================
+    {
+        id: 'RA_PASSFAIL_001',
+        studentId: 'S013',
+        studentName: '박지훈',
+        studentNumber: '2024007',
+        major: '생명과학과',
+        degree: '석사',
+
+        submissionId: 'SUB_PASSFAIL_001',
+        submissionType: '연구계획서',
+        submissionDate: '2025-11-14',
+
+        advisorId: 'P007',
+        advisorName: '최교수',
+
+        thesisTitle: 'CRISPR 기반 유전자 편집 기술의 윤리적 고찰',
+        thesisFile: {
+            name: '박지훈_연구계획서_IRB.pdf',
+            size: 1850000,
+            uploadedAt: '2025-11-14 13:20:00'
+        },
+
+        copyKillerScore: 97,
+        gptKillerScore: 94,
+
+        committee: [
+            {
+                id: 'C023',
+                professorId: 'P003',
+                professorName: '김교수',
+                role: 'chair',
+                department: '인공지능학과',
+                assignedDate: '2025-11-14'
+            },
+            {
+                id: 'C024',
+                professorId: 'P007',
+                professorName: '최교수',
+                role: 'member',
+                department: '생명과학과',
+                assignedDate: '2025-11-14'
+            },
+            {
+                id: 'C025',
+                professorId: 'P008',
+                professorName: '윤교수',
+                role: 'member',
+                department: '생명과학과',
+                assignedDate: '2025-11-14'
+            }
+        ],
+
+        templateId: 'TMPL_PASSFAIL',  // Pass/Fail형 평가표 사용
+        dueDate: '2025-11-28',
+        status: '진행중',
+
+        createdAt: '2025-11-14 09:30:00'
     }
 ];
 
@@ -1468,6 +1678,168 @@ const REVIEW_EVALUATIONS = [
     }
 ];
 
+// ==================== 저장된 심사 평가 결과 (척도형/서술형) ====================
+const SAVED_REVIEWS = {
+    // 척도형 평가 결과 예시 (교수 P002가 작성, 초안 저장 상태)
+    'RA_RUBRIC_001_P002': {
+        assignmentId: 'RA_RUBRIC_001',
+        professorId: 'P002',
+        status: 'draft',  // 'draft' or 'submitted'
+        rubricResults: [
+            { itemId: 'RUB001', scale: 4, comment: '연구 주제가 명확하고 구체적으로 정의되었습니다.' },
+            { itemId: 'RUB002', scale: 3, comment: '연구 방법론은 적절하나 보완이 필요합니다.' },
+            { itemId: 'RUB003', scale: 5, comment: '선행연구 검토가 매우 충실하게 이루어졌습니다.' },
+            { itemId: 'RUB004', scale: 4, comment: '연구 계획이 실현 가능하며 타임라인이 적절합니다.' }
+        ],
+        overallComment: '전반적으로 양호한 연구계획서입니다. 방법론 부분을 보완하면 우수한 연구가 될 것으로 기대됩니다.',
+        attachedFiles: [],
+        lastSavedAt: '2025-11-15T14:30:00'
+    },
+
+    // 서술형 평가 결과 예시 (교수 P005가 작성, 제출 완료 상태)
+    'RA_DESCRIPTIVE_001_P005': {
+        assignmentId: 'RA_DESCRIPTIVE_001',
+        professorId: 'P005',
+        status: 'submitted',
+        descriptiveResults: [
+            {
+                itemId: 'DESC001',
+                content: '연구가 전반적으로 계획에 따라 순조롭게 진행되고 있습니다. 데이터 수집과 분석이 체계적으로 이루어지고 있으며, 예상했던 연구 일정을 잘 준수하고 있습니다. 다만, 일부 인터뷰 대상자 확보에 어려움이 있었던 것으로 보이나, 대체 방안을 마련하여 해결한 것으로 판단됩니다.'
+            },
+            {
+                itemId: 'DESC002',
+                content: '도출된 연구 결과는 이론적 배경과 잘 부합하며, 분석 방법이 적절하게 적용되었습니다. 정량적 데이터와 정성적 데이터를 균형있게 활용하여 연구 문제에 대한 타당한 답을 제시하고 있습니다. 통계 분석의 신뢰도와 타당도가 확보되었으며, 질적 분석도 체계적으로 수행되었습니다.'
+            },
+            {
+                itemId: 'DESC003',
+                content: '논문의 구성이 논리적이며, 각 장의 연결이 자연스럽습니다. 학술적 글쓰기 기준에 부합하며, 선행연구와의 비교 논의가 충실합니다. 다만, 일부 표와 그림의 설명을 보완하면 더욱 완성도가 높아질 것으로 판단됩니다. 참고문헌의 형식도 통일성 있게 잘 작성되었습니다.'
+            }
+        ],
+        overallComment: '연구가 매우 체계적으로 진행되었으며, 중간논문으로서 충분한 수준에 도달하였습니다. 최종 논문 작성 시 피드백 내용을 반영하면 우수한 연구 성과를 낼 수 있을 것으로 기대됩니다.',
+        attachedFiles: [
+            { name: '평가의견서_강민준.pdf', size: 245000, uploadedAt: '2025-11-18T16:20:00' }
+        ],
+        submittedAt: '2025-11-18T16:22:00'
+    },
+
+    // 척도형 평가 결과 예시 (교수 P001 위원장이 작성, 제출 완료)
+    'RA_RUBRIC_001_P001': {
+        assignmentId: 'RA_RUBRIC_001',
+        professorId: 'P001',
+        status: 'submitted',
+        rubricResults: [
+            { itemId: 'RUB001', scale: 5, comment: '연구 주제가 매우 명확하고 학술적 가치가 높습니다.' },
+            { itemId: 'RUB002', scale: 4, comment: '연구 방법론이 적절하며 실험 설계가 탄탄합니다.' },
+            { itemId: 'RUB003', scale: 5, comment: '최신 연구 동향을 잘 파악하고 있으며 연구 gap이 명확합니다.' },
+            { itemId: 'RUB004', scale: 4, comment: '연구 계획이 구체적이며 실현 가능성이 높습니다.' }
+        ],
+        overallComment: '우수한 연구계획서입니다. 제시된 계획대로 연구를 진행하면 의미있는 학술적 기여를 할 수 있을 것으로 판단됩니다.',
+        attachedFiles: [],
+        finalDecision: 'pass',  // 위원장 최종 판정: 'pass', 'conditional', 'fail'
+        submittedAt: '2025-11-16T10:15:00'
+    },
+
+    // 척도형 평가 결과 예시 (교수 P003가 작성, 제출 완료)
+    'RA_RUBRIC_001_P003': {
+        assignmentId: 'RA_RUBRIC_001',
+        professorId: 'P003',
+        status: 'submitted',
+        rubricResults: [
+            { itemId: 'RUB001', scale: 4, comment: '연구 주제가 명확하게 정의되었습니다.' },
+            { itemId: 'RUB002', scale: 4, comment: '연구 방법론이 타당합니다.' },
+            { itemId: 'RUB003', scale: 4, comment: '선행연구 검토가 충실합니다.' },
+            { itemId: 'RUB004', scale: 5, comment: '연구 계획이 매우 구체적이고 실현 가능합니다.' }
+        ],
+        overallComment: '연구계획서가 전반적으로 잘 작성되었습니다. 계획대로 연구를 수행하시기 바랍니다.',
+        attachedFiles: [],
+        submittedAt: '2025-11-17T11:00:00'
+    },
+
+    // Pass/Fail형 평가 결과 예시 (교수 P008이 작성, 제출 완료 상태)
+    'RA_PASSFAIL_001_P008': {
+        assignmentId: 'RA_PASSFAIL_001',
+        professorId: 'P008',
+        status: 'submitted',
+        passfailResults: [
+            { itemId: 'IRB001', decision: 'pass', comment: '연구 윤리 규정을 충실히 준수하고 있습니다.' },
+            { itemId: 'IRB002', decision: 'pass', comment: 'IRB 승인 절차가 적절하게 진행되었습니다.' },
+            { itemId: 'IRB003', decision: 'pass', comment: '개인정보 보호 방안이 명확히 수립되어 있습니다.' }
+        ],
+        overallComment: 'IRB 심사 기준을 모두 충족하고 있으며, 연구 수행에 문제가 없습니다.',
+        attachedFiles: [],
+        submittedAt: '2025-11-16T09:45:00'
+    },
+
+    // Pass/Fail형 평가 결과 예시 (교수 P007 위원장이 작성, 제출 완료)
+    'RA_PASSFAIL_001_P007': {
+        assignmentId: 'RA_PASSFAIL_001',
+        professorId: 'P007',
+        status: 'submitted',
+        passfailResults: [
+            { itemId: 'IRB001', decision: 'pass', comment: '윤리적 고려사항이 충분히 검토되었습니다.' },
+            { itemId: 'IRB002', decision: 'pass', comment: 'IRB 심사가 완료되었으며 승인되었습니다.' },
+            { itemId: 'IRB003', decision: 'pass', comment: '피험자 보호 조치가 적절합니다.' }
+        ],
+        overallComment: '연구 윤리 및 IRB 기준을 모두 충족하였습니다. 연구 진행을 승인합니다.',
+        attachedFiles: [],
+        submittedAt: '2025-11-17T14:20:00'
+    },
+
+    // Pass/Fail형 평가 결과 예시 (교수 P008이 작성, 제출 완료)
+    'RA_PASSFAIL_001_P008': {
+        assignmentId: 'RA_PASSFAIL_001',
+        professorId: 'P008',
+        status: 'submitted',
+        passfailResults: [
+            { itemId: 'IRB001', decision: 'pass', comment: '의학적 윤리 기준을 준수하고 있습니다.' },
+            { itemId: 'IRB002', decision: 'pass', comment: 'IRB 승인이 적절히 이루어졌습니다.' },
+            { itemId: 'IRB003', decision: 'pass', comment: '환자 안전 및 개인정보 보호가 충분합니다.' }
+        ],
+        overallComment: '의료윤리 관점에서 문제가 없으며 연구 수행이 가능합니다.',
+        attachedFiles: [],
+        submittedAt: '2025-11-17T16:30:00'
+    },
+
+    // 서술형 평가 결과 예시 (교수 P003이 작성, 초안 저장 상태)
+    'RA_DESCRIPTIVE_001_P003': {
+        assignmentId: 'RA_DESCRIPTIVE_001',
+        professorId: 'P003',
+        status: 'draft',
+        descriptiveResults: [
+            {
+                itemId: 'DESC001',
+                content: '연구가 체계적으로 진행되고 있으며, 일정 관리가 우수합니다.'
+            },
+            {
+                itemId: 'DESC002',
+                content: '연구 결과의 타당성이 확보되었으며, 분석 방법이 적절합니다.'
+            },
+            {
+                itemId: 'DESC003',
+                content: '논문 작성이 학술적 기준에 부합하며, 구성이 논리적입니다.'
+            }
+        ],
+        overallComment: '중간논문으로서 적절한 수준에 도달하였습니다.',
+        attachedFiles: [],
+        lastSavedAt: '2025-11-18T10:00:00'
+    },
+
+    // Pass/Fail형 평가 결과 예시 (교수 P003이 작성, 초안 저장 상태)
+    'RA_PASSFAIL_001_P003': {
+        assignmentId: 'RA_PASSFAIL_001',
+        professorId: 'P003',
+        status: 'submitted',
+        passfailResults: [
+            { itemId: 'IRB001', decision: 'pass', comment: '연구 윤리 기준을 준수하고 있습니다.' },
+            { itemId: 'IRB002', decision: 'pass', comment: 'IRB 승인이 적절히 진행되었습니다.' },
+            { itemId: 'IRB003', decision: 'pass', comment: '개인정보 보호 방안이 충분합니다.' }
+        ],
+        overallComment: 'IRB 기준을 충족하고 있습니다.',
+        attachedFiles: [],
+        submittedAt: '2025-11-17T14:30:00'
+    }
+};
+
 // ==================== 심사 결과 ====================
 const REVIEW_RESULTS = [
     {
@@ -1705,3 +2077,4 @@ window.EVALUATION_TEMPLATES = EVALUATION_TEMPLATES;
 window.REVIEW_ASSIGNMENTS = REVIEW_ASSIGNMENTS;
 window.REVIEW_EVALUATIONS = REVIEW_EVALUATIONS;
 window.REVIEW_RESULTS = REVIEW_RESULTS;
+window.SAVED_REVIEWS = SAVED_REVIEWS;
