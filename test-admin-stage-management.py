@@ -446,9 +446,9 @@ class TestAdminStageManagement:
             classes = input_el.get_attribute("class")
             assert "w-full" not in classes, \
                 f"datetime input {i+1}이 여전히 w-full을 사용합니다"
-            assert "w-48" in classes, \
-                f"datetime input {i+1}에 w-48이 설정되지 않았습니다: {classes}"
-        print(f"  [OK] datetime input {len(datetime_inputs)}개 모두 w-48 고정 폭 확인")
+            assert "w-40" in classes or "w-48" in classes, \
+                f"datetime input {i+1}에 고정 폭이 설정되지 않았습니다: {classes}"
+        print(f"  [OK] datetime input {len(datetime_inputs)}개 모두 고정 폭 확인")
 
         # Close modal
         self.driver.execute_script("closeHeadquartersScheduleModal()")

@@ -8322,49 +8322,49 @@ function openHeadquartersScheduleModal() {
                     <table class="w-full border-collapse">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="py-3 px-4 border text-left">기본단계</th>
-                                <th class="py-3 px-4 border text-center">일정구분</th>
-                                <th class="py-3 px-4 border text-left">시작일시</th>
-                                <th class="py-3 px-4 border text-left">종료일시</th>
+                                <th class="py-2 px-3 border text-left text-sm font-semibold">기본단계</th>
+                                <th class="py-2 px-3 border text-center text-sm font-semibold">일정구분</th>
+                                <th class="py-2 px-3 border text-left text-sm font-semibold">시작일시</th>
+                                <th class="py-2 px-3 border text-left text-sm font-semibold">종료일시</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${basicStages.map(stage => `
                                 <!-- 신청 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 border" rowspan="2">${stage}</td>
-                                    <td class="py-3 px-4 border text-center">신청</td>
-                                    <td class="py-3 px-4 border">
+                                    <td class="py-2 px-3 border text-sm" rowspan="2">${stage}</td>
+                                    <td class="py-2 px-3 border text-center text-sm font-normal">신청</td>
+                                    <td class="py-2 px-3 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="application"
                                                data-field="startDate"
-                                               class="w-48 px-3 py-2 border rounded">
+                                               class="w-40 px-2 py-1.5 border rounded text-sm">
                                     </td>
-                                    <td class="py-3 px-4 border">
+                                    <td class="py-2 px-3 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="application"
                                                data-field="endDate"
-                                               class="w-48 px-3 py-2 border rounded">
+                                               class="w-40 px-2 py-1.5 border rounded text-sm">
                                     </td>
                                 </tr>
                                 <!-- 신청철회 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-4 border text-center">신청철회</td>
-                                    <td class="py-3 px-4 border">
+                                    <td class="py-2 px-3 border text-center text-sm font-normal">신청철회</td>
+                                    <td class="py-2 px-3 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="withdrawal"
                                                data-field="startDate"
-                                               class="w-48 px-3 py-2 border rounded">
+                                               class="w-40 px-2 py-1.5 border rounded text-sm">
                                     </td>
-                                    <td class="py-3 px-4 border">
+                                    <td class="py-2 px-3 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="withdrawal"
                                                data-field="endDate"
-                                               class="w-48 px-3 py-2 border rounded">
+                                               class="w-40 px-2 py-1.5 border rounded text-sm">
                                     </td>
                                 </tr>
                             `).join('')}

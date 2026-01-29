@@ -3647,7 +3647,7 @@ const views = {
                                 const isValidLabel = item.isValidStage === 'Y' ? 'Y' : 'N';
 
                                 return `
-                                <tr class="hover:bg-blue-50">
+                                <tr class="hover:bg-blue-50 cursor-pointer" onclick="switchView('typeManagementCreate', '${item.id}')">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                     <td class="py-3 px-4 text-sm text-gray-700">${departmentLabel}</td>
