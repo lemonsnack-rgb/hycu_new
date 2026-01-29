@@ -2378,9 +2378,11 @@ const views = {
                                     <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
                                         평가표 유형 <span class="text-red-600">*</span>
                                     </label>
-                                    <select id="edit-criteria-type" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm" ${isEdit ? 'disabled' : ''}>
+                                    <select id="edit-criteria-type" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm" ${isEdit ? 'disabled' : ''} onchange="handleEvaluationTypeChange()">
                                         <option value="score" ${evaluationType === 'score' ? 'selected' : ''}>점수형 - 점수로 평가 (예: 100점 만점)</option>
                                         <option value="passfail" ${evaluationType === 'passfail' ? 'selected' : ''}>Pass/Fail형 - 합격/불합격으로 평가</option>
+                                        <option value="rubric" ${evaluationType === 'rubric' ? 'selected' : ''}>척도형 - 5점 척도로 평가 (매우 아니다~매우 그렇다)</option>
+                                        <option value="descriptive" ${evaluationType === 'descriptive' ? 'selected' : ''}>서술형 - 서술식 의견으로 평가 (항목설명 필수)</option>
                                     </select>
                                 </div>
                                 ${isEdit ? '<p class="text-xs text-gray-500 mt-1">평가표 유형은 수정할 수 없습니다.</p>' : '<p class="text-xs text-gray-500 mt-1">선택한 유형에 따라 평가 항목의 입력 방식이 달라집니다.</p>'}
@@ -2398,41 +2400,19 @@ const views = {
                         </div>
                     </div>
 
-                    <!-- 통과 기준 -->
-                    <div class="mb-6 p-4 bg-gray-50 rounded-lg">
-                        <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
-                        <div class="grid grid-cols-3 gap-4">
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    총 심사위원 수 <span class="text-red-600">*</span>
-                                </label>
-                                <input type="number" id="pass-total-committee"
-                                       value="${isEdit && criteria?.passCriteria?.totalCommittee !== undefined ? criteria.passCriteria.totalCommittee : 3}"
-                                       class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                                       min="1" placeholder="예: 3">
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    통과 필요 인원 <span class="text-red-600">*</span>
-                                </label>
-                                <input type="number" id="pass-required-committee"
-                                       value="${evaluationType === 'passfail' ? '' : (isEdit && criteria?.passCriteria?.requiredCommittee !== undefined ? criteria.passCriteria.requiredCommittee : 2)}"
-                                       class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                                       min="1" placeholder="예: 2"
-                                       ${evaluationType === 'passfail' ? 'disabled' : ''}>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
-                                    최소 점수 <span class="text-red-600">*</span>
-                                </label>
-                                <input type="number" id="pass-min-score"
-                                       value="${evaluationType === 'passfail' ? '' : (isEdit && criteria?.passCriteria?.passScore !== undefined ? criteria.passCriteria.passScore : 70)}"
-                                       class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
-                                       min="0" max="100" placeholder="예: 70"
-                                       ${evaluationType === 'passfail' ? 'disabled' : ''}>
+                    <!-- 척도형 안내 (척도형일 때만 표시) -->
+                    ${evaluationType === 'rubric' ? `
+                        <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                            <div class="flex items-start gap-2">
+                                <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                                </svg>
+                                <div class="text-sm text-blue-800">
+                                    <strong>5점 척도 고정:</strong> 매우 아니다, 아니다, 보통, 그렇다, 매우 그렇다
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    ` : ''}
 
                     <!-- 평가 항목 -->
                     <div class="mb-6">
@@ -2454,19 +2434,19 @@ const views = {
                                     </tr>
                                 </thead>
                                 <tbody id="evaluation-items-container" class="divide-y divide-gray-200">
-                                    ${items.length > 0 ? items.map((item, idx) => {
+                                    ${(items.length > 0 ? items : [{}]).map((item, idx) => {
                                         if (evaluationType === 'score') {
                                             return `
-                                                <tr class="evaluation-item hover:bg-gray-50" data-item-id="${item.id}">
+                                                <tr class="evaluation-item hover:bg-gray-50" data-item-id="${item.id || ''}">
                                                     <td class="py-3 px-4 text-center text-sm text-gray-600 border-r border-gray-300">${idx + 1}</td>
                                                     <td class="py-3 px-4 border-r border-gray-300">
                                                         <input type="text" class="item-name w-full border border-gray-300 rounded px-3 py-2 text-sm" value="${(item.name || '').replace(/"/g, '&quot;')}" placeholder="예: 연구 목적의 명확성" required>
                                                     </td>
                                                     <td class="py-3 px-4 border-r border-gray-300">
-                                                        <input type="number" class="item-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" value="${item.score || 0}" min="0" required onchange="updateTotalScore()">
+                                                        <input type="number" class="item-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" value="${item.score || ''}" min="0" required onchange="updateTotalScore()">
                                                     </td>
                                                     <td class="py-3 px-4 border-r border-gray-300">
-                                                        <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" value="${item.failScore !== undefined && item.failScore !== null ? item.failScore : 0}" min="0" onchange="validateFailScore(this)">
+                                                        <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" value="${item.failScore !== undefined && item.failScore !== null ? item.failScore : ''}" min="0" onchange="validateFailScore(this)">
                                                     </td>
                                                     <td class="py-3 px-4 border-r border-gray-300">
                                                         <input type="text" class="item-description w-full border border-gray-300 rounded px-3 py-2 text-sm" value="${(item.description || '').replace(/"/g, '&quot;')}" placeholder="예: 연구 목적의 타당성과 명확성을 평가">
@@ -2480,7 +2460,7 @@ const views = {
                                             `;
                                         } else {
                                             return `
-                                                <tr class="evaluation-item hover:bg-gray-50" data-item-id="${item.id}">
+                                                <tr class="evaluation-item hover:bg-gray-50" data-item-id="${item.id || ''}">
                                                     <td class="py-3 px-4 text-center text-sm text-gray-600 border-r border-gray-300">${idx + 1}</td>
                                                     <td class="py-3 px-4 border-r border-gray-300">
                                                         <input type="text" class="item-name w-full border border-gray-300 rounded px-3 py-2 text-sm" value="${(item.name || '').replace(/"/g, '&quot;')}" placeholder="예: 연구 목적의 명확성" required>
@@ -2496,13 +2476,7 @@ const views = {
                                                 </tr>
                                             `;
                                         }
-                                    }).join('') : `
-                                        <tr>
-                                            <td colspan="${evaluationType === 'score' ? '6' : '4'}" class="py-8 text-center text-sm text-gray-500">
-                                                평가 항목을 추가해주세요.
-                                            </td>
-                                        </tr>
-                                    `}
+                                    }).join('')}
                                 </tbody>
                             </table>
                         </div>

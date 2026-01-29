@@ -118,58 +118,6 @@ function initEvaluationTypeChangeListener() {
         if (typeSelect && !typeSelect.disabled) {
             let initialType = typeSelect.value;
 
-            // 통과 기준 필드 업데이트 함수
-            const updatePassCriteriaFields = (newType) => {
-                const passCriteriaSection = document.getElementById('pass-criteria-section');
-
-                if (passCriteriaSection) {
-                    if (newType === 'rubric' || newType === 'descriptive') {
-                        // 척도형/서술형: 심사위원장 최종 판정 안내 표시
-                        const message = newType === 'rubric'
-                            ? '척도형 평가표는 시스템 자동 계산 없이 심사위원장이 모든 심사위원의 평가를 검토한 후 최종 판정을 내립니다.'
-                            : '서술형 평가표는 점수 없이 서술 내용만 작성하며, 심사위원장이 모든 심사위원의 평가를 검토한 후 최종 판정을 내립니다.';
-
-                        passCriteriaSection.innerHTML = `
-                            <h4 class="text-md font-semibold text-gray-800 mb-4">통과 기준</h4>
-                            <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                                <div class="flex items-start gap-3">
-                                    <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                    </svg>
-                                    <div>
-                                        <h5 class="text-sm font-semibold text-blue-900 mb-1">심사위원장 최종 판정</h5>
-                                        <p class="text-sm text-blue-800">${message}</p>
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    } else {
-                        // 점수형/Pass/Fail형: 기존 입력 필드 표시
-                        const requiredCommitteeInput = document.getElementById('pass-required-committee');
-                        const minScoreInput = document.getElementById('pass-min-score');
-
-                        if (requiredCommitteeInput && minScoreInput) {
-                            if (newType === 'passfail') {
-                                // Pass/Fail형으로 변경 시 비활성화 및 빈 값
-                                requiredCommitteeInput.value = '';
-                                requiredCommitteeInput.disabled = true;
-                                minScoreInput.value = '';
-                                minScoreInput.disabled = true;
-                            } else if (newType === 'score') {
-                                // 점수형으로 변경 시 활성화 및 기본값
-                                requiredCommitteeInput.value = '2';
-                                requiredCommitteeInput.disabled = false;
-                                minScoreInput.value = '70';
-                                minScoreInput.disabled = false;
-                            }
-                        }
-                    }
-                }
-            };
-
-            // 초기 로딩 시 현재 선택된 타입에 따라 필드 상태 설정
-            updatePassCriteriaFields(initialType);
-
             // 기존 리스너 제거 (중복 방지)
             const newSelect = typeSelect.cloneNode(true);
             typeSelect.parentNode.replaceChild(newSelect, typeSelect);
@@ -191,7 +139,7 @@ function initEvaluationTypeChangeListener() {
                         </tr>
                     `;
                 } else {
-                    const descriptionLabel = (type === 'rubric' || type === 'descriptive') ? '평가 기준' : '항목설명';
+                    const descriptionLabel = '항목설명';  // 모든 유형 통일
                     thead.innerHTML = `
                         <tr>
                             <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-16">순번</th>
@@ -225,14 +173,13 @@ function initEvaluationTypeChangeListener() {
                         if (typeof updateTotalScore === 'function') {
                             updateTotalScore();
                         }
-                        updatePassCriteriaFields(newType);
                         initialType = newType;
                     } else {
                         // 취소 - 이전 값으로 복원
                         e.target.value = initialType;
                     }
                 } else {
-                    // 항목이 없으면 테이블 헤더 업데이트하고 통과 기준 필드 업데이트
+                    // 항목이 없으면 테이블 헤더 업데이트
                     updateTableHeader(newType, container);
 
                     const colspan = newType === 'score' ? '6' : '4';
@@ -243,7 +190,6 @@ function initEvaluationTypeChangeListener() {
                             </td>
                         </tr>
                     `;
-                    updatePassCriteriaFields(newType);
                     initialType = newType;
                 }
             });
@@ -3635,6 +3581,14 @@ function addEvaluationItem(criteriaId) {
             return;
         }
 
+        // 서술형 평가표는 항목설명 필수 (최소 10글자)
+        if (evalType === 'descriptive') {
+            if (description.length < 10) {
+                showAlert('서술형 평가표는 항목설명을 최소 10글자 이상 입력해야 합니다.');
+                return;
+            }
+        }
+
         // 등급형과 Pass/Fail형은 설명이 필수
         if ((evalType === 'grade' || evalType === 'passfail') && !description) {
             showAlert(evalType === 'grade' ? '등급 기준 설명을 입력하세요.' : '판단 기준 설명을 입력하세요.');
@@ -3744,6 +3698,14 @@ function editEvaluationItem(criteriaId, itemId) {
         if (!name) {
             showAlert('평가 항목명을 입력하세요.');
             return;
+        }
+
+        // 서술형 평가표는 항목설명 필수 (최소 10글자)
+        if (evalType === 'descriptive') {
+            if (description.length < 10) {
+                showAlert('서술형 평가표는 항목설명을 최소 10글자 이상 입력해야 합니다.');
+                return;
+            }
         }
 
         // 등급형과 Pass/Fail형은 설명이 필수
@@ -4015,6 +3977,15 @@ function saveEvaluationCriteria(criteriaId) {
             return;
         }
 
+        // 서술형 평가표는 항목설명 필수 (최소 10글자)
+        if (evaluationType === 'descriptive') {
+            if (itemDescription.length < 10) {
+                showAlert(`항목 ${idx + 1}: 서술형 평가표는 항목설명을 최소 10글자 이상 입력해야 합니다.`);
+                hasError = true;
+                return;
+            }
+        }
+
         const item = {
             id: idx + 1,
             name: itemName,
@@ -4066,34 +4037,7 @@ function saveEvaluationCriteria(criteriaId) {
             showAlert(`총점이 100점이 아닙니다. 현재 총점: ${totalScore}점\n\n총점이 반드시 100점이 되도록 배점을 조정해주세요.`);
             return;
         }
-
-        // 통과 기준 검증 (점수형만)
-        const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
-        const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
-        const minScore = parseInt(document.getElementById('pass-min-score')?.value);
-
-        if (!totalCommittee || totalCommittee <= 0) {
-            showAlert('총 심사위원 수를 입력하세요.');
-            return;
-        }
-
-        if (!requiredCommittee || requiredCommittee <= 0) {
-            showAlert('통과 필요 인원을 입력하세요.');
-            return;
-        }
-
-        if (requiredCommittee > totalCommittee) {
-            showAlert('통과 필요 인원은 총 심사위원 수보다 클 수 없습니다.');
-            return;
-        }
-
-        if (!minScore || minScore < 0 || minScore > 100) {
-            showAlert('최소 점수를 0-100 사이로 입력하세요.');
-            return;
-        }
     }
-
-    // 척도형과 서술형은 통과 기준 검증 불필요 (심사위원장이 최종 판정)
 
     // Save or update
     if (criteriaId) {
@@ -4109,17 +4053,9 @@ function saveEvaluationCriteria(criteriaId) {
                 const totalScore = items.reduce((sum, item) => sum + (item.score || 0), 0);
                 criteria.totalScore = totalScore;
 
-                // 통과 기준 저장
-                const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
-                const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
-                const minScore = parseInt(document.getElementById('pass-min-score')?.value);
-
                 criteria.passCriteria = {
                     type: 'committee',
-                    totalCommittee: totalCommittee,
-                    requiredCommittee: requiredCommittee,
-                    passScore: minScore,
-                    description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
+                    description: '심사위원이 평가 기준에 따라 판정'
                 };
             } else if (evaluationType === 'passfail') {
                 criteria.totalScore = null;
@@ -4150,16 +4086,9 @@ function saveEvaluationCriteria(criteriaId) {
 
         let passCriteria = null;
         if (evaluationType === 'score') {
-            const totalCommittee = parseInt(document.getElementById('pass-total-committee')?.value);
-            const requiredCommittee = parseInt(document.getElementById('pass-required-committee')?.value);
-            const minScore = parseInt(document.getElementById('pass-min-score')?.value);
-
             passCriteria = {
                 type: 'committee',
-                totalCommittee: totalCommittee,
-                requiredCommittee: requiredCommittee,
-                passScore: minScore,
-                description: `총 심사위원 ${totalCommittee}명 중 ${requiredCommittee}명 이상이 ${minScore}점 이상을 줘야 통과`
+                description: '심사위원이 평가 기준에 따라 판정'
             };
         } else if (evaluationType === 'passfail') {
             passCriteria = {
@@ -8199,6 +8128,149 @@ function saveHierarchicalWorkflow() {
     switchView('typeManagement');
 }
 
+// ========== 평가표 유형 변경 처리 ==========
+
+function handleEvaluationTypeChange() {
+    const typeSelect = document.getElementById('edit-criteria-type');
+    if (!typeSelect) return;
+
+    const newType = typeSelect.value;
+
+    // 척도형 안내 메시지 표시/숨김
+    updateRubricInfoVisibility(newType);
+
+    // 테이블 헤더 업데이트
+    updateTableHeaders(newType);
+
+    // 총 배점 표시/숨김 업데이트
+    updateTotalScoreVisibility(newType);
+
+    // 기존 항목들 제거하고 빈 줄 1개 생성 (유형 변경 시 항목 구조가 달라지므로)
+    const container = document.getElementById('evaluation-items-container');
+    if (container) {
+        if (newType === 'score') {
+            container.innerHTML = `
+                <tr class="evaluation-item hover:bg-gray-50">
+                    <td class="py-3 px-4 text-center text-sm text-gray-600 border-r border-gray-300">1</td>
+                    <td class="py-3 px-4 border-r border-gray-300">
+                        <input type="text" class="item-name w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 명확성" required>
+                    </td>
+                    <td class="py-3 px-4 border-r border-gray-300">
+                        <input type="number" class="item-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" placeholder="0" min="0" required onchange="updateTotalScore()">
+                    </td>
+                    <td class="py-3 px-4 border-r border-gray-300">
+                        <input type="number" class="item-fail-score w-full border border-gray-300 rounded px-3 py-2 text-sm text-center" placeholder="0" min="0">
+                    </td>
+                    <td class="py-3 px-4 border-r border-gray-300">
+                        <input type="text" class="item-description w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 타당성과 명확성을 평가">
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm cursor-pointer">
+                            삭제
+                        </span>
+                    </td>
+                </tr>
+            `;
+        } else {
+            container.innerHTML = `
+                <tr class="evaluation-item hover:bg-gray-50">
+                    <td class="py-3 px-4 text-center text-sm text-gray-600 border-r border-gray-300">1</td>
+                    <td class="py-3 px-4 border-r border-gray-300">
+                        <input type="text" class="item-name w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 명확성" required>
+                    </td>
+                    <td class="py-3 px-4 border-r border-gray-300">
+                        <input type="text" class="item-description w-full border border-gray-300 rounded px-3 py-2 text-sm" placeholder="예: 연구 목적의 타당성과 명확성을 평가">
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <span onclick="removeEvaluationItem(this)" class="text-red-600 hover:text-red-800 text-sm cursor-pointer">
+                            삭제
+                        </span>
+                    </td>
+                </tr>
+            `;
+        }
+    }
+}
+
+function updateRubricInfoVisibility(type) {
+    // 기존 안내 메시지 찾기
+    let infoBox = document.querySelector('.rubric-info-box');
+
+    if (type === 'rubric') {
+        // 척도형: 안내 메시지 표시
+        if (!infoBox) {
+            // 안내 메시지가 없으면 생성
+            const insertPoint = document.querySelector('.overflow-x-auto')?.parentElement;
+            if (insertPoint) {
+                const infoHtml = `
+                    <div class="rubric-info-box mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div class="flex items-start gap-2">
+                            <svg class="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
+                            </svg>
+                            <div class="text-sm text-blue-800">
+                                <strong>5점 척도 고정:</strong> 매우 아니다, 아니다, 보통, 그렇다, 매우 그렇다
+                            </div>
+                        </div>
+                    </div>
+                `;
+                insertPoint.insertAdjacentHTML('beforebegin', infoHtml);
+            }
+        } else {
+            // 이미 있으면 표시
+            infoBox.style.display = '';
+        }
+    } else {
+        // 다른 유형: 안내 메시지 숨김
+        if (infoBox) {
+            infoBox.style.display = 'none';
+        }
+    }
+}
+
+function updateTableHeaders(type) {
+    const table = document.querySelector('#evaluation-items-container')?.closest('table');
+    if (!table) return;
+
+    const thead = table.querySelector('thead tr');
+    if (!thead) return;
+
+    // 테이블 헤더 재구성
+    if (type === 'score') {
+        thead.innerHTML = `
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-16">순번</th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목명 <span class="text-red-600">*</span></th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-24">배점 <span class="text-red-600">*</span></th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-24">과락점수</th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목설명</th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 w-20">관리</th>
+        `;
+    } else {
+        thead.innerHTML = `
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300 w-16">순번</th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목명 <span class="text-red-600">*</span></th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 border-r border-gray-300">항목설명</th>
+            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-700 w-20">관리</th>
+        `;
+    }
+}
+
+function updateTotalScoreVisibility(type) {
+    // 총 배점 표시 영역 찾기
+    const totalScoreDisplay = document.getElementById('total-score-display');
+    if (!totalScoreDisplay) return;
+
+    const totalScoreContainer = totalScoreDisplay.closest('div.flex.justify-between');
+    if (!totalScoreContainer) return;
+
+    // 점수형일 때만 표시
+    if (type === 'score') {
+        totalScoreContainer.style.display = '';
+    } else {
+        totalScoreContainer.style.display = 'none';
+    }
+}
+
 // 전역으로 노출
 window.addBasicStage = addBasicStage;
 window.removeBasicStage = removeBasicStage;
@@ -8210,3 +8282,4 @@ window.moveSubStageDown = moveSubStageDown;
 window.updateSubStageField = updateSubStageField;
 window.renderHierarchicalStages = renderHierarchicalStages;
 window.saveHierarchicalWorkflow = saveHierarchicalWorkflow;
+window.handleEvaluationTypeChange = handleEvaluationTypeChange;
