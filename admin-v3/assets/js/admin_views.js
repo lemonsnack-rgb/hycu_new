@@ -2346,7 +2346,13 @@ const views = {
         const name = isEdit && criteria ? criteria.name : '';
         const description = isEdit && criteria ? criteria.description : '';
         const evaluationType = isEdit && criteria ? criteria.evaluationType : 'score';
+        const applicableDepartment = isEdit && criteria ? criteria.applicableDepartment || '전체학과' : '전체학과';
         const items = isEdit && criteria && Array.isArray(criteria.items) ? criteria.items : [];
+
+        // 학과명 목록
+        const departments = window.mockDepartmentNames || [
+            '컴퓨터공학과', '전자공학과', '기계공학과', '경영학과', '행정학과', '교육공학과', '인공지능학과'
+        ];
 
         return `
             <div class="bg-white rounded-lg shadow-md">
@@ -2362,7 +2368,7 @@ const views = {
                     <!-- 평가표 기본 정보 -->
                     <div class="mb-6 p-4 bg-gray-50 rounded-lg">
                         <h4 class="text-md font-semibold text-gray-800 mb-4">평가표 기본 정보</h4>
-                        <div class="grid grid-cols-3 gap-4 items-start">
+                        <div class="grid grid-cols-2 gap-4 items-start">
                             <div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
@@ -2372,6 +2378,18 @@ const views = {
                                            placeholder="예: 일반 연구계획서 평가표"
                                            class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm">
                                 </div>
+                            </div>
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap">
+                                        적용 학과 <span class="text-red-600">*</span>
+                                    </label>
+                                    <select id="edit-criteria-department" class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm">
+                                        <option value="전체학과" ${applicableDepartment === '전체학과' ? 'selected' : ''}>전체학과 공통</option>
+                                        ${departments.map(dept => `<option value="${dept}" ${applicableDepartment === dept ? 'selected' : ''}>${dept}</option>`).join('')}
+                                    </select>
+                                </div>
+                                <p class="text-xs text-gray-500 mt-1">전체학과 선택 시 모든 학과에서 사용 가능합니다.</p>
                             </div>
                             <div>
                                 <div class="flex items-center gap-2">
@@ -3662,7 +3680,21 @@ const views = {
 
         // 초기 데이터 구조: window.hierarchicalStages
         // { basicStage: '논문 작성 계획서', subStages: [...] }
-        window.hierarchicalStages = window.hierarchicalStages || [];
+        // 화면 진입 시마다 1개의 기본단계와 1개의 세부단계를 가진 상태로 초기화
+        window.hierarchicalStages = [
+            {
+                id: 'BASIC_' + Date.now(),
+                basicStageName: '',
+                subStages: [
+                    {
+                        id: 'SUB_' + Date.now(),
+                        order: 1,
+                        name: '',
+                        isFinalEvaluationReflected: ''
+                    }
+                ]
+            }
+        ];
 
         // 학과명 목록 (mockDepartmentNames가 없을 경우 대비)
         const departments = window.mockDepartmentNames || [
@@ -3682,6 +3714,7 @@ const views = {
                 <!-- 기본 정보 -->
                 <div class="p-6 border-b bg-gray-50">
                     <div class="grid grid-cols-2 gap-4">
+                        <!-- Row 1 -->
                         <div class="flex items-center gap-4">
                             <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
                                 지도 단계명 <span class="text-red-600">*</span>
@@ -3703,6 +3736,64 @@ const views = {
                                     <option value="${dept}">${dept}</option>
                                 `).join('')}
                             </select>
+                        </div>
+
+                        <!-- Row 2 -->
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
+                                학위 과정 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="degreeType" value="master" checked class="mr-2">
+                                    <span class="text-sm text-gray-700">석사</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="degreeType" value="phd" class="mr-2">
+                                    <span class="text-sm text-gray-700">박사</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="degreeType" value="integrated" class="mr-2">
+                                    <span class="text-sm text-gray-700">통합과정</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[90px]">
+                                논문 유형 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="thesisType" value="degree" checked class="mr-2">
+                                    <span class="text-sm text-gray-700">학위 논문</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="thesisType" value="journal" class="mr-2">
+                                    <span class="text-sm text-gray-700">학술지 논문</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Row 3 -->
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap min-w-[110px]">
+                                유효 지도단계 <span class="text-red-600">*</span>
+                            </label>
+                            <div class="flex gap-4">
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="isValidStage" value="Y" checked class="mr-2">
+                                    <span class="text-sm text-gray-700">Y</span>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <input type="radio" name="isValidStage" value="N" class="mr-2">
+                                    <span class="text-sm text-gray-700">N</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-4">
+                            <!-- Empty cell for layout -->
                         </div>
                     </div>
                 </div>

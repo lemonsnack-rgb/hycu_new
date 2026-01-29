@@ -1059,6 +1059,23 @@
                     }, 0);
                 }
 
+                // 지도단계 등록 화면 후처리 - 자동 초기화
+                if (viewName === 'typeManagementCreate') {
+                    setTimeout(() => {
+                        const container = document.getElementById('hierarchical-stages-container');
+                        if (container && typeof renderHierarchicalStages === 'function' && window.hierarchicalStages) {
+                            console.log('✅ 지도단계 자동 렌더링 시작');
+                            renderHierarchicalStages();
+                        } else {
+                            console.error('❌ 지도단계 자동 렌더링 실패:', {
+                                container: !!container,
+                                function: typeof renderHierarchicalStages,
+                                data: !!window.hierarchicalStages
+                            });
+                        }
+                    }, 100);
+                }
+
                 // 콘텐츠 관리 화면 후처리
                 if (viewName === 'ethicsContentMgmt' && typeof initEthicsContentManagement === 'function') {
                     setTimeout(() => initEthicsContentManagement(), 0);

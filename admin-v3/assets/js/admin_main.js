@@ -96,14 +96,8 @@ function switchView(viewName, param = null) {
         // 지도단계 목록(신규) 화면 - 아무것도 안함
     }
 
-    if (viewName === 'typeManagementCreate') {
-        // 지도단계 등록 화면 렌더링 후 계층적 단계 초기화
-        setTimeout(() => {
-            if (typeof renderHierarchicalStages === 'function') {
-                renderHierarchicalStages();
-            }
-        }, 0);
-    }
+    // Note: typeManagementCreate auto-rendering is handled in index.html's renderAdminView()
+    // This switchView() function is not used for admin screens
 }
 
 // ========== 이벤트 리스너 초기화 ==========
