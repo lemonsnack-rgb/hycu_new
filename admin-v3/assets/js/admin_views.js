@@ -3622,6 +3622,12 @@ const views = {
                             <button onclick="switchView('typeManagementCreate')" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm">
                                 등록
                             </button>
+                            <button onclick="openHeadquartersScheduleModal()" class="bg-[#6A0028] text-white px-4 py-2 rounded-md hover:bg-[#8A0034] text-sm ml-2">
+                                본부일정관리
+                            </button>
+                            <button onclick="alert('지도단계를 먼저 선택해주세요.')" id="stage-task-management-btn" class="bg-[#0D8B63] text-white px-4 py-2 rounded-md hover:bg-[#0A6D4E] text-sm ml-2">
+                                단계별업무관리
+                            </button>
                         </div>
                     </div>
                     <div class="table-scroll">
@@ -3643,7 +3649,7 @@ const views = {
                                 const isValidLabel = item.isValidStage === 'Y' ? 'Y' : 'N';
 
                                 return `
-                                <tr class="hover:bg-blue-50" onclick="switchView('typeManagementCreate', '${item.id}')" style="cursor: pointer;">
+                                <tr class="hover:bg-blue-50" onclick="selectWorkflowForTaskManagement('${item.id}')" style="cursor: pointer;">
                                     <td class="py-3 px-4 text-sm text-gray-600">${idx + 1}</td>
                                     <td class="py-3 px-4 text-sm font-medium text-gray-800">${item.name}</td>
                                     <td class="py-3 px-4 text-sm text-gray-700">${departmentLabel}</td>

@@ -8277,3 +8277,378 @@ window.updateSubStageField = updateSubStageField;
 window.renderHierarchicalStages = renderHierarchicalStages;
 window.saveHierarchicalWorkflow = saveHierarchicalWorkflow;
 window.handleEvaluationTypeChange = handleEvaluationTypeChange;
+
+// ========== 본부일정관리 & 단계별업무관리 ==========
+
+// 테이블 행 선택 시 단계별업무관리 버튼 활성화
+function selectWorkflowForTaskManagement(workflowId) {
+    // Store selected workflow
+    window.selectedWorkflowId = workflowId;
+
+    // Highlight selected row
+    document.querySelectorAll('tbody tr').forEach(row => {
+        row.classList.remove('bg-blue-100');
+    });
+
+    // Highlight clicked row (only if event exists)
+    if (typeof event !== 'undefined' && event.currentTarget) {
+        event.currentTarget.classList.add('bg-blue-100');
+    }
+
+    // Update button to open modal
+    const btn = document.getElementById('stage-task-management-btn');
+    if (btn) {
+        btn.onclick = function() {
+            openStageTaskManagementModal(workflowId);
+        };
+    }
+}
+
+// 본부일정관리 모달 열기
+function openHeadquartersScheduleModal() {
+    const basicStages = ['논문작성계획서', '프로포절', '예비논문', '본논문'];
+
+    const modalHtml = `
+        <div id="headquarters-schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                    <h3 class="text-lg font-bold text-gray-900">본부일정관리</h3>
+                    <button onclick="closeHeadquartersScheduleModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <table class="w-full border-collapse">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-3 px-4 border text-left">기본단계</th>
+                                <th class="py-3 px-4 border text-left">일정구분</th>
+                                <th class="py-3 px-4 border text-left">시작일시</th>
+                                <th class="py-3 px-4 border text-left">종료일시</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${basicStages.map(stage => `
+                                <!-- 신청 일정 -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 border" rowspan="2">${stage}</td>
+                                    <td class="py-3 px-4 border">신청</td>
+                                    <td class="py-3 px-4 border">
+                                        <input type="datetime-local"
+                                               data-stage="${stage}"
+                                               data-type="application"
+                                               data-field="startDate"
+                                               class="w-full px-3 py-2 border rounded">
+                                    </td>
+                                    <td class="py-3 px-4 border">
+                                        <input type="datetime-local"
+                                               data-stage="${stage}"
+                                               data-type="application"
+                                               data-field="endDate"
+                                               class="w-full px-3 py-2 border rounded">
+                                    </td>
+                                </tr>
+                                <!-- 신청철회 일정 -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-4 border">신청철회</td>
+                                    <td class="py-3 px-4 border">
+                                        <input type="datetime-local"
+                                               data-stage="${stage}"
+                                               data-type="withdrawal"
+                                               data-field="startDate"
+                                               class="w-full px-3 py-2 border rounded">
+                                    </td>
+                                    <td class="py-3 px-4 border">
+                                        <input type="datetime-local"
+                                               data-stage="${stage}"
+                                               data-type="withdrawal"
+                                               data-field="endDate"
+                                               class="w-full px-3 py-2 border rounded">
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
+                    <button onclick="closeHeadquartersScheduleModal()"
+                            class="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50">취소</button>
+                    <button onclick="saveHeadquartersSchedule()"
+                            class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">저장</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// 본부일정관리 모달 닫기
+function closeHeadquartersScheduleModal() {
+    const modal = document.getElementById('headquarters-schedule-modal');
+    if (modal) modal.remove();
+}
+
+// 본부일정관리 저장
+function saveHeadquartersSchedule() {
+    // Collect all datetime-local inputs
+    const inputs = document.querySelectorAll('#headquarters-schedule-modal input[type="datetime-local"]');
+    const schedules = {};
+
+    inputs.forEach(input => {
+        const stage = input.dataset.stage;
+        const type = input.dataset.type;
+        const field = input.dataset.field;
+        const value = input.value;
+
+        if (!schedules[stage]) {
+            schedules[stage] = { application: {}, withdrawal: {} };
+        }
+        schedules[stage][type][field] = value;
+    });
+
+    // Validation: 종료일시 > 시작일시
+    for (const stage in schedules) {
+        for (const type in schedules[stage]) {
+            const start = schedules[stage][type].startDate;
+            const end = schedules[stage][type].endDate;
+
+            if (start && end && new Date(start) >= new Date(end)) {
+                alert(`${stage} - ${type === 'application' ? '신청' : '신청철회'}: 종료일시는 시작일시보다 이후여야 합니다.`);
+                return;
+            }
+        }
+    }
+
+    // Save to global data
+    if (!window.headquartersSchedules) {
+        window.headquartersSchedules = {};
+    }
+    window.headquartersSchedules = schedules;
+
+    alert('본부일정이 저장되었습니다.');
+    closeHeadquartersScheduleModal();
+}
+
+// 단계별업무관리 모달 열기
+function openStageTaskManagementModal(workflowId) {
+    const workflow = mockThesisStages.find(w => w.id === workflowId);
+    if (!workflow) {
+        alert('지도단계를 찾을 수 없습니다.');
+        return;
+    }
+
+    // Extract all sub-stages from hierarchicalStages
+    const subStages = [];
+    if (workflow.hierarchicalStages) {
+        workflow.hierarchicalStages.forEach(basic => {
+            basic.subStages.forEach(sub => {
+                subStages.push({
+                    id: sub.id,
+                    name: sub.name,
+                    basicStageName: basic.basicStageName
+                });
+            });
+        });
+    }
+
+    if (subStages.length === 0) {
+        alert('세부단계가 없습니다.');
+        return;
+    }
+
+    // Load available evaluation criteria and role groups
+    const evaluationCriteria = window.appData?.evaluationCriteria || [];
+    const roleGroups = window.mockRoleGroups || [];
+
+    const modalHtml = `
+        <div id="stage-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div class="bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
+                <!-- Header -->
+                <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
+                    <div>
+                        <h3 class="text-lg font-bold text-gray-900">단계별업무관리</h3>
+                        <p class="text-sm text-gray-600 mt-1">지도단계: ${workflow.name}</p>
+                    </div>
+                    <button onclick="closeStageTaskModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
+                </div>
+
+                <!-- Body -->
+                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <table class="w-full border-collapse text-sm">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="py-3 px-3 border text-left" style="width: 15%">세부단계명</th>
+                                <th class="py-3 px-3 border text-left" style="width: 15%">승인권한</th>
+                                <th class="py-3 px-3 border text-left" style="width: 15%">평가표 유형</th>
+                                <th class="py-3 px-3 border text-left" style="width: 10%">일정구분</th>
+                                <th class="py-3 px-3 border text-left" style="width: 22.5%">시작일시</th>
+                                <th class="py-3 px-3 border text-left" style="width: 22.5%">종료일시</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${subStages.map(sub => `
+                                <!-- 제출 일정 -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-3 border font-medium" rowspan="2">${sub.name}</td>
+                                    <td class="py-3 px-3 border" rowspan="2">
+                                        <select data-substage-id="${sub.id}" data-field="approvalAuthority"
+                                                class="w-full px-2 py-1.5 border rounded text-sm">
+                                            <option value="">선택</option>
+                                            ${roleGroups.map(rg => `
+                                                <option value="${rg.id}">${rg.name}</option>
+                                            `).join('')}
+                                        </select>
+                                    </td>
+                                    <td class="py-3 px-3 border" rowspan="2">
+                                        <select data-substage-id="${sub.id}" data-field="evaluationType"
+                                                class="w-full px-2 py-1.5 border rounded text-sm">
+                                            <option value="">선택</option>
+                                            ${evaluationCriteria.map(ec => `
+                                                <option value="${ec.id}">${ec.name}</option>
+                                            `).join('')}
+                                        </select>
+                                    </td>
+                                    <td class="py-3 px-3 border">제출</td>
+                                    <td class="py-3 px-3 border">
+                                        <input type="datetime-local"
+                                               data-substage-id="${sub.id}"
+                                               data-schedule-type="submission"
+                                               data-field="startDate"
+                                               class="w-full px-2 py-1.5 border rounded text-sm">
+                                    </td>
+                                    <td class="py-3 px-3 border">
+                                        <input type="datetime-local"
+                                               data-substage-id="${sub.id}"
+                                               data-schedule-type="submission"
+                                               data-field="endDate"
+                                               class="w-full px-2 py-1.5 border rounded text-sm">
+                                    </td>
+                                </tr>
+                                <!-- 심사 일정 -->
+                                <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-3 border">심사</td>
+                                    <td class="py-3 px-3 border">
+                                        <input type="datetime-local"
+                                               data-substage-id="${sub.id}"
+                                               data-schedule-type="review"
+                                               data-field="startDate"
+                                               class="w-full px-2 py-1.5 border rounded text-sm">
+                                    </td>
+                                    <td class="py-3 px-3 border">
+                                        <input type="datetime-local"
+                                               data-substage-id="${sub.id}"
+                                               data-schedule-type="review"
+                                               data-field="endDate"
+                                               class="w-full px-2 py-1.5 border rounded text-sm">
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Footer -->
+                <div class="px-6 py-4 border-t bg-gray-50 flex justify-end gap-3">
+                    <button onclick="closeStageTaskModal()"
+                            class="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50">취소</button>
+                    <button onclick="saveStageTaskManagement('${workflowId}')"
+                            class="px-6 py-2 bg-[#0D8B63] text-white rounded-md hover:bg-[#0A6D4E]">저장</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+// 단계별업무관리 모달 닫기
+function closeStageTaskModal() {
+    const modal = document.getElementById('stage-task-modal');
+    if (modal) modal.remove();
+}
+
+// 단계별업무관리 저장
+function saveStageTaskManagement(workflowId) {
+    const workflow = mockThesisStages.find(w => w.id === workflowId);
+    if (!workflow) return;
+
+    // Collect data
+    const subStageData = {};
+
+    // Collect approval authority and evaluation type
+    document.querySelectorAll('#stage-task-modal select').forEach(select => {
+        const subStageId = select.dataset.substageId;
+        const field = select.dataset.field;
+        const value = select.value;
+
+        if (!subStageData[subStageId]) {
+            subStageData[subStageId] = { submission: {}, review: {} };
+        }
+        subStageData[subStageId][field] = value;
+    });
+
+    // Collect schedule dates
+    document.querySelectorAll('#stage-task-modal input[type="datetime-local"]').forEach(input => {
+        const subStageId = input.dataset.substageId;
+        const scheduleType = input.dataset.scheduleType;
+        const field = input.dataset.field;
+        const value = input.value;
+
+        if (!subStageData[subStageId]) {
+            subStageData[subStageId] = { submission: {}, review: {} };
+        }
+        if (!subStageData[subStageId][scheduleType]) {
+            subStageData[subStageId][scheduleType] = {};
+        }
+        subStageData[subStageId][scheduleType][field] = value;
+    });
+
+    // Validation
+    for (const subStageId in subStageData) {
+        const data = subStageData[subStageId];
+
+        // Check approval authority and evaluation type
+        if (!data.approvalAuthority || !data.evaluationType) {
+            alert('모든 세부단계의 승인권한과 평가표 유형을 선택해주세요.');
+            return;
+        }
+
+        // Validate submission schedule
+        if (data.submission.startDate && data.submission.endDate) {
+            if (new Date(data.submission.startDate) >= new Date(data.submission.endDate)) {
+                alert('제출 일정: 종료일시는 시작일시보다 이후여야 합니다.');
+                return;
+            }
+        }
+
+        // Validate review schedule
+        if (data.review.startDate && data.review.endDate) {
+            if (new Date(data.review.startDate) >= new Date(data.review.endDate)) {
+                alert('심사 일정: 종료일시는 시작일시보다 이후여야 합니다.');
+                return;
+            }
+        }
+    }
+
+    // Save to workflow
+    if (!workflow.subStageManagement) {
+        workflow.subStageManagement = [];
+    }
+    workflow.subStageManagement = subStageData;
+
+    alert('단계별업무관리가 저장되었습니다.');
+    closeStageTaskModal();
+}
+
+// Export functions to window
+window.selectWorkflowForTaskManagement = selectWorkflowForTaskManagement;
+window.openHeadquartersScheduleModal = openHeadquartersScheduleModal;
+window.closeHeadquartersScheduleModal = closeHeadquartersScheduleModal;
+window.saveHeadquartersSchedule = saveHeadquartersSchedule;
+window.openStageTaskManagementModal = openStageTaskManagementModal;
+window.closeStageTaskModal = closeStageTaskModal;
+window.saveStageTaskManagement = saveStageTaskManagement;
