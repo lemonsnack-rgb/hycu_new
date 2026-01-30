@@ -8309,8 +8309,8 @@ function openHeadquartersScheduleModal() {
     const basicStages = ['논문작성계획서', '프로포절', '예비논문', '본논문'];
 
     const modalHtml = `
-        <div id="headquarters-schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-xl w-full max-w-5xl max-h-[90vh] overflow-hidden">
+        <div id="headquarters-schedule-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
+            <div class="bg-white rounded-lg shadow-xl w-full max-h-[90vh] overflow-hidden" style="max-width: 1300px;">
                 <!-- Header -->
                 <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
                     <h3 class="text-lg font-bold text-gray-900">본부일정관리</h3>
@@ -8318,59 +8318,53 @@ function openHeadquartersScheduleModal() {
                 </div>
 
                 <!-- Body -->
-                <div class="p-6 overflow-y-auto" style="max-height: calc(90vh - 140px);">
-                    <table class="w-full border-collapse" style="table-layout: fixed;">
-                        <colgroup>
-                            <col style="width: 25%;">
-                            <col style="width: 15%;">
-                            <col style="width: 30%;">
-                            <col style="width: 30%;">
-                        </colgroup>
+                <div class="px-6 py-4 overflow-y-auto" style="max-height: calc(90vh - 140px);">
+                    <table style="table-layout: fixed; width: 1000px; border-collapse: collapse;">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="py-2 px-3 border text-left text-sm font-semibold">기본단계</th>
-                                <th class="py-2 px-3 border text-center text-sm font-semibold">일정구분</th>
-                                <th class="py-2 px-3 border text-left text-sm font-semibold">시작일시</th>
-                                <th class="py-2 px-3 border text-left text-sm font-semibold">종료일시</th>
+                                <th class="py-2 px-2 border text-sm font-semibold" style="width: 200px; text-align: center;">기본단계</th>
+                                <th class="py-2 px-2 border text-sm font-semibold" style="width: 150px; text-align: center;">일정구분</th>
+                                <th class="py-2 px-2 border text-sm font-semibold" style="width: 325px; text-align: center;">시작일시</th>
+                                <th class="py-2 px-2 border text-sm font-semibold" style="width: 325px; text-align: center;">종료일시</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${basicStages.map(stage => `
                                 <!-- 신청 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-2 px-3 border text-sm" rowspan="2">${stage}</td>
-                                    <td class="py-2 px-3 border text-center text-sm font-normal">신청</td>
-                                    <td class="py-2 px-3 border">
+                                    <td class="py-2 px-2 border text-sm" rowspan="2">${stage}</td>
+                                    <td class="py-2 px-2 border text-sm" style="font-weight: 400; text-align: center; color: #000000;">신청</td>
+                                    <td class="py-2 px-2 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="application"
                                                data-field="startDate"
-                                               class="w-40 px-2 py-1.5 border rounded text-sm">
+                                               class="w-36 px-2 py-1.5 border rounded text-sm">
                                     </td>
-                                    <td class="py-2 px-3 border">
+                                    <td class="py-2 px-2 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="application"
                                                data-field="endDate"
-                                               class="w-40 px-2 py-1.5 border rounded text-sm">
+                                               class="w-36 px-2 py-1.5 border rounded text-sm">
                                     </td>
                                 </tr>
                                 <!-- 신청철회 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-2 px-3 border text-center text-sm font-normal">신청철회</td>
-                                    <td class="py-2 px-3 border">
+                                    <td class="py-2 px-2 border text-sm" style="font-weight: 400; text-align: center; color: #000000;">신청철회</td>
+                                    <td class="py-2 px-2 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="withdrawal"
                                                data-field="startDate"
-                                               class="w-40 px-2 py-1.5 border rounded text-sm">
+                                               class="w-36 px-2 py-1.5 border rounded text-sm">
                                     </td>
-                                    <td class="py-2 px-3 border">
+                                    <td class="py-2 px-2 border">
                                         <input type="datetime-local"
                                                data-stage="${stage}"
                                                data-type="withdrawal"
                                                data-field="endDate"
-                                               class="w-40 px-2 py-1.5 border rounded text-sm">
+                                               class="w-36 px-2 py-1.5 border rounded text-sm">
                                     </td>
                                 </tr>
                             `).join('')}
@@ -8466,12 +8460,16 @@ function openStageTaskManagementModal(workflowId) {
         return;
     }
 
-    // Load available evaluation criteria and role groups
-    const evaluationCriteria = window.appData?.evaluationCriteria || [];
-    const roleGroups = window.mockRoleGroups || [];
+    // Load available evaluation criteria
+    const evaluationCriteria = appData.evaluationCriteria || [];
+    // 승인권한은 고정된 2개 옵션: 지도교수, 심사위원회
+    const approvalAuthorities = [
+        { id: 'ADVISOR', name: '지도교수' },
+        { id: 'COMMITTEE', name: '심사위원회' }
+    ];
 
     const modalHtml = `
-        <div id="stage-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+        <div id="stage-task-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center" style="z-index: 9999;">
             <div class="bg-white rounded-lg shadow-xl w-full max-w-7xl max-h-[90vh] overflow-hidden">
                 <!-- Header -->
                 <div class="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
@@ -8487,12 +8485,12 @@ function openStageTaskManagementModal(workflowId) {
                     <table class="w-full border-collapse text-sm">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="py-3 px-3 border text-left" style="width: 15%">세부단계명</th>
-                                <th class="py-3 px-3 border text-left" style="width: 15%">승인권한</th>
-                                <th class="py-3 px-3 border text-left" style="width: 15%">평가표 유형</th>
-                                <th class="py-3 px-3 border text-left" style="width: 10%">일정구분</th>
-                                <th class="py-3 px-3 border text-left" style="width: 22.5%">시작일시</th>
-                                <th class="py-3 px-3 border text-left" style="width: 22.5%">종료일시</th>
+                                <th class="py-3 px-3 border" style="width: 15%; text-align: center;">세부단계명</th>
+                                <th class="py-3 px-3 border" style="width: 15%; text-align: center;">승인권한</th>
+                                <th class="py-3 px-3 border" style="width: 15%; text-align: center;">평가표 유형</th>
+                                <th class="py-3 px-3 border" style="width: 10%; text-align: center;">일정구분</th>
+                                <th class="py-3 px-3 border" style="width: 22.5%; text-align: center;">시작일시</th>
+                                <th class="py-3 px-3 border" style="width: 22.5%; text-align: center;">종료일시</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -8504,8 +8502,8 @@ function openStageTaskManagementModal(workflowId) {
                                         <select data-substage-id="${sub.id}" data-field="approvalAuthority"
                                                 class="w-full px-2 py-1.5 border rounded text-sm">
                                             <option value="">선택</option>
-                                            ${roleGroups.map(rg => `
-                                                <option value="${rg.id}">${rg.name}</option>
+                                            ${approvalAuthorities.map(aa => `
+                                                <option value="${aa.id}">${aa.name}</option>
                                             `).join('')}
                                         </select>
                                     </td>
@@ -8518,7 +8516,7 @@ function openStageTaskManagementModal(workflowId) {
                                             `).join('')}
                                         </select>
                                     </td>
-                                    <td class="py-3 px-3 border">제출</td>
+                                    <td class="py-3 px-3 border" style="color: #000000; text-align: center; font-weight: 400;">제출</td>
                                     <td class="py-3 px-3 border">
                                         <input type="datetime-local"
                                                data-substage-id="${sub.id}"
@@ -8536,7 +8534,7 @@ function openStageTaskManagementModal(workflowId) {
                                 </tr>
                                 <!-- 심사 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-3 border">심사</td>
+                                    <td class="py-3 px-3 border" style="color: #000000; text-align: center; font-weight: 400;">심사</td>
                                     <td class="py-3 px-3 border">
                                         <input type="datetime-local"
                                                data-substage-id="${sub.id}"

@@ -235,6 +235,64 @@ const mockThesisStages = [
                 scheduleTypes: ['submission', 'review'],
                 schedules: []
             }
+        ],
+        hierarchicalStages: [
+            {
+                id: 'HS001',
+                basicStageName: '논문작성계획서',
+                order: 1,
+                subStages: [
+                    {
+                        id: 'SS001',
+                        name: '계획서 초안 작성',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: {
+                            startDate: '2025-03-01T09:00',
+                            endDate: '2025-03-15T18:00'
+                        },
+                        reviewSchedule: {
+                            startDate: '2025-03-16T09:00',
+                            endDate: '2025-03-20T18:00'
+                        }
+                    },
+                    {
+                        id: 'SS002',
+                        name: '지도교수 승인',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: {
+                            startDate: '2025-03-21T09:00',
+                            endDate: '2025-03-25T18:00'
+                        },
+                        reviewSchedule: {
+                            startDate: '2025-03-26T09:00',
+                            endDate: '2025-03-31T18:00'
+                        }
+                    }
+                ]
+            },
+            {
+                id: 'HS002',
+                basicStageName: '프로포절',
+                order: 2,
+                subStages: [
+                    {
+                        id: 'SS003',
+                        name: '프로포절 제출',
+                        order: 1,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: {
+                            startDate: '2025-04-01T09:00',
+                            endDate: '2025-04-15T18:00'
+                        },
+                        reviewSchedule: {
+                            startDate: '2025-04-16T09:00',
+                            endDate: '2025-04-25T18:00'
+                        }
+                    }
+                ]
+            }
         ]
     },
     {

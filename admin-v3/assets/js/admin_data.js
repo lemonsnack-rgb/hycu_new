@@ -229,10 +229,7 @@ const appData = {
             totalScore: 100,
             passCriteria: {
                 type: 'committee',
-                totalCommittee: 3,
-                requiredCommittee: 2,
-                passScore: 70,
-                description: '총 심사위원 3명 중 2명 이상이 70점 이상을 줘야 통과'
+                description: '심사위원이 평가 기준에 따라 판정'
             }
         },
         {
@@ -253,10 +250,7 @@ const appData = {
             totalScore: 100,
             passCriteria: {
                 type: 'committee',
-                totalCommittee: 5,
-                requiredCommittee: 4,
-                passScore: 75,
-                description: '총 심사위원 5명 중 4명 이상이 75점 이상을 줘야 통과'
+                description: '심사위원이 평가 기준에 따라 판정'
             }
         },
         {
