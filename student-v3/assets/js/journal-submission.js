@@ -669,8 +669,19 @@ function renderJournalSubmissionForm(isViewMode = false) {
                             </button>
                             <span class="text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</span>
                         </div>
+                        ${isViewMode && data.fileName ? `
+                            <div class="mt-3 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
+                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span class="text-sm text-gray-900">${data.fileName}</span>
+                                <span class="text-xs text-gray-500">(${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                                <button class="ml-auto text-sm text-[#6A0028] hover:text-[#8A0034]">다운로드</button>
+                            </div>
+                        ` : ''}
                         <div id="file-info" class="text-sm text-gray-600 mt-2">
-                            ${data.fileName ? `
+                            ${!isViewMode && data.fileName ? `
                                 <div class="flex items-center gap-2">
                                     <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
