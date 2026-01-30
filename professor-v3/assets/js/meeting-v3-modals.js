@@ -283,7 +283,10 @@ const AvailableSlotModal = {
                 return;
             }
 
-            // 각 날짜마다 개별 일정 생성
+            // 반복일정 그룹 ID 생성
+            const recurringGroupId = `REC_${startDate.replace(/-/g, '')}_${Date.now()}`;
+
+            // 각 날짜마다 개별 일정 생성 (반복일정 메타데이터 포함)
             dates.forEach(date => {
                 const slotData = {
                     type: 'oneTime',
@@ -293,7 +296,14 @@ const AvailableSlotModal = {
                     duration: duration,
                     meetingType: meetingType,
                     startDate: date,
-                    endDate: date
+                    endDate: date,
+
+                    // 반복일정 메타데이터
+                    isRecurring: true,
+                    recurringGroupId: recurringGroupId,
+                    recurringDayOfWeek: parseInt(dayOfWeek),
+                    recurringStartDate: startDate,
+                    recurringEndDate: endDate
                 };
                 DataServiceV3.addAvailableSlot(slotData);
             });
@@ -649,6 +659,9 @@ const ManageSlotsModal = {
     render() {
         const slots = DataServiceV3.getAvailableSlots();
 
+        // 반복일정 그룹화
+        const groupedSlots = this.groupSlots(slots);
+
         return ModalBase.renderContainer('manage-slots-modal', `
             <!-- 헤더 -->
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
@@ -664,7 +677,7 @@ const ManageSlotsModal = {
             <div class="px-6 py-4">
                 <p class="text-sm text-gray-600 mb-4">등록된 가능시간 목록입니다. 삭제할 일정을 선택하세요.</p>
 
-                ${slots.length === 0 ? `
+                ${groupedSlots.length === 0 ? `
                     <div class="text-center py-12 text-gray-500">
                         <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -673,32 +686,7 @@ const ManageSlotsModal = {
                     </div>
                 ` : `
                     <div class="space-y-3 max-h-96 overflow-y-auto">
-                        ${slots.map(slot => `
-                            <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <div class="flex items-center gap-2 mb-2">
-                                            <span class="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-700">
-                                                ${MeetingTypeUtils.getMeetingMethodText(slot.meetingType)}
-                                            </span>
-                                        </div>
-
-                                        <div class="text-sm text-gray-900">
-                                            ${slot.date} ${slot.time}
-                                        </div>
-
-                                        <div class="text-xs text-gray-500 mt-1">
-                                            소요시간: ${MeetingUtils.formatDuration(slot.duration)}
-                                        </div>
-                                    </div>
-
-                                    <button onclick="ManageSlotsModal.deleteSlot('${slot.id}')"
-                                            class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
-                                        삭제
-                                    </button>
-                                </div>
-                            </div>
-                        `).join('')}
+                        ${groupedSlots.map(group => this.renderSlotGroup(group)).join('')}
                     </div>
                 `}
             </div>
@@ -711,6 +699,127 @@ const ManageSlotsModal = {
                 </button>
             </div>
         `);
+    },
+
+    /**
+     * Slot 그룹화 (반복일정은 하나로 묶음)
+     */
+    groupSlots(slots) {
+        const groups = [];
+        const processedGroupIds = new Set();
+
+        slots.forEach(slot => {
+            if (slot.isRecurring && !processedGroupIds.has(slot.recurringGroupId)) {
+                // 반복일정 그룹 생성
+                const groupSlots = slots.filter(s => s.recurringGroupId === slot.recurringGroupId);
+                groups.push({
+                    type: 'recurring',
+                    recurringGroupId: slot.recurringGroupId,
+                    slots: groupSlots,
+                    representativeSlot: slot
+                });
+                processedGroupIds.add(slot.recurringGroupId);
+            } else if (!slot.isRecurring) {
+                // 일반 일정
+                groups.push({
+                    type: 'single',
+                    slots: [slot],
+                    representativeSlot: slot
+                });
+            }
+        });
+
+        return groups;
+    },
+
+    /**
+     * Slot 그룹 렌더링
+     */
+    renderSlotGroup(group) {
+        const slot = group.representativeSlot;
+
+        if (group.type === 'recurring') {
+            // 반복일정 카드
+            const futureCount = group.slots.filter(s => !this.isSlotPast(s)).length;
+
+            return `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <!-- 배지 -->
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">
+                                    반복일정
+                                </span>
+                                <span class="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-700">
+                                    ${MeetingTypeUtils.getMeetingMethodText(slot.meetingType)}
+                                </span>
+                            </div>
+
+                            <!-- 반복 정보 -->
+                            <div class="text-sm text-gray-900 font-medium">
+                                매주 ${this.getDayOfWeekText(slot.recurringDayOfWeek)} ${slot.time} (${slot.duration}분)
+                            </div>
+
+                            <div class="text-xs text-gray-600 mt-1">
+                                기간: ${slot.recurringStartDate} ~ ${slot.recurringEndDate}
+                            </div>
+                        </div>
+
+                        <button onclick="ManageSlotsModal.deleteRecurringGroup('${slot.recurringGroupId}')"
+                                class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // 일반 일정 카드
+            return `
+                <div class="border border-gray-200 rounded-lg p-4 hover:bg-gray-50">
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                            <div class="flex items-center gap-2 mb-2">
+                                <span class="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-700">
+                                    ${MeetingTypeUtils.getMeetingMethodText(slot.meetingType)}
+                                </span>
+                            </div>
+
+                            <div class="text-sm text-gray-900">
+                                ${slot.date} ${slot.time}
+                            </div>
+
+                            <div class="text-xs text-gray-500 mt-1">
+                                소요시간: ${MeetingUtils.formatDuration(slot.duration)}
+                            </div>
+                        </div>
+
+                        <button onclick="ManageSlotsModal.deleteSlot('${slot.id}')"
+                                class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
+                            삭제
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+    },
+
+    /**
+     * 요일 숫자를 텍스트로 변환
+     */
+    getDayOfWeekText(dayOfWeek) {
+        const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
+        return days[dayOfWeek] || '';
+    },
+
+    /**
+     * Slot이 과거인지 확인 (완료 기준)
+     */
+    isSlotPast(slot) {
+        const slotDate = new Date(slot.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        return slotDate < today;
     },
 
     /**
@@ -737,7 +846,7 @@ const ManageSlotsModal = {
     },
 
     /**
-     * 가능시간 삭제
+     * 일반 일정 삭제
      */
     deleteSlot(slotId) {
         if (!confirm('이 가능시간을 삭제하시겠습니까?')) {
@@ -746,6 +855,26 @@ const ManageSlotsModal = {
 
         DataServiceV3.deleteAvailableSlot(slotId);
         alert('가능시간이 삭제되었습니다.');
+
+        // 모달 다시 열기 (새로고침)
+        this.open();
+    },
+
+    /**
+     * 반복일정 그룹 전체 삭제 (미래 일정만)
+     */
+    deleteRecurringGroup(recurringGroupId) {
+        if (!confirm('반복일정을 삭제하시겠습니까?\n\n과거 완료된 일정은 유지되며, 미래 일정만 삭제됩니다.')) {
+            return;
+        }
+
+        const deleteCount = DataServiceV3.deleteRecurringGroup(recurringGroupId);
+
+        if (deleteCount > 0) {
+            alert(`${deleteCount}개의 미완료 일정이 삭제되었습니다.\n(완료된 일정은 유지됩니다)`);
+        } else {
+            alert('삭제할 미완료 일정이 없습니다.\n(모든 일정이 이미 완료되었습니다)');
+        }
 
         // 모달 다시 열기 (새로고침)
         this.open();

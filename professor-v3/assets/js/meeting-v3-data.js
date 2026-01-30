@@ -77,6 +77,161 @@ const AVAILABLE_SLOTS_V3 = [
         startDate: '2026-02-05',
         endDate: '2026-02-05',
         status: 'active'
+    },
+    // ========== 반복일정 목업 데이터 (테스트용) ==========
+    // 반복일정 그룹 1: 매주 월요일 14:00 (과거 1개 + 미래 3개)
+    {
+        id: 'SLOT_REC_001',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-01-20',  // 과거 일정 (테스트용)
+        time: '14:00',
+        duration: 60,
+        meetingType: 'online',
+        startDate: '2026-01-20',
+        endDate: '2026-01-20',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260120_001',
+        recurringDayOfWeek: 1,  // 월요일
+        recurringStartDate: '2026-01-20',
+        recurringEndDate: '2026-02-10'
+    },
+    {
+        id: 'SLOT_REC_002',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-03',  // 미래 일정
+        time: '14:00',
+        duration: 60,
+        meetingType: 'online',
+        startDate: '2026-02-03',
+        endDate: '2026-02-03',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260120_001',
+        recurringDayOfWeek: 1,
+        recurringStartDate: '2026-01-20',
+        recurringEndDate: '2026-02-10'
+    },
+    {
+        id: 'SLOT_REC_003',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-10',  // 미래 일정
+        time: '14:00',
+        duration: 60,
+        meetingType: 'online',
+        startDate: '2026-02-10',
+        endDate: '2026-02-10',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260120_001',
+        recurringDayOfWeek: 1,
+        recurringStartDate: '2026-01-20',
+        recurringEndDate: '2026-02-10'
+    },
+    {
+        id: 'SLOT_REC_004',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-17',  // 미래 일정
+        time: '14:00',
+        duration: 60,
+        meetingType: 'online',
+        startDate: '2026-02-17',
+        endDate: '2026-02-17',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260120_001',
+        recurringDayOfWeek: 1,
+        recurringStartDate: '2026-01-20',
+        recurringEndDate: '2026-02-10'
+    },
+    // 반복일정 그룹 2: 매주 수요일 10:00 (모두 미래)
+    {
+        id: 'SLOT_REC_005',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-04',
+        time: '10:00',
+        duration: 90,
+        meetingType: 'offline',
+        startDate: '2026-02-04',
+        endDate: '2026-02-04',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260204_002',
+        recurringDayOfWeek: 3,  // 수요일
+        recurringStartDate: '2026-02-04',
+        recurringEndDate: '2026-02-25'
+    },
+    {
+        id: 'SLOT_REC_006',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-11',
+        time: '10:00',
+        duration: 90,
+        meetingType: 'offline',
+        startDate: '2026-02-11',
+        endDate: '2026-02-11',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260204_002',
+        recurringDayOfWeek: 3,
+        recurringStartDate: '2026-02-04',
+        recurringEndDate: '2026-02-25'
+    },
+    {
+        id: 'SLOT_REC_007',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-18',
+        time: '10:00',
+        duration: 90,
+        meetingType: 'offline',
+        startDate: '2026-02-18',
+        endDate: '2026-02-18',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260204_002',
+        recurringDayOfWeek: 3,
+        recurringStartDate: '2026-02-04',
+        recurringEndDate: '2026-02-25'
+    },
+    {
+        id: 'SLOT_REC_008',
+        professorId: 'P001',
+        professorName: '김교수',
+        type: 'oneTime',
+        dayOfWeek: null,
+        date: '2026-02-25',
+        time: '10:00',
+        duration: 90,
+        meetingType: 'offline',
+        startDate: '2026-02-25',
+        endDate: '2026-02-25',
+        status: 'active',
+        isRecurring: true,
+        recurringGroupId: 'REC_20260204_002',
+        recurringDayOfWeek: 3,
+        recurringStartDate: '2026-02-04',
+        recurringEndDate: '2026-02-25'
     }
 ];
 
@@ -967,6 +1122,57 @@ const DataServiceV3 = {
             return true;
         }
         return false;
+    },
+
+    /**
+     * Slot ID로 slot 조회
+     */
+    getSlotById(slotId) {
+        return AVAILABLE_SLOTS_V3.find(s => s.id === slotId && s.status === 'active');
+    },
+
+    /**
+     * 반복일정 그룹 전체 삭제 (미래 일정만)
+     */
+    deleteRecurringGroup(recurringGroupId) {
+        let deleteCount = 0;
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        AVAILABLE_SLOTS_V3.forEach(slot => {
+            if (slot.recurringGroupId === recurringGroupId &&
+                slot.status === 'active' &&
+                !this.isSlotCompleted(slot.id)) {
+                slot.status = 'inactive';
+                deleteCount++;
+            }
+        });
+
+        console.log(`✅ 반복일정 그룹 삭제: ${recurringGroupId} (${deleteCount}개)`);
+        return deleteCount;
+    },
+
+    /**
+     * Slot이 완료되었는지 확인 (날짜가 과거인 경우)
+     */
+    isSlotCompleted(slotId) {
+        const slot = this.getSlotById(slotId);
+        if (!slot) {
+            // status가 inactive인 경우도 체크
+            const inactiveSlot = AVAILABLE_SLOTS_V3.find(s => s.id === slotId);
+            if (!inactiveSlot) return false;
+
+            const slotDate = new Date(inactiveSlot.date);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return slotDate < today;
+        }
+
+        const slotDate = new Date(slot.date);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        return slotDate < today;
     },
 
     /**
