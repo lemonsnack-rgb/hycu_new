@@ -87,7 +87,8 @@ const journalSubmissions = [
             end: '2025-05-31'
         },
         status: 'submitted',
-        reviewResult: 'on_hold',
+        reviewResult: 'approved',
+        reviewComments: '우수한 연구 성과입니다. 논문 구조와 내용이 체계적이며, 연구 방법론도 적절합니다.',
         submittedData: {
             advisor: '박지성 교수',
             titleKorean: '딥러닝 기반 음성 인식 시스템 개발',
@@ -680,6 +681,51 @@ function renderJournalSubmissionForm(isViewMode = false) {
                         </div>
                     </div>
                 </div>
+
+                <!-- ===== 보기 모드일 때 제출정보 표시 ===== -->
+                ${isViewMode && submission.status === 'submitted' ? `
+                    <!-- border-t 구분선 -->
+                    <div class="border-t pt-4 mt-6"></div>
+
+                    <!-- 하단: 제출정보 -->
+                    <div class="space-y-3">
+                        <!-- 제출일시 -->
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출일시</label>
+                            <div class="text-sm text-gray-900">${data.submittedAt || '-'}</div>
+                        </div>
+
+                        <!-- 심사 결과 + 총평 보기 버튼 -->
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사 결과</label>
+                            <div class="flex items-center gap-2">
+                                ${submission.reviewResult ? `
+                                    <span class="text-sm font-medium ${
+                                        submission.reviewResult === 'approved' ? 'text-green-700' :
+                                        submission.reviewResult === 'rejected' ? 'text-red-700' :
+                                        'text-yellow-700'
+                                    }">
+                                        ${
+                                            submission.reviewResult === 'approved' ? '승인' :
+                                            submission.reviewResult === 'rejected' ? '반려' :
+                                            submission.reviewResult === 'revision_required' ? '보완후재제출' :
+                                            '-'
+                                        }
+                                    </span>
+                                    ${submission.reviewComments ? `
+                                        <button type="button" data-action="show-review-comments"
+                                                data-comments="${(submission.reviewComments || '').replace(/"/g, '&quot;')}"
+                                                class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
+                                            총평 보기
+                                        </button>
+                                    ` : ''}
+                                ` : `
+                                    <span class="text-sm text-gray-500">-</span>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+                ` : ''}
 
                 <!-- 제출 버튼 -->
                 ${!isViewMode ? `
