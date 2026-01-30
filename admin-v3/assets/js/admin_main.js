@@ -4016,8 +4016,9 @@ function renderStageManagementContent() {
                             <th style="width: 90px;">학번</th>
                             <th style="width: 70px;">성명</th>
                             <th style="width: 90px;">지도교수명</th>
-                            <th style="width: 130px;">적용단계</th>
+                            <th style="width: 130px;">지도단계</th>
                             <th style="width: 160px;">현재단계</th>
+                            <th style="width: 160px;">다음단계</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -4126,7 +4127,7 @@ function renderStudentTableRows(data) {
                     ${advisorName}
                 </td>
 
-                <!-- 적용단계 -->
+                <!-- 지도단계 (기존 "적용단계") -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     ${workflow?.name || '-'}
                 </td>
@@ -4139,6 +4140,33 @@ function renderStudentTableRows(data) {
                             ? '-'
                             : '<span class="font-medium text-red-600">미배정</span>'
                     }
+                </td>
+
+                <!-- 다음단계 (신규 추가) -->
+                <td class="px-6 py-4 text-sm text-gray-900">
+                    ${(() => {
+                        // Case 1: 지도단계가 배정되지 않은 경우
+                        if (!item.thesisStageId || !workflow) {
+                            return '<span class="font-medium text-red-600">미배정</span>';
+                        }
+
+                        // Case 2: 현재단계가 없는 경우 (아직 시작 안함)
+                        if (!item.currentStageOrder || !item.currentStageName) {
+                            return '-';
+                        }
+
+                        // Case 3: 다음단계 찾기
+                        const nextStageOrder = item.currentStageOrder + 1;
+                        const nextStage = workflow.stages.find(s => s.order === nextStageOrder);
+
+                        // Case 4: 다음단계가 있으면 표시, 없으면 "완료"
+                        if (nextStage) {
+                            return nextStage.name;
+                        } else {
+                            // 마지막 단계인 경우
+                            return '<span class="text-blue-600">완료</span>';
+                        }
+                    })()}
                 </td>
             </tr>
         `;
