@@ -1,13 +1,13 @@
 // Phase 5: 심사 관리 - Mock Data
 
 // ==================== 현재 사용자 ====================
-// 테스트용 현재 로그인 사용자: P003 (김교수)
+// 테스트용 현재 로그인 사용자: P002 (이교수) - 위원장 권한으로 재심 결정 테스트
 if (!window.CURRENT_USER) {
     window.CURRENT_USER = {
-        id: 'P003',
-        name: '김교수',
-        department: '인공지능학과',
-        email: 'kim@university.ac.kr'
+        id: 'P002',
+        name: '이교수',
+        department: '컴퓨터공학과',
+        email: 'lee@university.ac.kr'
     };
 }
 
@@ -1018,6 +1018,63 @@ const REVIEW_ASSIGNMENTS = [
         status: '진행중',
 
         createdAt: '2025-11-14 09:30:00'
+    },
+    {
+        id: 'RA_TEST_CHAIR',
+        studentId: 'S_TEST',
+        studentName: '재심테스트',
+        studentNumber: '2024999',
+        major: '컴퓨터공학과',
+        degree: '석사',
+
+        submissionId: 'SUB_TEST',
+        submissionType: '본심사',
+        copyKiller: 95,
+        gptKiller: 93,
+        submissionDate: '2025-11-20',
+
+        advisorId: 'P001',
+        advisorName: '박교수',
+
+        thesisTitle: '빅데이터 분석을 통한 소비자 행동 예측 모델 개발 (테스트:위원장재심결정대기)',
+        thesisFile: {
+            name: '재심테스트_본심사_v1.pdf',
+            size: 3850000,
+            uploadedAt: '2025-11-20 15:30:00'
+        },
+
+        committee: [
+            {
+                id: 'C_TEST_001',
+                professorId: 'P002',
+                professorName: '이교수',
+                role: 'chair',
+                department: '컴퓨터공학과',
+                assignedDate: '2025-11-21'
+            },
+            {
+                id: 'C_TEST_002',
+                professorId: 'P003',
+                professorName: '김교수',
+                role: 'member',
+                department: '인공지능학과',
+                assignedDate: '2025-11-21'
+            },
+            {
+                id: 'C_TEST_003',
+                professorId: 'P004',
+                professorName: '정교수',
+                role: 'member',
+                department: '소프트웨어학과',
+                assignedDate: '2025-11-21'
+            }
+        ],
+
+        templateId: 'TMPL_FINAL',
+        dueDate: '2025-12-05',
+        status: '진행중',
+
+        createdAt: '2025-11-21 10:00:00'
     }
 ];
 
@@ -1675,6 +1732,105 @@ const REVIEW_EVALUATIONS = [
 
         status: '제출완료',
         submittedAt: '2025-11-03 09:15:00'
+    },
+    // RA_TEST_CHAIR (재심테스트 - 본심사) - 위원 평가 완료, 위원장 대기
+    {
+        id: 'EVAL_TEST_001',
+        assignmentId: 'RA_TEST_CHAIR',
+        committeeId: 'C_TEST_002',
+        professorId: 'P003',
+        professorName: '김교수',
+        role: 'member',
+
+        scores: [
+            {
+                categoryId: 'CAT201',
+                categoryName: '연구의 창의성',
+                score: 8,
+                maxScore: 10,
+                weight: 25,
+                comment: '연구 주제가 창의적이고 독창적임'
+            },
+            {
+                categoryId: 'CAT202',
+                categoryName: '연구 방법의 타당성',
+                score: 7,
+                maxScore: 10,
+                weight: 25,
+                comment: '연구 방법은 타당하나 일부 보완 필요'
+            },
+            {
+                categoryId: 'CAT203',
+                categoryName: '결과 해석의 적절성',
+                score: 8,
+                maxScore: 10,
+                weight: 25,
+                comment: '결과 해석이 적절함'
+            },
+            {
+                categoryId: 'CAT204',
+                categoryName: '논문의 완성도',
+                score: 8,
+                maxScore: 10,
+                weight: 25,
+                comment: '논문 완성도가 우수함'
+            }
+        ],
+
+        totalScore: 77.5,
+        overallComment: '전반적으로 우수한 연구임. 연구 방법론 일부 보완 권장.',
+
+        status: '제출완료',
+        submittedAt: '2025-11-25 14:30:00'
+    },
+    {
+        id: 'EVAL_TEST_002',
+        assignmentId: 'RA_TEST_CHAIR',
+        committeeId: 'C_TEST_003',
+        professorId: 'P004',
+        professorName: '정교수',
+        role: 'member',
+
+        scores: [
+            {
+                categoryId: 'CAT201',
+                categoryName: '연구의 창의성',
+                score: 8,
+                maxScore: 10,
+                weight: 25,
+                comment: '독창적인 접근 방법'
+            },
+            {
+                categoryId: 'CAT202',
+                categoryName: '연구 방법의 타당성',
+                score: 8,
+                maxScore: 10,
+                weight: 25,
+                comment: '연구 방법이 적절함'
+            },
+            {
+                categoryId: 'CAT203',
+                categoryName: '결과 해석의 적절성',
+                score: 7,
+                maxScore: 10,
+                weight: 25,
+                comment: '결과 해석은 양호하나 심화 분석 필요'
+            },
+            {
+                categoryId: 'CAT204',
+                categoryName: '논문의 완성도',
+                score: 9,
+                maxScore: 10,
+                weight: 25,
+                comment: '논문 완성도가 매우 우수함'
+            }
+        ],
+
+        totalScore: 80.0,
+        overallComment: '우수한 논문임. 결과 해석 부분 보완 시 탁월한 연구가 될 것으로 기대.',
+
+        status: '제출완료',
+        submittedAt: '2025-11-26 10:15:00'
     }
 ];
 
@@ -1883,15 +2039,85 @@ const REVIEW_RESULTS = [
         finalDecision: '합격',
         
         notifiedAt: '2025-11-17 16:05:00',
-        
+
         createdAt: '2025-11-17 15:00:00'
+    },
+    {
+        id: 'RESULT002',
+        assignmentId: 'RA003',
+
+        evaluations: ['EVAL004', 'EVAL005', 'EVAL006'],
+
+        averageScore: 75.5,
+
+        systemDecision: '합격',
+        systemDecisionReason: '평균 점수 75.5점으로 합격 기준 75점 이상',
+
+        chairDecision: '조건부합격',
+        chairComment: '연구 방법론 보완 필요. 지적 사항 수정 후 재심사 요청',
+        chairDecidedAt: '2025-11-18 14:00:00',
+        chairDecidedBy: 'P003',
+
+        // 위원장 최종 결정 첨부 파일
+        chairDecisionFiles: [],
+
+        // 재심 정보 (조건부합격일 때만 존재)
+        resubmission: {
+            required: true,
+            reviewerType: 'single',           // 'committee' or 'single'
+            reviewerId: 'P004',               // single일 경우 선택된 심사위원 ID
+            reviewerName: '이교수',           // single일 경우 심사위원 이름
+            evaluationTemplateId: 'TMPL_MID', // 선택된 평가표 ID
+            deadline: '2025-12-31 23:59',     // 재심 제출 마감일
+            attemptNumber: 1,                  // 재심 차수 (1차 재심)
+            status: 'pending',                // pending, submitted, completed
+            createdAt: '2025-11-18 14:00:00'
+        },
+
+        finalDecision: '조건부합격',
+
+        notifiedAt: '2025-11-18 14:05:00',
+
+        createdAt: '2025-11-18 13:00:00'
+    },
+    {
+        id: 'RESULT_TEST_CHAIR',
+        assignmentId: 'RA_TEST_CHAIR',
+
+        evaluations: ['EVAL_TEST_001', 'EVAL_TEST_002'],
+
+        averageScore: 78.0,
+
+        systemDecision: '합격',
+        systemDecisionReason: '평균 점수 78.0점으로 합격 기준 75점 이상',
+
+        // 위원장이 아직 결정하지 않음 (테스트용)
+        chairDecision: null,
+        chairComment: null,
+        chairDecidedAt: null,
+        chairDecidedBy: null,
+
+        chairDecisionFiles: [],
+
+        // 재심 정보는 위원장이 조건부합격 선택 시 추가됨
+        resubmission: null,
+
+        finalDecision: null,
+
+        notifiedAt: null,
+
+        createdAt: '2025-11-21 16:00:00'
     }
 ];
 
 // ==================== Service ====================
 class ReviewService {
-    // 현재 로그인한 교수 정보 (CURRENT_USER 사용)
+    // 현재 로그인한 교수 정보 (CURRENT_USER 또는 전역 currentProfessorId 사용)
     static getCurrentProfessorId() {
+        // 전역 currentProfessorId가 설정되어 있으면 사용
+        if (typeof window.currentProfessorId !== 'undefined' && window.currentProfessorId) {
+            return window.currentProfessorId;
+        }
         return window.CURRENT_USER ? window.CURRENT_USER.id : 'P002';
     }
     
