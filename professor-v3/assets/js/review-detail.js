@@ -2324,19 +2324,20 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
-                        <select id="resubmission-template-id" ${disabledAttr}
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="">평가표 선택</option>
-                            <!-- 평가표 목록은 동적으로 채워짐 -->
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
-                        <input type="datetime-local" id="resubmission-deadline" ${disabledAttr}
-                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
+                            <select id="resubmission-template-id" ${disabledAttr}
+                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option value="">평가표 선택</option>
+                                <!-- 평가표 목록은 동적으로 채워짐 -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
+                            <input type="date" id="resubmission-deadline" ${disabledAttr}
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -3217,19 +3218,20 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                         </div>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
-                        <select id="resubmission-template-id" ${disabledAttr}
-                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                            <option value="">평가표 선택</option>
-                            <!-- 평가표 목록은 동적으로 채워짐 -->
-                        </select>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
-                        <input type="datetime-local" id="resubmission-deadline" ${disabledAttr}
-                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
+                            <select id="resubmission-template-id" ${disabledAttr}
+                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option value="">평가표 선택</option>
+                                <!-- 평가표 목록은 동적으로 채워짐 -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
+                            <input type="date" id="resubmission-deadline" ${disabledAttr}
+                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4039,7 +4041,7 @@ function submitChairDecision() {
             reviewerId: reviewerId,
             reviewerName: reviewerName,
             evaluationTemplateId: templateId.value,
-            deadline: deadline.value.replace('T', ' ') + ':00',
+            deadline: deadline.value + ' 23:59:00',  // date 형식(YYYY-MM-DD)에 시간 추가
             attemptNumber: 1,
             status: 'pending',
             createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
