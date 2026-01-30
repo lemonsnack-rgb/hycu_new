@@ -2300,24 +2300,21 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                     <h5 class="font-semibold text-gray-800 mb-3">재심 정보</h5>
 
                     <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 심사위원 *</label>
-                        <div class="space-y-2">
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">재심 심사위원 *</label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="committee"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr}
-                                       class="mr-2">
-                                <span class="text-sm">심사위원회 (전체)</span>
+                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                <span class="text-sm whitespace-nowrap">심사위원회 (전체)</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="single"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr}
-                                       class="mr-2">
-                                <span class="text-sm">심사위원회 중 1인</span>
+                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                <span class="text-sm whitespace-nowrap">심사위원회 중 1인</span>
                             </label>
-                        </div>
-                        <div id="single-reviewer-select" class="mt-2" style="display: none;">
                             <select id="resubmission-reviewer-id" ${disabledAttr}
-                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                    class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+                                    style="display: none;">
                                 <option value="">심사위원 선택</option>
                                 <!-- 심사위원 목록은 동적으로 채워짐 -->
                             </select>
@@ -3084,64 +3081,6 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
 
     html += `</div>`;
 
-    // 평균 점수 및 시스템 판정 - 항상 표시
-    if (allSubmitted) {
-        // 모든 평가 완료: 실제 평균 및 판정 계산
-        const avgScore = detail.allEvaluations.reduce((sum, e) => {
-            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + (sc.weightedScore || sc.score || 0), 0) : 0;
-            return sum + totalScore;
-        }, 0) / detail.allEvaluations.length;
-
-        const passedCount = detail.allEvaluations.filter(e => {
-            const totalScore = e.scores ? e.scores.reduce((s, sc) => s + (sc.weightedScore || sc.score || 0), 0) : 0;
-            return totalScore >= PASS_THRESHOLD;
-        }).length;
-
-        const allPassed = passedCount === detail.allEvaluations.length;
-        const systemDecision = allPassed ? '통과' : '불통과';
-
-        html += `
-            <div class="bg-[#FAF6F1] border-2 border-[#E8DED2] rounded-lg p-4 mb-6">
-                <div class="flex justify-between items-center mb-3">
-                    <p class="font-bold text-[#5C4A33]">전체 평균 점수</p>
-                    <p class="text-2xl font-bold text-[#6A0028]">${avgScore.toFixed(1)}점</p>
-                </div>
-                <div class="flex justify-between items-center pt-3 border-t border-[#E8DED2]">
-                    <p class="font-bold text-[#5C4A33]">시스템 판정 결과</p>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-600">(${passedCount}/${detail.allEvaluations.length}명 통과)</span>
-                        <span class="inline-block px-4 py-2 rounded-lg font-bold ${
-                            systemDecision === '통과'
-                                ? 'bg-green-100 text-green-700 border border-green-300'
-                                : 'bg-red-100 text-red-700 border border-red-300'
-                        }">
-                            ${systemDecision === '통과' ? '✓ 통과' : '✗ 불통과'}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        `;
-    } else {
-        // 평가 대기 중: 안내 메시지
-        html += `
-            <div class="bg-gray-50 border border-gray-300 rounded-lg p-4 mb-6">
-                <div class="flex justify-between items-center mb-3">
-                    <p class="font-bold text-gray-700">전체 평균 점수</p>
-                    <p class="text-2xl font-bold text-gray-500">-</p>
-                </div>
-                <div class="flex justify-between items-center pt-3 border-t border-gray-300">
-                    <p class="font-bold text-gray-700">시스템 판정 결과</p>
-                    <div class="flex items-center gap-2">
-                        <span class="text-sm text-gray-600">(${detail.allEvaluations.length}/${detail.assignment.committee.length}명 평가 완료)</span>
-                        <span class="inline-block px-4 py-2 rounded-lg font-bold bg-gray-100 text-gray-500 border border-gray-300">
-                            평가 대기
-                        </span>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     // 최종심사평 파일은 각 교수별 종합의견 하단에 표시됨 (별도 영역 불필요)
 
     // 최종 승인 영역 - 항상 표시 (평가 미완료 시 또는 제출 후 비활성화)
@@ -3194,24 +3133,21 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                     <h5 class="font-semibold text-gray-800 mb-3">재심 정보</h5>
 
                     <div class="mb-3">
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 심사위원 *</label>
-                        <div class="space-y-2">
+                        <div class="flex items-center gap-4">
+                            <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">재심 심사위원 *</label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="committee"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr}
-                                       class="mr-2">
-                                <span class="text-sm">심사위원회 (전체)</span>
+                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                <span class="text-sm whitespace-nowrap">심사위원회 (전체)</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="single"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr}
-                                       class="mr-2">
-                                <span class="text-sm">심사위원회 중 1인</span>
+                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                <span class="text-sm whitespace-nowrap">심사위원회 중 1인</span>
                             </label>
-                        </div>
-                        <div id="single-reviewer-select" class="mt-2" style="display: none;">
                             <select id="resubmission-reviewer-id" ${disabledAttr}
-                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                    class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
+                                    style="display: none;">
                                 <option value="">심사위원 선택</option>
                                 <!-- 심사위원 목록은 동적으로 채워짐 -->
                             </select>
@@ -3975,13 +3911,13 @@ function populateResubmissionOptions() {
  */
 function toggleReviewerSelect() {
     const reviewerType = document.querySelector('input[name="resubmission-reviewer-type"]:checked');
-    const singleReviewerSelect = document.getElementById('single-reviewer-select');
+    const reviewerSelect = document.getElementById('resubmission-reviewer-id');
 
-    if (reviewerType && singleReviewerSelect) {
+    if (reviewerType && reviewerSelect) {
         if (reviewerType.value === 'single') {
-            singleReviewerSelect.style.display = 'block';
+            reviewerSelect.style.display = 'block';
         } else {
-            singleReviewerSelect.style.display = 'none';
+            reviewerSelect.style.display = 'none';
         }
     }
 }
