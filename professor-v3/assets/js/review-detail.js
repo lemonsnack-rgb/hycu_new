@@ -69,7 +69,14 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
 
     // SAVED_REVIEWS에서 저장된 데이터 로드 (척도형/서술형 평가용)
     // 현재 로그인한 교수 ID (실제로는 세션에서 가져와야 하지만, 여기서는 Mock 데이터 사용)
-    currentProfessorId = detail.myProfessorId || 'P001'; // Mock: 기본값 P001 (전역 변수에 저장)
+    // currentProfessorId가 이미 설정되어 있으면 유지 (제출 후 재렌더링 시)
+    console.log('🔍 currentProfessorId before:', currentProfessorId);
+    if (!currentProfessorId) {
+        currentProfessorId = ReviewService.getCurrentProfessorId();
+        console.log('🔍 currentProfessorId set to:', currentProfessorId);
+    } else {
+        console.log('🔍 currentProfessorId already set, keeping:', currentProfessorId);
+    }
     const savedReview = loadSavedReview(assignmentId, currentProfessorId);
 
     // savedReview가 있으면 사용, 없으면 기존 myEvaluation 사용
@@ -4056,11 +4063,20 @@ function submitChairDecision() {
         console.log('✅ REVIEW_RESULTS 신규 추가:', newResult);
     }
 
+    console.log('✅ submitChairDecision: 저장 완료, 재렌더링 시작');
     showToast('최종 결정이 제출되었습니다.', 'success');
 
     // 화면 재렌더링
     setTimeout(() => {
-        renderReviewDetail(currentAssignmentId, 'chair', false);
+        console.log('⏰ setTimeout: renderReviewDetail 호출 시작');
+        console.log('  currentAssignmentId:', currentAssignmentId);
+        console.log('  currentProfessorId:', currentProfessorId);
+        try {
+            renderReviewDetail(currentAssignmentId, 'chair', false);
+            console.log('✅ setTimeout: renderReviewDetail 호출 완료');
+        } catch (e) {
+            console.error('❌ setTimeout: renderReviewDetail 오류:', e);
+        }
     }, 1000);
 }
 
