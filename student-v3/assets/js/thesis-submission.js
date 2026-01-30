@@ -79,21 +79,6 @@ const thesisSubmissions = [
             evaluationTemplateName: '본심사 평가표'
         },
         evaluationFormRegistered: true
-    },
-    {
-        id: 4,
-        stage: 'main',
-        stageName: '본심사',
-        attemptNumber: 2,
-        advisorName: '홍길동 교수',
-        submissionPeriod: {
-            start: '2025-06-01',
-            end: '2025-06-30'
-        },
-        status: 'not_submitted',
-        reviewResult: null,
-        submittedData: null,
-        evaluationFormRegistered: true
     }
 ];
 
@@ -177,6 +162,11 @@ function setupThesisEventDelegation() {
                 if (fileInput) {
                     fileInput.click();
                 }
+            } else if (action === 'show-review-comments') {
+                e.preventDefault();
+                e.stopPropagation();
+                const comments = target.getAttribute('data-comments');
+                showReviewCommentsModal(comments);
             } else {
                 console.log('알 수 없는 버튼 클릭, action:', action, 'target:', target);
             }
@@ -216,9 +206,32 @@ function renderThesisScreen() {
     console.log('화면 렌더링 완료');
 }
 
+/**
+ * 각 단계(stage)별로 가장 최신 제출(attemptNumber가 가장 큰 것)만 반환
+ * 재심이 있어도 한 단계당 하나의 행만 표시하기 위함
+ */
+function getLatestSubmissionPerStage(allSubmissions) {
+    const stageMap = new Map();
+
+    allSubmissions.forEach(submission => {
+        // 평가표 미등록 제출은 제외
+        if (!submission.evaluationFormRegistered) return;
+
+        const existing = stageMap.get(submission.stage);
+
+        // 해당 stage의 submission이 없거나,
+        // 현재 submission의 attemptNumber가 더 크면 업데이트
+        if (!existing || submission.attemptNumber > existing.attemptNumber) {
+            stageMap.set(submission.stage, submission);
+        }
+    });
+
+    return Array.from(stageMap.values());
+}
+
 // 목록 화면
 function renderThesisListScreen() {
-    const submissions = thesisSubmissions.filter(s => s.evaluationFormRegistered);
+    const submissions = getLatestSubmissionPerStage(thesisSubmissions);
 
     return `
         <div class="bg-white rounded-lg shadow-md">
@@ -233,8 +246,9 @@ function renderThesisListScreen() {
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">심사단계</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">지도단계</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">제출기간</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">제출구분</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">제출상태</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">심사결과</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">관리</th>
@@ -260,18 +274,18 @@ function renderThesisListScreen() {
 
 // 목록 행 렌더링
 function renderThesisListRow(submission, index) {
-    const stageDisplay = submission.attemptNumber > 1
-        ? `${submission.stageName} (${submission.attemptNumber}차)`
-        : submission.stageName;
+    // 지도단계명 (attemptNumber 제거)
+    const stageDisplay = submission.stageName;
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
 
-    // 상태 텍스트
+    // 제출구분 (신규 추가)
+    const submissionType = `${submission.attemptNumber}차 제출`;
+
+    // 상태 텍스트 (재심도 미제출로 표시)
     let statusText = '미제출';
     if (submission.status === 'submitted') {
         statusText = '제출완료';
-    } else if (submission.status === 'resubmit') {
-        statusText = '재심 제출';
     }
 
     // 심사 결과 텍스트
@@ -284,13 +298,11 @@ function renderThesisListRow(submission, index) {
         resultText = '조건부합격';
     }
 
-    // 액션 버튼
+    // 액션 버튼 (재심 구분 제거)
     let actionButton;
     if (submission.status === 'submitted') {
         actionButton = `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`;
-    } else if (submission.status === 'resubmit') {
-        actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">재심 제출</button>`;
-    } else {
+    } else {  // not_submitted 또는 resubmit
         actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
     }
 
@@ -299,6 +311,7 @@ function renderThesisListRow(submission, index) {
             <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${stageDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submissionType}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${statusText}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${resultText}</td>
             <td class="px-6 py-3 text-center">${actionButton}</td>
@@ -344,6 +357,25 @@ function renderThesisSubmissionForm() {
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
 
+    // 심사명 계산
+    // 재심 대기 상태면 재제출 차수 사용, 아니면 현재 차수 사용
+    const currentAttempt = (isResubmit && submission.resubmission)
+        ? submission.resubmission.attemptNumber
+        : submission.attemptNumber;
+
+    let examName;
+    if (currentAttempt === 1) {
+        examName = '심사';
+    } else if (currentAttempt === 2) {
+        examName = '재심';
+    } else if (currentAttempt === 3) {
+        examName = '2차 재심';
+    } else if (currentAttempt === 4) {
+        examName = '3차 재심';
+    } else {
+        examName = '재심 횟수 초과';
+    }
+
     let html = `
         <div class="mb-4">
             <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
@@ -358,30 +390,60 @@ function renderThesisSubmissionForm() {
     // 재심 제출인 경우: 기존 제출 내역 표시 (읽기 전용)
     if (isResubmit) {
         const orig = submission.originalSubmission;
+        const hasComments = orig.reviewComments && orig.reviewComments.trim() !== '';
+
         html += `
             <div class="bg-gray-50 border border-gray-300 rounded-lg p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역</h3>
                 <div class="space-y-3">
+                    <!-- 지도교수 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">지도교수</label>
+                        <input type="text" value="${submission.advisorName}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 심사단계 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
+                        <input type="text" value="${submission.stageName} (${submission.attemptNumber}차)" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 논문 제목 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목</label>
+                        <input type="text" value="${orig.title}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 첨부파일 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">첨부파일</label>
+                        <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-900">${orig.fileName}</span>
+                            <span class="text-xs text-gray-500">(${(orig.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                        </div>
+                    </div>
+
+                    <!-- border-t 구분선 -->
+                    <div class="border-t pt-3 mt-3"></div>
+
+                    <!-- 제출일시 -->
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출일시</label>
                         <div class="text-sm text-gray-900">${orig.submittedAt}</div>
                     </div>
+                    <!-- 평가 결과 -->
                     <div class="flex items-center gap-4">
-                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목</label>
-                        <div class="text-sm text-gray-900">${orig.title}</div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출 파일</label>
-                        <div class="text-sm text-gray-900">${orig.fileName} (${(orig.fileSize / 1024 / 1024).toFixed(2)} MB)</div>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사 결과</label>
-                        <span class="text-sm font-medium text-yellow-700">조건부합격</span>
-                    </div>
-                    <div class="flex gap-4">
-                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사 의견</label>
-                        <div class="flex-1 text-sm text-gray-900 bg-white border border-gray-200 rounded p-3">
-                            ${orig.reviewComments || '-'}
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">평가 결과</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-yellow-700">조건부합격</span>
+                            <button type="button" data-action="show-review-comments" data-comments="${(orig.reviewComments || '').replace(/"/g, '&quot;')}"
+                                    class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
+                                총평 보기
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -392,27 +454,13 @@ function renderThesisSubmissionForm() {
     // 재심 제출 또는 신규 제출 폼
     html += `
         <div class="bg-white rounded-lg shadow-md p-6">
-            ${isResubmit ? `
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">재심 논문 제출</h3>
-                <div class="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-md">
-                    <div class="flex items-start gap-2">
-                        <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <div class="text-sm text-yellow-800">
-                            <p class="font-medium">재심 제출 안내</p>
-                            <p class="mt-1">재심 심사위원: ${submission.resubmission.reviewerName || '심사위원회'}</p>
-                            <p>재심 제출 마감일: ${submission.resubmission.deadline}</p>
-                        </div>
-                    </div>
-                </div>
-            ` : ''}
-
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">논문 제출 정보</h3>
             <div class="space-y-4">
                 <!-- 지도교수명 출력 (읽기 전용) -->
-                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">지도교수</label>
-                    <div class="flex-1 text-sm text-gray-900 font-medium">${submission.advisorName || '홍길동 교수'}</div>
+                    <input type="text" value="${submission.advisorName || '홍길동 교수'}" readonly
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
                 <!-- 심사단계 -->
@@ -424,7 +472,7 @@ function renderThesisSubmissionForm() {
 
                 <!-- 논문제목 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">${isResubmit ? '재심 논문 제목 *' : '논문 제목 *'}</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목 *</label>
                     <input type="text" id="thesis-title" value="${data.title || ''}"
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
                            placeholder="논문 제목을 입력하세요">
@@ -432,8 +480,8 @@ function renderThesisSubmissionForm() {
 
                 <!-- 파일업로드 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">${isResubmit ? '재심 논문 파일 *' : '파일 업로드 *'}</label>
-                    <div class="flex-1 flex items-center gap-3">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">파일 업로드 *</label>
+                    <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 rounded-md bg-gray-50">
                         <input type="file" id="thesis-file" class="hidden" accept=".pdf">
                         <button type="button" data-action="select-file"
                                 class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
@@ -465,7 +513,7 @@ function renderThesisSubmissionForm() {
                     </button>
                     <button data-action="save-thesis"
                             class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
-                        ${isResubmit ? '재심 제출하기' : isEdit ? '저장' : '제출하기'}
+                        ${isEdit ? '저장' : '제출하기'}
                     </button>
                 </div>
             </div>
@@ -484,6 +532,16 @@ function renderThesisDetailView() {
     const stageDisplay = submission.attemptNumber > 1
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
+
+    // 평가 결과 텍스트 계산
+    let reviewResultText = '-';
+    if (submission.reviewResult === 'pass') {
+        reviewResultText = '합격';
+    } else if (submission.reviewResult === 'fail') {
+        reviewResultText = '불합격';
+    } else if (submission.reviewResult === 'conditional') {
+        reviewResultText = '조건부합격';
+    }
 
     return `
         <div class="mb-4">
@@ -506,27 +564,30 @@ function renderThesisDetailView() {
 
             <div class="space-y-4">
                 <!-- 지도교수명 출력 (읽기 전용) -->
-                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+                <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">지도교수</label>
-                    <div class="flex-1 text-sm text-gray-900 font-medium">${submission.advisorName || '홍길동 교수'}</div>
+                    <input type="text" value="${submission.advisorName || '홍길동 교수'}" readonly
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
                 <!-- 심사단계 -->
                 <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
-                    <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${stageDisplay}</div>
+                    <input type="text" value="${stageDisplay}" readonly
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
                 <!-- 논문제목 -->
                 <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목</label>
-                    <div class="flex-1 px-3 py-1.5 bg-gray-50 rounded-md text-sm text-gray-900">${data.title}</div>
+                    <input type="text" value="${data.title}" readonly
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
                 <!-- 첨부파일 -->
                 <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">첨부파일</label>
-                    <div class="flex-1 flex items-center gap-3 px-3 py-1.5 bg-gray-50 rounded-md">
+                    <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
                         <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                   d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
@@ -536,19 +597,29 @@ function renderThesisDetailView() {
                         <button class="ml-auto text-sm text-[#6A0028] hover:text-[#8A0034]">다운로드</button>
                     </div>
                 </div>
+            </div>
 
-                <!-- 제출 정보 -->
-                <div class="border-t pt-4">
-                    <label class="block text-sm font-medium text-gray-700 mb-2">제출 정보</label>
-                    <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <span class="text-xs text-gray-500">제출일시</span>
-                            <div class="text-sm text-gray-900 mt-1">${data.submittedAt}</div>
-                        </div>
-                        <div>
-                            <span class="text-xs text-gray-500">제출상태</span>
-                            <div class="text-sm text-gray-900 mt-1">제출완료</div>
-                        </div>
+            <!-- border-t 구분선 -->
+            <div class="border-t pt-4 mt-6"></div>
+
+            <!-- 하단: 제출정보 -->
+            <div class="space-y-3">
+                <!-- 제출일시 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출일시</label>
+                    <div class="text-sm text-gray-900">${data.submittedAt}</div>
+                </div>
+
+                <!-- 평가 결과 + 총평 보기 버튼 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">평가 결과</label>
+                    <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-green-700">${reviewResultText}</span>
+                        <button type="button" data-action="show-review-comments"
+                                data-comments="${(submission.reviewComments || '').replace(/"/g, '&quot;')}"
+                                class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
+                            총평 보기
+                        </button>
                     </div>
                 </div>
             </div>
@@ -689,6 +760,47 @@ function saveThesisSubmission() {
     document.head.appendChild(style);
 })();
 
+// 총평 보기 모달 표시
+function showReviewCommentsModal(comments) {
+    if (!comments || comments.trim() === '') {
+        alert('평가 의견이 없습니다.');
+        return;
+    }
+
+    // 모달 HTML 생성
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">평가 총평</h3>
+                <button data-action="close-modal" class="text-gray-400 hover:text-gray-600">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="border border-gray-200 rounded-md p-4 bg-gray-50">
+                <p class="text-sm text-gray-900 whitespace-pre-wrap">${comments}</p>
+            </div>
+            <div class="mt-6 flex justify-end">
+                <button data-action="close-modal" class="px-4 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
+                    닫기
+                </button>
+            </div>
+        </div>
+    `;
+
+    // 모달 닫기 이벤트
+    modal.addEventListener('click', function(e) {
+        if (e.target.getAttribute('data-action') === 'close-modal' || e.target === modal) {
+            document.body.removeChild(modal);
+        }
+    });
+
+    document.body.appendChild(modal);
+}
+
 // 전역 함수 등록
 window.submitThesis = submitThesis;
 window.viewThesisSubmission = viewThesisSubmission;
@@ -696,3 +808,4 @@ window.backToThesisList = backToThesisList;
 window.editThesisSubmission = editThesisSubmission;
 window.handleFileSelect = handleFileSelect;
 window.saveThesisSubmission = saveThesisSubmission;
+window.showReviewCommentsModal = showReviewCommentsModal;
