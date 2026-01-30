@@ -401,6 +401,23 @@ function renderJournalSubmissionForm(isViewMode = false) {
     if (isResubmit) {
         const orig = submission.originalSubmission;
 
+        // 학술지 구분 텍스트 변환
+        const journalTypeText = {
+            'KCI': 'KCI 등재(후보지)',
+            'SCI_SSCI_AHCI': 'SCI/SSCI/A&HCI',
+            'SCIE': 'SCIE',
+            'SCOPUS': 'SCOPUS',
+            'DOMESTIC': '기타(국내)',
+            'INTERNATIONAL': '기타(국외)'
+        }[orig.journalType] || orig.journalType;
+
+        // 증빙서류 텍스트 변환
+        const proofDocText = {
+            'confirmation': '논문게재 확인서',
+            'scheduled': '논문게재 예정증명서',
+            'published': '학술지 게재본'
+        }[orig.proofDocType] || orig.proofDocType;
+
         html += `
             <div class="bg-gray-50 border border-gray-300 rounded-lg p-6 mb-6">
                 <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역</h3>
@@ -415,6 +432,54 @@ function renderJournalSubmissionForm(isViewMode = false) {
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문제목(한글)</label>
                         <input type="text" value="${orig.titleKorean}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 저자명(전체) -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">저자명(전체)</label>
+                        <input type="text" value="${orig.authors}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 학술지명 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">학술지명</label>
+                        <input type="text" value="${orig.journalName}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 학술지 구분 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">학술지 구분</label>
+                        <input type="text" value="${journalTypeText}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 발행기관 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">발행기관</label>
+                        <input type="text" value="${orig.publisher}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 집/권/호 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">집/권/호</label>
+                        <input type="text" value="${orig.volumeIssue}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 발행년월일 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">발행년월일</label>
+                        <input type="text" value="${orig.publishDate}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 수록 Page -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">수록 Page</label>
+                        <input type="text" value="${orig.pages}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 증빙서류 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">증빙서류</label>
+                        <input type="text" value="${proofDocText}" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
                     <!-- 첨부파일 -->
