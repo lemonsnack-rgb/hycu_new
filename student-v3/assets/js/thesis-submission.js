@@ -55,14 +55,28 @@ const thesisSubmissions = [
             start: '2025-05-01',
             end: '2025-05-31'
         },
-        status: 'submitted',
-        reviewResult: 'fail',
-        submittedData: {
+        status: 'resubmit',  // 재심 제출 필요
+        reviewResult: 'conditional',  // 조건부합격
+        submittedData: null,  // 재심 제출 전이므로 null
+        // 1차 제출 원본 데이터
+        originalSubmission: {
             title: 'AI 기반 추천 시스템 연구',
             desiredExamDate: '2025-05-20',
             fileName: 'final_thesis_v1.pdf',
             fileSize: 4500000,
-            submittedAt: '2025-05-10 16:45'
+            submittedAt: '2025-05-10 16:45',
+            reviewResult: 'conditional',
+            reviewComments: '연구 방법론 보완 필요. 데이터 분석 부분을 더 상세히 작성하세요.'
+        },
+        // 재심 정보
+        resubmission: {
+            required: true,
+            deadline: '2025-12-31 23:59',
+            attemptNumber: 2,  // 2차 제출
+            status: 'pending',  // pending: 재심 대기, submitted: 재심 제출 완료
+            reviewerType: 'single',
+            reviewerName: '이교수',
+            evaluationTemplateName: '본심사 평가표'
         },
         evaluationFormRegistered: true
     },
@@ -252,19 +266,33 @@ function renderThesisListRow(submission, index) {
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
 
-    // 배지 대신 텍스트로 표시
-    const statusText = submission.status === 'submitted' ? '제출완료' : '미제출';
+    // 상태 텍스트
+    let statusText = '미제출';
+    if (submission.status === 'submitted') {
+        statusText = '제출완료';
+    } else if (submission.status === 'resubmit') {
+        statusText = '재심 제출';
+    }
 
+    // 심사 결과 텍스트
     let resultText = '-';
     if (submission.reviewResult === 'pass') {
         resultText = '합격';
     } else if (submission.reviewResult === 'fail') {
         resultText = '불합격';
+    } else if (submission.reviewResult === 'conditional') {
+        resultText = '조건부합격';
     }
 
-    const actionButton = submission.status === 'submitted'
-        ? `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`
-        : `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
+    // 액션 버튼
+    let actionButton;
+    if (submission.status === 'submitted') {
+        actionButton = `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`;
+    } else if (submission.status === 'resubmit') {
+        actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">재심 제출</button>`;
+    } else {
+        actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
+    }
 
     return `
         <tr class="hover:bg-gray-50">
@@ -308,6 +336,7 @@ function renderThesisSubmissionForm() {
     const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
     if (!submission) return '';
 
+    const isResubmit = submission.status === 'resubmit' && submission.originalSubmission;
     const isEdit = submission.status === 'submitted';
     const data = isEdit ? submission.submittedData : {};
 
@@ -315,7 +344,7 @@ function renderThesisSubmissionForm() {
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
 
-    return `
+    let html = `
         <div class="mb-4">
             <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -324,8 +353,61 @@ function renderThesisSubmissionForm() {
                 목록으로
             </button>
         </div>
+    `;
 
+    // 재심 제출인 경우: 기존 제출 내역 표시 (읽기 전용)
+    if (isResubmit) {
+        const orig = submission.originalSubmission;
+        html += `
+            <div class="bg-gray-50 border border-gray-300 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역</h3>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출일시</label>
+                        <div class="text-sm text-gray-900">${orig.submittedAt}</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목</label>
+                        <div class="text-sm text-gray-900">${orig.title}</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출 파일</label>
+                        <div class="text-sm text-gray-900">${orig.fileName} (${(orig.fileSize / 1024 / 1024).toFixed(2)} MB)</div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사 결과</label>
+                        <span class="text-sm font-medium text-yellow-700">조건부합격</span>
+                    </div>
+                    <div class="flex gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사 의견</label>
+                        <div class="flex-1 text-sm text-gray-900 bg-white border border-gray-200 rounded p-3">
+                            ${orig.reviewComments || '-'}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 재심 제출 또는 신규 제출 폼
+    html += `
         <div class="bg-white rounded-lg shadow-md p-6">
+            ${isResubmit ? `
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">재심 논문 제출</h3>
+                <div class="mb-4 p-3 bg-yellow-50 border border-yellow-300 rounded-md">
+                    <div class="flex items-start gap-2">
+                        <svg class="w-5 h-5 text-yellow-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <div class="text-sm text-yellow-800">
+                            <p class="font-medium">재심 제출 안내</p>
+                            <p class="mt-1">재심 심사위원: ${submission.resubmission.reviewerName || '심사위원회'}</p>
+                            <p>재심 제출 마감일: ${submission.resubmission.deadline}</p>
+                        </div>
+                    </div>
+                </div>
+            ` : ''}
+
             <div class="space-y-4">
                 <!-- 지도교수명 출력 (읽기 전용) -->
                 <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
@@ -342,7 +424,7 @@ function renderThesisSubmissionForm() {
 
                 <!-- 논문제목 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목 *</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">${isResubmit ? '재심 논문 제목 *' : '논문 제목 *'}</label>
                     <input type="text" id="thesis-title" value="${data.title || ''}"
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
                            placeholder="논문 제목을 입력하세요">
@@ -350,7 +432,7 @@ function renderThesisSubmissionForm() {
 
                 <!-- 파일업로드 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">파일 업로드 *</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">${isResubmit ? '재심 논문 파일 *' : '파일 업로드 *'}</label>
                     <div class="flex-1 flex items-center gap-3">
                         <input type="file" id="thesis-file" class="hidden" accept=".pdf">
                         <button type="button" data-action="select-file"
@@ -383,12 +465,14 @@ function renderThesisSubmissionForm() {
                     </button>
                     <button data-action="save-thesis"
                             class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
-                        ${isEdit ? '저장' : '제출하기'}
+                        ${isResubmit ? '재심 제출하기' : isEdit ? '저장' : '제출하기'}
                     </button>
                 </div>
             </div>
         </div>
     `;
+
+    return html;
 }
 
 // 상세/보기 화면
@@ -504,6 +588,7 @@ function saveThesisSubmission() {
 
     const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
     const isEdit = submission.status === 'submitted';
+    const isResubmit = submission.status === 'resubmit';
 
     if (!title) {
         alert('논문 제목을 입력해주세요.');
@@ -515,27 +600,50 @@ function saveThesisSubmission() {
         return;
     }
 
-    const confirmMessage = isEdit ? '논문을 수정하시겠습니까?' : '논문을 제출하시겠습니까?';
+    const confirmMessage = isResubmit ? '재심 논문을 제출하시겠습니까?' : isEdit ? '논문을 수정하시겠습니까?' : '논문을 제출하시겠습니까?';
     if (confirm(confirmMessage)) {
-        // 실제로는 서버로 전송
-        submission.status = 'submitted';
-        submission.submittedData = {
-            title: title,
-            fileName: file ? file.name : submission.submittedData.fileName,
-            fileSize: file ? file.size : submission.submittedData.fileSize,
-            submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit',
-                hour12: false
-            }).replace(/\. /g, '-').replace('.', '')
-        };
+        if (isResubmit) {
+            // 재심 제출 처리
+            submission.status = 'submitted';
+            submission.submittedData = {
+                title: title,
+                fileName: file ? file.name : 'resubmission.pdf',
+                fileSize: file ? file.size : 0,
+                submittedAt: new Date().toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).replace(/\. /g, '-').replace('.', '')
+            };
+            submission.resubmission.status = 'submitted';
+            submission.reviewResult = null;  // 재심 결과 대기
 
-        console.log('논문 저장:', submission);
+            console.log('재심 논문 제출:', submission);
+            alert('재심 논문이 제출되었습니다.');
+        } else {
+            // 일반 제출 또는 수정 처리
+            submission.status = 'submitted';
+            submission.submittedData = {
+                title: title,
+                fileName: file ? file.name : submission.submittedData.fileName,
+                fileSize: file ? file.size : submission.submittedData.fileSize,
+                submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
+                }).replace(/\. /g, '-').replace('.', '')
+            };
 
-        alert(isEdit ? '논문이 수정되었습니다.' : '논문이 제출되었습니다.');
+            console.log('논문 저장:', submission);
+            alert(isEdit ? '논문이 수정되었습니다.' : '논문이 제출되었습니다.');
+        }
+
         backToThesisList();
     }
 }
