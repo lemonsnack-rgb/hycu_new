@@ -372,10 +372,11 @@ function openReviewDetail(assignmentId, viewType) {
         console.log('🔍 openReviewDetail - assignmentId:', assignmentId, 'viewType:', viewType);
         console.log('🔍 renderReviewDetail function:', typeof window.renderReviewDetail);
         console.log('🔍 review-detail-screen exists:', !!document.getElementById('review-detail-screen'));
-        console.log('🔍 review-detail-content exists:', !!document.getElementById('review-detail-content'));
 
-        const contentContainer = document.getElementById('review-detail-content');
-        console.log('🔍 Content container:', contentContainer);
+        // IMPORTANT: 모달 안의 review-detail-content를 정확히 선택
+        const detailScreenElement = document.getElementById('review-detail-screen');
+        const contentContainer = detailScreenElement ? detailScreenElement.querySelector('#review-detail-content') : null;
+        console.log('🔍 Content container (from modal):', contentContainer);
 
         if (typeof window.renderReviewDetail === 'function') {
             console.log('✅ Calling renderReviewDetail...');

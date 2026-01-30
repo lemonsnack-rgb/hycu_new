@@ -45,8 +45,19 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
         return;
     }
 
-    const container = document.getElementById('review-detail-content');
-    console.log('🎯 Container element:', container);
+    // IMPORTANT: 모달 안의 container를 우선적으로 선택
+    let container = null;
+    const modalScreen = document.getElementById('review-detail-screen');
+    if (modalScreen) {
+        container = modalScreen.querySelector('#review-detail-content');
+        console.log('🎯 Using container from modal:', container);
+    }
+
+    // 모달이 없으면 페이지의 container 사용 (fallback)
+    if (!container) {
+        container = document.getElementById('review-detail-content');
+        console.log('🎯 Using container from page (fallback):', container);
+    }
 
     if (!container) {
         console.error('❌ Container #review-detail-content not found!');
@@ -64,7 +75,9 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
     // savedReview가 있으면 사용, 없으면 기존 myEvaluation 사용
     const myEval = savedReview || detail.myEvaluation;
     const isSubmitted = myEval && myEval.status === '제출완료';
-    const allSubmitted = detail.allEvaluations.length === detail.assignment.committee.length &&
+    // 위원장을 제외한 심사위원 수 (위원장은 평가하지 않고 최종 결정만 내림)
+    const memberCount = detail.assignment.committee.filter(m => m.role !== 'chair').length;
+    const allSubmitted = detail.allEvaluations.length === memberCount &&
                          detail.allEvaluations.every(e => e.status === '제출완료');
 
     let html = '';
@@ -2281,6 +2294,53 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                 </div>
             </div>
 
+            <!-- 재심 정보 입력 영역 (조건부합격 선택 시에만 표시) -->
+            <div id="resubmission-info-section" class="mb-4" style="display: none;">
+                <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                    <h5 class="font-semibold text-gray-800 mb-3">재심 정보</h5>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 심사위원 *</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="resubmission-reviewer-type" value="committee"
+                                       onchange="toggleReviewerSelect()" ${disabledAttr}
+                                       class="mr-2">
+                                <span class="text-sm">심사위원회 (전체)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="resubmission-reviewer-type" value="single"
+                                       onchange="toggleReviewerSelect()" ${disabledAttr}
+                                       class="mr-2">
+                                <span class="text-sm">심사위원회 중 1인</span>
+                            </label>
+                        </div>
+                        <div id="single-reviewer-select" class="mt-2" style="display: none;">
+                            <select id="resubmission-reviewer-id" ${disabledAttr}
+                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option value="">심사위원 선택</option>
+                                <!-- 심사위원 목록은 동적으로 채워짐 -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
+                        <select id="resubmission-template-id" ${disabledAttr}
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option value="">평가표 선택</option>
+                            <!-- 평가표 목록은 동적으로 채워짐 -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
+                        <input type="datetime-local" id="resubmission-deadline" ${disabledAttr}
+                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    </div>
+                </div>
+            </div>
+
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
                 <textarea id="chair-final-comment" rows="4" ${disabledAttr}
@@ -3127,6 +3187,53 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                 </div>
             </div>
 
+            <!-- 재심 정보 입력 영역 (조건부합격 선택 시에만 표시) -->
+            <div id="resubmission-info-section" class="mb-4" style="display: none;">
+                <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
+                    <h5 class="font-semibold text-gray-800 mb-3">재심 정보</h5>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 심사위원 *</label>
+                        <div class="space-y-2">
+                            <label class="flex items-center">
+                                <input type="radio" name="resubmission-reviewer-type" value="committee"
+                                       onchange="toggleReviewerSelect()" ${disabledAttr}
+                                       class="mr-2">
+                                <span class="text-sm">심사위원회 (전체)</span>
+                            </label>
+                            <label class="flex items-center">
+                                <input type="radio" name="resubmission-reviewer-type" value="single"
+                                       onchange="toggleReviewerSelect()" ${disabledAttr}
+                                       class="mr-2">
+                                <span class="text-sm">심사위원회 중 1인</span>
+                            </label>
+                        </div>
+                        <div id="single-reviewer-select" class="mt-2" style="display: none;">
+                            <select id="resubmission-reviewer-id" ${disabledAttr}
+                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                                <option value="">심사위원 선택</option>
+                                <!-- 심사위원 목록은 동적으로 채워짐 -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
+                        <select id="resubmission-template-id" ${disabledAttr}
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option value="">평가표 선택</option>
+                            <!-- 평가표 목록은 동적으로 채워짐 -->
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
+                        <input type="datetime-local" id="resubmission-deadline" ${disabledAttr}
+                               class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                    </div>
+                </div>
+            </div>
+
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
                 <textarea id="chair-final-comment" rows="4" ${disabledAttr}
@@ -3190,43 +3297,7 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
     return html;
 }
 
-let selectedDecision = null;
-
-function selectDecision(decision) {
-    selectedDecision = decision;
-
-    // 버튼 스타일 업데이트
-    document.querySelectorAll('#btn-pass, #btn-conditional, #btn-fail').forEach(btn => {
-        btn.classList.remove('border-2', 'border-green-600', 'bg-green-100', 'border-yellow-600', 'bg-yellow-100', 'border-red-600', 'bg-red-100');
-        btn.classList.add('border', 'border-gray-300', 'bg-white');
-    });
-
-    // 텍스트 색상 초기화
-    document.querySelectorAll('#btn-pass span, #btn-conditional span, #btn-fail span').forEach(span => {
-        span.classList.remove('text-green-700', 'text-yellow-700', 'text-red-700');
-        span.classList.add('text-gray-700');
-    });
-
-    if (decision === '합격') {
-        const btn = document.getElementById('btn-pass');
-        btn.classList.remove('border', 'border-gray-300', 'bg-white');
-        btn.classList.add('border-2', 'border-green-600', 'bg-green-100');
-        btn.querySelector('span').classList.remove('text-gray-700');
-        btn.querySelector('span').classList.add('text-green-700');
-    } else if (decision === '조건부합격') {
-        const btn = document.getElementById('btn-conditional');
-        btn.classList.remove('border', 'border-gray-300', 'bg-white');
-        btn.classList.add('border-2', 'border-yellow-600', 'bg-yellow-100');
-        btn.querySelector('span').classList.remove('text-gray-700');
-        btn.querySelector('span').classList.add('text-yellow-700');
-    } else if (decision === '불합격') {
-        const btn = document.getElementById('btn-fail');
-        btn.classList.remove('border', 'border-gray-300', 'bg-white');
-        btn.classList.add('border-2', 'border-red-600', 'bg-red-100');
-        btn.querySelector('span').classList.remove('text-gray-700');
-        btn.querySelector('span').classList.add('text-red-700');
-    }
-}
+// Note: selectDecision function is defined later at line 3908 with resubmission logic
 
 function submitChairDecision() {
     if (!selectedDecision) {
@@ -3787,7 +3858,7 @@ function getCurrentReviewDetail() {
 
 // Export
 window.renderReviewDetail = renderReviewDetail;
-window.selectDecision = selectDecision;
+// selectDecision is exported later at line 4059
 window.submitChairDecision = submitChairDecision;
 window.handleEvaluationFileSelect = handleEvaluationFileSelect;
 window.removeEvaluationFile = removeEvaluationFile;
@@ -3845,6 +3916,72 @@ function selectDecision(decision) {
             span.className = span.className.replace(/text-gray-700/, `text-${color}-700`);
         }
     }
+
+    // 재심 정보 영역 표시/숨김
+    const resubmissionSection = document.getElementById('resubmission-info-section');
+    if (resubmissionSection) {
+        if (decision === '조건부합격') {
+            resubmissionSection.style.display = 'block';
+            populateResubmissionOptions();
+        } else {
+            resubmissionSection.style.display = 'none';
+        }
+    }
+}
+
+/**
+ * 재심 정보 옵션 채우기 (심사위원, 평가표)
+ */
+function populateResubmissionOptions() {
+    const detail = getCurrentReviewDetail();
+    if (!detail) return;
+
+    // 심사위원 셀렉트 박스 채우기 (위원장 제외)
+    const reviewerSelect = document.getElementById('resubmission-reviewer-id');
+    if (reviewerSelect && detail.assignment && detail.assignment.committee) {
+        reviewerSelect.innerHTML = '<option value="">심사위원 선택</option>';
+        const members = detail.assignment.committee.filter(m => m.role !== 'chair');
+        members.forEach(member => {
+            const option = document.createElement('option');
+            option.value = member.professorId;
+            option.textContent = member.professorName;
+            reviewerSelect.appendChild(option);
+        });
+    }
+
+    // 평가표 셀렉트 박스 채우기 (해당 학과의 모든 평가표)
+    const templateSelect = document.getElementById('resubmission-template-id');
+    if (templateSelect && detail.assignment) {
+        const department = detail.assignment.department;
+        const allTemplates = Object.values(EVALUATION_TEMPLATES);
+        const departmentTemplates = allTemplates.filter(t =>
+            t.department === department || t.department === 'all'
+        );
+
+        templateSelect.innerHTML = '<option value="">평가표 선택</option>';
+        departmentTemplates.forEach(template => {
+            const option = document.createElement('option');
+            option.value = template.id;
+            option.textContent = template.name;
+            templateSelect.appendChild(option);
+        });
+    }
+}
+
+/**
+ * 심사위원 선택 타입 토글
+ */
+function toggleReviewerSelect() {
+    const reviewerType = document.querySelector('input[name="resubmission-reviewer-type"]:checked');
+    const singleReviewerSelect = document.getElementById('single-reviewer-select');
+
+    if (reviewerType && singleReviewerSelect) {
+        if (reviewerType.value === 'single') {
+            singleReviewerSelect.style.display = 'block';
+        } else {
+            singleReviewerSelect.style.display = 'none';
+        }
+    }
 }
 
 /**
@@ -3860,6 +3997,53 @@ function submitChairDecision() {
     if (!chairComment || !chairComment.value.trim()) {
         showToast('최종 의견을 입력해주세요.', 'warning');
         return;
+    }
+
+    // 조건부합격일 경우 재심 정보 유효성 검사
+    let resubmissionData = null;
+    if (selectedChairDecision === '조건부합격') {
+        const reviewerType = document.querySelector('input[name="resubmission-reviewer-type"]:checked');
+        if (!reviewerType) {
+            showToast('재심 심사위원을 선택해주세요.', 'warning');
+            return;
+        }
+
+        let reviewerId = null;
+        let reviewerName = null;
+        if (reviewerType.value === 'single') {
+            const reviewerSelect = document.getElementById('resubmission-reviewer-id');
+            if (!reviewerSelect || !reviewerSelect.value) {
+                showToast('심사위원을 선택해주세요.', 'warning');
+                return;
+            }
+            reviewerId = reviewerSelect.value;
+            reviewerName = reviewerSelect.options[reviewerSelect.selectedIndex].text;
+        }
+
+        const templateId = document.getElementById('resubmission-template-id');
+        if (!templateId || !templateId.value) {
+            showToast('평가표를 선택해주세요.', 'warning');
+            return;
+        }
+
+        const deadline = document.getElementById('resubmission-deadline');
+        if (!deadline || !deadline.value) {
+            showToast('재심 제출 마감일을 입력해주세요.', 'warning');
+            return;
+        }
+
+        // 재심 데이터 구성
+        resubmissionData = {
+            required: true,
+            reviewerType: reviewerType.value,
+            reviewerId: reviewerId,
+            reviewerName: reviewerName,
+            evaluationTemplateId: templateId.value,
+            deadline: deadline.value.replace('T', ' ') + ':00',
+            attemptNumber: 1,
+            status: 'pending',
+            createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
+        };
     }
 
     // 현재 심사 상세 정보 가져오기
@@ -3884,6 +4068,11 @@ function submitChairDecision() {
     SAVED_REVIEWS[reviewKey].chairComment = chairComment.value.trim();
     SAVED_REVIEWS[reviewKey].submittedAt = new Date().toISOString();
 
+    // 재심 데이터 저장 (조건부합격일 경우)
+    if (resubmissionData) {
+        SAVED_REVIEWS[reviewKey].resubmission = resubmissionData;
+    }
+
     showToast('최종 결정이 제출되었습니다.', 'success');
 
     // 화면 재렌더링
@@ -3895,6 +4084,8 @@ function submitChairDecision() {
 // 전역 함수로 노출
 window.selectDecision = selectDecision;
 window.submitChairDecision = submitChairDecision;
+window.populateResubmissionOptions = populateResubmissionOptions;
+window.toggleReviewerSelect = toggleReviewerSelect;
 
 console.log('✅ review-detail.js 로드 완료 - 버전 2025-01-29-002');
 console.log('   renderEvaluationForm:', typeof renderEvaluationForm);
