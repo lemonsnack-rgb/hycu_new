@@ -113,9 +113,25 @@ const journalSubmissions = [
             start: '2025-06-01',
             end: '2025-06-30'
         },
-        status: 'not_submitted',
+        status: 'resubmit',
         reviewResult: null,
-        submittedData: null
+        submittedData: null,
+        originalSubmission: {
+            advisor: '이영희 교수',
+            titleKorean: '머신러닝 기반 데이터 분석 연구',
+            authors: '홍길동, 이영희',
+            journalName: '데이터사이언스학회지',
+            journalType: 'SCIE',
+            publisher: '한국데이터사이언스학회',
+            volumeIssue: '15권 3호',
+            publishDate: '2025-02-20',
+            pages: '45-68',
+            proofDocType: 'scheduled',
+            fileName: 'journal_paper_2nd_v1.pdf',
+            fileSize: 2800000,
+            submittedAt: '2025-03-12 09:30',
+            reviewComments: '연구 방법론의 보완이 필요합니다. 통계 분석 부분을 강화해 주시기 바랍니다.'
+        }
     }
 ];
 
@@ -194,6 +210,11 @@ function setupEventDelegation() {
                 if (fileInput) {
                     fileInput.click();
                 }
+            } else if (action === 'show-review-comments') {
+                e.preventDefault();
+                e.stopPropagation();
+                const comments = target.getAttribute('data-comments');
+                showReviewCommentsModal(comments);
             } else {
                 console.log('알 수 없는 버튼 클릭, action:', action, 'target:', target);
             }
@@ -252,6 +273,7 @@ function renderJournalListScreen() {
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">심사단계</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">제출기간</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">제출구분</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">제출상태</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">심사결과</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">관리</th>
@@ -277,14 +299,19 @@ function renderJournalListScreen() {
 
 // 목록 행 렌더링
 function renderJournalListRow(submission, index) {
-    const stageDisplay = submission.attemptNumber > 1
-        ? `${submission.stageName} (${submission.attemptNumber}차)`
-        : submission.stageName;
+    // 심사단계명만 표시 (attemptNumber 제거)
+    const stageDisplay = submission.stageName;
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
 
-    // 배지 대신 텍스트로 표시
-    const statusText = submission.status === 'submitted' ? '제출완료' : '미제출';
+    // 제출구분 추가
+    const submissionType = `${submission.attemptNumber}차 제출`;
+
+    // 상태 텍스트 (재제출도 미제출로 표시)
+    let statusText = '미제출';
+    if (submission.status === 'submitted') {
+        statusText = '제출완료';
+    }
 
     let resultText = '-';
     if (submission.reviewResult === 'approved') {
@@ -297,15 +324,20 @@ function renderJournalListRow(submission, index) {
         resultText = '보류';
     }
 
-    const actionButton = submission.status === 'submitted'
-        ? `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`
-        : `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
+    // 액션 버튼 (재제출도 제출 버튼)
+    let actionButton;
+    if (submission.status === 'submitted') {
+        actionButton = `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`;
+    } else {  // not_submitted 또는 resubmit
+        actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
+    }
 
     return `
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${stageDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submissionType}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${statusText}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${resultText}</td>
             <td class="px-6 py-3 text-center">${actionButton}</td>
@@ -343,6 +375,8 @@ function renderJournalSubmissionForm(isViewMode = false) {
     const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
     if (!submission) return '';
 
+    // 재제출 여부 확인
+    const isResubmit = submission.status === 'resubmit';
     const isEdit = submission.status === 'submitted';
     const data = isEdit ? submission.submittedData : {};
 
@@ -350,7 +384,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
     const disabledAttr = isViewMode ? 'disabled' : '';
     const disabledClass = isViewMode ? 'bg-gray-100 cursor-not-allowed' : '';
 
-    return `
+    let html = `
         ${!isViewMode ? `
         <div class="mb-4">
             <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
@@ -361,20 +395,74 @@ function renderJournalSubmissionForm(isViewMode = false) {
             </button>
         </div>
         ` : ''}
+    `;
 
+    // 재제출인 경우: 기존 제출 내역 표시
+    if (isResubmit) {
+        const orig = submission.originalSubmission;
+
+        html += `
+            <div class="bg-gray-50 border border-gray-300 rounded-lg p-6 mb-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역</h3>
+                <div class="space-y-3">
+                    <!-- 논문지도교수 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문지도교수</label>
+                        <input type="text" value="${orig.advisor}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 논문제목(한글) -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문제목(한글)</label>
+                        <input type="text" value="${orig.titleKorean}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 첨부파일 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">첨부파일</label>
+                        <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
+                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            <span class="text-sm text-gray-900">${orig.fileName}</span>
+                            <span class="text-xs text-gray-500">(${(orig.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
+                        </div>
+                    </div>
+
+                    <!-- border-t 구분선 -->
+                    <div class="border-t pt-3 mt-3"></div>
+
+                    <!-- 제출일시 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">제출일시</label>
+                        <div class="text-sm text-gray-900">${orig.submittedAt}</div>
+                    </div>
+                    <!-- 심사 결과 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사 결과</label>
+                        <div class="flex items-center gap-2">
+                            <span class="text-sm font-medium text-yellow-700">보완후재제출</span>
+                            <button type="button" data-action="show-review-comments" data-comments="${(orig.reviewComments || '').replace(/"/g, '&quot;')}"
+                                    class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
+                                총평 보기
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    // 재제출 또는 신규 제출 폼
+    html += `
         <div class="bg-white rounded-lg shadow-md p-6">
             <h3 class="text-lg font-bold text-gray-900 mb-6">학술지 논문 제출</h3>
 
             <div class="space-y-4">
-                <!-- 지도교수명 출력 (읽기 전용) -->
-                <div class="flex items-center gap-4 mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0">지도교수</label>
-                    <div class="flex-1 text-sm text-gray-900 font-medium">${submission.advisorName || '홍길동 교수'}</div>
-                </div>
-
                 <!-- 논문지도교수 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">논문지도교수</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">논문지도교수</label>
                     <input type="text" id="journal-advisor" value="${data.advisor || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="논문지도교수명을 입력하세요" ${disabledAttr}>
@@ -382,7 +470,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 논문제목(한글) -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">논문제목(한글)</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">논문제목(한글)</label>
                     <div class="flex-1">
                         <p class="text-xs text-red-600 mb-2">* 반드시 본인이 제1저자 또는 교신저자이며, 공저자에는 지도교수가 포함되어야 함</p>
                         <input type="text" id="journal-title-korean" value="${data.titleKorean || ''}"
@@ -393,7 +481,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 저자명(전체) -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">저자명(전체)</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">저자명(전체)</label>
                     <input type="text" id="journal-authors" value="${data.authors || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="모든 저자명을 입력하세요" ${disabledAttr}>
@@ -401,7 +489,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 학술지명 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">학술지명</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">학술지명</label>
                     <input type="text" id="journal-name" value="${data.journalName || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="학술지명을 입력하세요" ${disabledAttr}>
@@ -409,7 +497,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 학술지 구분 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">학술지 구분</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">학술지 구분</label>
                     <div class="flex-1">
                         <p class="text-xs text-red-600 mb-2">* 한국연구재단(www.kci.go.kr)에서 확인 가능</p>
                         <div class="space-y-2">
@@ -449,7 +537,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 발행기관 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">발행기관</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">발행기관</label>
                     <input type="text" id="journal-publisher" value="${data.publisher || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="발행기관을 입력하세요" ${disabledAttr}>
@@ -457,7 +545,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 집/권/호 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">집/권/호</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">집/권/호</label>
                     <input type="text" id="journal-volume-issue" value="${data.volumeIssue || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="예: 10권 2호" ${disabledAttr}>
@@ -465,14 +553,14 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 발행년월일 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">발행년월일</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">발행년월일</label>
                     <input type="date" id="journal-publish-date" value="${data.publishDate || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}" ${disabledAttr}>
                 </div>
 
                 <!-- 수록 Page -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">수록 Page</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">수록 Page</label>
                     <input type="text" id="journal-pages" value="${data.pages || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="예: 123-145" ${disabledAttr}>
@@ -480,7 +568,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 증빙서류 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-32 flex-shrink-0 pt-2">증빙서류<br>(심사평가)</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">증빙서류<br>(심사평가)</label>
                     <div class="flex-1">
                         <p class="text-xs text-red-600 mb-2">* 승인서류는 첨부파일 또는 우편/팩스로 제출 필수</p>
                         <div class="space-y-2 mb-3">
@@ -544,6 +632,8 @@ function renderJournalSubmissionForm(isViewMode = false) {
             </div>
         </div>
     `;
+
+    return html;
 }
 
 // 상세/보기 화면
@@ -644,6 +734,42 @@ function saveJournalSubmission() {
     }
 }
 
+// 총평 보기 모달 표시
+function showReviewCommentsModal(comments) {
+    if (!comments || comments.trim() === '') {
+        alert('평가 의견이 없습니다.');
+        return;
+    }
+
+    const modal = document.createElement('div');
+    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+    modal.innerHTML = `
+        <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="p-6 border-b">
+                <h3 class="text-xl font-semibold text-gray-800">평가 총평</h3>
+            </div>
+            <div class="p-6">
+                <div class="whitespace-pre-wrap text-gray-700">${comments}</div>
+            </div>
+            <div class="p-6 border-t flex justify-end">
+                <button data-action="close-modal" class="px-6 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">
+                    닫기
+                </button>
+            </div>
+        </div>
+    `;
+
+    // 모달 닫기 이벤트
+    modal.addEventListener('click', function(e) {
+        const target = e.target;
+        if (target === modal || target.closest('[data-action="close-modal"]')) {
+            document.body.removeChild(modal);
+        }
+    });
+
+    document.body.appendChild(modal);
+}
+
 // 스타일 추가 (즉시 실행)
 (function() {
     const style = document.createElement('style');
@@ -693,3 +819,4 @@ window.backToList = backToList;
 window.editJournalSubmission = editJournalSubmission;
 window.handleFileSelect = handleFileSelect;
 window.saveJournalSubmission = saveJournalSubmission;
+window.showReviewCommentsModal = showReviewCommentsModal;
