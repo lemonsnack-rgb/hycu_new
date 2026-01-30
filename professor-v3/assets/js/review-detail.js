@@ -3244,11 +3244,6 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                         </div>
                     </div>
                 </div>
-
-                <div class="text-sm text-gray-600 mt-2">
-                    <p>재심 차수: ${resub.attemptNumber}차</p>
-                    <p>상태: ${resub.status === 'pending' ? '학생 제출 대기' : resub.status === 'submitted' ? '평가 대기' : '완료'}</p>
-                </div>
             </div>
         `;
     }
