@@ -4011,6 +4011,51 @@ function submitChairDecision() {
         SAVED_REVIEWS[reviewKey].resubmission = resubmissionData;
     }
 
+    // REVIEW_RESULTS에 저장
+    const existingResult = REVIEW_RESULTS.find(r => r.assignmentId === currentAssignmentId);
+    if (existingResult) {
+        // 기존 RESULT 업데이트
+        existingResult.chairDecision = selectedChairDecision;
+        existingResult.chairComment = chairComment.value.trim();
+        existingResult.chairDecidedAt = new Date().toISOString().replace('T', ' ').substring(0, 19);
+        existingResult.chairDecidedBy = currentProfessorId;
+        existingResult.finalDecision = selectedChairDecision;
+
+        // 재심 정보 저장
+        if (resubmissionData) {
+            existingResult.resubmission = resubmissionData;
+        } else {
+            existingResult.resubmission = null;
+        }
+
+        console.log('✅ REVIEW_RESULTS 업데이트:', existingResult);
+    } else {
+        // 새로운 RESULT 생성 (정상적으로는 이미 존재해야 함)
+        const newResult = {
+            id: `RESULT_${currentAssignmentId}`,
+            assignmentId: currentAssignmentId,
+            evaluations: [],  // 기존 평가 ID들
+            averageScore: 0,
+            systemDecision: null,
+            systemDecisionReason: null,
+
+            chairDecision: selectedChairDecision,
+            chairComment: chairComment.value.trim(),
+            chairDecidedAt: new Date().toISOString().replace('T', ' ').substring(0, 19),
+            chairDecidedBy: currentProfessorId,
+            chairDecisionFiles: [],
+
+            resubmission: resubmissionData,
+
+            finalDecision: selectedChairDecision,
+            notifiedAt: null,
+            createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
+        };
+
+        REVIEW_RESULTS.push(newResult);
+        console.log('✅ REVIEW_RESULTS 신규 추가:', newResult);
+    }
+
     showToast('최종 결정이 제출되었습니다.', 'success');
 
     // 화면 재렌더링
