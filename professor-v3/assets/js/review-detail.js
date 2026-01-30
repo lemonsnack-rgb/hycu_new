@@ -2300,8 +2300,11 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                     </button>
                 </div>
             </div>
+    `;
 
-            <!-- 재심 정보 입력 영역 (조건부합격 선택 시에만 표시) -->
+    // 재심 정보 입력 영역 (제출 전 && 조건부합격 선택 시에만 표시)
+    if (!chairSubmitted) {
+        html += `
             <div id="resubmission-info-section" class="mb-4" style="display: none;">
                 <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
                     <h5 class="font-semibold text-gray-800 mb-3">재심 정보</h5>
@@ -2311,15 +2314,15 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                             <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">재심 심사위원 *</label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="committee"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                       onchange="toggleReviewerSelect()" class="mr-2">
                                 <span class="text-sm whitespace-nowrap">심사위원회 (전체)</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="single"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                       onchange="toggleReviewerSelect()" class="mr-2">
                                 <span class="text-sm whitespace-nowrap">심사위원회 중 1인</span>
                             </label>
-                            <select id="resubmission-reviewer-id" ${disabledAttr}
+                            <select id="resubmission-reviewer-id"
                                     class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
                                     style="display: none;">
                                 <option value="">심사위원 선택</option>
@@ -2331,7 +2334,7 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                     <div class="grid grid-cols-2 gap-4 mb-3">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
-                            <select id="resubmission-template-id" ${disabledAttr}
+                            <select id="resubmission-template-id"
                                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                                 <option value="">평가표 선택</option>
                                 <!-- 평가표 목록은 동적으로 채워짐 -->
@@ -2339,13 +2342,16 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
-                            <input type="date" id="resubmission-deadline" ${disabledAttr}
+                            <input type="date" id="resubmission-deadline"
                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                         </div>
                     </div>
                 </div>
             </div>
+        `;
+    }
 
+    html += `
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
                 <textarea id="chair-final-comment" rows="4" ${disabledAttr}
@@ -3133,8 +3139,11 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                     </button>
                 </div>
             </div>
+    `;
 
-            <!-- 재심 정보 입력 영역 (조건부합격 선택 시에만 표시) -->
+    // 재심 정보 입력 영역 (제출 전 && 조건부합격 선택 시에만 표시)
+    if (!chairSubmitted) {
+        html += `
             <div id="resubmission-info-section" class="mb-4" style="display: none;">
                 <div class="bg-yellow-50 border border-yellow-300 rounded-lg p-4">
                     <h5 class="font-semibold text-gray-800 mb-3">재심 정보</h5>
@@ -3144,15 +3153,15 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                             <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">재심 심사위원 *</label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="committee"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                       onchange="toggleReviewerSelect()" class="mr-2">
                                 <span class="text-sm whitespace-nowrap">심사위원회 (전체)</span>
                             </label>
                             <label class="flex items-center">
                                 <input type="radio" name="resubmission-reviewer-type" value="single"
-                                       onchange="toggleReviewerSelect()" ${disabledAttr} class="mr-2">
+                                       onchange="toggleReviewerSelect()" class="mr-2">
                                 <span class="text-sm whitespace-nowrap">심사위원회 중 1인</span>
                             </label>
-                            <select id="resubmission-reviewer-id" ${disabledAttr}
+                            <select id="resubmission-reviewer-id"
                                     class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm"
                                     style="display: none;">
                                 <option value="">심사위원 선택</option>
@@ -3164,7 +3173,7 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                     <div class="grid grid-cols-2 gap-4 mb-3">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
-                            <select id="resubmission-template-id" ${disabledAttr}
+                            <select id="resubmission-template-id"
                                     class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                                 <option value="">평가표 선택</option>
                                 <!-- 평가표 목록은 동적으로 채워짐 -->
@@ -3172,13 +3181,16 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
-                            <input type="date" id="resubmission-deadline" ${disabledAttr}
+                            <input type="date" id="resubmission-deadline"
                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
                         </div>
                     </div>
                 </div>
             </div>
+        `;
+    }
 
+    html += `
             <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-700 mb-2">최종 의견</label>
                 <textarea id="chair-final-comment" rows="4" ${disabledAttr}
@@ -3186,6 +3198,60 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                           placeholder="${!allSubmitted ? '모든 심사위원의 평가가 완료되면 입력할 수 있습니다' : chairSubmitted ? '' : '최종 심사 의견을 입력하세요'}">${chairComment}</textarea>
             </div>
     `;
+
+    // 제출된 재심 정보 표시 (조건부합격이고 제출된 경우)
+    if (chairSubmitted && chairDecision === '조건부합격' && detail.result && detail.result.resubmission) {
+        const resub = detail.result.resubmission;
+
+        html += `
+            <div id="resubmission-info-section" class="mb-4" style="display: block;">
+                <h5 class="font-semibold text-gray-800 mb-3">재심 정보 (제출됨)</h5>
+
+                <div class="mb-3">
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-semibold text-gray-700 whitespace-nowrap">재심 심사위원</label>
+                        <label class="flex items-center">
+                            <input type="radio" name="resubmission-reviewer-type-readonly" value="committee"
+                                   ${resub.reviewerType === 'committee' ? 'checked' : ''} disabled class="mr-2">
+                            <span class="text-sm whitespace-nowrap">심사위원회 (전체)</span>
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="resubmission-reviewer-type-readonly" value="single"
+                                   ${resub.reviewerType === 'single' ? 'checked' : ''} disabled class="mr-2">
+                            <span class="text-sm whitespace-nowrap">심사위원회 중 1인</span>
+                        </label>
+                        ${resub.reviewerType === 'single' ? `
+                            <div class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                                ${resub.reviewerName || '심사위원'}
+                            </div>
+                        ` : `
+                            <div class="flex-1"></div>
+                        `}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mb-3">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택</label>
+                        <div class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                            ${getTemplateName(resub.evaluationTemplateId)}
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일</label>
+                        <div class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                            ${resub.deadline ? resub.deadline.substring(0, 10) : ''}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="text-sm text-gray-600 mt-2">
+                    <p>재심 차수: ${resub.attemptNumber}차</p>
+                    <p>상태: ${resub.status === 'pending' ? '학생 제출 대기' : resub.status === 'submitted' ? '평가 대기' : '완료'}</p>
+                </div>
+            </div>
+        `;
+    }
 
     // 최종 결정 첨부파일 영역
     const existingFiles = result?.chairDecisionFiles || [];
@@ -3927,6 +3993,14 @@ function toggleReviewerSelect() {
             reviewerSelect.style.display = 'none';
         }
     }
+}
+
+/**
+ * 평가표 ID로 평가표 이름 가져오기
+ */
+function getTemplateName(templateId) {
+    const template = EVALUATION_TEMPLATES[templateId];
+    return template ? template.name : templateId;
 }
 
 /**
