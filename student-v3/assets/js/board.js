@@ -1,23 +1,21 @@
 /**
  * ================================================================
- * 자료실 게시판 (교수용)
+ * 자료실 게시판 (학생용)
  * ================================================================
- * ID 32: 교수용 게시판
+ * ID 57: 학생용 게시판
  *
  * 기능:
- * - 게시글 작성/수정/삭제
- * - 리치 텍스트 에디터
- * - 파일 첨부 및 다운로드
- * - 열람자 지정 (전체/석사/박사/개별학생)
+ * - 지도교수가 등록한 자료 열람
+ * - 파일 다운로드
  * - 댓글 기능
- * - 권한별 접근 제어
+ * - 학생 본인 작성 글 수정/삭제
  */
 
 // 현재 사용자 정보
 let currentUser = {
-    role: 'professor',
-    id: 'P001',
-    name: '김교수'
+    role: 'student',
+    id: 'S001',
+    name: '홍길동'
 };
 
 // 화면 상태 관리
@@ -27,16 +25,12 @@ let boardEventListenerAttached = false;  // 이벤트 리스너 중복 방지
 
 // 게시판 초기화
 function initBoard(userRole, userId = null) {
+    console.log('[Board] initBoard called, userRole:', userRole, 'userId:', userId);
+    console.log('[Board] boardEventListenerAttached:', boardEventListenerAttached);
+
     // 사용자 정보 설정
-    if (userRole === 'professor') {
-        const professor = DataService.getProfessor();
-        currentUser = {
-            role: 'professor',
-            id: professor.id,
-            name: professor.name
-        };
-    } else if (userRole === 'student' && userId) {
-        const student = DataService.getStudent(userId);
+    if (userRole === 'student') {
+        const student = DataService.getStudent(userId || 'S001');
         if (student) {
             currentUser = {
                 role: 'student',
@@ -48,25 +42,35 @@ function initBoard(userRole, userId = null) {
 
     // 이벤트 위임 설정 (한 번만)
     if (!boardEventListenerAttached) {
+        console.log('[Board] Calling setupBoardEventDelegation for the first time');
         setupBoardEventDelegation();
         boardEventListenerAttached = true;
+    } else {
+        console.log('[Board] Event listener already attached, skipping');
     }
 
     // 초기 화면 렌더링
+    console.log('[Board] Calling renderBoardScreen');
     renderBoardScreen();
 }
 
 // 이벤트 위임 설정
 function setupBoardEventDelegation() {
     const container = document.getElementById('boardContainer');
+    console.log('[Board] setupBoardEventDelegation called, container:', container);
     if (!container) {
+        console.error('[Board] Container not found!');
         return;
     }
 
+    console.log('[Board] Attaching event listener to container');
     container.addEventListener('click', (e) => {
+        console.log('[Board] Click detected:', e.target.tagName, e.target.className);
+
         // 버튼 클릭 처리
         const button = e.target.closest('button');
         if (button) {
+            console.log('[Board] Button found:', button.getAttribute('data-action'));
             const action = button.getAttribute('data-action');
             const id = button.getAttribute('data-id');
             const commentId = button.getAttribute('data-comment-id');
@@ -127,9 +131,12 @@ function setupBoardEventDelegation() {
             element = element.parentElement;
         }
 
+        console.log('[Board] Row search result:', row ? 'Found' : 'Not found', row ? row.getAttribute('data-id') : 'N/A');
+
         if (row) {
             const id = row.getAttribute('data-id');
             if (id) {
+                console.log('[Board] Switching to detail view, id:', id);
                 e.preventDefault();
                 e.stopPropagation();
                 // Convert string ID to number

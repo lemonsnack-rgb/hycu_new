@@ -1108,6 +1108,11 @@
                 <div id="review-list">
                     <!-- review-list.js에서 동적으로 렌더링 -->
                 </div>
+
+                <!-- 심사 상세 -->
+                <div id="review-detail-content">
+                    <!-- review-detail.js에서 동적으로 렌더링 -->
+                </div>
             </section>
             
             <!-- ===================================
@@ -1321,7 +1326,7 @@
     <script src="assets/js/feedback-detail-screen.js?v=20260128005000"></script>
     <script src="assets/js/review-list.js?v=20251219012"></script>
     <script src="assets/js/review-detail.js?v=20260113001"></script>
-    <script src="assets/js/board.js?v=20251218003"></script>
+    <script src="assets/js/board.js?v=20260130002"></script>
     <script src="assets/js/journal-review-detail.js?v=20251219002"></script>
 
     <!-- 공통 유틸리티 -->
@@ -1520,6 +1525,64 @@ document.addEventListener('DOMContentLoaded', function() {
     overflow-x: visible;
 }
 </style>
+
+<!-- ============ 테스트 자동화를 위한 숨겨진 버튼 섹션 ============ -->
+<div id="test-helpers" style="display: none; position: absolute; left: -9999px;">
+    <!-- 척도형 평가 테스트 버튼 (화면 전환 포함) -->
+    <button id="test-open-rubric-001" onclick="
+        console.log('[TEST] Activating review screen and opening rubric evaluation');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+        var reviewScreen = document.getElementById('review');
+        if (reviewScreen) {
+            reviewScreen.classList.remove('hidden');
+            console.log('[TEST] Review screen activated');
+        }
+        setTimeout(() => {
+            console.log('[TEST] Rendering rubric detail for RA_RUBRIC_001');
+            renderReviewDetail('RA_RUBRIC_001', 'member', false);
+        }, 200);
+    ">
+        Open Rubric 001
+    </button>
+
+    <!-- 서술형 평가 테스트 버튼 (화면 전환 포함) -->
+    <button id="test-open-descriptive-001" onclick="
+        console.log('[TEST] Activating review screen and opening descriptive evaluation');
+        document.querySelectorAll('.content-section').forEach(s => s.classList.add('hidden'));
+        var reviewScreen = document.getElementById('review');
+        if (reviewScreen) {
+            reviewScreen.classList.remove('hidden');
+            console.log('[TEST] Review screen activated');
+        }
+        setTimeout(() => {
+            console.log('[TEST] Rendering descriptive detail for RA_DESCRIPTIVE_001');
+            renderReviewDetail('RA_DESCRIPTIVE_001', 'member', false);
+        }, 200);
+    ">
+        Open Descriptive 001
+    </button>
+
+    <!-- 척도형 임시저장 테스트 버튼 -->
+    <button id="test-save-rubric-draft" onclick="handleSaveRubricDescriptiveDraft('rubric')">
+        Save Rubric Draft
+    </button>
+
+    <!-- 척도형 제출 테스트 버튼 -->
+    <button id="test-submit-rubric" onclick="handleSubmitRubricDescriptive('rubric')">
+        Submit Rubric
+    </button>
+
+    <!-- 서술형 임시저장 테스트 버튼 -->
+    <button id="test-save-descriptive-draft" onclick="handleSaveRubricDescriptiveDraft('descriptive')">
+        Save Descriptive Draft
+    </button>
+
+    <!-- 서술형 제출 테스트 버튼 -->
+    <button id="test-submit-descriptive" onclick="handleSubmitRubricDescriptive('descriptive')">
+        Submit Descriptive
+    </button>
+</div>
+<!-- ============ 테스트 자동화 섹션 끝 ============ -->
 
 </body>
 </html>
