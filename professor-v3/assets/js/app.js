@@ -601,24 +601,32 @@ function viewProfessorProposalDetail(proposalId) {
             <!-- 연구계획서 상세 내용 (스크롤 가능) -->
             <div class="p-6" style="max-height: calc(100vh - 200px); overflow-y: auto;">
                 <div class="space-y-4">
+                    <!-- 연구 제목 (NEW) -->
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">연구 제목</label>
+                        <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200">
+                            <p class="text-gray-900 font-medium">${proposal.title || '정보 없음'}</p>
+                        </div>
+                    </div>
+
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 목적</label>
                         <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
-                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose}</p>
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.purpose || '정보 없음'}</p>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 필요성</label>
                         <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
-                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity}</p>
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.necessity || '정보 없음'}</p>
                         </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">연구 문제 및 연구 방법</label>
                         <div class="px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 min-h-[120px]">
-                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method}</p>
+                            <p class="text-gray-900 leading-relaxed whitespace-pre-wrap">${proposal.method || '정보 없음'}</p>
                         </div>
                     </div>
 
