@@ -1,0 +1,308 @@
+# 한양사이버대학교 논문지도시스템 - Claude Code 설정
+
+## 프로젝트 개요
+
+한양사이버대학교 대학원 논문지도 시스템
+- 교수용 화면 (professor-v3)
+- 관리자용 화면 (admin-v3)
+- 학생용 화면 (student-v3)
+
+## 테스트 프레임워크
+
+### 사용 도구
+- **pytest**: Python 테스트 프레임워크
+- **Selenium**: 브라우저 자동화 (ChromeDriver)
+- **테스트 위치**: 프로젝트 루트의 `test-*.py` 파일들
+
+### 테스트 실행 방법
+
+```bash
+# 전체 테스트 실행
+python -m pytest test-*.py -v
+
+# 특정 영역 테스트
+python -m pytest test-professor-*.py -v
+python -m pytest test-admin-*.py -v
+python -m pytest test-student-*.py -v
+
+# UI 테스트 (브라우저 표시)
+python -m pytest test-professor-board.py -v -s
+
+# 상세 에러 로그
+python -m pytest test-admin-stage.py -v --tb=long
+```
+
+### 테스트 파일 명명 규칙
+- `test-professor-*.py`: 교수용 화면 테스트
+- `test-admin-*.py`: 관리자용 화면 테스트
+- `test-student-*.py`: 학생용 화면 테스트
+
+## 자동 알파테스트 시스템
+
+### 개요
+코드 수정 후 자동으로 테스트를 실행하고, 문제 발견 시 AI가 자동으로 디버그 및 수정합니다 (최대 3회).
+
+### 동작 방식
+
+#### 1. 자동 트리거 (권장)
+파일을 수정하면 자동으로 알파테스트가 실행됩니다:
+
+```
+코드 수정 (Edit/Write)
+    ↓
+PostToolUse Hook 자동 실행
+    ↓
+관련 테스트 파일 확인
+    ↓
+alpha-tester subagent 자동 호출
+    ↓
+[자동 진행]
+- 테스트 실행
+- 실패 시 디버그
+- 수정 (최대 3회)
+- 재테스트
+    ↓
+최종 결과만 보고
+```
+
+**예시**:
+```
+사용자: "board.js에서 getCurrentUser 에러 수정해줘"
+
+Claude: [코드 수정 완료]
+        [자동으로 알파테스트 시작...]
+
+        === 2분 후 ===
+
+        ✅ 알파테스트 완료
+        - 시도 횟수: 2회
+        - getCurrentUser() 호출 제거
+        - 전역 currentUser 사용으로 변경
+        - 모든 테스트 통과 ✓
+```
+
+#### 2. 수동 호출
+명시적으로 알파테스트를 요청할 수도 있습니다:
+
+```
+"알파테스트 실행해줘"
+"자동으로 테스트하고 고쳐줘"
+"테스트 돌리고 문제 있으면 수정해줘"
+```
+
+### 알파테스트가 자동 실행되는 경우
+- ✅ `professor-v3/**/*.js` 파일 수정
+- ✅ `admin-v3/**/*.js` 파일 수정
+- ✅ `student-v3/**/*.js` 파일 수정
+- ✅ 관련 `test-*.py` 파일이 존재할 때
+
+### 알파테스트가 스킵되는 경우
+- ⏭️ 문서 파일 (`.md`, `.txt` 등)
+- ⏭️ 설정 파일 (`.json`)
+- ⏭️ 테스트 파일 자체 (`test-*.py`)
+- ⏭️ 관련 테스트 파일이 없을 때
+
+### 알파테스트 결과
+
+#### 성공 시
+```
+✅ 알파테스트 완료
+
+테스트: test-professor-board.py
+시도: 2회
+결과: 전체 통과 ✓
+
+수정 내역:
+  1차: getCurrentUser() 제거
+  2차: null 체크 추가
+```
+
+#### 실패 시 (3회 시도 후)
+```
+⚠️ 알파테스트 실패 (3회 시도)
+
+남은 문제: currentUser 초기화 누락
+근본 원인: initBoard() 미호출
+다음 조치: HTML 파일에서 초기화 코드 확인 필요
+```
+
+### 중요 규칙
+
+1. **자동 진행**
+   - 중간 과정은 보고하지 않음
+   - 최종 결과만 사용자에게 표시
+   - 최대 3회까지 자동 수정-재테스트
+
+2. **UI 테스트**
+   - Selenium 테스트는 항상 Headless=False
+   - 브라우저가 실제로 열려야 함
+   - 사용자가 UI를 육안으로 확인 가능
+
+3. **실패 제한**
+   - 3회 시도 후 자동 중단
+   - 상세한 실패 리포트 제공
+   - 추가 조치 사항 제안
+
+## 개발 워크플로우
+
+### 1단계: 분석 및 계획 수립
+```
+사용자: "○○ 기능 추가해줘"
+
+Claude:
+  [사전 탐색] 실제 파일/버튼명 확인 (Read/Glob)
+  [계획 수립] 개발 계획 작성
+  [성공 조건] "어떤 상태가 되면 완성인지" 정의
+  [사용자 승인 대기] ⏸️
+```
+
+### 2단계: 구현 (승인 후)
+```
+사용자: "좋아, 진행해"
+
+Claude:
+  [코드 작성]
+  [자동으로 알파테스트 시작] ← Hook 자동 실행
+```
+
+### 3단계: 자동 테스트 및 검증
+```
+alpha-tester subagent:
+  [1차] 테스트 실행
+  [실패 시] 디버그 → 수정 → 재테스트
+  [2차] 재시도
+  [성공 또는 3회 실패 시] 최종 보고
+```
+
+### 4단계: 최종 보고
+```
+Claude:
+  ✅ 기능 구현 및 알파테스트 완료
+  [수정 내역 요약]
+  [테스트 결과]
+
+  커밋하시겠습니까?
+```
+
+## 코딩 규칙
+
+### 1. 추측 금지
+- 코딩 전 실제 파일/함수/변수명을 Read/Grep으로 확인
+- 가정하지 말고 실제 코드를 읽어서 확인
+
+### 2. 계획 우선
+- 코드 작성 전 항상 계획 수립
+- 성공 조건을 명확히 정의
+- 사용자 승인 후 구현
+
+### 3. 최소 수정
+- 테스트 통과에 필요한 최소한만 수정
+- 기존 코드 구조 최대한 유지
+- 불필요한 리팩토링 금지
+
+### 4. 테스트 통과 확인
+- 코드 수정 후 반드시 알파테스트 실행
+- 모든 테스트 통과 확인 후 커밋
+- 실패 시 자동으로 수정 시도
+
+## 프로젝트 구조
+
+```
+hycu_new/
+├── professor-v3/          # 교수용 화면
+│   ├── index.html
+│   └── assets/
+│       └── js/
+│           ├── board.js          # 자료실 게시판
+│           ├── review-detail.js  # 논문 심사
+│           └── ...
+├── admin-v3/              # 관리자용 화면
+│   ├── index.html
+│   └── assets/
+│       └── js/
+│           ├── admin_modals.js
+│           └── ...
+├── student-v3/            # 학생용 화면
+│   ├── index.html
+│   └── assets/
+│       └── js/
+│           └── ...
+├── test-professor-*.py    # 교수 화면 테스트
+├── test-admin-*.py        # 관리자 화면 테스트
+├── test-student-*.py      # 학생 화면 테스트
+└── .claude/               # Claude Code 설정
+    ├── agents/
+    │   └── alpha-tester.md      # 알파테스트 에이전트
+    ├── skills/
+    │   └── alpha-test/
+    │       └── SKILL.md         # 알파테스트 스킬
+    ├── hooks/
+    │   └── auto-alpha-test.sh   # 자동 테스트 Hook
+    └── settings.json            # Hook 설정
+```
+
+## 성공 조건 정의 예시
+
+### ❌ 나쁜 예 (기술적 용어)
+```
+"DataService.getCurrentUser() 호출을 제거하고
+전역 currentUser 변수를 사용하도록 수정"
+```
+
+### ✅ 좋은 예 (사용자 관점)
+```
+"교수 자료실 화면에서 '글쓰기' 버튼을 눌렀을 때
+에러 없이 글 작성 화면이 정상적으로 표시됨"
+```
+
+## 문제 해결
+
+### Q: 알파테스트가 자동으로 실행되지 않아요
+**A**: 다음을 확인하세요:
+1. `.claude/settings.json`에 Hook 설정이 있는지
+2. `.claude/hooks/auto-alpha-test.sh` 파일이 있는지
+3. 수정한 파일이 `*-v3/**/*.js` 경로인지
+4. 관련 `test-*.py` 파일이 있는지
+
+### Q: 테스트가 3회 실패했어요
+**A**: 보고된 내용을 확인하세요:
+- 근본 원인 분석
+- 추가 조사 필요 영역
+- 다음 조치 사항
+
+그 후 수동으로 수정하거나 Claude에게 추가 지시를 내리세요.
+
+### Q: 브라우저가 열리지 않아요
+**A**: Selenium 환경을 확인하세요:
+```bash
+# Chrome 및 ChromeDriver 설치 확인
+python -c "from selenium import webdriver; driver = webdriver.Chrome(); driver.quit()"
+
+# pytest 및 selenium 설치
+pip install pytest selenium
+```
+
+### Q: Hook을 일시적으로 끄고 싶어요
+**A**: `.claude/settings.json`의 `hooks` 섹션을 주석 처리하거나 삭제하세요.
+
+## 권한 설정
+
+다음 명령어들은 자동으로 허용됩니다:
+- `python -m pytest`
+- `pytest`
+- `python test-*.py`
+- 기타 Git 명령어 (`.claude/settings.local.json`에 설정됨)
+
+## 참고 자료
+
+- **alpha-tester agent**: `.claude/agents/alpha-tester.md`
+- **alpha-test skill**: `.claude/skills/alpha-test/SKILL.md`
+- **Hook 스크립트**: `.claude/hooks/auto-alpha-test.sh`
+
+## 최종 목표
+
+**"AI가 의도한 것이 실제로 동작하는지 자동으로 확인하고,
+문제가 있으면 자동으로 고쳐서,
+사용자는 최종 결과만 확인하면 됨"**
+
+이것이 자동 알파테스트 시스템의 목적입니다.
