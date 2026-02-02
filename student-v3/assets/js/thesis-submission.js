@@ -24,8 +24,10 @@ const thesisSubmissions = [
         submittedData: {
             title: 'AI 기반 추천 시스템 연구',
             desiredExamDate: '2025-01-15',
-            fileName: 'proposal_v1.pdf',
-            fileSize: 2500000,
+            thesisFile: 'proposal_v1.pdf',
+            thesisFileSize: 2500000,
+            otherFile: 'proposal_appendix.pdf',
+            otherFileSize: 1200000,
             submittedAt: '2025-01-10 14:30'
         },
         evaluationFormRegistered: true
@@ -62,8 +64,10 @@ const thesisSubmissions = [
         originalSubmission: {
             title: 'AI 기반 추천 시스템 연구',
             desiredExamDate: '2025-05-20',
-            fileName: 'final_thesis_v1.pdf',
-            fileSize: 4500000,
+            thesisFile: 'final_thesis_v1.pdf',
+            thesisFileSize: 4500000,
+            otherFile: 'thesis_references.pdf',
+            otherFileSize: 1800000,
             submittedAt: '2025-05-10 16:45',
             reviewResult: 'conditional',
             reviewComments: '연구 방법론 보완 필요. 데이터 분석 부분을 더 상세히 작성하세요.'
@@ -155,10 +159,17 @@ function setupThesisEventDelegation() {
                 e.preventDefault();
                 e.stopPropagation();
                 saveThesisSubmission();
-            } else if (action === 'select-file') {
+            } else if (action === 'select-thesis-file') {
                 e.preventDefault();
                 e.stopPropagation();
-                const fileInput = document.getElementById('thesis-file');
+                const fileInput = document.getElementById('thesis-main-file');
+                if (fileInput) {
+                    fileInput.click();
+                }
+            } else if (action === 'select-other-file') {
+                e.preventDefault();
+                e.stopPropagation();
+                const fileInput = document.getElementById('thesis-other-file');
                 if (fileInput) {
                     fileInput.click();
                 }
@@ -175,8 +186,10 @@ function setupThesisEventDelegation() {
 
     // 파일 입력 변경 이벤트 (이벤트 위임으로 처리할 수 없으므로 직접 처리)
     content.addEventListener('change', function(e) {
-        if (e.target && e.target.id === 'thesis-file') {
-            handleFileSelect(e);
+        if (e.target && e.target.id === 'thesis-main-file') {
+            handleThesisFileSelect(e);
+        } else if (e.target && e.target.id === 'thesis-other-file') {
+            handleOtherFileSelect(e);
         }
     });
 
@@ -414,17 +427,21 @@ function renderThesisSubmissionForm() {
                         <input type="text" value="${orig.title}" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
-                    <!-- 첨부파일 -->
+                    <!-- 논문파일 / 기타파일 (읽기 전용 - 등록 화면과 동일 UI) -->
                     <div class="flex items-center gap-4">
-                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">첨부파일</label>
-                        <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
-                            <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            <span class="text-sm text-gray-900">${orig.fileName}</span>
-                            <span class="text-xs text-gray-500">(${(orig.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
-                        </div>
+                        <!-- 논문파일 -->
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문파일</label>
+                        <input type="text" readonly
+                               value="${orig.thesisFile ? orig.thesisFile + ' (' + (orig.thesisFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                               placeholder="첨부파일 없음">
+
+                        <!-- 기타파일 -->
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 ml-4">기타파일</label>
+                        <input type="text" readonly
+                               value="${orig.otherFile ? orig.otherFile + ' (' + (orig.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                               placeholder="첨부파일 없음">
                     </div>
 
                     <!-- border-t 구분선 -->
@@ -478,31 +495,34 @@ function renderThesisSubmissionForm() {
                            placeholder="논문 제목을 입력하세요">
                 </div>
 
-                <!-- 파일업로드 -->
-                <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">파일 업로드 *</label>
-                    <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 rounded-md bg-gray-50">
-                        <input type="file" id="thesis-file" class="hidden" accept=".pdf">
-                        <button type="button" data-action="select-file"
-                                class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm">
-                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                            </svg>
-                            파일 선택
+                <!-- 논문파일 / 기타파일 (한 줄 배치) -->
+                <div>
+                    <div class="flex items-center gap-4">
+                        <!-- 논문파일 -->
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">논문파일 <span class="text-red-500">*</span></label>
+                        <input type="text" id="thesis-file-display" readonly
+                               value="${data.thesisFile ? data.thesisFile + ' (' + (data.thesisFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                               placeholder="선택된 파일 없음">
+                        <input type="file" id="thesis-main-file" class="hidden" accept=".pdf">
+                        <button type="button" data-action="select-thesis-file"
+                                class="px-4 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 whitespace-nowrap">
+                            찾아보기
                         </button>
-                        <span class="text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</span>
-                        <div id="file-info" class="text-sm text-gray-600">
-                            ${data.fileName ? `
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    <span class="text-green-600 font-medium">${data.fileName} (${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
-                                </div>
-                            ` : ''}
-                        </div>
+
+                        <!-- 기타파일 -->
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap ml-4">기타파일</label>
+                        <input type="text" id="other-file-display" readonly
+                               value="${data.otherFile ? data.otherFile + ' (' + (data.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                               placeholder="선택된 파일 없음">
+                        <input type="file" id="thesis-other-file" class="hidden" accept=".pdf">
+                        <button type="button" data-action="select-other-file"
+                                class="px-4 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 whitespace-nowrap">
+                            찾아보기
+                        </button>
                     </div>
+                    <p class="mt-1 text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</p>
                 </div>
 
                 <!-- 제출 버튼 -->
@@ -584,18 +604,21 @@ function renderThesisDetailView() {
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
-                <!-- 첨부파일 -->
+                <!-- 논문파일 / 기타파일 (읽기 전용 - 등록 화면과 동일 UI) -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">첨부파일</label>
-                    <div class="flex-1 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
-                        <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                        </svg>
-                        <span class="text-sm text-gray-900">${data.fileName}</span>
-                        <span class="text-xs text-gray-500">(${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
-                        <button class="ml-auto text-sm text-[#6A0028] hover:text-[#8A0034]">다운로드</button>
-                    </div>
+                    <!-- 논문파일 -->
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문파일</label>
+                    <input type="text" readonly
+                           value="${data.thesisFile ? data.thesisFile + ' (' + (data.thesisFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                           placeholder="첨부파일 없음">
+
+                    <!-- 기타파일 -->
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 ml-4">기타파일</label>
+                    <input type="text" readonly
+                           value="${data.otherFile ? data.otherFile + ' (' + (data.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                           placeholder="첨부파일 없음">
                 </div>
             </div>
 
@@ -635,27 +658,33 @@ function editThesisSubmission(id) {
 }
 
 // 파일 선택 처리
-function handleFileSelect(event) {
+// 논문파일 선택 처리
+function handleThesisFileSelect(event) {
     const file = event.target.files[0];
-    const fileInfo = document.getElementById('file-info');
+    const fileDisplay = document.getElementById('thesis-file-display');
 
     if (file) {
         const fileSize = (file.size / 1024 / 1024).toFixed(2);
-        fileInfo.innerHTML = `
-            <div class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span class="text-green-600 font-medium">${file.name} (${fileSize} MB)</span>
-            </div>
-        `;
+        fileDisplay.value = `${file.name} (${fileSize} MB)`;
+    }
+}
+
+// 기타파일 선택 처리
+function handleOtherFileSelect(event) {
+    const file = event.target.files[0];
+    const fileDisplay = document.getElementById('other-file-display');
+
+    if (file) {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        fileDisplay.value = `${file.name} (${fileSize} MB)`;
     }
 }
 
 // 논문 제출/수정 저장
 function saveThesisSubmission() {
     const title = document.getElementById('thesis-title').value.trim();
-    const file = document.getElementById('thesis-file').files[0];
+    const thesisFile = document.getElementById('thesis-main-file').files[0];
+    const otherFile = document.getElementById('thesis-other-file').files[0];
 
     const submission = thesisSubmissions.find(s => s.id === thesisCurrentSubmissionId);
     const isEdit = submission.status === 'submitted';
@@ -666,8 +695,8 @@ function saveThesisSubmission() {
         return;
     }
 
-    if (!isEdit && !file) {
-        alert('파일을 선택해주세요.');
+    if (!isEdit && !thesisFile && !submission.submittedData?.thesisFile) {
+        alert('논문파일을 선택해주세요.');
         return;
     }
 
@@ -678,8 +707,10 @@ function saveThesisSubmission() {
             submission.status = 'submitted';
             submission.submittedData = {
                 title: title,
-                fileName: file ? file.name : 'resubmission.pdf',
-                fileSize: file ? file.size : 0,
+                thesisFile: thesisFile ? thesisFile.name : 'resubmission.pdf',
+                thesisFileSize: thesisFile ? thesisFile.size : 0,
+                otherFile: otherFile ? otherFile.name : null,
+                otherFileSize: otherFile ? otherFile.size : 0,
                 submittedAt: new Date().toLocaleString('ko-KR', {
                     year: 'numeric',
                     month: '2-digit',
@@ -699,8 +730,10 @@ function saveThesisSubmission() {
             submission.status = 'submitted';
             submission.submittedData = {
                 title: title,
-                fileName: file ? file.name : submission.submittedData.fileName,
-                fileSize: file ? file.size : submission.submittedData.fileSize,
+                thesisFile: thesisFile ? thesisFile.name : submission.submittedData.thesisFile,
+                thesisFileSize: thesisFile ? thesisFile.size : submission.submittedData.thesisFileSize,
+                otherFile: otherFile ? otherFile.name : submission.submittedData?.otherFile,
+                otherFileSize: otherFile ? otherFile.size : submission.submittedData?.otherFileSize,
                 submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {
                     year: 'numeric',
                     month: '2-digit',

@@ -312,6 +312,7 @@ const REVIEW_ASSIGNMENTS = [
         
         thesisTitle: '딥러닝 기반 자연어 처리 모델의 성능 개선 연구',
         thesisFile: 'thesis_kimcs_proposal.pdf',
+        otherFile: 'thesis_kimcs_proposal_appendix.pdf',
         
         committee: [
             {
@@ -365,6 +366,7 @@ const REVIEW_ASSIGNMENTS = [
         
         thesisTitle: '블록체인 기반 분산 데이터베이스 시스템 설계',
         thesisFile: 'thesis_leeyh_midterm.pdf',
+        otherFile: 'thesis_leeyh_midterm_supplement.pdf',
         
         committee: [
             {
@@ -418,6 +420,7 @@ const REVIEW_ASSIGNMENTS = [
         
         thesisTitle: 'AI 기반 이미지 분류 시스템의 정확도 향상 연구',
         thesisFile: 'thesis_parkms_final.pdf',
+        otherFile: 'thesis_parkms_final_references.pdf',
         
         committee: [
             {
@@ -477,6 +480,7 @@ const REVIEW_ASSIGNMENTS = [
         
         thesisTitle: '강화학습을 이용한 자율주행 차량 경로 최적화',
         thesisFile: 'thesis_choisy_proposal.pdf',
+        otherFile: 'thesis_choisy_proposal_data.pdf',
         
         committee: [
             {
@@ -530,6 +534,7 @@ const REVIEW_ASSIGNMENTS = [
         
         thesisTitle: '마이크로서비스 아키텍처 기반 클라우드 네이티브 애플리케이션 설계',
         thesisFile: 'thesis_jeongwj_midterm.pdf',
+        otherFile: 'thesis_jeongwj_midterm_charts.pdf',
         
         committee: [
             {

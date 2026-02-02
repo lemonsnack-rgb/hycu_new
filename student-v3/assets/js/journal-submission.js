@@ -107,6 +107,33 @@ const journalSubmissions = [
     },
     {
         id: 5,
+        stageName: '2차 제출',
+        attemptNumber: 1,
+        advisorName: '홍길동 교수',
+        submissionPeriod: {
+            start: '2025-05-20',
+            end: '2025-06-20'
+        },
+        status: 'submitted',
+        reviewResult: 'approved',
+        submittedData: {
+            advisor: '이영희 교수',
+            titleKorean: '블록체인 기반 스마트 계약 보안',
+            authors: '홍길동, 이영희',
+            journalName: '정보보호학회논문지',
+            journalType: 'KCI',
+            publisher: '한국정보보호학회',
+            volumeIssue: '35권 4호',
+            publishDate: '2025-06-10',
+            pages: '87-105',
+            proofDocType: 'offprint',
+            fileName: 'journal_offprint.pdf',
+            fileSize: 2800000,
+            submittedAt: '2025-06-05 14:30'
+        }
+    },
+    {
+        id: 6,
         stageName: '3차 제출',
         attemptNumber: 2,
         advisorName: '홍길동 교수',
@@ -414,6 +441,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
         // 증빙서류 텍스트 변환
         const proofDocText = {
+            'offprint': '논문별쇄본',
             'confirmation': '논문게재 확인서',
             'scheduled': '논문게재 예정증명서',
             'published': '학술지 게재본'
@@ -639,6 +667,11 @@ function renderJournalSubmissionForm(isViewMode = false) {
                         <p class="text-xs text-red-600 mb-2">* 승인서류는 첨부파일 또는 우편/팩스로 제출 필수</p>
                         <div class="space-y-2 mb-3">
                             <label class="flex items-center">
+                                <input type="radio" name="journal-proof-type" value="offprint" ${data.proofDocType === 'offprint' ? 'checked' : ''}
+                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
+                                <span class="ml-2 text-sm text-gray-900">논문별쇄본</span>
+                            </label>
+                            <label class="flex items-center">
                                 <input type="radio" name="journal-proof-type" value="confirmation" ${data.proofDocType === 'confirmation' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 확인서</span>
@@ -808,20 +841,71 @@ function handleFileSelect(event) {
 
 // 학술지 논문 제출/수정 저장
 function saveJournalSubmission() {
-    const title = document.getElementById('journal-title').value.trim();
-    const desiredExamDate = document.getElementById('journal-desired-exam-date').value;
+    const advisor = document.getElementById('journal-advisor').value.trim();
+    const titleKorean = document.getElementById('journal-title-korean').value.trim();
+    const authors = document.getElementById('journal-authors').value.trim();
+    const journalName = document.getElementById('journal-name').value.trim();
+    const journalTypeInput = document.querySelector('input[name="journal-type"]:checked');
+    const journalType = journalTypeInput ? journalTypeInput.value : null;
+    const publisher = document.getElementById('journal-publisher').value.trim();
+    const volumeIssue = document.getElementById('journal-volume-issue').value.trim();
+    const publishDate = document.getElementById('journal-publish-date').value;
+    const pages = document.getElementById('journal-pages').value.trim();
+    const proofTypeInput = document.querySelector('input[name="journal-proof-type"]:checked');
+    const proofDocType = proofTypeInput ? proofTypeInput.value : null;
     const file = document.getElementById('journal-file').files[0];
 
     const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
     const isEdit = submission.status === 'submitted';
 
-    if (!title) {
+    // 필수 필드 검증
+    if (!advisor) {
+        alert('논문지도교수를 입력해주세요.');
+        return;
+    }
+
+    if (!titleKorean) {
         alert('논문 제목을 입력해주세요.');
         return;
     }
 
-    if (!desiredExamDate) {
-        alert('희망심사일을 선택해주세요.');
+    if (!authors) {
+        alert('저자명을 입력해주세요.');
+        return;
+    }
+
+    if (!journalName) {
+        alert('학술지명을 입력해주세요.');
+        return;
+    }
+
+    if (!journalType) {
+        alert('학술지 구분을 선택해주세요.');
+        return;
+    }
+
+    if (!publisher) {
+        alert('발행기관을 입력해주세요.');
+        return;
+    }
+
+    if (!volumeIssue) {
+        alert('집/권/호를 입력해주세요.');
+        return;
+    }
+
+    if (!publishDate) {
+        alert('발행년월일을 선택해주세요.');
+        return;
+    }
+
+    if (!pages) {
+        alert('수록 Page를 입력해주세요.');
+        return;
+    }
+
+    if (!proofDocType) {
+        alert('증빙서류 종류를 선택해주세요.');
         return;
     }
 
@@ -835,8 +919,16 @@ function saveJournalSubmission() {
         // 실제로는 서버로 전송
         submission.status = 'submitted';
         submission.submittedData = {
-            title: title,
-            desiredExamDate: desiredExamDate,
+            advisor: advisor,
+            titleKorean: titleKorean,
+            authors: authors,
+            journalName: journalName,
+            journalType: journalType,
+            publisher: publisher,
+            volumeIssue: volumeIssue,
+            publishDate: publishDate,
+            pages: pages,
+            proofDocType: proofDocType,
             fileName: file ? file.name : submission.submittedData.fileName,
             fileSize: file ? file.size : submission.submittedData.fileSize,
             submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {

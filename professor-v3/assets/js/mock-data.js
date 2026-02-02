@@ -1565,6 +1565,7 @@ const journalReviews = [
         status: '심사중',
         progress: 50,
         pdfUrl: '/uploads/papers/ai-learning-system.pdf',
+        otherFileUrl: '/uploads/papers/ai-learning-system-supplement.pdf',
         myRole: 'chair', // 'chair' 또는 'member'
         year: '2025',
         semester: '2',
@@ -1663,6 +1664,7 @@ const journalReviews = [
         progress: 100,
         decision: '수정후게재',
         pdfUrl: '/uploads/papers/metaverse-learning.pdf',
+        otherFileUrl: '/uploads/papers/metaverse-learning-data.pdf',
         myRole: 'member',
         year: '2025',
         semester: '2',

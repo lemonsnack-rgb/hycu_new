@@ -117,10 +117,18 @@ function viewJournalReviewDetail(journalId, viewType, isAdminMode = false) {
                         <div class="col-span-3 flex gap-2 items-center">
                             <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
                             <span class="text-gray-900 font-medium flex-1">${journal.paperTitle}</span>
-                            <button onclick="window.open('${journal.pdfUrl || '#'}', '_blank')"
-                                    class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034] whitespace-nowrap">
-                                논문 다운로드
-                            </button>
+                            <div class="flex gap-2">
+                                <button onclick="downloadJournalFile('${journal.pdfUrl || '#'}')"
+                                        class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034] whitespace-nowrap">
+                                    논문파일 다운로드
+                                </button>
+                                ${journal.otherFileUrl ? `
+                                    <button onclick="downloadJournalOtherFile('${journal.otherFileUrl}')"
+                                            class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 whitespace-nowrap">
+                                        기타파일 다운로드
+                                    </button>
+                                ` : ''}
+                            </div>
                         </div>
                         <div class="flex gap-2">
                             <span class="text-gray-600 min-w-[80px]">제출일:</span>
@@ -1150,12 +1158,35 @@ try {
     window.removeJournalChairFile = removeJournalChairFile;
     window.renderJournalUploadedFileList = renderJournalUploadedFileList;
 
+    // ==================== 파일 다운로드 함수 ====================
+    function downloadJournalFile(url) {
+        if (url && url !== '#') {
+            window.open(url, '_blank');
+        } else {
+            alert('논문파일을 찾을 수 없습니다.');
+        }
+    }
+
+    function downloadJournalOtherFile(url) {
+        if (url && url !== '#') {
+            window.open(url, '_blank');
+        } else {
+            alert('기타파일을 찾을 수 없습니다.');
+        }
+    }
+
+    // 전역 함수로 등록
+    window.downloadJournalFile = downloadJournalFile;
+    window.downloadJournalOtherFile = downloadJournalOtherFile;
+
     console.log('✅ 학술지 상세보기 (위원/위원장 분리) 로드 완료');
     console.log('   - viewJournalReviewDetail:', typeof window.viewJournalReviewDetail);
     console.log('   - updateJournalTotalScore:', typeof window.updateJournalTotalScore);
     console.log('   - submitJournalEvaluation:', typeof window.submitJournalEvaluation);
     console.log('   - handleJournalEvaluationFileSelect:', typeof window.handleJournalEvaluationFileSelect);
     console.log('   - handleJournalChairFileSelect:', typeof window.handleJournalChairFileSelect);
+    console.log('   - downloadJournalFile:', typeof window.downloadJournalFile);
+    console.log('   - downloadJournalOtherFile:', typeof window.downloadJournalOtherFile);
 } catch (error) {
     console.error('❌ journal-review-detail.js 로드 중 에러:', error);
 }

@@ -181,10 +181,18 @@ function renderThesisInfo(assignment) {
                     <div class="col-span-3 flex gap-2 items-center">
                         <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
                         <span class="text-gray-900 font-medium flex-1">${assignment.thesisTitle}</span>
-                        <button onclick="downloadThesis('${assignment.thesisFile}')"
-                                class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034] whitespace-nowrap">
-                            논문 다운로드
-                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="downloadThesisFile('${assignment.thesisFile}')"
+                                    class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034] whitespace-nowrap">
+                                논문파일 다운로드
+                            </button>
+                            ${assignment.otherFile ? `
+                                <button onclick="downloadOtherFile('${assignment.otherFile}')"
+                                        class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 whitespace-nowrap">
+                                    기타파일 다운로드
+                                </button>
+                            ` : ''}
+                        </div>
                     </div>
                     <div class="flex gap-2">
                         <span class="text-gray-600 min-w-[80px]">제출일:</span>
@@ -2245,9 +2253,23 @@ function formatDateTime(dateStr) {
     return date.toLocaleString('ko-KR');
 }
 
-function downloadThesis(filename) {
-    showToast('파일을 다운로드합니다', 'info');
+function downloadThesisFile(filename) {
+    showToast('논문파일을 다운로드합니다', 'info');
     // 실제 다운로드 로직
+    // const url = `/api/thesis/download/${filename}`;
+    // window.open(url, '_blank');
+}
+
+function downloadOtherFile(filename) {
+    showToast('기타파일을 다운로드합니다', 'info');
+    // 실제 다운로드 로직
+    // const url = `/api/thesis/other/${filename}`;
+    // window.open(url, '_blank');
+}
+
+// Legacy function for backward compatibility
+function downloadThesis(filename) {
+    downloadThesisFile(filename);
 }
 
 function viewThesisOnline(filename) {
