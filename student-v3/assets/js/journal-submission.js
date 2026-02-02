@@ -33,9 +33,9 @@ const journalSubmissions = [
             pages: '123-145',
             thesisFile: 'journal_paper_v1.pdf',
             thesisFileSize: 2500000,
-            otherFileType: 'confirmation',
-            otherFile: 'journal_confirmation_v1.pdf',
-            otherFileSize: 800000,
+            proofDocType: 'confirmation',
+            proofDoc: 'journal_confirmation_v1.pdf',
+            proofDocSize: 800000,
             submittedAt: '2025-01-10 14:30'
         }
     },
@@ -62,9 +62,9 @@ const journalSubmissions = [
             pages: '45-68',
             thesisFile: 'journal_paper_2nd_v1.pdf',
             thesisFileSize: 2800000,
-            otherFileType: 'scheduled',
-            otherFile: 'journal_scheduled_v1.pdf',
-            otherFileSize: 600000,
+            proofDocType: 'scheduled',
+            proofDoc: 'journal_scheduled_v1.pdf',
+            proofDocSize: 600000,
             submittedAt: '2025-03-12 09:30'
         }
     },
@@ -105,9 +105,9 @@ const journalSubmissions = [
             pages: '201-225',
             thesisFile: 'journal_paper_v2.pdf',
             thesisFileSize: 3200000,
-            otherFileType: 'proof',
-            otherFile: 'journal_proof_v2.pdf',
-            otherFileSize: 500000,
+            proofDocType: 'proof',
+            proofDoc: 'journal_proof_v2.pdf',
+            proofDocSize: 500000,
             submittedAt: '2025-05-15 10:20'
         }
     },
@@ -161,9 +161,9 @@ const journalSubmissions = [
             pages: '45-68',
             thesisFile: 'journal_paper_2nd_v1.pdf',
             thesisFileSize: 2800000,
-            otherFileType: 'scheduled',
-            otherFile: 'journal_scheduled_v1.pdf',
-            otherFileSize: 600000,
+            proofDocType: 'scheduled',
+            proofDoc: 'journal_scheduled_v1.pdf',
+            proofDocSize: 600000,
             submittedAt: '2025-03-12 09:30',
             reviewComments: '연구 방법론의 보완이 필요합니다. 통계 분석 부분을 강화해 주시기 바랍니다.'
         }
@@ -245,6 +245,13 @@ function setupEventDelegation() {
                 if (fileInput) {
                     fileInput.click();
                 }
+            } else if (action === 'select-journal-proof-doc') {
+                e.preventDefault();
+                e.stopPropagation();
+                const fileInput = document.getElementById('journal-proof-doc-file');
+                if (fileInput) {
+                    fileInput.click();
+                }
             } else if (action === 'select-journal-other-file') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -267,6 +274,8 @@ function setupEventDelegation() {
     content.addEventListener('change', function(e) {
         if (e.target && e.target.id === 'journal-thesis-file') {
             handleThesisFileSelect(e);
+        } else if (e.target && e.target.id === 'journal-proof-doc-file') {
+            handleProofDocFileSelect(e);
         } else if (e.target && e.target.id === 'journal-other-file') {
             handleOtherFileSelect(e);
         }
@@ -582,7 +591,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 논문제목(한글) -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">논문제목(한글)</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">논문제목(한글) <span class="text-red-500">*</span></label>
                     <div class="flex-1">
                         <p class="text-xs text-red-600 mb-2">* 반드시 본인이 제1저자 또는 교신저자이며, 공저자에는 지도교수가 포함되어야 함</p>
                         <input type="text" id="journal-title-korean" value="${data.titleKorean || ''}"
@@ -593,7 +602,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 저자명(전체) -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">저자명(전체)</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">저자명(전체) <span class="text-red-500">*</span></label>
                     <input type="text" id="journal-authors" value="${data.authors || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="모든 저자명을 입력하세요" ${disabledAttr}>
@@ -601,7 +610,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 학술지명 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">학술지명</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">학술지명 <span class="text-red-500">*</span></label>
                     <input type="text" id="journal-name" value="${data.journalName || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="학술지명을 입력하세요" ${disabledAttr}>
@@ -609,7 +618,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 학술지 구분 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">학술지 구분</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">학술지 구분 <span class="text-red-500">*</span></label>
                     <div class="flex-1">
                         <p class="text-xs text-red-600 mb-2">* 한국연구재단(www.kci.go.kr)에서 확인 가능</p>
                         <div class="space-y-2">
@@ -649,7 +658,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 발행기관 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">발행기관</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">발행기관 <span class="text-red-500">*</span></label>
                     <input type="text" id="journal-publisher" value="${data.publisher || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="발행기관을 입력하세요" ${disabledAttr}>
@@ -657,7 +666,7 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 집/권/호 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">집/권/호</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">집/권/호 <span class="text-red-500">*</span></label>
                     <input type="text" id="journal-volume-issue" value="${data.volumeIssue || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="예: 10권 2호" ${disabledAttr}>
@@ -665,14 +674,14 @@ function renderJournalSubmissionForm(isViewMode = false) {
 
                 <!-- 발행년월일 -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">발행년월일</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">발행년월일 <span class="text-red-500">*</span></label>
                     <input type="date" id="journal-publish-date" value="${data.publishDate || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}" ${disabledAttr}>
                 </div>
 
                 <!-- 수록 Page -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">수록 Page</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">수록 Page <span class="text-red-500">*</span></label>
                     <input type="text" id="journal-pages" value="${data.pages || ''}"
                            class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
                            placeholder="예: 123-145" ${disabledAttr}>
@@ -693,41 +702,58 @@ function renderJournalSubmissionForm(isViewMode = false) {
                     </button>
                 </div>
 
-                <!-- 기타파일 (선택) -->
+                <!-- 증빙서류 (선택) -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">기타파일</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">증빙서류</label>
                     <div class="flex-1 space-y-3">
                         <p class="text-xs text-red-600">* 승인서류는 첨부파일 또는 우편/팩스로 제출 필수</p>
                         <div class="space-y-2">
                             <label class="flex items-center">
-                                <input type="radio" name="journal-other-file-type" value="confirmation" ${data.otherFileType === 'confirmation' ? 'checked' : ''}
+                                <input type="radio" name="journal-proof-doc-type" value="confirmation" ${data.proofDocType === 'confirmation' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 확인서</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="journal-other-file-type" value="scheduled" ${data.otherFileType === 'scheduled' ? 'checked' : ''}
+                                <input type="radio" name="journal-proof-doc-type" value="scheduled" ${data.proofDocType === 'scheduled' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 예정증명서</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="journal-other-file-type" value="proof" ${data.otherFileType === 'proof' ? 'checked' : ''}
+                                <input type="radio" name="journal-proof-doc-type" value="proof" ${data.proofDocType === 'proof' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 증빙서</span>
                             </label>
                         </div>
 
-                        <!-- 기타파일 업로드 -->
+                        <!-- 증빙서류 업로드 -->
                         <div class="flex items-center gap-2">
-                            <input type="text" id="journal-other-file-display" readonly
-                                   value="${data.otherFile ? data.otherFile + ' (' + (data.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                            <input type="text" id="journal-proof-doc-display" readonly
+                                   value="${data.proofDoc ? data.proofDoc + ' (' + (data.proofDocSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
                                    class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
                                    placeholder="선택된 파일 없음">
-                            <input type="file" id="journal-other-file" class="hidden" accept=".pdf" ${disabledAttr}>
-                            <button type="button" data-action="select-journal-other-file"
+                            <input type="file" id="journal-proof-doc-file" class="hidden" accept=".pdf" ${disabledAttr}>
+                            <button type="button" data-action="select-journal-proof-doc"
                                     class="px-4 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 whitespace-nowrap ${isViewMode ? 'opacity-50 cursor-not-allowed' : ''}"
                                     ${isViewMode ? 'disabled' : ''}>
                                 찾아보기
+                            </button>
+                        </div>
                     </div>
+                </div>
+
+                <!-- 기타파일 (선택) -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">기타파일</label>
+                    <input type="text" id="journal-other-file-display" readonly
+                           value="${data.otherFile ? data.otherFile + ' (' + (data.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                           placeholder="선택된 파일 없음">
+                    <input type="file" id="journal-other-file" class="hidden" accept=".pdf" ${disabledAttr}>
+                    <button type="button" data-action="select-journal-other-file"
+                            class="px-4 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 whitespace-nowrap ${isViewMode ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${isViewMode ? 'disabled' : ''}>
+                        찾아보기
+                    </button>
                 </div>
 
                 <!-- ===== 보기 모드일 때 제출정보 표시 ===== -->
@@ -836,6 +862,16 @@ function handleThesisFileSelect(event) {
     }
 }
 
+function handleProofDocFileSelect(event) {
+    const file = event.target.files[0];
+    const displayInput = document.getElementById('journal-proof-doc-display');
+
+    if (file) {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        displayInput.value = `${file.name} (${fileSize} MB)`;
+    }
+}
+
 function handleOtherFileSelect(event) {
     const file = event.target.files[0];
     const displayInput = document.getElementById('journal-other-file-display');
@@ -859,8 +895,9 @@ function saveJournalSubmission() {
     const publishDate = document.getElementById('journal-publish-date').value;
     const pages = document.getElementById('journal-pages').value.trim();
     const thesisFile = document.getElementById('journal-thesis-file').files[0];
-    const otherFileTypeInput = document.querySelector('input[name="journal-other-file-type"]:checked');
-    const otherFileType = otherFileTypeInput ? otherFileTypeInput.value : null;
+    const proofDocTypeInput = document.querySelector('input[name="journal-proof-doc-type"]:checked');
+    const proofDocType = proofDocTypeInput ? proofDocTypeInput.value : null;
+    const proofDocFile = document.getElementById('journal-proof-doc-file').files[0];
     const otherFile = document.getElementById('journal-other-file').files[0];
 
     const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
@@ -917,15 +954,15 @@ function saveJournalSubmission() {
         return;
     }
 
-    // 기타파일 종류가 선택되었는데 파일이 없는 경우
-    if (otherFileType && !otherFile && !submission.submittedData?.otherFile) {
-        alert('기타파일을 선택해주세요.');
+    // 증빙서류 종류가 선택되었는데 파일이 없는 경우
+    if (proofDocType && !proofDocFile && !submission.submittedData?.proofDoc) {
+        alert('증빙서류 파일을 선택해주세요.');
         return;
     }
 
-    // 기타파일이 있는데 종류가 선택되지 않은 경우
-    if (otherFile && !otherFileType) {
-        alert('기타파일 종류를 선택해주세요.');
+    // 증빙서류 파일이 있는데 종류가 선택되지 않은 경우
+    if (proofDocFile && !proofDocType) {
+        alert('증빙서류 종류를 선택해주세요.');
         return;
     }
 
@@ -945,7 +982,9 @@ function saveJournalSubmission() {
             pages: pages,
             thesisFile: thesisFile ? thesisFile.name : submission.submittedData?.thesisFile,
             thesisFileSize: thesisFile ? thesisFile.size : submission.submittedData?.thesisFileSize,
-            otherFileType: otherFileType,
+            proofDocType: proofDocType,
+            proofDoc: proofDocFile ? proofDocFile.name : submission.submittedData?.proofDoc,
+            proofDocSize: proofDocFile ? proofDocFile.size : submission.submittedData?.proofDocSize,
             otherFile: otherFile ? otherFile.name : submission.submittedData?.otherFile,
             otherFileSize: otherFile ? otherFile.size : submission.submittedData?.otherFileSize,
             submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {

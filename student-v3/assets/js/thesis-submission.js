@@ -489,7 +489,7 @@ function renderThesisSubmissionForm() {
 
                 <!-- 논문제목 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목 *</label>
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문 제목 <span class="text-red-500">*</span></label>
                     <input type="text" id="thesis-title" value="${data.title || ''}"
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028]"
                            placeholder="논문 제목을 입력하세요">
