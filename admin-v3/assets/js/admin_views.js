@@ -6058,3 +6058,194 @@ console.log('✅ views.scheduleContentMgmt:', typeof views.scheduleContentMgmt);
 console.log('✅ views.procedureContentMgmt:', typeof views.procedureContentMgmt);
 console.log('✅ views.noticeManagement:', typeof views.noticeManagement);
 console.log('✅ views.userManagement:', typeof views.userManagement);
+
+// ========== 논문신청 관리 ==========
+views.thesisApplication = () => {
+        return `
+            <!-- 목록 화면 -->
+            <div id="thesis-application-list-view">
+                <!-- 검색 필터 -->
+                <div class="bg-white rounded-lg shadow-md p-6 mb-4">
+                    <div class="grid grid-cols-5 gap-3">
+                        <!-- 1행: 5개 필드 -->
+                        <!-- 1. 학년도/학기 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학년도/학기
+                            </label>
+                            <div class="flex gap-2 flex-1">
+                                <select id="filter-year"
+                                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                        style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="2025" selected>2025</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2023">2023</option>
+                                </select>
+                                <select id="filter-semester"
+                                        class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                        style="height: 34px;">
+                                    <option value="">전체</option>
+                                    <option value="1" selected>1학기</option>
+                                    <option value="2">2학기</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 2. 대학구분 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                대학구분
+                            </label>
+                            <select id="filter-college-type"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="대학원">대학원</option>
+                                <option value="특수대학원">특수대학원</option>
+                            </select>
+                        </div>
+
+                        <!-- 3. 계열/대학원 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                계열/대학원
+                            </label>
+                            <select id="filter-graduate"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="일반대학원">일반대학원</option>
+                                <option value="경영대학원">경영대학원</option>
+                                <option value="특수대학원">특수대학원</option>
+                            </select>
+                        </div>
+
+                        <!-- 4. 학부(과)전공 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학부(과)전공
+                            </label>
+                            <select id="filter-college"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="공학대학">공학대학</option>
+                                <option value="경영대학">경영대학</option>
+                                <option value="인문사회대학">인문사회대학</option>
+                            </select>
+                        </div>
+
+                        <!-- 5. 학과/전공 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학과/전공
+                            </label>
+                            <input type="text" id="filter-department"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs"
+                                   style="height: 34px;"
+                                   placeholder="학과 입력">
+                        </div>
+
+                        <!-- 2행: 5개 필드 -->
+                        <!-- 6. 학위과정 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학위과정
+                            </label>
+                            <select id="filter-degree"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="석사">석사</option>
+                                <option value="박사">박사</option>
+                                <option value="석박통합">석박통합</option>
+                            </select>
+                        </div>
+
+                        <!-- 7. 학적상태 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                학적상태
+                            </label>
+                            <select id="filter-status"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="재학">재학</option>
+                                <option value="휴학">휴학</option>
+                                <option value="수료">수료</option>
+                                <option value="졸업">졸업</option>
+                            </select>
+                        </div>
+
+                        <!-- 8. 지도교수명 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                지도교수명
+                            </label>
+                            <input type="text" id="filter-advisor"
+                                   class="flex-1 px-2 border border-gray-300 rounded text-xs"
+                                   style="height: 34px;"
+                                   placeholder="지도교수명 입력">
+                        </div>
+
+                        <!-- 9. 지도단계 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                지도단계
+                            </label>
+                            <select id="filter-step-type"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="연구계획서">연구계획서</option>
+                                <option value="IRB 승인">IRB 승인</option>
+                                <option value="중간논문">중간논문</option>
+                                <option value="예비심사">예비심사</option>
+                                <option value="최종논문">최종논문</option>
+                            </select>
+                        </div>
+
+                        <!-- 10. 신청상태 -->
+                        <div class="flex items-center gap-2">
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
+                                신청상태
+                            </label>
+                            <select id="filter-application-status"
+                                    class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
+                                    style="height: 34px;">
+                                <option value="">전체</option>
+                                <option value="신청완료">신청완료</option>
+                                <option value="미신청">미신청</option>
+                            </select>
+                        </div>
+
+                        <!-- 3행: 버튼 행 -->
+                        <div></div>
+                        <div></div>
+                        <div></div>
+                        <div></div>
+
+                        <!-- 12. 조회/초기화 버튼 -->
+                        <div class="flex items-center justify-end gap-2">
+                            <button onclick="resetAdminThesisApplicationFilters()"
+                                    class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded text-sm font-medium">
+                                <i class="fas fa-redo mr-1"></i>초기화
+                            </button>
+                            <button onclick="applyAdminThesisApplicationFilters()"
+                                    class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-4 py-2 rounded text-sm font-medium">
+                                <i class="fas fa-search mr-1"></i>조회
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 목록 -->
+                <div id="thesis-application-list"></div>
+            </div>
+
+            <!-- 상세 화면 -->
+            <div id="thesis-application-detail-view" style="display: none;"></div>
+        `;
+};

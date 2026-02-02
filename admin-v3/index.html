@@ -808,6 +808,10 @@
                 <div id="evaluation-criteria-content"></div>
             </section>
 
+            <section id="thesisApplication-screen" class="content-screen">
+                <div id="thesis-application-content"></div>
+            </section>
+
             <section id="requirementManagement-screen" class="content-screen">
                 <div id="requirement-management-content"></div>
             </section>
@@ -994,6 +998,7 @@
                 'journalReview': 'journal-review-content',
                 'evaluationCriteria': 'evaluation-criteria-content',
                 'evaluationCriteriaEdit': 'evaluation-criteria-content', // 평가 기준 수정
+                'thesisApplication': 'thesis-application-content',
                 'requirementManagement': 'requirement-management-content',
                 'titleChangeRequests': 'title-change-requests-content',
                 'workScheduleManagement': 'work-schedule-management-content',
@@ -1094,6 +1099,13 @@
                     }, 0);
                 }
 
+                // 논문신청 화면 후처리
+                if (viewName === 'thesisApplication' && typeof renderAdminThesisApplicationList === 'function') {
+                    setTimeout(() => {
+                        renderAdminThesisApplicationList();
+                    }, 0);
+                }
+
                 // 콘텐츠 목록 관리 화면 후처리
                 if (viewName === 'ethicsList' || viewName === 'scheduleList' || viewName === 'procedureList') {
                     console.log('🔍 콘텐츠 목록 화면 post-processing 시작:', viewName);
@@ -1168,6 +1180,7 @@
                 'process': { menu: '논문 안내', submenu: '논문지도절차' },
                 'requirementManagement': { menu: '논문 제출', submenu: '논문 제출 요건 등록' },
                 'titleChangeRequests': { menu: '논문 제출', submenu: '최종 논문 제목 등록' },
+                'thesisApplication': { menu: '논문 심사', submenu: '논문신청' },
                 'stageManagement': { menu: '논문 지도', submenu: '논문 지도 학생 현황' },
                 'typeManagement': { menu: '논문 지도', submenu: '지도 단계 등록' },
                 'stageTypeManagement': { menu: '논문 지도', submenu: '지도 단계 유형 관리' },
@@ -1262,6 +1275,7 @@
     <script src="assets/js/notice-data.js"></script>
     <script src="assets/js/department-utils.js"></script>
     <script src="assets/js/requirement-management.js"></script>
+    <script src="assets/js/admin-thesis-application.js"></script>
     <script src="assets/js/admin_main.js"></script>
     <script src="assets/js/admin_views.js"></script>
     <script src="assets/js/admin_modals.js"></script>

@@ -1676,6 +1676,153 @@ const appData = {
             phone: '02-6789-0123',
             loginUrl: './index.html'
         }
+    ],
+
+    // ========== 논문신청 관리 - 학생 목록 ==========
+    mockStudents: [
+        {
+            id: 1,
+            studentNumber: '2024001234',
+            studentName: '김철수',
+            year: '2025',
+            semester: '1',
+            graduate: '일반대학원',
+            college: '공학대학',
+            undergraduate: '공학부',
+            department: '컴퓨터공학과',
+            degreeType: '석사',
+            academicStatus: '재학',
+            advisorId: 'PROF001',
+            advisorName: '홍길동'
+        },
+        {
+            id: 2,
+            studentNumber: '2024001235',
+            studentName: '이영희',
+            year: '2025',
+            semester: '1',
+            graduate: '일반대학원',
+            college: '경영대학',
+            undergraduate: '경영학부',
+            department: '경영학과',
+            degreeType: '박사',
+            academicStatus: '재학',
+            advisorId: 'PROF003',
+            advisorName: '김교수'
+        },
+        {
+            id: 3,
+            studentNumber: '2023001100',
+            studentName: '박민수',
+            year: '2025',
+            semester: '1',
+            graduate: '일반대학원',
+            college: '공학대학',
+            undergraduate: '공학부',
+            department: '전기전자공학과',
+            degreeType: '석사',
+            academicStatus: '재학',
+            advisorId: 'PROF002',
+            advisorName: '이교수'
+        },
+        {
+            id: 4,
+            studentNumber: '2024002001',
+            studentName: '정수현',
+            year: '2025',
+            semester: '1',
+            graduate: '특수대학원',
+            college: '경영대학원',
+            undergraduate: '-',
+            department: '경영학과',
+            degreeType: '석사',
+            academicStatus: '재학',
+            advisorId: 'PROF003',
+            advisorName: '김교수'
+        },
+        {
+            id: 5,
+            studentNumber: '2022001001',
+            studentName: '윤서준',
+            year: '2025',
+            semester: '1',
+            graduate: '일반대학원',
+            college: '인문사회대학',
+            undergraduate: '인문사회학부',
+            department: '교육학과',
+            degreeType: '박사',
+            academicStatus: '재학',
+            advisorId: 'PROF005',
+            advisorName: '박교수'
+        }
+    ],
+
+    // ========== 논문신청 관리 - 논문지도단계 목록 ==========
+    mockStepTypes: [
+        { id: 1, name: '연구계획서' },
+        { id: 2, name: 'IRB 승인' },
+        { id: 3, name: '중간논문' },
+        { id: 4, name: '예비심사' },
+        { id: 5, name: '최종논문' }
+    ],
+
+    // ========== 논문신청 관리 - 신청 목록 ==========
+    mockThesisApplications: [
+        {
+            id: 1,
+            studentId: 1,
+            stepTypeId: 1,
+            applicationPeriodStart: '2025-03-01',
+            applicationPeriodEnd: '2025-03-15',
+            withdrawalPeriodStart: '2025-03-01',
+            withdrawalPeriodEnd: '2025-03-10',
+            status: 'submitted',
+            submittedDate: '2025-03-05'
+        },
+        {
+            id: 2,
+            studentId: 2,
+            stepTypeId: 1,
+            applicationPeriodStart: '2025-03-01',
+            applicationPeriodEnd: '2025-03-15',
+            withdrawalPeriodStart: '2025-03-01',
+            withdrawalPeriodEnd: '2025-03-10',
+            status: 'submitted',
+            submittedDate: '2025-03-06'
+        },
+        {
+            id: 3,
+            studentId: 3,
+            stepTypeId: 3,
+            applicationPeriodStart: '2025-05-01',
+            applicationPeriodEnd: '2025-05-15',
+            withdrawalPeriodStart: '2025-05-01',
+            withdrawalPeriodEnd: '2025-05-10',
+            status: 'pending',
+            submittedDate: null
+        },
+        {
+            id: 4,
+            studentId: 4,
+            stepTypeId: 1,
+            applicationPeriodStart: '2025-03-01',
+            applicationPeriodEnd: '2025-03-15',
+            withdrawalPeriodStart: '2025-03-01',
+            withdrawalPeriodEnd: '2025-03-10',
+            status: 'pending',
+            submittedDate: null
+        },
+        {
+            id: 5,
+            studentId: 5,
+            stepTypeId: 5,
+            applicationPeriodStart: '2025-11-01',
+            applicationPeriodEnd: '2025-11-15',
+            withdrawalPeriodStart: '2025-11-01',
+            withdrawalPeriodEnd: '2025-11-10',
+            status: 'submitted',
+            submittedDate: '2025-11-03'
+        }
     ]
 };
 
