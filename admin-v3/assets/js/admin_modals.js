@@ -8485,18 +8485,20 @@ function openStageTaskManagementModal(workflowId) {
                     <table class="w-full border-collapse text-sm">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="py-3 px-3 border" style="width: 15%; text-align: center;">세부단계명</th>
-                                <th class="py-3 px-3 border" style="width: 15%; text-align: center;">승인권한</th>
-                                <th class="py-3 px-3 border" style="width: 15%; text-align: center;">평가표 유형</th>
-                                <th class="py-3 px-3 border" style="width: 10%; text-align: center;">일정구분</th>
-                                <th class="py-3 px-3 border" style="width: 22.5%; text-align: center;">시작일시</th>
-                                <th class="py-3 px-3 border" style="width: 22.5%; text-align: center;">종료일시</th>
+                                <th class="py-3 px-3 border" style="width: 12%; text-align: center;">기본단계명</th>
+                                <th class="py-3 px-3 border" style="width: 13%; text-align: center;">세부단계명</th>
+                                <th class="py-3 px-3 border" style="width: 13%; text-align: center;">승인권한</th>
+                                <th class="py-3 px-3 border" style="width: 13%; text-align: center;">평가표 유형</th>
+                                <th class="py-3 px-3 border" style="width: 9%; text-align: center;">일정구분</th>
+                                <th class="py-3 px-3 border" style="width: 20%; text-align: center;">시작일시</th>
+                                <th class="py-3 px-3 border" style="width: 20%; text-align: center;">종료일시</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${subStages.map(sub => `
                                 <!-- 제출 일정 -->
                                 <tr class="hover:bg-gray-50">
+                                    <td class="py-3 px-3 border bg-blue-50 font-medium" rowspan="2">${sub.basicStageName}</td>
                                     <td class="py-3 px-3 border font-medium" rowspan="2">${sub.name}</td>
                                     <td class="py-3 px-3 border" rowspan="2">
                                         <select data-substage-id="${sub.id}" data-field="approvalAuthority"

@@ -2331,21 +2331,15 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-3">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
-                            <select id="resubmission-template-id"
-                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                                <option value="">평가표 선택</option>
-                                <!-- 평가표 목록은 동적으로 채워짐 -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
-                            <input type="date" id="resubmission-deadline"
-                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                        </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
+                        <select id="resubmission-template-id"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option value="">평가표 선택</option>
+                            <!-- 평가표 목록은 동적으로 채워짐 -->
+                        </select>
                     </div>
+                    <!-- 재심 제출 마감일 필드 제거: 학교 정한 제출 기간 사용 -->
                 </div>
             </div>
         `;
@@ -3170,21 +3164,15 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4 mb-3">
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
-                            <select id="resubmission-template-id"
-                                    class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                                <option value="">평가표 선택</option>
-                                <!-- 평가표 목록은 동적으로 채워짐 -->
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일 *</label>
-                            <input type="date" id="resubmission-deadline"
-                                   class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
-                        </div>
+                    <div class="mb-3">
+                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택 *</label>
+                        <select id="resubmission-template-id"
+                                class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+                            <option value="">평가표 선택</option>
+                            <!-- 평가표 목록은 동적으로 채워짐 -->
+                        </select>
                     </div>
+                    <!-- 재심 제출 마감일 필드 제거: 학교 정한 제출 기간 사용 -->
                 </div>
             </div>
         `;
@@ -3230,20 +3218,13 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4 mb-3">
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택</label>
-                        <div class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
-                            ${getTemplateName(resub.evaluationTemplateId)}
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-semibold text-gray-700 mb-2">재심 제출 마감일</label>
-                        <div class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
-                            ${resub.deadline ? resub.deadline.substring(0, 10) : ''}
-                        </div>
+                <div class="mb-3">
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">평가표 선택</label>
+                    <div class="border border-gray-300 rounded px-3 py-2 text-sm bg-gray-100">
+                        ${getTemplateName(resub.evaluationTemplateId)}
                     </div>
                 </div>
+                <!-- 재심 제출 마감일 표시 제거: 시스템 공식 기간 사용 -->
             </div>
         `;
     }
@@ -4040,11 +4021,8 @@ function submitChairDecision() {
             return;
         }
 
-        const deadline = document.getElementById('resubmission-deadline');
-        if (!deadline || !deadline.value) {
-            showToast('재심 제출 마감일을 입력해주세요.', 'warning');
-            return;
-        }
+        // 재심 제출 마감일은 학교 정한 공식 제출 기간 사용
+        // deadline 필드 제거됨
 
         // 재심 데이터 구성
         resubmissionData = {
@@ -4053,7 +4031,7 @@ function submitChairDecision() {
             reviewerId: reviewerId,
             reviewerName: reviewerName,
             evaluationTemplateId: templateId.value,
-            deadline: deadline.value + ' 23:59:00',  // date 형식(YYYY-MM-DD)에 시간 추가
+            // deadline 필드 제거: 시스템 설정된 제출 기간 사용
             attemptNumber: 1,
             status: 'pending',
             createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
