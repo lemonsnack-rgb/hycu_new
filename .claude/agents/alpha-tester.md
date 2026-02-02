@@ -202,6 +202,56 @@ model: sonnet
 - 테스트 파일 찾기: `test-professor-*.py`
 - 관련 소스 파일 찾기
 
+## Selenium 테스트 특별 가이드
+
+### 오버레이 클릭 차단 문제 해결
+HTML 파일을 직접 열 때 모바일 오버레이가 클릭을 막는 경우:
+
+**❌ 안 되는 방법:**
+```python
+element = driver.find_element(By.CSS_SELECTOR, '#some-element')
+element.click()  # ElementClickInterceptedException 발생
+```
+
+**✅ 되는 방법 - JavaScript 직접 호출:**
+```python
+# 함수가 있으면 직접 호출
+driver.execute_script('showExamScheduleDetailReadonly("CA001")')
+driver.execute_script('showScreen("scheduleManagement")')
+
+# 또는 DOM 요소에 직접 이벤트 발생
+driver.execute_script('arguments[0].click()', element)
+```
+
+### 권장 패턴
+1. **페이지 로드**: `driver.get(url)` 후 `time.sleep(2-3)` 대기
+2. **요소 확인**: `WebDriverWait`로 요소 존재 확인
+3. **상호작용**: JavaScript 함수 직접 호출 우선, 안 되면 `execute_script(...click())`
+4. **검증**: 요소 속성/스타일 확인으로 결과 검증
+
+### 교수/관리자 화면 테스트 예시
+```python
+# 교수 화면 - 해시로 직접 이동
+driver.get('file:///G:/...professor-dashboard-proposal.html#exam-schedule')
+time.sleep(3)
+
+# JavaScript로 상세 화면 열기
+driver.execute_script('showExamScheduleDetailReadonly("CA001")')
+time.sleep(2)
+
+# 요소 검증
+heading = driver.find_element(By.XPATH, '//h5[contains(text(), "온라인 회의 정보")]')
+assert heading.is_displayed()
+
+# 관리자 화면
+driver.get('file:///G:/...admin-v3/index.html')
+time.sleep(3)
+driver.execute_script('showScreen("scheduleManagement")')
+time.sleep(2)
+driver.execute_script('showExamScheduleDetail("CA001")')
+time.sleep(2)
+```
+
 ## 실행 예시
 
 ### 예시 1: getCurrentUser 에러

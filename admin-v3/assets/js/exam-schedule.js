@@ -264,7 +264,7 @@ function renderExamScheduleDetail(assignmentId) {
     }).join('');
 
     detailView.innerHTML = `
-        <div class="review-detail-content-wrapper">
+        <div class="review-detail-content-wrapper" style="max-width: none;">
             <!-- 헤더 -->
             <div class="review-detail-header" style="padding: 12px 24px;">
                 <button onclick="backToExamScheduleList()" class="back-to-list-btn">
