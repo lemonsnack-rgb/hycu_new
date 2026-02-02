@@ -554,12 +554,14 @@ function renderJournalSubmissionForm(isViewMode = false) {
             <h3 class="text-lg font-bold text-gray-900 mb-6">학술지 논문 제출</h3>
 
             <div class="space-y-4">
-                <!-- 논문지도교수 -->
+                <!-- 논문지도교수 (읽기 전용) -->
                 <div class="flex items-start gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">논문지도교수</label>
-                    <input type="text" id="journal-advisor" value="${data.advisor || ''}"
-                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:ring-[#6A0028] focus:border-[#6A0028] ${disabledClass}"
-                           placeholder="논문지도교수명을 입력하세요" ${disabledAttr}>
+                    <input type="text" id="journal-advisor"
+                           value="${data.advisor || submission?.advisorName || window.currentStudent?.advisorName || ''}"
+                           readonly
+                           class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-100"
+                           placeholder="지도교수명">
                 </div>
 
                 <!-- 논문제목(한글) -->

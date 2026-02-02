@@ -499,7 +499,7 @@ function renderThesisSubmissionForm() {
                 <div>
                     <div class="flex items-center gap-4">
                         <!-- 논문파일 -->
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">논문파일 <span class="text-red-500">*</span></label>
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문파일 <span class="text-red-500">*</span></label>
                         <input type="text" id="thesis-file-display" readonly
                                value="${data.thesisFile ? data.thesisFile + ' (' + (data.thesisFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
@@ -511,7 +511,7 @@ function renderThesisSubmissionForm() {
                         </button>
 
                         <!-- 기타파일 -->
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap ml-4">기타파일</label>
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 ml-4">기타파일</label>
                         <input type="text" id="other-file-display" readonly
                                value="${data.otherFile ? data.otherFile + ' (' + (data.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
