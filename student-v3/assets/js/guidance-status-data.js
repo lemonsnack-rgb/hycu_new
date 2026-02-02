@@ -235,18 +235,8 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
                 timestamp: '2025-01-06 10:20',
                 attachments: [],
                 ts: new Date('2025-01-06 10:20').getTime()
-            },
-            {
-                id: 'gf-gs001-2',
-                authorId: 'S2024001',
-                authorName: '김철수',
-                authorRole: 'student',
-                text: '감사합니다 교수님. 지적하신 부분 수정하여 다시 제출하겠습니다.',
-                audio: null,
-                timestamp: '2025-01-06 11:30',
-                attachments: [],
-                ts: new Date('2025-01-06 11:30').getTime()
             }
+            // Student comment removed: Students cannot add general evaluation comments
         ],
 
         annotations: {
@@ -423,18 +413,8 @@ const STUDENT_GUIDANCE_FEEDBACK_DATA = {
                 timestamp: '2025-01-04 16:45',
                 attachments: [],
                 ts: new Date('2025-01-04 16:45').getTime()
-            },
-            {
-                id: 'gf-gs002-2',
-                authorId: 'S2024001',
-                authorName: '김철수',
-                authorRole: 'student',
-                text: '감사합니다 교수님!',
-                audio: null,
-                timestamp: '2025-01-04 17:00',
-                attachments: [],
-                ts: new Date('2025-01-04 17:00').getTime()
             }
+            // Student comment removed: Students cannot add general evaluation comments
         ],
 
         annotations: {}
@@ -508,46 +488,16 @@ const StudentGuidanceDataService = {
 
     // 댓글 추가 (학생은 댓글만 가능)
     addStudentComment(requestId, annotationId, comment) {
-        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
-        if (!data) return false;
-
-        // 페이지별 주석에서 해당 annotation 찾기
-        for (const pageNum in data.annotations) {
-            const annotation = data.annotations[pageNum].find(a => a.id === annotationId);
-            if (annotation) {
-                if (!annotation.comments) {
-                    annotation.comments = [];
-                }
-                annotation.comments.push(comment);
-
-                // 버전 업데이트
-                data.version++;
-                data.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
-                data.lastModifiedBy = CURRENT_STUDENT.id;
-
-                return true;
-            }
-        }
+        // Students are not allowed to add comments
+        console.warn('Students cannot add comments to annotations');
         return false;
     },
 
     // 전체 평가 댓글 추가
     addStudentGeneralComment(requestId, comment) {
-        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
-        if (!data) return false;
-
-        if (!data.generalFeedbackThread) {
-            data.generalFeedbackThread = [];
-        }
-
-        data.generalFeedbackThread.push(comment);
-
-        // 버전 업데이트
-        data.version++;
-        data.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
-        data.lastModifiedBy = CURRENT_STUDENT.id;
-
-        return true;
+        // Students are not allowed to add general evaluation comments
+        console.warn('Students cannot add general evaluation comments');
+        return false;
     },
 
     // 댓글 수정 (본인 것만)
@@ -618,19 +568,9 @@ const StudentGuidanceDataService = {
 
     // 학생이 주석(annotation) 추가
     addStudentAnnotation(requestId, pageNum, annotationData) {
-        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
-        if (!data) return false;
-
-        if (!data.annotations) {
-            data.annotations = {};
-        }
-        if (!data.annotations[pageNum]) {
-            data.annotations[pageNum] = [];
-        }
-
-        data.annotations[pageNum].push(annotationData);
-        console.log(`✅ 학생 주석 추가: requestId=${requestId}, page=${pageNum}`, annotationData);
-        return true;
+        // Students are not allowed to add annotations
+        console.warn('Students cannot add annotations');
+        return false;
     },
 
     // 학생이 자신의 annotation 삭제
