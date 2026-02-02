@@ -76,8 +76,9 @@ function renderApplicationListScreen() {
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">순번</th>
-                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사단계</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문지도단계</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 200px;">신청기간</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 200px;">철회기간</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">신청상태</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">관리</th>
                             </tr>
@@ -106,18 +107,24 @@ function renderApplicationRow(data, index) {
         periodText = `${schedule.startDate} ~ ${schedule.endDate}`;
     }
 
-    // 신청 상태
+    // 철회 기간 (신청 기간과 동일하게 표시)
+    let withdrawalPeriodText = '-';
+    if (schedule) {
+        withdrawalPeriodText = `${schedule.startDate} ~ ${schedule.endDate}`;
+    }
+
+    // 신청 상태 및 관리 버튼
     let statusText = '미신청';
     let actionButton = `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
                            class="text-[#6A0028] hover:underline text-xs font-medium">
-                            신청
+                            [관리]
                         </a>`;
 
     if (application && application.status === 'submitted') {
         statusText = '신청완료';
-        actionButton = `<a href="#" onclick="viewApplicationDetail('${application.id}'); return false;"
-                           class="text-[#6A0028] hover:underline text-xs font-medium">
-                            보기
+        actionButton = `<a href="#" onclick="confirmWithdrawal('${application.id}'); return false;"
+                           class="text-red-600 hover:underline text-xs font-medium">
+                            [철회]
                         </a>`;
     }
 
@@ -126,6 +133,7 @@ function renderApplicationRow(data, index) {
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
             <td class="py-3 px-4 text-sm font-medium text-gray-800">${stage.name}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${periodText}</td>
+            <td class="py-3 px-4 text-sm text-gray-600 text-center">${withdrawalPeriodText}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${statusText}</td>
             <td class="py-3 px-4 text-center">${actionButton}</td>
         </tr>
@@ -337,7 +345,26 @@ function viewApplicationDetail(applicationId) {
 }
 
 /**
- * 신청 철회
+ * 목록에서 바로 철회 확인
+ */
+function confirmWithdrawal(applicationId) {
+    if (confirm('논문 신청을 철회하시겠습니까?')) {
+        // mockThesisApplications에서 해당 항목 삭제
+        const index = window.mockThesisApplications.findIndex(app => app.id === applicationId);
+        if (index > -1) {
+            window.mockThesisApplications.splice(index, 1);
+        }
+
+        // 성공 메시지
+        alert('논문 신청이 철회되었습니다.');
+
+        // 목록 재렌더링 (미신청 상태로 표시)
+        renderApplicationListScreen();
+    }
+}
+
+/**
+ * 신청 철회 (상세 모달에서)
  */
 function cancelApplication(applicationId) {
     if (confirm('논문 신청을 철회하시겠습니까?')) {
@@ -379,6 +406,7 @@ window.openApplicationModal = openApplicationModal;
 window.closeApplicationModal = closeApplicationModal;
 window.submitApplication = submitApplication;
 window.viewApplicationDetail = viewApplicationDetail;
+window.confirmWithdrawal = confirmWithdrawal;
 window.cancelApplication = cancelApplication;
 window.closeDetailModal = closeDetailModal;
 
