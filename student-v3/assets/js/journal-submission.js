@@ -22,7 +22,7 @@ const journalSubmissions = [
         status: 'submitted',
         reviewResult: 'approved',
         submittedData: {
-            advisor: '김철수 교수',
+            advisor: '홍길동 교수',
             titleKorean: 'AI 기반 추천 시스템에 관한 연구',
             authors: '홍길동, 김철수, 이영희',
             journalName: '한국정보과학회논문지',
@@ -31,9 +31,11 @@ const journalSubmissions = [
             volumeIssue: '10권 2호',
             publishDate: '2024-11-15',
             pages: '123-145',
-            proofDocType: 'confirmation',
-            fileName: 'journal_paper_v1.pdf',
-            fileSize: 2500000,
+            thesisFile: 'journal_paper_v1.pdf',
+            thesisFileSize: 2500000,
+            otherFileType: 'confirmation',
+            otherFile: 'journal_confirmation_v1.pdf',
+            otherFileSize: 800000,
             submittedAt: '2025-01-10 14:30'
         }
     },
@@ -49,7 +51,7 @@ const journalSubmissions = [
         status: 'submitted',
         reviewResult: 'revision_required',
         submittedData: {
-            advisor: '이영희 교수',
+            advisor: '홍길동 교수',
             titleKorean: '머신러닝 기반 데이터 분석 연구',
             authors: '홍길동, 이영희',
             journalName: '데이터사이언스학회지',
@@ -58,9 +60,11 @@ const journalSubmissions = [
             volumeIssue: '15권 3호',
             publishDate: '2025-02-20',
             pages: '45-68',
-            proofDocType: 'scheduled',
-            fileName: 'journal_paper_2nd_v1.pdf',
-            fileSize: 2800000,
+            thesisFile: 'journal_paper_2nd_v1.pdf',
+            thesisFileSize: 2800000,
+            otherFileType: 'scheduled',
+            otherFile: 'journal_scheduled_v1.pdf',
+            otherFileSize: 600000,
             submittedAt: '2025-03-12 09:30'
         }
     },
@@ -90,7 +94,7 @@ const journalSubmissions = [
         reviewResult: 'approved',
         reviewComments: '우수한 연구 성과입니다. 논문 구조와 내용이 체계적이며, 연구 방법론도 적절합니다.',
         submittedData: {
-            advisor: '박지성 교수',
+            advisor: '홍길동 교수',
             titleKorean: '딥러닝 기반 음성 인식 시스템 개발',
             authors: '홍길동, 박지성, 최민수',
             journalName: 'IEEE Transactions on Audio',
@@ -99,9 +103,11 @@ const journalSubmissions = [
             volumeIssue: '28권 5호',
             publishDate: '2025-04-30',
             pages: '201-225',
-            proofDocType: 'proof',
-            fileName: 'journal_paper_v2.pdf',
-            fileSize: 3200000,
+            thesisFile: 'journal_paper_v2.pdf',
+            thesisFileSize: 3200000,
+            otherFileType: 'proof',
+            otherFile: 'journal_proof_v2.pdf',
+            otherFileSize: 500000,
             submittedAt: '2025-05-15 10:20'
         }
     },
@@ -117,7 +123,7 @@ const journalSubmissions = [
         status: 'submitted',
         reviewResult: 'approved',
         submittedData: {
-            advisor: '이영희 교수',
+            advisor: '홍길동 교수',
             titleKorean: '블록체인 기반 스마트 계약 보안',
             authors: '홍길동, 이영희',
             journalName: '정보보호학회논문지',
@@ -126,9 +132,8 @@ const journalSubmissions = [
             volumeIssue: '35권 4호',
             publishDate: '2025-06-10',
             pages: '87-105',
-            proofDocType: 'offprint',
-            fileName: 'journal_offprint.pdf',
-            fileSize: 2800000,
+            thesisFile: 'journal_offprint.pdf',
+            thesisFileSize: 2800000,
             submittedAt: '2025-06-05 14:30'
         }
     },
@@ -145,7 +150,7 @@ const journalSubmissions = [
         reviewResult: null,
         submittedData: null,
         originalSubmission: {
-            advisor: '이영희 교수',
+            advisor: '홍길동 교수',
             titleKorean: '머신러닝 기반 데이터 분석 연구',
             authors: '홍길동, 이영희',
             journalName: '데이터사이언스학회지',
@@ -154,9 +159,11 @@ const journalSubmissions = [
             volumeIssue: '15권 3호',
             publishDate: '2025-02-20',
             pages: '45-68',
-            proofDocType: 'scheduled',
-            fileName: 'journal_paper_2nd_v1.pdf',
-            fileSize: 2800000,
+            thesisFile: 'journal_paper_2nd_v1.pdf',
+            thesisFileSize: 2800000,
+            otherFileType: 'scheduled',
+            otherFile: 'journal_scheduled_v1.pdf',
+            otherFileSize: 600000,
             submittedAt: '2025-03-12 09:30',
             reviewComments: '연구 방법론의 보완이 필요합니다. 통계 분석 부분을 강화해 주시기 바랍니다.'
         }
@@ -231,10 +238,17 @@ function setupEventDelegation() {
                 e.preventDefault();
                 e.stopPropagation();
                 saveJournalSubmission();
-            } else if (action === 'select-file') {
+            } else if (action === 'select-journal-thesis-file') {
                 e.preventDefault();
                 e.stopPropagation();
-                const fileInput = document.getElementById('journal-file');
+                const fileInput = document.getElementById('journal-thesis-file');
+                if (fileInput) {
+                    fileInput.click();
+                }
+            } else if (action === 'select-journal-other-file') {
+                e.preventDefault();
+                e.stopPropagation();
+                const fileInput = document.getElementById('journal-other-file');
                 if (fileInput) {
                     fileInput.click();
                 }
@@ -251,8 +265,10 @@ function setupEventDelegation() {
 
     // 파일 입력 변경 이벤트 (이벤트 위임으로 처리할 수 없으므로 직접 처리)
     content.addEventListener('change', function(e) {
-        if (e.target && e.target.id === 'journal-file') {
-            handleFileSelect(e);
+        if (e.target && e.target.id === 'journal-thesis-file') {
+            handleThesisFileSelect(e);
+        } else if (e.target && e.target.id === 'journal-other-file') {
+            handleOtherFileSelect(e);
         }
     });
 
@@ -662,69 +678,55 @@ function renderJournalSubmissionForm(isViewMode = false) {
                            placeholder="예: 123-145" ${disabledAttr}>
                 </div>
 
-                <!-- 증빙서류 -->
+                <!-- 논문파일 (필수) -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">논문파일 <span class="text-red-500">*</span></label>
+                    <input type="text" id="journal-thesis-file-display" readonly
+                           value="${data.thesisFile ? data.thesisFile + ' (' + (data.thesisFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                           placeholder="선택된 파일 없음">
+                    <input type="file" id="journal-thesis-file" class="hidden" accept=".pdf" ${disabledAttr}>
+                    <button type="button" data-action="select-journal-thesis-file"
+                            class="px-4 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 whitespace-nowrap ${isViewMode ? 'opacity-50 cursor-not-allowed' : ''}"
+                            ${isViewMode ? 'disabled' : ''}>
+                        찾아보기
+                    </button>
+                </div>
+
+                <!-- 기타파일 (선택) -->
                 <div class="flex items-start gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">증빙서류<br>(심사평가)</label>
-                    <div class="flex-1">
-                        <p class="text-xs text-red-600 mb-2">* 승인서류는 첨부파일 또는 우편/팩스로 제출 필수</p>
-                        <div class="space-y-2 mb-3">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0 pt-2">기타파일</label>
+                    <div class="flex-1 space-y-3">
+                        <p class="text-xs text-red-600">* 승인서류는 첨부파일 또는 우편/팩스로 제출 필수</p>
+                        <div class="space-y-2">
                             <label class="flex items-center">
-                                <input type="radio" name="journal-proof-type" value="offprint" ${data.proofDocType === 'offprint' ? 'checked' : ''}
-                                       class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
-                                <span class="ml-2 text-sm text-gray-900">논문별쇄본</span>
-                            </label>
-                            <label class="flex items-center">
-                                <input type="radio" name="journal-proof-type" value="confirmation" ${data.proofDocType === 'confirmation' ? 'checked' : ''}
+                                <input type="radio" name="journal-other-file-type" value="confirmation" ${data.otherFileType === 'confirmation' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 확인서</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="journal-proof-type" value="scheduled" ${data.proofDocType === 'scheduled' ? 'checked' : ''}
+                                <input type="radio" name="journal-other-file-type" value="scheduled" ${data.otherFileType === 'scheduled' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 예정증명서</span>
                             </label>
                             <label class="flex items-center">
-                                <input type="radio" name="journal-proof-type" value="proof" ${data.proofDocType === 'proof' ? 'checked' : ''}
+                                <input type="radio" name="journal-other-file-type" value="proof" ${data.otherFileType === 'proof' ? 'checked' : ''}
                                        class="w-4 h-4 text-[#6A0028] border-gray-300 focus:ring-[#6A0028]" ${disabledAttr}>
                                 <span class="ml-2 text-sm text-gray-900">논문게재 증빙서</span>
                             </label>
                         </div>
 
-                        <!-- 파일업로드 -->
-                        <div class="flex items-center gap-3">
-                            <input type="file" id="journal-file" class="hidden" accept=".pdf" ${disabledAttr}>
-                            <button type="button" data-action="select-file"
-                                    class="inline-flex items-center px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 text-sm ${isViewMode ? 'opacity-50 cursor-not-allowed' : ''}"
+                        <!-- 기타파일 업로드 -->
+                        <div class="flex items-center gap-2">
+                            <input type="text" id="journal-other-file-display" readonly
+                                   value="${data.otherFile ? data.otherFile + ' (' + (data.otherFileSize / 1024 / 1024).toFixed(2) + ' MB)' : ''}"
+                                   class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50"
+                                   placeholder="선택된 파일 없음">
+                            <input type="file" id="journal-other-file" class="hidden" accept=".pdf" ${disabledAttr}>
+                            <button type="button" data-action="select-journal-other-file"
+                                    class="px-4 py-1.5 text-sm border border-gray-300 rounded-md hover:bg-gray-50 whitespace-nowrap ${isViewMode ? 'opacity-50 cursor-not-allowed' : ''}"
                                     ${isViewMode ? 'disabled' : ''}>
-                                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                </svg>
-                                파일 선택
-                            </button>
-                            <span class="text-xs text-gray-500">PDF만 업로드 가능. 최대 30MB</span>
-                        </div>
-                        ${isViewMode && data.fileName ? `
-                            <div class="mt-3 flex items-center gap-3 px-3 py-1.5 border border-gray-300 bg-gray-50 rounded-md">
-                                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                          d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                                </svg>
-                                <span class="text-sm text-gray-900">${data.fileName}</span>
-                                <span class="text-xs text-gray-500">(${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
-                                <button class="ml-auto text-sm text-[#6A0028] hover:text-[#8A0034]">다운로드</button>
-                            </div>
-                        ` : ''}
-                        <div id="file-info" class="text-sm text-gray-600 mt-2">
-                            ${!isViewMode && data.fileName ? `
-                                <div class="flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                                    </svg>
-                                    <span class="text-green-600 font-medium">${data.fileName} (${(data.fileSize / 1024 / 1024).toFixed(2)} MB)</span>
-                                </div>
-                            ` : ''}
-                        </div>
+                                찾아보기
                     </div>
                 </div>
 
@@ -824,20 +826,23 @@ function editJournalSubmission(id) {
 }
 
 // 파일 선택 처리
-function handleFileSelect(event) {
+function handleThesisFileSelect(event) {
     const file = event.target.files[0];
-    const fileInfo = document.getElementById('file-info');
+    const displayInput = document.getElementById('journal-thesis-file-display');
 
     if (file) {
         const fileSize = (file.size / 1024 / 1024).toFixed(2);
-        fileInfo.innerHTML = `
-            <div class="flex items-center justify-center gap-2">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                <span class="text-green-600 font-medium">${file.name} (${fileSize} MB)</span>
-            </div>
-        `;
+        displayInput.value = `${file.name} (${fileSize} MB)`;
+    }
+}
+
+function handleOtherFileSelect(event) {
+    const file = event.target.files[0];
+    const displayInput = document.getElementById('journal-other-file-display');
+
+    if (file) {
+        const fileSize = (file.size / 1024 / 1024).toFixed(2);
+        displayInput.value = `${file.name} (${fileSize} MB)`;
     }
 }
 
@@ -853,9 +858,10 @@ function saveJournalSubmission() {
     const volumeIssue = document.getElementById('journal-volume-issue').value.trim();
     const publishDate = document.getElementById('journal-publish-date').value;
     const pages = document.getElementById('journal-pages').value.trim();
-    const proofTypeInput = document.querySelector('input[name="journal-proof-type"]:checked');
-    const proofDocType = proofTypeInput ? proofTypeInput.value : null;
-    const file = document.getElementById('journal-file').files[0];
+    const thesisFile = document.getElementById('journal-thesis-file').files[0];
+    const otherFileTypeInput = document.querySelector('input[name="journal-other-file-type"]:checked');
+    const otherFileType = otherFileTypeInput ? otherFileTypeInput.value : null;
+    const otherFile = document.getElementById('journal-other-file').files[0];
 
     const submission = journalSubmissions.find(s => s.id === journalCurrentSubmissionId);
     const isEdit = submission.status === 'submitted';
@@ -906,13 +912,20 @@ function saveJournalSubmission() {
         return;
     }
 
-    if (!proofDocType) {
-        alert('증빙서류 종류를 선택해주세요.');
+    if (!isEdit && !thesisFile && !submission.submittedData?.thesisFile) {
+        alert('논문파일을 선택해주세요.');
         return;
     }
 
-    if (!isEdit && !file) {
-        alert('파일을 선택해주세요.');
+    // 기타파일 종류가 선택되었는데 파일이 없는 경우
+    if (otherFileType && !otherFile && !submission.submittedData?.otherFile) {
+        alert('기타파일을 선택해주세요.');
+        return;
+    }
+
+    // 기타파일이 있는데 종류가 선택되지 않은 경우
+    if (otherFile && !otherFileType) {
+        alert('기타파일 종류를 선택해주세요.');
         return;
     }
 
@@ -930,9 +943,11 @@ function saveJournalSubmission() {
             volumeIssue: volumeIssue,
             publishDate: publishDate,
             pages: pages,
-            proofDocType: proofDocType,
-            fileName: file ? file.name : submission.submittedData.fileName,
-            fileSize: file ? file.size : submission.submittedData.fileSize,
+            thesisFile: thesisFile ? thesisFile.name : submission.submittedData?.thesisFile,
+            thesisFileSize: thesisFile ? thesisFile.size : submission.submittedData?.thesisFileSize,
+            otherFileType: otherFileType,
+            otherFile: otherFile ? otherFile.name : submission.submittedData?.otherFile,
+            otherFileSize: otherFile ? otherFile.size : submission.submittedData?.otherFileSize,
             submittedAt: isEdit ? submission.submittedData.submittedAt : new Date().toLocaleString('ko-KR', {
                 year: 'numeric',
                 month: '2-digit',
