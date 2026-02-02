@@ -741,25 +741,9 @@ function addGeneralFeedback(){
 
 // ✅ 전체 평가 댓글 등록 (신규)
 function addGeneralReply(feedbackId){
-  const ta = document.getElementById('general-reply-textarea');
-  if (!ta) return;
-  const v = ta.value.trim();
-  if (!v) { alert('댓글을 입력하세요.'); return; }
-  
-  window._generalComments = window._generalComments || {};
-  window._generalComments[feedbackId] = window._generalComments[feedbackId] || [];
-  
-  // 댓글 추가
-  window._generalComments[feedbackId].push({
-    text: v,
-    ts: Date.now(),
-    attach: [],
-    authorId: CURRENT_USER ? CURRENT_USER.id : 'prof1'
-  });
-  
-  ta.value = '';
-  renderGeneralThread(feedbackId);
-  showToast('댓글이 등록되었습니다.', 'success');
+  // Students are not allowed to add replies to evaluation
+  console.warn('Students cannot add replies to general evaluation');
+  return false;
 }
 
 // 전역 함수 등록

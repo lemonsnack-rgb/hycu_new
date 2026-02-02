@@ -99,7 +99,13 @@ function openStudentGuidanceStatusDetail(requestId) {
                 ts: item.ts || new Date(item.timestamp).getTime(),
                 attach: item.attachments || []
             }));
-            console.log('✅ 전체 평가 데이터 매핑 완료:', window._generalComments[requestId]);
+
+            // 브라우저 메모리에서 이전 학생 댓글 정리 (학생은 댓글 추가 불가)
+            window._generalComments[requestId] = window._generalComments[requestId].filter(
+                comment => comment.authorRole !== 'student'
+            );
+
+            console.log('✅ 전체 평가 데이터 매핑 완료 (학생 댓글 제외):', window._generalComments[requestId]);
         }
 
         // 학생용 전역 컨텍스트 설정
