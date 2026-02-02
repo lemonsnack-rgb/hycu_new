@@ -320,7 +320,7 @@ function renderJournalListRow(submission, index) {
     } else if (submission.reviewResult === 'rejected') {
         resultText = '반려';
     } else if (submission.reviewResult === 'revision_required') {
-        resultText = '보완후재제출';
+        resultText = '조건부합격';
     } else if (submission.reviewResult === 'on_hold') {
         resultText = '보류';
     }
