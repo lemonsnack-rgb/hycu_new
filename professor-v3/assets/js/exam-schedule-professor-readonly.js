@@ -18,19 +18,17 @@ let currentExamFilters = {
 };
 
 let currentExamAssignmentId = null;
-const currentProfessorId = 'PROF003'; // 실제로는 세션에서 가져옴
+let examCurrentProfessorId = 'PROF003'; // 실제로는 세션에서 가져옴
 
 /**
  * 심사 일정 화면 초기 렌더링
  */
 function renderExamScheduleScreen() {
-    console.log('🔍 renderExamScheduleScreen 호출됨');
     const container = document.getElementById('exam-schedule-content');
     if (!container) {
-        console.error('❌ exam-schedule-content 컨테이너를 찾을 수 없습니다');
+        console.error('exam-schedule-content 컨테이너를 찾을 수 없습니다');
         return;
     }
-    console.log('✅ exam-schedule-content 컨테이너 찾음');
 
     container.innerHTML = `
         <!-- 목록 화면 -->
@@ -267,7 +265,7 @@ function filterExamScheduleList() {
     let data = getExamScheduleListData().filter(item => {
         const assignment = mockCommitteeAssignments.find(a => a.id === item.assignmentId);
         if (!assignment) return false;
-        return assignment.members.some(m => m.professorId === currentProfessorId);
+        return assignment.members.some(m => m.professorId === examCurrentProfessorId);
     });
 
     // 필터 적용
@@ -740,4 +738,4 @@ if (typeof window !== 'undefined') {
     window.backToExamScheduleListReadonly = backToExamScheduleListReadonly;
 }
 
-console.log('✅ exam-schedule-professor-readonly.js 로드 완료');
+// exam-schedule-professor-readonly.js 로드 완료

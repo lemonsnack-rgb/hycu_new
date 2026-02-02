@@ -350,4 +350,4 @@ window.filterProfessorContentList = filterProfessorContentList;
 window.showProfessorContentDetail = showProfessorContentDetail;
 window.backToProfessorContentList = backToProfessorContentList;
 
-console.log('✅ 교수용 콘텐츠 모듈 로드 완료');
+// 교수용 콘텐츠 모듈 로드 완료

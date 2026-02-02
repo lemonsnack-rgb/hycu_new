@@ -643,32 +643,18 @@ const FeedbackDataService = {
     
     // 코멘트 추가
     addComment(feedbackId, annotationId, comment, isMainComment = false) {
-        console.log('🟢 [FeedbackDataService.addComment] 시작');
-        console.log('🟢 feedbackId:', feedbackId);
-        console.log('🟢 annotationId:', annotationId);
-        console.log('🟢 comment:', comment);
-        console.log('🟢 isMainComment:', isMainComment);
-        
         const data = FEEDBACK_DATA[feedbackId];
-        console.log('🟢 FEEDBACK_DATA[feedbackId]:', data);
-        
+
         if (!data) {
-            console.error('❌ [FeedbackDataService.addComment] data가 없음!');
+            console.error('[FeedbackDataService.addComment] data not found');
             return;
         }
-        
-        console.log('🟢 data.annotations:', data.annotations);
-        
+
         for (const pageNum in data.annotations) {
-            console.log(`🟢 페이지 ${pageNum} 체크 중...`);
-            
             const annotation = data.annotations[pageNum].find(a => a.id === annotationId);
-            
+
             if (annotation) {
-                console.log('🟢 annotation 찾음:', annotation);
-                
                 if (!annotation.comments) {
-                    console.log('🟢 annotation.comments 초기화');
                     annotation.comments = [];
                 }
                 

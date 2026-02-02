@@ -453,4 +453,4 @@ if (typeof window !== 'undefined') {
     window.backToExamScheduleList = backToExamScheduleList;
 }
 
-console.log('✅ exam-schedule-professor.js 로드 완료');
+// exam-schedule-professor.js 로드 완료

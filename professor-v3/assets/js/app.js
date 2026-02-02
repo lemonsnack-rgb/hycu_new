@@ -93,48 +93,45 @@ function showScreen(screenId) {
             }
         } else if (screenId === 'exam-schedule') {
             // 심사 일정 관리 초기화 (읽기 전용)
-            console.log('📋 exam-schedule 화면 전환 시도');
-            console.log('renderExamScheduleScreen 타입:', typeof renderExamScheduleScreen);
             if (typeof renderExamScheduleScreen === 'function') {
-                console.log('✅ renderExamScheduleScreen 함수 호출');
                 renderExamScheduleScreen();
             } else {
-                console.error('❌ renderExamScheduleScreen 함수를 찾을 수 없습니다');
+                console.error('renderExamScheduleScreen 함수를 찾을 수 없습니다');
             }
         } else if (screenId === 'guidance') {
             // ✨ 주차별 논문지도 현황 초기화 (새로운 weekly-guidance.js 사용)
             if (typeof initProfessorWeeklyGuidance === 'function') {
                 initProfessorWeeklyGuidance();
             } else {
-                console.error('❌ initProfessorWeeklyGuidance 함수를 찾을 수 없습니다');
+                // initProfessorWeeklyGuidance not found
             }
         } else if (screenId === 'ethics') {
             // 연구윤리 화면 렌더링
             if (typeof initProfessorEthics === 'function') {
                 initProfessorEthics();
             } else {
-                console.error('❌ initProfessorEthics 함수를 찾을 수 없습니다');
+                // initProfessorEthics not found
             }
         } else if (screenId === 'schedule') {
             // 논문일정 화면 렌더링
             if (typeof initProfessorSchedule === 'function') {
                 initProfessorSchedule();
             } else {
-                console.error('❌ initProfessorSchedule 함수를 찾을 수 없습니다');
+                // initProfessorSchedule not found
             }
         } else if (screenId === 'process') {
             // 논문지도절차 화면 렌더링
             if (typeof initProfessorProcedure === 'function') {
                 initProfessorProcedure();
             } else {
-                console.error('❌ initProfessorProcedure 함수를 찾을 수 없습니다');
+                // initProfessorProcedure not found
             }
         } else if (screenId === 'notice') {
             // 공지사항 화면 렌더링
             if (typeof initProfessorNotice === 'function') {
                 initProfessorNotice();
             } else {
-                console.error('❌ initProfessorNotice 함수를 찾을 수 없습니다');
+                // initProfessorNotice not found
             }
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];
@@ -221,23 +218,20 @@ function handleLogout() {
 
 // 페이지 초기화
 function initializePage() {
-    console.log('페이지 초기화 시작');
-    console.log('⚠️ SSO 인증 완료 가정 (외부 시스템에서 처리됨)');
-    
     // 알림 배지 업데이트
     updateNotificationBadge();
-    
+
     // 대시보드 초기화
     if (typeof initDashboard === 'function') {
         initDashboard();
     }
-    
+
     // 사용자 메뉴 클릭 이벤트
     const userMenu = document.querySelector('.user-menu');
     if (userMenu) {
         userMenu.addEventListener('click', toggleUserMenu);
     }
-    
+
     // URL 해시로 초기 화면 설정
     if (window.location.hash) {
         const screenId = window.location.hash.substring(1);
@@ -245,8 +239,6 @@ function initializePage() {
             showScreen(screenId);
         }
     }
-    
-    console.log('페이지 초기화 완료');
 }
 
 // 탭 전환 함수

@@ -8,12 +8,10 @@
 function getProfessorDepartments() {
     // appData가 로드되지 않았으면 빈 배열 반환
     if (typeof appData === 'undefined') {
-        console.warn('⚠️ appData가 아직 로드되지 않았습니다.');
         return [];
     }
 
     if (!appData?.weeklyGuidance?.guidancePairs) {
-        console.warn('⚠️ appData.weeklyGuidance.guidancePairs를 찾을 수 없습니다.');
         return [];
     }
 
@@ -114,4 +112,4 @@ window.getProfessorDefaultDepartment = getProfessorDefaultDepartment;
 window.generateDepartmentDropdownHtml = generateDepartmentDropdownHtml;
 window.shouldShowContentForDepartment = shouldShowContentForDepartment;
 
-console.log('✅ 학과 유틸리티 모듈 로드 완료');
+// 학과 유틸리티 모듈 로드 완료

@@ -297,4 +297,4 @@ window.filterProfessorNoticeList = filterProfessorNoticeList;
 window.showProfessorNoticeDetail = showProfessorNoticeDetail;
 window.backToProfessorNoticeList = backToProfessorNoticeList;
 
-console.log('✅ 교수용 공지사항 모듈 로드 완료');
+// 교수용 공지사항 모듈 로드 완료
