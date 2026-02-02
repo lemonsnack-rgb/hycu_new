@@ -386,6 +386,9 @@ function renderBoardWriteForm() {
     const container = document.getElementById('boardContainer');
     if (!container) return;
 
+    // 학생 목록 가져오기 (교수가 열람자 지정할 때 사용)
+    const students = DataService.getStudents();
+
     const html = `
         <div class="bg-white rounded-lg shadow-md">
             <div class="px-6 py-3 border-b flex items-center justify-between">
@@ -440,11 +443,37 @@ function renderBoardWriteForm() {
                         </div>
                     </div>
 
-                    <!-- 공개 범위 안내 -->
-                    <div>
-                        <label class="block text-sm font-medium text-gray-800 mb-2">공개 범위</label>
-                        <p class="text-sm text-gray-600">이 글은 지도교수에게만 공개됩니다.</p>
-                    </div>
+                    <!-- 열람자 지정 (교수) / 공개 범위 안내 (학생) -->
+                    ${currentUser.role === 'professor' ? `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">열람자 지정 *</label>
+                            <select id="postViewerType" class="w-full px-3 py-2 border border-gray-300 rounded-lg" onchange="toggleStudentSelection()">
+                                <option value="all">전체 학생</option>
+                                <option value="masters">석사과정만</option>
+                                <option value="phd">박사과정만</option>
+                                <option value="specific">개별 학생 선택</option>
+                            </select>
+                        </div>
+
+                        <!-- 개별 학생 선택 -->
+                        <div id="studentSelectionDiv" style="display: none;">
+                            <label class="block text-sm font-medium text-gray-800 mb-2">학생 선택</label>
+                            <div class="border border-gray-300 rounded-lg p-3 max-h-40 overflow-y-auto space-y-2">
+                                ${students.map(student => `
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="checkbox" name="selectedStudents" value="${student.id}" class="rounded">
+                                        <span class="text-sm">${student.name} (${student.studentId}) - ${student.degree === 'master' ? '석사' : '박사'}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                    ` : `
+                        <input type="hidden" id="postViewerType" value="specific">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-800 mb-2">공개 범위</label>
+                            <p class="text-sm text-gray-600">이 글은 지도교수에게만 공개됩니다.</p>
+                        </div>
+                    `}
 
                     <!-- 파일 첨부 -->
                     <div>
@@ -619,9 +648,38 @@ function submitBoardPost() {
         return;
     }
 
-    // 학생이 작성하는 경우, 지도교수에게만 공개
-    const student = DataService.getStudent(currentUser.id);
-    const viewers = student ? (student.advisors || [student.advisor]) : [];
+    // 열람자 설정
+    let viewerType = 'specific';
+    let viewers = [];
+
+    if (currentUser.role === 'professor') {
+        const viewerTypeSelect = document.getElementById('postViewerType');
+        viewerType = viewerTypeSelect ? viewerTypeSelect.value : 'all';
+
+        if (viewerType === 'specific') {
+            const checkboxes = document.querySelectorAll('input[name="selectedStudents"]:checked');
+            if (checkboxes.length === 0) {
+                alert('열람할 학생을 선택해주세요.');
+                return;
+            }
+            viewers = Array.from(checkboxes).map(cb => cb.value);
+        } else if (viewerType === 'all') {
+            // 전체 학생: viewers 빈 배열
+            viewers = [];
+        } else if (viewerType === 'masters' || viewerType === 'phd') {
+            // 학위과정별: DataService에서 필터링하여 가져오기
+            const allStudents = DataService.getStudents();
+            const degreeKey = viewerType === 'masters' ? 'master' : 'phd';
+            viewers = allStudents
+                .filter(s => s.degree === degreeKey && s.advisor === currentUser.id)
+                .map(s => s.id);
+        }
+    } else {
+        // 학생 작성: 기존 로직 유지
+        const student = DataService.getStudent(currentUser.id);
+        viewerType = 'specific';
+        viewers = student ? (student.advisors || [student.advisor]) : [];
+    }
 
     // 파일 처리
     const files = [];
@@ -645,7 +703,7 @@ function submitBoardPost() {
         authorName: currentUser.name,
         authorRole: currentUser.role,
         files: files,
-        viewerType: 'specific',
+        viewerType: viewerType,
         viewers: viewers
     };
 
@@ -744,6 +802,16 @@ function formatFileSize(bytes) {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
+// 학생 선택 토글 (열람자 지정 드롭다운 변경 시)
+function toggleStudentSelection() {
+    const viewerType = document.getElementById('postViewerType');
+    const studentSelectionDiv = document.getElementById('studentSelectionDiv');
+
+    if (viewerType && studentSelectionDiv) {
+        studentSelectionDiv.style.display = viewerType.value === 'specific' ? 'block' : 'none';
+    }
+}
+
 // 전역으로 export
 window.initBoard = initBoard;
 window.renderBoardScreen = renderBoardScreen;
@@ -760,5 +828,6 @@ window.formatText = formatText;
 window.addComment = addComment;
 window.deleteComment = deleteComment;
 window.removeExistingFile = removeExistingFile;
+window.toggleStudentSelection = toggleStudentSelection;
 
 // 자료실 게시판 모듈 로드 완료
