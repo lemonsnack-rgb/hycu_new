@@ -153,7 +153,7 @@ function renderProfessorContentListView(contentType) {
                                 <th style="width: 60px;">순번</th>
                                 <th>제목</th>
                                 <th style="width: 150px;">대상학과</th>
-                                <th style="width: 150px;">작성일</th>
+                                <th style="width: 150px;">최근 수정일</th>
                                 <th style="width: 120px;">작성자</th>
                             </tr>
                         </thead>
