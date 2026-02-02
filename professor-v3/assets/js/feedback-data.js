@@ -326,19 +326,8 @@ const FEEDBACK_DATA = {
                 attachments: [],
                 ts: new Date('2025-11-20 09:30').getTime(),
                 attach: []
-            },
-            {
-                id: 'gf-fb001-2',
-                authorId: 'S001',
-                authorName: '김철수',
-                authorRole: 'student',
-                text: '감사합니다 교수님. 지적하신 부분 확인하고 수정하겠습니다.',
-                audio: null,
-                timestamp: '2025-11-20 10:00',
-                attachments: [],
-                ts: new Date('2025-11-20 10:00').getTime(),
-                attach: []
             }
+            // Student comment removed: Students cannot add general evaluation comments
         ],
         
         annotations: {
@@ -446,19 +435,8 @@ const FEEDBACK_DATA = {
                 attachments: [],
                 ts: new Date('2025-11-19 15:30').getTime(),
                 attach: []
-            },
-            {
-                id: 'gf-fb002-2',
-                authorId: 'S002',
-                authorName: '이영희',
-                authorRole: 'student',
-                text: '감사합니다 교수님. 지적하신 부분 모두 수정했습니다.',
-                audio: null,
-                timestamp: '2025-11-19 16:00',
-                attachments: [],
-                ts: new Date('2025-11-19 16:00').getTime(),
-                attach: []
             }
+            // 학생 댓글 제거됨 (2026-02-02): 학생은 전체평가 댓글 작성 불가
         ],
 
         annotations: {
