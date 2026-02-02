@@ -707,36 +707,9 @@ function renderGeneralThread(feedbackId){
 }
 
 function addGeneralFeedback(){
-  // feedbackId를 전역 컨텍스트에서 가져오기
-  const feedbackId = window._currentFeedbackCtx?.id;
-  if (!feedbackId) {
-    alert('피드백 정보를 찾을 수 없습니다.');
-    return;
-  }
-
-  const ta = document.getElementById('general-feedback-input');
-  if (!ta) return;
-  const v = ta.value.trim();
-  if (!v) { alert('내용을 입력하세요.'); return; }
-
-  window._generalComments = window._generalComments || {};
-  window._generalComments[feedbackId] = window._generalComments[feedbackId] || [];
-
-  // authorId 추가
-  window._generalComments[feedbackId].push({
-    text: v,
-    ts: Date.now(),
-    attach: (window._pendingAttach||[]),
-    authorId: CURRENT_USER ? CURRENT_USER.id : 'student1'
-  });
-
-  window._pendingAttach = [];
-  ta.value='';
-
-  // UI 미리보기 제거
-  removeGeneralAttachment();
-
-  renderGeneralThread(feedbackId);
+  // Students are not allowed to add general evaluation
+  console.warn('Students cannot add general evaluation');
+  return false;
 }
 
 // ✅ 전체 평가 댓글 등록 (신규)
