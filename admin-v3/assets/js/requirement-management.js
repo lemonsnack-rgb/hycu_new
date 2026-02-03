@@ -12,7 +12,7 @@ const RequirementManagement = {
             { key: "연구방법론_이수여부", label: "연구방법론" },
             { key: "외국어시험_합격여부", label: "외국어시험" },
             { key: "종합시험_합격여부", label: "종합시험" },
-            { key: "학술지계재요건_충족여부", label: "학술지계재" }
+            { key: "학술지계재요건_충족여부", label: "학술지게재" }
         ],
         "박사": [
             { key: "학점수료여부", label: "학점수료" },
@@ -22,7 +22,7 @@ const RequirementManagement = {
             { key: "연구방법론_이수여부", label: "연구방법론" },
             { key: "외국어시험_합격여부", label: "외국어시험" },
             { key: "종합시험_합격여부", label: "종합시험" },
-            { key: "학술지계재요건_충족여부", label: "학술지계재" }
+            { key: "학술지계재요건_충족여부", label: "학술지게재" }
         ],
         "통합과정": [
             { key: "학점수료여부", label: "학점수료" },
@@ -33,7 +33,7 @@ const RequirementManagement = {
             { key: "연구방법론_이수여부", label: "연구방법론" },
             { key: "외국어시험_합격여부", label: "외국어시험" },
             { key: "종합시험_합격여부", label: "종합시험" },
-            { key: "학술지계재요건_충족여부", label: "학술지계재" }
+            { key: "학술지계재요건_충족여부", label: "학술지게재" }
         ]
     },
 
