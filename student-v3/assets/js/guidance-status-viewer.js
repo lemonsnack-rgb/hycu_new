@@ -192,14 +192,18 @@ function createFeedbackModal(request, feedbackData) {
                         
                         <div class="w-px h-6 bg-gray-300"></div>
                         
-                        <!-- 도구 (학생은 선택 도구만 가능) -->
+                        <!-- 도구 (학생은 선택 도구와 첨삭 도구만 가능, 판서 제외) -->
                         <div class="flex items-center gap-1">
                             <button id="select-tool" class="pdf-toolbar-btn active" title="선택 및 텍스트 드래그">
                                 <svg class="w-5 h-5" viewBox="0 0 16 16" fill="currentColor">
                                     <path d="M14.082 2.182a.5.5 0 0 1 .103.557L8.528 15.467a.5.5 0 0 1-.917-.007L5.57 10.694.803 8.652a.5.5 0 0 1-.006-.916l12.728-5.657a.5.5 0 0 1 .556.103z"/>
                                 </svg>
                             </button>
-                            <!-- Comment tool removed: Students cannot add annotations -->
+                            <button id="comment-tool" class="pdf-toolbar-btn" title="첨삭 영역 추가">
+                                <svg class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 5v8a2 2 0 01-2 2h-5l-5 4v-4H4a2 2 0 01-2-2V5a2 2 0 012-2h12a2 2 0 012 2zM9 9a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2zm2 0a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
                         </div>
                         
                         <div class="w-px h-6 bg-gray-300"></div>

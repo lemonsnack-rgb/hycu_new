@@ -488,8 +488,28 @@ const StudentGuidanceDataService = {
 
     // 댓글 추가 (학생은 댓글만 가능)
     addStudentComment(requestId, annotationId, comment) {
-        // Students are not allowed to add comments
-        console.warn('Students cannot add comments to annotations');
+        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
+        if (!data) return false;
+
+        // 페이지별 주석에서 해당 annotation 찾기
+        for (const pageNum in data.annotations) {
+            const annotation = data.annotations[pageNum].find(a => a.id === annotationId);
+            if (annotation) {
+                if (!annotation.comments) {
+                    annotation.comments = [];
+                }
+                annotation.comments.push(comment);
+
+                // 버전 업데이트
+                data.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
+                data.lastModifiedBy = CURRENT_STUDENT.id;
+
+                console.log(`✅ 학생 댓글 추가: requestId=${requestId}, annotationId=${annotationId}`);
+                return true;
+            }
+        }
+
+        console.error('❌ 주석을 찾을 수 없습니다:', annotationId);
         return false;
     },
 
@@ -568,9 +588,32 @@ const StudentGuidanceDataService = {
 
     // 학생이 주석(annotation) 추가
     addStudentAnnotation(requestId, pageNum, annotationData) {
-        // Students are not allowed to add annotations
-        console.warn('Students cannot add annotations');
-        return false;
+        const data = STUDENT_GUIDANCE_FEEDBACK_DATA[requestId];
+        if (!data) {
+            console.error('❌ 피드백 데이터를 찾을 수 없습니다:', requestId);
+            return false;
+        }
+
+        if (!data.annotations) {
+            data.annotations = {};
+        }
+        if (!data.annotations[pageNum]) {
+            data.annotations[pageNum] = [];
+        }
+
+        // 학생이 작성한 주석임을 명시
+        annotationData.userType = 'student';
+        annotationData.authorId = CURRENT_STUDENT.id;
+        annotationData.authorName = CURRENT_STUDENT.name;
+
+        data.annotations[pageNum].push(annotationData);
+
+        // 버전 업데이트
+        data.lastModified = new Date().toISOString().slice(0, 16).replace('T', ' ');
+        data.lastModifiedBy = CURRENT_STUDENT.id;
+
+        console.log(`✅ 학생 주석 추가: requestId=${requestId}, page=${pageNum}, id=${annotationData.id}`);
+        return true;
     },
 
     // 학생이 자신의 annotation 삭제
