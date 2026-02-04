@@ -342,6 +342,52 @@
         .search-btn-secondary:hover {
             background: #4B5563;
         }
+
+        /* =============================================
+           대시보드 반응형 스타일
+           ============================================= */
+        @media (max-width: 1200px) {
+            /* 2컬럼을 1컬럼으로 변경 */
+            #dashboard-screen #content-area > div {
+                flex-direction: column !important;
+            }
+
+            /* 우측 사이드바를 전체 너비로 */
+            #dashboard-screen #content-area > div > div:last-child {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* 학위과정 필터 버튼 크기 축소 */
+            .degree-filter-btn {
+                font-size: 12px !important;
+                padding: 4px 12px !important;
+            }
+
+            /* 단계별 탭 크기 조정 */
+            #dashboard-screen .stage-tab-btn {
+                padding: 8px 4px !important;
+            }
+
+            #dashboard-screen .stage-tab-btn p:first-child {
+                font-size: 11px !important;
+            }
+
+            #dashboard-screen .stage-tab-btn p:last-child {
+                font-size: 14px !important;
+            }
+
+            /* 테이블 폰트 크기 축소 */
+            #dashboard-screen table {
+                font-size: 12px !important;
+            }
+
+            #dashboard-screen th,
+            #dashboard-screen td {
+                padding: 8px 4px !important;
+            }
+        }
     </style>
     
     <!-- FullCalendar JS -->
@@ -770,52 +816,223 @@
                  대시보드 화면
                  =================================== -->
             <section id="dashboard-screen" class="content-screen active">
-                <!-- 콘텐츠 -->
                 <div id="content-area">
-                    <!-- 요약 카드 -->
-                    <div id="summary-cards" class="summary-cards">
-                        <!-- JavaScript로 동적 생성 -->
-                    </div>
-                    
-                    <!-- 메인 콘텐츠 그리드 -->
-                    <div class="dashboard-grid">
-                        
-                        <!-- 좌측: To-Do 목록 -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h2>처리 승인대기 사항</h2>
-                                <span class="badge badge-danger" id="todo-count">5</span>
-                            </div>
-                            <div class="card-body">
-                                <div id="todo-list">
-                                    <!-- JavaScript로 동적 생성 -->
+                    <!-- 2컬럼 레이아웃 (flex-1 + 288px) -->
+                    <div style="display: flex; gap: 24px;">
+
+                        <!-- 좌측 메인 영역 (flex-1) -->
+                        <div style="flex: 1; display: flex; flex-direction: column; gap: 24px;">
+
+                            <!-- 지도학생 현황 카드 -->
+                            <section class="bg-white rounded-lg shadow-sm" style="border: 1px solid #E5E7EB;">
+                                <!-- 카드 헤더 -->
+                                <div class="p-5" style="border-bottom: 1px solid #F3F4F6;">
+                                    <div class="flex items-center gap-2 mb-4">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="18" y1="20" x2="18" y2="10"></line>
+                                            <line x1="12" y1="20" x2="12" y2="4"></line>
+                                            <line x1="6" y1="20" x2="6" y2="14"></line>
+                                        </svg>
+                                        <h2 class="font-bold text-gray-900">지도학생 현황</h2>
+                                    </div>
+
+                                    <!-- 학위과정 필터 -->
+                                    <div class="flex gap-2 mb-4">
+                                        <button id="degree-all" class="degree-filter-btn" style="background: #6A0028; color: #fff; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('전체')">전체 15명</button>
+                                        <button id="degree-master" class="degree-filter-btn" style="background: #fff; color: #6B7280; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('석사')">석사 8명</button>
+                                        <button id="degree-doctor" class="degree-filter-btn" style="background: #fff; color: #6B7280; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('박사')">박사 5명</button>
+                                        <button id="degree-integrated" class="degree-filter-btn" style="background: #fff; color: #6B7280; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('통합')">통합 2명</button>
+                                    </div>
+
+                                    <!-- 단계별 탭 (1행 4개 grid) -->
+                                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #F3F4F6;">
+                                        <button id="stage-plan" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; border-right: 1px solid #F3F4F6; cursor: pointer; position: relative; background: #FCE4EC; border: none; border-bottom: 2px solid #6A0028; transition: all 0.2s;" onclick="filterStage('논문작성계획서')">
+                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">논문작성계획서</p>
+                                            <p style="font-size: 16px; font-weight: 700; color: #6A0028; margin: 0;">4<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
+                                        </button>
+                                        <button id="stage-proposal" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; border-right: 1px solid #F3F4F6; cursor: pointer; position: relative; background: white; border: none; transition: all 0.2s;" onclick="filterStage('프로포절')">
+                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">프로포절</p>
+                                            <p style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0;">3<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
+                                        </button>
+                                        <button id="stage-prelim" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; border-right: 1px solid #F3F4F6; cursor: pointer; position: relative; background: white; border: none; transition: all 0.2s;" onclick="filterStage('예비심사')">
+                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">예비심사</p>
+                                            <p style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0;">5<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
+                                        </button>
+                                        <button id="stage-main" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; cursor: pointer; position: relative; background: white; border: none; transition: all 0.2s;" onclick="filterStage('본심사')">
+                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">본심사</p>
+                                            <p style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0;">3<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
+                                        </button>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 우측: 최근 활동 -->
-                        <div class="card">
-                            <div class="card-header">
-                                <h2>최근 활동</h2>
-                            </div>
-                            <div class="card-body">
-                                <div id="activity-timeline">
-                                    <!-- JavaScript로 동적 생성 -->
+
+                                <!-- 학생 테이블 -->
+                                <div style="overflow-x: auto;">
+                                    <table class="w-full text-sm">
+                                        <thead style="background: #F8FAFC; border-bottom: 2px solid #6A0028;">
+                                            <tr style="color: #4B5563;">
+                                                <th class="px-4 py-3 text-center font-bold">학과/전공</th>
+                                                <th class="px-4 py-3 text-center font-bold">학력과정</th>
+                                                <th class="px-4 py-3 text-center font-bold">학기차</th>
+                                                <th class="px-4 py-3 text-center font-bold">학번</th>
+                                                <th class="px-4 py-3 text-center font-bold">성명</th>
+                                                <th class="px-4 py-3 text-center font-bold">현재 지도단계</th>
+                                                <th class="px-4 py-3 text-center font-bold">상세보기</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="student-table-body">
+                                            <!-- JavaScript로 동적 생성 -->
+                                            <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">학생 데이터를 불러오는 중...</td></tr>
+                                        </tbody>
+                                    </table>
                                 </div>
-                            </div>
+                            </section>
+
+                            <!-- 공지사항 카드 -->
+                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
+                                <div class="flex items-center justify-between mb-4">
+                                    <div class="flex items-center gap-2">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                        </svg>
+                                        <h2 class="font-bold text-gray-900">공지사항</h2>
+                                    </div>
+                                    <a href="#" class="text-sm font-medium hover:underline" style="color: #6A0028; text-decoration: none;">전체 공지 보기 &gt;</a>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 12px;">
+                                    <div class="flex items-center justify-between py-2 hover:bg-gray-50" style="border-bottom: 1px solid #F3F4F6; cursor: pointer; padding: 8px 0;">
+                                        <span style="color: #374151;">2025-1학기 본심사 일정 안내</span>
+                                        <span class="text-sm" style="color: #9CA3AF;">2024.11.15</span>
+                                    </div>
+                                    <div class="flex items-center justify-between py-2 hover:bg-gray-50" style="border-bottom: 1px solid #F3F4F6; cursor: pointer; padding: 8px 0;">
+                                        <span style="color: #374151;">예비심사 결과 입력 안내</span>
+                                        <span class="text-sm" style="color: #9CA3AF;">2024.11.10</span>
+                                    </div>
+                                    <div class="flex items-center justify-between py-2 hover:bg-gray-50" style="cursor: pointer; padding: 8px 0;">
+                                        <span style="color: #374151;">논문지도 일정 변경 공지</span>
+                                        <span class="text-sm" style="color: #9CA3AF;">2024.11.08</span>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
-                        
-                    </div>
-                    
-                    <!-- 단계별 현황 차트 -->
-                    <div class="card">
-                        <div class="card-header">
-                            <h2>학생 단계별 현황</h2>
-                        </div>
-                        <div class="card-body">
-                            <div id="stage-chart">
-                                <!-- JavaScript로 동적 생성 -->
-                            </div>
+
+                        <!-- 우측 사이드바 (288px) -->
+                        <div style="width: 288px; display: flex; flex-direction: column; gap: 24px;">
+
+                            <!-- 자주 찾는 메뉴 -->
+                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                    </svg>
+                                    <h2 class="font-bold text-gray-900">자주 찾는 메뉴</h2>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <button class="w-full flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; background: white; cursor: pointer; text-align: left;" onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#D1D5DB';" onmouseout="this.style.background='white'; this.style.borderColor='#E5E7EB';" onclick="showScreen('guidance')">
+                                        <span style="color: #1F2937; font-size: 14px; font-weight: 500;">논문지도</span>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </button>
+                                    <button class="w-full flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; background: white; cursor: pointer; text-align: left;" onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#D1D5DB';" onmouseout="this.style.background='white'; this.style.borderColor='#E5E7EB';">
+                                        <span style="color: #1F2937; font-size: 14px; font-weight: 500;">학기별논문지도</span>
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </section>
+
+                            <!-- 내 심사 관리 -->
+                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                        <polyline points="14 2 14 8 20 8"></polyline>
+                                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                                        <polyline points="10 9 9 9 8 9"></polyline>
+                                    </svg>
+                                    <h2 class="font-bold text-gray-900">내 심사 관리</h2>
+                                </div>
+                                <div style="display: flex; flex-direction: column; gap: 8px;">
+                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
+                                        <span style="color: #374151; font-size: 14px;">논문작성계획서</span>
+                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">2</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
+                                        <span style="color: #374151; font-size: 14px;">프로포절</span>
+                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">1</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
+                                        <span style="color: #374151; font-size: 14px;">예비심사</span>
+                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">3</span>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
+                                        <span style="color: #374151; font-size: 14px;">본심사</span>
+                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">2</span>
+                                    </div>
+                                </div>
+                            </section>
+
+                            <!-- 내 지도 일정 -->
+                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
+                                <div class="flex items-center gap-2 mb-4">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                    <h2 class="font-bold text-gray-900">내 지도 일정</h2>
+                                </div>
+
+                                <!-- 승인 대기 -->
+                                <div class="mb-4">
+                                    <p style="font-size: 12px; color: #6B7280; margin-bottom: 12px; font-weight: 500;">승인 대기 중인 지도 일정</p>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">온라인</span>
+                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[박사] 이영희</span>
+                                            </div>
+                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 28일(목) 14:00 ~ 15:00</p>
+                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">본심사 준비 상담</p>
+                                        </div>
+                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">오프라인</span>
+                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[석사] 정수아</span>
+                                            </div>
+                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 30일(토) 10:00 ~ 11:00</p>
+                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">논문 방법론 논의</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- 다가오는 일정 -->
+                                <div style="border-top: 1px solid #F3F4F6; padding-top: 16px;">
+                                    <p style="font-size: 12px; color: #6B7280; margin-bottom: 12px; font-weight: 500;">다가오는 지도 일정</p>
+                                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">온라인</span>
+                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[석사] 박민준</span>
+                                            </div>
+                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 19일(화) 14:00 ~ 15:00</p>
+                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">연구 진행 상황 점검</p>
+                                        </div>
+                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
+                                            <div class="flex items-center gap-2 mb-1">
+                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">오프라인</span>
+                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[박사] 홍길동</span>
+                                            </div>
+                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 25일(월) 10:00 ~ 11:00</p>
+                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">논문 초안 검토</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
                         </div>
                     </div>
                 </div>
@@ -1313,7 +1530,175 @@
     })();
     </script>
     <script src="assets/js/app.js?v=20251219008"></script>
-    <script src="assets/js/dashboard.js?v=20251218002"></script>
+
+    <!-- 대시보드 데이터 및 필터링 함수 -->
+    <script>
+    // 학생 데이터
+    const dashboardStudents = [
+        {id:1, name:'김철수', dept:'컴퓨터공학과', degree:'통합', semester:'7학기', stdNo:'2021001', stage:'논문작성계획서'},
+        {id:2, name:'이영희', dept:'전자공학과', degree:'석사', semester:'3학기', stdNo:'2022015', stage:'논문작성계획서'},
+        {id:3, name:'박민준', dept:'컴퓨터공학과', degree:'박사', semester:'5학기', stdNo:'2020008', stage:'논문작성계획서'},
+        {id:4, name:'최민지', dept:'데이터사이언스', degree:'통합', semester:'4학기', stdNo:'2021023', stage:'논문작성계획서'},
+        {id:5, name:'정수아', dept:'컴퓨터공학과', degree:'석사', semester:'4학기', stdNo:'2022018', stage:'프로포절'},
+        {id:6, name:'강지훈', dept:'전자공학과', degree:'석사', semester:'3학기', stdNo:'2022025', stage:'프로포절'},
+        {id:7, name:'홍길동', dept:'기계공학과', degree:'박사', semester:'6학기', stdNo:'2019012', stage:'프로포절'},
+        {id:8, name:'윤서진', dept:'컴퓨터공학과', degree:'박사', semester:'5학기', stdNo:'2020003', stage:'예비심사'},
+        {id:9, name:'조현우', dept:'전자공학과', degree:'석사', semester:'4학기', stdNo:'2021045', stage:'예비심사'},
+        {id:10, name:'오연우', dept:'데이터사이언스', degree:'박사', semester:'7학기', stdNo:'2019028', stage:'본심사'},
+        {id:11, name:'한지민', dept:'컴퓨터공학과', degree:'석사', semester:'3학기', stdNo:'2022030', stage:'예비심사'},
+        {id:12, name:'송민호', dept:'전자공학과', degree:'박사', semester:'6학기', stdNo:'2020015', stage:'본심사'},
+        {id:13, name:'김수현', dept:'데이터사이언스', degree:'석사', semester:'4학기', stdNo:'2022042', stage:'본심사'},
+        {id:14, name:'이승훈', dept:'기계공학과', degree:'통합', semester:'5학기', stdNo:'2021033', stage:'예비심사'},
+        {id:15, name:'박소연', dept:'컴퓨터공학과', degree:'석사', semester:'3학기', stdNo:'2022055', stage:'예비심사'}
+    ];
+
+    let currentDegree = '전체';
+    let currentStage = '논문작성계획서';
+
+    // 학위과정 필터
+    function filterDegree(degree) {
+        currentDegree = degree;
+
+        // 버튼 스타일 업데이트
+        document.querySelectorAll('.degree-filter-btn').forEach(btn => {
+            btn.style.background = '#fff';
+            btn.style.color = '#6B7280';
+            btn.style.border = '1px solid #E5E7EB';
+        });
+
+        const activeBtn = degree === '전체' ? document.getElementById('degree-all') :
+                          degree === '석사' ? document.getElementById('degree-master') :
+                          degree === '박사' ? document.getElementById('degree-doctor') :
+                          document.getElementById('degree-integrated');
+
+        if (activeBtn) {
+            activeBtn.style.background = '#6A0028';
+            activeBtn.style.color = '#fff';
+            activeBtn.style.border = 'none';
+        }
+
+        // 단계별 카운트 업데이트
+        updateStageCounts();
+
+        // 테이블 업데이트
+        renderStudentTable();
+    }
+
+    // 단계 필터
+    function filterStage(stage) {
+        currentStage = stage;
+
+        // 탭 스타일 업데이트
+        document.querySelectorAll('.stage-tab-btn').forEach(btn => {
+            btn.style.background = 'white';
+            btn.style.borderBottom = 'none';
+            const paragraphs = btn.querySelectorAll('p');
+            if (paragraphs.length > 1) {
+                paragraphs[1].style.color = '#1A1A1A';
+            }
+        });
+
+        const activeBtn = stage === '논문작성계획서' ? document.getElementById('stage-plan') :
+                          stage === '프로포절' ? document.getElementById('stage-proposal') :
+                          stage === '예비심사' ? document.getElementById('stage-prelim') :
+                          document.getElementById('stage-main');
+
+        if (activeBtn) {
+            activeBtn.style.background = '#FCE4EC';
+            activeBtn.style.borderBottom = '2px solid #6A0028';
+            const paragraphs = activeBtn.querySelectorAll('p');
+            if (paragraphs.length > 1) {
+                paragraphs[1].style.color = '#6A0028';
+            }
+        }
+
+        // 테이블 업데이트
+        renderStudentTable();
+    }
+
+    // 단계별 카운트 업데이트
+    function updateStageCounts() {
+        const stages = ['논문작성계획서', '프로포절', '예비심사', '본심사'];
+        const stageIds = ['stage-plan', 'stage-proposal', 'stage-prelim', 'stage-main'];
+
+        stages.forEach((stage, i) => {
+            const count = dashboardStudents.filter(s =>
+                (currentDegree === '전체' || s.degree === currentDegree) && s.stage === stage
+            ).length;
+
+            const btn = document.getElementById(stageIds[i]);
+            if (btn) {
+                const paragraphs = btn.querySelectorAll('p');
+                if (paragraphs.length > 1) {
+                    paragraphs[1].innerHTML = count + '<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span>';
+                }
+            }
+        });
+    }
+
+    // 학생 테이블 렌더링
+    function renderStudentTable() {
+        const tbody = document.getElementById('student-table-body');
+        if (!tbody) return;
+
+        const filtered = dashboardStudents.filter(s =>
+            (currentDegree === '전체' || s.degree === currentDegree) && s.stage === currentStage
+        );
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center" style="color: #9CA3AF;">해당 단계의 학생이 없습니다.</td></tr>';
+            return;
+        }
+
+        tbody.innerHTML = filtered.map(s => `
+            <tr style="border-top: 1px solid #F3F4F6;">
+                <td class="px-4 py-3 text-center" style="color: #4B5563;">${s.dept}</td>
+                <td class="px-4 py-3 text-center" style="color: #4B5563;">${s.degree}</td>
+                <td class="px-4 py-3 text-center" style="color: #4B5563;">${s.semester}</td>
+                <td class="px-4 py-3 text-center" style="color: #4B5563;">${s.stdNo}</td>
+                <td class="px-4 py-3 text-center font-medium" style="color: #1F2937;">${s.name}</td>
+                <td class="px-4 py-3 text-center">
+                    <span class="inline-block px-2 py-1 rounded text-xs font-semibold"
+                          style="background: #FCE4EC; color: #6A0028;">
+                        ${s.stage}
+                    </span>
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <button class="text-sm font-medium hover:underline"
+                            style="color: #6A0028; background: none; border: none; cursor: pointer;"
+                            onclick="viewStudentDetail(${s.id})">
+                        상세보기
+                    </button>
+                </td>
+            </tr>
+        `).join('');
+    }
+
+    // 학생 상세 보기
+    function viewStudentDetail(studentId) {
+        const student = dashboardStudents.find(s => s.id === studentId);
+        if (student) {
+            alert('학생 상세 정보: ' + student.name + ' (' + student.stdNo + ')\\n\\n이 기능은 추후 구현됩니다.');
+        }
+    }
+
+    // 초기화
+    document.addEventListener('DOMContentLoaded', function() {
+        // 대시보드 화면일 때만 실행
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        if (dashboardScreen && dashboardScreen.classList.contains('active')) {
+            setTimeout(function() {
+                if (document.getElementById('student-table-body')) {
+                    updateStageCounts();
+                    renderStudentTable();
+                }
+            }, 100);
+        }
+    });
+    </script>
+
+    <!-- ❌ 기존 dashboard.js 주석 처리 (새 대시보드는 인라인 JavaScript 사용) -->
+    <!-- <script src="assets/js/dashboard.js?v=20251218002"></script> -->
     <script src="assets/js/journal-review.js?v=20251219002"></script>
     <!-- ✨ 새로운 주차별 지도 관리 (관리자 UI 기반 + 실적 입력 기능) -->
     <script src="assets/js/weekly-guidance.js?v=20260122006"></script>
