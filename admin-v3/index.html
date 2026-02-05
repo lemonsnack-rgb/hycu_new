@@ -378,10 +378,6 @@
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>사용자관리</span>
                         </a>
-                        <a href="#" onclick="showScreen('statistics'); return false;" data-screen="statistics"
-                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
-                            <span>통계</span>
-                        </a>
                     </div>
                 </div>
             </nav>
@@ -1058,6 +1054,17 @@
                 }
 
                 // 특정 뷰에 대한 후처리
+
+                // 대시보드 초기화
+                if (viewName === 'dashboard') {
+                    setTimeout(() => {
+                        if (typeof initAdminDashboard === 'function') {
+                            console.log('✅ 대시보드 초기화 시작');
+                            initAdminDashboard();
+                        }
+                    }, 0);
+                }
+
                 if (viewName === 'stageManagement' && typeof renderStageManagementContent === 'function') {
                     setTimeout(() => {
                         renderStageManagementContent();
@@ -1195,7 +1202,6 @@
                 'workScheduleManagement': { menu: '시스템 설정', submenu: '업무일정등록' },
                 'permissionManagement': { menu: '시스템 설정', submenu: '권한관리' },
                 'userManagement': { menu: '시스템 설정', submenu: '사용자관리' },
-                'statistics': { menu: '시스템 설정', submenu: '통계' },
                 'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' },
                 'noticeManagement': { menu: '논문 안내', submenu: '공지사항' },
                 'ethicsContentMgmt': { menu: '시스템 설정', submenu: '연구윤리 관리' },

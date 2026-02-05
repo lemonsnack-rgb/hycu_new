@@ -1,79 +1,48 @@
 // ========== 뷰 렌더링 함수들 ==========
 
 const views = {
-    // ========== 대시보드 ==========
+    // ========== 대시보드 (간소화 버전) ==========
     dashboard: () => `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-2">연구계획서 제출</p>
-                        <p class="text-3xl font-bold text-gray-800">${appData.submissions.researchProposal.length}</p>
-                    </div>
-                    <div class="bg-blue-100 text-blue-600 p-3 rounded-full">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
+        <div style="display: flex; gap: 24px; margin-bottom: 24px;">
+            <!-- 좌측: 공지사항 -->
+            <div style="flex: 1; background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                    공지사항
+                </h3>
+                <div id="admin-notice-list">
+                    <!-- renderAdminNotices()로 동적 생성 -->
                 </div>
             </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-2">중간논문 제출</p>
-                        <p class="text-3xl font-bold text-gray-800">${appData.submissions.midThesis.length}</p>
-                    </div>
-                    <div class="bg-green-100 text-green-600 p-3 rounded-full">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-2">최종논문 제출</p>
-                        <p class="text-3xl font-bold text-gray-800">${appData.submissions.finalThesis.length}</p>
-                    </div>
-                    <div class="bg-purple-100 text-purple-600 p-3 rounded-full">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    </div>
-                </div>
-            </div>
-            <div class="bg-white p-6 rounded-lg shadow-md">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-sm text-gray-500 mb-2">학술지 심사</p>
-                        <p class="text-3xl font-bold text-gray-800">${appData.submissions.journalSubmission.length}</p>
-                    </div>
-                    <div class="bg-yellow-100 text-yellow-600 p-3 rounded-full">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    </div>
+
+            <!-- 우측: 자주 찾는 메뉴 -->
+            <div style="width: 320px; background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                    </svg>
+                    자주 찾는 메뉴
+                </h3>
+                <div id="admin-quick-menu-list">
+                    <!-- renderAdminQuickMenus()로 동적 생성 -->
                 </div>
             </div>
         </div>
-        
-        <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">최근 활동</h3>
-            <div class="space-y-4">
-                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div class="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800"><strong>김철수</strong> 학생이 연구계획서를 제출했습니다.</p>
-                        <p class="text-xs text-gray-500 mt-1">2025-03-10 14:30</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div class="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800"><strong>이영희</strong> 학생의 연구계획서가 승인되었습니다.</p>
-                        <p class="text-xs text-gray-500 mt-1">2025-03-12 10:15</p>
-                    </div>
-                </div>
-                <div class="flex items-start space-x-3 p-3 bg-gray-50 rounded-lg">
-                    <div class="w-2 h-2 bg-purple-500 rounded-full mt-2"></div>
-                    <div class="flex-1">
-                        <p class="text-sm text-gray-800"><strong>정태훈</strong> 학생의 최종논문 심사가 완료되었습니다.</p>
-                        <p class="text-xs text-gray-500 mt-1">2025-06-10 16:45</p>
-                    </div>
-                </div>
+
+        <!-- 관련 사이트 (아웃링크) -->
+        <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                </svg>
+                관련 사이트
+            </h3>
+            <div id="admin-outlink-cards" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
+                <!-- renderAdminOutlinks()로 동적 생성 -->
             </div>
         </div>
     `,

@@ -73,6 +73,13 @@ function switchView(viewName, param = null) {
     }
 
     // 뷰별 후처리 (렌더링 후 추가 작업)
+    if (viewName === 'dashboard') {
+        // 대시보드 화면 렌더링 후 컨텐츠 초기화
+        setTimeout(() => {
+            initAdminDashboard();
+        }, 0);
+    }
+
     if (viewName === 'stageManagement') {
         // 단계 관리 화면이 렌더링된 후 컨텐츠 로드
         setTimeout(() => {
@@ -6897,3 +6904,92 @@ window.toggleAllUsers = toggleAllUsers;
 window.loginAsUser = loginAsUser;
 
 console.log('✅ 사용자 관리 함수 로드 완료');
+
+// ========== 관리자 대시보드 렌더링 함수 ==========
+
+// 관리자 대시보드 데이터
+const adminNotices = [
+    { id: 1, title: '2025-1학기 본심사 일정 안내', date: '2024.11.15' },
+    { id: 2, title: '예비심사 결과 입력 안내', date: '2024.11.10' },
+    { id: 3, title: '논문지도 일정 변경 공지', date: '2024.11.08' },
+];
+
+const adminQuickMenus = [
+    { id: 1, name: '논문지도학생현황', view: 'stageManagement' },
+    { id: 2, name: '논문지도단계등록', view: 'typeManagement' },
+    { id: 3, name: '심사위원등록', view: 'committeeAssignment' },
+];
+
+const adminOutlinks = [
+    { id: 1, title: '아웃링크 1', description: '관련 사이트 설명', url: '#outlink1' },
+    { id: 2, title: '아웃링크 2', description: '관련 사이트 설명', url: '#outlink2' },
+    { id: 3, title: '아웃링크 3', description: '관련 사이트 설명', url: '#outlink3' },
+];
+
+// 공지사항 렌더링
+function renderAdminNotices() {
+    const container = document.getElementById('admin-notice-list');
+    if (!container) return;
+
+    container.innerHTML = adminNotices.map((n, i) => `
+        <div style="display: flex; justify-content: space-between; padding: 12px 0; ${i < adminNotices.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''} cursor: pointer;"
+             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';"
+             onclick="switchView('noticeManagement')">
+            <span style="font-size: 14px; color: #1a1a1a;">${n.title}</span>
+            <span style="font-size: 13px; color: #9ca3af;">${n.date}</span>
+        </div>
+    `).join('');
+}
+
+// 자주 찾는 메뉴 렌더링
+function renderAdminQuickMenus() {
+    const container = document.getElementById('admin-quick-menu-list');
+    if (!container) return;
+
+    container.innerHTML = adminQuickMenus.map((m, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; ${i < adminQuickMenus.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''} cursor: pointer;"
+             onclick="switchView('${m.view}')"
+             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';">
+            <span style="font-size: 14px; color: #1a1a1a;">${m.name}</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </div>
+    `).join('');
+}
+
+// 아웃링크 렌더링
+function renderAdminOutlinks() {
+    const container = document.getElementById('admin-outlink-cards');
+    if (!container) return;
+
+    container.innerHTML = adminOutlinks.map(link => `
+        <a href="${link.url}" target="_blank" rel="noopener noreferrer"
+           style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px 16px; text-decoration: none; transition: all 0.2s;"
+           onmouseover="this.style.background='#F1F5F9'; this.style.borderColor='#6A0028';"
+           onmouseout="this.style.background='#F8FAFC'; this.style.borderColor='#E5E7EB';">
+            <div>
+                <div style="font-size: 14px; font-weight: 600; color: #1a1a1a;">${link.title}</div>
+                <div style="font-size: 12px; color: #6b7280;">${link.description}</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+        </a>
+    `).join('');
+}
+
+// 관리자 대시보드 초기화
+function initAdminDashboard() {
+    renderAdminNotices();
+    renderAdminQuickMenus();
+    renderAdminOutlinks();
+}
+
+// Export admin dashboard functions
+window.initAdminDashboard = initAdminDashboard;
+window.renderAdminNotices = renderAdminNotices;
+window.renderAdminQuickMenus = renderAdminQuickMenus;
+window.renderAdminOutlinks = renderAdminOutlinks;
+
+console.log('✅ 관리자 대시보드 함수 로드 완료');
