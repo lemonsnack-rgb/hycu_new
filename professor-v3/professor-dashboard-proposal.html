@@ -353,7 +353,7 @@
             }
 
             /* 우측 사이드바를 전체 너비로 */
-            #dashboard-screen #content-area > div > div:last-child {
+            .dashboard-sidebar {
                 width: 100% !important;
             }
         }
@@ -545,7 +545,7 @@
         </aside>
 
         <!-- 메인 콘텐츠 영역 -->
-        <div class="layout-v3-main-content">
+        <div class="layout-v3-main-content" style="overflow-x: hidden;">
 
         <!-- 유틸리티 헤더 -->
         <header class="layout-v3-utility-header">
@@ -816,12 +816,12 @@
                  대시보드 화면
                  =================================== -->
             <section id="dashboard-screen" class="content-screen active">
-                <div id="content-area">
-                    <!-- 2컬럼 레이아웃 (flex-1 + 288px) -->
+                <div id="content-area" style="overflow-x: hidden;">
+                    <!-- 2컬럼 레이아웃 (flex-1 + 400px) -->
                     <div style="display: flex; gap: 24px;">
 
-                        <!-- 좌측 메인 영역 (flex-1) -->
-                        <div style="flex: 1; display: flex; flex-direction: column; gap: 24px;">
+                        <!-- 좌측 메인 영역 (flex-1, min-width:0으로 축소 허용) -->
+                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; overflow: hidden;">
 
                             <!-- 지도학생 현황 카드 -->
                             <section class="bg-white rounded-lg shadow-sm" style="border: 1px solid #E5E7EB;">
@@ -866,8 +866,8 @@
                                 </div>
 
                                 <!-- 학생 테이블 -->
-                                <div style="overflow-x: auto;">
-                                    <table class="w-full text-sm">
+                                <div style="overflow-x: auto; width: 100%;">
+                                    <table class="w-full text-sm" style="table-layout: fixed; width: 100%;">
                                         <thead style="background: #F8FAFC; border-bottom: 2px solid #6A0028;">
                                             <tr style="color: #4B5563;">
                                                 <th class="px-4 py-3 text-center font-bold">학과/전공</th>
@@ -916,8 +916,8 @@
                             </section>
                         </div>
 
-                        <!-- 우측 사이드바 (288px) -->
-                        <div style="width: 288px; display: flex; flex-direction: column; gap: 24px;">
+                        <!-- 우측 사이드바 (400px) -->
+                        <div class="dashboard-sidebar" style="width: 400px; display: flex; flex-direction: column; gap: 24px; flex-shrink: 0;">
 
                             <!-- 자주 찾는 메뉴 -->
                             <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">

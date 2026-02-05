@@ -160,6 +160,39 @@
             pointer-events: none !important;
             opacity: 0.5 !important;
         }
+
+        /* =============================================
+           학생 대시보드 반응형 스타일
+           ============================================= */
+        @media (max-width: 1200px) {
+            /* 2컬럼을 1컬럼으로 변경 */
+            #dashboard-screen > div {
+                flex-direction: column !important;
+            }
+
+            /* 우측 사이드바를 전체 너비로 */
+            .dashboard-sidebar {
+                width: 100% !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            /* 요건 칩 크기 조정 */
+            #requirements-chips > div {
+                padding: 6px 10px !important;
+                font-size: 12px !important;
+            }
+
+            /* 카드 패딩 축소 */
+            #dashboard-screen section {
+                padding: 16px !important;
+            }
+
+            /* 타임라인 단계명 크기 조정 */
+            #journey-timeline text {
+                font-size: 11px !important;
+            }
+        }
     </style>
 </head>
 <body class="layout-v3 bg-gray-100">
@@ -324,7 +357,7 @@
         </aside>
 
         <!-- 메인 콘텐츠 영역 -->
-        <div class="layout-v3-main-content">
+        <div class="layout-v3-main-content" style="overflow-x: hidden;">
 
         <!-- 유틸리티 헤더 -->
         <header class="layout-v3-utility-header">
@@ -399,92 +432,111 @@
         <!-- 콘텐츠 영역 -->
         <main class="layout-v3-content-area">
 
-            <!-- 대시보드 화면 -->
-            <section id="dashboard-screen" class="content-screen active">
-                <!-- 메인 콘텐츠 영역 -->
-                <div class="dashboard-main-grid">
-                    <!-- 좌측 컬럼 (60%) -->
-                    <div class="dashboard-left-column">
-                        <!-- 나의 정보 -->
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-header">
-                                <h2 class="dashboard-card-title">나의 정보</h2>
-                            </div>
-                            <div class="dashboard-card-body">
-                                <div id="student-status-table"></div>
-                            </div>
-                        </div>
+            <!-- 대시보드 화면 (React 디자인 적용) -->
+            <section id="dashboard-screen" class="content-screen active" style="overflow-x: hidden;">
+                <!-- 2컬럼 레이아웃 -->
+                <div style="display: flex; gap: 24px;">
 
-                        <!-- 학위 논문 청구 요건 -->
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-header">
-                                <h2 class="dashboard-card-title">학위 논문 청구 요건</h2>
-                            </div>
-                            <div class="dashboard-card-body">
-                                <div id="requirements-list" class="requirements-list"></div>
-                            </div>
-                        </div>
+                    <!-- 좌측 메인 (flex-1, min-width:0으로 축소 허용) -->
+                    <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 20px; overflow: hidden;">
 
-                        <!-- 공지사항 -->
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-header">
-                                <h2 class="dashboard-card-title">공지사항</h2>
-                                <a href="#" onclick="showScreen('notice'); return false;" class="dashboard-view-all">
-                                    전체 공지 보기
-                                    <svg class="dashboard-arrow-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        <!-- 1. 내 지도단계 (SVG 타임라인) -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 24px;">
+                            <h2 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 8px;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
+                                </svg>
+                                내 지도단계
+                            </h2>
+                            <div id="journey-timeline" style="padding: 8px 0;">
+                                <!-- SVG 타임라인 동적 생성 -->
+                            </div>
+                            <!-- 범례 -->
+                            <div style="display: flex; gap: 24px; margin-top: 8px; padding-top: 12px; border-top: 1px solid #e5e7eb;">
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6b7280;">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #2E7D32;"></span> 완료
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6b7280;">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: #0288D1;"></span> 진행중
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6b7280;">
+                                    <span style="width: 12px; height: 12px; border-radius: 50%; background: white; border: 2px solid #d1d5db;"></span> 예정
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- 2. 학위논문청구요건 충족현황 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                                <h2 style="font-size: 16px; font-weight: 700; color: #1a1a1a;">학위논문청구요건 충족현황</h2>
+                                <span style="font-size: 13px; color: #6b7280;">
+                                    충족 <span id="req-completed-count" style="color: #6A0028; font-weight: 700;">4</span>/8
+                                </span>
+                            </div>
+                            <div id="requirements-chips" style="display: flex; flex-wrap: wrap; gap: 10px;">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
+
+                        <!-- 3. 공지사항 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 20px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                                <h2 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                                     </svg>
+                                    공지사항
+                                </h2>
+                                <a href="#" onclick="showScreen('notice'); return false;"
+                                   style="font-size: 13px; color: #6A0028; text-decoration: none; font-weight: 500;">
+                                    전체 공지 보기 &gt;
                                 </a>
                             </div>
-                            <div class="dashboard-card-body">
-                                <div id="notice-list" class="notice-list"></div>
+                            <div id="dashboard-notice-list">
+                                <!-- JavaScript로 동적 생성 -->
                             </div>
-                        </div>
+                        </section>
                     </div>
 
-                    <!-- 우측 컬럼 (40%) -->
-                    <div class="dashboard-right-column">
-                        <!-- 알림 -->
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-header">
-                                <h2 class="dashboard-card-title">알림</h2>
-                            </div>
-                            <div class="dashboard-card-body">
-                                <div id="activity-list" class="activity-list"></div>
-                            </div>
-                        </div>
+                    <!-- 우측 사이드바 (400px) -->
+                    <div class="dashboard-sidebar" style="width: 400px; display: flex; flex-direction: column; gap: 20px; flex-shrink: 0;">
 
-                        <!-- 일정 -->
-                        <div class="dashboard-card">
-                            <div class="dashboard-card-header">
-                                <h2 class="dashboard-card-title">일정</h2>
+                        <!-- 1. 자주 찾는 메뉴 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
+                                </svg>
+                                자주 찾는 메뉴
+                            </h2>
+                            <div id="quick-menu-list">
+                                <!-- JavaScript로 동적 생성 -->
                             </div>
-                            <div class="dashboard-card-body">
-                                <!-- 주요 일정 -->
-                                <div class="schedule-section">
-                                    <div class="schedule-section-header">
-                                        <h3 class="schedule-section-title">주요 일정</h3>
-                                    </div>
-                                    <div id="main-schedule-list" class="schedule-items"></div>
-                                </div>
+                        </section>
 
-                                <!-- 실시간 지도 예약 현황 -->
-                                <div class="schedule-section">
-                                    <div class="schedule-section-header">
-                                        <h3 class="schedule-section-title">실시간 지도 예약 현황</h3>
-                                    </div>
-                                    <div id="meeting-schedule-list" class="schedule-items"></div>
-                                </div>
-
-                                <!-- 논문 지도 현황 -->
-                                <div class="schedule-section">
-                                    <div class="schedule-section-header">
-                                        <h3 class="schedule-section-title">논문 지도 현황</h3>
-                                    </div>
-                                    <div id="feedback-schedule-list" class="schedule-items"></div>
-                                </div>
+                        <!-- 2. 내 지도 일정 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                내 지도 일정
+                            </h2>
+                            <div style="font-size: 12px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">
+                                다가오는 지도 일정
                             </div>
-                        </div>
+                            <div id="schedule-card-list" style="display: flex; flex-direction: column; gap: 8px;">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
                     </div>
                 </div>
             </section>
