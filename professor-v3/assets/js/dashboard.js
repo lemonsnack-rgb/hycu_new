@@ -51,7 +51,8 @@ function renderSummaryCards() {
         </div>
     `).join('');
     
-    document.getElementById('summary-cards').innerHTML = html;
+    const container = document.getElementById('summary-cards');
+    if (container) container.innerHTML = html;
 }
 
 // To-Do 목록 렌더링
@@ -65,17 +66,22 @@ function renderTodoList() {
         return priorityOrder[a.priority] - priorityOrder[b.priority];
     });
     
+    const todoList = document.getElementById('todo-list');
+    const todoCount = document.getElementById('todo-count');
+
+    if (!todoList) return;
+
     if (sortedNotifications.length === 0) {
-        document.getElementById('todo-list').innerHTML = `
+        todoList.innerHTML = `
             <div class="text-center text-gray-500" style="padding: 2rem;">
                 <div style="font-size: 48px; margin-bottom: 1rem;">✓</div>
                 <p>처리할 사항이 없습니다</p>
             </div>
         `;
-        document.getElementById('todo-count').textContent = '0';
+        if (todoCount) todoCount.textContent = '0';
         return;
     }
-    
+
     const html = sortedNotifications.map(notif => `
         <div class="todo-item" onclick="handleNotificationClick('${notif.id}', '${notif.actionUrl}')">
             <div class="todo-priority">${notif.icon}</div>
@@ -88,9 +94,9 @@ function renderTodoList() {
             </div>
         </div>
     `).join('');
-    
-    document.getElementById('todo-list').innerHTML = html;
-    document.getElementById('todo-count').textContent = sortedNotifications.length;
+
+    todoList.innerHTML = html;
+    if (todoCount) todoCount.textContent = sortedNotifications.length;
 }
 
 // 우선순위 텍스트
@@ -225,6 +231,45 @@ function refreshDashboard() {
     }, 800);
 }
 
+// 아웃링크 데이터 (URL은 추후 지정)
+const outlinks = [
+    { id: 1, title: '아웃링크 1', description: '관련 사이트 설명', url: '#outlink1' },
+    { id: 2, title: '아웃링크 2', description: '관련 사이트 설명', url: '#outlink2' },
+    { id: 3, title: '아웃링크 3', description: '관련 사이트 설명', url: '#outlink3' },
+];
+
+/**
+ * 아웃링크 카드 렌더링
+ */
+function renderOutlinkCards() {
+    const container = document.getElementById('outlink-cards');
+    if (!container) return;
+
+    container.innerHTML = outlinks.map(link => `
+        <a href="${link.url}" target="_blank" rel="noopener noreferrer"
+           style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px 16px; text-decoration: none; transition: all 0.2s;"
+           onmouseover="this.style.background='#F1F5F9'; this.style.borderColor='#6A0028';"
+           onmouseout="this.style.background='#F8FAFC'; this.style.borderColor='#E5E7EB';">
+            <div>
+                <div style="font-size: 14px; font-weight: 600; color: #1a1a1a;">${link.title}</div>
+                <div style="font-size: 12px; color: #6b7280;">${link.description}</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+        </a>
+    `).join('');
+}
+
+// DOMContentLoaded에서 아웃링크 렌더링
+document.addEventListener('DOMContentLoaded', function() {
+    if (document.getElementById('outlink-cards')) {
+        renderOutlinkCards();
+    }
+});
+
 // 전역으로 export
 window.initDashboard = initDashboard;
 window.refreshDashboard = refreshDashboard;
@@ -232,3 +277,4 @@ window.renderSummaryCards = renderSummaryCards;
 window.renderTodoList = renderTodoList;
 window.renderActivityTimeline = renderActivityTimeline;
 window.renderStageChart = renderStageChart;
+window.renderOutlinkCards = renderOutlinkCards;

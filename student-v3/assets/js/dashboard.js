@@ -645,6 +645,13 @@ const newNotices = [
     { id: 3, title: '논문지도 일정 변경 공지', date: '2024.11.08' },
 ];
 
+// 아웃링크 데이터 (URL은 추후 지정)
+const outlinks = [
+    { id: 1, title: '아웃링크 1', description: '관련 사이트 설명', url: '#outlink1' },
+    { id: 2, title: '아웃링크 2', description: '관련 사이트 설명', url: '#outlink2' },
+    { id: 3, title: '아웃링크 3', description: '관련 사이트 설명', url: '#outlink3' },
+];
+
 /**
  * SVG 타임라인 렌더링 (동적 컬럼)
  * - 컨테이너 너비에 따라 컬럼 수 자동 조절
@@ -842,6 +849,31 @@ function renderScheduleCards() {
 }
 
 /**
+ * 아웃링크 카드 렌더링
+ */
+function renderOutlinkCards() {
+    const container = document.getElementById('outlink-cards');
+    if (!container) return;
+
+    container.innerHTML = outlinks.map(link => `
+        <a href="${link.url}" target="_blank" rel="noopener noreferrer"
+           style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px 16px; text-decoration: none; transition: all 0.2s;"
+           onmouseover="this.style.background='#F1F5F9'; this.style.borderColor='#6A0028';"
+           onmouseout="this.style.background='#F8FAFC'; this.style.borderColor='#E5E7EB';">
+            <div>
+                <div style="font-size: 14px; font-weight: 600; color: #1a1a1a;">${link.title}</div>
+                <div style="font-size: 12px; color: #6b7280;">${link.description}</div>
+            </div>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+            </svg>
+        </a>
+    `).join('');
+}
+
+/**
  * 새 대시보드 초기화
  */
 function initNewDashboard() {
@@ -850,6 +882,7 @@ function initNewDashboard() {
     renderDashboardNotices();
     renderQuickMenus();
     renderScheduleCards();
+    renderOutlinkCards();
 
     // ResizeObserver로 컨테이너 크기 변경 감지
     const timelineContainer = document.getElementById('journey-timeline');
@@ -886,3 +919,4 @@ window.renderRequirementsChips = renderRequirementsChips;
 window.renderDashboardNotices = renderDashboardNotices;
 window.renderQuickMenus = renderQuickMenus;
 window.renderScheduleCards = renderScheduleCards;
+window.renderOutlinkCards = renderOutlinkCards;
