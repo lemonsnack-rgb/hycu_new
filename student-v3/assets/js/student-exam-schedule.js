@@ -44,7 +44,8 @@ function renderStudentExamScheduleScreen() {
                                     <th>학번</th>
                                     <th>성명</th>
                                     <th>지도교수명</th>
-                                    <th>심사단계</th>
+                                    <th>기본단계</th>
+                                    <th>세부단계</th>
                                     <th>등록상태</th>
                                     <th>심사일정</th>
                                     <th>진행방식</th>
@@ -145,7 +146,8 @@ function renderStudentExamScheduleTable(data) {
                 <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.studentNumber}</td>
                 <td class="px-4 py-3 text-sm font-medium text-gray-900 text-center">${item.studentName}</td>
                 <td class="px-4 py-3 text-sm text-gray-600 text-center">${item.advisorName || '-'}</td>
-                <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.stageName}</td>
+                <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.basicStageName || item.stageName || '-'}</td>
+                <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.subStageName || '-'}</td>
                 <td class="px-4 py-3 text-sm text-gray-800 text-center">${statusText}</td>
                 <td class="px-4 py-3 text-sm text-gray-900 text-center">${scheduleText}</td>
                 <td class="px-4 py-3 text-sm text-center">${methodText}</td>
@@ -265,8 +267,12 @@ function renderStudentExamScheduleDetail(assignmentId) {
                             <span class="text-gray-900 font-medium">${assignment.dueDate || '-'}</span>
                         </div>
                         <div class="flex gap-2">
-                            <span class="text-gray-600 min-w-[80px]">심사 단계:</span>
-                            <span class="text-gray-900 font-medium">${assignment.stageName}</span>
+                            <span class="text-gray-600 min-w-[80px]">기본 단계:</span>
+                            <span class="text-gray-900 font-medium">${assignment.basicStageName || assignment.stageName || '-'}</span>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-gray-600 min-w-[80px]">세부 단계:</span>
+                            <span class="text-gray-900 font-medium">${assignment.subStageName || '-'}</span>
                         </div>
                     </div>
                 </div>
@@ -385,8 +391,12 @@ function renderStudentExamScheduleDetail(assignmentId) {
                         <span class="text-gray-900 font-medium">${assignment.dueDate || '-'}</span>
                     </div>
                     <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">심사 단계:</span>
-                        <span class="text-gray-900 font-medium">${assignment.stageName}</span>
+                        <span class="text-gray-600 min-w-[80px]">기본 단계:</span>
+                        <span class="text-gray-900 font-medium">${assignment.basicStageName || assignment.stageName || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">세부 단계:</span>
+                        <span class="text-gray-900 font-medium">${assignment.subStageName || '-'}</span>
                     </div>
                 </div>
             </div>

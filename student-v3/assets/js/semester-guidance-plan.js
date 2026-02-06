@@ -544,8 +544,12 @@ function showStudentSemesterPlanDetail() {
                         <span class="text-gray-900 font-medium">${student.advisorName || '-'}</span>
                     </div>
                     <div class="flex gap-2">
-                        <span class="text-gray-600 min-w-[80px]">지도단계:</span>
-                        <span class="text-gray-900 font-medium">${student.currentStage || '-'}</span>
+                        <span class="text-gray-600 min-w-[80px]">기본단계:</span>
+                        <span class="text-gray-900 font-medium">${student.basicStageName || student.currentStage || '-'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <span class="text-gray-600 min-w-[80px]">세부단계:</span>
+                        <span class="text-gray-900 font-medium">${student.subStageName || '-'}</span>
                     </div>
                 </div>
             </div>

@@ -146,7 +146,9 @@ function createStudentGuidanceStatusDetailScreen(request, feedbackData) {
                         <span class="font-semibold">논문명:</span>
                         <span title="${request.thesisTitle || request.documentTitle}">${request.thesisTitle && request.thesisTitle.length > 30 ? request.thesisTitle.substring(0, 30) + '...' : request.thesisTitle || request.documentTitle || '논문명'}</span>
                         <span class="mx-2 text-gray-400">|</span>
-                        <span class="font-semibold">지도단계:</span> <span class="text-[#6A0028]">${request.stage || request.guidanceStage || '연구계획서'}</span>
+                        <span class="font-semibold">기본단계:</span> <span class="text-[#6A0028]">${request.basicStageName || request.stage || request.guidanceStage || '-'}</span>
+                        <span class="mx-2 text-gray-400">|</span>
+                        <span class="font-semibold">세부단계:</span> <span class="text-[#6A0028]">${request.subStageName || '-'}</span>
                         <span class="mx-2 text-gray-400">|</span>
                         <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
                         <span class="mx-2 text-gray-400">|</span>
@@ -485,7 +487,9 @@ function updateStudentInfoSection(request) {
                 : request.thesisTitle || request.documentTitle || '논문명'
         }</span>
         <span class="mx-2 text-gray-400">|</span>
-        <span class="font-semibold">지도단계:</span> <span class="text-[#6A0028]">${request.stage || request.guidanceStage || '연구계획서'}</span>
+        <span class="font-semibold">기본단계:</span> <span class="text-[#6A0028]">${request.basicStageName || request.stage || request.guidanceStage || '-'}</span>
+        <span class="mx-2 text-gray-400">|</span>
+        <span class="font-semibold">세부단계:</span> <span class="text-[#6A0028]">${request.subStageName || '-'}</span>
         <span class="mx-2 text-gray-400">|</span>
         <span class="font-semibold">학번:</span> ${request.studentNumber || '-'}
         <span class="mx-2 text-gray-400">|</span>

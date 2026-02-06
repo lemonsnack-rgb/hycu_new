@@ -792,7 +792,7 @@ function searchGuidanceSchedule() {
         filtered = filtered.filter(item => item.professor.toLowerCase().includes(filters.professor));
     }
 
-    // 심사단계
+    // 기본단계
     if (filters.stage) {
         filtered = filtered.filter(item => item.stage === filters.stage);
     }
@@ -3602,7 +3602,7 @@ function resetAdvisorSearch() {
     showAlert('검색 조건이 초기화되었습니다.');
 }
 
-// 학생 상세정보 모달 표시
+// 학생 상세정보 모달 표시 (지도단계 + 제출 문서 포함)
 function showStudentInfo(studentId) {
     console.log('학생 상세정보 조회:', studentId);
 
@@ -3613,6 +3613,103 @@ function showStudentInfo(studentId) {
         showNotification('학생 정보를 찾을 수 없습니다.', 'error');
         return;
     }
+
+    // 학생별 지도단계 진행 현황 조회
+    const stageProgress = (window.mockStudentStageProgress || []).find(sp => sp.studentId === studentId);
+
+    // 학생별 제출 문서 조회
+    const submissions = (window.mockStageSubmissions || [])
+        .filter(s => s.studentId === studentId)
+        .sort((a, b) => new Date(a.submittedDate) - new Date(b.submittedDate));
+
+    // 지도단계 기본값 (데이터가 없는 경우)
+    const defaultStages = student.degreeType === '박사'
+        ? [
+            { name: '연구계획서', status: 'completed' },
+            { name: '프로포절', status: 'completed' },
+            { name: '예비심사1차', status: 'current' },
+            { name: '예비심사2차', status: 'upcoming' },
+            { name: '발표논문게재', status: 'upcoming' },
+            { name: '본심사1차', status: 'upcoming' },
+            { name: '본심사2차', status: 'upcoming' }
+        ]
+        : [
+            { name: '연구계획서', status: 'completed' },
+            { name: '프로포절', status: 'current' },
+            { name: '예비심사', status: 'upcoming' },
+            { name: '본심사', status: 'upcoming' },
+            { name: '졸업', status: 'upcoming' }
+        ];
+
+    const stages = stageProgress ? stageProgress.stages : defaultStages;
+
+    // 심사결과 텍스트/배지
+    const getReviewResultText = (result) => ({ approved: '승인', rejected: '반려', pending: '대기', reviewing: '심사중' }[result] || result);
+    const getReviewResultBadgeClass = (result) => ({
+        approved: 'bg-green-100 text-green-800',
+        rejected: 'bg-red-100 text-red-800',
+        pending: 'bg-yellow-100 text-yellow-800',
+        reviewing: 'bg-blue-100 text-blue-800'
+    }[result] || 'bg-gray-100 text-gray-800');
+
+    // 지도단계 SVG 생성
+    const stageWidth = 90;
+    const totalWidth = stages.length * stageWidth;
+    const stageSvgHtml = `
+        <div style="overflow-x: auto; padding: 10px 0;">
+            <svg width="${totalWidth}" height="80" viewBox="0 0 ${totalWidth} 80" style="display: block; margin: 0 auto; min-width: ${totalWidth}px;">
+                ${stages.map((stage, i) => {
+                    const x = i * stageWidth + 45;
+                    const color = stage.status === 'completed' ? '#2E7D32' : stage.status === 'current' ? '#0288D1' : '#E5E7EB';
+                    const fill = stage.status === 'upcoming' ? 'white' : color;
+                    const stroke = color;
+                    return `
+                        ${i < stages.length - 1 ? `<line x1="${x + 12}" y1="25" x2="${x + stageWidth - 12}" y2="25" stroke="${stages[i+1].status === 'upcoming' ? '#E5E7EB' : '#2E7D32'}" stroke-width="2"/>` : ''}
+                        <circle cx="${x}" cy="25" r="10" fill="${fill}" stroke="${stroke}" stroke-width="2"/>
+                        ${stage.status === 'completed' ? `<path d="M${x-4} 25 L${x-1} 28 L${x+5} 21" stroke="white" stroke-width="2" fill="none"/>` : ''}
+                        <text x="${x}" y="50" text-anchor="middle" font-size="10" fill="#374151">${stage.name}</text>
+                        <text x="${x}" y="65" text-anchor="middle" font-size="8" fill="${stage.status === 'completed' ? '#2E7D32' : stage.status === 'current' ? '#0288D1' : '#9CA3AF'}">
+                            ${stage.status === 'completed' ? '완료' : stage.status === 'current' ? '진행중' : '예정'}
+                        </text>
+                    `;
+                }).join('')}
+            </svg>
+        </div>
+        <div style="display: flex; justify-content: center; gap: 20px; padding-top: 8px; border-top: 1px solid #E5E7EB;">
+            <span style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6B7280;">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: #2E7D32;"></span> 완료
+            </span>
+            <span style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6B7280;">
+                <span style="width: 10px; height: 10px; border-radius: 50%; background: #0288D1;"></span> 진행중
+            </span>
+            <span style="display: flex; align-items: center; gap: 4px; font-size: 11px; color: #6B7280;">
+                <span style="width: 10px; height: 10px; border-radius: 50%; border: 2px solid #E5E7EB; background: white;"></span> 예정
+            </span>
+        </div>
+    `;
+
+    // 제출 문서 HTML
+    const submissionsHtml = submissions.length > 0
+        ? submissions.map(s => `
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; background: #F8FAFC; border-radius: 6px; margin-bottom: 6px;">
+                <div style="flex: 1;">
+                    <div style="font-weight: 600; color: #1a1a1a; margin-bottom: 3px; font-size: 12px;">
+                        📄 ${s.subStageName}
+                    </div>
+                    <div style="font-size: 11px; color: #4B5563;">
+                        ${s.title} | ${s.submittedDate} |
+                        <span class="px-2 py-0.5 rounded text-xs font-medium ${getReviewResultBadgeClass(s.reviewResult)}">${getReviewResultText(s.reviewResult)}</span>
+                    </div>
+                </div>
+                ${s.fileUrl ? `
+                    <a href="${s.fileUrl}" target="_blank"
+                       style="padding: 5px 10px; background: #6A0028; color: white; border-radius: 4px; font-size: 11px; text-decoration: none;">
+                        📥
+                    </a>
+                ` : ''}
+            </div>
+        `).join('')
+        : '<p style="color: #9CA3AF; text-align: center; padding: 12px; font-size: 13px;">제출된 문서가 없습니다.</p>';
 
     // 모달 내용 렌더링
     const content = `
@@ -3660,6 +3757,22 @@ function showStudentInfo(studentId) {
                         ${student.status === 'active' ? '재학' : '휴학'}
                     </span>
                 </div>
+            </div>
+        </div>
+
+        <!-- 지도단계 섹션 -->
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #E5E7EB;">
+            <h4 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">지도단계</h4>
+            <div style="background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 16px;">
+                ${stageSvgHtml}
+            </div>
+        </div>
+
+        <!-- 제출 문서 섹션 -->
+        <div style="margin-top: 20px; padding-top: 16px; border-top: 1px solid #E5E7EB;">
+            <h4 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">제출 문서</h4>
+            <div style="max-height: 200px; overflow-y: auto;">
+                ${submissionsHtml}
             </div>
         </div>
     `;
@@ -6266,10 +6379,10 @@ function showCommitteeAssignment() {
 
                     <!-- 3행: 3개 필드 + 버튼 -->
 
-                    <!-- 11. 심사단계 -->
+                    <!-- 11. 기본단계 -->
                     <div class="flex items-center gap-2">
                         <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">
-                            심사단계
+                            기본단계
                         </label>
                         <select id="reviewStageFilter"
                                 class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
@@ -6333,7 +6446,8 @@ function showCommitteeAssignment() {
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">학번</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">성명</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수명</th>
-                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">심사단계</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">기본단계</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">세부단계</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">배정상태</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
                         </tr>
@@ -6341,7 +6455,7 @@ function showCommitteeAssignment() {
                     <tbody class="bg-white divide-y divide-gray-200">
                         ${data.length === 0 ? `
                             <tr>
-                                <td colspan="15" class="px-6 py-8 text-center text-gray-500">
+                                <td colspan="16" class="px-6 py-8 text-center text-gray-500">
                                     심사위원 배정 대기 중인 학생이 없습니다.
                                 </td>
                             </tr>
@@ -6359,7 +6473,8 @@ function showCommitteeAssignment() {
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.studentNumber}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${item.studentName}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.advisorName}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.reviewStage}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.basicStageName || item.reviewStage || '-'}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.subStageName || '-'}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.assignmentStatus}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                                     <button onclick="openCommitteeAssignmentModal('${item.id}')"

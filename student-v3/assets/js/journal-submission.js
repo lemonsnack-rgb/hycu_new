@@ -324,7 +324,8 @@ function renderJournalListScreen() {
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">심사단계</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">기본단계</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 130px;">세부단계</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">제출기간</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">제출구분</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">제출상태</th>
@@ -352,7 +353,7 @@ function renderJournalListScreen() {
 
 // 목록 행 렌더링
 function renderJournalListRow(submission, index) {
-    // 심사단계명만 표시 (attemptNumber 제거)
+    // 기본단계 및 세부단계 표시
     const stageDisplay = submission.stageName;
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
@@ -388,7 +389,8 @@ function renderJournalListRow(submission, index) {
     return `
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
-            <td class="px-6 py-3 text-center text-sm text-gray-900">${stageDisplay}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.basicStageName || stageDisplay || '-'}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.subStageName || '-'}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${submissionType}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${statusText}</td>

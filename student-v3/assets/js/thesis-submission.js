@@ -259,7 +259,8 @@ function renderThesisListScreen() {
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 60px;">순번</th>
-                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 150px;">지도단계</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">기본단계</th>
+                            <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 130px;">세부단계</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 200px;">제출기간</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 100px;">제출구분</th>
                             <th class="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider" style="width: 120px;">제출상태</th>
@@ -287,7 +288,7 @@ function renderThesisListScreen() {
 
 // 목록 행 렌더링
 function renderThesisListRow(submission, index) {
-    // 지도단계명 (attemptNumber 제거)
+    // 기본단계 및 세부단계
     const stageDisplay = submission.stageName;
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
@@ -322,7 +323,8 @@ function renderThesisListRow(submission, index) {
     return `
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
-            <td class="px-6 py-3 text-center text-sm text-gray-900">${stageDisplay}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.basicStageName || stageDisplay || '-'}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.subStageName || '-'}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${submissionType}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${statusText}</td>
@@ -415,10 +417,16 @@ function renderThesisSubmissionForm() {
                         <input type="text" value="${submission.advisorName}" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
-                    <!-- 심사단계 -->
+                    <!-- 기본단계 -->
                     <div class="flex items-center gap-4">
-                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
-                        <input type="text" value="${submission.stageName} (${submission.attemptNumber}차)" readonly
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">기본단계</label>
+                        <input type="text" value="${submission.basicStageName || submission.stageName || '-'}" readonly
+                               class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                    </div>
+                    <!-- 세부단계 -->
+                    <div class="flex items-center gap-4">
+                        <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">세부단계</label>
+                        <input type="text" value="${submission.subStageName || '-'} (${submission.attemptNumber}차)" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
                     <!-- 논문 제목 -->
@@ -480,10 +488,16 @@ function renderThesisSubmissionForm() {
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
-                <!-- 심사단계 -->
+                <!-- 기본단계 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
-                    <input type="text" value="${stageDisplay}" readonly
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">기본단계</label>
+                    <input type="text" value="${submission.basicStageName || stageDisplay || '-'}" readonly
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                </div>
+                <!-- 세부단계 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">세부단계</label>
+                    <input type="text" value="${submission.subStageName || '-'}" readonly
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
@@ -590,10 +604,16 @@ function renderThesisDetailView() {
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 
-                <!-- 심사단계 -->
+                <!-- 기본단계 -->
                 <div class="flex items-center gap-4">
-                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">심사단계</label>
-                    <input type="text" value="${stageDisplay}" readonly
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">기본단계</label>
+                    <input type="text" value="${submission.basicStageName || stageDisplay || '-'}" readonly
+                           class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
+                </div>
+                <!-- 세부단계 -->
+                <div class="flex items-center gap-4">
+                    <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">세부단계</label>
+                    <input type="text" value="${submission.subStageName || '-'}" readonly
                            class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                 </div>
 

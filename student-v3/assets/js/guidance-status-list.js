@@ -59,7 +59,8 @@ function renderStudentGuidanceStatusList() {
                             <th style="width: 100px; text-align: center;">지도교수명</th>
                             <th style="width: 120px; text-align: center;">제출일시</th>
                             <th style="width: 120px; text-align: center;">피드백 희망일자</th>
-                            <th style="width: 120px; text-align: center;">지도단계</th>
+                            <th style="width: 100px; text-align: center;">기본단계</th>
+                            <th style="width: 120px; text-align: center;">세부단계</th>
                             <th style="width: 100px; text-align: center;">피드백상태</th>
                         </tr>
                     </thead>
@@ -117,7 +118,8 @@ function renderStudentGuidanceRow(request, idx) {
             <td style="text-align: center;">${request.professorName || '-'}</td>
             <td style="text-align: center;">${request.uploadDate || '-'}</td>
             <td style="text-align: center;">${request.desiredDate || '-'}</td>
-            <td style="text-align: center;">${request.guidanceStage || '연구계획서'}</td>
+            <td style="text-align: center;">${request.basicStageName || request.guidanceStage || '-'}</td>
+            <td style="text-align: center;">${request.subStageName || '-'}</td>
             <td style="text-align: center;">${feedbackStatus}</td>
         </tr>
     `;

@@ -74,7 +74,8 @@ function renderAdminThesisReviewList() {
                             <th style="width: 90px;">학번</th>
                             <th style="width: 80px;">성명</th>
                             <th style="width: 100px;">지도교수명</th>
-                            <th style="width: 100px;">심사단계</th>
+                            <th style="width: 100px;">기본단계</th>
+                            <th style="width: 120px;">세부단계</th>
                             <th style="width: 100px;">심사결과</th>
                             <th style="width: 100px;">관리</th>
                         </tr>
@@ -94,7 +95,8 @@ function renderAdminThesisReviewList() {
                                 <td>${assignment.studentNumber}</td>
                                 <td>${assignment.studentName}</td>
                                 <td>${assignment.advisorName || '-'}</td>
-                                <td>${assignment.reviewType || '예비심사'}</td>
+                                <td>${assignment.basicStageName || assignment.reviewType || '-'}</td>
+                                <td>${assignment.subStageName || '-'}</td>
                                 <td>
                                     ${getProgressStatusText(assignment.evaluationProgress)}
                                 </td>

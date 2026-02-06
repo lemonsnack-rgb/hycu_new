@@ -129,7 +129,7 @@ function renderExamScheduleScreen() {
 
                         <!-- 3행 -->
                         <div class="flex items-center gap-2">
-                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사단계</label>
+                            <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">기본단계</label>
                             <select id="exam-filter-stage" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                 <option value="">전체</option>
                             </select>
@@ -177,7 +177,8 @@ function renderExamScheduleScreen() {
                                     <th>학번</th>
                                     <th>성명</th>
                                     <th>지도교수명</th>
-                                    <th>심사단계</th>
+                                    <th>기본단계</th>
+                                    <th>세부단계</th>
                                     <th>등록상태</th>
                                     <th>심사일정</th>
                                     <th>진행방식</th>

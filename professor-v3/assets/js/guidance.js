@@ -152,7 +152,8 @@ function showStudentList() {
                             <th style="width: 80px;">학적상태</th>
                             <th style="width: 100px;">학번</th>
                             <th style="width: 100px;">성명</th>
-                            <th style="width: 100px;">지도단계</th>
+                            <th style="width: 100px;">기본단계</th>
+                            <th style="width: 120px;">세부단계</th>
                             <th style="width: 100px;">지도교수</th>
                         </tr>
                     </thead>
@@ -173,7 +174,8 @@ function showStudentList() {
                                     <td>재학</td>
                                     <td>${student.studentId}</td>
                                     <td>${student.name}</td>
-                                    <td>${student.currentStage || '-'}</td>
+                                    <td>${student.basicStageName || student.currentStage || '-'}</td>
+                                    <td>${student.subStageName || '-'}</td>
                                     <td>${currentProf.name}</td>
                                 </tr>
                             `;

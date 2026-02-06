@@ -1517,9 +1517,9 @@ const views = {
                                        onkeypress="if(event.key==='Enter') filterExamSchedule()">
                             </div>
 
-                            <!-- 12. 심사단계 -->
+                            <!-- 12. 기본단계 -->
                             <div class="flex items-center gap-2">
-                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">심사단계</label>
+                                <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">기본단계</label>
                                 <select id="filter-stage" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
                                     <option value="">전체</option>
                                     <!-- 동적 로드 -->
@@ -1573,7 +1573,8 @@ const views = {
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">학번</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">성명</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수명</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">심사단계</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">기본단계</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">세부단계</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록상태</th>
                                 </tr>
                             </thead>

@@ -199,7 +199,8 @@ function renderExamScheduleTable(data) {
                 <td class="px-4 py-3 text-sm text-gray-900">${item.studentNumber}</td>
                 <td class="px-4 py-3 text-sm font-medium text-gray-900">${item.studentName}</td>
                 <td class="px-4 py-3 text-sm text-gray-600">${item.advisorName || '-'}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">${item.stageName}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">${item.basicStageName || item.stageName || '-'}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">${item.subStageName || '-'}</td>
                 <td class="px-4 py-3 text-sm text-gray-800">${statusText}</td>
             </tr>
         `;
