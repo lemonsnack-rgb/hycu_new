@@ -11,8 +11,8 @@ let currentScreen = 'dashboard';
 const breadcrumbMap = {
     'dashboard': [{ label: '홈', url: '#' }, { label: '대시보드' }],
     // 논문 안내
-    'notice': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '공지사항' }],
-    'board': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '자료실' }],
+    'notice': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '행정공지사항' }],
+    'board': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '논문지도공지 및 자료' }],
     'ethics': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '연구윤리' }],
     'schedule': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '논문일정' }],
     'process': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '논문지도절차' }],

@@ -184,7 +184,7 @@ function renderBoardList() {
             <div class="table-container">
                 <div class="table-header">
                     <div class="table-header-left">
-                        <h3 class="table-title">논문지도 자료실</h3>
+                        <h3 class="table-title">논문지도공지 및 자료</h3>
                         <span class="table-count">(총 ${posts.length}건)</span>
                     </div>
                     <div class="table-header-right">
