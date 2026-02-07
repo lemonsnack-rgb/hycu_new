@@ -6652,8 +6652,7 @@ function openCommitteeAssignmentModal(committeeId) {
                         <!-- 오른쪽: 심사위원 -->
                         <div style="padding-left: 24px; display: flex; flex-direction: column;">
                             <h4 class="font-semibold text-gray-900 mb-3" style="font-size: 15px;">
-                                심사위원 (복수 선택 가능) <span class="text-red-500 text-sm">*</span>
-                                <span class="text-xs text-gray-500 ml-2">(${minMembers}명 이상)</span>
+                                심사위원 (복수 선택 가능)
                             </h4>
 
                             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px;">
@@ -6772,14 +6771,6 @@ function handleCommitteeSelection(profId, isChair) {
             window.selectedMembers.splice(index, 1);
         } else {
             // 체크박스 선택 - 추가
-            // 최대 인원 초과 체크
-            const maxMembers = window.maxCommitteeMembers || 4; // 기본값 4명 (석사 3명 - 위원장 1명)
-            if (window.selectedMembers.length >= maxMembers) {
-                showNotification('심사위원 수를 초과하였습니다.', 'warning');
-                const checkbox = document.querySelector(`#member-list input[value="${profId}"]`);
-                if (checkbox) checkbox.checked = false;
-                return;
-            }
             window.selectedMembers.push({ ...prof });
         }
     }
@@ -6832,8 +6823,7 @@ function updateSaveCommitteeButtonState() {
         return;
     }
 
-    const minMembers = reviewTarget.degreeType === '석사' ? 2 : 4;
-    const isValid = chair && members.length >= minMembers;
+    const isValid = !!chair;
 
     saveBtn.disabled = !isValid;
 }
@@ -6850,12 +6840,6 @@ function confirmCommitteeAssignment() {
     // 유효성 검사
     if (!chair) {
         showNotification('심사위원장을 선택해주세요.', 'warning');
-        return;
-    }
-
-    const minMembers = reviewTarget.degreeType === '석사' ? 2 : 4;
-    if (members.length < minMembers) {
-        showNotification(`${reviewTarget.degreeType} 과정은 심사위원을 ${minMembers}명 이상 선택해야 합니다.`, 'warning');
         return;
     }
 
