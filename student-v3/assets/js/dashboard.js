@@ -600,20 +600,9 @@ window.closeAllGuidanceStagesModal = closeAllGuidanceStagesModal;
 
 console.log('dashboard.js loaded (redesigned with updates)');
 
-/* ==================== 새 대시보드 (React 디자인) ==================== */
+/* ==================== 새 대시보드 (PPT 레이아웃 기반 개편) ==================== */
 
-// 지도 단계 데이터 (React 컴포넌트에서 가져옴)
-const journeySteps = [
-    { id: 1, name: '논문작성계획서', status: 'completed' },
-    { id: 2, name: '프로포절', status: 'completed' },
-    { id: 3, name: '예비심사(1차)', status: 'completed' },
-    { id: 4, name: '예비심사(2차)', status: 'current', period: '2025-01-15 ~ 2025-02-15' },
-    { id: 5, name: '발표', status: 'upcoming', period: '2025-03-01 ~ 2025-03-15' },
-    { id: 6, name: '본심사(1차)', status: 'upcoming', period: '2025-04-01 ~ 2025-04-30' },
-    { id: 7, name: '본심사(2차)', status: 'upcoming', period: '2025-05-15 ~ 2025-06-15' },
-];
-
-// 학위논문청구요건 (React 컴포넌트에서 가져옴)
+// 학위논문청구요건
 const newRequirements = [
     { id: 1, name: '학점 이수', completed: true },
     { id: 2, name: '연구윤리', completed: true },
@@ -625,156 +614,152 @@ const newRequirements = [
     { id: 8, name: '박사논문2', completed: false },
 ];
 
-// 자주 찾는 메뉴
-const quickMenus = [
-    { id: 1, name: '논문지도받기', screen: 'guidance-status' },
-    { id: 2, name: '단계별 산출물 제출', screen: 'thesis-submission' },
-    { id: 3, name: '학기별논문지도', screen: 'semester-guidance-plan' },
-];
-
-// 일정 데이터
-const newSchedules = [
-    { id: 1, type: '온라인', professor: '박교수', date: '11월 28일(목) 14:00 ~ 15:00', topic: '본심사 준비 상담' },
-    { id: 2, type: '오프라인', professor: '박교수', date: '11월 30일(토) 10:00 ~ 11:00', topic: '논문 방향성 논의' },
-];
-
-// 공지사항 데이터
-const newNotices = [
-    { id: 1, title: '2025-1학기 본심사 일정 안내', date: '2024.11.15' },
-    { id: 2, title: '예비심사 결과 입력 안내', date: '2024.11.10' },
-    { id: 3, title: '논문지도 일정 변경 공지', date: '2024.11.08' },
-];
-
-// 아웃링크 데이터 (URL은 추후 지정)
-const outlinks = [
-    { id: 1, title: '아웃링크 1', description: '관련 사이트 설명', url: '#outlink1' },
-    { id: 2, title: '아웃링크 2', description: '관련 사이트 설명', url: '#outlink2' },
-    { id: 3, title: '아웃링크 3', description: '관련 사이트 설명', url: '#outlink3' },
+// 학생별 논문지도단계 진행 현황 (세로형 여정용 Mock 데이터)
+// 기본단계: applicationPeriod(신청기간), withdrawalPeriod(철회기간)
+// 세부단계: submissionPeriod(제출기간), reviewPeriod(심사기간) 각각 분리
+const studentStageProgress = [
+    {
+        stageId: 'HS001',
+        basicStageName: '논문작성계획서',
+        applicationPeriod: '2025-03-01 ~ 2025-03-15',
+        withdrawalPeriod: '2025-03-01 ~ 2025-03-10',
+        status: 'completed',
+        subStages: [
+            { id: 'SS001', name: '논문작성계획서 초안', status: 'completed',
+              submissionPeriod: '2025-03-01 ~ 2025-03-15', reviewPeriod: '2025-03-16 ~ 2025-03-20' },
+            { id: 'SS002', name: '논문작성계획서 최종본', status: 'completed',
+              submissionPeriod: '2025-03-21 ~ 2025-03-25', reviewPeriod: '2025-03-26 ~ 2025-03-31' }
+        ]
+    },
+    {
+        stageId: 'HS002',
+        basicStageName: '프로포절',
+        applicationPeriod: '2025-04-01 ~ 2025-04-15',
+        withdrawalPeriod: '2025-04-01 ~ 2025-04-10',
+        status: 'completed',
+        subStages: [
+            { id: 'SS003', name: '프로포절 초안', status: 'completed',
+              submissionPeriod: '2025-04-01 ~ 2025-04-15', reviewPeriod: '2025-04-16 ~ 2025-04-25' },
+            { id: 'SS004', name: '프로포절 발표', status: 'completed',
+              submissionPeriod: '2025-04-20 ~ 2025-05-05', reviewPeriod: '2025-05-06 ~ 2025-05-10' }
+        ]
+    },
+    {
+        stageId: 'HS003',
+        basicStageName: '예비심사',
+        applicationPeriod: '2025-05-10 ~ 2025-06-10',
+        withdrawalPeriod: '2025-05-10 ~ 2025-05-20',
+        status: 'in-progress',
+        subStages: [
+            { id: 'SS005', name: '1차 예비심사', status: 'completed',
+              submissionPeriod: '2025-05-10 ~ 2025-05-25', reviewPeriod: '2025-05-26 ~ 2025-05-31' },
+            { id: 'SS006', name: '2차 예비심사', status: 'current',
+              submissionPeriod: '2025-06-01 ~ 2025-06-15', reviewPeriod: '2025-06-16 ~ 2025-06-25' }
+        ]
+    },
+    {
+        stageId: 'HS004',
+        basicStageName: '본심사',
+        applicationPeriod: '2025-08-20 ~ 2025-09-05',
+        withdrawalPeriod: '2025-08-20 ~ 2025-08-30',
+        status: 'upcoming',
+        subStages: [
+            { id: 'SS007', name: '1차 본심사', status: 'upcoming',
+              submissionPeriod: '2025-09-01 ~ 2025-09-15', reviewPeriod: '2025-09-20 ~ 2025-10-05' },
+            { id: 'SS008', name: '2차 본심사', status: 'upcoming',
+              submissionPeriod: '2025-10-10 ~ 2025-10-20', reviewPeriod: '2025-10-25 ~ 2025-11-05' }
+        ]
+    }
 ];
 
 /**
- * SVG 타임라인 렌더링 (동적 컬럼)
- * - 컨테이너 너비에 따라 컬럼 수 자동 조절
- * - 최소 3컬럼, 최대 7컬럼 (전체 단계 수)
+ * 카드1: 행정 공지사항 렌더링 (최근 3건)
  */
-function renderJourneyTimeline() {
-    const container = document.getElementById('journey-timeline');
+function renderAdminNoticeCard() {
+    const container = document.getElementById('admin-notice-list');
     if (!container) return;
 
-    // 동적 컬럼 계산
-    const containerWidth = container.offsetWidth || 800;
-    const minNodeWidth = 160;  // 노드당 최소 너비
-    const maxCols = journeySteps.length;  // 최대 = 전체 단계 수 (1행에 모두 표시)
-    const minCols = 3;  // 최소 3컬럼
-
-    // 컨테이너 너비 기반 컬럼 수 계산
-    let COLS = Math.floor(containerWidth / minNodeWidth);
-    COLS = Math.max(minCols, Math.min(maxCols, COLS));  // 3 ~ 7 사이로 제한
-
-    const viewBoxW = COLS * 200;  // 컬럼 수에 따라 viewBox 너비 조정
-    const cellW = viewBoxW / COLS;
-    const rowH = 130;
-    const nodeY = 40;
-    const radius = 12;
-
-    const rows = [];
-    for (let i = 0; i < journeySteps.length; i += COLS) {
-        rows.push(journeySteps.slice(i, i + COLS));
+    // noticeDataStore (admin-v3/assets/js/notice-data.js)에서 최근 3건 가져오기
+    let notices = [];
+    if (typeof noticeDataStore !== 'undefined') {
+        notices = noticeDataStore
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+            .slice(0, 3);
     }
-    const svgH = rows.length * rowH;
 
-    const getNodeX = (colIdx) => cellW * colIdx + cellW / 2;
-    const getNodeY = (rowIdx) => rowIdx * rowH + nodeY;
+    if (notices.length === 0) {
+        container.innerHTML = '<div style="font-size: 13px; color: #9ca3af; padding: 8px 0;">등록된 공지사항이 없습니다.</div>';
+        return;
+    }
 
-    const getNodeColor = (status) => {
-        if (status === 'completed') return '#2E7D32';
-        if (status === 'current') return '#0288D1';
-        return 'white';
-    };
-
-    const getLineColor = (fromStatus, toStatus) => {
-        if (fromStatus === 'completed' && (toStatus === 'completed' || toStatus === 'current')) {
-            return '#2E7D32';
-        }
-        return '#d1d5db';
-    };
-
-    let svgContent = `<svg width="100%" viewBox="0 0 ${viewBoxW} ${svgH}" style="display: block;" preserveAspectRatio="xMidYMid meet">`;
-
-    rows.forEach((row, rowIdx) => {
-        // 행 내 화살표
-        row.forEach((step, colIdx) => {
-            if (colIdx < row.length - 1) {
-                const fromX = getNodeX(colIdx);
-                const toX = getNodeX(colIdx + 1);
-                const y = getNodeY(rowIdx);
-                const lineColor = getLineColor(step.status, row[colIdx + 1].status);
-                svgContent += `
-                    <line x1="${fromX + 14}" y1="${y}" x2="${toX - 20}" y2="${y}" stroke="${lineColor}" stroke-width="2"/>
-                    <polygon points="${toX - 20},${y - 5} ${toX - 20},${y + 5} ${toX - 12},${y}" fill="${lineColor}"/>
-                `;
-            }
-        });
-
-        // 다음 행 연결선 (곡선)
-        if (rowIdx < rows.length - 1) {
-            const lastCol = row.length - 1;
-            const fromX = getNodeX(lastCol);
-            const fromY = getNodeY(rowIdx) + 60;
-            const toX = getNodeX(0);
-            const toY = getNodeY(rowIdx + 1);
-            const midY = fromY + 25;
-            const curveR = 10;
-
-            svgContent += `
-                <path d="M ${fromX} ${fromY} L ${fromX} ${midY - curveR} Q ${fromX} ${midY} ${fromX - curveR} ${midY} L ${toX + curveR} ${midY} Q ${toX} ${midY} ${toX} ${midY + curveR} L ${toX} ${toY - 18}" fill="none" stroke="#d1d5db" stroke-width="2"/>
-                <polygon points="${toX - 5},${toY - 16} ${toX + 5},${toY - 16} ${toX},${toY - 8}" fill="#d1d5db"/>
-            `;
-        }
-
-        // 노드
-        row.forEach((step, colIdx) => {
-            const x = getNodeX(colIdx);
-            const y = getNodeY(rowIdx);
-            const isCompleted = step.status === 'completed';
-            const isCurrent = step.status === 'current';
-            const nodeColor = getNodeColor(step.status);
-            const textColor = isCompleted ? '#2E7D32' : isCurrent ? '#0288D1' : '#9ca3af';
-
-            // 진행중 배지
-            if (isCurrent) {
-                svgContent += `
-                    <rect x="${x - 26}" y="${y - 38}" width="52" height="20" rx="4" fill="#0288D1"/>
-                    <text x="${x}" y="${y - 24}" text-anchor="middle" fill="white" font-size="11" font-weight="700">진행중</text>
-                `;
-            }
-
-            // 노드 원
-            svgContent += `
-                <circle cx="${x}" cy="${y}" r="${radius}" fill="${nodeColor}" ${step.status === 'upcoming' ? 'stroke="#d1d5db" stroke-width="2"' : ''}/>
-            `;
-
-            // 체크마크 (완료)
-            if (isCompleted) {
-                svgContent += `
-                    <path d="M ${x - 5} ${y} L ${x - 1} ${y + 4} L ${x + 6} ${y - 4}" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-                `;
-            }
-
-            // 단계명
-            svgContent += `
-                <text x="${x}" y="${y + 28}" text-anchor="middle" fill="${textColor}" font-size="13" font-weight="600">${step.name}</text>
-                <text x="${x}" y="${y + 44}" text-anchor="middle" fill="#9ca3af" font-size="10">${isCompleted ? '[완료]' : step.period || ''}</text>
-            `;
-        });
-    });
-
-    svgContent += '</svg>';
-    container.innerHTML = svgContent;
+    container.innerHTML = notices.map((n, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; ${i < notices.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : ''} cursor: pointer;"
+             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';"
+             onclick="showScreen('notice')">
+            <span style="font-size: 13px; color: #1a1a1a; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 8px;">${n.title}</span>
+            <span style="font-size: 12px; color: #9ca3af; flex-shrink: 0;">${n.createdAt.split(' ')[0]}</span>
+        </div>
+    `).join('');
 }
 
 /**
- * 요건 충족 현황 렌더링 (칩 형태)
+ * 카드2: 논문지도공지 및 자료 렌더링 (최근 3건)
+ */
+function renderBoardNoticeCard() {
+    const container = document.getElementById('board-notice-list');
+    if (!container) return;
+
+    // DataService.getResourceBoards (professor-v3/assets/js/mock-data.js)에서 최근 3건
+    let boards = [];
+    if (typeof DataService !== 'undefined' && typeof DataService.getResourceBoards === 'function') {
+        boards = DataService.getResourceBoards('student', 'S001')
+            .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+            .slice(0, 3);
+    }
+
+    if (boards.length === 0) {
+        container.innerHTML = '<div style="font-size: 13px; color: #9ca3af; padding: 8px 0;">등록된 자료가 없습니다.</div>';
+        return;
+    }
+
+    container.innerHTML = boards.map((b, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; ${i < boards.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : ''} cursor: pointer;"
+             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';"
+             onclick="showScreen('resources')">
+            <span style="font-size: 13px; color: #1a1a1a; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 8px;">${b.title}</span>
+            <span style="font-size: 12px; color: #9ca3af; flex-shrink: 0;">${b.createdAt.split('T')[0]}</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * 카드3: 알림 렌더링 (최근 3건)
+ */
+function renderAlertCard() {
+    const container = document.getElementById('alert-list');
+    if (!container) return;
+
+    // DashboardData.activities에서 최근 3건
+    const alerts = (DashboardData.activities || []).slice(0, 3);
+
+    if (alerts.length === 0) {
+        container.innerHTML = '<div style="font-size: 13px; color: #9ca3af; padding: 8px 0;">새로운 알림이 없습니다.</div>';
+        return;
+    }
+
+    container.innerHTML = alerts.map((a, i) => `
+        <div style="display: flex; align-items: flex-start; gap: 8px; padding: 8px 0; ${i < alerts.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : ''}">
+            <div style="width: 6px; height: 6px; border-radius: 50%; background: ${a.isRead ? '#d1d5db' : '#6A0028'}; margin-top: 6px; flex-shrink: 0;"></div>
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${a.title}</div>
+                <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">${a.time}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * 카드4: 요건 충족 현황 렌더링 (칩 형태, 기존 유지)
  */
 function renderRequirementsChips() {
     const container = document.getElementById('requirements-chips');
@@ -796,115 +781,235 @@ function renderRequirementsChips() {
 }
 
 /**
- * 공지사항 렌더링 (새 스타일)
+ * 카드5: 세로형 논문지도단계 렌더링
+ * - 모든 기본단계에 아코디언 (완료만 디폴트 접힘)
+ * - 날짜 위치 통일 (right: 0 고정)
+ * - 세부단계 폰트 14px
  */
-function renderDashboardNotices() {
-    const container = document.getElementById('dashboard-notice-list');
+function renderVerticalJourney() {
+    const container = document.getElementById('vertical-journey');
     if (!container) return;
 
-    container.innerHTML = newNotices.map((n, i) => `
-        <div style="display: flex; justify-content: space-between; padding: 12px 0; ${i < newNotices.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''} cursor: pointer;"
-             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';"
-             onclick="showScreen('notice')">
-            <span style="font-size: 14px; color: #1a1a1a;">${n.title}</span>
-            <span style="font-size: 13px; color: #9ca3af;">${n.date}</span>
-        </div>
-    `).join('');
-}
+    let html = '';
+    const lastIdx = studentStageProgress.length - 1;
 
-/**
- * 자주 찾는 메뉴 렌더링
- */
-function renderQuickMenus() {
-    const container = document.getElementById('quick-menu-list');
-    if (!container) return;
+    studentStageProgress.forEach((stage, stageIdx) => {
+        const isCompleted = stage.status === 'completed';
+        const isCurrent = stage.status === 'in-progress';
+        const isUpcoming = stage.status === 'upcoming';
+        const isLast = stageIdx === lastIdx;
+        const defaultCollapsed = isCompleted;
 
-    container.innerHTML = quickMenus.map((m, i) => `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; ${i < quickMenus.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''} cursor: pointer;"
-             onclick="showScreen('${m.screen}')"
-             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';">
-            <span style="font-size: 14px; color: #1a1a1a;">${m.name}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </div>
-    `).join('');
-}
+        // 기본단계 아이콘 (28px 사각형)
+        const basicIcon = isCompleted
+            ? '<div style="width: 28px; height: 28px; border-radius: 6px; background: #2E7D32; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
+            : isCurrent
+                ? '<div style="width: 28px; height: 28px; border-radius: 6px; background: #0288D1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: white;"></div></div>'
+                : '<div style="width: 28px; height: 28px; border-radius: 6px; background: #F5F5F5; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: #BDBDBD;"></div></div>';
 
-/**
- * 일정 카드 렌더링
- */
-function renderScheduleCards() {
-    const container = document.getElementById('schedule-card-list');
-    if (!container) return;
+        // 기본단계 상태 배지
+        const basicBadge = isCompleted
+            ? '<span style="padding: 3px 12px; background: #E8F5E9; color: #2E7D32; border-radius: 4px; font-size: 12px; font-weight: 600;">완료</span>'
+            : isCurrent
+                ? '<span style="padding: 3px 12px; background: #E3F2FD; color: #0288D1; border-radius: 4px; font-size: 12px; font-weight: 600;">진행 중</span>'
+                : '<span style="padding: 3px 12px; background: #F5F5F5; color: #9E9E9E; border-radius: 4px; font-size: 12px; font-weight: 600;">예정</span>';
 
-    container.innerHTML = newSchedules.map(s => `
-        <div style="background: #FAF6F1; border-radius: 4px; padding: 12px; border: 1px solid #E8E0D8;">
-            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
-                <span style="padding: 2px 8px; background: #6A0028; color: white; border-radius: 4px; font-size: 11px; font-weight: 600;">${s.type}</span>
-                <span style="font-size: 13px; font-weight: 600; color: #1a1a1a;">${s.professor}</span>
-            </div>
-            <div style="font-size: 12px; color: #6b7280;">${s.date}</div>
-            <div style="font-size: 12px; color: #9ca3af; margin-top: 2px;">${s.topic}</div>
-        </div>
-    `).join('');
-}
+        // 기본단계 날짜 (완료면 숨김, 우측 고정 위치)
+        let basicPeriodHtml = '';
+        if (!isCompleted) {
+            const periods = [];
+            if (stage.applicationPeriod) periods.push(`<span class="jd-label" style="color: #4B5563; font-weight: 500;">신청</span>${stage.applicationPeriod}`);
+            if (stage.withdrawalPeriod) periods.push(`<span class="jd-label" style="color: #4B5563; font-weight: 500;">철회</span>${stage.withdrawalPeriod}`);
+            if (periods.length > 0) {
+                basicPeriodHtml = `<span class="journey-date-area">${periods.join('<span class="jd-sep">|</span>')}</span>`;
+            }
+        }
 
-/**
- * 아웃링크 카드 렌더링
- */
-function renderOutlinkCards() {
-    const container = document.getElementById('outlink-cards');
-    if (!container) return;
+        // 토글 아이콘 (모든 기본단계)
+        const toggleRotate = defaultCollapsed ? '' : 'transform: rotate(180deg);';
+        const toggleTitle = defaultCollapsed ? '펼치기' : '접기';
+        const toggleIcon = `<span class="journey-toggle" data-stage="${stageIdx}" style="cursor: pointer; margin-left: 6px; display: inline-flex; align-items: center; color: #9ca3af; transition: transform 0.2s; ${toggleRotate}" title="${toggleTitle}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>`;
 
-    container.innerHTML = outlinks.map(link => `
-        <a href="${link.url}" target="_blank" rel="noopener noreferrer"
-           style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px 16px; text-decoration: none; transition: all 0.2s;"
-           onmouseover="this.style.background='#F1F5F9'; this.style.borderColor='#6A0028';"
-           onmouseout="this.style.background='#F8FAFC'; this.style.borderColor='#E5E7EB';">
-            <div>
-                <div style="font-size: 14px; font-weight: 600; color: #1a1a1a;">${link.title}</div>
-                <div style="font-size: 12px; color: #6b7280;">${link.description}</div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-        </a>
-    `).join('');
-}
+        html += `
+            <div style="margin-bottom: ${!isLast ? '4px' : '0'};">
+                <!-- 기본단계 헤더 -->
+                <div onclick="toggleJourneyStage(${stageIdx})" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: ${isCurrent ? '#F0F7FF' : '#F8F8F8'}; border-radius: 8px; ${isCurrent ? 'border: 2px solid #90CAF9;' : 'border: 1px solid #EEEEEE;'} cursor: pointer;">
+                    ${basicIcon}
+                    <span style="font-size: 15px; font-weight: 700; color: ${isUpcoming ? '#9E9E9E' : '#1a1a1a'};">${stage.basicStageName}</span>
+                    ${basicBadge}
+                    ${toggleIcon}
+                    ${basicPeriodHtml}
+                </div>
 
-/**
- * 새 대시보드 초기화
- */
-function initNewDashboard() {
-    renderJourneyTimeline();
-    renderRequirementsChips();
-    renderDashboardNotices();
-    renderQuickMenus();
-    renderScheduleCards();
-    renderOutlinkCards();
+                <!-- 세부단계 목록 -->
+                <div id="journey-sub-${stageIdx}" style="margin-left: 30px; ${!isLast ? 'border-left: 2px solid ' + (isCompleted ? '#A5D6A7' : isCurrent ? '#90CAF9' : '#E0E0E0') + ';' : ''} padding-left: 28px; padding-top: 4px; padding-bottom: 4px; ${defaultCollapsed ? 'display: none;' : ''}">
+        `;
 
-    // ResizeObserver로 컨테이너 크기 변경 감지
-    const timelineContainer = document.getElementById('journey-timeline');
-    if (timelineContainer && window.ResizeObserver) {
-        let resizeTimeout;
-        const resizeObserver = new ResizeObserver(() => {
-            // 디바운스: 100ms 후에 렌더링 (과도한 호출 방지)
-            clearTimeout(resizeTimeout);
-            resizeTimeout = setTimeout(() => {
-                renderJourneyTimeline();
-            }, 100);
+        stage.subStages.forEach((sub, subIdx) => {
+            const subCompleted = sub.status === 'completed';
+            const subCurrent = sub.status === 'current';
+            const subUpcoming = sub.status === 'upcoming';
+
+            // 세부단계 아이콘 (16px 원)
+            const subIcon = subCompleted
+                ? '<div style="width: 16px; height: 16px; border-radius: 50%; background: #2E7D32; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: -38px; margin-right: 22px;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
+                : subCurrent
+                    ? '<div style="width: 16px; height: 16px; border-radius: 50%; background: #0288D1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: -38px; margin-right: 22px;"><div style="width: 6px; height: 6px; border-radius: 50%; background: white;"></div></div>'
+                    : '<div style="width: 16px; height: 16px; border-radius: 50%; background: white; border: 2px solid #E0E0E0; flex-shrink: 0; margin-left: -38px; margin-right: 22px;"></div>';
+
+            // 세부단계 배지
+            const subBadge = subCompleted
+                ? '<span style="padding: 2px 10px; background: #E8F5E9; color: #2E7D32; border-radius: 4px; font-size: 11px; font-weight: 600;">완료</span>'
+                : subCurrent
+                    ? '<span style="padding: 2px 10px; background: #E3F2FD; color: #0288D1; border-radius: 4px; font-size: 11px; font-weight: 600;">진행 중</span>'
+                    : '<span style="padding: 2px 10px; background: #F5F5F5; color: #9E9E9E; border-radius: 4px; font-size: 11px; font-weight: 600;">예정</span>';
+
+            // 세부단계 날짜 (완료면 숨김, 우측 고정 위치)
+            let subPeriodHtml = '';
+            if (!subCompleted) {
+                const subPeriods = [];
+                if (sub.submissionPeriod) subPeriods.push(`<span class="jd-label" style="color: #6A0028; font-weight: 500;">제출</span>${sub.submissionPeriod}`);
+                if (sub.reviewPeriod) subPeriods.push(`<span class="jd-label" style="color: #1565C0; font-weight: 500;">심사</span>${sub.reviewPeriod}`);
+                if (subPeriods.length > 0) {
+                    subPeriodHtml = `<span class="journey-date-area">${subPeriods.join('<span class="jd-sep">|</span>')}</span>`;
+                }
+            }
+
+            html += `
+                    <div style="padding: 8px 0; ${subIdx < stage.subStages.length - 1 ? 'border-bottom: 1px solid #F3F4F6;' : ''}">
+                        <div style="display: flex; align-items: center;">
+                            ${subIcon}
+                            <span style="font-size: 14px; color: ${subUpcoming ? '#9E9E9E' : '#374151'}; ${subCurrent ? 'font-weight: 600;' : ''}">${sub.name}</span>
+                            <span style="margin-left: 8px;">${subBadge}</span>
+                            ${subPeriodHtml}
+                        </div>
+                    </div>
+            `;
         });
-        resizeObserver.observe(timelineContainer);
+
+        html += `
+                </div>
+            </div>
+        `;
+    });
+
+    container.innerHTML = html;
+}
+
+/**
+ * 기본단계 접기/펼치기 토글 (모든 단계)
+ */
+function toggleJourneyStage(stageIdx) {
+    const subDiv = document.getElementById(`journey-sub-${stageIdx}`);
+    const toggle = document.querySelector(`.journey-toggle[data-stage="${stageIdx}"]`);
+    if (!subDiv) return;
+
+    const isHidden = subDiv.style.display === 'none';
+    subDiv.style.display = isHidden ? '' : 'none';
+    if (toggle) {
+        toggle.style.transform = isHidden ? 'rotate(180deg)' : '';
+        toggle.title = isHidden ? '접기' : '펼치기';
+    }
+}
+
+/**
+ * 카드6: 최근 피드백 내역 렌더링 (최근 3건)
+ */
+function renderRecentFeedback() {
+    const container = document.getElementById('recent-feedback-list');
+    if (!container) return;
+
+    // StudentGuidanceDataService (guidance-status-data.js)에서 피드백 완료된 것 중 최근 3건
+    let feedbacks = [];
+    if (typeof STUDENT_GUIDANCE_SUBMISSIONS !== 'undefined') {
+        feedbacks = STUDENT_GUIDANCE_SUBMISSIONS
+            .filter(s => s.feedbackDate)
+            .sort((a, b) => b.feedbackDate.localeCompare(a.feedbackDate))
+            .slice(0, 3);
     }
 
-    console.log('New dashboard initialized (React design with dynamic columns)');
+    if (feedbacks.length === 0) {
+        container.innerHTML = '<div style="font-size: 13px; color: #9ca3af; padding: 8px 0;">피드백 내역이 없습니다.</div>';
+        return;
+    }
+
+    container.innerHTML = feedbacks.map((f, i) => `
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; ${i < feedbacks.length - 1 ? 'border-bottom: 1px solid #f3f4f6;' : ''} cursor: pointer;"
+             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';"
+             onclick="showScreen('guidance-status')">
+            <div style="flex: 1; min-width: 0;">
+                <div style="font-size: 13px; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${f.basicStageName || f.guidanceStage || '-'} - ${f.subStageName || ''}</div>
+                <div style="font-size: 11px; color: #9ca3af; margin-top: 2px;">${f.professorName || ''}</div>
+            </div>
+            <span style="font-size: 12px; color: #9ca3af; flex-shrink: 0; margin-left: 8px;">${f.feedbackDate.split(' ')[0]}</span>
+        </div>
+    `).join('');
+}
+
+/**
+ * 카드7: 지도예약현황 렌더링 (확정된 예약 최대 3건)
+ */
+function renderReservationStatus() {
+    const container = document.getElementById('reservation-status-list');
+    if (!container) return;
+
+    // MEETING_REQUESTS_V3에서 대기/승인/확정 상태 중 다가오는 예약
+    let reservations = [];
+    if (typeof MEETING_REQUESTS_V3 !== 'undefined') {
+        reservations = MEETING_REQUESTS_V3
+            .filter(m => m.status === 'confirmed' || m.status === 'approved' || m.status === 'pending')
+            .sort((a, b) => {
+                const dateA = a.selectedDate || a.date || '';
+                const dateB = b.selectedDate || b.date || '';
+                return dateA.localeCompare(dateB);
+            })
+            .slice(0, 3);
+    }
+
+    if (reservations.length === 0) {
+        container.innerHTML = '<div style="font-size: 13px; color: #9ca3af; padding: 8px 0;">예정된 지도 예약이 없습니다.</div>';
+        return;
+    }
+
+    container.innerHTML = reservations.map(r => {
+        const statusMap = { confirmed: { label: '확정', color: '#2E7D32', bg: '#E8F5E9' }, approved: { label: '승인', color: '#0288D1', bg: '#E3F2FD' }, pending: { label: '대기', color: '#F57C00', bg: '#FFF3E0' } };
+        const st = statusMap[r.status] || statusMap.pending;
+        const meetingTypeLabel = r.meetingType === 'online' ? '온라인' : '오프라인';
+        const durationText = r.duration ? ` (${r.duration}분)` : '';
+
+        return `
+            <div style="background: #FAF6F1; border-radius: 4px; padding: 12px; border: 1px solid #E8E0D8;">
+                <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 6px;">
+                    <span style="padding: 2px 8px; background: #6A0028; color: white; border-radius: 4px; font-size: 11px; font-weight: 600;">${meetingTypeLabel}</span>
+                    <span style="font-size: 13px; font-weight: 600; color: #1a1a1a;">${r.advisorName || ''}</span>
+                    <span style="padding: 2px 8px; background: ${st.bg}; color: ${st.color}; border-radius: 4px; font-size: 11px; font-weight: 600;">${st.label}</span>
+                </div>
+                <div style="font-size: 13px; color: #1a1a1a; margin-bottom: 4px;">${r.selectedDate || ''}  ${r.selectedTime || ''}${durationText}</div>
+                <div style="font-size: 12px; color: #6b7280; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${r.topic || ''}</div>
+            </div>
+        `;
+    }).join('');
+}
+
+/**
+ * 새 대시보드 초기화 (PPT 레이아웃)
+ */
+function initNewDashboard() {
+    renderAdminNoticeCard();
+    renderBoardNoticeCard();
+    renderAlertCard();
+    renderRequirementsChips();
+    renderVerticalJourney();
+    renderRecentFeedback();
+    renderReservationStatus();
+
+    console.log('New dashboard initialized (PPT layout)');
 }
 
 // DOM 로드 완료 시 새 대시보드 초기화
 document.addEventListener('DOMContentLoaded', function() {
     // 새 대시보드 요소가 있으면 새 대시보드 초기화
-    if (document.getElementById('journey-timeline')) {
+    if (document.getElementById('vertical-journey')) {
         initNewDashboard();
     } else {
         // 기존 대시보드 요소가 있으면 기존 초기화
@@ -914,9 +1019,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // 전역 export (새 함수들)
 window.initNewDashboard = initNewDashboard;
-window.renderJourneyTimeline = renderJourneyTimeline;
+window.renderAdminNoticeCard = renderAdminNoticeCard;
+window.renderBoardNoticeCard = renderBoardNoticeCard;
+window.renderAlertCard = renderAlertCard;
 window.renderRequirementsChips = renderRequirementsChips;
-window.renderDashboardNotices = renderDashboardNotices;
-window.renderQuickMenus = renderQuickMenus;
-window.renderScheduleCards = renderScheduleCards;
-window.renderOutlinkCards = renderOutlinkCards;
+window.renderVerticalJourney = renderVerticalJourney;
+window.renderRecentFeedback = renderRecentFeedback;
+window.renderReservationStatus = renderReservationStatus;
+window.toggleJourneyStage = toggleJourneyStage;
