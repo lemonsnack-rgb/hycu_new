@@ -227,7 +227,12 @@ function renderEvaluationForm(template, existingEvaluation) {
     // 전역 변수에 템플릿 저장 (저장/제출 핸들러에서 사용)
     currentTemplate = template;
 
-    const savedData = existingEvaluation || { scores: [], passFailResults: [], gradeResults: [], rubricResults: [], descriptiveResults: [] };
+    const savedData = existingEvaluation || {};
+    if (!savedData.scores) savedData.scores = [];
+    if (!savedData.passFailResults) savedData.passFailResults = [];
+    if (!savedData.gradeResults) savedData.gradeResults = [];
+    if (!savedData.rubricResults) savedData.rubricResults = [];
+    if (!savedData.descriptiveResults) savedData.descriptiveResults = [];
 
     // Pass/Fail 방식
     if (template.evaluationType === 'passfail') {
