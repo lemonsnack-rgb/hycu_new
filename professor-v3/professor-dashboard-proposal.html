@@ -815,227 +815,170 @@
             <!-- ===================================
                  대시보드 화면
                  =================================== -->
-            <section id="dashboard-screen" class="content-screen active">
-                <div id="content-area" style="overflow-x: hidden;">
-                    <!-- 2컬럼 레이아웃 (flex-1 + 400px) -->
-                    <div style="display: flex; gap: 24px;">
+            <section id="dashboard-screen" class="content-screen active" style="overflow-x: hidden;">
 
-                        <!-- 좌측 메인 영역 (flex-1, min-width:0으로 축소 허용) -->
-                        <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 24px; overflow: hidden;">
-
-                            <!-- 지도학생 현황 카드 -->
-                            <section class="bg-white rounded-lg shadow-sm" style="border: 1px solid #E5E7EB;">
-                                <!-- 카드 헤더 -->
-                                <div class="p-5" style="border-bottom: 1px solid #F3F4F6;">
-                                    <div class="flex items-center gap-2 mb-4">
-                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <line x1="18" y1="20" x2="18" y2="10"></line>
-                                            <line x1="12" y1="20" x2="12" y2="4"></line>
-                                            <line x1="6" y1="20" x2="6" y2="14"></line>
-                                        </svg>
-                                        <h2 class="font-bold text-gray-900">지도학생 현황</h2>
-                                    </div>
-
-                                    <!-- 학위과정 필터 -->
-                                    <div class="flex gap-2 mb-4">
-                                        <button id="degree-all" class="degree-filter-btn" style="background: #6A0028; color: #fff; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('전체')">전체 15명</button>
-                                        <button id="degree-master" class="degree-filter-btn" style="background: #fff; color: #6B7280; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('석사')">석사 8명</button>
-                                        <button id="degree-doctor" class="degree-filter-btn" style="background: #fff; color: #6B7280; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('박사')">박사 5명</button>
-                                        <button id="degree-integrated" class="degree-filter-btn" style="background: #fff; color: #6B7280; padding: 6px 16px; border-radius: 9999px; font-size: 14px; font-weight: 500; border: 1px solid #E5E7EB; cursor: pointer; transition: all 0.2s;" onclick="filterDegree('통합')">통합 2명</button>
-                                    </div>
-
-                                    <!-- 단계별 탭 (1행 4개 grid) -->
-                                    <div style="display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #F3F4F6;">
-                                        <button id="stage-plan" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; border-right: 1px solid #F3F4F6; cursor: pointer; position: relative; background: #FCE4EC; border: none; border-bottom: 2px solid #6A0028; transition: all 0.2s;" onclick="filterStage('논문작성계획서')">
-                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">논문작성계획서</p>
-                                            <p style="font-size: 16px; font-weight: 700; color: #6A0028; margin: 0;">4<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
-                                        </button>
-                                        <button id="stage-proposal" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; border-right: 1px solid #F3F4F6; cursor: pointer; position: relative; background: white; border: none; transition: all 0.2s;" onclick="filterStage('프로포절')">
-                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">프로포절</p>
-                                            <p style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0;">3<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
-                                        </button>
-                                        <button id="stage-prelim" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; border-right: 1px solid #F3F4F6; cursor: pointer; position: relative; background: white; border: none; transition: all 0.2s;" onclick="filterStage('예비심사')">
-                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">예비심사</p>
-                                            <p style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0;">5<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
-                                        </button>
-                                        <button id="stage-main" class="stage-tab-btn" style="padding: 12px 16px; text-align: center; cursor: pointer; position: relative; background: white; border: none; transition: all 0.2s;" onclick="filterStage('본심사')">
-                                            <p style="font-size: 13px; color: #6B7280; margin-bottom: 4px;">본심사</p>
-                                            <p style="font-size: 16px; font-weight: 700; color: #1A1A1A; margin: 0;">3<span style="font-size: 13px; font-weight: 500; color: #6B7280; margin-left: 2px;">명</span></p>
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- 학생 테이블 -->
-                                <div style="overflow-x: auto; width: 100%;">
-                                    <table class="w-full text-sm" style="table-layout: fixed; width: 100%;">
-                                        <thead style="background: #F8FAFC; border-bottom: 2px solid #6A0028;">
-                                            <tr style="color: #4B5563;">
-                                                <th class="px-4 py-3 text-center font-bold">학과/전공</th>
-                                                <th class="px-4 py-3 text-center font-bold">학력과정</th>
-                                                <th class="px-4 py-3 text-center font-bold">학기차</th>
-                                                <th class="px-4 py-3 text-center font-bold">학번</th>
-                                                <th class="px-4 py-3 text-center font-bold">성명</th>
-                                                <th class="px-4 py-3 text-center font-bold">현재 지도단계</th>
-                                                <th class="px-4 py-3 text-center font-bold">상세보기</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="student-table-body">
-                                            <!-- JavaScript로 동적 생성 -->
-                                            <tr><td colspan="7" class="px-4 py-8 text-center text-gray-400">학생 데이터를 불러오는 중...</td></tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </section>
-
-                            <!-- 공지사항 카드 -->
-                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
-                                <div class="flex items-center justify-between mb-4">
-                                    <div class="flex items-center gap-2">
-                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                                        </svg>
-                                        <h2 class="font-bold text-gray-900">공지사항</h2>
-                                    </div>
-                                    <a href="#" class="text-sm font-medium hover:underline" style="color: #6A0028; text-decoration: none;">전체 공지 보기 &gt;</a>
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 12px;">
-                                    <div class="flex items-center justify-between py-2 hover:bg-gray-50" style="border-bottom: 1px solid #F3F4F6; cursor: pointer; padding: 8px 0;">
-                                        <span style="color: #374151;">2025-1학기 본심사 일정 안내</span>
-                                        <span class="text-sm" style="color: #9CA3AF;">2024.11.15</span>
-                                    </div>
-                                    <div class="flex items-center justify-between py-2 hover:bg-gray-50" style="border-bottom: 1px solid #F3F4F6; cursor: pointer; padding: 8px 0;">
-                                        <span style="color: #374151;">예비심사 결과 입력 안내</span>
-                                        <span class="text-sm" style="color: #9CA3AF;">2024.11.10</span>
-                                    </div>
-                                    <div class="flex items-center justify-between py-2 hover:bg-gray-50" style="cursor: pointer; padding: 8px 0;">
-                                        <span style="color: #374151;">논문지도 일정 변경 공지</span>
-                                        <span class="text-sm" style="color: #9CA3AF;">2024.11.08</span>
-                                    </div>
-                                </div>
-                            </section>
+                <!-- 상단 3분할 공지사항 -->
+                <div id="dashboard-top-notices" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                    <!-- 카드1: 행정 공지사항 -->
+                    <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                행정 공지사항
+                            </h2>
+                            <a href="#" onclick="showScreen('notice'); return false;" style="font-size: 12px; color: #6A0028; text-decoration: none; font-weight: 500;">전체 보기 &gt;</a>
                         </div>
-
-                        <!-- 우측 사이드바 (400px) -->
-                        <div class="dashboard-sidebar" style="width: 400px; display: flex; flex-direction: column; gap: 24px; flex-shrink: 0;">
-
-                            <!-- 자주 찾는 메뉴 -->
-                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                                    </svg>
-                                    <h2 class="font-bold text-gray-900">자주 찾는 메뉴</h2>
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <button class="w-full flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; background: white; cursor: pointer; text-align: left;" onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#D1D5DB';" onmouseout="this.style.background='white'; this.style.borderColor='#E5E7EB';" onclick="showScreen('guidance')">
-                                        <span style="color: #1F2937; font-size: 14px; font-weight: 500;">논문지도</span>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
-                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                        </svg>
-                                    </button>
-                                    <button class="w-full flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; background: white; cursor: pointer; text-align: left;" onmouseover="this.style.background='#F9FAFB'; this.style.borderColor='#D1D5DB';" onmouseout="this.style.background='white'; this.style.borderColor='#E5E7EB';">
-                                        <span style="color: #1F2937; font-size: 14px; font-weight: 500;">학기별논문지도</span>
-                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2">
-                                            <polyline points="9 18 15 12 9 6"></polyline>
-                                        </svg>
-                                    </button>
-                                </div>
-                            </section>
-
-                            <!-- 내 심사 관리 -->
-                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                        <polyline points="14 2 14 8 20 8"></polyline>
-                                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                                        <polyline points="10 9 9 9 8 9"></polyline>
-                                    </svg>
-                                    <h2 class="font-bold text-gray-900">내 심사 관리</h2>
-                                </div>
-                                <div style="display: flex; flex-direction: column; gap: 8px;">
-                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
-                                        <span style="color: #374151; font-size: 14px;">논문작성계획서</span>
-                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">2</span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
-                                        <span style="color: #374151; font-size: 14px;">프로포절</span>
-                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">1</span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
-                                        <span style="color: #374151; font-size: 14px;">예비심사</span>
-                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">3</span>
-                                    </div>
-                                    <div class="flex items-center justify-between p-3 rounded" style="border: 1px solid #E5E7EB; cursor: pointer;" onmouseover="this.style.background='#F9FAFB';" onmouseout="this.style.background='white';">
-                                        <span style="color: #374151; font-size: 14px;">본심사</span>
-                                        <span style="min-width: 24px; height: 24px; padding: 0 8px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; color: white; background: #6A0028;">2</span>
-                                    </div>
-                                </div>
-                            </section>
-
-                            <!-- 내 지도 일정 -->
-                            <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB;">
-                                <div class="flex items-center gap-2 mb-4">
-                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                                    </svg>
-                                    <h2 class="font-bold text-gray-900">내 지도 일정</h2>
-                                </div>
-
-                                <!-- 다가오는 일정 -->
-                                <div class="mb-4">
-                                    <p style="font-size: 12px; color: #6B7280; margin-bottom: 12px; font-weight: 500;">다가오는 지도 일정</p>
-                                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">온라인</span>
-                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[석사] 박민준</span>
-                                            </div>
-                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 19일(화) 14:00 ~ 15:00</p>
-                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">연구 진행 상황 점검</p>
-                                        </div>
-                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">오프라인</span>
-                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[박사] 홍길동</span>
-                                            </div>
-                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 25일(월) 10:00 ~ 11:00</p>
-                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">논문 초안 검토</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- 승인 대기 -->
-                                <div style="border-top: 1px solid #F3F4F6; padding-top: 16px;">
-                                    <p style="font-size: 12px; color: #6B7280; margin-bottom: 12px; font-weight: 500;">승인 대기 중인 지도 일정</p>
-                                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">온라인</span>
-                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[박사] 이영희</span>
-                                            </div>
-                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 28일(목) 14:00 ~ 15:00</p>
-                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">본심사 준비 상담</p>
-                                        </div>
-                                        <div class="p-3 rounded" style="background: #FAF6F1; border: 1px solid #E8E0D8;">
-                                            <div class="flex items-center gap-2 mb-1">
-                                                <span style="color: white; font-size: 11px; padding: 2px 8px; border-radius: 4px; font-weight: 600; background: #6A0028;">오프라인</span>
-                                                <span style="font-weight: 500; color: #1F2937; font-size: 14px;">[석사] 정수아</span>
-                                            </div>
-                                            <p style="font-size: 14px; color: #4B5563; margin: 4px 0;">11월 30일(토) 10:00 ~ 11:00</p>
-                                            <p style="font-size: 12px; color: #6B7280; margin: 0;">논문 방법론 논의</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </section>
+                        <div id="prof-admin-notice-list">
+                            <!-- JavaScript로 동적 생성 -->
                         </div>
+                    </section>
+
+                    <!-- 카드2: 심사 배정 알림 -->
+                    <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                                </svg>
+                                심사 배정 알림
+                            </h2>
+                            <a href="#" onclick="showScreen('review'); return false;" style="font-size: 12px; color: #6A0028; text-decoration: none; font-weight: 500;">전체 보기 &gt;</a>
+                        </div>
+                        <div id="prof-review-notice-list">
+                            <!-- JavaScript로 동적 생성 -->
+                        </div>
+                    </section>
+
+                    <!-- 카드3: 논문지도공지 및 자료 -->
+                    <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                논문지도공지 및 자료
+                            </h2>
+                            <a href="#" onclick="showScreen('resources'); return false;" style="font-size: 12px; color: #6A0028; text-decoration: none; font-weight: 500;">전체 보기 &gt;</a>
+                        </div>
+                        <div id="prof-board-notice-list">
+                            <!-- JavaScript로 동적 생성 -->
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 2컬럼 레이아웃 (좌: 3fr, 우: 1fr) -->
+                <div id="dashboard-main-content" style="display: grid; grid-template-columns: 3fr 1fr; gap: 16px; align-items: start;">
+                    <!-- ===== 좌측 컬럼 (메인) ===== -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                        <!-- 지도학생 현황 (요약 카드 3개) -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                                </svg>
+                                지도학생 현황
+                            </h2>
+                            <div id="student-summary-cards" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
+
+                        <!-- 처리 대기 사항 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                                </svg>
+                                처리 대기 사항
+                            </h2>
+                            <div id="todo-list">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- ===== 우측 컬럼 (사이드) ===== -->
+                    <div style="display: flex; flex-direction: column; gap: 16px;">
+
+                        <!-- 최근 제출물 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                </svg>
+                                최근 제출물
+                            </h2>
+                            <div id="recent-submissions-list">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
+
+                        <!-- 미팅 신청 현황 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                                </svg>
+                                미팅 신청 현황
+                            </h2>
+                            <div id="meeting-requests-list">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
+
+                        <!-- 예정된 미팅 -->
+                        <section class="bg-white rounded shadow-sm" style="border: 1px solid #E5E7EB; padding: 16px;">
+                            <h2 style="display: flex; align-items: center; gap: 6px; font-size: 14px; font-weight: 700; color: #1a1a1a; margin-bottom: 12px;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                예정된 미팅
+                            </h2>
+                            <div id="scheduled-meetings-list">
+                                <!-- JavaScript로 동적 생성 -->
+                            </div>
+                        </section>
                     </div>
                 </div>
+
+                <!-- 반응형 CSS -->
+                <style>
+                @media (max-width: 1024px) {
+                    /* 상단 3분할 -> 2분할 */
+                    #dashboard-top-notices {
+                        grid-template-columns: 1fr 1fr !important;
+                    }
+                    /* 본문 2컬럼 -> 1컬럼 */
+                    #dashboard-main-content {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+
+                @media (max-width: 768px) {
+                    /* 상단 3분할 -> 1분할 */
+                    #dashboard-top-notices {
+                        grid-template-columns: 1fr !important;
+                    }
+                    /* 지도학생 요약 카드도 1컬럼 */
+                    #student-summary-cards {
+                        grid-template-columns: 1fr !important;
+                    }
+                }
+                </style>
 
                 <!-- 관련 사이트 (아웃링크) - 2컬럼 바깥, 최하단 풀 와이드 -->
                 <section class="bg-white rounded-lg shadow-sm p-5" style="border: 1px solid #E5E7EB; margin-top: 20px;">
@@ -1968,6 +1911,8 @@
 
     <!-- dashboard.js (아웃링크 렌더링용) -->
     <script src="assets/js/dashboard.js?v=20260205001"></script>
+    <!-- dashboard-v3-new.js (3분할 상단 + 2컬럼 대시보드) -->
+    <script src="assets/js/dashboard-v3-new.js?v=20260207001"></script>
     <script src="assets/js/journal-review.js?v=20251219002"></script>
     <!-- ✨ 새로운 주차별 지도 관리 (관리자 UI 기반 + 실적 입력 기능) -->
     <script src="assets/js/weekly-guidance.js?v=20260122006"></script>
