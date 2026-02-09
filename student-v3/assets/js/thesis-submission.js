@@ -30,6 +30,7 @@ const thesisSubmissions = [
             otherFileSize: 1200000,
             submittedAt: '2025-01-10 14:30'
         },
+        reviewComments: '모든 심사위원의 평가가 우수하며, 연구 계획이 체계적으로 잘 구성되었습니다. AI 기반 추천 시스템에 대한 문헌 조사가 충실하고, 연구 목적이 명확합니다. 지적사항 보완 후 최종 논문 진행을 권장합니다.',
         evaluationFormRegistered: true
     },
     {
@@ -826,7 +827,7 @@ function showReviewCommentsModal(comments) {
     modal.innerHTML = `
         <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
             <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-semibold text-gray-800">평가 총평</h3>
+                <h3 class="text-lg font-semibold text-gray-800">심사위원장 최종 총평</h3>
                 <button data-action="close-modal" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
