@@ -2812,174 +2812,77 @@ const views = {
 
     // ========== 권한 관리 ==========
     permissionManagement: () => {
-        const administrators = appData.administrators || [];
-        const screenList = appData.screenList || [];
+        const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
+        const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
+        const roleGroups = (typeof mockRoleGroups !== 'undefined') ? mockRoleGroups : [];
 
         return `
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <h2 class="text-2xl font-bold text-gray-800">권한 관리</h2>
-                    <p class="text-sm text-gray-600 mt-2">관리자별 화면 접근 권한을 관리합니다.</p>
+                    <p class="text-sm text-gray-600 mt-2">소속/신분/역할그룹/개인별 메뉴 접근 권한을 관리합니다.</p>
                 </div>
 
-                <!-- 관리자 검색 및 추가 섹션 -->
-                <div class="p-6 border-b" style="background: linear-gradient(to bottom, #FFFBF5, #FFF9F0);">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 text-[#009DE8] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
-                        </svg>
-                        <h3 class="text-lg font-bold text-gray-800">새 관리자 검색 및 추가</h3>
-                    </div>
-                    <p class="text-sm text-gray-600 mb-4">
-                        교번 또는 이름으로 검색하여 새로운 관리자를 추가할 수 있습니다.
-                    </p>
-                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
-                        <div class="flex">
-                            <div class="flex-shrink-0">
-                                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"/>
-                                </svg>
-                            </div>
-                            <div class="ml-3">
-                                <p class="text-sm text-blue-700">
-                                    <strong>예시:</strong> 교번 "A2024004" 또는 이름 "김직원"으로 검색하면 교무처 소속 김직원님을 관리자로 추가할 수 있습니다.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <input type="text" id="search-employee-id" placeholder="예: A2024004"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
-                        <input type="text" id="search-employee-name" placeholder="예: 김직원"
-                               class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-[#009DE8]">
-                        <button onclick="searchEmployee()"
-                                class="bg-[#009DE8] text-white px-4 py-2 rounded text-sm hover:bg-[#0087c9] flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                            </svg>
-                            검색
-                        </button>
-                        <div id="search-result" class="col-span-full"></div>
+                <!-- 탭 영역 -->
+                <div class="border-b">
+                    <div class="flex" id="permission-tabs">
+                        <button onclick="switchPermissionTab('dept')" data-tab="dept"
+                                class="px-6 py-3 text-sm font-medium border-b-2 border-[#6A0028] text-[#6A0028]">소속별</button>
+                        <button onclick="switchPermissionTab('position')" data-tab="position"
+                                class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">신분별</button>
+                        <button onclick="switchPermissionTab('rolegroup')" data-tab="rolegroup"
+                                class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">역할그룹별</button>
+                        <button onclick="switchPermissionTab('individual')" data-tab="individual"
+                                class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">개인별</button>
                     </div>
                 </div>
 
-                <!-- 등록된 관리자 목록 및 권한 설정 섹션 -->
-                <div class="p-6" style="background-color: #FAFAFA;">
-                    <div class="flex items-center mb-4">
-                        <svg class="w-6 h-6 text-[#009DE8] mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-                        </svg>
-                        <h3 class="text-lg font-bold text-gray-800">등록된 관리자 목록 및 권한 설정</h3>
+                <!-- 필터 영역 -->
+                <div class="p-6 border-b bg-gray-50">
+                    <!-- 소속별 필터 -->
+                    <div id="filter-dept" class="permission-filter flex items-center gap-3">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">소속</label>
+                        <select id="perm-dept-select" class="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">선택하세요</option>
+                            ${departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+                        </select>
+                        <button onclick="filterPermissionByDept()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
                     </div>
-                    <p class="text-sm text-gray-600 mb-4">
-                        각 관리자의 화면별 접근 권한을 설정하고, 권한을 중지하거나 관리자를 삭제할 수 있습니다.
-                    </p>
+                    <!-- 신분별 필터 -->
+                    <div id="filter-position" class="permission-filter hidden flex items-center gap-3">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">신분</label>
+                        <select id="perm-position-select" class="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">선택하세요</option>
+                            ${positions.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+                        </select>
+                        <button onclick="filterPermissionByPosition()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
+                    </div>
+                    <!-- 역할그룹별 필터 -->
+                    <div id="filter-rolegroup" class="permission-filter hidden flex items-center gap-3">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">역할그룹</label>
+                        <select id="perm-rolegroup-select" class="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">선택하세요</option>
+                            ${roleGroups.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
+                        </select>
+                        <button onclick="filterPermissionByRoleGroup()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
+                    </div>
+                    <!-- 개인별 필터 -->
+                    <div id="filter-individual" class="permission-filter hidden flex items-center gap-3">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">사용자ID</label>
+                        <input type="text" id="perm-user-id" placeholder="예: admin"
+                               class="max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                        <button onclick="filterPermissionByUser()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
+                    </div>
+                </div>
 
-                    ${administrators.length > 0 ? administrators.map((admin, index) => {
-                        const permissions = appData.permissions.filter(p => p.adminId === admin.id);
-                        const permissionMap = {};
-                        permissions.forEach(p => {
-                            permissionMap[p.screenId] = p.hasAccess;
-                        });
-
-                        // 화면을 카테고리별로 그룹화
-                        const categories = {};
-                        screenList.forEach(screen => {
-                            if (!categories[screen.category]) {
-                                categories[screen.category] = [];
-                            }
-                            categories[screen.category].push(screen);
-                        });
-
-                        return `
-                            <div class="mb-6 border border-gray-200 rounded-lg overflow-hidden ${admin.status === 'suspended' ? 'opacity-60' : ''}" style="${admin.status === 'suspended' ? 'filter: grayscale(40%); background-color: #F5F5F5;' : ''}">
-                                <!-- 관리자 정보 헤더 -->
-                                <div class="p-4 flex justify-between items-center ${admin.status === 'suspended' ? 'bg-gray-200' : 'bg-gray-100'}">
-                                    <div class="flex items-center gap-4">
-                                        <div>
-                                            <h4 class="font-bold text-gray-800">${admin.name}</h4>
-                                            <p class="text-sm text-gray-600">교번: ${admin.employeeId} | 소속: ${admin.department}</p>
-                                        </div>
-                                        <span class="px-3 py-1 text-xs rounded-full ${admin.status === 'active' ? 'bg-green-100 text-green-800' : admin.status === 'suspended' ? 'bg-yellow-100 text-yellow-800' : 'bg-red-100 text-red-800'}">
-                                            ${admin.status === 'active' ? '활성' : admin.status === 'suspended' ? '권한 중지' : '비활성'}
-                                        </span>
-                                    </div>
-                                    <div class="flex gap-2">
-                                        <button onclick="saveAdminPermissions(${admin.id})"
-                                                ${admin.status === 'suspended' ? 'disabled' : ''}
-                                                class="bg-blue-600 text-white px-4 py-2 rounded text-sm hover:bg-blue-700 flex items-center gap-1 ${admin.status === 'suspended' ? 'opacity-50 cursor-not-allowed' : ''}">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
-                                            </svg>
-                                            권한 저장
-                                        </button>
-                                        ${admin.status === 'active' ? `
-                                        <button onclick="suspendAdmin(${admin.id})"
-                                                class="bg-yellow-600 text-white px-4 py-2 rounded text-sm hover:bg-yellow-700 flex items-center gap-1"
-                                                title="모든 권한을 비활성화합니다. 재등록 없이 다시 활성화할 수 있습니다.">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            권한 중지
-                                        </button>
-                                        ` : admin.status === 'suspended' ? `
-                                        <button onclick="activateAdmin(${admin.id})"
-                                                class="bg-green-600 text-white px-4 py-2 rounded text-sm hover:bg-green-700 flex items-center gap-1"
-                                                title="중지된 권한을 다시 활성화합니다.">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path>
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                            </svg>
-                                            권한 활성화
-                                        </button>
-                                        ` : ''}
-                                        <button onclick="removeAdmin(${admin.id})"
-                                                class="bg-red-600 text-white px-4 py-2 rounded text-sm hover:bg-red-700 flex items-center gap-1"
-                                                title="관리자를 완전히 삭제합니다. 재등록이 필요합니다.">
-                                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-                                            </svg>
-                                            완전 삭제
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <!-- 권한 설정 테이블 -->
-                                <div class="p-4 ${admin.status === 'suspended' ? 'bg-gray-100' : ''}">
-                                    ${admin.status === 'suspended' ? `
-                                        <div class="mb-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                                            <p class="text-sm text-yellow-800">
-                                                <strong>⚠️ 권한 중지됨:</strong> 모든 권한이 비활성화되어 있습니다. "권한 활성화" 버튼을 눌러 다시 활성화하세요.
-                                            </p>
-                                        </div>
-                                    ` : ''}
-                                    ${Object.entries(categories).map(([category, screens]) => `
-                                        <div class="mb-4">
-                                            <h5 class="font-semibold text-gray-700 mb-2 border-b pb-2">${category}</h5>
-                                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                                ${screens.map(screen => `
-                                                    <label class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded ${admin.status === 'suspended' ? 'cursor-not-allowed' : 'cursor-pointer'}">
-                                                        <input type="checkbox"
-                                                               data-admin-id="${admin.id}"
-                                                               data-screen-id="${screen.id}"
-                                                               ${permissionMap[screen.id] ? 'checked' : ''}
-                                                               ${admin.status === 'suspended' ? 'disabled' : ''}
-                                                               onchange="updatePermission(${admin.id}, '${screen.id}', this.checked)"
-                                                               class="rounded border-gray-300">
-                                                        <span class="text-sm ${admin.status === 'suspended' ? 'text-gray-500' : 'text-gray-700'}">${screen.name}</span>
-                                                    </label>
-                                                `).join('')}
-                                            </div>
-                                        </div>
-                                    `).join('')}
-                                </div>
-                            </div>
-                        `;
-                    }).join('') : `
-                        <div class="text-center py-8 text-gray-500">
-                            등록된 관리자가 없습니다.
-                        </div>
-                    `}
+                <!-- 메뉴 접근권한 매트릭스 -->
+                <div class="p-6" id="permission-matrix-area">
+                    <div class="text-center py-12 text-gray-400">
+                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                        <p class="text-sm">위 필터에서 항목을 선택한 후 [조회] 버튼을 클릭하세요.</p>
+                    </div>
                 </div>
             </div>
         `;
@@ -4159,13 +4062,13 @@ const views = {
                         </div>
                     </div>
 
-                    <!-- Right Panel: CRUD Permission Matrix (70%) -->
+                    <!-- Right Panel: Access Permission Matrix (70%) -->
                     <div class="col-span-8">
                         <div class="p-6 border-b bg-gray-50">
                             <div class="flex justify-between items-center">
                                 <div>
                                     <h4 class="font-bold text-gray-800">${selectedTarget?.name || '선택된 대상 없음'}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">메뉴별 CRUD 권한을 설정합니다.</p>
+                                    <p class="text-xs text-gray-500 mt-1">메뉴별 접근 권한을 설정합니다.</p>
                                 </div>
                                 <div class="flex space-x-2">
                                     <button onclick="resetPermissionMatrix()"
@@ -4185,12 +4088,8 @@ const views = {
                             <table class="w-full table-fixed">
                                 <thead class="bg-gray-100 sticky top-0">
                                     <tr>
-                                        <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 35%;">메뉴명</th>
-                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">조회<br/>(R)</th>
-                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">등록<br/>(C)</th>
-                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">수정<br/>(U)</th>
-                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 13%;">삭제<br/>(D)</th>
-                                        <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 13%;">비고</th>
+                                        <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 70%;">메뉴명</th>
+                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 30%;">접근</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -4206,27 +4105,9 @@ const views = {
                                                 <input type="checkbox"
                                                        ${perm1.canRead ? 'checked' : ''}
                                                        class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                       data-menu="${menu1.id}" data-crud="R">
+                                                       data-menu="${menu1.id}" data-crud="R"
+                                                       onchange="toggleParentMenuAccess('${menu1.id}', this.checked)">
                                             </td>
-                                            <td class="text-center py-2">
-                                                <input type="checkbox"
-                                                       ${perm1.canCreate ? 'checked' : ''}
-                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                       data-menu="${menu1.id}" data-crud="C">
-                                            </td>
-                                            <td class="text-center py-2">
-                                                <input type="checkbox"
-                                                       ${perm1.canUpdate ? 'checked' : ''}
-                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                       data-menu="${menu1.id}" data-crud="U">
-                                            </td>
-                                            <td class="text-center py-2">
-                                                <input type="checkbox"
-                                                       ${perm1.canDelete ? 'checked' : ''}
-                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                       data-menu="${menu1.id}" data-crud="D">
-                                            </td>
-                                            <td class="py-3 px-4 text-xs text-gray-500">-</td>
                                         </tr>
                                         ${children.map(menu2 => {
                                             const perm2 = currentPermissions.find(p => p.menuId === menu2.id) || {};
@@ -4240,25 +4121,6 @@ const views = {
                                                            class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
                                                            data-menu="${menu2.id}" data-crud="R">
                                                 </td>
-                                                <td class="text-center py-2">
-                                                    <input type="checkbox"
-                                                           ${perm2.canCreate ? 'checked' : ''}
-                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                           data-menu="${menu2.id}" data-crud="C">
-                                                </td>
-                                                <td class="text-center py-2">
-                                                    <input type="checkbox"
-                                                           ${perm2.canUpdate ? 'checked' : ''}
-                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                           data-menu="${menu2.id}" data-crud="U">
-                                                </td>
-                                                <td class="text-center py-2">
-                                                    <input type="checkbox"
-                                                           ${perm2.canDelete ? 'checked' : ''}
-                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                           data-menu="${menu2.id}" data-crud="D">
-                                                </td>
-                                                <td class="py-3 px-4 text-xs text-gray-500">-</td>
                                             </tr>
                                             `;
                                         }).join('')}
@@ -5988,6 +5850,72 @@ views.noticeManagement = () => `
         <!-- 동적으로 생성됨 -->
     </div>
 `;
+
+// ========== 메뉴 관리 ==========
+views.menuManagement = () => {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+
+    return `
+        <div class="bg-white rounded-lg shadow-md">
+            <div class="p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">메뉴 관리</h2>
+                <p class="text-sm text-gray-600 mt-2">시스템 메뉴의 이름, 다국어, 사용여부, 순서를 관리합니다.</p>
+            </div>
+
+            <!-- 조회 + 메뉴추가 영역 -->
+            <div class="p-6 border-b bg-gray-50">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">메뉴명</label>
+                        <input type="text" id="filter-menu-name" placeholder="메뉴명 검색"
+                               class="max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap ml-4">사용여부</label>
+                        <select id="filter-menu-active" class="max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">전체</option>
+                            <option value="true">사용</option>
+                            <option value="false">미사용</option>
+                        </select>
+                        <button onclick="filterMenuList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
+                    </div>
+                    <button onclick="addNewMenu()" class="bg-[#009DE8] hover:bg-[#0080C0] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                        메뉴 추가
+                    </button>
+                </div>
+            </div>
+
+            <!-- 테이블 타이틀 -->
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 class="table-title">메뉴 목록</h3>
+                    <span class="table-count" id="menu-count">(${menus.length}건)</span>
+                </div>
+            </div>
+
+            <!-- 인라인 편집 테이블 -->
+            <div class="overflow-x-auto">
+                <table class="min-w-full table-auto">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 130px;">메뉴ID</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 180px;">메뉴명 (계층)</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 130px;">한글명</th>
+                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 130px;">중국어명</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">상위메뉴</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">사용</th>
+                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="menuTableBody" class="bg-white divide-y divide-gray-200">
+                        <!-- 데이터는 initMenuManagement에서 동적 렌더링 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+};
 
 // ========== 사용자 관리 ==========
 views.userManagement = () => {

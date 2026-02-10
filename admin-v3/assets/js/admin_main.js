@@ -3215,218 +3215,610 @@ window.toggleSelectAllAdmin = toggleSelectAllAdmin;
 window.sendNotificationToSelectedStudents = sendNotificationToSelectedStudents;
 window.openAdminNotificationModal = openAdminNotificationModal;
 
-// ========== 권한 관리 ==========
+// ========== 권한 관리 (신규) ==========
 
-// 직원 검색
-function searchEmployee() {
-    const employeeId = document.getElementById('search-employee-id').value.trim();
-    const employeeName = document.getElementById('search-employee-name').value.trim();
-    const resultDiv = document.getElementById('search-result');
+// 현재 권한관리 상태
+let _permCurrentTab = 'dept';
+let _permCurrentType = null;
+let _permCurrentId = null;
 
-    if (!employeeId && !employeeName) {
-        resultDiv.innerHTML = '<p class="text-sm text-red-600">교번 또는 이름을 입력해주세요.</p>';
-        return;
-    }
-
-    // 직원 디렉토리에서 검색
-    const results = appData.employeeDirectory.filter(emp => {
-        const matchId = !employeeId || emp.employeeId.toLowerCase().includes(employeeId.toLowerCase());
-        const matchName = !employeeName || emp.name.includes(employeeName);
-        return matchId && matchName && !emp.isAdmin; // 이미 관리자인 경우 제외
-    });
-
-    if (results.length === 0) {
-        resultDiv.innerHTML = '<p class="text-sm text-gray-600">검색 결과가 없습니다.</p>';
-        return;
-    }
-
-    resultDiv.innerHTML = `
-        <div class="bg-white border border-gray-300 rounded-lg p-4 mt-2">
-            <h4 class="font-semibold text-gray-800 mb-2">검색 결과 (${results.length}건)</h4>
-            <div class="space-y-2">
-                ${results.map(emp => `
-                    <div class="flex justify-between items-center p-2 bg-gray-50 rounded hover:bg-gray-100">
-                        <div>
-                            <p class="font-medium text-gray-800">${emp.name}</p>
-                            <p class="text-sm text-gray-600">교번: ${emp.employeeId} | 소속: ${emp.department}</p>
-                        </div>
-                        <button onclick="addAdmin('${emp.employeeId}', '${emp.name}', '${emp.department}')"
-                                class="bg-[#009DE8] text-white px-3 py-1 rounded text-sm hover:bg-[#0087c9]">
-                            관리자 추가
-                        </button>
-                    </div>
-                `).join('')}
-            </div>
-        </div>
-    `;
+// 권한관리 화면 초기화
+function initPermissionManagement() {
+    _permCurrentTab = 'dept';
+    _permCurrentType = null;
+    _permCurrentId = null;
+    console.log('✅ 권한관리 화면 초기화 완료');
 }
 
-// 관리자 추가
-function addAdmin(employeeId, name, department) {
-    // 이미 관리자인지 확인
-    const exists = appData.administrators.find(a => a.employeeId === employeeId);
-    if (exists) {
-        showNotification('이미 관리자로 등록되어 있습니다.', 'warning');
-        return;
+// 탭 전환
+function switchPermissionTab(tabName) {
+    _permCurrentTab = tabName;
+    _permCurrentType = null;
+    _permCurrentId = null;
+
+    // 탭 버튼 스타일 업데이트
+    document.querySelectorAll('#permission-tabs button').forEach(btn => {
+        if (btn.dataset.tab === tabName) {
+            btn.className = 'px-6 py-3 text-sm font-medium border-b-2 border-[#6A0028] text-[#6A0028]';
+        } else {
+            btn.className = 'px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700';
+        }
+    });
+
+    // 필터 영역 전환
+    document.querySelectorAll('.permission-filter').forEach(f => f.classList.add('hidden'));
+    const filterMap = { dept: 'filter-dept', position: 'filter-position', rolegroup: 'filter-rolegroup', individual: 'filter-individual' };
+    const targetFilter = document.getElementById(filterMap[tabName]);
+    if (targetFilter) targetFilter.classList.remove('hidden');
+
+    // 매트릭스 초기화
+    const area = document.getElementById('permission-matrix-area');
+    if (area) {
+        area.innerHTML = `
+            <div class="text-center py-12 text-gray-400">
+                <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                </svg>
+                <p class="text-sm">위 필터에서 항목을 선택한 후 [조회] 버튼을 클릭하세요.</p>
+            </div>
+        `;
+    }
+}
+
+// 필터 조회 - 소속별
+function filterPermissionByDept() {
+    const selectedId = document.getElementById('perm-dept-select').value;
+    if (!selectedId) { alert('소속을 선택하세요.'); return; }
+    _permCurrentType = 'dept';
+    _permCurrentId = selectedId;
+    renderPermissionMatrix('dept', selectedId);
+}
+
+// 필터 조회 - 신분별
+function filterPermissionByPosition() {
+    const selectedId = document.getElementById('perm-position-select').value;
+    if (!selectedId) { alert('신분을 선택하세요.'); return; }
+    _permCurrentType = 'position';
+    _permCurrentId = selectedId;
+    renderPermissionMatrix('position', selectedId);
+}
+
+// 필터 조회 - 역할그룹별
+function filterPermissionByRoleGroup() {
+    const selectedId = document.getElementById('perm-rolegroup-select').value;
+    if (!selectedId) { alert('역할그룹을 선택하세요.'); return; }
+    _permCurrentType = 'rolegroup';
+    _permCurrentId = selectedId;
+    renderPermissionMatrix('rolegroup', selectedId);
+}
+
+// 필터 조회 - 개인별
+function filterPermissionByUser() {
+    const userId = document.getElementById('perm-user-id').value.trim();
+    if (!userId) { alert('사용자ID를 입력하세요.'); return; }
+    _permCurrentType = 'individual';
+    _permCurrentId = userId;
+    renderPermissionMatrix('individual', userId);
+}
+
+// 접근권한 매트릭스 렌더링
+function renderPermissionMatrix(type, selectedId) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const area = document.getElementById('permission-matrix-area');
+    if (!area) return;
+
+    // 권한 데이터 가져오기
+    let permData = null;
+    let targetLabel = '';
+
+    if (type === 'dept') {
+        const list = (typeof mockDepartmentPermissions !== 'undefined') ? mockDepartmentPermissions : [];
+        permData = list.find(d => d.departmentId === selectedId);
+        const dept = (typeof mockDepartments !== 'undefined') ? mockDepartments.find(d => d.id === selectedId) : null;
+        targetLabel = dept ? dept.name : selectedId;
+    } else if (type === 'position') {
+        const list = (typeof mockPositionPermissions !== 'undefined') ? mockPositionPermissions : [];
+        permData = list.find(p => p.positionId === selectedId);
+        const pos = (typeof mockPositions !== 'undefined') ? mockPositions.find(p => p.id === selectedId) : null;
+        targetLabel = pos ? pos.name : selectedId;
+    } else if (type === 'rolegroup') {
+        const list = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
+        permData = list.find(r => r.roleGroupId === selectedId);
+        const rg = (typeof mockRoleGroups !== 'undefined') ? mockRoleGroups.find(r => r.id === selectedId) : null;
+        targetLabel = rg ? rg.name : selectedId;
+    } else if (type === 'individual') {
+        const list = (typeof mockIndividualPermissions !== 'undefined') ? mockIndividualPermissions : [];
+        permData = list.find(i => i.userId === selectedId);
+        targetLabel = selectedId;
     }
 
-    // 새 관리자 ID 생성
-    const newId = Math.max(...appData.administrators.map(a => a.id), 0) + 1;
+    const permissions = permData ? permData.permissions : [];
+    const permMap = {};
+    permissions.forEach(p => { permMap[p.menuId] = p.canRead; });
 
-    // 관리자 추가
-    const newAdmin = {
-        id: newId,
-        employeeId: employeeId,
-        name: name,
-        department: department,
-        role: 'admin',
-        status: 'active',
-        createdAt: new Date().toISOString().split('T')[0]
-    };
+    // 메뉴를 계층 구조로 정렬
+    const depth1Menus = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
 
-    appData.administrators.push(newAdmin);
+    let html = `
+        <div class="mb-4 flex items-center justify-between">
+            <h4 class="text-sm font-bold text-gray-800">
+                <span class="text-[#6A0028]">${targetLabel}</span>의 메뉴 접근 권한
+            </h4>
+            <span class="text-xs text-gray-500">${permissions.length}개 메뉴 권한 설정됨</span>
+        </div>
+        <div class="border rounded-lg overflow-hidden">
+            <table class="w-full">
+                <thead>
+                    <tr style="background: #f8fafc; border-bottom: 2px solid #6A0028;">
+                        <th class="px-4 py-3 text-left text-xs font-bold text-gray-800" style="width: 60%;">메뉴명</th>
+                        <th class="px-4 py-3 text-center text-xs font-bold text-gray-800" style="width: 40%;">접근</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200">
+    `;
 
-    // 모든 화면에 대해 기본 권한 설정 (모두 false)
-    appData.screenList.forEach(screen => {
-        appData.permissions.push({
-            adminId: newId,
-            screenId: screen.id,
-            hasAccess: false
+    depth1Menus.forEach(parent => {
+        const children = menus.filter(m => m.parentId === parent.id).sort((a, b) => a.order - b.order);
+        const isChecked = permMap[parent.id] === true;
+
+        html += `
+            <tr class="bg-gray-50">
+                <td class="px-4 py-2">
+                    <span class="text-sm font-bold text-gray-800">${parent.name}</span>
+                </td>
+                <td class="px-4 py-2 text-center">
+                    <input type="checkbox" data-menu-id="${parent.id}" data-is-parent="true"
+                           ${isChecked ? 'checked' : ''}
+                           onchange="toggleParentMenuPermission('${parent.id}', this.checked)"
+                           class="rounded border-gray-300 text-[#6A0028] focus:ring-[#6A0028]">
+                </td>
+            </tr>
+        `;
+
+        children.forEach(child => {
+            const childChecked = permMap[child.id] === true;
+            html += `
+                <tr>
+                    <td class="px-4 py-2 pl-10">
+                        <span class="text-sm text-gray-600">${child.name}</span>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                        <input type="checkbox" data-menu-id="${child.id}" data-parent-id="${parent.id}"
+                               ${childChecked ? 'checked' : ''}
+                               class="rounded border-gray-300 text-[#6A0028] focus:ring-[#6A0028]">
+                    </td>
+                </tr>
+            `;
         });
     });
 
-    // 직원 디렉토리에서 관리자로 표시
-    const emp = appData.employeeDirectory.find(e => e.employeeId === employeeId);
-    if (emp) {
-        emp.isAdmin = true;
-    }
+    html += `
+                </tbody>
+            </table>
+        </div>
+        <div class="mt-4 flex justify-end">
+            <button onclick="savePermission()" class="px-6 py-2 bg-[#6A0028] hover:bg-[#8A0034] text-white rounded text-sm font-medium">저장</button>
+        </div>
+    `;
 
-    showNotification(`${name}님이 관리자로 추가되었습니다.`, 'success');
-
-    // 검색 결과 초기화
-    document.getElementById('search-employee-id').value = '';
-    document.getElementById('search-employee-name').value = '';
-    document.getElementById('search-result').innerHTML = '';
-
-    // 화면 새로고침
-    switchView('permissionManagement');
+    area.innerHTML = html;
 }
 
-// 권한 업데이트
-function updatePermission(adminId, screenId, hasAccess) {
-    const permission = appData.permissions.find(p => p.adminId == adminId && p.screenId === screenId);
-    if (permission) {
-        permission.hasAccess = hasAccess;
-    }
+// 상위메뉴 체크 시 하위 연동
+function toggleParentMenuPermission(menuId, checked) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const children = menus.filter(m => m.parentId === menuId);
+    children.forEach(child => {
+        const cb = document.querySelector(`input[data-menu-id="${child.id}"]`);
+        if (cb) cb.checked = checked;
+    });
 }
 
-// 관리자 권한 저장
-function saveAdminPermissions(adminId) {
-    const admin = appData.administrators.find(a => a.id == adminId);
-    if (!admin) {
-        console.error('관리자를 찾을 수 없습니다:', adminId);
+// 상위메뉴 접근권한 체크 시 하위 연동 (Y/N 단일 체크박스용)
+function toggleParentMenuAccess(menuId, checked) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const children = menus.filter(m => m.parentId === menuId);
+    children.forEach(child => {
+        const cb = document.querySelector(`input[data-menu="${child.id}"]`);
+        if (cb) cb.checked = checked;
+    });
+}
+
+// 권한 저장 (접근 Y/N 단일 체크박스)
+function savePermission() {
+    if (!_permCurrentType || !_permCurrentId) {
+        alert('저장할 대상이 선택되지 않았습니다.');
         return;
     }
 
-    // 실제로는 서버에 저장 요청
-    console.log('권한 저장:', {
-        adminId: adminId,
-        permissions: appData.permissions.filter(p => p.adminId == adminId)
+    // 접근 체크박스에서 현재 상태 수집
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-menu][data-crud="R"]');
+    const newPermissions = [];
+    checkboxes.forEach(cb => {
+        newPermissions.push({
+            menuId: cb.dataset.menu,
+            canRead: cb.checked,
+            canCreate: cb.checked,
+            canUpdate: cb.checked,
+            canDelete: false
+        });
     });
 
-    showNotification(`${admin.name}님의 권한이 저장되었습니다.`, 'success');
+    // mock 데이터에 반영
+    if (_permCurrentType === 'dept') {
+        const list = (typeof mockDepartmentPermissions !== 'undefined') ? mockDepartmentPermissions : [];
+        let item = list.find(d => d.departmentId === _permCurrentId);
+        if (!item) {
+            item = { departmentId: _permCurrentId, permissions: [] };
+            list.push(item);
+        }
+        item.permissions = newPermissions;
+    } else if (_permCurrentType === 'position') {
+        const list = (typeof mockPositionPermissions !== 'undefined') ? mockPositionPermissions : [];
+        let item = list.find(p => p.positionId === _permCurrentId);
+        if (!item) {
+            item = { positionId: _permCurrentId, permissions: [] };
+            list.push(item);
+        }
+        item.permissions = newPermissions;
+    } else if (_permCurrentType === 'rolegroup') {
+        const list = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
+        let item = list.find(r => r.roleGroupId === _permCurrentId);
+        if (!item) {
+            item = { roleGroupId: _permCurrentId, permissions: [] };
+            list.push(item);
+        }
+        item.permissions = newPermissions;
+    } else if (_permCurrentType === 'individual') {
+        const list = (typeof mockIndividualPermissions !== 'undefined') ? mockIndividualPermissions : [];
+        let item = list.find(i => i.userId === _permCurrentId);
+        if (!item) {
+            item = { userId: _permCurrentId, permissions: [] };
+            list.push(item);
+        }
+        item.permissions = newPermissions;
+    }
+
+    alert('권한이 저장되었습니다.');
 }
 
-// 관리자 삭제
-function removeAdmin(adminId) {
-    const admin = appData.administrators.find(a => a.id == adminId);
-    if (!admin) {
-        console.error('관리자를 찾을 수 없습니다:', adminId);
-        return;
-    }
-
-    if (!confirm(`${admin.name}님을 관리자에서 완전히 삭제하시겠습니까?\n\n⚠️ 삭제 후 재등록이 필요합니다.\n권한만 중지하려면 "권한 중지" 버튼을 사용하세요.`)) {
-        return;
-    }
-
-    // 관리자 삭제
-    appData.administrators = appData.administrators.filter(a => a.id != adminId);
-
-    // 권한 삭제
-    appData.permissions = appData.permissions.filter(p => p.adminId != adminId);
-
-    // 직원 디렉토리에서 관리자 표시 제거
-    const emp = appData.employeeDirectory.find(e => e.employeeId === admin.employeeId);
-    if (emp) {
-        emp.isAdmin = false;
-    }
-
-    showNotification(`${admin.name}님이 관리자에서 완전히 삭제되었습니다.`, 'success');
-
-    // 화면 새로고침
-    switchView('permissionManagement');
+// 권한 매트릭스 저장 (뷰에서 호출)
+function savePermissionMatrix() {
+    savePermission();
 }
 
-// 관리자 권한 중지
-function suspendAdmin(adminId) {
-    const admin = appData.administrators.find(a => a.id == adminId);
-    if (!admin) {
-        console.error('관리자를 찾을 수 없습니다:', adminId);
+// 권한 매트릭스 초기화
+function resetPermissionMatrix() {
+    const checkboxes = document.querySelectorAll('input[type="checkbox"][data-menu][data-crud="R"]');
+    checkboxes.forEach(cb => cb.checked = false);
+}
+
+// ========== 메뉴 관리 ==========
+
+// 메뉴관리 화면 초기화
+function initMenuManagement() {
+    renderMenuTable();
+    console.log('✅ 메뉴관리 화면 초기화 완료');
+}
+
+// 메뉴 테이블 렌더링 (disabled input 기본, 행 단위 수정모드 전환)
+function renderMenuTable(filterName, filterActive) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const tbody = document.getElementById('menuTableBody');
+    if (!tbody) return;
+
+    // 필터 적용
+    let filtered = [...menus];
+    if (filterName) {
+        filtered = filtered.filter(m => m.name.includes(filterName) || (m.nameKo && m.nameKo.includes(filterName)));
+    }
+    if (filterActive === 'true') {
+        filtered = filtered.filter(m => m.isActive === true);
+    } else if (filterActive === 'false') {
+        filtered = filtered.filter(m => m.isActive === false);
+    }
+
+    // 계층 정렬 (depth 1 > depth 2)
+    const sorted = [];
+    const depth1 = filtered.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
+    depth1.forEach(parent => {
+        sorted.push(parent);
+        const children = filtered.filter(m => m.parentId === parent.id).sort((a, b) => a.order - b.order);
+        sorted.push(...children);
+    });
+    const orphans = filtered.filter(m => m.depth === 2 && !depth1.find(p => p.id === m.parentId));
+    sorted.push(...orphans);
+
+    // 건수 업데이트
+    const countEl = document.getElementById('menu-count');
+    if (countEl) countEl.textContent = `(${sorted.length}건)`;
+
+    if (sorted.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 text-sm">검색 결과가 없습니다.</td></tr>';
         return;
     }
 
-    if (!confirm(`${admin.name}님의 모든 권한을 중지하시겠습니까?\n\n권한 중지 후 언제든 다시 활성화할 수 있습니다.`)) {
-        return;
-    }
+    // 상위메뉴 옵션 생성용
+    const depth1All = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
 
-    // 상태를 suspended로 변경
-    admin.status = 'suspended';
+    tbody.innerHTML = sorted.map((m, idx) => {
+        const isDepth1 = m.depth === 1;
+        const bgClass = isDepth1 ? 'bg-blue-50' : '';
+        const namePrefix = isDepth1 ? '📁 ' : '&nbsp;&nbsp;&nbsp;&nbsp;└ ';
 
-    // 모든 권한 비활성화
-    const permissions = appData.permissions.filter(p => p.adminId == adminId);
-    permissions.forEach(p => {
-        p.hasAccess = false;
+        // 상위메뉴 드롭다운 (현재 메뉴 자신 제외)
+        const parentOpts = depth1All.filter(p => p.id !== m.id)
+            .map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+
+        return `
+            <tr class="${bgClass} hover:bg-gray-50 transition-colors" data-menu-id="${m.id}">
+                <td class="px-4 py-3 text-center text-sm text-gray-900">${idx + 1}</td>
+                <td class="px-4 py-3 text-left text-sm text-gray-600" style="font-family:monospace;">${m.id}</td>
+                <td class="px-4 py-3 text-left">
+                    ${namePrefix}<input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
+                        class="menu-input border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isDepth1 ? 'font-medium text-gray-900' : 'text-gray-600'} cursor-not-allowed"
+                        style="width: ${isDepth1 ? '120px' : '100px'};">
+                </td>
+                <td class="px-4 py-3 text-left">
+                    <input type="text" value="${m.nameKo || ''}" data-field="nameKo" data-id="${m.id}" disabled
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-left">
+                    <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <select data-field="parentId" data-id="${m.id}" disabled
+                        class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed" style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
+                        <option value="" ${!m.parentId ? 'selected' : ''}>최상위</option>
+                        ${parentOpts}
+                    </select>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
+                        class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <div class="flex items-center justify-center gap-1">
+                        <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
+                        <button onclick="deleteMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// 행 단위 수정모드 전환 (disabled 해제 + 버튼 변경)
+function toggleMenuEdit(menuId) {
+    const row = document.querySelector(`tr[data-menu-id="${menuId}"]`);
+    if (!row) return;
+
+    // 이미 수정모드면 무시
+    if (row.classList.contains('editing')) return;
+
+    // 모든 input/select의 disabled 해제 + 활성화 스타일 적용
+    row.querySelectorAll('.menu-input').forEach(el => {
+        el.disabled = false;
+        el.classList.remove('bg-gray-50', 'cursor-not-allowed');
+        el.classList.add('bg-white', 'cursor-pointer');
+        if (el.type === 'text') {
+            el.classList.remove('border-gray-200');
+            el.classList.add('border-gray-300');
+        } else if (el.tagName === 'SELECT') {
+            el.classList.remove('border-gray-200');
+            el.classList.add('border-gray-300');
+            el.style.webkitAppearance = '';
+            el.style.mozAppearance = '';
+            el.style.appearance = '';
+        } else if (el.type === 'checkbox') {
+            el.classList.add('cursor-pointer');
+        }
     });
 
-    showNotification(`${admin.name}님의 권한이 중지되었습니다.`, 'success');
+    // 순서 컬럼(td[6])에 ▲▼ 버튼 추가
+    const cells = row.querySelectorAll('td');
+    const currentOrder = cells[6].textContent.trim();
+    cells[6].innerHTML = `
+        <div class="flex items-center justify-center gap-1">
+            <button onclick="moveMenuOrder('${menuId}', -1)" class="text-gray-400 hover:text-gray-700 text-sm" title="위로">▲</button>
+            <span class="text-sm text-gray-600 w-4 text-center">${currentOrder}</span>
+            <button onclick="moveMenuOrder('${menuId}', 1)" class="text-gray-400 hover:text-gray-700 text-sm" title="아래로">▼</button>
+        </div>`;
 
-    // 화면 새로고침
-    switchView('permissionManagement');
+    // 관리 컬럼(td[8]) 버튼 변경: 수정/삭제 → 저장/취소
+    cells[8].innerHTML = `
+        <div class="flex items-center justify-center gap-1">
+            <button onclick="saveMenuRow('${menuId}')" class="px-3 py-1 text-xs bg-[#6A0028] hover:bg-[#550020] text-white rounded">저장</button>
+            <button onclick="cancelMenuEdit('${menuId}')" class="px-3 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded">취소</button>
+        </div>`;
+
+    row.classList.add('editing');
+    row.style.backgroundColor = '#fffbeb';
 }
 
-// 관리자 권한 활성화
-function activateAdmin(adminId) {
-    const admin = appData.administrators.find(a => a.id == adminId);
-    if (!admin) {
-        console.error('관리자를 찾을 수 없습니다:', adminId);
-        return;
+// 행 단위 저장
+function saveMenuRow(menuId) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+
+    const row = document.querySelector(`tr[data-menu-id="${menuId}"]`);
+    if (!row) return;
+
+    // 각 input/select에서 값 수집
+    const nameInput = row.querySelector('input[data-field="name"]');
+    const nameKoInput = row.querySelector('input[data-field="nameKo"]');
+    const nameCnInput = row.querySelector('input[data-field="nameCn"]');
+    const parentSelect = row.querySelector('select[data-field="parentId"]');
+    const activeCheckbox = row.querySelector('input[data-field="isActive"]');
+
+    if (nameInput) menu.name = nameInput.value.trim() || menu.name;
+    if (nameKoInput) menu.nameKo = nameKoInput.value.trim();
+    if (nameCnInput) menu.nameCn = nameCnInput.value.trim();
+    if (parentSelect) {
+        const newParentId = parentSelect.value || null;
+        if (newParentId !== menu.parentId) {
+            menu.parentId = newParentId;
+            menu.depth = newParentId ? 2 : 1;
+        }
     }
+    if (activeCheckbox) menu.isActive = activeCheckbox.checked;
 
-    if (!confirm(`${admin.name}님의 권한을 다시 활성화하시겠습니까?\n\n활성화 후 개별 화면 권한을 설정해야 합니다.`)) {
-        return;
-    }
-
-    // 상태를 active로 변경
-    admin.status = 'active';
-
-    showNotification(`${admin.name}님의 권한이 활성화되었습니다. 개별 화면 권한을 설정해주세요.`, 'success');
-
-    // 화면 새로고침
-    switchView('permissionManagement');
+    // 전체 테이블 다시 렌더링 (읽기전용으로 복귀)
+    renderMenuTable();
 }
 
-// Export
-window.searchEmployee = searchEmployee;
-window.addAdmin = addAdmin;
-window.updatePermission = updatePermission;
-window.saveAdminPermissions = saveAdminPermissions;
-window.removeAdmin = removeAdmin;
-window.suspendAdmin = suspendAdmin;
-window.activateAdmin = activateAdmin;
+// 수정 취소 (원래 값으로 복원)
+function cancelMenuEdit(menuId) {
+    // 전체 테이블 다시 렌더링 (원래 mock 데이터 기준)
+    renderMenuTable();
+}
+
+// 메뉴 목록 필터/조회
+function filterMenuList() {
+    const name = document.getElementById('filter-menu-name')?.value.trim();
+    const active = document.getElementById('filter-menu-active')?.value;
+    renderMenuTable(name || null, active || null);
+}
+
+// 상위메뉴 변경 시 depth 자동 업데이트
+function onMenuParentChange(menuId, newParentId) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+
+    menu.parentId = newParentId || null;
+    menu.depth = newParentId ? 2 : 1;
+
+    // depth 1로 변경 시 하위 메뉴의 parentId도 업데이트 필요 없음 (이미 연결된 것 유지)
+    renderMenuTable();
+}
+
+// 순서 이동 (▲▼)
+function moveMenuOrder(menuId, direction) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+
+    // 같은 레벨 + 같은 부모 메뉴 그룹에서 순서 교환
+    const siblings = menus.filter(m => m.parentId === menu.parentId && m.depth === menu.depth)
+        .sort((a, b) => a.order - b.order);
+
+    const currentIdx = siblings.findIndex(m => m.id === menuId);
+    const targetIdx = currentIdx + direction;
+
+    if (targetIdx < 0 || targetIdx >= siblings.length) return;
+
+    // 순서 교환
+    const temp = siblings[currentIdx].order;
+    siblings[currentIdx].order = siblings[targetIdx].order;
+    siblings[targetIdx].order = temp;
+
+    renderMenuTable();
+}
+
+// 메뉴 추가
+function addNewMenu() {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+
+    // 새 ID 생성
+    const maxNum = menus.reduce((max, m) => {
+        const num = parseInt(m.id.replace('MENU_', ''));
+        return num > max ? num : max;
+    }, 0);
+    const newId = 'MENU_' + String(maxNum + 1).padStart(3, '0');
+
+    // 새 코드 생성
+    const newCode = 'new_menu_' + (maxNum + 1);
+
+    const newMenu = {
+        id: newId,
+        parentId: null,
+        name: '새 메뉴',
+        nameKo: '새 메뉴',
+        nameCn: '',
+        code: newCode,
+        depth: 1,
+        order: menus.filter(m => m.depth === 1).length + 1,
+        isActive: true
+    };
+
+    menus.push(newMenu);
+    renderMenuTable();
+
+    // 새로 추가된 행을 자동으로 수정모드로 전환
+    setTimeout(() => {
+        toggleMenuEdit(newId);
+    }, 50);
+}
+
+// 메뉴 삭제
+function deleteMenu(menuId) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+
+    // 하위 메뉴가 있으면 경고
+    const children = menus.filter(m => m.parentId === menuId);
+    if (children.length > 0) {
+        if (!confirm(`'${menu.name}' 메뉴 아래에 ${children.length}개 하위 메뉴가 있습니다.\n하위 메뉴도 함께 삭제됩니다. 계속하시겠습니까?`)) return;
+        // 하위 메뉴도 삭제
+        children.forEach(child => {
+            const idx = menus.findIndex(m => m.id === child.id);
+            if (idx !== -1) menus.splice(idx, 1);
+        });
+    } else {
+        if (!confirm(`'${menu.name}' 메뉴를 삭제하시겠습니까?`)) return;
+    }
+
+    const idx = menus.findIndex(m => m.id === menuId);
+    if (idx !== -1) menus.splice(idx, 1);
+
+    renderMenuTable();
+}
+
+// 하위호환: 기존 함수명 (사용되지 않음)
+function saveAllMenus() { renderMenuTable(); }
+function editMenuModal(menuId) { toggleMenuEdit(menuId); }
+function saveMenuEdit() { renderMenuTable(); }
+function closeMenuModal() { /* 모달 제거됨 */ }
+
+// Export - 권한관리
+window.initPermissionManagement = initPermissionManagement;
+window.switchPermissionTab = switchPermissionTab;
+window.filterPermissionByDept = filterPermissionByDept;
+window.filterPermissionByPosition = filterPermissionByPosition;
+window.filterPermissionByRoleGroup = filterPermissionByRoleGroup;
+window.filterPermissionByUser = filterPermissionByUser;
+window.renderPermissionMatrix = renderPermissionMatrix;
+window.toggleParentMenuPermission = toggleParentMenuPermission;
+window.toggleParentMenuAccess = toggleParentMenuAccess;
+window.savePermission = savePermission;
+window.savePermissionMatrix = savePermissionMatrix;
+window.resetPermissionMatrix = resetPermissionMatrix;
+
+// Export - 메뉴관리
+window.initMenuManagement = initMenuManagement;
+window.renderMenuTable = renderMenuTable;
+window.filterMenuList = filterMenuList;
+window.onMenuParentChange = onMenuParentChange;
+window.moveMenuOrder = moveMenuOrder;
+window.addNewMenu = addNewMenu;
+window.deleteMenu = deleteMenu;
+window.toggleMenuEdit = toggleMenuEdit;
+window.saveMenuRow = saveMenuRow;
+window.cancelMenuEdit = cancelMenuEdit;
+window.saveAllMenus = saveAllMenus;
+window.editMenuModal = editMenuModal;
+window.saveMenuEdit = saveMenuEdit;
+window.closeMenuModal = closeMenuModal;
+
 window.closeAdminNotificationModal = closeAdminNotificationModal;
 window.submitAdminNotification = submitAdminNotification;
 
-console.log('✅ 관리자 알림 발송 기능 로드 완료');
+console.log('✅ 권한관리/메뉴관리 기능 로드 완료');
 
 // ========== 대리로그인 ==========
 
