@@ -7079,14 +7079,13 @@ function renderDashSubmissionDelay() {
     let html = '<table style="width: 100%; border-collapse: collapse; table-layout: fixed;">';
     html += '<thead style="background: #f8fafc; border-bottom: 2px solid #6A0028; position: sticky; top: 0; z-index: 1;">';
     html += '<tr>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학과</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">학번</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">과정</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">기본단계</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">세부단계</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">D-day</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">마감일</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">성명</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 15%;">학과</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학번</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 8%;">과정</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 19%;">기본단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 17%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">마감일</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 13%;">성명</th>';
     html += '</tr></thead><tbody>';
     data.forEach(function(r, idx) {
         html += '<tr style="cursor: pointer; border-bottom: 1px solid #f3f4f6;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#FAFAFA' : '') + '\'" onclick="switchView(\'stageManagement\')">';
@@ -7095,7 +7094,6 @@ function renderDashSubmissionDelay() {
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.basicStageName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
-        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px;"><span style="color: #6A0028; font-weight: 600;">D-' + r.dDay + '</span></td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #9ca3af;">' + r.endDate + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
         html += '</tr>';
@@ -7149,13 +7147,12 @@ function renderDashFeedbackDelay() {
     let html = '<table style="width: 100%; border-collapse: collapse; table-layout: fixed;">';
     html += '<thead style="background: #f8fafc; border-bottom: 2px solid #6A0028; position: sticky; top: 0; z-index: 1;">';
     html += '<tr>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">학과</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">학번</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 6%;">과정</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">기본단계</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">세부단계</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">D+day</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">요청일</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 13%;">학과</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">학번</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">과정</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">기본단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 15%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 13%;">요청일</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">성명</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">지도교수</th>';
     html += '</tr></thead><tbody>';
@@ -7166,7 +7163,6 @@ function renderDashFeedbackDelay() {
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.basicStageName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
-        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px;"><span style="color: #DC2626; font-weight: 600;">D+' + r.delayDays + '</span></td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #9ca3af;">' + r.uploadDate + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.advisorName + '</td>';

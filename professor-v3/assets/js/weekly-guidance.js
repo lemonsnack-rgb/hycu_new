@@ -555,7 +555,7 @@ function showProfessorStudentList() {
                                     <td>${getDegreeText(student.degree)}</td>
                                     <td>재학</td>
                                     <td>${student.studentId}</td>
-                                    <td>${student.name}</td>
+                                    <td><a href="#" onclick="event.stopPropagation(); showStudentDetailModal({stdNo:'${student.studentId}', name:'${student.name}', dept:'${student.major || "-"}', degree:'${getDegreeText(student.degree)}', stage:'${(student.basicStageName || student.currentStage || "-").replace(/'/g, "\\'")}'}); return false;" class="text-[#6A0028] hover:underline font-medium cursor-pointer">${student.name}</a></td>
                                     <td>${currentProf.name}</td>
                                 </tr>
                             `;
