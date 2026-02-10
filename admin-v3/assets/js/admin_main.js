@@ -7004,91 +7004,381 @@ window.loginAsUser = loginAsUser;
 
 console.log('✅ 사용자 관리 함수 로드 완료');
 
-// ========== 관리자 대시보드 렌더링 함수 ==========
+// ========== 관리자 대시보드 렌더링 함수 (업무 모니터링) ==========
 
-// 관리자 대시보드 데이터
-const adminNotices = [
-    { id: 1, title: '2025-1학기 본심사 일정 안내', date: '2024.11.15' },
-    { id: 2, title: '예비심사 결과 입력 안내', date: '2024.11.10' },
-    { id: 3, title: '논문지도 일정 변경 공지', date: '2024.11.08' },
-];
-
-const adminQuickMenus = [
-    { id: 1, name: '논문지도학생현황', view: 'stageManagement' },
-    { id: 2, name: '논문지도단계등록', view: 'typeManagement' },
-    { id: 3, name: '심사위원등록', view: 'committeeAssignment' },
-];
-
-const adminOutlinks = [
-    { id: 1, title: '아웃링크 1', description: '관련 사이트 설명', url: '#outlink1' },
-    { id: 2, title: '아웃링크 2', description: '관련 사이트 설명', url: '#outlink2' },
-    { id: 3, title: '아웃링크 3', description: '관련 사이트 설명', url: '#outlink3' },
-];
-
-// 공지사항 렌더링
-function renderAdminNotices() {
-    const container = document.getElementById('admin-notice-list');
-    if (!container) return;
-
-    container.innerHTML = adminNotices.map((n, i) => `
-        <div style="display: flex; justify-content: space-between; padding: 12px 0; ${i < adminNotices.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''} cursor: pointer;"
-             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';"
-             onclick="switchView('noticeManagement')">
-            <span style="font-size: 14px; color: #1a1a1a;">${n.title}</span>
-            <span style="font-size: 13px; color: #9ca3af;">${n.date}</span>
-        </div>
-    `).join('');
+// 테이블 행 공통 스타일
+function _dashRowStyle(isLast) {
+    return 'display: flex; justify-content: space-between; align-items: center; padding: 10px 0;' + (isLast ? '' : ' border-bottom: 1px solid #f3f4f6;');
 }
 
-// 자주 찾는 메뉴 렌더링
-function renderAdminQuickMenus() {
-    const container = document.getElementById('admin-quick-menu-list');
-    if (!container) return;
-
-    container.innerHTML = adminQuickMenus.map((m, i) => `
-        <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; ${i < adminQuickMenus.length - 1 ? 'border-bottom: 1px solid #e5e7eb;' : ''} cursor: pointer;"
-             onclick="switchView('${m.view}')"
-             onmouseover="this.style.background='#f9fafb';" onmouseout="this.style.background='transparent';">
-            <span style="font-size: 14px; color: #1a1a1a;">${m.name}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
-        </div>
-    `).join('');
+// 빈 목록 안내 메시지
+function _dashEmpty(msg) {
+    return '<p style="color: #9CA3AF; text-align: center; padding: 24px 0; font-size: 13px;">' + msg + '</p>';
 }
 
-// 아웃링크 렌더링
-function renderAdminOutlinks() {
-    const container = document.getElementById('admin-outlink-cards');
+// ===== 카드1: 행정 공지사항 =====
+function renderDashNotices() {
+    const container = document.getElementById('admin-dash-notices');
     if (!container) return;
 
-    container.innerHTML = adminOutlinks.map(link => `
-        <a href="${link.url}" target="_blank" rel="noopener noreferrer"
-           style="display: flex; align-items: center; justify-content: space-between; background: #F8FAFC; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px 16px; text-decoration: none; transition: all 0.2s;"
-           onmouseover="this.style.background='#F1F5F9'; this.style.borderColor='#6A0028';"
-           onmouseout="this.style.background='#F8FAFC'; this.style.borderColor='#E5E7EB';">
-            <div>
-                <div style="font-size: 14px; font-weight: 600; color: #1a1a1a;">${link.title}</div>
-                <div style="font-size: 12px; color: #6b7280;">${link.description}</div>
-            </div>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                <polyline points="15 3 21 3 21 9"></polyline>
-                <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-        </a>
-    `).join('');
+    const notices = (typeof mockNotices !== 'undefined' ? mockNotices : []).slice(0, 3);
+    if (notices.length === 0) { container.innerHTML = _dashEmpty('공지사항이 없습니다.'); return; }
+
+    container.innerHTML = notices.map((n, i) => {
+        const pin = n.isPinned ? '<span style="color: #6A0028; font-weight: 700; margin-right: 6px;">&#128204;</span>' : '';
+        const date = (n.createdAt || '').split(' ')[0] || '';
+        return '<div style="' + _dashRowStyle(i === notices.length - 1) + ' cursor: pointer;" onmouseover="this.style.background=\'#f9fafb\'" onmouseout="this.style.background=\'transparent\'" onclick="switchView(\'noticeManagement\')">'
+            + '<span style="font-size: 14px; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1;">' + pin + n.title + '</span>'
+            + '<span style="font-size: 13px; color: #9ca3af; flex-shrink: 0; margin-left: 16px;">' + date + '</span>'
+            + '</div>';
+    }).join('');
 }
 
-// 관리자 대시보드 초기화
+// ===== 카드2: 제출 일정 지연 위험 =====
+function _getDashSubmissionDelay() {
+    if (typeof mockStudentStageAssignments === 'undefined' || typeof mockThesisStages === 'undefined') return [];
+
+    // Mock 기준일 (단계 submissionEndDate와 비교 가능한 날짜)
+    const today = new Date('2025-03-20');
+    const results = [];
+
+    mockStudentStageAssignments.forEach(function(sa) {
+        if (!sa.thesisStageId || !sa.currentStageOrder) return;
+        const template = mockThesisStages.find(function(ts) { return ts.id === sa.thesisStageId; });
+        if (!template) return;
+        const stage = template.stages.find(function(st) { return st.order === sa.currentStageOrder; });
+        if (!stage || !stage.submissionEndDate) return;
+
+        const endDate = new Date(stage.submissionEndDate);
+        const diffDays = Math.ceil((endDate - today) / (1000 * 60 * 60 * 24));
+        if (diffDays <= 15 && diffDays >= 0) {
+            results.push({
+                department: sa.department,
+                studentNumber: sa.studentNumber,
+                degreeType: sa.degreeType,
+                basicStageName: sa.currentStageName || stage.name || '-',
+                subStageName: '-',
+                endDate: stage.submissionEndDate,
+                studentName: sa.studentName,
+                dDay: diffDays
+            });
+        }
+    });
+
+    results.sort(function(a, b) { return a.dDay - b.dDay; });
+    return results;
+}
+
+function renderDashSubmissionDelay() {
+    const container = document.getElementById('admin-dash-submission-delay');
+    if (!container) return;
+
+    const data = _getDashSubmissionDelay();
+    if (data.length === 0) { container.innerHTML = _dashEmpty('지연 위험 학생이 없습니다.'); return; }
+
+    let html = '<table style="width: 100%; border-collapse: collapse; table-layout: fixed;">';
+    html += '<thead style="background: #f8fafc; border-bottom: 2px solid #6A0028; position: sticky; top: 0; z-index: 1;">';
+    html += '<tr>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학과</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">학번</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">과정</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">기본단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">D-day</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">마감일</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">성명</th>';
+    html += '</tr></thead><tbody>';
+    data.forEach(function(r, idx) {
+        html += '<tr style="cursor: pointer; border-bottom: 1px solid #f3f4f6;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#FAFAFA' : '') + '\'" onclick="switchView(\'stageManagement\')">';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.department + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.studentNumber + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.basicStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px;"><span style="color: #6A0028; font-weight: 600;">D-' + r.dDay + '</span></td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #9ca3af;">' + r.endDate + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ===== 카드3: 피드백 지연 =====
+function _getDashFeedbackDelay() {
+    const frs = (typeof FEEDBACK_REQUESTS !== 'undefined' ? FEEDBACK_REQUESTS : (typeof window.FEEDBACK_REQUESTS !== 'undefined' ? window.FEEDBACK_REQUESTS : []));
+    const today = new Date('2025-11-26');
+    const results = [];
+
+    frs.forEach(function(f) {
+        if (f.status !== '피드백 대기') return;
+        if (!f.uploadDate) return;
+        const uploadDate = new Date(f.uploadDate);
+        const diffDays = Math.ceil((today - uploadDate) / (1000 * 60 * 60 * 24));
+        if (diffDays > 7) {
+            let advisorName = '-';
+            if (typeof mockReviewTargets !== 'undefined') {
+                const rt = mockReviewTargets.find(function(r) { return r.studentNumber === f.studentNumber; });
+                if (rt) advisorName = rt.advisorName || '-';
+            }
+            results.push({
+                department: f.major || '-',
+                studentNumber: f.studentNumber,
+                degreeType: f.program || '-',
+                basicStageName: f.stage || '-',
+                subStageName: '-',
+                uploadDate: f.uploadDate,
+                studentName: f.studentName,
+                advisorName: advisorName,
+                delayDays: diffDays
+            });
+        }
+    });
+
+    results.sort(function(a, b) { return b.delayDays - a.delayDays; });
+    return results;
+}
+
+function renderDashFeedbackDelay() {
+    const container = document.getElementById('admin-dash-feedback-delay');
+    if (!container) return;
+
+    const data = _getDashFeedbackDelay();
+    if (data.length === 0) { container.innerHTML = _dashEmpty('피드백 지연 건이 없습니다.'); return; }
+
+    let html = '<table style="width: 100%; border-collapse: collapse; table-layout: fixed;">';
+    html += '<thead style="background: #f8fafc; border-bottom: 2px solid #6A0028; position: sticky; top: 0; z-index: 1;">';
+    html += '<tr>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">학과</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">학번</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 6%;">과정</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">기본단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 7%;">D+day</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">요청일</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">성명</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 12%;">지도교수</th>';
+    html += '</tr></thead><tbody>';
+    data.forEach(function(r, idx) {
+        html += '<tr style="cursor: pointer; border-bottom: 1px solid #f3f4f6;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#FAFAFA' : '') + '\'" onclick="switchView(\'guidanceProgress\')">';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.department + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.studentNumber + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.basicStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px;"><span style="color: #DC2626; font-weight: 600;">D+' + r.delayDays + '</span></td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #9ca3af;">' + r.uploadDate + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.advisorName + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ===== 카드4: 심사위원 등록 대기 =====
+function _getDashCommitteePending() {
+    if (typeof mockReviewTargets === 'undefined') return [];
+    const typeMap = { 'proposal': '연구계획서', 'progress': '1차보고서', 'final': '최종논문', 'preliminary': '예비심사' };
+    return mockReviewTargets.filter(function(r) { return r.status === 'pending'; }).map(function(r) {
+        return {
+            department: r.department,
+            studentNumber: r.studentNumber,
+            degreeType: r.degreeType,
+            basicStageName: typeMap[r.reviewType] || r.reviewType || '-',
+            subStageName: '-',
+            studentName: r.studentName,
+            advisorName: r.advisorName || '-'
+        };
+    });
+}
+
+function renderDashCommitteePending() {
+    const container = document.getElementById('admin-dash-committee-pending');
+    if (!container) return;
+
+    const data = _getDashCommitteePending();
+    if (data.length === 0) { container.innerHTML = _dashEmpty('대기 건이 없습니다.'); return; }
+
+    let html = '<table style="width: 100%; border-collapse: collapse; table-layout: fixed;">';
+    html += '<thead style="background: #f8fafc; border-bottom: 2px solid #6A0028; position: sticky; top: 0; z-index: 1;">';
+    html += '<tr>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">학과</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학번</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 8%;">과정</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">기본단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">성명</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">지도교수</th>';
+    html += '</tr></thead><tbody>';
+    data.forEach(function(r, idx) {
+        html += '<tr style="cursor: pointer; border-bottom: 1px solid #f3f4f6;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#FAFAFA' : '') + '\'" onclick="switchView(\'committeeAssignment\')">';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.department + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.studentNumber + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151;">' + r.basicStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.advisorName + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ===== 카드5: 심사일정 확정 대기 =====
+function _getDashSchedulePending() {
+    if (typeof mockCommitteeAssignments === 'undefined') return [];
+    const schedules = (typeof mockExamSchedules !== 'undefined' ? mockExamSchedules : []);
+    const scheduledIds = new Set(schedules.map(function(s) { return s.assignmentId; }));
+
+    return mockCommitteeAssignments.filter(function(ca) {
+        return !scheduledIds.has(ca.id);
+    }).map(function(ca) {
+        // 지도교수 조인: reviewTargetId로 mockReviewTargets에서 advisorName 추출
+        let advisorName = '-';
+        if (typeof mockReviewTargets !== 'undefined' && ca.reviewTargetId) {
+            const rt = mockReviewTargets.find(function(r) { return r.id === ca.reviewTargetId; });
+            if (rt) advisorName = rt.advisorName || '-';
+        }
+        return {
+            department: ca.department,
+            studentNumber: ca.studentNumber,
+            degreeType: ca.degreeType,
+            basicStageName: ca.stageName || '-',
+            subStageName: '-',
+            studentName: ca.studentName,
+            advisorName: advisorName
+        };
+    });
+}
+
+function renderDashSchedulePending() {
+    const container = document.getElementById('admin-dash-schedule-pending');
+    if (!container) return;
+
+    const data = _getDashSchedulePending();
+    if (data.length === 0) { container.innerHTML = _dashEmpty('대기 건이 없습니다.'); return; }
+
+    let html = '<table style="width: 100%; border-collapse: collapse; table-layout: fixed;">';
+    html += '<thead style="background: #f8fafc; border-bottom: 2px solid #6A0028; position: sticky; top: 0; z-index: 1;">';
+    html += '<tr>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 16%;">학과</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학번</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 8%;">과정</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">기본단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">성명</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">지도교수</th>';
+    html += '</tr></thead><tbody>';
+    data.forEach(function(r, idx) {
+        html += '<tr style="cursor: pointer; border-bottom: 1px solid #f3f4f6;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'' + (idx % 2 === 1 ? '#FAFAFA' : '') + '\'" onclick="switchView(\'examSchedule\')">';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + r.department + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.studentNumber + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151;">' + r.basicStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.advisorName + '</td>';
+        html += '</tr>';
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+// ===== 관리자 알림 카드 =====
+function _getAdminAlerts() {
+    // Mock 알림 데이터: 심사 제출 등록, 일정 확정 필요 등 관리자 대상 알림
+    const alerts = [];
+
+    // 심사위원 등록 대기 건에서 알림 생성
+    if (typeof mockReviewTargets !== 'undefined') {
+        mockReviewTargets.filter(function(r) { return r.status === 'pending'; }).slice(0, 3).forEach(function(r) {
+            alerts.push({
+                type: 'committee',
+                message: r.studentName + '(' + r.studentNumber + ')의 심사위원 배정이 필요합니다.',
+                time: '오늘',
+                read: false
+            });
+        });
+    }
+
+    // 심사일정 미확정 건에서 알림 생성
+    if (typeof mockCommitteeAssignments !== 'undefined') {
+        var schedules = (typeof mockExamSchedules !== 'undefined' ? mockExamSchedules : []);
+        var scheduledIds = new Set(schedules.map(function(s) { return s.assignmentId; }));
+        mockCommitteeAssignments.filter(function(ca) {
+            return !scheduledIds.has(ca.id);
+        }).slice(0, 2).forEach(function(ca) {
+            alerts.push({
+                type: 'schedule',
+                message: ca.studentName + '(' + ca.studentNumber + ')의 ' + (ca.stageName || '심사') + ' 일정을 확정해주세요.',
+                time: '오늘',
+                read: false
+            });
+        });
+    }
+
+    // 피드백 지연 건에서 알림 생성
+    var feedbackData = _getDashFeedbackDelay();
+    feedbackData.slice(0, 2).forEach(function(f) {
+        alerts.push({
+            type: 'feedback',
+            message: f.studentName + '(' + f.studentNumber + ')의 ' + f.basicStageName + ' 피드백이 ' + f.delayDays + '일 지연 중입니다.',
+            time: '오늘',
+            read: true
+        });
+    });
+
+    // 제출 지연 건에서 알림 생성
+    var submissionData = _getDashSubmissionDelay();
+    submissionData.slice(0, 2).forEach(function(s) {
+        alerts.push({
+            type: 'submission',
+            message: s.studentName + '(' + s.studentNumber + ')의 ' + s.basicStageName + ' 제출 마감이 D-' + s.dDay + '입니다.',
+            time: '오늘',
+            read: true
+        });
+    });
+
+    return alerts;
+}
+
+function renderDashAlerts() {
+    const container = document.getElementById('admin-dash-alerts');
+    if (!container) return;
+
+    const alerts = _getAdminAlerts().slice(0, 3);
+    if (alerts.length === 0) {
+        container.innerHTML = '<div style="text-align: center; color: #9CA3AF; padding: 40px 0; font-size: 13px;">새로운 알림이 없습니다.</div>';
+        return;
+    }
+
+    let html = '';
+    alerts.forEach(function(a) {
+        var dotColor = a.read ? '#D1D5DB' : '#6A0028';
+        html += '<div style="display: flex; align-items: flex-start; gap: 10px; padding: 10px 0; border-bottom: 1px solid #f3f4f6; cursor: pointer;" onmouseover="this.style.background=\'#f8fafc\'" onmouseout="this.style.background=\'\'">';
+        html += '  <span style="display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: ' + dotColor + '; margin-top: 5px; flex-shrink: 0;"></span>';
+        html += '  <div style="flex: 1; min-width: 0;">';
+        html += '    <p style="margin: 0; font-size: 13px; color: #374151; line-height: 1.5; word-break: break-word;">' + a.message + '</p>';
+        html += '    <span style="font-size: 11px; color: #9CA3AF;">' + a.time + '</span>';
+        html += '  </div>';
+        html += '</div>';
+    });
+    container.innerHTML = html;
+}
+
+// ===== 관리자 대시보드 초기화 =====
 function initAdminDashboard() {
-    renderAdminNotices();
-    renderAdminQuickMenus();
-    renderAdminOutlinks();
+    renderDashNotices();
+    renderDashAlerts();
+    renderDashSubmissionDelay();
+    renderDashFeedbackDelay();
+    renderDashCommitteePending();
+    renderDashSchedulePending();
 }
 
-// Export admin dashboard functions
+// Export
 window.initAdminDashboard = initAdminDashboard;
-window.renderAdminNotices = renderAdminNotices;
-window.renderAdminQuickMenus = renderAdminQuickMenus;
-window.renderAdminOutlinks = renderAdminOutlinks;
 
 console.log('✅ 관리자 대시보드 함수 로드 완료');

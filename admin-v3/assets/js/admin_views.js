@@ -1,48 +1,101 @@
 // ========== 뷰 렌더링 함수들 ==========
 
 const views = {
-    // ========== 대시보드 (간소화 버전) ==========
+    // ========== 대시보드 (업무 모니터링) ==========
     dashboard: () => `
-        <div style="display: flex; gap: 24px; margin-bottom: 24px;">
-            <!-- 좌측: 공지사항 -->
-            <div style="flex: 1; background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
-                <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    공지사항
-                </h3>
-                <div id="admin-notice-list">
-                    <!-- renderAdminNotices()로 동적 생성 -->
+        <style>
+            .dash-top-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+            .dash-bottom-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; }
+            .dash-bottom-grid > div { min-width: 0; overflow: hidden; }
+            .dash-card-table { overflow-x: auto; }
+            .dash-card-table table { table-layout: auto; min-width: 600px; width: 100%; }
+            @media (max-width: 1200px) {
+                .dash-top-grid { grid-template-columns: 1fr; }
+                .dash-bottom-grid { grid-template-columns: 1fr; }
+            }
+        </style>
+        <!-- 상단: 공지사항 + 알림 -->
+        <div class="dash-top-grid">
+            <!-- 카드1: 행정 공지사항 -->
+            <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin: 0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                        </svg>
+                        행정 공지사항
+                    </h3>
+                    <a onclick="switchView('noticeManagement')" style="font-size: 13px; color: #6A0028; cursor: pointer; text-decoration: none; font-weight: 500;">더보기 &rarr;</a>
                 </div>
+                <div id="admin-dash-notices"><!-- 동적 생성 --></div>
             </div>
 
-            <!-- 우측: 자주 찾는 메뉴 -->
-            <div style="width: 320px; background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
-                <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
-                        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-                    </svg>
-                    자주 찾는 메뉴
-                </h3>
-                <div id="admin-quick-menu-list">
-                    <!-- renderAdminQuickMenus()로 동적 생성 -->
+            <!-- 알림 카드 -->
+            <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin: 0;">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
+                            <path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0 1 18 14.158V11a6.002 6.002 0 0 0-4-5.659V5a2 2 0 1 0-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 1 1-6 0v-1m6 0H9"></path>
+                        </svg>
+                        알림
+                    </h3>
                 </div>
+                <div id="admin-dash-alerts"><!-- 동적 생성 --></div>
             </div>
         </div>
 
-        <!-- 관련 사이트 (아웃링크) -->
-        <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
-            <h3 style="display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 700; color: #1a1a1a; margin-bottom: 16px;">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6A0028" stroke-width="2">
-                    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                </svg>
-                관련 사이트
-            </h3>
-            <div id="admin-outlink-cards" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px;">
-                <!-- renderAdminOutlinks()로 동적 생성 -->
+        <!-- 하단 2x2 그리드 -->
+        <div class="dash-bottom-grid">
+            <!-- 카드2: 제출 일정 지연 위험 -->
+            <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 0;">제출 일정 지연 위험</h3>
+                </div>
+                <div id="admin-dash-submission-delay" class="dash-card-table" style="max-height: 380px; overflow-y: auto;"><!-- 동적 생성 --></div>
+            </div>
+
+            <!-- 카드3: 피드백 지연 -->
+            <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 0;">피드백 지연</h3>
+                </div>
+                <div id="admin-dash-feedback-delay" class="dash-card-table" style="max-height: 380px; overflow-y: auto;"><!-- 동적 생성 --></div>
+            </div>
+
+            <!-- 카드4: 심사위원 등록 대기 -->
+            <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <line x1="19" y1="8" x2="19" y2="14"></line>
+                        <line x1="22" y1="11" x2="16" y2="11"></line>
+                    </svg>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 0;">심사위원 등록 대기</h3>
+                </div>
+                <div id="admin-dash-committee-pending" class="dash-card-table" style="max-height: 380px; overflow-y: auto;"><!-- 동적 생성 --></div>
+            </div>
+
+            <!-- 카드5: 심사일정 확정 대기 -->
+            <div style="background: white; border-radius: 8px; border: 1px solid #E5E7EB; padding: 20px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <h3 style="font-size: 15px; font-weight: 700; color: #1a1a1a; margin: 0;">심사일정 확정 대기</h3>
+                </div>
+                <div id="admin-dash-schedule-pending" class="dash-card-table" style="max-height: 380px; overflow-y: auto;"><!-- 동적 생성 --></div>
             </div>
         </div>
     `,
