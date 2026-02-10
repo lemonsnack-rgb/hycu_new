@@ -2,17 +2,17 @@
 // professor-v3/feedback-detail-screen.js를 복사하여 읽기 전용으로 변환
 
 // ==================== 상세 화면 열기 (페이지 전환) ====================
-function viewPdfFeedback(feedbackId, isReadOnly = true) {
+function _viewPdfFeedbackDetail(feedbackId, isReadOnly = true) {
     const request = FeedbackDataService.getFeedbackRequestById(feedbackId);
     if (!request) {
         alert('제출물을 찾을 수 없습니다.');
-        console.error('[viewPdfFeedback] 제출물을 찾을 수 없음:', feedbackId);
+        console.error('[_viewPdfFeedbackDetail] 제출물을 찾을 수 없음:', feedbackId);
         return;
     }
 
     const feedbackData = FeedbackDataService.getFeedbackData(feedbackId);
-    console.log('[viewPdfFeedback] 요청:', request);
-    console.log('[viewPdfFeedback] 피드백 데이터:', feedbackData);
+    console.log('[_viewPdfFeedbackDetail] 요청:', request);
+    console.log('[_viewPdfFeedbackDetail] 피드백 데이터:', feedbackData);
 
     // 상세 화면 생성 및 표시 (모달 방식)
     const detailScreen = createFeedbackDetailScreenReadOnly(request, feedbackData);
@@ -811,7 +811,7 @@ function escapeHtmlReadOnly(s) {
 }
 
 // Export
-window.viewPdfFeedback = viewPdfFeedback;
+// viewPdfFeedback는 admin_modals.js에서 등록 (guidanceProgress 데이터 사용)
 window.closeFeedbackDetailScreenReadOnly = closeFeedbackDetailScreenReadOnly;
 window.switchFeedbackTabReadOnly = switchFeedbackTabReadOnly;
 window.downloadPlagiarismReportReadOnly = downloadPlagiarismReportReadOnly;

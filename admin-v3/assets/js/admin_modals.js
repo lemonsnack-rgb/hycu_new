@@ -660,7 +660,7 @@ function showRejectModal(id) {
 
 // ========== PDF 피드백 관련 함수 (뷰어는 별도 구현) ==========
 
-// Task 1-5 ID 25: PDF 뷰어 (관리자는 읽기 전용)
+// Task 1-5 ID 25: PDF 뷰어 (관리자는 읽기 전용, 3단구조 뷰어)
 function viewPdfFeedback(id, readOnly = false) {
     const item = appData.guidanceProgress.find(doc => doc.id === id);
     if (!item) {
@@ -668,103 +668,76 @@ function viewPdfFeedback(id, readOnly = false) {
         return;
     }
 
-    // ID 25: 관리자는 읽기 전용으로 교수용 PDF 뷰어 호출
-    const mode = readOnly ? '읽기 전용 (관리자)' : '편집 가능 (교수)';
-    const modeClass = readOnly ? 'bg-[#009DE8]' : 'bg-[#009DE8]';
-    const readOnlyBadge = readOnly ? '<span class="ml-2 px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">읽기 전용</span>' : '';
+    // appData.guidanceProgress 데이터를 createFeedbackDetailScreenReadOnly가 기대하는 형태로 변환
+    const request = {
+        id: item.id,
+        studentId: item.studentId,
+        studentName: item.studentName,
+        studentNumber: item.studentId,
+        major: item.major || '-',
+        graduate: '-',
+        thesisTitle: item.documentTitle,
+        documentTitle: item.documentTitle,
+        file: item.fileName,
+        fileName: item.fileName,
+        fileUrl: item.fileUrl,
+        stage: item.stage || '-',
+        submitDate: item.submitDate,
+        uploadDate: item.submitDate,
+        copykillerScore: (item.copyKiller || 0) + '%',
+        gptkillerScore: (item.gptKiller || 0) + '%',
+        status: item.feedbackStatus || '대기',
+        memo: ''
+    };
 
-    // 피드백 상태값 변환
-    let statusText = item.feedbackStatus || '대기';
-    if (statusText === '답변 대기중') statusText = '대기';
-    if (statusText === '피드백 완료') statusText = '완료';
+    // feedbackId로 FEEDBACK_DATA에서 피드백 데이터 조회
+    const fbId = item.feedbackId || id;
+    let feedbackData = null;
+    if (typeof FeedbackDataService !== 'undefined' && FeedbackDataService.getFeedbackData) {
+        try { feedbackData = FeedbackDataService.getFeedbackData(fbId); } catch(e) { /* 무시 */ }
+    }
 
-    const statusClass =
-        statusText === '대기' ? 'bg-yellow-100 text-yellow-700' :
-        statusText === '진행 중' ? 'bg-blue-100 text-blue-700' :
-        'bg-green-100 text-green-700';
+    // 3단구조 읽기전용 모달 뷰어 생성 (admin_feedback_detail.js의 함수 활용)
+    if (typeof createFeedbackDetailScreenReadOnly === 'function') {
+        const detailScreen = createFeedbackDetailScreenReadOnly(request, feedbackData);
+        document.body.appendChild(detailScreen);
 
-    // 교수용 PDF 뷰어를 읽기 전용 모드로 표시
-    const pdfViewerHtml = `
-        <div id="pdf-viewer-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[70]"
-             onclick="if(event.target.id==='pdf-viewer-modal') closePdfViewer()">
-            <div class="bg-white rounded-lg shadow-xl w-full h-full mx-4 my-4 flex flex-col"
-                 onclick="event.stopPropagation()">
+        // 백드롭 클릭으로 닫기
+        detailScreen.addEventListener('click', (e) => {
+            if (e.target === detailScreen) {
+                closeFeedbackDetailScreenReadOnly();
+            }
+        });
 
-                <!-- 헤더 -->
-                <div class="${modeClass} text-white px-6 py-4 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-lg font-bold flex items-center">
-                            PDF 뷰어 - ${item.documentTitle}
-                            ${readOnlyBadge}
-                        </h3>
-                        <div class="text-sm text-white text-opacity-90 mt-1">
-                            ${item.fileName} | 학생: ${item.studentName} (${item.studentId})
-                        </div>
-                    </div>
-                    <button onclick="closePdfViewer()"
-                            class="text-white hover:text-gray-200 text-2xl leading-none">
-                        ×
-                    </button>
-                </div>
+        // ESC 키로 닫기
+        const handleEscape = (e) => {
+            if (e.key === 'Escape') {
+                closeFeedbackDetailScreenReadOnly();
+                document.removeEventListener('keydown', handleEscape);
+            }
+        };
+        document.addEventListener('keydown', handleEscape);
 
-                ${readOnly ? `
-                <!-- 읽기 전용 안내 -->
-                <div class="px-6 py-3 bg-blue-50 border-b border-blue-200">
-                    <div class="flex items-center text-sm text-blue-800">
-                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        <span class="font-medium">관리자 모드:</span>
-                        <span class="ml-1">교수의 첨삭 내역만 조회할 수 있습니다. 편집 및 댓글 기능은 비활성화됩니다.</span>
-                    </div>
-                </div>
-                ` : ''}
-
-                <!-- PDF 뷰어 영역 -->
-                <div class="flex-1 overflow-hidden p-4 bg-gray-100">
-                    <div class="h-full bg-white rounded shadow-lg flex items-center justify-center">
-                        <div class="text-center">
-                            <svg class="w-24 h-24 mx-auto text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
-                            </svg>
-                            <p class="text-gray-600 text-lg mb-2">PDF 뷰어 영역</p>
-                            <p class="text-sm text-gray-500">파일: ${item.fileName}</p>
-                            <p class="text-xs text-gray-400 mt-4">
-                                ${readOnly ? '교수의 첨삭 내역이 표시됩니다 (읽기 전용)' : '첨삭 및 피드백 작성이 가능합니다'}
-                            </p>
-                            <div class="mt-6 inline-flex items-center px-4 py-2 bg-gray-100 rounded-lg text-sm text-gray-600">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                실제 PDF 렌더링은 별도 라이브러리로 구현 예정
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 푸터 -->
-                <div class="border-t px-6 py-4 bg-gray-50 flex justify-between items-center">
-                    <div class="text-sm text-gray-600">
-                        <span class="font-medium">상태:</span>
-                        <span class="ml-2 px-2 py-1 rounded text-xs font-medium ${statusClass}">
-                            ${statusText}
-                        </span>
-                    </div>
-                    <button onclick="closePdfViewer()"
-                            class="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300">
-                        닫기
-                    </button>
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.insertAdjacentHTML('beforeend', pdfViewerHtml);
-}
-
-function closePdfViewer() {
-    const modal = document.getElementById('pdf-viewer-modal');
-    if (modal) modal.remove();
+        // PDF 로드
+        setTimeout(() => {
+            window._currentFeedbackCtx = {id: fbId, fileUrl: request.fileUrl, data: feedbackData};
+            if (typeof ensureSubmissionSidebarReadOnly === 'function') {
+                ensureSubmissionSidebarReadOnly();
+            }
+            if (typeof initPDFViewerReadOnly === 'function') {
+                initPDFViewerReadOnly(fbId, request.fileUrl, feedbackData);
+            }
+            if (typeof renderGeneralThreadReadOnly === 'function') {
+                renderGeneralThreadReadOnly(fbId);
+            }
+            if (typeof refreshInlineTabMarkerReadOnly === 'function') {
+                refreshInlineTabMarkerReadOnly();
+            }
+        }, 100);
+    } else {
+        // fallback: createFeedbackDetailScreenReadOnly가 없으면 기본 알림
+        showAlert('PDF 뷰어를 로드할 수 없습니다. 페이지를 새로고침해주세요.');
+    }
 }
 
 function writeFeedback(id) {
@@ -5768,7 +5741,6 @@ function createNewWeeklyPlan(pairId) {
 
 // Export functions
 window.viewPdfFeedback = viewPdfFeedback;
-window.closePdfViewer = closePdfViewer;
 window.viewIndividualEvaluation = viewIndividualEvaluation;
 window.viewWeeklyGuidanceDetail = viewWeeklyGuidanceDetail;
 window.toggleWeekAccordion = toggleWeekAccordion;
@@ -8498,7 +8470,7 @@ function openStageTaskManagementModal(workflowId) {
                             ${subStages.map(sub => `
                                 <!-- 제출 일정 -->
                                 <tr class="hover:bg-gray-50">
-                                    <td class="py-3 px-3 border bg-blue-50 font-medium" rowspan="2">${sub.basicStageName}</td>
+                                    <td class="py-3 px-3 border font-medium" rowspan="2">${sub.basicStageName}</td>
                                     <td class="py-3 px-3 border font-medium" rowspan="2">${sub.name}</td>
                                     <td class="py-3 px-3 border" rowspan="2">
                                         <select data-substage-id="${sub.id}" data-field="approvalAuthority"
