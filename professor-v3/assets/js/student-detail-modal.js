@@ -35,7 +35,6 @@ function showStudentDetailModal(studentInfo) {
 
     // 지도단계 진행현황 조회 (전역 Mock 데이터)
     const stageProgress = _findStageProgress(s.stdNo);
-    const submissions = _findSubmissions(s.stdNo);
 
     // 기본 단계 (데이터 없을 때)
     const defaultStages = [
@@ -52,8 +51,13 @@ function showStudentDetailModal(studentInfo) {
     const journeyStages = _buildJourneyStages(stages, s.stdNo);
     const stageJourneyHtml = _renderVerticalJourney(journeyStages);
 
-    // 제출 문서 HTML
-    const submissionsHtml = _renderSubmissionsHtml(submissions);
+    // 학위논문청구요건 HTML (학위과정별 다른 항목)
+    const requirements = _getRequirements(s.stdNo, s.degree);
+    const requirementsHtml = _renderRequirements(requirements);
+
+    // 활동 이력 HTML
+    const activities = _buildActivityHistory(s.stdNo);
+    const activityHtml = _renderActivityHistory(activities);
 
     // 모달 HTML
     const modalHtml = `
@@ -84,6 +88,11 @@ function showStudentDetailModal(studentInfo) {
                         </div>
                     </div>
 
+                    <!-- 학위논문청구요건 -->
+                    <div style="margin-bottom: 24px;">
+                        ${requirementsHtml}
+                    </div>
+
                     <!-- 지도단계 -->
                     <div style="margin-bottom: 24px;">
                         <h3 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px;">지도단계</h3>
@@ -92,11 +101,11 @@ function showStudentDetailModal(studentInfo) {
                         </div>
                     </div>
 
-                    <!-- 제출 문서 -->
+                    <!-- 활동 이력 -->
                     <div style="width: 100%; max-width: 100%; overflow: hidden;">
-                        <h3 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">제출 문서</h3>
+                        <h3 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">활동 이력</h3>
                         <div style="border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px; overflow: hidden; width: 100%;">
-                            ${submissionsHtml}
+                            ${activityHtml}
                         </div>
                     </div>
                 </div>
@@ -137,14 +146,156 @@ function _findStageProgress(stdNo) {
     );
 }
 
-// 학번으로 제출문서 조회
-function _findSubmissions(stdNo) {
-    const data = window.mockStageSubmissions || [];
-    return data.filter(s =>
-        s.studentId === stdNo ||
-        s.studentId === 'STU' + String(stdNo).padStart(3, '0') ||
-        s.studentNumber === stdNo
-    ).sort((a, b) => new Date(a.submittedDate) - new Date(b.submittedDate));
+// 학번 매칭 헬퍼
+function _matchStudentId(dataId, stdNo) {
+    return dataId === stdNo ||
+           dataId === 'STU' + String(stdNo).padStart(3, '0') ||
+           String(dataId) === String(stdNo);
+}
+
+// 학생 활동 이력 수집 (제출/승인, 지도활동, 실시간지도예약)
+function _buildActivityHistory(stdNo) {
+    var activities = [];
+
+    // 1. mockStageSubmissions → 논문 제출 / 승인·반려 이력
+    var subs = window.mockStageSubmissions || [];
+    subs.forEach(function(s) {
+        if (!(_matchStudentId(s.studentId, stdNo) || _matchStudentId(s.studentNumber, stdNo))) return;
+        // 제출 이력
+        activities.push({
+            date: s.submittedDate || '',
+            type: 'submission',
+            label: '논문제출',
+            content: '[' + (s.subStageName || s.stageName || '-') + '] 논문 제출',
+            fileUrl: s.fileUrl || null
+        });
+        // 승인/반려 이력
+        if (s.reviewResult) {
+            var isApproved = s.reviewResult === 'approved' || s.reviewResult === 'pass';
+            activities.push({
+                date: s.reviewedDate || s.submittedDate || '',
+                type: isApproved ? 'approved' : 'rejected',
+                label: isApproved ? '승인' : '반려',
+                content: '[' + (s.subStageName || s.stageName || '-') + '] ' + (isApproved ? '승인' : '반려'),
+                fileUrl: null
+            });
+        }
+    });
+
+    // 2. FEEDBACK_REQUESTS → 지도활동 (문서 업로드/피드백)
+    var frs = window.FEEDBACK_REQUESTS || [];
+    frs.forEach(function(f) {
+        if (f.studentNumber !== stdNo) return;
+        var titleShort = (f.thesisTitle || '').length > 20
+            ? (f.thesisTitle || '').substring(0, 20) + '...'
+            : (f.thesisTitle || '-');
+        activities.push({
+            date: f.uploadDate || '',
+            type: 'guidance',
+            label: '지도활동',
+            content: '[' + titleShort + '] ' + (f.file || '문서') + ' 제출',
+            fileUrl: f.fileUrl || null
+        });
+    });
+
+    // 3. MEETING_REQUESTS_V3 → 실시간지도예약
+    var mtgs = window.MEETING_REQUESTS_V3 || [];
+    var statusMap = { pending: '대기', approved: '승인', completed: '완료', rejected: '반려', cancelled: '취소' };
+    mtgs.forEach(function(m) {
+        if (m.studentNumber !== stdNo) return;
+        var profName = m.professorName || m.advisorName || '교수';
+        var statusText = statusMap[m.status] || m.status || '';
+        activities.push({
+            date: m.requestDate || m.selectedDate || '',
+            type: 'meeting',
+            label: '실시간지도',
+            content: '[' + profName + '] 실시간지도예약 (' + statusText + ')',
+            fileUrl: null
+        });
+    });
+
+    // 날짜 내림차순 정렬
+    activities.sort(function(a, b) { return new Date(b.date) - new Date(a.date); });
+    return activities;
+}
+
+// 학위논문청구요건 데이터 (학위과정별 다른 항목 - requirement-management.js REQUIREMENT_COLUMNS 기준)
+function _getRequirements(stdNo, degree) {
+    // 학위과정별 요건 항목 정의
+    var reqByDegree = {
+        '석사': [
+            { name: '학점수료', completed: true },
+            { name: '석사논문1', completed: false },
+            { name: '연구윤리', completed: true },
+            { name: '연구방법론', completed: true },
+            { name: '외국어시험', completed: false },
+            { name: '종합시험', completed: false },
+            { name: '학술지게재', completed: false }
+        ],
+        '박사': [
+            { name: '학점수료', completed: true },
+            { name: '박사논문1', completed: false },
+            { name: '박사논문2', completed: false },
+            { name: '연구윤리', completed: true },
+            { name: '연구방법론', completed: true },
+            { name: '외국어시험', completed: false },
+            { name: '종합시험', completed: false },
+            { name: '학술지게재', completed: false }
+        ],
+        '통합과정': [
+            { name: '학점수료', completed: true },
+            { name: '석사논문1', completed: false },
+            { name: '박사논문1', completed: false },
+            { name: '박사논문2', completed: false },
+            { name: '연구윤리', completed: true },
+            { name: '연구방법론', completed: true },
+            { name: '외국어시험', completed: false },
+            { name: '종합시험', completed: false },
+            { name: '학술지게재', completed: false }
+        ]
+    };
+
+    // degree에서 학위과정 매칭 (석사/박사/통합과정)
+    var deg = degree || '';
+    var key = '박사'; // 기본값
+    if (deg.indexOf('석사') >= 0) key = '석사';
+    else if (deg.indexOf('통합') >= 0) key = '통합과정';
+    else if (deg.indexOf('박사') >= 0) key = '박사';
+
+    return reqByDegree[key] || reqByDegree['박사'];
+}
+
+// 학위논문청구요건 충족현황 칩 UI 렌더링
+function _renderRequirements(requirements) {
+    if (!requirements || requirements.length === 0) return '';
+
+    var completedCount = requirements.filter(function(r) { return r.completed; }).length;
+    var totalCount = requirements.length;
+
+    var html = '<div style="background: #F9FAFB; border-radius: 8px; padding: 16px;">';
+    // 제목 행
+    html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">';
+    html += '<h3 style="font-size: 14px; font-weight: 600; color: #374151; margin: 0;">학위논문청구요건 충족현황</h3>';
+    html += '<span style="font-size: 13px; color: #6b7280;">충족 <span style="color: #6A0028; font-weight: 700;">' + completedCount + '</span>/' + totalCount + '</span>';
+    html += '</div>';
+    // 칩 목록
+    html += '<div style="display: flex; flex-wrap: wrap; gap: 10px;">';
+    requirements.forEach(function(req) {
+        var bg = req.completed ? '#E8F5E9' : '#f8fafc';
+        var border = req.completed ? '#A5D6A7' : '#e5e7eb';
+        var textColor = req.completed ? '#2E7D32' : '#9ca3af';
+        var fontWeight = req.completed ? '600' : '400';
+        var icon = req.completed
+            ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2E7D32" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>'
+            : '<div style="width: 14px; height: 14px; border-radius: 50%; border: 2px solid #9ca3af;"></div>';
+        html += '<div style="display: flex; align-items: center; gap: 6px; padding: 8px 14px; background: ' + bg + '; border: 1px solid ' + border + '; border-radius: 4px; font-size: 13px;">';
+        html += icon;
+        html += '<span style="color: ' + textColor + '; font-weight: ' + fontWeight + ';">' + req.name + '</span>';
+        html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    return html;
 }
 
 // 학적상태 한글 변환
@@ -398,37 +549,42 @@ function _toggleModalJourneyStage(stageIdx) {
     }
 }
 
-// 제출 문서 HTML 렌더링
-function _renderSubmissionsHtml(submissions) {
-    if (!submissions || submissions.length === 0) {
-        return '<p style="color: #9CA3AF; text-align: center; padding: 16px;">제출된 문서가 없습니다.</p>';
+// 활동 이력 테이블 렌더링 (컬럼: 구분 | 활동내용 | 날짜)
+function _renderActivityHistory(activities) {
+    if (!activities || activities.length === 0) {
+        return '<p style="color: #9CA3AF; text-align: center; padding: 16px;">활동 이력이 없습니다.</p>';
     }
 
-    const getResultText = (result) => {
-        if (result === 'pass' || result === 'approved') return '합격';
-        if (result === 'fail' || result === 'rejected') return '불합격';
-        return '-';
-    };
-    const getResultStyle = (result) => {
-        if (result === 'pass' || result === 'approved') return 'color: #046C4E; font-weight: 600;';
-        if (result === 'fail' || result === 'rejected') return 'color: #C81E1E; font-weight: 600;';
-        return 'color: #6B7280;';
+    // 유형별 배지 스타일
+    var badgeStyles = {
+        submission: 'background: #F3E8FF; color: #7C3AED;',
+        approved:   'background: #E8F5E9; color: #2E7D32;',
+        rejected:   'background: #FEE2E2; color: #C81E1E;',
+        guidance:   'background: #E3F2FD; color: #0288D1;',
+        meeting:    'background: #FFF3E0; color: #E65100;'
     };
 
-    let html = '<div style="font-size: 13px;">';
-    html += '<div style="display: grid; grid-template-columns: 1fr 90px 65px 70px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151;">';
-    html += '<div style="padding: 8px 6px;">지도단계</div>';
-    html += '<div style="padding: 8px 6px; text-align: center;">제출일자</div>';
-    html += '<div style="padding: 8px 6px; text-align: center;">심사결과</div>';
-    html += '<div style="padding: 8px 6px; text-align: center;">첨부파일</div>';
+    var html = '<div style="font-size: 13px;">';
+    // 헤더
+    html += '<div style="display: grid; grid-template-columns: 80px 1fr 90px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151;">';
+    html += '<div style="padding: 8px 6px; text-align: center;">구분</div>';
+    html += '<div style="padding: 8px 6px;">활동내용</div>';
+    html += '<div style="padding: 8px 6px; text-align: center;">날짜</div>';
     html += '</div>';
 
-    submissions.forEach((s, idx) => {
-        html += '<div style="display: grid; grid-template-columns: 1fr 90px 65px 70px; border-bottom: 1px solid #E5E7EB;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '">';
-        html += '<div style="padding: 8px 6px; color: #374151; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + (s.subStageName || s.stageName || '-') + '</div>';
-        html += '<div style="padding: 8px 6px; text-align: center; color: #6B7280;">' + (s.submittedDate || '-') + '</div>';
-        html += '<div style="padding: 8px 6px; text-align: center; ' + getResultStyle(s.reviewResult) + '">' + getResultText(s.reviewResult) + '</div>';
-        html += '<div style="padding: 8px 6px; text-align: center;">' + (s.fileUrl ? '<a href="' + s.fileUrl + '" target="_blank" style="display: inline-block; padding: 2px 8px; background: #6A0028; color: white; border-radius: 3px; font-size: 11px; text-decoration: none;">다운로드</a>' : '-') + '</div>';
+    activities.forEach(function(a, idx) {
+        var badge = badgeStyles[a.type] || 'background: #F5F5F5; color: #9E9E9E;';
+        var fileLink = a.fileUrl
+            ? '<a href="' + a.fileUrl + '" target="_blank" style="display: inline-block; margin-left: 6px; padding: 1px 6px; background: #6A0028; color: white; border-radius: 3px; font-size: 10px; text-decoration: none; vertical-align: middle;">파일</a>'
+            : '';
+
+        html += '<div style="display: grid; grid-template-columns: 80px 1fr 90px; border-bottom: 1px solid #E5E7EB;' + (idx % 2 === 1 ? ' background: #FAFAFA;' : '') + '">';
+        // 구분 배지
+        html += '<div style="padding: 8px 6px; text-align: center;"><span style="display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; white-space: nowrap; ' + badge + '">' + a.label + '</span></div>';
+        // 활동내용 + 파일링크
+        html += '<div style="padding: 8px 6px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">' + a.content + fileLink + '</div>';
+        // 날짜
+        html += '<div style="padding: 8px 6px; text-align: center; color: #6B7280; font-size: 12px;">' + (a.date || '-') + '</div>';
         html += '</div>';
     });
 

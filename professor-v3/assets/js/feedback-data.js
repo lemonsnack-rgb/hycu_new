@@ -820,4 +820,5 @@ const FeedbackDataService = {
 // Export
 window.FeedbackDataService = FeedbackDataService;
 window.FEEDBACK_USERS = FEEDBACK_USERS;
+window.FEEDBACK_REQUESTS = FEEDBACK_REQUESTS;
 window.CURRENT_USER = CURRENT_USER;
