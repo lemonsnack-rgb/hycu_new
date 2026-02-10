@@ -1855,6 +1855,572 @@ const mockWorkSchedules = [
     }
 ];
 
+// =============================================================================
+// 학생별 지도단계 진행 현황 데이터
+// =============================================================================
+const mockStudentStageProgress = [
+    {
+        studentId: 'STU001',
+        stages: [
+            { name: '연구계획서', status: 'completed', completedDate: '2025-02-15' },
+            { name: '프로포절', status: 'completed', completedDate: '2025-03-20' },
+            { name: '예비심사', status: 'current', completedDate: null },
+            { name: '본심사', status: 'upcoming', completedDate: null },
+            { name: '졸업', status: 'upcoming', completedDate: null }
+        ]
+    },
+    {
+        studentId: 'STU002',
+        stages: [
+            { name: '연구계획서', status: 'completed', completedDate: '2025-02-10' },
+            { name: '프로포절', status: 'completed', completedDate: '2025-03-15' },
+            { name: '예비심사', status: 'completed', completedDate: '2025-04-20' },
+            { name: '본심사', status: 'current', completedDate: null },
+            { name: '졸업', status: 'upcoming', completedDate: null }
+        ]
+    },
+    {
+        studentId: 'STU003',
+        stages: [
+            { name: '연구계획서', status: 'completed', completedDate: '2025-02-12' },
+            { name: '프로포절', status: 'current', completedDate: null },
+            { name: '예비심사', status: 'upcoming', completedDate: null },
+            { name: '본심사', status: 'upcoming', completedDate: null },
+            { name: '졸업', status: 'upcoming', completedDate: null }
+        ]
+    },
+    {
+        studentId: 'STU004',
+        stages: [
+            { name: '연구계획서', status: 'completed', completedDate: '2024-09-15' },
+            { name: '프로포절', status: 'completed', completedDate: '2024-10-20' },
+            { name: '예비심사', status: 'completed', completedDate: '2024-11-25' },
+            { name: '본심사', status: 'completed', completedDate: '2025-01-10' },
+            { name: '졸업', status: 'current', completedDate: null }
+        ]
+    },
+    {
+        studentId: 'STU011',
+        stages: [
+            { name: '연구계획서', status: 'completed', completedDate: '2024-03-10' },
+            { name: '프로포절', status: 'completed', completedDate: '2024-05-15' },
+            { name: '예비심사1차', status: 'completed', completedDate: '2024-08-20' },
+            { name: '예비심사2차', status: 'completed', completedDate: '2024-11-15' },
+            { name: '발표논문게재', status: 'current', completedDate: null },
+            { name: '본심사1차', status: 'upcoming', completedDate: null },
+            { name: '본심사2차', status: 'upcoming', completedDate: null }
+        ]
+    },
+    {
+        studentId: 'STU012',
+        stages: [
+            { name: '연구계획서', status: 'completed', completedDate: '2024-03-12' },
+            { name: '프로포절', status: 'completed', completedDate: '2024-05-20' },
+            { name: '예비심사1차', status: 'completed', completedDate: '2024-08-25' },
+            { name: '예비심사2차', status: 'current', completedDate: null },
+            { name: '발표논문게재', status: 'upcoming', completedDate: null },
+            { name: '본심사1차', status: 'upcoming', completedDate: null },
+            { name: '본심사2차', status: 'upcoming', completedDate: null }
+        ]
+    }
+];
+
+// =============================================================================
+// 세부단계별 학생 제출 문서 데이터
+// =============================================================================
+const mockStageSubmissions = [
+    // STU001 (김학생) 제출 문서
+    {
+        id: 'SUB001',
+        studentId: 'STU001',
+        subStageName: '연구계획서 제출',
+        title: 'AI 기반 이미지 처리 알고리즘 연구계획서',
+        submittedDate: '2025-02-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB001.pdf'
+    },
+    {
+        id: 'SUB002',
+        studentId: 'STU001',
+        subStageName: '프로포절 발표',
+        title: 'AI 기반 이미지 처리 프로포절 발표자료',
+        submittedDate: '2025-03-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB002.pdf'
+    },
+    {
+        id: 'SUB003',
+        studentId: 'STU001',
+        subStageName: '예비심사 신청서',
+        title: '예비심사 신청서 (2025-1학기)',
+        submittedDate: '2025-04-01',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB003.pdf'
+    },
+
+    // STU002 (이학생) 제출 문서
+    {
+        id: 'SUB004',
+        studentId: 'STU002',
+        subStageName: '연구계획서 제출',
+        title: '블록체인 기반 데이터 무결성 보장 방안 연구계획서',
+        submittedDate: '2025-02-10',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB004.pdf'
+    },
+    {
+        id: 'SUB005',
+        studentId: 'STU002',
+        subStageName: '프로포절 발표',
+        title: '블록체인 프로포절 발표자료',
+        submittedDate: '2025-03-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB005.pdf'
+    },
+    {
+        id: 'SUB006',
+        studentId: 'STU002',
+        subStageName: '예비심사 논문',
+        title: '블록체인 기반 데이터 무결성 - 예비심사본',
+        submittedDate: '2025-04-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB006.pdf'
+    },
+    {
+        id: 'SUB007',
+        studentId: 'STU002',
+        subStageName: '본심사 논문',
+        title: '블록체인 기반 데이터 무결성 - 본심사본',
+        submittedDate: '2025-05-10',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB007.pdf'
+    },
+
+    // STU003 (박학생) 제출 문서
+    {
+        id: 'SUB008',
+        studentId: 'STU003',
+        subStageName: '연구계획서 제출',
+        title: '디지털 전환 시대의 기업 경쟁력 분석 연구계획서',
+        submittedDate: '2025-02-12',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB008.pdf'
+    },
+    {
+        id: 'SUB009',
+        studentId: 'STU003',
+        subStageName: '프로포절 초안',
+        title: '디지털 전환 프로포절 초안',
+        submittedDate: '2025-03-25',
+        reviewResult: 'pending',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB009.pdf'
+    },
+
+    // STU004 (최학생) 제출 문서
+    {
+        id: 'SUB010',
+        studentId: 'STU004',
+        subStageName: '연구계획서 제출',
+        title: 'ESG 경영이 기업 가치에 미치는 영향 연구계획서',
+        submittedDate: '2024-09-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB010.pdf'
+    },
+    {
+        id: 'SUB011',
+        studentId: 'STU004',
+        subStageName: '프로포절 발표',
+        title: 'ESG 경영 프로포절 발표자료',
+        submittedDate: '2024-10-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB011.pdf'
+    },
+    {
+        id: 'SUB012',
+        studentId: 'STU004',
+        subStageName: '예비심사 논문',
+        title: 'ESG 경영이 기업 가치에 미치는 영향 - 예비심사본',
+        submittedDate: '2024-11-25',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB012.pdf'
+    },
+    {
+        id: 'SUB013',
+        studentId: 'STU004',
+        subStageName: '본심사 논문',
+        title: 'ESG 경영이 기업 가치에 미치는 영향 - 최종본',
+        submittedDate: '2025-01-10',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB013.pdf'
+    },
+    {
+        id: 'SUB014',
+        studentId: 'STU004',
+        subStageName: '졸업논문 최종제출',
+        title: 'ESG 경영이 기업 가치에 미치는 영향 - 최종제출',
+        submittedDate: '2025-02-01',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB014.pdf'
+    },
+
+    // STU011 (한학생 - 박사) 제출 문서
+    {
+        id: 'SUB015',
+        studentId: 'STU011',
+        subStageName: '연구계획서 제출',
+        title: '양자 컴퓨팅 알고리즘 최적화 연구계획서',
+        submittedDate: '2024-03-10',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB015.pdf'
+    },
+    {
+        id: 'SUB016',
+        studentId: 'STU011',
+        subStageName: '프로포절 발표',
+        title: '양자 컴퓨팅 프로포절',
+        submittedDate: '2024-05-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB016.pdf'
+    },
+    {
+        id: 'SUB017',
+        studentId: 'STU011',
+        subStageName: '예비심사1차 논문',
+        title: '양자 컴퓨팅 알고리즘 - 예비심사1차',
+        submittedDate: '2024-08-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB017.pdf'
+    },
+    {
+        id: 'SUB018',
+        studentId: 'STU011',
+        subStageName: '예비심사2차 논문',
+        title: '양자 컴퓨팅 알고리즘 - 예비심사2차',
+        submittedDate: '2024-11-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB018.pdf'
+    },
+    {
+        id: 'SUB019',
+        studentId: 'STU011',
+        subStageName: '학술지 게재 증빙',
+        title: 'IEEE Quantum Computing 학술지 게재 확인서',
+        submittedDate: '2025-01-20',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB019.pdf'
+    },
+
+    // STU012 (서학생 - 박사) 제출 문서
+    {
+        id: 'SUB020',
+        studentId: 'STU012',
+        subStageName: '연구계획서 제출',
+        title: '엣지 컴퓨팅 환경에서의 데이터 처리 연구계획서',
+        submittedDate: '2024-03-12',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB020.pdf'
+    },
+    {
+        id: 'SUB021',
+        studentId: 'STU012',
+        subStageName: '프로포절 발표',
+        title: '엣지 컴퓨팅 프로포절',
+        submittedDate: '2024-05-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB021.pdf'
+    },
+    {
+        id: 'SUB022',
+        studentId: 'STU012',
+        subStageName: '예비심사1차 논문',
+        title: '엣지 컴퓨팅 - 예비심사1차',
+        submittedDate: '2024-08-25',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB022.pdf'
+    },
+    {
+        id: 'SUB023',
+        studentId: 'STU012',
+        subStageName: '예비심사2차 논문',
+        title: '엣지 컴퓨팅 - 예비심사2차',
+        submittedDate: '2025-01-10',
+        reviewResult: 'pending',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB023.pdf'
+    },
+
+    // ========================================
+    // 교수 대시보드 학생용 제출 문서 (dashboardStudents id 1~15)
+    // ========================================
+
+    // ID 1: 김철수 (통합 7학기, 논문작성계획서)
+    {
+        id: 'SUB101',
+        studentId: 1,
+        subStageName: '연구계획서 제출',
+        title: '딥러닝 기반 자율주행 시스템 연구계획서',
+        submittedDate: '2024-09-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB101.pdf'
+    },
+    {
+        id: 'SUB102',
+        studentId: 1,
+        subStageName: '논문작성계획서 초안',
+        title: '자율주행 딥러닝 모델 논문작성계획서',
+        submittedDate: '2025-01-10',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB102.pdf'
+    },
+
+    // ID 2: 이영희 (석사 3학기, 논문작성계획서)
+    {
+        id: 'SUB103',
+        studentId: 2,
+        subStageName: '연구계획서 제출',
+        title: '반도체 공정 최적화 연구계획서',
+        submittedDate: '2024-10-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB103.pdf'
+    },
+    {
+        id: 'SUB104',
+        studentId: 2,
+        subStageName: '논문작성계획서 초안',
+        title: '반도체 공정 최적화 논문작성계획서',
+        submittedDate: '2025-01-15',
+        reviewResult: 'pending',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB104.pdf'
+    },
+
+    // ID 3: 박민준 (박사 5학기, 논문작성계획서)
+    {
+        id: 'SUB105',
+        studentId: 3,
+        subStageName: '연구계획서 제출',
+        title: '양자 암호화 시스템 연구계획서',
+        submittedDate: '2024-03-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB105.pdf'
+    },
+    {
+        id: 'SUB106',
+        studentId: 3,
+        subStageName: '프로포절 발표',
+        title: '양자 암호화 프로포절 발표자료',
+        submittedDate: '2024-06-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB106.pdf'
+    },
+    {
+        id: 'SUB107',
+        studentId: 3,
+        subStageName: '논문작성계획서 제출',
+        title: '양자 암호화 시스템 논문작성계획서',
+        submittedDate: '2025-01-20',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB107.pdf'
+    },
+
+    // ID 5: 정수아 (석사 4학기, 프로포절)
+    {
+        id: 'SUB108',
+        studentId: 5,
+        subStageName: '연구계획서 제출',
+        title: '머신러닝 기반 이상탐지 연구계획서',
+        submittedDate: '2024-09-10',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB108.pdf'
+    },
+    {
+        id: 'SUB109',
+        studentId: 5,
+        subStageName: '논문작성계획서 제출',
+        title: '머신러닝 이상탐지 논문작성계획서',
+        submittedDate: '2024-12-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB109.pdf'
+    },
+    {
+        id: 'SUB110',
+        studentId: 5,
+        subStageName: '프로포절 초안',
+        title: '머신러닝 이상탐지 프로포절',
+        submittedDate: '2025-01-25',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB110.pdf'
+    },
+
+    // ID 7: 홍길동 (박사 6학기, 프로포절)
+    {
+        id: 'SUB111',
+        studentId: 7,
+        subStageName: '연구계획서 제출',
+        title: '로봇 공학 제어 시스템 연구계획서',
+        submittedDate: '2023-09-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB111.pdf'
+    },
+    {
+        id: 'SUB112',
+        studentId: 7,
+        subStageName: '논문작성계획서 제출',
+        title: '로봇 제어 시스템 논문작성계획서',
+        submittedDate: '2024-03-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB112.pdf'
+    },
+    {
+        id: 'SUB113',
+        studentId: 7,
+        subStageName: '프로포절 발표',
+        title: '로봇 제어 시스템 프로포절',
+        submittedDate: '2024-11-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB113.pdf'
+    },
+    {
+        id: 'SUB114',
+        studentId: 7,
+        subStageName: '프로포절 수정본',
+        title: '로봇 제어 시스템 프로포절 수정본',
+        submittedDate: '2025-01-28',
+        reviewResult: 'pending',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB114.pdf'
+    },
+
+    // ID 8: 윤서진 (박사 5학기, 예비심사)
+    {
+        id: 'SUB115',
+        studentId: 8,
+        subStageName: '연구계획서 제출',
+        title: '빅데이터 분석 플랫폼 연구계획서',
+        submittedDate: '2023-03-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB115.pdf'
+    },
+    {
+        id: 'SUB116',
+        studentId: 8,
+        subStageName: '논문작성계획서 제출',
+        title: '빅데이터 분석 플랫폼 논문작성계획서',
+        submittedDate: '2023-09-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB116.pdf'
+    },
+    {
+        id: 'SUB117',
+        studentId: 8,
+        subStageName: '프로포절 발표',
+        title: '빅데이터 플랫폼 프로포절',
+        submittedDate: '2024-03-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB117.pdf'
+    },
+    {
+        id: 'SUB118',
+        studentId: 8,
+        subStageName: '예비심사 논문',
+        title: '빅데이터 분석 플랫폼 - 예비심사본',
+        submittedDate: '2025-01-30',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB118.pdf'
+    },
+
+    // ID 10: 오연우 (박사 7학기, 본심사)
+    {
+        id: 'SUB119',
+        studentId: 10,
+        subStageName: '연구계획서 제출',
+        title: '데이터 마이닝 알고리즘 연구계획서',
+        submittedDate: '2022-09-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB119.pdf'
+    },
+    {
+        id: 'SUB120',
+        studentId: 10,
+        subStageName: '논문작성계획서 제출',
+        title: '데이터 마이닝 논문작성계획서',
+        submittedDate: '2023-03-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB120.pdf'
+    },
+    {
+        id: 'SUB121',
+        studentId: 10,
+        subStageName: '프로포절 발표',
+        title: '데이터 마이닝 프로포절',
+        submittedDate: '2023-09-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB121.pdf'
+    },
+    {
+        id: 'SUB122',
+        studentId: 10,
+        subStageName: '예비심사 논문',
+        title: '데이터 마이닝 알고리즘 - 예비심사본',
+        submittedDate: '2024-03-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB122.pdf'
+    },
+    {
+        id: 'SUB123',
+        studentId: 10,
+        subStageName: '본심사 논문',
+        title: '데이터 마이닝 알고리즘 - 본심사본',
+        submittedDate: '2025-01-25',
+        reviewResult: 'reviewing',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB123.pdf'
+    },
+
+    // ID 12: 송민호 (박사 6학기, 본심사)
+    {
+        id: 'SUB124',
+        studentId: 12,
+        subStageName: '연구계획서 제출',
+        title: '5G 네트워크 최적화 연구계획서',
+        submittedDate: '2022-09-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB124.pdf'
+    },
+    {
+        id: 'SUB125',
+        studentId: 12,
+        subStageName: '논문작성계획서 제출',
+        title: '5G 네트워크 논문작성계획서',
+        submittedDate: '2023-03-25',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB125.pdf'
+    },
+    {
+        id: 'SUB126',
+        studentId: 12,
+        subStageName: '프로포절 발표',
+        title: '5G 네트워크 프로포절',
+        submittedDate: '2023-09-20',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB126.pdf'
+    },
+    {
+        id: 'SUB127',
+        studentId: 12,
+        subStageName: '예비심사 논문',
+        title: '5G 네트워크 최적화 - 예비심사본',
+        submittedDate: '2024-06-15',
+        reviewResult: 'approved',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB127.pdf'
+    },
+    {
+        id: 'SUB128',
+        studentId: 12,
+        subStageName: '본심사 논문',
+        title: '5G 네트워크 최적화 - 본심사본',
+        submittedDate: '2025-02-01',
+        reviewResult: 'pending',
+        fileUrl: 'https://school-system.hycu.ac.kr/submissions/SUB128.pdf'
+    }
+];
+
 // 전역으로 노출 (window 객체에 할당)
 if (typeof window !== 'undefined') {
     // 기본 데이터
@@ -1893,6 +2459,11 @@ if (typeof window !== 'undefined') {
     // 업무일정등록 데이터
     window.mockAdminWorkTypes = mockAdminWorkTypes;
     window.mockWorkSchedules = mockWorkSchedules;
+
+    // 학생 지도단계 및 제출 문서 데이터
+    window.mockStudentStageProgress = mockStudentStageProgress;
+    window.mockStageSubmissions = mockStageSubmissions;
+    window.mockThesisStages = mockThesisStages;
 
     // 디버그: 로드 확인
     console.log('✅ mockData.js 로드 완료');

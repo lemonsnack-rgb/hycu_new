@@ -1768,7 +1768,7 @@
         );
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="px-4 py-8 text-center" style="color: #9CA3AF;">해당 단계의 학생이 없습니다.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="px-4 py-8 text-center" style="color: #9CA3AF;">해당 단계의 학생이 없습니다.</td></tr>';
             return;
         }
 
@@ -1785,222 +1785,10 @@
                         ${s.stage}
                     </span>
                 </td>
-                <td class="px-4 py-3 text-center">
-                    <button class="text-sm font-medium hover:underline"
-                            style="color: #6A0028; background: none; border: none; cursor: pointer;"
-                            onclick="viewStudentDetail(${s.id})">
-                        상세보기
-                    </button>
-                </td>
             </tr>
         `).join('');
     }
 
-    // 학생 상세 보기 - 모달 팝업
-    function viewStudentDetail(studentId) {
-        const student = dashboardStudents.find(s => s.id === studentId);
-        if (!student) return;
-
-        // Mock 데이터에서 학생별 지도단계 진행 현황 조회
-        // studentId를 3자리로 패딩하여 'STU001', 'STU010' 형식으로 변환
-        const stuIdPadded = 'STU' + String(studentId).padStart(3, '0');
-        const stageProgress = (window.mockStudentStageProgress || []).find(sp =>
-            sp.studentId === stuIdPadded || sp.studentId === studentId || sp.studentId === String(studentId)
-        );
-
-        // 학생별 제출 문서 조회 (로컬 Mock 데이터 우선, 없으면 전역 mockStageSubmissions)
-        let submissions = dashboardSubmissions[studentId] || [];
-        if (submissions.length === 0) {
-            submissions = (window.mockStageSubmissions || []).filter(s =>
-                s.studentId === stuIdPadded || s.studentId === studentId || s.studentId === String(studentId)
-            );
-        }
-        submissions = submissions.sort((a, b) => new Date(a.submittedDate) - new Date(b.submittedDate));
-
-        // 지도단계 기본값 (데이터가 없는 경우)
-        const defaultStages = [
-            { name: '연구계획서', status: 'completed' },
-            { name: '프로포절', status: student.stage === '프로포절' ? 'current' : (student.stage === '논문작성계획서' ? 'upcoming' : 'completed') },
-            { name: '예비심사', status: student.stage === '예비심사' ? 'current' : (['논문작성계획서', '프로포절'].includes(student.stage) ? 'upcoming' : 'completed') },
-            { name: '본심사', status: student.stage === '본심사' ? 'current' : 'upcoming' },
-            { name: '졸업', status: 'upcoming' }
-        ];
-
-        const stages = stageProgress ? stageProgress.stages : defaultStages;
-
-        // 심사결과 텍스트 (합격/불합격/-)
-        const getReviewResultText = (result) => {
-            if (result === 'pass' || result === 'approved') return '합격';
-            if (result === 'fail' || result === 'rejected') return '불합격';
-            return '-'; // pending, reviewing, 기타
-        };
-        const getReviewResultStyle = (result) => {
-            if (result === 'pass' || result === 'approved') return 'color: #046C4E; font-weight: 600;';
-            if (result === 'fail' || result === 'rejected') return 'color: #C81E1E; font-weight: 600;';
-            return 'color: #6B7280;'; // pending, reviewing, 기타
-        };
-
-        // 지도단계 SVG 생성 (학생 대시보드와 동일 스타일)
-        const COLS = Math.min(stages.length, 5); // 모달 너비에 맞게 최대 5컬럼
-        const viewBoxW = COLS * 150;
-        const cellW = viewBoxW / COLS;
-        const rowH = 100;
-        const nodeY = 40;
-        const radius = 12;
-
-        const rows = [];
-        for (let i = 0; i < stages.length; i += COLS) {
-            rows.push(stages.slice(i, i + COLS));
-        }
-        const svgH = rows.length * rowH;
-
-        const getNodeX = (colIdx) => cellW * colIdx + cellW / 2;
-        const getNodeY = (rowIdx) => rowIdx * rowH + nodeY;
-        const getNodeColor = (status) => status === 'completed' ? '#2E7D32' : status === 'current' ? '#0288D1' : 'white';
-        const getLineColor = (fromStatus, toStatus) => (fromStatus === 'completed' && (toStatus === 'completed' || toStatus === 'current')) ? '#2E7D32' : '#d1d5db';
-
-        let stageSvg = '<svg width="100%" viewBox="0 0 ' + viewBoxW + ' ' + svgH + '" style="display: block;" preserveAspectRatio="xMidYMid meet">';
-
-        rows.forEach((row, rowIdx) => {
-            // 행 내 화살표
-            row.forEach((step, colIdx) => {
-                if (colIdx < row.length - 1) {
-                    const fromX = getNodeX(colIdx);
-                    const toX = getNodeX(colIdx + 1);
-                    const y = getNodeY(rowIdx);
-                    const lineColor = getLineColor(step.status, row[colIdx + 1].status);
-                    stageSvg += '<line x1="' + (fromX + 14) + '" y1="' + y + '" x2="' + (toX - 20) + '" y2="' + y + '" stroke="' + lineColor + '" stroke-width="2"/>';
-                    stageSvg += '<polygon points="' + (toX - 20) + ',' + (y - 5) + ' ' + (toX - 20) + ',' + (y + 5) + ' ' + (toX - 12) + ',' + y + '" fill="' + lineColor + '"/>';
-                }
-            });
-
-            // 다음 행 연결선 (곡선)
-            if (rowIdx < rows.length - 1) {
-                const lastCol = row.length - 1;
-                const fromX = getNodeX(lastCol);
-                const fromY = getNodeY(rowIdx) + 50;
-                const toX = getNodeX(0);
-                const toY = getNodeY(rowIdx + 1);
-                const midY = fromY + 20;
-                const curveR = 8;
-                stageSvg += '<path d="M ' + fromX + ' ' + fromY + ' L ' + fromX + ' ' + (midY - curveR) + ' Q ' + fromX + ' ' + midY + ' ' + (fromX - curveR) + ' ' + midY + ' L ' + (toX + curveR) + ' ' + midY + ' Q ' + toX + ' ' + midY + ' ' + toX + ' ' + (midY + curveR) + ' L ' + toX + ' ' + (toY - 18) + '" fill="none" stroke="#d1d5db" stroke-width="2"/>';
-                stageSvg += '<polygon points="' + (toX - 5) + ',' + (toY - 16) + ' ' + (toX + 5) + ',' + (toY - 16) + ' ' + toX + ',' + (toY - 8) + '" fill="#d1d5db"/>';
-            }
-
-            // 노드
-            row.forEach((step, colIdx) => {
-                const x = getNodeX(colIdx);
-                const y = getNodeY(rowIdx);
-                const isCompleted = step.status === 'completed';
-                const isCurrent = step.status === 'current';
-                const nodeColor = getNodeColor(step.status);
-                const textColor = isCompleted ? '#2E7D32' : isCurrent ? '#0288D1' : '#9ca3af';
-
-                // 진행중 배지
-                if (isCurrent) {
-                    stageSvg += '<rect x="' + (x - 26) + '" y="' + (y - 35) + '" width="52" height="18" rx="4" fill="#0288D1"/>';
-                    stageSvg += '<text x="' + x + '" y="' + (y - 22) + '" text-anchor="middle" fill="white" font-size="10" font-weight="700">진행중</text>';
-                }
-
-                // 노드 원
-                stageSvg += '<circle cx="' + x + '" cy="' + y + '" r="' + radius + '" fill="' + nodeColor + '"' + (step.status === 'upcoming' ? ' stroke="#d1d5db" stroke-width="2"' : '') + '/>';
-
-                // 체크마크 (완료)
-                if (isCompleted) {
-                    stageSvg += '<path d="M ' + (x - 5) + ' ' + y + ' L ' + (x - 1) + ' ' + (y + 4) + ' L ' + (x + 6) + ' ' + (y - 4) + '" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>';
-                }
-
-                // 단계명
-                stageSvg += '<text x="' + x + '" y="' + (y + 26) + '" text-anchor="middle" fill="' + textColor + '" font-size="12" font-weight="600">' + step.name + '</text>';
-                stageSvg += '<text x="' + x + '" y="' + (y + 40) + '" text-anchor="middle" fill="#9ca3af" font-size="9">' + (isCompleted ? '[완료]' : (step.period || '')) + '</text>';
-            });
-        });
-
-        stageSvg += '</svg>';
-
-        // 제출 문서 그리드 HTML (논문명 컬럼 제거 - 동일 논문이므로)
-        const submissionsHtml = submissions.length > 0
-            ? `<div style="font-size: 13px;"><div style="display: grid; grid-template-columns: 1fr 90px 65px 70px; background: #F9FAFB; border-bottom: 2px solid #E5E7EB; font-weight: 600; color: #374151;"><div style="padding: 8px 6px;">지도단계</div><div style="padding: 8px 6px; text-align: center;">제출일자</div><div style="padding: 8px 6px; text-align: center;">심사결과</div><div style="padding: 8px 6px; text-align: center;">첨부파일</div></div>${submissions.map((s, idx) => `<div style="display: grid; grid-template-columns: 1fr 90px 65px 70px; border-bottom: 1px solid #E5E7EB; ${idx % 2 === 1 ? 'background: #FAFAFA;' : ''}"><div style="padding: 8px 6px; color: #374151; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${s.subStageName}</div><div style="padding: 8px 6px; text-align: center; color: #6B7280;">${s.submittedDate}</div><div style="padding: 8px 6px; text-align: center; ${getReviewResultStyle(s.reviewResult)}">${getReviewResultText(s.reviewResult)}</div><div style="padding: 8px 6px; text-align: center;">${s.fileUrl ? `<a href="${s.fileUrl}" target="_blank" style="display: inline-block; padding: 2px 8px; background: #6A0028; color: white; border-radius: 3px; font-size: 11px; text-decoration: none;">다운로드</a>` : '-'}</div></div>`).join('')}</div>`
-            : '<p style="color: #9CA3AF; text-align: center; padding: 16px;">제출된 문서가 없습니다.</p>';
-
-        // 모달 HTML
-        const modalHtml = `
-            <div id="student-detail-modal" style="position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; z-index: 9999;">
-                <div style="background: white; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-                    <!-- 헤더 -->
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #E5E7EB; background: #F9FAFB;">
-                        <h2 style="font-size: 18px; font-weight: 700; color: #1A1A1A; margin: 0;">학생 상세정보</h2>
-                        <button onclick="closeStudentDetailModal()" style="background: none; border: none; cursor: pointer; padding: 4px;">
-                            <svg width="24" height="24" fill="none" stroke="#6B7280" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
-                        </button>
-                    </div>
-
-                    <!-- 본문 (스크롤) -->
-                    <div style="padding: 24px; overflow-y: auto; overflow-x: hidden; max-height: calc(90vh - 70px);">
-                        <!-- 기본 정보 -->
-                        <div style="background: #F9FAFB; border-radius: 8px; padding: 16px; margin-bottom: 24px;">
-                            <h3 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">기본 정보</h3>
-                            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                                <div><span style="color: #6B7280; font-size: 12px;">학번</span><p style="color: #1A1A1A; font-weight: 500; margin: 4px 0 0;">${student.stdNo}</p></div>
-                                <div><span style="color: #6B7280; font-size: 12px;">성명</span><p style="color: #1A1A1A; font-weight: 500; margin: 4px 0 0;">${student.name}</p></div>
-                                <div><span style="color: #6B7280; font-size: 12px;">학과</span><p style="color: #1A1A1A; font-weight: 500; margin: 4px 0 0;">${student.dept}</p></div>
-                                <div><span style="color: #6B7280; font-size: 12px;">학위과정</span><p style="color: #1A1A1A; font-weight: 500; margin: 4px 0 0;">${student.degree}</p></div>
-                                <div><span style="color: #6B7280; font-size: 12px;">학기</span><p style="color: #1A1A1A; font-weight: 500; margin: 4px 0 0;">${student.semester}</p></div>
-                                <div><span style="color: #6B7280; font-size: 12px;">현재 단계</span><p style="color: #6A0028; font-weight: 600; margin: 4px 0 0;">${student.stage}</p></div>
-                            </div>
-                        </div>
-
-                        <!-- 지도단계 -->
-                        <div style="margin-bottom: 24px;">
-                            <h3 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 16px;">지도단계</h3>
-                            <div style="background: white; border: 1px solid #E5E7EB; border-radius: 8px; padding: 20px; overflow-x: auto;">
-                                ${stageSvg}
-                                <div style="display: flex; justify-content: center; gap: 24px; margin-top: 16px; padding-top: 12px; border-top: 1px solid #E5E7EB;">
-                                    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280;">
-                                        <span style="width: 12px; height: 12px; border-radius: 50%; background: #2E7D32;"></span> 완료
-                                    </span>
-                                    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280;">
-                                        <span style="width: 12px; height: 12px; border-radius: 50%; background: #0288D1;"></span> 진행중
-                                    </span>
-                                    <span style="display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6B7280;">
-                                        <span style="width: 12px; height: 12px; border-radius: 50%; border: 2px solid #E5E7EB; background: white;"></span> 예정
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- 제출 문서 -->
-                        <div style="width: 100%; max-width: 100%; overflow: hidden;">
-                            <h3 style="font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px;">제출 문서</h3>
-                            <div style="border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px; overflow: hidden; width: 100%;">
-                                ${submissionsHtml}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-
-        // 기존 모달 제거 후 새 모달 추가
-        const existingModal = document.getElementById('student-detail-modal');
-        if (existingModal) existingModal.remove();
-
-        document.body.insertAdjacentHTML('beforeend', modalHtml);
-
-        // ESC 키로 닫기
-        document.addEventListener('keydown', handleModalEsc);
-    }
-
-    // 모달 닫기
-    function closeStudentDetailModal() {
-        const modal = document.getElementById('student-detail-modal');
-        if (modal) modal.remove();
-        document.removeEventListener('keydown', handleModalEsc);
-    }
-
-    function handleModalEsc(e) {
-        if (e.key === 'Escape') closeStudentDetailModal();
-    }
 
     // 초기화
     document.addEventListener('DOMContentLoaded', function() {
@@ -2024,6 +1812,8 @@
     <script src="assets/js/journal-review.js?v=20251219002"></script>
     <!-- ✨ 새로운 주차별 지도 관리 (관리자 UI 기반 + 실적 입력 기능) -->
     <script src="assets/js/weekly-guidance.js?v=20260122006"></script>
+    <!-- 학생 상세정보 모달 (공통) -->
+    <script src="assets/js/student-detail-modal.js?v=20260210"></script>
     <!-- ✨ 학기별 지도 계획 V2 (테이블 방식 + 댓글 방식 실적 입력) -->
     <script src="assets/js/semester-guidance-v2.js?v=20260122006"></script>
     <script src="assets/js/feedback-data.js?v=20260128120001"></script>

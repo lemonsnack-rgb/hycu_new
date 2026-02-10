@@ -19,6 +19,7 @@ const STUDENTS_WITH_ADVISORS = [
         major: '교육공학',
         degree: '석사',
         stage: 'research_proposal',
+        basicStageName: '예비심사',
         advisors: [
             { id: 'P001', name: '김교수', role: 'primary', department: '교육공학과' },
             { id: 'P002', name: '홍교수', role: 'secondary', department: '교육공학과' }
@@ -36,6 +37,7 @@ const STUDENTS_WITH_ADVISORS = [
         major: '경영학',
         degree: '박사',
         stage: 'mid_thesis',
+        basicStageName: '프로포절',
         advisors: [
             { id: 'P001', name: '김교수', role: 'primary', department: '경영학과' }
         ],
@@ -51,6 +53,7 @@ const STUDENTS_WITH_ADVISORS = [
         major: '컴퓨터공학',
         degree: '석사',
         stage: 'thesis_plan',
+        basicStageName: '본심사',
         advisors: [
             { id: 'P001', name: '김교수', role: 'secondary', department: '컴퓨터공학과' },
             { id: 'P003', name: '최교수', role: 'primary', department: '컴퓨터공학과' }

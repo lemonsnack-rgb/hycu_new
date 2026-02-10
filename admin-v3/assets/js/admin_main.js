@@ -4247,7 +4247,7 @@ function renderStudentTableRows(data) {
 
                 <!-- 성명 -->
                 <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                    ${item.studentName}
+                    <a href="#" onclick="event.stopPropagation(); showStudentDetailModal({stdNo:'${item.studentNumber}', name:'${item.studentName}', dept:'${item.department}', degree:'${item.degreeType}', stage:'${(item.currentStageName || "-").replace(/'/g, "\\'")}', status:'${studentStatus}', advisor:'${advisorName}'}); return false;" class="text-primary hover:underline cursor-pointer">${item.studentName}</a>
                 </td>
 
                 <!-- 지도교수명 -->
