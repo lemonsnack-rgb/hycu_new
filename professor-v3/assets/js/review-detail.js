@@ -429,75 +429,100 @@ function renderPassFailForm(template, savedData) {
         <div class="bg-white rounded-lg shadow-md p-6 mb-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">${template.name}</h3>
 
-            <div id="passfail-items" class="space-y-4">
-                ${template.items.map((item, index) => {
-                    const savedResult = savedData.passFailResults?.find(r => r.itemId === item.id);
-                    const currentResult = savedResult?.result || '';
-                    const currentComment = savedResult?.comment || '';
+            <!-- 데스크톱 테이블 -->
+            <div class="evaluation-table-desktop hidden md:block">
+                <div class="table-scroll">
+                    <table class="min-w-full border-collapse border border-gray-300">
+                        <thead>
+                            <tr class="bg-gray-50">
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 60px;">순번</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 150px;">평가 항목</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 200px;">평가 기준</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 80px;">Pass</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="width: 80px;">Fail</th>
+                                <th class="border border-gray-300 px-2 py-1.5 text-center text-sm" style="min-width: 250px;">평가 의견</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${template.items.map((item, index) => {
+                                const savedResult = savedData.passFailResults?.find(r => r.itemId === item.id);
+                                const currentResult = savedResult?.result || '';
+                                const currentComment = savedResult?.comment || '';
 
-                    return `
-                        <div style="margin-bottom: 1.5rem; padding: 1rem; background: white; border: 2px solid #d1d5db; border-radius: 0.5rem;"
-                             data-item-id="${item.id}">
-                            <div style="display: flex !important; justify-content: space-between !important; align-items: flex-start !important; margin-bottom: 1rem;">
-                                <div style="flex: 1 1 0%;">
-                                    <h4 style="font-weight: 700; color: #1f2937; margin-bottom: 0.25rem;">
-                                        ${index + 1}. ${item.name}
-                                    </h4>
-                                    ${item.description ? `
-                                        <div style="margin-top: 0.5rem; background: #f9fafb; border: 1px solid #d1d5db; border-radius: 0.25rem; padding: 0.75rem;">
-                                            <p style="font-size: 0.75rem; color: #111827; font-weight: 500; margin-bottom: 0.25rem;">판단 기준:</p>
-                                            <p style="font-size: 0.75rem; color: #374151;">${item.description}</p>
-                                        </div>
-                                    ` : ''}
-                                </div>
-                            </div>
-
-                            <div class="space-y-3">
-                                <div class="flex items-center gap-4">
-                                    <label class="text-sm font-medium text-gray-700">판정:</label>
-                                    <div class="flex gap-3">
-                                        <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'} hover:border-green-400">
+                                return `
+                                    <tr class="hover:bg-gray-50" data-item-id="${item.id}">
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center text-gray-700 text-sm">${index + 1}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 font-medium text-gray-900 text-sm">${item.name}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-xs text-gray-600">${item.description || '-'}</td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center">
                                             <input type="radio"
                                                    name="result-${item.id}"
                                                    value="pass"
                                                    class="passfail-radio"
                                                    data-item-id="${item.id}"
                                                    ${currentResult === 'pass' ? 'checked' : ''}>
-                                            <span class="font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
-                                        </label>
-                                        <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'} hover:border-red-400">
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-1.5 text-center">
                                             <input type="radio"
                                                    name="result-${item.id}"
                                                    value="fail"
                                                    class="passfail-radio"
                                                    data-item-id="${item.id}"
                                                    ${currentResult === 'fail' ? 'checked' : ''}>
-                                            <span class="font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
-                                        </label>
-                                    </div>
+                                        </td>
+                                        <td class="border border-gray-300 px-2 py-1">
+                                            <textarea class="passfail-comment w-full border border-gray-300 rounded p-1 text-xs"
+                                                      rows="2"
+                                                      placeholder="평가 의견"
+                                                      data-item-id="${item.id}">${currentComment}</textarea>
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 모바일 카드 뷰 -->
+            <div id="passfail-items" class="evaluation-table-mobile block md:hidden">
+                ${template.items.map((item, index) => {
+                    const savedResult = savedData.passFailResults?.find(r => r.itemId === item.id);
+                    const currentResult = savedResult?.result || '';
+                    const currentComment = savedResult?.comment || '';
+
+                    return `
+                        <div class="bg-white border-2 border-gray-200 rounded-lg p-4 mb-4" data-item-id="${item.id}">
+                            <div class="font-bold text-gray-800 mb-2">${index + 1}. ${item.name}</div>
+                            ${item.description ? `
+                                <div class="text-xs text-gray-600 mb-3 bg-gray-50 p-2 rounded">${item.description}</div>
+                            ` : ''}
+                            <div class="flex items-center gap-4 mb-2">
+                                <label class="text-sm font-medium text-gray-700">판정:</label>
+                                <div class="flex gap-3">
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'pass' ? 'border-green-500 bg-green-50' : 'border-gray-300 bg-white'}">
+                                        <input type="radio" name="result-${item.id}" value="pass"
+                                               class="passfail-radio" data-item-id="${item.id}"
+                                               ${currentResult === 'pass' ? 'checked' : ''}>
+                                        <span class="font-medium ${currentResult === 'pass' ? 'text-green-700' : 'text-gray-700'}">Pass</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer p-2 px-4 rounded-lg border-2 ${currentResult === 'fail' ? 'border-red-500 bg-red-50' : 'border-gray-300 bg-white'}">
+                                        <input type="radio" name="result-${item.id}" value="fail"
+                                               class="passfail-radio" data-item-id="${item.id}"
+                                               ${currentResult === 'fail' ? 'checked' : ''}>
+                                        <span class="font-medium ${currentResult === 'fail' ? 'text-red-700' : 'text-gray-700'}">Fail</span>
+                                    </label>
                                 </div>
-                                <div>
-                                    <label class="text-sm font-medium text-gray-700 block">평가 의견:</label>
-                                    <textarea class="passfail-comment w-full border border-gray-300 rounded-lg p-2 text-sm mt-1"
-                                              rows="2"
-                                              placeholder="해당 항목에 대한 의견을 작성해주세요"
-                                              data-item-id="${item.id}">${currentComment}</textarea>
-                                </div>
+                            </div>
+                            <div>
+                                <label class="text-xs font-medium text-gray-700 block mb-1">평가 의견:</label>
+                                <textarea class="passfail-comment w-full border border-gray-300 rounded p-2 text-xs"
+                                          rows="2" placeholder="평가 의견을 입력하세요"
+                                          data-item-id="${item.id}">${currentComment}</textarea>
                             </div>
                         </div>
                     `;
                 }).join('')}
-            </div>
-
-            <!-- 최종 결과 -->
-            <div class="mt-6 bg-gray-50 border-2 border-gray-300 rounded-lg p-4">
-                <div class="flex items-center justify-between">
-                    <h4 class="text-lg font-bold text-gray-800">최종 결과</h4>
-                    <div id="passfail-result" class="text-2xl font-bold text-gray-400">미완료</div>
-                </div>
-                <p class="text-sm text-gray-600 mt-1 text-right" id="passfail-summary">
-                    ${passCriteria.description || '통과 기준 설정 필요'}
-                </p>
             </div>
 
             <!-- 종합 의견 -->

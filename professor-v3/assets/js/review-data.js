@@ -875,18 +875,18 @@ const REVIEW_ASSIGNMENTS = [
         committee: [
             {
                 id: 'C017',
-                professorId: 'P003',
-                professorName: '김교수',
+                professorId: 'P002',
+                professorName: '이교수',
                 role: 'chair',
-                department: '인공지능학과',
+                department: '전자공학과',
                 assignedDate: '2025-11-10'
             },
             {
                 id: 'C018',
-                professorId: 'P002',
-                professorName: '이교수',
+                professorId: 'P003',
+                professorName: '김교수',
                 role: 'member',
-                department: '전자공학과',
+                department: '인공지능학과',
                 assignedDate: '2025-11-10'
             },
             {
@@ -934,18 +934,18 @@ const REVIEW_ASSIGNMENTS = [
         committee: [
             {
                 id: 'C020',
-                professorId: 'P003',
-                professorName: '김교수',
+                professorId: 'P002',
+                professorName: '이교수',
                 role: 'chair',
-                department: '인공지능학과',
+                department: '전자공학과',
                 assignedDate: '2025-11-12'
             },
             {
                 id: 'C021',
-                professorId: 'P004',
-                professorName: '정교수',
+                professorId: 'P003',
+                professorName: '김교수',
                 role: 'member',
-                department: '경영학과',
+                department: '인공지능학과',
                 assignedDate: '2025-11-12'
             },
             {
@@ -994,18 +994,18 @@ const REVIEW_ASSIGNMENTS = [
         committee: [
             {
                 id: 'C023',
-                professorId: 'P003',
-                professorName: '김교수',
+                professorId: 'P002',
+                professorName: '이교수',
                 role: 'chair',
-                department: '인공지능학과',
+                department: '전자공학과',
                 assignedDate: '2025-11-14'
             },
             {
                 id: 'C024',
-                professorId: 'P007',
-                professorName: '최교수',
+                professorId: 'P003',
+                professorName: '김교수',
                 role: 'member',
-                department: '생명과학과',
+                department: '인공지능학과',
                 assignedDate: '2025-11-14'
             },
             {
