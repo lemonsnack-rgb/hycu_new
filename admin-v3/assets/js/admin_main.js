@@ -3043,29 +3043,24 @@ function sendNotificationToSelectedStudents(viewType) {
 // ========== 알림 발송 모달 열기 ==========
 function openAdminNotificationModal(students, viewType) {
     const modal = document.createElement('div');
-    modal.className = 'modal-backdrop active';
+    modal.className = 'modal-overlay show';
     modal.id = 'admin-notification-modal';
-
-    const studentList = students.map(s => `${s.name} (${s.studentId})`).join(', ');
+    modal.onclick = function(e) { if (e.target === this) closeAdminNotificationModal(); };
 
     modal.innerHTML = `
         <div class="modal-content" style="max-width: 600px; width: 90%;">
-            <div class="p-6 border-b">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-xl font-bold text-gray-800">알림 발송</h3>
-                    <button onclick="closeAdminNotificationModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
-                </div>
+            <div class="modal-header">
+                <h3>알림 발송</h3>
+                <button class="modal-close" onclick="closeAdminNotificationModal()">&times;</button>
             </div>
 
-            <div class="p-6">
+            <div class="modal-body">
                 <!-- 발송 대상 -->
                 <div class="mb-4">
                     <label class="block text-sm font-medium text-gray-700 mb-2">
-                        발송 대상 (${students.length}명)
+                        발송 대상
                     </label>
-                    <div class="bg-gray-50 p-3 rounded-lg border border-gray-200 max-h-32 overflow-y-auto">
-                        <p class="text-sm text-gray-700">${studentList}</p>
-                    </div>
+                    <p class="text-sm text-gray-600">선택된 ${students.length}명에게 발송됩니다.</p>
                 </div>
 
                 <!-- 발송 방법 선택 -->
@@ -3075,12 +3070,12 @@ function openAdminNotificationModal(students, viewType) {
                     </label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="admin-notification-type" value="kakao" checked class="rounded-full">
-                            <span class="text-sm text-gray-700">카카오톡</span>
+                            <input type="radio" name="admin-notification-type" value="sms" checked class="rounded-full">
+                            <span class="text-sm text-gray-700">SMS</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="admin-notification-type" value="sms" class="rounded-full">
-                            <span class="text-sm text-gray-700">SMS</span>
+                            <input type="radio" name="admin-notification-type" value="email" class="rounded-full">
+                            <span class="text-sm text-gray-700">이메일</span>
                         </label>
                     </div>
                 </div>
@@ -3170,16 +3165,21 @@ function submitAdminNotification() {
     }
 
     const { students, viewType } = window._adminNotificationCallback;
-    const notifTypeText = notificationType === 'kakao' ? '카카오톡' : 'SMS';
+    const notifTypeText = notificationType === 'sms' ? 'SMS' : '이메일';
 
-    // 실제로는 서버에 알림 전송 요청
-    console.log('관리자 알림 발송:', {
-        viewType,
-        students,
-        title,
-        message,
-        type: notificationType
-    });
+    // SMS API 규격 파라미터 (Mock - 실제 연동 시 사용)
+    const smsApiParams = {
+        sysCd: 'UNI000001',
+        orgCd: 'ORG000001',
+        bussGbn: 'TGS',
+        alarmType: notificationType === 'sms' ? 'S' : 'E',
+        rcvUserInfoStr: students.map(s =>
+            `${s.id};${s.name};${s.studentId};`
+        ).join('|'),
+        title: title,
+        message: message
+    };
+    console.log('SMS API 파라미터:', smsApiParams);
 
     showNotification(`${students.length}명의 학생에게 ${notifTypeText} 알림이 발송되었습니다`, 'success');
 

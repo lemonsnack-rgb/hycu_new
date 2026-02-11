@@ -1182,24 +1182,16 @@ function sendNotificationToSelectedPairs() {
     }
 
     const students = Array.from(checkboxes).map(cb => ({
-        studentId: cb.value,
-        name: cb.getAttribute('data-name')
+        id: cb.value,
+        name: cb.getAttribute('data-name'),
+        studentId: cb.value
     }));
 
-    const studentNames = students.map(s => s.name).join(', ');
-
-    if (confirm(`${students.length}명의 학생에게 알림을 발송하시겠습니까?\n\n학생: ${studentNames}`)) {
-        console.log('알림 발송 대상:', students);
-        if (typeof showAlert === 'function') {
-            showAlert(`${students.length}명의 학생에게 알림이 발송되었습니다.`);
-        } else {
-            alert(`${students.length}명의 학생에게 알림이 발송되었습니다.`);
-        }
-
-        // 체크박스 초기화
-        checkboxes.forEach(cb => cb.checked = false);
-        const selectAll = document.getElementById('select-all-pairs');
-        if (selectAll) selectAll.checked = false;
+    // openAdminNotificationModal 사용 (admin_main.js)
+    if (typeof openAdminNotificationModal === 'function') {
+        openAdminNotificationModal(students, 'weeklyGuidance');
+    } else {
+        alert(`${students.length}명의 학생에게 알림이 발송되었습니다.`);
     }
 }
 
