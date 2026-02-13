@@ -53,7 +53,7 @@ const AvailableSlotModal = {
         return ModalBase.renderContainer('available-slot-modal', `
             <!-- 헤더 -->
             <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                <h3 class="text-xl font-semibold text-gray-900">지도가능 시간 등록</h3>
+                <h3 id="slot-modal-title" class="text-xl font-semibold text-gray-900">지도가능 시간 등록</h3>
                 <button onclick="AvailableSlotModal.close()" class="text-gray-400 hover:text-gray-600">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -66,21 +66,31 @@ const AvailableSlotModal = {
                 <p class="text-sm text-gray-600 mb-6">학생들이 선택할 수 있는 가능한 시간대를 설정합니다.</p>
 
                 <div class="space-y-3 mb-4">
-                    <!-- 요일 선택 -->
+                    <!-- 반복 일정 토글 -->
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
-                            요일 <span class="text-red-600">*</span>
+                            반복 일정
                         </label>
-                        <select id="slot-dayOfWeek" onchange="AvailableSlotModal.toggleFields()" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
-                            <option value="none">반복 안 함</option>
-                            <option value="1">월요일</option>
-                            <option value="2">화요일</option>
-                            <option value="3">수요일</option>
-                            <option value="4">목요일</option>
-                            <option value="5">금요일</option>
-                            <option value="6">토요일</option>
-                            <option value="0">일요일</option>
-                        </select>
+                        <label class="inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="slot-isRecurring" onchange="AvailableSlotModal.toggleFields()" class="mr-2 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]">
+                            <span class="text-sm text-gray-700">반복 일정으로 등록</span>
+                        </label>
+                    </div>
+
+                    <!-- 반복 요일 (반복일 때만 표시) -->
+                    <div id="dayOfWeek-field" class="flex items-center gap-2 hidden">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
+                            반복 요일 <span class="text-red-600">*</span>
+                        </label>
+                        <div class="flex flex-wrap gap-3">
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="1" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">월</span></label>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="2" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">화</span></label>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="3" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">수</span></label>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="4" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">목</span></label>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="5" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">금</span></label>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="6" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">토</span></label>
+                            <label class="inline-flex items-center cursor-pointer"><input type="checkbox" name="slot-dayOfWeek" value="0" class="mr-1 w-4 h-4 text-[#6A0028] rounded focus:ring-[#6A0028]"><span class="text-sm">일</span></label>
+                        </div>
                     </div>
 
                     <!-- 날짜 (반복 안 함일 때만 표시) -->
@@ -91,36 +101,26 @@ const AvailableSlotModal = {
                         <input type="date" id="slot-date" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
                     </div>
 
-                    <!-- 시작일 (반복일 때만 표시) -->
-                    <div id="startDate-field" class="flex items-center gap-2 hidden">
+                    <!-- 기간 (반복일 때만 표시) - 한 행에 시작일 ~ 종료일 -->
+                    <div id="period-field" class="flex items-center gap-2 hidden">
                         <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
-                            시작일 <span class="text-red-600">*</span>
+                            기간 <span class="text-red-600">*</span>
                         </label>
-                        <input type="date" id="slot-startDate" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
+                        <input type="date" id="slot-startDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
+                        <span class="text-gray-500">~</span>
+                        <input type="date" id="slot-endDate" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
                     </div>
 
-                    <!-- 종료일 (반복일 때만 표시) -->
-                    <div id="endDate-field" class="flex items-center gap-2 hidden">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
-                            종료일 <span class="text-red-600">*</span>
-                        </label>
-                        <input type="date" id="slot-endDate" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
-                    </div>
-
-                    <!-- 시간 (항상 표시) -->
+                    <!-- 시간 + 소요시간 (한 행) -->
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
                             시간 <span class="text-red-600">*</span>
                         </label>
-                        <input type="time" id="slot-time" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
-                    </div>
-
-                    <!-- 소요 시간 -->
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap" style="width: 100px;">
-                            소요 시간 <span class="text-red-600">*</span>
+                        <input type="time" id="slot-time" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
+                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap ml-4">
+                            소요시간 <span class="text-red-600">*</span>
                         </label>
-                        <select id="slot-duration" class="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
+                        <select id="slot-duration" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#6A0028]">
                             <option value="30">30분</option>
                             <option value="60" selected>60분</option>
                             <option value="90">90분</option>
@@ -147,7 +147,7 @@ const AvailableSlotModal = {
                         class="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50">
                     취소
                 </button>
-                <button onclick="AvailableSlotModal.save()"
+                <button id="slot-submit-btn" onclick="AvailableSlotModal.save()"
                         class="px-6 py-2 bg-[#6A0028] text-white rounded-lg hover:bg-[#8A0034]">
                     등록
                 </button>
@@ -158,30 +158,97 @@ const AvailableSlotModal = {
     /**
      * 모달 열기
      */
+    _editMode: null,
+
     open() {
+        this._editMode = null;
         ModalBase.open('available-slot-modal');
+
+        // 제목/버튼 초기화
+        const title = document.getElementById('slot-modal-title');
+        if (title) title.textContent = '지도가능 시간 등록';
+        const btn = document.getElementById('slot-submit-btn');
+        if (btn) btn.textContent = '등록';
+
+        // 반복 토글 초기화
+        const isRecurringCb = document.getElementById('slot-isRecurring');
+        if (isRecurringCb) isRecurringCb.checked = false;
+
+        // 요일 체크박스 초기화
+        document.querySelectorAll('input[name="slot-dayOfWeek"]').forEach(cb => cb.checked = false);
 
         // 오늘 날짜 기본값 설정
         const today = new Date().toISOString().split('T')[0];
         const slotDateInput = document.getElementById('slot-date');
-        if (slotDateInput) {
-            slotDateInput.value = today;
-        }
+        if (slotDateInput) slotDateInput.value = today;
 
-        // 반복 일정용 날짜 기본값
         const slotStartDateInput = document.getElementById('slot-startDate');
-        if (slotStartDateInput) {
-            slotStartDateInput.value = today;
-        }
+        if (slotStartDateInput) slotStartDateInput.value = today;
 
         const endDate = new Date();
         endDate.setMonth(endDate.getMonth() + 3);
         const slotEndDateInput = document.getElementById('slot-endDate');
-        if (slotEndDateInput) {
-            slotEndDateInput.value = endDate.toISOString().split('T')[0];
+        if (slotEndDateInput) slotEndDateInput.value = endDate.toISOString().split('T')[0];
+
+        // 시간/소요시간/미팅방식 초기화
+        const timeInput = document.getElementById('slot-time');
+        if (timeInput) timeInput.value = '';
+        const durationSelect = document.getElementById('slot-duration');
+        if (durationSelect) durationSelect.value = '60';
+        const meetingTypeSelect = document.getElementById('slot-meetingType');
+        if (meetingTypeSelect) meetingTypeSelect.value = 'online';
+
+        this.toggleFields();
+    },
+
+    /**
+     * 수정 모드로 모달 열기
+     */
+    openForEdit(slot, isRecurring) {
+        this._editMode = {
+            isEdit: true,
+            isRecurring: isRecurring,
+            slotIdOrGroupId: isRecurring ? slot.recurringGroupId : slot.id,
+            originalSlot: slot
+        };
+
+        ModalBase.open('available-slot-modal');
+
+        // 제목/버튼 변경
+        const title = document.getElementById('slot-modal-title');
+        if (title) title.textContent = '지도가능 시간 수정';
+        const btn = document.getElementById('slot-submit-btn');
+        if (btn) btn.textContent = '수정';
+
+        // 요일 체크박스 초기화
+        document.querySelectorAll('input[name="slot-dayOfWeek"]').forEach(cb => cb.checked = false);
+
+        if (isRecurring) {
+            // 반복일정 pre-fill
+            document.getElementById('slot-isRecurring').checked = true;
+
+            const daysArray = Array.isArray(slot.recurringDayOfWeek)
+                ? slot.recurringDayOfWeek
+                : [slot.recurringDayOfWeek];
+
+            daysArray.forEach(day => {
+                const cb = document.querySelector(`input[name="slot-dayOfWeek"][value="${day}"]`);
+                if (cb) cb.checked = true;
+            });
+
+            document.getElementById('slot-startDate').value = slot.recurringStartDate;
+            document.getElementById('slot-endDate').value = slot.recurringEndDate;
+        } else {
+            // 일반일정 pre-fill
+            document.getElementById('slot-isRecurring').checked = false;
+            document.getElementById('slot-date').value = slot.date;
         }
 
-        // 초기 필드 표시 상태 설정 (반복 안 함이 기본)
+        // 공통 필드 pre-fill
+        document.getElementById('slot-time').value = slot.time;
+        document.getElementById('slot-duration').value = String(slot.duration);
+        document.getElementById('slot-meetingType').value = slot.meetingType;
+
         this.toggleFields();
     },
 
@@ -190,27 +257,28 @@ const AvailableSlotModal = {
      */
     close() {
         ModalBase.close('available-slot-modal');
+        this._editMode = null;
     },
 
     /**
      * 필드 표시 토글 (요일 선택에 따라)
      */
     toggleFields() {
-        const dayOfWeek = document.getElementById('slot-dayOfWeek').value;
+        const isRecurring = document.getElementById('slot-isRecurring').checked;
         const dateField = document.getElementById('date-field');
-        const startDateField = document.getElementById('startDate-field');
-        const endDateField = document.getElementById('endDate-field');
+        const dayOfWeekField = document.getElementById('dayOfWeek-field');
+        const periodField = document.getElementById('period-field');
 
-        if (dayOfWeek === 'none') {
-            // 반복 안 함: 날짜 필드만 표시
-            dateField.classList.remove('hidden');
-            startDateField.classList.add('hidden');
-            endDateField.classList.add('hidden');
-        } else {
-            // 반복: 시작일/종료일 필드 표시
+        if (isRecurring) {
+            // 반복: 요일 + 기간 표시, 단일 날짜 숨김
             dateField.classList.add('hidden');
-            startDateField.classList.remove('hidden');
-            endDateField.classList.remove('hidden');
+            dayOfWeekField.classList.remove('hidden');
+            periodField.classList.remove('hidden');
+        } else {
+            // 1회성: 날짜만 표시
+            dateField.classList.remove('hidden');
+            dayOfWeekField.classList.add('hidden');
+            periodField.classList.add('hidden');
         }
     },
 
@@ -218,30 +286,36 @@ const AvailableSlotModal = {
      * 저장
      */
     save() {
-        const dayOfWeek = document.getElementById('slot-dayOfWeek').value;
+        const isEditMode = this._editMode && this._editMode.isEdit;
+        const isRecurring = document.getElementById('slot-isRecurring').checked;
         const time = document.getElementById('slot-time').value;
         const duration = parseInt(document.getElementById('slot-duration').value);
         const meetingType = document.getElementById('slot-meetingType').value;
 
-        if (dayOfWeek === 'none') {
-            // 반복 안 함: 특정 날짜 1회 등록
+        // 수정 모드: 기존 일정 먼저 삭제
+        if (isEditMode) {
+            if (this._editMode.isRecurring) {
+                DataServiceV3.deleteRecurringGroup(this._editMode.slotIdOrGroupId);
+            } else {
+                DataServiceV3.deleteAvailableSlot(this._editMode.slotIdOrGroupId);
+            }
+        }
+
+        const actionText = isEditMode ? '수정' : '등록';
+
+        if (!isRecurring) {
+            // 1회성 일정
             const date = document.getElementById('slot-date').value;
 
-            // 검증
             const validation = ValidationUtils.validateRequired({
                 '날짜': date,
                 '시간': time
             });
+            if (!validation.isValid) { alert(validation.message); return; }
 
-            if (!validation.isValid) {
-                alert(validation.message);
-                return;
-            }
-
-            const dateValidation = ValidationUtils.validateFutureDate(date);
-            if (!dateValidation.isValid) {
-                alert(dateValidation.message);
-                return;
+            if (!isEditMode) {
+                const dateValidation = ValidationUtils.validateFutureDate(date);
+                if (!dateValidation.isValid) { alert(dateValidation.message); return; }
             }
 
             const slotData = {
@@ -256,37 +330,36 @@ const AvailableSlotModal = {
             };
 
             DataServiceV3.addAvailableSlot(slotData);
-
-            alert('가능시간이 등록되었습니다.');
+            alert(`가능시간이 ${actionText}되었습니다.`);
         } else {
-            // 반복 일정: 해당 요일마다 반복
+            // 반복일정: 복수 요일
+            const selectedDays = Array.from(document.querySelectorAll('input[name="slot-dayOfWeek"]:checked'))
+                .map(cb => parseInt(cb.value));
+
             const startDate = document.getElementById('slot-startDate').value;
             const endDate = document.getElementById('slot-endDate').value;
 
-            // 검증
+            if (selectedDays.length === 0) {
+                alert('반복 요일을 1개 이상 선택해주세요.');
+                return;
+            }
+
             const validation = ValidationUtils.validateRequired({
                 '시간': time,
                 '시작일': startDate,
                 '종료일': endDate
             });
+            if (!validation.isValid) { alert(validation.message); return; }
 
-            if (!validation.isValid) {
-                alert(validation.message);
-                return;
-            }
-
-            // 반복 일정 전개: 시작일부터 종료일까지 해당 요일의 모든 날짜 계산
-            const dates = this.calculateRepeatDates(startDate, endDate, parseInt(dayOfWeek));
+            const dates = this.calculateRepeatDatesMultipleDays(startDate, endDate, selectedDays);
 
             if (dates.length === 0) {
                 alert('선택한 기간에 해당하는 요일이 없습니다.');
                 return;
             }
 
-            // 반복일정 그룹 ID 생성
             const recurringGroupId = `REC_${startDate.replace(/-/g, '')}_${Date.now()}`;
 
-            // 각 날짜마다 개별 일정 생성 (반복일정 메타데이터 포함)
             dates.forEach(date => {
                 const slotData = {
                     type: 'oneTime',
@@ -297,23 +370,20 @@ const AvailableSlotModal = {
                     meetingType: meetingType,
                     startDate: date,
                     endDate: date,
-
-                    // 반복일정 메타데이터
                     isRecurring: true,
                     recurringGroupId: recurringGroupId,
-                    recurringDayOfWeek: parseInt(dayOfWeek),
+                    recurringDayOfWeek: selectedDays,
                     recurringStartDate: startDate,
                     recurringEndDate: endDate
                 };
                 DataServiceV3.addAvailableSlot(slotData);
             });
 
-            alert(`${dates.length}개의 가능시간이 등록되었습니다.`);
+            alert(`${dates.length}개의 가능시간이 ${actionText}되었습니다.`);
         }
 
         this.close();
 
-        // 목록 새로고침 (필요시)
         if (typeof MeetingList !== 'undefined' && typeof MeetingList.refresh === 'function') {
             MeetingList.refresh();
         }
@@ -340,6 +410,25 @@ const AvailableSlotModal = {
                 dates.push(dateStr);
             }
             // 다음 날로 이동
+            current.setDate(current.getDate() + 1);
+        }
+
+        return dates;
+    },
+
+    /**
+     * 복수 요일 반복 일정 날짜 계산
+     */
+    calculateRepeatDatesMultipleDays(startDate, endDate, targetDaysOfWeek) {
+        const dates = [];
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+
+        let current = new Date(start);
+        while (current <= end) {
+            if (targetDaysOfWeek.includes(current.getDay())) {
+                dates.push(current.toISOString().split('T')[0]);
+            }
             current.setDate(current.getDate() + 1);
         }
 
@@ -766,10 +855,16 @@ const ManageSlotsModal = {
                             </div>
                         </div>
 
-                        <button onclick="ManageSlotsModal.deleteRecurringGroup('${slot.recurringGroupId}')"
-                                class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
-                            삭제
-                        </button>
+                        <div class="flex gap-1">
+                            <button onclick="ManageSlotsModal.editSlotGroup('${slot.recurringGroupId}', true)"
+                                    class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded">
+                                수정
+                            </button>
+                            <button onclick="ManageSlotsModal.deleteRecurringGroup('${slot.recurringGroupId}')"
+                                    class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
+                                삭제
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -794,10 +889,16 @@ const ManageSlotsModal = {
                             </div>
                         </div>
 
-                        <button onclick="ManageSlotsModal.deleteSlot('${slot.id}')"
-                                class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
-                            삭제
-                        </button>
+                        <div class="flex gap-1">
+                            <button onclick="ManageSlotsModal.editSlotGroup('${slot.id}', false)"
+                                    class="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded">
+                                수정
+                            </button>
+                            <button onclick="ManageSlotsModal.deleteSlot('${slot.id}')"
+                                    class="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded">
+                                삭제
+                            </button>
+                        </div>
                     </div>
                 </div>
             `;
@@ -809,7 +910,26 @@ const ManageSlotsModal = {
      */
     getDayOfWeekText(dayOfWeek) {
         const days = ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'];
-        return days[dayOfWeek] || '';
+
+        // 하위호환: 단일 숫자
+        if (typeof dayOfWeek === 'number') {
+            return days[dayOfWeek] || '';
+        }
+
+        // 배열: 복수 요일
+        if (Array.isArray(dayOfWeek)) {
+            if (dayOfWeek.length === 0) return '';
+            if (dayOfWeek.length === 1) return days[dayOfWeek[0]] || '';
+
+            const sorted = [...dayOfWeek].sort((a, b) => a - b);
+            const names = sorted.map((d, i) => {
+                const full = days[d] || '';
+                return i === sorted.length - 1 ? full : full.replace('요일', '');
+            });
+            return names.join(', ');
+        }
+
+        return '';
     },
 
     /**
@@ -878,6 +998,31 @@ const ManageSlotsModal = {
 
         // 모달 다시 열기 (새로고침)
         this.open();
+    },
+
+    /**
+     * 일정 수정 (조회 모달 → 등록 모달)
+     */
+    editSlotGroup(slotIdOrGroupId, isRecurring) {
+        const slots = DataServiceV3.getAvailableSlots();
+
+        let representativeSlot;
+        if (isRecurring) {
+            representativeSlot = slots.find(s => s.recurringGroupId === slotIdOrGroupId);
+        } else {
+            representativeSlot = slots.find(s => s.id === slotIdOrGroupId);
+        }
+
+        if (!representativeSlot) {
+            alert('일정 정보를 찾을 수 없습니다.');
+            return;
+        }
+
+        // 조회 모달 닫기
+        this.close();
+
+        // 등록 모달 열기 (수정 모드)
+        AvailableSlotModal.openForEdit(representativeSlot, isRecurring);
     }
 };
 
