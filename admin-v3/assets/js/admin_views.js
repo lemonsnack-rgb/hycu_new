@@ -3886,7 +3886,7 @@ const views = {
             <div class="bg-white rounded-lg shadow-md">
                 <div class="p-6 border-b">
                     <h3 class="text-lg font-bold text-gray-800">권한 관리</h3>
-                    <p class="text-sm text-gray-600 mt-1">소속 > 신분 > 상태 순으로 이용자를 필터링하고 메뉴 권한을 부여합니다.</p>
+                    <p class="text-sm text-gray-600 mt-1">소속/신분/상태 조합, 역할그룹, 개인별로 관리자 메뉴 접근 권한을 설정합니다.</p>
                 </div>
                 <div id="perm-page-content">
                     ${renderPermissionPage()}
@@ -5642,12 +5642,14 @@ views.menuManagement = () => {
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(한글)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(영어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(중국어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(한글)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(영어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(중국어명)</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">경로</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 70px;">사용여부</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">경로</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">관리자</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">교수</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">학생</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
                             </tr>
                         </thead>
@@ -5659,7 +5661,7 @@ views.menuManagement = () => {
         </div>
 
         <!-- Section 2: 메뉴 관리 -->
-        <div class="bg-white rounded-lg shadow-md">
+        <div class="bg-white rounded-lg shadow-md mb-6">
             <div class="p-6 border-b">
                 <h2 class="text-2xl font-bold text-gray-800">메뉴 관리</h2>
                 <p class="text-sm text-gray-600 mt-2">하위 메뉴의 이름, 상위메뉴, 경로 등을 관리합니다.</p>
@@ -5682,14 +5684,16 @@ views.menuManagement = () => {
                         <thead class="bg-gray-50">
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(한글)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(영어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(중국어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">상위메뉴</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">경로</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 70px;">사용여부</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">메뉴명(한글)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">메뉴명(영어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">메뉴명(중국어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">상위메뉴</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">순서</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">경로</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">관리자</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">교수</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">학생</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 110px;">관리</th>
                             </tr>
                         </thead>
                         <tbody id="subMenuTableBody" class="bg-white divide-y divide-gray-200">
@@ -5697,6 +5701,13 @@ views.menuManagement = () => {
                     </table>
                 </div>
             </div>
+        </div>
+
+        <!-- 하단 저장 버튼 -->
+        <div class="flex justify-end mt-2 mb-4">
+            <button onclick="saveAllMenuChanges()" class="bg-[#6A0028] text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-opacity-90">
+                저장
+            </button>
         </div>
     `;
 };

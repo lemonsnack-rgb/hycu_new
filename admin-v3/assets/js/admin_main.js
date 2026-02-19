@@ -3229,17 +3229,7 @@ if (!window._permMenuTab) window._permMenuTab = 'admin';
 
 // === 메인 페이지 렌더링 ===
 function renderPermissionPage() {
-    // hierarchy 모드 초기 진입 시 전체 체크 + 즉시 매트릭스 표시
-    if (!window._permMode || window._permMode === 'hierarchy') {
-        if (!window._permMode) window._permMode = 'hierarchy';
-        if (window._permDeptAll === undefined) window._permDeptAll = true;
-        if (window._permPosAll === undefined) window._permPosAll = true;
-        if (window._permStatAll === undefined) window._permStatAll = true;
-        if (window._permHierarchyConfirmed === undefined) {
-            window._permHierarchyConfirmed = true;
-            window._permSelectedUsers = ['__hierarchy_target__'];
-        }
-    }
+    if (!window._permMode) window._permMode = 'hierarchy';
     return `
         <div class="p-6">
             <!-- 영역 1: 권한 부여 대상 선택 -->
@@ -3294,19 +3284,10 @@ function switchPermMode(mode) {
     window._permSelectedUsers = [];
     window._permSelectedRoleGroup = '';
     window._permSearchKeyword = '';
-    if (mode === 'hierarchy') {
-        // hierarchy 모드: 전체 체크 초기 상태 + 즉시 매트릭스 표시
-        window._permDeptAll = true;
-        window._permPosAll = true;
-        window._permStatAll = true;
-        window._permFilterDept = '';
-        window._permFilterPos = '';
-        window._permFilterStat = '';
-        window._permHierarchyConfirmed = true;
-        window._permSelectedUsers = ['__hierarchy_target__'];
-    } else {
-        window._permHierarchyConfirmed = false;
-    }
+    window._permEditingHierarchyId = null;
+    window._permFilterDept = '';
+    window._permFilterPos = '';
+    window._permFilterStat = '';
     // 전체 페이지 다시 렌더링
     const container = document.getElementById('perm-page-content');
     if (container) container.innerHTML = renderPermissionPage();
@@ -3324,18 +3305,12 @@ function renderPermTargetSection() {
 
 // === 소속/신분/상태별 모드 ===
 function renderHierarchyMode() {
+    const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
     const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
     const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
     const userStatuses = (typeof mockUserStatus !== 'undefined') ? mockUserStatus : [];
 
-    const filterDept = window._permFilterDept || '';
-    const filterPos = window._permFilterPos || '';
-    const filterStat = window._permFilterStat || '';
-
-    // 전체 체크박스 상태 (기본값: 전체=체크)
-    const deptAll = (window._permDeptAll !== undefined) ? window._permDeptAll : true;
-    const posAll = (window._permPosAll !== undefined) ? window._permPosAll : true;
-    const statAll = (window._permStatAll !== undefined) ? window._permStatAll : true;
+    const editingId = window._permEditingHierarchyId || null;
 
     // 상태 옵션
     const statusOptions = [...new Set(userStatuses.map(s => s.statusCode))].map(code => {
@@ -3343,51 +3318,141 @@ function renderHierarchyMode() {
         return { code, name: s ? s.statusName : code };
     });
 
-    return `
-        <div class="border rounded-lg">
-            <!-- 필터 바 -->
-            <div class="bg-gray-50 p-4 border-b">
-                <div class="flex items-center gap-3 flex-wrap">
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">소속</label>
-                        <select id="perm-filter-dept" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] ${deptAll ? 'opacity-40' : ''}" onchange="onPermFilterChange()" ${deptAll ? 'disabled' : ''}>
-                            <option value="">선택</option>
-                            ${departments.map(d => `<option value="${d.id}" ${filterDept === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}
-                        </select>
-                        <label class="flex items-center gap-1 cursor-pointer select-none">
-                            <input type="checkbox" id="perm-dept-all" ${deptAll ? 'checked' : ''} onchange="onPermAllToggle('dept', this.checked)" class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
-                            <span class="text-xs text-gray-600 whitespace-nowrap">전체</span>
-                        </label>
+    // 조합 목록 테이블
+    const tableRows = hPerms.map(hp => {
+        const deptName = hp.deptId ? (departments.find(d => d.id === hp.deptId) || {}).name || hp.deptId : '전체';
+        const posName = hp.positionId ? (positions.find(p => p.id === hp.positionId) || {}).name || hp.positionId : '전체';
+        const statusName = hp.statusCode ? (userStatuses.find(s => s.statusCode === hp.statusCode) || {}).statusName || hp.statusCode : '전체';
+        const menuCount = hp.permissions ? hp.permissions.filter(p => p.canRead).length : 0;
+        const isEditing = editingId === hp.id;
+        return `
+            <tr class="${isEditing ? 'bg-red-50' : 'hover:bg-gray-50'} border-b">
+                <td class="py-2.5 px-4 text-sm">${deptName}</td>
+                <td class="py-2.5 px-4 text-sm">${posName}</td>
+                <td class="py-2.5 px-4 text-sm">${statusName}</td>
+                <td class="py-2.5 px-4 text-sm text-center"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">${menuCount}개</span></td>
+                <td class="py-2.5 px-4 text-sm text-center">
+                    <button onclick="editHierarchyPerm('${hp.id}')" class="px-2 py-1 text-xs ${isEditing ? 'bg-[#6A0028] text-white' : 'text-[#6A0028] border border-[#6A0028]'} rounded hover:bg-[#8A0034] hover:text-white mr-1">편집</button>
+                    <button onclick="deleteHierarchyPerm('${hp.id}')" class="px-2 py-1 text-xs text-red-600 border border-red-300 rounded hover:bg-red-50">삭제</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
+
+    // 편집 영역 (조합 추가/편집 시)
+    let editSection = '';
+    if (editingId === '__new__' || (editingId && hPerms.find(h => h.id === editingId))) {
+        const editItem = editingId === '__new__' ? null : hPerms.find(h => h.id === editingId);
+        const filterDept = editItem ? editItem.deptId : (window._permFilterDept || '');
+        const filterPos = editItem ? editItem.positionId : (window._permFilterPos || '');
+        const filterStat = editItem ? editItem.statusCode : (window._permFilterStat || '');
+
+        editSection = `
+            <div class="mt-4 border rounded-lg border-[#6A0028]">
+                <div class="bg-red-50 p-3 border-b border-[#6A0028] flex justify-between items-center">
+                    <p class="text-sm font-bold text-[#6A0028]">${editingId === '__new__' ? '새 조합 추가' : '조합 편집'}</p>
+                    <button onclick="cancelHierarchyEdit()" class="text-xs text-gray-500 hover:text-gray-700">취소</button>
+                </div>
+                <div class="p-4 bg-gray-50 border-b">
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">소속</label>
+                            <select id="perm-filter-dept" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]" onchange="onPermFilterChange()">
+                                <option value="">전체</option>
+                                ${departments.map(d => `<option value="${d.id}" ${filterDept === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <span class="text-gray-300">|</span>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">신분</label>
+                            <select id="perm-filter-pos" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]" onchange="onPermFilterChange()">
+                                <option value="">전체</option>
+                                ${positions.map(p => `<option value="${p.id}" ${filterPos === p.id ? 'selected' : ''}>${p.name}</option>`).join('')}
+                            </select>
+                        </div>
+                        <span class="text-gray-300">|</span>
+                        <div class="flex items-center gap-2">
+                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">상태</label>
+                            <select id="perm-filter-stat" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]" onchange="onPermFilterChange()">
+                                <option value="">전체</option>
+                                ${statusOptions.map(s => `<option value="${s.code}" ${filterStat === s.code ? 'selected' : ''}>${s.name}</option>`).join('')}
+                            </select>
+                        </div>
                     </div>
-                    <span class="text-gray-300">|</span>
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">신분</label>
-                        <select id="perm-filter-pos" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] ${posAll ? 'opacity-40' : ''}" onchange="onPermFilterChange()" ${posAll ? 'disabled' : ''}>
-                            <option value="">선택</option>
-                            ${positions.map(p => `<option value="${p.id}" ${filterPos === p.id ? 'selected' : ''}>${p.name}</option>`).join('')}
-                        </select>
-                        <label class="flex items-center gap-1 cursor-pointer select-none">
-                            <input type="checkbox" id="perm-pos-all" ${posAll ? 'checked' : ''} onchange="onPermAllToggle('pos', this.checked)" class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
-                            <span class="text-xs text-gray-600 whitespace-nowrap">전체</span>
-                        </label>
-                    </div>
-                    <span class="text-gray-300">|</span>
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">상태</label>
-                        <select id="perm-filter-stat" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] ${statAll ? 'opacity-40' : ''}" onchange="onPermFilterChange()" ${statAll ? 'disabled' : ''}>
-                            <option value="">선택</option>
-                            ${statusOptions.map(s => `<option value="${s.code}" ${filterStat === s.code ? 'selected' : ''}>${s.name}</option>`).join('')}
-                        </select>
-                        <label class="flex items-center gap-1 cursor-pointer select-none">
-                            <input type="checkbox" id="perm-stat-all" ${statAll ? 'checked' : ''} onchange="onPermAllToggle('stat', this.checked)" class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
-                            <span class="text-xs text-gray-600 whitespace-nowrap">전체</span>
-                        </label>
-                    </div>
-                    <button onclick="resetPermFilters()" class="px-3 py-2 text-xs border border-gray-300 rounded hover:bg-gray-100 ml-1">초기화</button>
                 </div>
             </div>
+        `;
+    }
+
+    return `
+        <div class="border rounded-lg">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-sm font-medium text-gray-700">등록된 권한 조합</p>
+                    <button onclick="addHierarchyPerm()" class="px-3 py-1.5 text-xs bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">+ 새 조합 추가</button>
+                </div>
+                ${hPerms.length > 0 ? `
+                <table class="w-full table-fixed">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:22%">소속</th>
+                            <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:22%">신분</th>
+                            <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:18%">상태</th>
+                            <th class="text-center py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:15%">허용 메뉴</th>
+                            <th class="text-center py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:23%">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                ` : '<p class="text-sm text-gray-400 text-center py-4">등록된 조합이 없습니다.</p>'}
+            </div>
+            ${editSection}
         </div>
     `;
+}
+
+// 조합 편집 모드 진입
+function editHierarchyPerm(id) {
+    window._permEditingHierarchyId = id;
+    // 기존 조합의 필터값 세팅
+    const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+    const hp = hPerms.find(h => h.id === id);
+    if (hp) {
+        window._permFilterDept = hp.deptId || '';
+        window._permFilterPos = hp.positionId || '';
+        window._permFilterStat = hp.statusCode || '';
+    }
+    window._permSelectedUsers = ['__hierarchy_target__'];
+    refreshPermPage();
+}
+
+// 새 조합 추가 모드 진입
+function addHierarchyPerm() {
+    window._permEditingHierarchyId = '__new__';
+    window._permFilterDept = '';
+    window._permFilterPos = '';
+    window._permFilterStat = '';
+    window._permSelectedUsers = ['__hierarchy_target__'];
+    refreshPermPage();
+}
+
+// 조합 편집 취소
+function cancelHierarchyEdit() {
+    window._permEditingHierarchyId = null;
+    window._permSelectedUsers = [];
+    refreshPermPage();
+}
+
+// 조합 삭제
+function deleteHierarchyPerm(id) {
+    if (!confirm('이 권한 조합을 삭제하시겠습니까?')) return;
+    const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+    const idx = hPerms.findIndex(h => h.id === id);
+    if (idx >= 0) hPerms.splice(idx, 1);
+    if (window._permEditingHierarchyId === id) window._permEditingHierarchyId = null;
+    window._permSelectedUsers = [];
+    refreshPermPage();
+    showToast('권한 조합이 삭제되었습니다.', 'success');
 }
 
 // === 역할그룹별 모드 ===
@@ -3396,19 +3461,20 @@ function renderRoleGroupMode() {
     const selectedGroupId = window._permSelectedRoleGroup || '';
     const selectedGroup = roleGroups.find(g => g.id === selectedGroupId);
 
-    const userMapping = (typeof mockUserMapping !== 'undefined') ? mockUserMapping : [];
     const users = (typeof mockUsers !== 'undefined') ? mockUsers : [];
+    const userMapping = (typeof mockUserMapping !== 'undefined') ? mockUserMapping : [];
     const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
     const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
 
-    const members = selectedGroupId ? userMapping
-        .filter(m => m.roleGroupIds && m.roleGroupIds.includes(selectedGroupId))
-        .map(m => {
-            const user = users.find(u => u.username === m.userId);
-            const dept = departments.find(d => d.id === m.departmentId);
-            const pos = positions.find(p => p.id === m.positionId);
-            return { userId: m.userId, name: user ? user.name : m.userId, dept: dept ? dept.name : '-', position: pos ? pos.name : '-' };
-        }) : [];
+    // memberIds 기반으로 멤버 정보 조회
+    const members = (selectedGroup && selectedGroup.memberIds) ? selectedGroup.memberIds.map(uid => {
+        const user = users.find(u => u.username === uid);
+        const mapping = userMapping.find(m => m.userId === uid) || {};
+        const dept = departments.find(d => d.id === mapping.departmentId);
+        const pos = positions.find(p => p.id === mapping.positionId);
+        const num = user ? (user.employeeNumber || user.studentNumber || user.username) : uid;
+        return { userId: uid, name: user ? user.name : uid, num, dept: dept ? dept.name : '-', position: pos ? pos.name : '-' };
+    }) : [];
 
     return `
         <div class="border rounded-lg p-4">
@@ -3417,22 +3483,57 @@ function renderRoleGroupMode() {
                 <select id="perm-rolegroup-select" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] w-64"
                         onchange="selectPermRoleGroup(this.value)">
                     <option value="">선택하세요</option>
-                    ${roleGroups.map(g => `<option value="${g.id}" ${selectedGroupId === g.id ? 'selected' : ''}>${g.name} (${g.memberCount}명)</option>`).join('')}
+                    ${roleGroups.map(g => `<option value="${g.id}" ${selectedGroupId === g.id ? 'selected' : ''}>${g.name} (${g.memberIds ? g.memberIds.length : g.memberCount}명)</option>`).join('')}
                 </select>
+                <button onclick="openRoleGroupModal()" class="px-3 py-2 text-xs bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">+ 추가</button>
+                ${selectedGroupId ? `
+                <button onclick="openRoleGroupModal('${selectedGroupId}')" class="px-3 py-2 text-xs text-[#6A0028] border border-[#6A0028] rounded hover:bg-red-50">수정</button>
+                <button onclick="deleteRoleGroup('${selectedGroupId}')" class="px-3 py-2 text-xs text-red-600 border border-red-300 rounded hover:bg-red-50">삭제</button>
+                ` : ''}
             </div>
             ${selectedGroup ? `
             <div class="bg-gray-50 border rounded p-3">
-                <p class="text-xs text-gray-500 mb-2">조건: <code class="bg-gray-200 px-1 rounded">${selectedGroup.query}</code></p>
+                <p class="text-xs text-gray-500 mb-2">${selectedGroup.description || ''}</p>
                 <p class="text-sm font-medium text-gray-700 mb-2">소속 멤버 (${members.length}명)</p>
                 ${members.length > 0 ? `
                 <div class="flex flex-wrap gap-2">
-                    ${members.map(m => `<span class="px-2 py-1 bg-white border rounded text-xs text-gray-700">${m.name} <span class="text-gray-400">(${m.dept}/${m.position})</span></span>`).join('')}
+                    ${members.map(m => `<span class="px-2 py-1 bg-white border rounded text-xs text-gray-700">${m.num} ${m.name} <span class="text-gray-400">(${m.dept}/${m.position})</span></span>`).join('')}
                 </div>
                 ` : '<p class="text-xs text-gray-400">멤버가 없습니다.</p>'}
             </div>
             ` : '<p class="text-sm text-gray-400">역할그룹을 선택하세요.</p>'}
         </div>
     `;
+}
+
+// 역할그룹 삭제
+function deleteRoleGroup(groupId) {
+    const roleGroups = (typeof mockRoleGroups !== 'undefined') ? mockRoleGroups : [];
+    const group = roleGroups.find(g => g.id === groupId);
+    if (!group) return;
+    if (!confirm(`'${group.name}' 역할그룹을 삭제하시겠습니까?`)) return;
+
+    // mockRoleGroups에서 제거
+    const idx = roleGroups.findIndex(g => g.id === groupId);
+    if (idx >= 0) roleGroups.splice(idx, 1);
+
+    // mockRoleGroupPermissions에서 제거
+    const rgPerms = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
+    const permIdx = rgPerms.findIndex(rp => rp.roleGroupId === groupId);
+    if (permIdx >= 0) rgPerms.splice(permIdx, 1);
+
+    // mockUserMapping에서 해당 그룹 ID 제거
+    const userMapping = (typeof mockUserMapping !== 'undefined') ? mockUserMapping : [];
+    userMapping.forEach(m => {
+        if (m.roleGroupIds) {
+            const gi = m.roleGroupIds.indexOf(groupId);
+            if (gi >= 0) m.roleGroupIds.splice(gi, 1);
+        }
+    });
+
+    window._permSelectedRoleGroup = '';
+    refreshPermPage();
+    showToast('역할그룹이 삭제되었습니다.', 'success');
 }
 
 // === 개인별 모드 ===
@@ -3484,53 +3585,28 @@ function renderIndividualMode() {
     `;
 }
 
-// === 필터 변경 (즉시 반영) ===
-function confirmPermTarget() {
-    // 하위호환: 필터 값 저장 후 즉시 반영
-    onPermFilterChange();
-}
+// === 필터 변경 (조합 편집 시 매트릭스 갱신) ===
+function confirmPermTarget() { onPermFilterChange(); }
 
 function onPermFilterChange() {
-    // 현재 드롭다운 값 저장 (리렌더링 전에)
+    // 편집 중인 조합의 드롭다운 값만 저장 (매트릭스는 저장 시점에 반영)
     window._permFilterDept = document.getElementById('perm-filter-dept')?.value || '';
     window._permFilterPos = document.getElementById('perm-filter-pos')?.value || '';
     window._permFilterStat = document.getElementById('perm-filter-stat')?.value || '';
-    // 필터 변경 즉시 매트릭스 표시
-    window._permHierarchyConfirmed = true;
-    window._permSelectedUsers = ['__hierarchy_target__'];
-    refreshPermPage();
+    // 매트릭스만 갱신 (전체 페이지 리렌더 대신)
+    const matrixEl = document.getElementById('perm-matrix-section');
+    if (matrixEl) matrixEl.innerHTML = renderPermMatrix();
 }
 
-function onPermAllToggle(type, checked) {
-    if (type === 'dept') {
-        window._permDeptAll = checked;
-        if (checked) window._permFilterDept = '';
-    } else if (type === 'pos') {
-        window._permPosAll = checked;
-        if (checked) window._permFilterPos = '';
-    } else if (type === 'stat') {
-        window._permStatAll = checked;
-        if (checked) window._permFilterStat = '';
-    }
-    // 즉시 매트릭스 표시
-    window._permHierarchyConfirmed = true;
-    window._permSelectedUsers = ['__hierarchy_target__'];
-    refreshPermPage();
-}
-
-function filterPermUsers() {
-    onPermFilterChange(); // 하위호환
-}
+function onPermAllToggle() { /* 전체 체크박스 제거됨 - 하위호환용 */ }
+function filterPermUsers() { onPermFilterChange(); }
 
 function resetPermFilters() {
     window._permFilterDept = '';
     window._permFilterPos = '';
     window._permFilterStat = '';
-    window._permDeptAll = true;
-    window._permPosAll = true;
-    window._permStatAll = true;
-    window._permHierarchyConfirmed = true;
-    window._permSelectedUsers = ['__hierarchy_target__'];
+    window._permEditingHierarchyId = null;
+    window._permSelectedUsers = [];
     refreshPermPage();
 }
 
@@ -3572,16 +3648,24 @@ function refreshPermPage() {
 // === 메뉴 권한 매트릭스 ===
 function renderPermMatrix() {
     const allMenus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
-    const currentTab = window._permMenuTab || 'admin';
+    const currentTab = 'admin'; // 관리자 메뉴만 표시
     const targetLabel = getPermTargetLabel();
 
-    // 현재 탭(화면)에 해당하는 메뉴만 필터링
+    // 관리자 메뉴만 필터링
     const menus = allMenus.filter(m => !m.screen || m.screen.includes(currentTab));
     const menuTree = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
 
-    // 현재 권한 로드 (첫 번째 선택된 이용자 기준)
+    // 현재 권한 로드
     const permMap = {};
-    if (window._permMode === 'hierarchy' || window._permMode === 'individual') {
+    if (window._permMode === 'hierarchy') {
+        // 소속/신분/상태별: mockHierarchyPermissions에서 로드
+        const editingId = window._permEditingHierarchyId;
+        if (editingId) {
+            const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+            const hp = hPerms.find(h => h.id === editingId);
+            if (hp) hp.permissions.forEach(p => { permMap[p.menuId] = p.canRead; });
+        }
+    } else if (window._permMode === 'individual') {
         const selectedUsers = window._permSelectedUsers || [];
         if (selectedUsers.length > 0) {
             const indPerms = (typeof mockIndividualPermissions !== 'undefined') ? mockIndividualPermissions : [];
@@ -3605,37 +3689,17 @@ function renderPermMatrix() {
         `;
     }
 
-    // 화면별 탭 라벨
-    const tabs = [
-        { key: 'admin', label: '관리자 메뉴' },
-        { key: 'professor', label: '교수 메뉴' },
-        { key: 'student', label: '학생 메뉴' }
-    ];
-
     return `
         <div class="border rounded-lg">
             <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                 <div>
                     <p class="text-sm font-bold text-gray-800">선택된 대상: <span class="text-[#6A0028]">${targetLabel}</span></p>
-                    <p class="text-xs text-gray-500 mt-1">아래 메뉴별 접근 권한을 설정하고 [권한 저장]을 클릭하세요.</p>
+                    <p class="text-xs text-gray-500 mt-1">관리자 시스템 메뉴 접근 권한을 설정하고 [권한 저장]을 클릭하세요.</p>
                 </div>
                 <div class="flex space-x-2">
                     <button onclick="resetMenuPermission()" class="px-3 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-100">초기화</button>
                     <button onclick="saveMenuPermission()" class="px-4 py-2 text-sm bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">권한 저장</button>
                 </div>
-            </div>
-            <!-- 화면별 탭 -->
-            <div class="flex border-b bg-white">
-                ${tabs.map(tab => `
-                    <button onclick="switchPermMenuTab('${tab.key}')"
-                        class="px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-                            currentTab === tab.key
-                                ? 'border-[#6A0028] text-[#6A0028] bg-red-50'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        }">
-                        ${tab.label}
-                    </button>
-                `).join('')}
             </div>
             <div style="max-height: 400px; overflow-y: auto;">
                 <table class="w-full table-fixed">
@@ -3677,38 +3741,40 @@ function renderPermMatrix() {
     `;
 }
 
-// 화면별 메뉴 탭 전환
-function switchPermMenuTab(tab) {
-    window._permMenuTab = tab;
-    const matrixEl = document.getElementById('perm-matrix-section');
-    if (matrixEl) matrixEl.innerHTML = renderPermMatrix();
-}
+// 화면별 메뉴 탭 전환 (관리자 메뉴만 사용하므로 탭 제거됨 - 하위호환용)
+function switchPermMenuTab(tab) { /* 탭 제거됨 */ }
 
 // 선택 대상 라벨 생성
 function getPermTargetLabel() {
     if (window._permMode === 'hierarchy') {
-        if (!window._permHierarchyConfirmed) return '';
+        const editingId = window._permEditingHierarchyId;
+        if (!editingId) return '';
 
         const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
         const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
         const statusList = (typeof mockUserStatus !== 'undefined') ? mockUserStatus : [];
 
+        // 편집 중인 조합 또는 새 조합의 필터값 사용
+        const deptId = window._permFilterDept || '';
+        const posId = window._permFilterPos || '';
+        const statCode = window._permFilterStat || '';
+
         const parts = [];
-        if (window._permFilterDept) {
-            const d = departments.find(d => d.id === window._permFilterDept);
+        if (deptId) {
+            const d = departments.find(d => d.id === deptId);
             if (d) parts.push(d.name);
         } else {
             parts.push('전체 소속');
         }
-        if (window._permFilterPos) {
-            const p = positions.find(p => p.id === window._permFilterPos);
+        if (posId) {
+            const p = positions.find(p => p.id === posId);
             if (p) parts.push(p.name);
         } else {
             parts.push('전체 신분');
         }
-        if (window._permFilterStat) {
-            const s = statusList.find(s => s.statusCode === window._permFilterStat);
-            if (s) parts.push(s.name);
+        if (statCode) {
+            const s = statusList.find(s => s.statusCode === statCode);
+            if (s) parts.push(s.statusName);
         } else {
             parts.push('전체 상태');
         }
@@ -3751,28 +3817,69 @@ function saveMenuPermission() {
 
     const newPermissions = [];
     checkboxes.forEach(cb => {
-        newPermissions.push({ menuId: cb.dataset.menu, canRead: cb.checked, canCreate: cb.checked, canUpdate: cb.checked, canDelete: false });
+        if (cb.checked) {
+            newPermissions.push({ menuId: cb.dataset.menu, canRead: true });
+        }
     });
 
-    if (window._permMode === 'hierarchy' || window._permMode === 'individual') {
+    if (window._permMode === 'hierarchy') {
+        // 소속/신분/상태별: mockHierarchyPermissions에 저장
+        const editingId = window._permEditingHierarchyId;
+        if (!editingId) { alert('편집할 조합을 선택해주세요.'); return; }
+
+        const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+        const deptId = window._permFilterDept || '';
+        const positionId = window._permFilterPos || '';
+        const statusCode = window._permFilterStat || '';
+
+        if (editingId === '__new__') {
+            // 새 조합 추가
+            const newId = 'HP_' + Date.now();
+            hPerms.push({ id: newId, deptId, positionId, statusCode, permissions: newPermissions });
+            window._permEditingHierarchyId = null;
+        } else {
+            // 기존 조합 수정
+            const item = hPerms.find(h => h.id === editingId);
+            if (item) {
+                item.deptId = deptId;
+                item.positionId = positionId;
+                item.statusCode = statusCode;
+                item.permissions = newPermissions;
+            }
+            window._permEditingHierarchyId = null;
+        }
+        window._permSelectedUsers = [];
+        refreshPermPage();
+        showToast('권한 조합이 저장되었습니다.', 'success');
+
+    } else if (window._permMode === 'individual') {
         const selectedUsers = window._permSelectedUsers || [];
         if (selectedUsers.length === 0) { alert('이용자를 선택해주세요.'); return; }
         const list = (typeof mockIndividualPermissions !== 'undefined') ? mockIndividualPermissions : [];
+        const fullPerms = [];
+        checkboxes.forEach(cb => {
+            fullPerms.push({ menuId: cb.dataset.menu, canRead: cb.checked, canCreate: cb.checked, canUpdate: cb.checked, canDelete: false });
+        });
         selectedUsers.forEach(userId => {
             let item = list.find(i => i.userId === userId);
             if (!item) { item = { userId: userId, permissions: [] }; list.push(item); }
-            item.permissions = [...newPermissions];
+            item.permissions = [...fullPerms];
         });
+        showToast('권한 설정이 저장되었습니다.', 'success');
+
     } else if (window._permMode === 'roleGroup') {
         const groupId = window._permSelectedRoleGroup || '';
         if (!groupId) { alert('역할그룹을 선택해주세요.'); return; }
         const list = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
+        const fullPerms = [];
+        checkboxes.forEach(cb => {
+            fullPerms.push({ menuId: cb.dataset.menu, canRead: cb.checked, canCreate: cb.checked, canUpdate: cb.checked, canDelete: false });
+        });
         let item = list.find(r => r.roleGroupId === groupId);
         if (!item) { item = { roleGroupId: groupId, permissions: [] }; list.push(item); }
-        item.permissions = newPermissions;
+        item.permissions = fullPerms;
+        showToast('권한 설정이 저장되었습니다.', 'success');
     }
-
-    alert('권한 설정이 저장되었습니다.');
 }
 
 // 메뉴 권한 초기화
@@ -3791,6 +3898,11 @@ function renderPermTabContent() { return renderPermissionPage(); }
 
 // ========== 메뉴 관리 ==========
 
+// 변경 추적 변수
+let menuChanges = {};       // { menuId: { field: value, ... } }
+let menuOriginalData = [];  // 페이지 진입 시 mockMenus 스냅샷
+let isMenuDirty = false;    // 변경 여부 플래그
+
 // 양쪽 테이블 재렌더링 헬퍼
 function renderAllMenuTables() {
     renderTopMenuTable();
@@ -3799,6 +3911,10 @@ function renderAllMenuTables() {
 
 // 메뉴관리 화면 초기화
 function initMenuManagement() {
+    // 원본 데이터 스냅샷 (deep copy)
+    menuOriginalData = JSON.parse(JSON.stringify(mockMenus));
+    menuChanges = {};
+    isMenuDirty = false;
     renderAllMenuTables();
     console.log('✅ 메뉴관리 화면 초기화 완료');
 }
@@ -3815,7 +3931,7 @@ function renderTopMenuTable() {
     if (countEl) countEl.textContent = `(${depth1.length}건)`;
 
     if (depth1.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 최상위 메뉴가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="10" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 최상위 메뉴가 없습니다.</td></tr>';
         return;
     }
 
@@ -3840,8 +3956,19 @@ function renderTopMenuTable() {
                     class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
             </td>
             <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
-                    class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
+                <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''}
+                    onchange="onMenuCheckboxChange('${m.id}', 'isActiveAdmin', this.checked)"
+                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+            </td>
+            <td class="px-4 py-3 text-center">
+                <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''}
+                    onchange="onMenuCheckboxChange('${m.id}', 'isActiveProf', this.checked)"
+                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+            </td>
+            <td class="px-4 py-3 text-center">
+                <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''}
+                    onchange="onMenuCheckboxChange('${m.id}', 'isActiveStudent', this.checked)"
+                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
             </td>
             <td class="px-4 py-3 text-center">
                 <div class="flex items-center justify-center gap-1">
@@ -3866,8 +3993,63 @@ function renderSubMenuTable() {
     if (countEl) countEl.textContent = `(${depth2.length}건)`;
 
     if (depth2.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 메뉴가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="11" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 메뉴가 없습니다.</td></tr>';
         return;
+    }
+
+    // 하위 메뉴 행 렌더링 헬퍼
+    function renderSubRow(m, idx) {
+        const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+        return `
+            <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="sub">
+                <td class="px-4 py-3 text-center text-sm text-gray-600">${idx}</td>
+                <td class="px-4 py-3 text-center">
+                    <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <select data-field="parentId" data-id="${m.id}" disabled
+                        class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed"
+                        style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
+                        <option value="">--선택--</option>
+                        ${parentOpts}
+                    </select>
+                </td>
+                <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+                <td class="px-4 py-3 text-center">
+                    <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''}
+                        onchange="onMenuCheckboxChange('${m.id}', 'isActiveAdmin', this.checked)"
+                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''}
+                        onchange="onMenuCheckboxChange('${m.id}', 'isActiveProf', this.checked)"
+                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''}
+                        onchange="onMenuCheckboxChange('${m.id}', 'isActiveStudent', this.checked)"
+                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                </td>
+                <td class="px-4 py-3 text-center">
+                    <div class="flex items-center justify-center gap-1">
+                        <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
+                        <button onclick="deleteSubMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
+                    </div>
+                </td>
+            </tr>`;
     }
 
     // 상위메뉴별 그룹핑
@@ -3878,99 +4060,21 @@ function renderSubMenuTable() {
         if (children.length === 0) return;
 
         // 그룹 구분 행
-        html += `<tr class="bg-gray-100"><td colspan="9" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴: ${parent.name} (${children.length}건)</td></tr>`;
+        html += `<tr class="bg-gray-100"><td colspan="11" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴: ${parent.name} (${children.length}건)</td></tr>`;
 
         children.forEach(m => {
             globalIdx++;
-            const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
-            html += `
-                <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="sub">
-                    <td class="px-4 py-3 text-center text-sm text-gray-600">${globalIdx}</td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <select data-field="parentId" data-id="${m.id}" disabled
-                            class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed"
-                            style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
-                            <option value="">--선택--</option>
-                            ${parentOpts}
-                        </select>
-                    </td>
-                    <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
-                            class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <div class="flex items-center justify-center gap-1">
-                            <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
-                            <button onclick="deleteSubMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
-                        </div>
-                    </td>
-                </tr>`;
+            html += renderSubRow(m, globalIdx);
         });
     });
 
     // 고아 메뉴 (상위메뉴가 삭제된 경우)
     const orphans = depth2.filter(m => !depth1All.find(p => p.id === m.parentId));
     if (orphans.length > 0) {
-        html += `<tr class="bg-gray-100"><td colspan="9" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴 미지정 (${orphans.length}건)</td></tr>`;
+        html += `<tr class="bg-gray-100"><td colspan="11" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴 미지정 (${orphans.length}건)</td></tr>`;
         orphans.forEach(m => {
             globalIdx++;
-            const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
-            html += `
-                <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="sub">
-                    <td class="px-4 py-3 text-center text-sm text-gray-600">${globalIdx}</td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <select data-field="parentId" data-id="${m.id}" disabled
-                            class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed"
-                            style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
-                            <option value="">--선택--</option>
-                            ${parentOpts}
-                        </select>
-                    </td>
-                    <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
-                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
-                            class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
-                    </td>
-                    <td class="px-4 py-3 text-center">
-                        <div class="flex items-center justify-center gap-1">
-                            <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
-                            <button onclick="deleteSubMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
-                        </div>
-                    </td>
-                </tr>`;
+            html += renderSubRow(m, globalIdx);
         });
     }
 
@@ -3985,7 +4089,7 @@ function toggleMenuEdit(menuId) {
 
     const section = row.dataset.menuSection || 'top';
 
-    // input/select disabled 해제
+    // input/select disabled 해제 (text, select만 — 체크박스는 이미 활성)
     row.querySelectorAll('.menu-input').forEach(el => {
         el.disabled = false;
         el.classList.remove('bg-gray-50', 'cursor-not-allowed');
@@ -3999,15 +4103,13 @@ function toggleMenuEdit(menuId) {
             el.style.webkitAppearance = '';
             el.style.mozAppearance = '';
             el.style.appearance = '';
-        } else if (el.type === 'checkbox') {
-            el.classList.add('cursor-pointer');
         }
     });
 
-    // 컬럼 인덱스: top(8컬럼) 순서=4, 관리=7 / sub(9컬럼) 순서=5, 관리=8
+    // 컬럼 인덱스: top(10컬럼) 순서=4, 관리=9 / sub(11컬럼) 순서=5, 관리=10
     const cells = row.querySelectorAll('td');
     const orderIdx = (section === 'top') ? 4 : 5;
-    const mgmtIdx = (section === 'top') ? 7 : 8;
+    const mgmtIdx = (section === 'top') ? 9 : 10;
 
     const currentOrder = cells[orderIdx].textContent.trim();
     cells[orderIdx].innerHTML = `
@@ -4027,7 +4129,7 @@ function toggleMenuEdit(menuId) {
     row.style.backgroundColor = '#fffbeb';
 }
 
-// ---- 행 단위 저장 ----
+// ---- 행 단위 저장 (텍스트 편집 → mockMenus 임시 반영) ----
 function saveMenuRow(menuId) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
@@ -4041,8 +4143,8 @@ function saveMenuRow(menuId) {
     const nameCnInput = row.querySelector('input[data-field="nameCn"]');
     const codeInput = row.querySelector('input[data-field="code"]');
     const parentSelect = row.querySelector('select[data-field="parentId"]');
-    const activeCheckbox = row.querySelector('input[data-field="isActive"]');
 
+    // mockMenus에 임시 반영 (화면 표시용)
     if (nameInput) { menu.name = nameInput.value.trim() || menu.name; menu.nameKo = menu.name; }
     if (nameEnInput) menu.nameEn = nameEnInput.value.trim();
     if (nameCnInput) menu.nameCn = nameCnInput.value.trim();
@@ -4054,14 +4156,52 @@ function saveMenuRow(menuId) {
             menu.depth = newParentId ? 2 : 1;
         }
     }
-    if (activeCheckbox) menu.isActive = activeCheckbox.checked;
 
+    isMenuDirty = true;
     renderAllMenuTables();
 }
 
 // ---- 수정 취소 ----
 function cancelMenuEdit(menuId) {
     renderAllMenuTables();
+}
+
+// ---- 체크박스 변경 처리 ----
+function onMenuCheckboxChange(menuId, field, checked) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (menu) menu[field] = checked;
+    isMenuDirty = true;
+}
+
+// ---- 전체 저장 ----
+function saveAllMenuChanges() {
+    if (!isMenuDirty) {
+        alert('변경된 내용이 없습니다.');
+        return;
+    }
+    // mockMenus는 이미 임시 반영되어 있으므로, 원본 스냅샷만 갱신
+    menuOriginalData = JSON.parse(JSON.stringify(mockMenus));
+    menuChanges = {};
+    isMenuDirty = false;
+    alert('메뉴 설정이 저장되었습니다.');
+    renderAllMenuTables();
+}
+
+// ---- 미저장 변경 확인 (이탈 방지) ----
+function checkMenuUnsavedChanges() {
+    if (isMenuDirty) {
+        if (confirm('저장하지 않은 변경사항이 있습니다.\n이동하시겠습니까?')) {
+            // mockMenus를 원본으로 복원
+            mockMenus.length = 0;
+            menuOriginalData.forEach(m => mockMenus.push(JSON.parse(JSON.stringify(m))));
+            menuChanges = {};
+            isMenuDirty = false;
+            return true;
+        }
+        return false;
+    }
+    return true;
 }
 
 // ---- 필터 (제거됨, 하위호환 유지) ----
@@ -4074,6 +4214,7 @@ function onMenuParentChange(menuId, newParentId) {
     if (!menu) return;
     menu.parentId = newParentId || null;
     menu.depth = newParentId ? 2 : 1;
+    isMenuDirty = true;
     renderAllMenuTables();
 }
 
@@ -4094,6 +4235,7 @@ function moveMenuOrder(menuId, direction) {
     siblings[currentIdx].order = siblings[targetIdx].order;
     siblings[targetIdx].order = temp;
 
+    isMenuDirty = true;
     renderAllMenuTables();
 }
 
@@ -4110,9 +4252,10 @@ function addNewTopMenu() {
         id: newId, parentId: null, name: '새 메뉴', nameKo: '새 메뉴', nameEn: '', nameCn: '',
         code: 'new_menu_' + (maxNum + 1), depth: 1,
         order: menus.filter(m => m.depth === 1).length + 1,
-        isActive: true, screen: ['admin']
+        isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin']
     };
     menus.push(newMenu);
+    isMenuDirty = true;
     renderAllMenuTables();
     setTimeout(() => toggleMenuEdit(newId), 50);
 }
@@ -4134,9 +4277,10 @@ function addNewSubMenu() {
         id: newId, parentId: defaultParent.id, name: '새 하위 메뉴', nameKo: '새 하위 메뉴', nameEn: '', nameCn: '',
         code: 'new_sub_' + (maxNum + 1), depth: 2,
         order: menus.filter(m => m.parentId === defaultParent.id).length + 1,
-        isActive: true, screen: ['admin']
+        isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin']
     };
     menus.push(newMenu);
+    isMenuDirty = true;
     renderAllMenuTables();
     setTimeout(() => toggleMenuEdit(newId), 50);
 }
@@ -4156,6 +4300,7 @@ function deleteTopMenu(menuId) {
     }
     const idx = menus.findIndex(m => m.id === menuId);
     if (idx !== -1) menus.splice(idx, 1);
+    isMenuDirty = true;
     renderAllMenuTables();
 }
 
@@ -4167,6 +4312,7 @@ function deleteSubMenu(menuId) {
     if (!confirm(`'${menu.name}' 메뉴를 삭제하시겠습니까?`)) return;
     const idx = menus.findIndex(m => m.id === menuId);
     if (idx !== -1) menus.splice(idx, 1);
+    isMenuDirty = true;
     renderSubMenuTable();
 }
 
@@ -4223,6 +4369,9 @@ window.toggleMenuEdit = toggleMenuEdit;
 window.saveMenuRow = saveMenuRow;
 window.cancelMenuEdit = cancelMenuEdit;
 window.moveMenuOrder = moveMenuOrder;
+window.saveAllMenuChanges = saveAllMenuChanges;
+window.onMenuCheckboxChange = onMenuCheckboxChange;
+window.checkMenuUnsavedChanges = checkMenuUnsavedChanges;
 // 하위호환 별칭
 window.renderMenuTable = function() { renderTopMenuTable(); renderSubMenuTable(); };
 window.addNewMenu = addNewTopMenu;

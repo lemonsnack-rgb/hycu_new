@@ -1341,6 +1341,11 @@
         window.switchView = function(viewName, param = null) {
             console.log('🔧 switchView called with:', viewName, param);
 
+            // 메뉴관리 미저장 변경 확인
+            if (typeof checkMenuUnsavedChanges === 'function' && !checkMenuUnsavedChanges()) {
+                return; // 사용자가 이동 취소
+            }
+
             // 등록/수정 화면과 부모 화면 매핑
             const parentScreenMap = {
                 'workflowCreateUnified': 'typeManagement',
@@ -1365,9 +1370,13 @@
             }
         };
 
-        // Extend showScreen to handle parameters
+        // Extend showScreen to handle parameters + 메뉴관리 이탈 방지
         const originalShowScreen = showScreen;
         window.showScreen = function(screenId, param = null) {
+            // 메뉴관리 미저장 변경 확인
+            if (typeof checkMenuUnsavedChanges === 'function' && !checkMenuUnsavedChanges()) {
+                return; // 사용자가 이동 취소
+            }
             // Call original showScreen for UI updates
             originalShowScreen(screenId);
 

@@ -1029,6 +1029,83 @@ const mockUsers = [
         employeeNumber: null,
         studentNumber: '2024001',
         status: 'active'
+    },
+    {
+        id: 'USER_PROF_002',
+        username: 'prof002',
+        name: '이교수',
+        roleId: 'ROLE_PROFESSOR',
+        email: 'lee@hycu.ac.kr',
+        department: '경영학과',
+        employeeNumber: 'P2020002',
+        studentNumber: null,
+        status: 'active'
+    },
+    {
+        id: 'USER_PROF_003',
+        username: 'prof003',
+        name: '박교수',
+        roleId: 'ROLE_PROFESSOR',
+        email: 'park@hycu.ac.kr',
+        department: '컴퓨터공학과',
+        employeeNumber: 'P2019005',
+        studentNumber: null,
+        status: 'active'
+    },
+    {
+        id: 'USER_PROF_004',
+        username: 'prof004',
+        name: '정교수',
+        roleId: 'ROLE_PROFESSOR',
+        email: 'jung@hycu.ac.kr',
+        department: '경영학과',
+        employeeNumber: 'P2018010',
+        studentNumber: null,
+        status: 'leave'
+    },
+    {
+        id: 'USER_STAFF_001',
+        username: 'staff001',
+        name: '최직원',
+        roleId: 'ROLE_ADMIN',
+        email: 'choi@hycu.ac.kr',
+        department: '교무학사팀',
+        employeeNumber: 'E2018003',
+        studentNumber: null,
+        status: 'active'
+    },
+    {
+        id: 'USER_STAFF_002',
+        username: 'staff002',
+        name: '한직원',
+        roleId: 'ROLE_ADMIN',
+        email: 'han@hycu.ac.kr',
+        department: '학생지원팀',
+        employeeNumber: 'E2019007',
+        studentNumber: null,
+        status: 'active'
+    },
+    {
+        id: 'USER_STU_002',
+        username: 'stu002',
+        name: '박학생',
+        roleId: 'ROLE_STUDENT',
+        email: 'stu002@hycu.ac.kr',
+        department: '경영학과',
+        employeeNumber: null,
+        studentNumber: '2024015',
+        status: 'active'
+    },
+    {
+        id: 'USER_STU_003',
+        username: 'stu003',
+        name: '최학생',
+        roleId: 'ROLE_STUDENT',
+        email: 'stu003@hycu.ac.kr',
+        department: '컴퓨터공학과',
+        employeeNumber: null,
+        studentNumber: '2023008',
+        status: 'active'
     }
 ];
 
@@ -1127,8 +1204,9 @@ const mockRoleGroups = [
         id: 'ROLEGROUP_001',
         name: '논문심사위원',
         description: '논문 심사 권한을 가진 교수진',
+        memberIds: ['prof001', 'prof002', 'prof003'],
         query: 'position=PROF_FULL AND status=active',
-        memberCount: 38,
+        memberCount: 3,
         createdBy: 'admin',
         createdDate: '2025-01-10'
     },
@@ -1136,8 +1214,9 @@ const mockRoleGroups = [
         id: 'ROLEGROUP_002',
         name: '졸업사정담당',
         description: '졸업 사정 업무 담당자',
+        memberIds: ['admin', 'staff001'],
         query: 'department=DEPT_001 AND role=graduation_officer',
-        memberCount: 3,
+        memberCount: 2,
         createdBy: 'admin',
         createdDate: '2025-01-10'
     },
@@ -1145,8 +1224,9 @@ const mockRoleGroups = [
         id: 'ROLEGROUP_003',
         name: '논문관리자',
         description: '논문 시스템 전체 관리자',
+        memberIds: ['admin', 'staff001', 'staff002'],
         query: 'department=DEPT_001 AND position=STAFF',
-        memberCount: 5,
+        memberCount: 3,
         createdBy: 'admin',
         createdDate: '2025-01-10'
     }
@@ -1183,6 +1263,48 @@ const mockUserStatus = [
         statusName: '재학',
         statusCode: 'ACTIVE',
         canWrite: true
+    },
+    {
+        userId: 'prof003',
+        status: 'active',
+        statusName: '재직',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    },
+    {
+        userId: 'prof004',
+        status: 'leave',
+        statusName: '휴직',
+        statusCode: 'LEAVE',
+        canWrite: false
+    },
+    {
+        userId: 'staff001',
+        status: 'active',
+        statusName: '재직',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    },
+    {
+        userId: 'staff002',
+        status: 'active',
+        statusName: '재직',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    },
+    {
+        userId: 'stu002',
+        status: 'active',
+        statusName: '재학',
+        statusCode: 'ACTIVE',
+        canWrite: true
+    },
+    {
+        userId: 'stu003',
+        status: 'active',
+        statusName: '재학',
+        statusCode: 'ACTIVE',
+        canWrite: true
     }
 ];
 
@@ -1191,52 +1313,52 @@ const mockMenus = [
     // =============================================
     // 1depth: 논문 안내 (공통: 관리자/교수/학생)
     // =============================================
-    { id: 'MENU_001', parentId: null, name: '논문 안내', nameKo: '논문 안내', nameEn: 'Thesis Guide', nameCn: '论文指南', code: 'guidance_info', depth: 1, order: 1, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_001_001', parentId: 'MENU_001', name: '행정공지사항', nameKo: '행정공지사항', nameEn: 'Administrative Notice', nameCn: '行政公告事项', code: 'notice', depth: 2, order: 1, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_001_002', parentId: 'MENU_001', name: '연구윤리', nameKo: '연구윤리', nameEn: 'Research Ethics', nameCn: '研究伦理', code: 'ethics', depth: 2, order: 2, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_001_003', parentId: 'MENU_001', name: '논문일정', nameKo: '논문일정', nameEn: 'Thesis Schedule', nameCn: '论文日程', code: 'schedule', depth: 2, order: 3, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_001_004', parentId: 'MENU_001', name: '논문지도절차', nameKo: '논문지도절차', nameEn: 'Guidance Procedure', nameCn: '论文指导程序', code: 'guidance_procedure', depth: 2, order: 4, isActive: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_001', parentId: null, name: '논문 안내', nameKo: '논문 안내', nameEn: 'Thesis Guide', nameCn: '论文指南', code: 'guidance_info', depth: 1, order: 1, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_001_001', parentId: 'MENU_001', name: '행정공지사항', nameKo: '행정공지사항', nameEn: 'Administrative Notice', nameCn: '行政公告事项', code: 'notice', depth: 2, order: 1, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_001_002', parentId: 'MENU_001', name: '연구윤리', nameKo: '연구윤리', nameEn: 'Research Ethics', nameCn: '研究伦理', code: 'ethics', depth: 2, order: 2, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_001_003', parentId: 'MENU_001', name: '논문일정', nameKo: '논문일정', nameEn: 'Thesis Schedule', nameCn: '论文日程', code: 'schedule', depth: 2, order: 3, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_001_004', parentId: 'MENU_001', name: '논문지도절차', nameKo: '논문지도절차', nameEn: 'Guidance Procedure', nameCn: '论文指导程序', code: 'guidance_procedure', depth: 2, order: 4, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
 
     // =============================================
     // 1depth: 논문 제출 (관리자/학생 - 교수 없음)
     // =============================================
-    { id: 'MENU_002', parentId: null, name: '논문 제출', nameKo: '논문 제출', nameEn: 'Thesis Submission', nameCn: '论文提交', code: 'thesis_submission', depth: 1, order: 2, isActive: true, screen: ['admin', 'student'] },
-    { id: 'MENU_002_001', parentId: 'MENU_002', name: '논문제출요건등록', nameKo: '논문제출요건등록', nameEn: 'Submission Requirement', nameCn: '论文提交要件登记', code: 'submission_requirement', depth: 2, order: 1, isActive: true, screen: ['admin'] },
-    { id: 'MENU_002_002', parentId: 'MENU_002', name: '최종논문제목등록', nameKo: '최종논문제목등록', nameEn: 'Final Title Registration', nameCn: '最终论文题目登记', code: 'final_title', depth: 2, order: 2, isActive: true, screen: ['admin', 'student'] },
+    { id: 'MENU_002', parentId: null, name: '논문 제출', nameKo: '논문 제출', nameEn: 'Thesis Submission', nameCn: '论文提交', code: 'thesis_submission', depth: 1, order: 2, isActiveAdmin: true, isActiveProf: false, isActiveStudent: true, screen: ['admin', 'student'] },
+    { id: 'MENU_002_001', parentId: 'MENU_002', name: '논문제출요건등록', nameKo: '논문제출요건등록', nameEn: 'Submission Requirement', nameCn: '论文提交要件登记', code: 'submission_requirement', depth: 2, order: 1, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_002_002', parentId: 'MENU_002', name: '최종논문제목등록', nameKo: '최종논문제목등록', nameEn: 'Final Title Registration', nameCn: '最终论文题目登记', code: 'final_title', depth: 2, order: 2, isActiveAdmin: true, isActiveProf: false, isActiveStudent: true, screen: ['admin', 'student'] },
 
     // =============================================
     // 1depth: 논문 지도 (공통: 관리자/교수/학생)
     // =============================================
-    { id: 'MENU_003', parentId: null, name: '논문 지도', nameKo: '논문 지도', nameEn: 'Thesis Guidance', nameCn: '论文指导', code: 'thesis_guidance', depth: 1, order: 3, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_003_001', parentId: 'MENU_003', name: '논문지도학생현황', nameKo: '논문지도학생현황', nameEn: 'Student Status', nameCn: '论文指导学生现况', code: 'student_status', depth: 2, order: 1, isActive: true, screen: ['admin'] },
-    { id: 'MENU_003_002', parentId: 'MENU_003', name: '지도단계등록', nameKo: '지도단계등록', nameEn: 'Stage Registration', nameCn: '指导阶段登记', code: 'stage_registration', depth: 2, order: 2, isActive: true, screen: ['admin'] },
-    { id: 'MENU_003_003', parentId: 'MENU_003', name: '지도교수배정', nameKo: '지도교수배정', nameEn: 'Advisor Assignment', nameCn: '指导教授分配', code: 'advisor_assignment', depth: 2, order: 3, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_003_004', parentId: 'MENU_003', name: '학기별지도계획', nameKo: '학기별지도계획', nameEn: 'Semester Plan', nameCn: '学期别指导计划', code: 'semester_plan', depth: 2, order: 4, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_003_005', parentId: 'MENU_003', name: '실시간지도예약', nameKo: '실시간지도예약', nameEn: 'Realtime Reservation', nameCn: '实时指导预约', code: 'realtime_reservation', depth: 2, order: 5, isActive: true, screen: ['professor', 'student'] },
-    { id: 'MENU_003_006', parentId: 'MENU_003', name: '논문지도활동', nameKo: '논문지도활동', nameEn: 'Guidance Activity', nameCn: '论文指导活动', code: 'guidance_progress', depth: 2, order: 6, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_003_007', parentId: 'MENU_003', name: '논문지도공지및자료', nameKo: '논문지도공지및자료', nameEn: 'Guidance Notice', nameCn: '论文指导公告及资料', code: 'guidance_notice', depth: 2, order: 7, isActive: true, screen: ['professor', 'student'] },
+    { id: 'MENU_003', parentId: null, name: '논문 지도', nameKo: '논문 지도', nameEn: 'Thesis Guidance', nameCn: '论文指导', code: 'thesis_guidance', depth: 1, order: 3, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_003_001', parentId: 'MENU_003', name: '논문지도학생현황', nameKo: '논문지도학생현황', nameEn: 'Student Status', nameCn: '论文指导学生现况', code: 'student_status', depth: 2, order: 1, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_003_002', parentId: 'MENU_003', name: '지도단계등록', nameKo: '지도단계등록', nameEn: 'Stage Registration', nameCn: '指导阶段登记', code: 'stage_registration', depth: 2, order: 2, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_003_003', parentId: 'MENU_003', name: '지도교수배정', nameKo: '지도교수배정', nameEn: 'Advisor Assignment', nameCn: '指导教授分配', code: 'advisor_assignment', depth: 2, order: 3, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_003_004', parentId: 'MENU_003', name: '학기별지도계획', nameKo: '학기별지도계획', nameEn: 'Semester Plan', nameCn: '学期别指导计划', code: 'semester_plan', depth: 2, order: 4, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_003_005', parentId: 'MENU_003', name: '실시간지도예약', nameKo: '실시간지도예약', nameEn: 'Realtime Reservation', nameCn: '实时指导预约', code: 'realtime_reservation', depth: 2, order: 5, isActiveAdmin: false, isActiveProf: true, isActiveStudent: true, screen: ['professor', 'student'] },
+    { id: 'MENU_003_006', parentId: 'MENU_003', name: '논문지도활동', nameKo: '논문지도활동', nameEn: 'Guidance Activity', nameCn: '论文指导活动', code: 'guidance_progress', depth: 2, order: 6, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_003_007', parentId: 'MENU_003', name: '논문지도공지및자료', nameKo: '논문지도공지및자료', nameEn: 'Guidance Notice', nameCn: '论文指导公告及资料', code: 'guidance_notice', depth: 2, order: 7, isActiveAdmin: false, isActiveProf: true, isActiveStudent: true, screen: ['professor', 'student'] },
 
     // =============================================
     // 1depth: 논문 심사 (공통: 관리자/교수/학생)
     // =============================================
-    { id: 'MENU_004', parentId: null, name: '논문 심사', nameKo: '논문 심사', nameEn: 'Thesis Review', nameCn: '论文审查', code: 'thesis_review', depth: 1, order: 4, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_004_001', parentId: 'MENU_004', name: '심사평가기준등록', nameKo: '심사평가기준등록', nameEn: 'Review Criteria', nameCn: '审查评价基准登记', code: 'review_criteria', depth: 2, order: 1, isActive: true, screen: ['admin'] },
-    { id: 'MENU_004_002', parentId: 'MENU_004', name: '심사위원등록', nameKo: '심사위원등록', nameEn: 'Committee Registration', nameCn: '审查委员登记', code: 'committee_registration', depth: 2, order: 2, isActive: true, screen: ['admin'] },
-    { id: 'MENU_004_003', parentId: 'MENU_004', name: '심사일정현황', nameKo: '심사일정현황', nameEn: 'Review Schedule', nameCn: '审查日程现况', code: 'review_schedule', depth: 2, order: 3, isActive: true, screen: ['admin', 'professor', 'student'] },
-    { id: 'MENU_004_004', parentId: 'MENU_004', name: '논문신청', nameKo: '논문신청', nameEn: 'Thesis Application', nameCn: '论文申请', code: 'thesis_application', depth: 2, order: 4, isActive: true, screen: ['admin', 'student'] },
-    { id: 'MENU_004_005', parentId: 'MENU_004', name: '학위논문심사', nameKo: '학위논문심사', nameEn: 'Degree Thesis Review', nameCn: '学位论文审查', code: 'thesis_review_detail', depth: 2, order: 5, isActive: true, screen: ['admin', 'professor'] },
-    { id: 'MENU_004_006', parentId: 'MENU_004', name: '학술지논문심사', nameKo: '학술지논문심사', nameEn: 'Journal Paper Review', nameCn: '学术期刊论文审查', code: 'journal_review', depth: 2, order: 6, isActive: true, screen: ['admin', 'professor'] },
-    { id: 'MENU_004_007', parentId: 'MENU_004', name: '학위논문제출', nameKo: '학위논문제출', nameEn: 'Degree Thesis Submit', nameCn: '学位论文提交', code: 'thesis_submit', depth: 2, order: 7, isActive: true, screen: ['student'] },
-    { id: 'MENU_004_008', parentId: 'MENU_004', name: '학술지논문제출', nameKo: '학술지논문제출', nameEn: 'Journal Paper Submit', nameCn: '学术期刊论文提交', code: 'journal_submit', depth: 2, order: 8, isActive: true, screen: ['student'] },
+    { id: 'MENU_004', parentId: null, name: '논문 심사', nameKo: '논문 심사', nameEn: 'Thesis Review', nameCn: '论文审查', code: 'thesis_review', depth: 1, order: 4, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_004_001', parentId: 'MENU_004', name: '심사평가기준등록', nameKo: '심사평가기준등록', nameEn: 'Review Criteria', nameCn: '审查评价基准登记', code: 'review_criteria', depth: 2, order: 1, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_004_002', parentId: 'MENU_004', name: '심사위원등록', nameKo: '심사위원등록', nameEn: 'Committee Registration', nameCn: '审查委员登记', code: 'committee_registration', depth: 2, order: 2, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_004_003', parentId: 'MENU_004', name: '심사일정현황', nameKo: '심사일정현황', nameEn: 'Review Schedule', nameCn: '审查日程现况', code: 'review_schedule', depth: 2, order: 3, isActiveAdmin: true, isActiveProf: true, isActiveStudent: true, screen: ['admin', 'professor', 'student'] },
+    { id: 'MENU_004_004', parentId: 'MENU_004', name: '논문신청', nameKo: '논문신청', nameEn: 'Thesis Application', nameCn: '论文申请', code: 'thesis_application', depth: 2, order: 4, isActiveAdmin: true, isActiveProf: false, isActiveStudent: true, screen: ['admin', 'student'] },
+    { id: 'MENU_004_005', parentId: 'MENU_004', name: '학위논문심사', nameKo: '학위논문심사', nameEn: 'Degree Thesis Review', nameCn: '学位论文审查', code: 'thesis_review_detail', depth: 2, order: 5, isActiveAdmin: true, isActiveProf: true, isActiveStudent: false, screen: ['admin', 'professor'] },
+    { id: 'MENU_004_006', parentId: 'MENU_004', name: '학술지논문심사', nameKo: '학술지논문심사', nameEn: 'Journal Paper Review', nameCn: '学术期刊论文审查', code: 'journal_review', depth: 2, order: 6, isActiveAdmin: true, isActiveProf: true, isActiveStudent: false, screen: ['admin', 'professor'] },
+    { id: 'MENU_004_007', parentId: 'MENU_004', name: '학위논문제출', nameKo: '학위논문제출', nameEn: 'Degree Thesis Submit', nameCn: '学位论文提交', code: 'thesis_submit', depth: 2, order: 7, isActiveAdmin: false, isActiveProf: false, isActiveStudent: true, screen: ['student'] },
+    { id: 'MENU_004_008', parentId: 'MENU_004', name: '학술지논문제출', nameKo: '학술지논문제출', nameEn: 'Journal Paper Submit', nameCn: '学术期刊论文提交', code: 'journal_submit', depth: 2, order: 8, isActiveAdmin: false, isActiveProf: false, isActiveStudent: true, screen: ['student'] },
 
     // =============================================
     // 1depth: 시스템 설정 (관리자 전용)
     // =============================================
-    { id: 'MENU_005', parentId: null, name: '시스템 설정', nameKo: '시스템 설정', nameEn: 'System Settings', nameCn: '系统设置', code: 'system_settings', depth: 1, order: 5, isActive: true, screen: ['admin'] },
-    { id: 'MENU_005_001', parentId: 'MENU_005', name: '업무일정등록', nameKo: '업무일정등록', nameEn: 'Work Schedule', nameCn: '业务日程登记', code: 'work_schedule', depth: 2, order: 1, isActive: true, screen: ['admin'] },
-    { id: 'MENU_005_002', parentId: 'MENU_005', name: '권한관리', nameKo: '권한관리', nameEn: 'Permission Management', nameCn: '权限管理', code: 'permission_management', depth: 2, order: 2, isActive: true, screen: ['admin'] },
-    { id: 'MENU_005_003', parentId: 'MENU_005', name: '메뉴관리', nameKo: '메뉴관리', nameEn: 'Menu Management', nameCn: '菜单管理', code: 'menu_management', depth: 2, order: 3, isActive: true, screen: ['admin'] },
-    { id: 'MENU_005_004', parentId: 'MENU_005', name: '사용자관리', nameKo: '사용자관리', nameEn: 'User Management', nameCn: '用户管理', code: 'user_management', depth: 2, order: 4, isActive: true, screen: ['admin'] }
+    { id: 'MENU_005', parentId: null, name: '시스템 설정', nameKo: '시스템 설정', nameEn: 'System Settings', nameCn: '系统设置', code: 'system_settings', depth: 1, order: 5, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_005_001', parentId: 'MENU_005', name: '업무일정등록', nameKo: '업무일정등록', nameEn: 'Work Schedule', nameCn: '业务日程登记', code: 'work_schedule', depth: 2, order: 1, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_005_002', parentId: 'MENU_005', name: '권한관리', nameKo: '권한관리', nameEn: 'Permission Management', nameCn: '权限管理', code: 'permission_management', depth: 2, order: 2, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_005_003', parentId: 'MENU_005', name: '메뉴관리', nameKo: '메뉴관리', nameEn: 'Menu Management', nameCn: '菜单管理', code: 'menu_management', depth: 2, order: 3, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] },
+    { id: 'MENU_005_004', parentId: 'MENU_005', name: '사용자관리', nameKo: '사용자관리', nameEn: 'User Management', nameCn: '用户管理', code: 'user_management', depth: 2, order: 4, isActiveAdmin: true, isActiveProf: false, isActiveStudent: false, screen: ['admin'] }
 ];
 
 // 부서별 권한 (Department Permissions)
@@ -1373,6 +1495,86 @@ const mockUserMapping = [
         departmentId: 'DEPT_004',
         positionId: 'POS_004',
         roleGroupIds: []
+    },
+    {
+        userId: 'prof002',
+        departmentId: 'DEPT_003',
+        positionId: 'POS_001',
+        roleGroupIds: ['ROLEGROUP_001']
+    },
+    {
+        userId: 'prof003',
+        departmentId: 'DEPT_004',
+        positionId: 'POS_001',
+        roleGroupIds: ['ROLEGROUP_001']
+    },
+    {
+        userId: 'prof004',
+        departmentId: 'DEPT_003',
+        positionId: 'POS_002',
+        roleGroupIds: []
+    },
+    {
+        userId: 'staff001',
+        departmentId: 'DEPT_001',
+        positionId: 'POS_003',
+        roleGroupIds: ['ROLEGROUP_002', 'ROLEGROUP_003']
+    },
+    {
+        userId: 'staff002',
+        departmentId: 'DEPT_002',
+        positionId: 'POS_003',
+        roleGroupIds: ['ROLEGROUP_003']
+    },
+    {
+        userId: 'stu002',
+        departmentId: 'DEPT_003',
+        positionId: 'POS_004',
+        roleGroupIds: []
+    },
+    {
+        userId: 'stu003',
+        departmentId: 'DEPT_004',
+        positionId: 'POS_004',
+        roleGroupIds: []
+    }
+];
+
+// 소속/신분/상태별 권한 조합 (Hierarchy Permissions)
+const mockHierarchyPermissions = [
+    {
+        id: 'HP_001',
+        deptId: '',
+        positionId: 'POS_003',
+        statusCode: '',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true },
+            { menuId: 'MENU_001_001', canRead: true },
+            { menuId: 'MENU_001_002', canRead: true },
+            { menuId: 'MENU_001_003', canRead: true },
+            { menuId: 'MENU_001_004', canRead: true },
+            { menuId: 'MENU_002', canRead: true },
+            { menuId: 'MENU_002_002', canRead: true },
+            { menuId: 'MENU_003', canRead: true },
+            { menuId: 'MENU_003_003', canRead: true },
+            { menuId: 'MENU_003_004', canRead: true },
+            { menuId: 'MENU_003_006', canRead: true }
+        ]
+    },
+    {
+        id: 'HP_002',
+        deptId: 'DEPT_001',
+        positionId: '',
+        statusCode: 'ACTIVE',
+        permissions: [
+            { menuId: 'MENU_001', canRead: true },
+            { menuId: 'MENU_001_001', canRead: true },
+            { menuId: 'MENU_001_003', canRead: true },
+            { menuId: 'MENU_003', canRead: true },
+            { menuId: 'MENU_003_001', canRead: true },
+            { menuId: 'MENU_003_002', canRead: true },
+            { menuId: 'MENU_003_006', canRead: true }
+        ]
     }
 ];
 
@@ -2351,6 +2553,7 @@ if (typeof window !== 'undefined') {
     window.mockRoleGroupPermissions = mockRoleGroupPermissions;
     window.mockIndividualPermissions = mockIndividualPermissions;
     window.mockUserMapping = mockUserMapping;
+    window.mockHierarchyPermissions = mockHierarchyPermissions;
 
     // 게시판 데이터
     window.mockNotices = mockNotices;
