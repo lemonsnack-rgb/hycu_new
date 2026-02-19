@@ -2810,83 +2810,7 @@ const views = {
         `;
     },
 
-    // ========== 권한 관리 ==========
-    permissionManagement: () => {
-        const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
-        const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
-        const roleGroups = (typeof mockRoleGroups !== 'undefined') ? mockRoleGroups : [];
-
-        return `
-            <div class="bg-white rounded-lg shadow-md">
-                <div class="p-6 border-b">
-                    <h2 class="text-2xl font-bold text-gray-800">권한 관리</h2>
-                    <p class="text-sm text-gray-600 mt-2">소속/신분/역할그룹/개인별 메뉴 접근 권한을 관리합니다.</p>
-                </div>
-
-                <!-- 탭 영역 -->
-                <div class="border-b">
-                    <div class="flex" id="permission-tabs">
-                        <button onclick="switchPermissionTab('dept')" data-tab="dept"
-                                class="px-6 py-3 text-sm font-medium border-b-2 border-[#6A0028] text-[#6A0028]">소속별</button>
-                        <button onclick="switchPermissionTab('position')" data-tab="position"
-                                class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">신분별</button>
-                        <button onclick="switchPermissionTab('rolegroup')" data-tab="rolegroup"
-                                class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">역할그룹별</button>
-                        <button onclick="switchPermissionTab('individual')" data-tab="individual"
-                                class="px-6 py-3 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700">개인별</button>
-                    </div>
-                </div>
-
-                <!-- 필터 영역 -->
-                <div class="p-6 border-b bg-gray-50">
-                    <!-- 소속별 필터 -->
-                    <div id="filter-dept" class="permission-filter flex items-center gap-3">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">소속</label>
-                        <select id="perm-dept-select" class="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
-                            <option value="">선택하세요</option>
-                            ${departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
-                        </select>
-                        <button onclick="filterPermissionByDept()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
-                    </div>
-                    <!-- 신분별 필터 -->
-                    <div id="filter-position" class="permission-filter hidden flex items-center gap-3">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">신분</label>
-                        <select id="perm-position-select" class="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
-                            <option value="">선택하세요</option>
-                            ${positions.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
-                        </select>
-                        <button onclick="filterPermissionByPosition()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
-                    </div>
-                    <!-- 역할그룹별 필터 -->
-                    <div id="filter-rolegroup" class="permission-filter hidden flex items-center gap-3">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">역할그룹</label>
-                        <select id="perm-rolegroup-select" class="flex-1 max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
-                            <option value="">선택하세요</option>
-                            ${roleGroups.map(r => `<option value="${r.id}">${r.name}</option>`).join('')}
-                        </select>
-                        <button onclick="filterPermissionByRoleGroup()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
-                    </div>
-                    <!-- 개인별 필터 -->
-                    <div id="filter-individual" class="permission-filter hidden flex items-center gap-3">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">사용자ID</label>
-                        <input type="text" id="perm-user-id" placeholder="예: admin"
-                               class="max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
-                        <button onclick="filterPermissionByUser()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
-                    </div>
-                </div>
-
-                <!-- 메뉴 접근권한 매트릭스 -->
-                <div class="p-6" id="permission-matrix-area">
-                    <div class="text-center py-12 text-gray-400">
-                        <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                        <p class="text-sm">위 필터에서 항목을 선택한 후 [조회] 버튼을 클릭하세요.</p>
-                    </div>
-                </div>
-            </div>
-        `;
-    },
+    // ========== 권한 관리 (V1 삭제됨 - V2가 아래에서 재정의) ==========
 
     // ========== 대리로그인 ==========
     proxyLogin: () => {
@@ -3956,180 +3880,16 @@ const views = {
         `;
     },
 
-    // ========== 권한 관리 (ERP 연동 기반) ==========
+    // ========== 권한 관리 (단일 화면 통합형: 소속 > 신분 > 상태 → 권한 부여) ==========
     permissionManagement: () => {
-        // 초기화: 선택된 탭과 대상
-        const currentTab = window.currentPermissionTab || 'department';
-        const currentTargetId = window.currentPermissionTargetId || (currentTab === 'department' ? 'DEPT_001' : null);
-
-        // 탭별 데이터
-        const tabData = {
-            department: mockDepartments,
-            position: mockPositions,
-            roleGroup: mockRoleGroups,
-            individual: mockUsers
-        };
-
-        const currentData = tabData[currentTab];
-        const selectedTarget = currentData?.find(item => item.id === currentTargetId) || currentData?.[0];
-
-        // 현재 대상의 권한 가져오기
-        let currentPermissions = [];
-        if (currentTab === 'department') {
-            currentPermissions = mockDepartmentPermissions.find(dp => dp.departmentId === selectedTarget?.id)?.permissions || [];
-        } else if (currentTab === 'position') {
-            currentPermissions = mockPositionPermissions.find(pp => pp.positionId === selectedTarget?.id)?.permissions || [];
-        } else if (currentTab === 'roleGroup') {
-            currentPermissions = mockRoleGroupPermissions.find(rp => rp.roleGroupId === selectedTarget?.id)?.permissions || [];
-        } else if (currentTab === 'individual') {
-            currentPermissions = mockIndividualPermissions.find(ip => ip.userId === selectedTarget?.id)?.permissions || [];
-        }
-
-        // 권한 매트릭스 생성
-        const menuTree = mockMenus.filter(m => m.depth === 1);
-
         return `
             <div class="bg-white rounded-lg shadow-md">
-                <!-- Header -->
                 <div class="p-6 border-b">
-                    <div>
-                        <h3 class="text-lg font-bold text-gray-800">권한 관리</h3>
-                        <p class="text-sm text-gray-600 mt-1">부서, 신분, 역할그룹, 개인별 권한을 관리합니다.</p>
-                    </div>
+                    <h3 class="text-lg font-bold text-gray-800">권한 관리</h3>
+                    <p class="text-sm text-gray-600 mt-1">소속 > 신분 > 상태 순으로 이용자를 필터링하고 메뉴 권한을 부여합니다.</p>
                 </div>
-
-                <!-- 2-Column Layout -->
-                <div class="grid grid-cols-12 gap-4">
-                    <!-- Left Panel: Target Selection (30%) -->
-                    <div class="col-span-4 border-r" style="min-height: 600px;">
-                        <!-- Tabs -->
-                        <div class="border-b flex">
-                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'department' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
-                                    onclick="switchPermissionTab('department')">
-                                부서별
-                            </button>
-                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'position' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
-                                    onclick="switchPermissionTab('position')">
-                                신분별
-                            </button>
-                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'roleGroup' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
-                                    onclick="switchPermissionTab('roleGroup')">
-                                역할그룹별
-                            </button>
-                            <button class="flex-1 py-3 px-4 text-sm font-medium ${currentTab === 'individual' ? 'text-[#009DE8] border-b-2 border-[#009DE8] bg-blue-50' : 'text-gray-600 hover:bg-gray-50'}"
-                                    onclick="switchPermissionTab('individual')">
-                                개인별
-                            </button>
-                        </div>
-
-                        <!-- Search -->
-                        <div class="p-4 border-b bg-gray-50">
-                            <input type="text"
-                                   id="target-search"
-                                   placeholder="검색..."
-                                   class="w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
-                        </div>
-
-                        <!-- Target List -->
-                        <div style="max-height: 500px; overflow-y: auto;">
-                            ${currentData?.map(item => {
-                                const isSelected = item.id === selectedTarget?.id;
-                                let displayName = '';
-                                let displayInfo = '';
-
-                                if (currentTab === 'department') {
-                                    displayName = item.name;
-                                    displayInfo = `코드: ${item.code}`;
-                                } else if (currentTab === 'position') {
-                                    displayName = item.name;
-                                    displayInfo = `코드: ${item.code}`;
-                                } else if (currentTab === 'roleGroup') {
-                                    displayName = item.name;
-                                    displayInfo = `코드: ${item.id}`;
-                                } else if (currentTab === 'individual') {
-                                    displayName = item.name;
-                                    displayInfo = `${item.employeeNumber || item.studentNumber || item.username}`;
-                                }
-
-                                return `
-                                <div class="px-4 py-3 border-b cursor-pointer hover:bg-gray-50 ${isSelected ? 'bg-blue-50 border-l-4 border-l-[#009DE8]' : ''}"
-                                     onclick="selectPermissionTarget('${currentTab}', '${item.id}')">
-                                    <div class="font-medium text-gray-800 text-sm">${displayName}</div>
-                                    <div class="text-xs text-gray-500 mt-1">${displayInfo}</div>
-                                </div>
-                                `;
-                            }).join('')}
-                        </div>
-                    </div>
-
-                    <!-- Right Panel: Access Permission Matrix (70%) -->
-                    <div class="col-span-8">
-                        <div class="p-6 border-b bg-gray-50">
-                            <div class="flex justify-between items-center">
-                                <div>
-                                    <h4 class="font-bold text-gray-800">${selectedTarget?.name || '선택된 대상 없음'}</h4>
-                                    <p class="text-xs text-gray-500 mt-1">메뉴별 접근 권한을 설정합니다.</p>
-                                </div>
-                                <div class="flex space-x-2">
-                                    <button onclick="resetPermissionMatrix()"
-                                            class="px-4 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-100">
-                                        초기화
-                                    </button>
-                                    <button onclick="savePermissionMatrix()"
-                                            class="px-4 py-2 text-sm bg-[#009DE8] text-white rounded-md hover:bg-opacity-90">
-                                        저장
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Permission Matrix Table -->
-                        <div style="max-height: 520px; overflow-y: auto;">
-                            <table class="w-full table-fixed">
-                                <thead class="bg-gray-100 sticky top-0">
-                                    <tr>
-                                        <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700" style="width: 70%;">메뉴명</th>
-                                        <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700" style="width: 30%;">접근</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${menuTree.map(menu1 => {
-                                        const perm1 = currentPermissions.find(p => p.menuId === menu1.id) || {};
-                                        const children = mockMenus.filter(m => m.parentId === menu1.id);
-
-                                        return `
-                                        <!-- 1depth Menu -->
-                                        <tr class="bg-blue-50 border-b">
-                                            <td class="py-3 px-4 font-semibold text-sm">${menu1.name}</td>
-                                            <td class="text-center py-2">
-                                                <input type="checkbox"
-                                                       ${perm1.canRead ? 'checked' : ''}
-                                                       class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                       data-menu="${menu1.id}" data-crud="R"
-                                                       onchange="toggleParentMenuAccess('${menu1.id}', this.checked)">
-                                            </td>
-                                        </tr>
-                                        ${children.map(menu2 => {
-                                            const perm2 = currentPermissions.find(p => p.menuId === menu2.id) || {};
-                                            return `
-                                            <!-- 2depth Menu -->
-                                            <tr class="border-b hover:bg-gray-50">
-                                                <td class="py-3 px-4 text-sm pl-8">└ ${menu2.name}</td>
-                                                <td class="text-center py-2">
-                                                    <input type="checkbox"
-                                                           ${perm2.canRead ? 'checked' : ''}
-                                                           class="w-4 h-4 text-[#009DE8] border-gray-300 rounded focus:ring-[#009DE8]"
-                                                           data-menu="${menu2.id}" data-crud="R">
-                                                </td>
-                                            </tr>
-                                            `;
-                                        }).join('')}
-                                        `;
-                                    }).join('')}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
+                <div id="perm-page-content">
+                    ${renderPermissionPage()}
                 </div>
             </div>
         `;
@@ -5854,64 +5614,88 @@ views.noticeManagement = () => `
 // ========== 메뉴 관리 ==========
 views.menuManagement = () => {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const depth1Count = menus.filter(m => m.depth === 1).length;
+    const depth2Count = menus.filter(m => m.depth === 2).length;
 
     return `
+        <!-- Section 1: 최상위 메뉴 관리 -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">최상위 메뉴 관리</h2>
+                <p class="text-sm text-gray-600 mt-2">최상위 메뉴의 이름, 경로, 사용여부를 관리합니다.</p>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">최상위 메뉴 목록</h3>
+                        <span class="table-count" id="top-menu-count">(${depth1Count}건)</span>
+                    </div>
+                    <div class="table-header-right">
+                        <button onclick="addNewTopMenu()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            최상위 메뉴 추가
+                        </button>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="min-w-full table-fixed">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(한글)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(영어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(중국어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">경로</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 70px;">사용여부</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="topMenuTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: 메뉴 관리 -->
         <div class="bg-white rounded-lg shadow-md">
             <div class="p-6 border-b">
                 <h2 class="text-2xl font-bold text-gray-800">메뉴 관리</h2>
-                <p class="text-sm text-gray-600 mt-2">시스템 메뉴의 이름, 다국어, 사용여부, 순서를 관리합니다.</p>
+                <p class="text-sm text-gray-600 mt-2">하위 메뉴의 이름, 상위메뉴, 경로 등을 관리합니다.</p>
             </div>
-
-            <!-- 조회 + 메뉴추가 영역 -->
-            <div class="p-6 border-b bg-gray-50">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center gap-3">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap">메뉴명</label>
-                        <input type="text" id="filter-menu-name" placeholder="메뉴명 검색"
-                               class="max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
-                        <label class="text-sm font-medium text-gray-700 whitespace-nowrap ml-4">사용여부</label>
-                        <select id="filter-menu-active" class="max-w-xs px-3 py-2 border border-gray-300 rounded text-sm focus:ring-[#6A0028] focus:border-[#6A0028]">
-                            <option value="">전체</option>
-                            <option value="true">사용</option>
-                            <option value="false">미사용</option>
-                        </select>
-                        <button onclick="filterMenuList()" class="bg-[#6A0028] hover:bg-[#8A0034] text-white px-6 py-2 rounded text-sm font-medium">조회</button>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">메뉴 목록</h3>
+                        <span class="table-count" id="sub-menu-count">(${depth2Count}건)</span>
                     </div>
-                    <button onclick="addNewMenu()" class="bg-[#009DE8] hover:bg-[#0080C0] text-white px-4 py-2 rounded text-sm font-medium flex items-center gap-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                        메뉴 추가
-                    </button>
+                    <div class="table-header-right">
+                        <button onclick="addNewSubMenu()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            메뉴 추가
+                        </button>
+                    </div>
                 </div>
-            </div>
-
-            <!-- 테이블 타이틀 -->
-            <div class="table-header">
-                <div class="table-header-left">
-                    <h3 class="table-title">메뉴 목록</h3>
-                    <span class="table-count" id="menu-count">(${menus.length}건)</span>
+                <div class="table-scroll">
+                    <table class="min-w-full table-fixed">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(한글)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(영어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(중국어명)</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">상위메뉴</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">경로</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 70px;">사용여부</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subMenuTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
                 </div>
-            </div>
-
-            <!-- 인라인 편집 테이블 -->
-            <div class="overflow-x-auto">
-                <table class="min-w-full table-auto">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 130px;">메뉴ID</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 180px;">메뉴명 (계층)</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 130px;">한글명</th>
-                            <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 130px;">중국어명</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">상위메뉴</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">사용</th>
-                            <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
-                        </tr>
-                    </thead>
-                    <tbody id="menuTableBody" class="bg-white divide-y divide-gray-200">
-                        <!-- 데이터는 initMenuManagement에서 동적 렌더링 -->
-                    </tbody>
-                </table>
             </div>
         </div>
     `;

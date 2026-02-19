@@ -3791,110 +3791,201 @@ function renderPermTabContent() { return renderPermissionPage(); }
 
 // ========== 메뉴 관리 ==========
 
+// 양쪽 테이블 재렌더링 헬퍼
+function renderAllMenuTables() {
+    renderTopMenuTable();
+    renderSubMenuTable();
+}
+
 // 메뉴관리 화면 초기화
 function initMenuManagement() {
-    renderMenuTable();
+    renderAllMenuTables();
     console.log('✅ 메뉴관리 화면 초기화 완료');
 }
 
-// 메뉴 테이블 렌더링 (disabled input 기본, 행 단위 수정모드 전환)
-function renderMenuTable(filterName, filterActive) {
+// ---- Section 1: 최상위 메뉴 테이블 렌더링 ----
+function renderTopMenuTable() {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
-    const tbody = document.getElementById('menuTableBody');
+    const tbody = document.getElementById('topMenuTableBody');
     if (!tbody) return;
 
-    // 필터 적용
-    let filtered = [...menus];
-    if (filterName) {
-        filtered = filtered.filter(m => m.name.includes(filterName) || (m.nameKo && m.nameKo.includes(filterName)));
-    }
-    if (filterActive === 'true') {
-        filtered = filtered.filter(m => m.isActive === true);
-    } else if (filterActive === 'false') {
-        filtered = filtered.filter(m => m.isActive === false);
-    }
+    const depth1 = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
 
-    // 계층 정렬 (depth 1 > depth 2)
-    const sorted = [];
-    const depth1 = filtered.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
-    depth1.forEach(parent => {
-        sorted.push(parent);
-        const children = filtered.filter(m => m.parentId === parent.id).sort((a, b) => a.order - b.order);
-        sorted.push(...children);
-    });
-    const orphans = filtered.filter(m => m.depth === 2 && !depth1.find(p => p.id === m.parentId));
-    sorted.push(...orphans);
+    const countEl = document.getElementById('top-menu-count');
+    if (countEl) countEl.textContent = `(${depth1.length}건)`;
 
-    // 건수 업데이트
-    const countEl = document.getElementById('menu-count');
-    if (countEl) countEl.textContent = `(${sorted.length}건)`;
-
-    if (sorted.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 text-sm">검색 결과가 없습니다.</td></tr>';
+    if (depth1.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 최상위 메뉴가 없습니다.</td></tr>';
         return;
     }
 
-    // 상위메뉴 옵션 생성용
-    const depth1All = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
-
-    tbody.innerHTML = sorted.map((m, idx) => {
-        const isDepth1 = m.depth === 1;
-        const bgClass = isDepth1 ? 'bg-blue-50' : '';
-        const namePrefix = isDepth1 ? '📁 ' : '&nbsp;&nbsp;&nbsp;&nbsp;└ ';
-
-        // 상위메뉴 드롭다운 (현재 메뉴 자신 제외)
-        const parentOpts = depth1All.filter(p => p.id !== m.id)
-            .map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
-
-        return `
-            <tr class="${bgClass} hover:bg-gray-50 transition-colors" data-menu-id="${m.id}">
-                <td class="px-4 py-3 text-center text-sm text-gray-900">${idx + 1}</td>
-                <td class="px-4 py-3 text-left text-sm text-gray-600" style="font-family:monospace;">${m.id}</td>
-                <td class="px-4 py-3 text-left">
-                    ${namePrefix}<input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
-                        class="menu-input border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isDepth1 ? 'font-medium text-gray-900' : 'text-gray-600'} cursor-not-allowed"
-                        style="width: ${isDepth1 ? '120px' : '100px'};">
-                </td>
-                <td class="px-4 py-3 text-left">
-                    <input type="text" value="${m.nameKo || ''}" data-field="nameKo" data-id="${m.id}" disabled
-                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                </td>
-                <td class="px-4 py-3 text-left">
-                    <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
-                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
-                </td>
-                <td class="px-4 py-3 text-center">
-                    <select data-field="parentId" data-id="${m.id}" disabled
-                        class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed" style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
-                        <option value="" ${!m.parentId ? 'selected' : ''}>최상위</option>
-                        ${parentOpts}
-                    </select>
-                </td>
-                <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
-                <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
-                        class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
-                </td>
-                <td class="px-4 py-3 text-center">
-                    <div class="flex items-center justify-center gap-1">
-                        <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
-                        <button onclick="deleteMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
-                    </div>
-                </td>
-            </tr>
-        `;
-    }).join('');
+    tbody.innerHTML = depth1.map((m, idx) => `
+        <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="top">
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${idx + 1}</td>
+            <td class="px-4 py-3 text-center">
+                <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm font-medium text-gray-900 cursor-not-allowed">
+            </td>
+            <td class="px-4 py-3 text-center">
+                <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+            </td>
+            <td class="px-4 py-3 text-center">
+                <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+            </td>
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+            <td class="px-4 py-3 text-center">
+                <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+            </td>
+            <td class="px-4 py-3 text-center">
+                <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
+                    class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
+            </td>
+            <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-1">
+                    <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
+                    <button onclick="deleteTopMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
+                </div>
+            </td>
+        </tr>
+    `).join('');
 }
 
-// 행 단위 수정모드 전환 (disabled 해제 + 버튼 변경)
+// ---- Section 2: 하위 메뉴 테이블 렌더링 (상위메뉴별 그룹핑) ----
+function renderSubMenuTable() {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const tbody = document.getElementById('subMenuTableBody');
+    if (!tbody) return;
+
+    const depth1All = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
+    const depth2 = menus.filter(m => m.depth === 2);
+
+    const countEl = document.getElementById('sub-menu-count');
+    if (countEl) countEl.textContent = `(${depth2.length}건)`;
+
+    if (depth2.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 메뉴가 없습니다.</td></tr>';
+        return;
+    }
+
+    // 상위메뉴별 그룹핑
+    let html = '';
+    let globalIdx = 0;
+    depth1All.forEach(parent => {
+        const children = depth2.filter(m => m.parentId === parent.id).sort((a, b) => a.order - b.order);
+        if (children.length === 0) return;
+
+        // 그룹 구분 행
+        html += `<tr class="bg-gray-100"><td colspan="9" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴: ${parent.name} (${children.length}건)</td></tr>`;
+
+        children.forEach(m => {
+            globalIdx++;
+            const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+            html += `
+                <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="sub">
+                    <td class="px-4 py-3 text-center text-sm text-gray-600">${globalIdx}</td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <select data-field="parentId" data-id="${m.id}" disabled
+                            class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed"
+                            style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
+                            <option value="">--선택--</option>
+                            ${parentOpts}
+                        </select>
+                    </td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
+                            class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
+                            <button onclick="deleteSubMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+    });
+
+    // 고아 메뉴 (상위메뉴가 삭제된 경우)
+    const orphans = depth2.filter(m => !depth1All.find(p => p.id === m.parentId));
+    if (orphans.length > 0) {
+        html += `<tr class="bg-gray-100"><td colspan="9" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴 미지정 (${orphans.length}건)</td></tr>`;
+        orphans.forEach(m => {
+            globalIdx++;
+            const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+            html += `
+                <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="sub">
+                    <td class="px-4 py-3 text-center text-sm text-gray-600">${globalIdx}</td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <select data-field="parentId" data-id="${m.id}" disabled
+                            class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed"
+                            style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
+                            <option value="">--선택--</option>
+                            ${parentOpts}
+                        </select>
+                    </td>
+                    <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
+                            class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <input type="checkbox" ${m.isActive !== false ? 'checked' : ''} data-field="isActive" data-id="${m.id}" disabled
+                            class="menu-input w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-not-allowed">
+                    </td>
+                    <td class="px-4 py-3 text-center">
+                        <div class="flex items-center justify-center gap-1">
+                            <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
+                            <button onclick="deleteSubMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
+                        </div>
+                    </td>
+                </tr>`;
+        });
+    }
+
+    tbody.innerHTML = html;
+}
+
+// ---- 행 단위 수정모드 전환 ----
 function toggleMenuEdit(menuId) {
     const row = document.querySelector(`tr[data-menu-id="${menuId}"]`);
     if (!row) return;
-
-    // 이미 수정모드면 무시
     if (row.classList.contains('editing')) return;
 
-    // 모든 input/select의 disabled 해제 + 활성화 스타일 적용
+    const section = row.dataset.menuSection || 'top';
+
+    // input/select disabled 해제
     row.querySelectorAll('.menu-input').forEach(el => {
         el.disabled = false;
         el.classList.remove('bg-gray-50', 'cursor-not-allowed');
@@ -3913,18 +4004,20 @@ function toggleMenuEdit(menuId) {
         }
     });
 
-    // 순서 컬럼(td[6])에 ▲▼ 버튼 추가
+    // 컬럼 인덱스: top(8컬럼) 순서=4, 관리=7 / sub(9컬럼) 순서=5, 관리=8
     const cells = row.querySelectorAll('td');
-    const currentOrder = cells[6].textContent.trim();
-    cells[6].innerHTML = `
+    const orderIdx = (section === 'top') ? 4 : 5;
+    const mgmtIdx = (section === 'top') ? 7 : 8;
+
+    const currentOrder = cells[orderIdx].textContent.trim();
+    cells[orderIdx].innerHTML = `
         <div class="flex items-center justify-center gap-1">
             <button onclick="moveMenuOrder('${menuId}', -1)" class="text-gray-400 hover:text-gray-700 text-sm" title="위로">▲</button>
             <span class="text-sm text-gray-600 w-4 text-center">${currentOrder}</span>
             <button onclick="moveMenuOrder('${menuId}', 1)" class="text-gray-400 hover:text-gray-700 text-sm" title="아래로">▼</button>
         </div>`;
 
-    // 관리 컬럼(td[8]) 버튼 변경: 수정/삭제 → 저장/취소
-    cells[8].innerHTML = `
+    cells[mgmtIdx].innerHTML = `
         <div class="flex items-center justify-center gap-1">
             <button onclick="saveMenuRow('${menuId}')" class="px-3 py-1 text-xs bg-[#6A0028] hover:bg-[#550020] text-white rounded">저장</button>
             <button onclick="cancelMenuEdit('${menuId}')" class="px-3 py-1 text-xs bg-gray-600 hover:bg-gray-700 text-white rounded">취소</button>
@@ -3934,7 +4027,7 @@ function toggleMenuEdit(menuId) {
     row.style.backgroundColor = '#fffbeb';
 }
 
-// 행 단위 저장
+// ---- 행 단위 저장 ----
 function saveMenuRow(menuId) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
@@ -3943,16 +4036,17 @@ function saveMenuRow(menuId) {
     const row = document.querySelector(`tr[data-menu-id="${menuId}"]`);
     if (!row) return;
 
-    // 각 input/select에서 값 수집
     const nameInput = row.querySelector('input[data-field="name"]');
-    const nameKoInput = row.querySelector('input[data-field="nameKo"]');
+    const nameEnInput = row.querySelector('input[data-field="nameEn"]');
     const nameCnInput = row.querySelector('input[data-field="nameCn"]');
+    const codeInput = row.querySelector('input[data-field="code"]');
     const parentSelect = row.querySelector('select[data-field="parentId"]');
     const activeCheckbox = row.querySelector('input[data-field="isActive"]');
 
-    if (nameInput) menu.name = nameInput.value.trim() || menu.name;
-    if (nameKoInput) menu.nameKo = nameKoInput.value.trim();
+    if (nameInput) { menu.name = nameInput.value.trim() || menu.name; menu.nameKo = menu.name; }
+    if (nameEnInput) menu.nameEn = nameEnInput.value.trim();
     if (nameCnInput) menu.nameCn = nameCnInput.value.trim();
+    if (codeInput) menu.code = codeInput.value.trim();
     if (parentSelect) {
         const newParentId = parentSelect.value || null;
         if (newParentId !== menu.parentId) {
@@ -3962,124 +4056,128 @@ function saveMenuRow(menuId) {
     }
     if (activeCheckbox) menu.isActive = activeCheckbox.checked;
 
-    // 전체 테이블 다시 렌더링 (읽기전용으로 복귀)
-    renderMenuTable();
+    renderAllMenuTables();
 }
 
-// 수정 취소 (원래 값으로 복원)
+// ---- 수정 취소 ----
 function cancelMenuEdit(menuId) {
-    // 전체 테이블 다시 렌더링 (원래 mock 데이터 기준)
-    renderMenuTable();
+    renderAllMenuTables();
 }
 
-// 메뉴 목록 필터/조회
-function filterMenuList() {
-    const name = document.getElementById('filter-menu-name')?.value.trim();
-    const active = document.getElementById('filter-menu-active')?.value;
-    renderMenuTable(name || null, active || null);
-}
+// ---- 필터 (제거됨, 하위호환 유지) ----
+function filterMenuList() { /* 필터 UI 제거됨 */ }
 
-// 상위메뉴 변경 시 depth 자동 업데이트
+// ---- 상위메뉴 변경 시 depth 자동 업데이트 ----
 function onMenuParentChange(menuId, newParentId) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
     if (!menu) return;
-
     menu.parentId = newParentId || null;
     menu.depth = newParentId ? 2 : 1;
-
-    // depth 1로 변경 시 하위 메뉴의 parentId도 업데이트 필요 없음 (이미 연결된 것 유지)
-    renderMenuTable();
+    renderAllMenuTables();
 }
 
-// 순서 이동 (▲▼)
+// ---- 순서 이동 (▲▼) ----
 function moveMenuOrder(menuId, direction) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
     if (!menu) return;
 
-    // 같은 레벨 + 같은 부모 메뉴 그룹에서 순서 교환
     const siblings = menus.filter(m => m.parentId === menu.parentId && m.depth === menu.depth)
         .sort((a, b) => a.order - b.order);
 
     const currentIdx = siblings.findIndex(m => m.id === menuId);
     const targetIdx = currentIdx + direction;
-
     if (targetIdx < 0 || targetIdx >= siblings.length) return;
 
-    // 순서 교환
     const temp = siblings[currentIdx].order;
     siblings[currentIdx].order = siblings[targetIdx].order;
     siblings[targetIdx].order = temp;
 
-    renderMenuTable();
+    renderAllMenuTables();
 }
 
-// 메뉴 추가
-function addNewMenu() {
+// ---- 최상위 메뉴 추가 ----
+function addNewTopMenu() {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
-
-    // 새 ID 생성
     const maxNum = menus.reduce((max, m) => {
-        const num = parseInt(m.id.replace('MENU_', ''));
+        const num = parseInt(m.id.replace(/MENU_/g, '').replace(/_/g, ''));
         return num > max ? num : max;
     }, 0);
     const newId = 'MENU_' + String(maxNum + 1).padStart(3, '0');
 
-    // 새 코드 생성
-    const newCode = 'new_menu_' + (maxNum + 1);
-
     const newMenu = {
-        id: newId,
-        parentId: null,
-        name: '새 메뉴',
-        nameKo: '새 메뉴',
-        nameCn: '',
-        code: newCode,
-        depth: 1,
+        id: newId, parentId: null, name: '새 메뉴', nameKo: '새 메뉴', nameEn: '', nameCn: '',
+        code: 'new_menu_' + (maxNum + 1), depth: 1,
         order: menus.filter(m => m.depth === 1).length + 1,
-        isActive: true
+        isActive: true, screen: ['admin']
     };
-
     menus.push(newMenu);
-    renderMenuTable();
-
-    // 새로 추가된 행을 자동으로 수정모드로 전환
-    setTimeout(() => {
-        toggleMenuEdit(newId);
-    }, 50);
+    renderAllMenuTables();
+    setTimeout(() => toggleMenuEdit(newId), 50);
 }
 
-// 메뉴 삭제
-function deleteMenu(menuId) {
+// ---- 하위 메뉴 추가 ----
+function addNewSubMenu() {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const depth1 = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
+    if (depth1.length === 0) { alert('최상위 메뉴를 먼저 등록해주세요.'); return; }
+
+    const maxNum = menus.reduce((max, m) => {
+        const num = parseInt(m.id.replace(/MENU_/g, '').replace(/_/g, ''));
+        return num > max ? num : max;
+    }, 0);
+    const newId = 'MENU_' + String(maxNum + 1).padStart(3, '0');
+    const defaultParent = depth1[0];
+
+    const newMenu = {
+        id: newId, parentId: defaultParent.id, name: '새 하위 메뉴', nameKo: '새 하위 메뉴', nameEn: '', nameCn: '',
+        code: 'new_sub_' + (maxNum + 1), depth: 2,
+        order: menus.filter(m => m.parentId === defaultParent.id).length + 1,
+        isActive: true, screen: ['admin']
+    };
+    menus.push(newMenu);
+    renderAllMenuTables();
+    setTimeout(() => toggleMenuEdit(newId), 50);
+}
+
+// ---- 최상위 메뉴 삭제 ----
+function deleteTopMenu(menuId) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
     if (!menu) return;
 
-    // 하위 메뉴가 있으면 경고
     const children = menus.filter(m => m.parentId === menuId);
     if (children.length > 0) {
         if (!confirm(`'${menu.name}' 메뉴 아래에 ${children.length}개 하위 메뉴가 있습니다.\n하위 메뉴도 함께 삭제됩니다. 계속하시겠습니까?`)) return;
-        // 하위 메뉴도 삭제
-        children.forEach(child => {
-            const idx = menus.findIndex(m => m.id === child.id);
-            if (idx !== -1) menus.splice(idx, 1);
-        });
+        children.forEach(child => { const idx = menus.findIndex(m => m.id === child.id); if (idx !== -1) menus.splice(idx, 1); });
     } else {
-        if (!confirm(`'${menu.name}' 메뉴를 삭제하시겠습니까?`)) return;
+        if (!confirm(`'${menu.name}' 최상위 메뉴를 삭제하시겠습니까?`)) return;
     }
-
     const idx = menus.findIndex(m => m.id === menuId);
     if (idx !== -1) menus.splice(idx, 1);
-
-    renderMenuTable();
+    renderAllMenuTables();
 }
 
-// 하위호환: 기존 함수명 (사용되지 않음)
-function saveAllMenus() { renderMenuTable(); }
+// ---- 하위 메뉴 삭제 ----
+function deleteSubMenu(menuId) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+    if (!confirm(`'${menu.name}' 메뉴를 삭제하시겠습니까?`)) return;
+    const idx = menus.findIndex(m => m.id === menuId);
+    if (idx !== -1) menus.splice(idx, 1);
+    renderSubMenuTable();
+}
+
+// 하위호환
+function saveAllMenus() { renderAllMenuTables(); }
 function editMenuModal(menuId) { toggleMenuEdit(menuId); }
-function saveMenuEdit() { renderMenuTable(); }
+function saveMenuEdit() { renderAllMenuTables(); }
 function closeMenuModal() { /* 모달 제거됨 */ }
+function addNewMenu() { addNewTopMenu(); }
+function deleteMenu(menuId) { deleteTopMenu(menuId); }
+function renderMenuTable() { renderAllMenuTables(); }
 
 // Export - 권한관리 (단일 화면 통합형)
 window.renderPermissionPage = renderPermissionPage;
@@ -4114,19 +4212,22 @@ window.initPermissionManagement = function() { console.log('권한관리 초기�
 
 // Export - 메뉴관리
 window.initMenuManagement = initMenuManagement;
-window.renderMenuTable = renderMenuTable;
-window.filterMenuList = filterMenuList;
-window.onMenuParentChange = onMenuParentChange;
-window.moveMenuOrder = moveMenuOrder;
-window.addNewMenu = addNewMenu;
-window.deleteMenu = deleteMenu;
+window.renderTopMenuTable = renderTopMenuTable;
+window.renderSubMenuTable = renderSubMenuTable;
+window.renderAllMenuTables = renderAllMenuTables;
+window.addNewTopMenu = addNewTopMenu;
+window.addNewSubMenu = addNewSubMenu;
+window.deleteTopMenu = deleteTopMenu;
+window.deleteSubMenu = deleteSubMenu;
 window.toggleMenuEdit = toggleMenuEdit;
 window.saveMenuRow = saveMenuRow;
 window.cancelMenuEdit = cancelMenuEdit;
-window.saveAllMenus = saveAllMenus;
-window.editMenuModal = editMenuModal;
-window.saveMenuEdit = saveMenuEdit;
-window.closeMenuModal = closeMenuModal;
+window.moveMenuOrder = moveMenuOrder;
+// 하위호환 별칭
+window.renderMenuTable = function() { renderTopMenuTable(); renderSubMenuTable(); };
+window.addNewMenu = addNewTopMenu;
+window.deleteMenu = deleteTopMenu;
+window.filterMenuList = function() {};
 
 window.closeAdminNotificationModal = closeAdminNotificationModal;
 window.submitAdminNotification = submitAdminNotification;
