@@ -3215,7 +3215,7 @@ window.toggleSelectAllAdmin = toggleSelectAllAdmin;
 window.sendNotificationToSelectedStudents = sendNotificationToSelectedStudents;
 window.openAdminNotificationModal = openAdminNotificationModal;
 
-// ========== 권한 관리 (단일 화면 통합형: 소속 > 신분 > 상태 → 권한 부여) ==========
+// ========== 권한 관리 (목록/상세 분리형) ==========
 
 // 상태 초기화
 if (!window._permMode) window._permMode = 'hierarchy';
@@ -3227,55 +3227,51 @@ if (!window._permSelectedRoleGroup) window._permSelectedRoleGroup = '';
 if (!window._permSearchKeyword) window._permSearchKeyword = '';
 if (!window._permMenuTab) window._permMenuTab = 'admin';
 
-// === 메인 페이지 렌더링 ===
+// === 메인 페이지 렌더링 (항상 목록) ===
 function renderPermissionPage() {
     if (!window._permMode) window._permMode = 'hierarchy';
+    return renderPermListView();
+}
+
+// === 목록화면 ===
+function renderPermListView() {
     return `
         <div class="p-6">
-            <!-- 영역 1: 권한 부여 대상 선택 -->
-            <div class="mb-6">
-                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-[#6A0028] text-white rounded-full text-xs flex items-center justify-center">1</span>
-                    권한 부여 대상 선택
-                </h4>
-
-                <!-- 부여 방식 라디오 -->
-                <div class="bg-gray-50 border rounded-lg p-4 mb-4">
-                    <div class="flex items-center gap-6">
-                        <label class="text-sm font-medium text-gray-700">부여 방식</label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="permMode" value="hierarchy" ${window._permMode === 'hierarchy' ? 'checked' : ''} onchange="switchPermMode('hierarchy')" class="text-[#6A0028] focus:ring-[#6A0028]">
-                            <span class="text-sm ${window._permMode === 'hierarchy' ? 'font-bold text-[#6A0028]' : 'text-gray-600'}">소속/신분/상태별</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="permMode" value="roleGroup" ${window._permMode === 'roleGroup' ? 'checked' : ''} onchange="switchPermMode('roleGroup')" class="text-[#6A0028] focus:ring-[#6A0028]">
-                            <span class="text-sm ${window._permMode === 'roleGroup' ? 'font-bold text-[#6A0028]' : 'text-gray-600'}">역할그룹별</span>
-                        </label>
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="permMode" value="individual" ${window._permMode === 'individual' ? 'checked' : ''} onchange="switchPermMode('individual')" class="text-[#6A0028] focus:ring-[#6A0028]">
-                            <span class="text-sm ${window._permMode === 'individual' ? 'font-bold text-[#6A0028]' : 'text-gray-600'}">개인별</span>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- 대상 선택 영역 -->
-                <div id="perm-target-section">
-                    ${renderPermTargetSection()}
+            <!-- 부여 방식 라디오 -->
+            <div class="bg-gray-50 border rounded-lg p-4 mb-4">
+                <div class="flex items-center gap-6">
+                    <label class="text-sm font-medium text-gray-700">부여 방식</label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="permMode" value="hierarchy" ${window._permMode === 'hierarchy' ? 'checked' : ''} onchange="switchPermMode('hierarchy')" class="text-[#6A0028] focus:ring-[#6A0028]">
+                        <span class="text-sm ${window._permMode === 'hierarchy' ? 'font-bold text-[#6A0028]' : 'text-gray-600'}">소속/신분/상태별</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="permMode" value="roleGroup" ${window._permMode === 'roleGroup' ? 'checked' : ''} onchange="switchPermMode('roleGroup')" class="text-[#6A0028] focus:ring-[#6A0028]">
+                        <span class="text-sm ${window._permMode === 'roleGroup' ? 'font-bold text-[#6A0028]' : 'text-gray-600'}">역할그룹별</span>
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="radio" name="permMode" value="individual" ${window._permMode === 'individual' ? 'checked' : ''} onchange="switchPermMode('individual')" class="text-[#6A0028] focus:ring-[#6A0028]">
+                        <span class="text-sm ${window._permMode === 'individual' ? 'font-bold text-[#6A0028]' : 'text-gray-600'}">개인별</span>
+                    </label>
                 </div>
             </div>
 
-            <!-- 영역 2: 메뉴별 권한 설정 -->
-            <div>
-                <h4 class="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                    <span class="w-6 h-6 bg-[#6A0028] text-white rounded-full text-xs flex items-center justify-center">2</span>
-                    메뉴별 권한 설정
-                </h4>
-                <div id="perm-matrix-section">
-                    ${renderPermMatrix()}
-                </div>
+            <!-- 모드별 목록 -->
+            <div id="perm-list-section">
+                ${renderPermListSection()}
             </div>
         </div>
     `;
+}
+
+// === 목록 영역 렌더링 (모드별) ===
+function renderPermListSection() {
+    switch (window._permMode) {
+        case 'hierarchy': return renderHierarchyMode();
+        case 'roleGroup': return renderRoleGroupMode();
+        case 'individual': return renderIndividualMode();
+        default: return renderHierarchyMode();
+    }
 }
 
 // === 부여 방식 전환 ===
@@ -3288,107 +3284,40 @@ function switchPermMode(mode) {
     window._permFilterDept = '';
     window._permFilterPos = '';
     window._permFilterStat = '';
-    // 전체 페이지 다시 렌더링
-    const container = document.getElementById('perm-page-content');
-    if (container) container.innerHTML = renderPermissionPage();
+    refreshPermPage();
 }
 
-// === 대상 선택 영역 렌더링 ===
-function renderPermTargetSection() {
-    switch (window._permMode) {
-        case 'hierarchy': return renderHierarchyMode();
-        case 'roleGroup': return renderRoleGroupMode();
-        case 'individual': return renderIndividualMode();
-        default: return renderHierarchyMode();
-    }
-}
-
-// === 소속/신분/상태별 모드 ===
+// === 소속/신분/상태별 모드 (목록 테이블만) ===
 function renderHierarchyMode() {
     const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
     const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
     const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
     const userStatuses = (typeof mockUserStatus !== 'undefined') ? mockUserStatus : [];
 
-    const editingId = window._permEditingHierarchyId || null;
-
-    // 상태 옵션
-    const statusOptions = [...new Set(userStatuses.map(s => s.statusCode))].map(code => {
-        const s = userStatuses.find(st => st.statusCode === code);
-        return { code, name: s ? s.statusName : code };
-    });
-
-    // 조합 목록 테이블
     const tableRows = hPerms.map(hp => {
         const deptName = hp.deptId ? (departments.find(d => d.id === hp.deptId) || {}).name || hp.deptId : '전체';
         const posName = hp.positionId ? (positions.find(p => p.id === hp.positionId) || {}).name || hp.positionId : '전체';
         const statusName = hp.statusCode ? (userStatuses.find(s => s.statusCode === hp.statusCode) || {}).statusName || hp.statusCode : '전체';
         const menuCount = hp.permissions ? hp.permissions.filter(p => p.canRead).length : 0;
-        const isEditing = editingId === hp.id;
         return `
-            <tr class="${isEditing ? 'bg-red-50' : 'hover:bg-gray-50'} border-b">
+            <tr class="hover:bg-gray-50 border-b">
                 <td class="py-2.5 px-4 text-sm">${deptName}</td>
                 <td class="py-2.5 px-4 text-sm">${posName}</td>
                 <td class="py-2.5 px-4 text-sm">${statusName}</td>
                 <td class="py-2.5 px-4 text-sm text-center"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">${menuCount}개</span></td>
                 <td class="py-2.5 px-4 text-sm text-center">
-                    <button onclick="editHierarchyPerm('${hp.id}')" class="px-2 py-1 text-xs ${isEditing ? 'bg-[#6A0028] text-white' : 'text-[#6A0028] border border-[#6A0028]'} rounded hover:bg-[#8A0034] hover:text-white mr-1">편집</button>
+                    <button onclick="editHierarchyPerm('${hp.id}')" class="px-2 py-1 text-xs text-[#6A0028] border border-[#6A0028] rounded hover:bg-[#8A0034] hover:text-white mr-1">편집</button>
                     <button onclick="deleteHierarchyPerm('${hp.id}')" class="px-2 py-1 text-xs text-red-600 border border-red-300 rounded hover:bg-red-50">삭제</button>
                 </td>
             </tr>
         `;
     }).join('');
 
-    // 편집 영역 (조합 추가/편집 시)
-    let editSection = '';
-    if (editingId === '__new__' || (editingId && hPerms.find(h => h.id === editingId))) {
-        const editItem = editingId === '__new__' ? null : hPerms.find(h => h.id === editingId);
-        const filterDept = editItem ? editItem.deptId : (window._permFilterDept || '');
-        const filterPos = editItem ? editItem.positionId : (window._permFilterPos || '');
-        const filterStat = editItem ? editItem.statusCode : (window._permFilterStat || '');
-
-        editSection = `
-            <div class="mt-4 border rounded-lg border-[#6A0028]">
-                <div class="bg-red-50 p-3 border-b border-[#6A0028] flex justify-between items-center">
-                    <p class="text-sm font-bold text-[#6A0028]">${editingId === '__new__' ? '새 조합 추가' : '조합 편집'}</p>
-                    <button onclick="cancelHierarchyEdit()" class="text-xs text-gray-500 hover:text-gray-700">취소</button>
-                </div>
-                <div class="p-4 bg-gray-50 border-b">
-                    <div class="flex items-center gap-3 flex-wrap">
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">소속</label>
-                            <select id="perm-filter-dept" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]" onchange="onPermFilterChange()">
-                                <option value="">전체</option>
-                                ${departments.map(d => `<option value="${d.id}" ${filterDept === d.id ? 'selected' : ''}>${d.name}</option>`).join('')}
-                            </select>
-                        </div>
-                        <span class="text-gray-300">|</span>
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">신분</label>
-                            <select id="perm-filter-pos" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]" onchange="onPermFilterChange()">
-                                <option value="">전체</option>
-                                ${positions.map(p => `<option value="${p.id}" ${filterPos === p.id ? 'selected' : ''}>${p.name}</option>`).join('')}
-                            </select>
-                        </div>
-                        <span class="text-gray-300">|</span>
-                        <div class="flex items-center gap-2">
-                            <label class="text-sm font-medium text-gray-700 whitespace-nowrap">상태</label>
-                            <select id="perm-filter-stat" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]" onchange="onPermFilterChange()">
-                                <option value="">전체</option>
-                                ${statusOptions.map(s => `<option value="${s.code}" ${filterStat === s.code ? 'selected' : ''}>${s.name}</option>`).join('')}
-                            </select>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `;
-    }
-
     return `
         <div class="border rounded-lg">
             <div class="p-4">
                 <div class="flex justify-between items-center mb-3">
-                    <p class="text-sm font-medium text-gray-700">등록된 권한 조합</p>
+                    <p class="text-sm font-medium text-gray-700">등록된 권한 조합 <span class="text-gray-400 text-xs ml-1">(${hPerms.length}건)</span></p>
                     <button onclick="addHierarchyPerm()" class="px-3 py-1.5 text-xs bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">+ 새 조합 추가</button>
                 </div>
                 ${hPerms.length > 0 ? `
@@ -3406,40 +3335,28 @@ function renderHierarchyMode() {
                 </table>
                 ` : '<p class="text-sm text-gray-400 text-center py-4">등록된 조합이 없습니다.</p>'}
             </div>
-            ${editSection}
         </div>
     `;
 }
 
-// 조합 편집 모드 진입
+// 조합 편집 → 모달 팝업
 function editHierarchyPerm(id) {
-    window._permEditingHierarchyId = id;
-    // 기존 조합의 필터값 세팅
-    const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
-    const hp = hPerms.find(h => h.id === id);
-    if (hp) {
-        window._permFilterDept = hp.deptId || '';
-        window._permFilterPos = hp.positionId || '';
-        window._permFilterStat = hp.statusCode || '';
+    if (typeof openPermEditModal === 'function') {
+        openPermEditModal('hierarchy', id);
     }
-    window._permSelectedUsers = ['__hierarchy_target__'];
-    refreshPermPage();
 }
 
-// 새 조합 추가 모드 진입
+// 새 조합 추가 → 모달 팝업
 function addHierarchyPerm() {
-    window._permEditingHierarchyId = '__new__';
-    window._permFilterDept = '';
-    window._permFilterPos = '';
-    window._permFilterStat = '';
-    window._permSelectedUsers = ['__hierarchy_target__'];
-    refreshPermPage();
+    if (typeof openHierarchyPermModal === 'function') {
+        openHierarchyPermModal();
+    } else {
+        alert('openHierarchyPermModal 함수를 찾을 수 없습니다.');
+    }
 }
 
-// 조합 편집 취소
+// 조합 편집 취소 (하위호환)
 function cancelHierarchyEdit() {
-    window._permEditingHierarchyId = null;
-    window._permSelectedUsers = [];
     refreshPermPage();
 }
 
@@ -3452,58 +3369,65 @@ function deleteHierarchyPerm(id) {
     if (window._permEditingHierarchyId === id) window._permEditingHierarchyId = null;
     window._permSelectedUsers = [];
     refreshPermPage();
-    showToast('권한 조합이 삭제되었습니다.', 'success');
+    if (typeof showToast === 'function') showToast('권한 조합이 삭제되었습니다.', 'success');
+    else alert('권한 조합이 삭제되었습니다.');
 }
 
-// === 역할그룹별 모드 ===
+// === 역할그룹별 모드 (테이블 목록) ===
 function renderRoleGroupMode() {
     const roleGroups = (typeof mockRoleGroups !== 'undefined') ? mockRoleGroups : [];
-    const selectedGroupId = window._permSelectedRoleGroup || '';
-    const selectedGroup = roleGroups.find(g => g.id === selectedGroupId);
+    const rgPerms = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
 
-    const users = (typeof mockUsers !== 'undefined') ? mockUsers : [];
-    const userMapping = (typeof mockUserMapping !== 'undefined') ? mockUserMapping : [];
-    const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
-    const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
-
-    // memberIds 기반으로 멤버 정보 조회
-    const members = (selectedGroup && selectedGroup.memberIds) ? selectedGroup.memberIds.map(uid => {
-        const user = users.find(u => u.username === uid);
-        const mapping = userMapping.find(m => m.userId === uid) || {};
-        const dept = departments.find(d => d.id === mapping.departmentId);
-        const pos = positions.find(p => p.id === mapping.positionId);
-        const num = user ? (user.employeeNumber || user.studentNumber || user.username) : uid;
-        return { userId: uid, name: user ? user.name : uid, num, dept: dept ? dept.name : '-', position: pos ? pos.name : '-' };
-    }) : [];
+    const tableRows = roleGroups.map(g => {
+        const memberCount = g.memberIds ? g.memberIds.length : (g.memberCount || 0);
+        const gPerm = rgPerms.find(rp => rp.roleGroupId === g.id);
+        const menuCount = gPerm ? gPerm.permissions.filter(p => p.canRead).length : 0;
+        return `
+            <tr class="hover:bg-gray-50 border-b">
+                <td class="py-2.5 px-4 text-sm font-medium">${g.name}</td>
+                <td class="py-2.5 px-4 text-sm text-gray-600">${g.description || '-'}</td>
+                <td class="py-2.5 px-4 text-sm text-center"><span class="px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs font-medium">${memberCount}명</span></td>
+                <td class="py-2.5 px-4 text-sm text-center"><span class="px-2 py-0.5 bg-blue-100 text-blue-700 rounded text-xs font-medium">${menuCount}개</span></td>
+                <td class="py-2.5 px-4 text-sm text-center">
+                    <button onclick="editRoleGroupPerm('${g.id}')" class="px-2 py-1 text-xs text-[#6A0028] border border-[#6A0028] rounded hover:bg-[#8A0034] hover:text-white mr-1">편집</button>
+                    <button onclick="openRoleGroupModal('${g.id}')" class="px-2 py-1 text-xs text-gray-600 border border-gray-300 rounded hover:bg-gray-100 mr-1">수정</button>
+                    <button onclick="deleteRoleGroup('${g.id}')" class="px-2 py-1 text-xs text-red-600 border border-red-300 rounded hover:bg-red-50">삭제</button>
+                </td>
+            </tr>
+        `;
+    }).join('');
 
     return `
-        <div class="border rounded-lg p-4">
-            <div class="flex items-center gap-3 mb-4">
-                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">역할그룹</label>
-                <select id="perm-rolegroup-select" class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] w-64"
-                        onchange="selectPermRoleGroup(this.value)">
-                    <option value="">선택하세요</option>
-                    ${roleGroups.map(g => `<option value="${g.id}" ${selectedGroupId === g.id ? 'selected' : ''}>${g.name} (${g.memberIds ? g.memberIds.length : g.memberCount}명)</option>`).join('')}
-                </select>
-                <button onclick="openRoleGroupModal()" class="px-3 py-2 text-xs bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">+ 추가</button>
-                ${selectedGroupId ? `
-                <button onclick="openRoleGroupModal('${selectedGroupId}')" class="px-3 py-2 text-xs text-[#6A0028] border border-[#6A0028] rounded hover:bg-red-50">수정</button>
-                <button onclick="deleteRoleGroup('${selectedGroupId}')" class="px-3 py-2 text-xs text-red-600 border border-red-300 rounded hover:bg-red-50">삭제</button>
-                ` : ''}
-            </div>
-            ${selectedGroup ? `
-            <div class="bg-gray-50 border rounded p-3">
-                <p class="text-xs text-gray-500 mb-2">${selectedGroup.description || ''}</p>
-                <p class="text-sm font-medium text-gray-700 mb-2">소속 멤버 (${members.length}명)</p>
-                ${members.length > 0 ? `
-                <div class="flex flex-wrap gap-2">
-                    ${members.map(m => `<span class="px-2 py-1 bg-white border rounded text-xs text-gray-700">${m.num} ${m.name} <span class="text-gray-400">(${m.dept}/${m.position})</span></span>`).join('')}
+        <div class="border rounded-lg">
+            <div class="p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-sm font-medium text-gray-700">등록된 역할그룹 <span class="text-gray-400 text-xs ml-1">(${roleGroups.length}건)</span></p>
+                    <button onclick="openRoleGroupModal()" class="px-3 py-1.5 text-xs bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">+ 새 역할그룹 추가</button>
                 </div>
-                ` : '<p class="text-xs text-gray-400">멤버가 없습니다.</p>'}
+                ${roleGroups.length > 0 ? `
+                <table class="w-full table-fixed">
+                    <thead class="bg-gray-100">
+                        <tr>
+                            <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:20%">역할그룹명</th>
+                            <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:28%">설명</th>
+                            <th class="text-center py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:12%">멤버수</th>
+                            <th class="text-center py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:12%">허용메뉴</th>
+                            <th class="text-center py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:28%">작업</th>
+                        </tr>
+                    </thead>
+                    <tbody>${tableRows}</tbody>
+                </table>
+                ` : '<p class="text-sm text-gray-400 text-center py-4">등록된 역할그룹이 없습니다.</p>'}
             </div>
-            ` : '<p class="text-sm text-gray-400">역할그룹을 선택하세요.</p>'}
         </div>
     `;
+}
+
+// 역할그룹 편집 → 모달 팝업
+function editRoleGroupPerm(groupId) {
+    if (typeof openPermEditModal === 'function') {
+        openPermEditModal('roleGroup', groupId);
+    }
 }
 
 // 역할그룹 삭제
@@ -3513,16 +3437,13 @@ function deleteRoleGroup(groupId) {
     if (!group) return;
     if (!confirm(`'${group.name}' 역할그룹을 삭제하시겠습니까?`)) return;
 
-    // mockRoleGroups에서 제거
     const idx = roleGroups.findIndex(g => g.id === groupId);
     if (idx >= 0) roleGroups.splice(idx, 1);
 
-    // mockRoleGroupPermissions에서 제거
     const rgPerms = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
     const permIdx = rgPerms.findIndex(rp => rp.roleGroupId === groupId);
     if (permIdx >= 0) rgPerms.splice(permIdx, 1);
 
-    // mockUserMapping에서 해당 그룹 ID 제거
     const userMapping = (typeof mockUserMapping !== 'undefined') ? mockUserMapping : [];
     userMapping.forEach(m => {
         if (m.roleGroupIds) {
@@ -3533,17 +3454,17 @@ function deleteRoleGroup(groupId) {
 
     window._permSelectedRoleGroup = '';
     refreshPermPage();
-    showToast('역할그룹이 삭제되었습니다.', 'success');
+    if (typeof showToast === 'function') showToast('역할그룹이 삭제되었습니다.', 'success');
+    else alert('역할그룹이 삭제되었습니다.');
 }
 
-// === 개인별 모드 ===
+// === 개인별 모드 (검색 + 테이블 목록) ===
 function renderIndividualMode() {
     const users = (typeof mockUsers !== 'undefined') ? mockUsers : [];
     const userMapping = (typeof mockUserMapping !== 'undefined') ? mockUserMapping : [];
     const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
     const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
     const keyword = window._permSearchKeyword || '';
-    const selectedUsers = window._permSelectedUsers || [];
 
     let filteredUsers = users;
     if (keyword) {
@@ -3558,47 +3479,70 @@ function renderIndividualMode() {
         return { ...u, deptName: dept ? dept.name : '-', posName: pos ? pos.name : '-' };
     });
 
+    const tableRows = enriched.map(u => `
+        <tr class="hover:bg-gray-50 border-b">
+            <td class="py-2.5 px-4 text-sm font-medium">${u.username}</td>
+            <td class="py-2.5 px-4 text-sm">${u.name}</td>
+            <td class="py-2.5 px-4 text-sm text-gray-600">${u.deptName}</td>
+            <td class="py-2.5 px-4 text-sm text-gray-600">${u.posName}</td>
+            <td class="py-2.5 px-4 text-sm text-center">
+                <button onclick="editIndividualPerm('${u.username}')" class="px-2 py-1 text-xs text-[#6A0028] border border-[#6A0028] rounded hover:bg-[#8A0034] hover:text-white">편집</button>
+            </td>
+        </tr>
+    `).join('');
+
     return `
-        <div class="border rounded-lg p-4">
-            <div class="flex items-center gap-3 mb-4">
-                <label class="text-sm font-medium text-gray-700 whitespace-nowrap">이용자 검색</label>
-                <input type="text" id="perm-user-search" value="${keyword}" placeholder="이름 또는 ID 입력"
-                       class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] w-64"
-                       onkeydown="if(event.key==='Enter') searchPermUser(this.value)">
-                <button onclick="searchPermUser(document.getElementById('perm-user-search').value)" class="px-4 py-2 text-sm bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">검색</button>
+        <div class="border rounded-lg">
+            <div class="p-4">
+                <div class="flex items-center gap-3 mb-3">
+                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap">이용자 검색</label>
+                    <input type="text" id="perm-user-search" value="${keyword}" placeholder="이름 또는 ID 입력"
+                           class="px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028] w-64"
+                           onkeydown="if(event.key==='Enter') searchPermUser(this.value)">
+                    <button onclick="searchPermUser(document.getElementById('perm-user-search').value)" class="px-4 py-2 text-sm bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">검색</button>
+                    ${keyword ? `<button onclick="searchPermUser('')" class="px-3 py-2 text-xs text-gray-600 border border-gray-300 rounded hover:bg-gray-100">초기화</button>` : ''}
+                </div>
+                <p class="text-xs text-gray-400 mb-2">검색 결과: ${enriched.length}건</p>
+                ${enriched.length > 0 ? `
+                <div style="max-height: 350px; overflow-y: auto;">
+                    <table class="w-full table-fixed">
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:20%">ID</th>
+                                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:20%">이름</th>
+                                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:22%">소속</th>
+                                <th class="text-left py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:18%">신분</th>
+                                <th class="text-center py-2.5 px-4 text-xs font-semibold text-gray-700" style="width:20%">작업</th>
+                            </tr>
+                        </thead>
+                        <tbody>${tableRows}</tbody>
+                    </table>
+                </div>
+                ` : '<p class="text-sm text-gray-400 text-center py-4">검색 결과가 없습니다.</p>'}
             </div>
-            ${enriched.length > 0 ? `
-            <div style="max-height: 250px; overflow-y: auto;">
-                ${enriched.map(u => `
-                <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer ${selectedUsers.includes(u.username) ? 'bg-red-50' : ''}">
-                    <input type="checkbox" value="${u.username}" ${selectedUsers.includes(u.username) ? 'checked' : ''}
-                           onchange="togglePermUser('${u.username}', this.checked)"
-                           class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
-                    <span class="text-sm font-medium text-gray-800">${u.username}</span>
-                    <span class="text-sm text-gray-600">${u.name}</span>
-                    <span class="text-xs text-gray-400">(${u.deptName} / ${u.posName})</span>
-                </label>
-                `).join('')}
-            </div>
-            ` : '<p class="text-sm text-gray-400">검색 결과가 없습니다.</p>'}
         </div>
     `;
 }
 
-// === 필터 변경 (조합 편집 시 매트릭스 갱신) ===
+// 개인별 편집 → 모달 팝업
+function editIndividualPerm(userId) {
+    if (typeof openPermEditModal === 'function') {
+        openPermEditModal('individual', userId);
+    }
+}
+
+// === 필터 변경 (상세화면에서 조합 드롭다운 변경 시) ===
 function confirmPermTarget() { onPermFilterChange(); }
 
 function onPermFilterChange() {
-    // 편집 중인 조합의 드롭다운 값만 저장 (매트릭스는 저장 시점에 반영)
     window._permFilterDept = document.getElementById('perm-filter-dept')?.value || '';
     window._permFilterPos = document.getElementById('perm-filter-pos')?.value || '';
     window._permFilterStat = document.getElementById('perm-filter-stat')?.value || '';
-    // 매트릭스만 갱신 (전체 페이지 리렌더 대신)
     const matrixEl = document.getElementById('perm-matrix-section');
     if (matrixEl) matrixEl.innerHTML = renderPermMatrix();
 }
 
-function onPermAllToggle() { /* 전체 체크박스 제거됨 - 하위호환용 */ }
+function onPermAllToggle() { /* 하위호환용 */ }
 function filterPermUsers() { onPermFilterChange(); }
 
 function resetPermFilters() {
@@ -3610,9 +3554,8 @@ function resetPermFilters() {
     refreshPermPage();
 }
 
-// === 이용자 선택 (개인별 모드 전용) ===
+// === 이용자 선택 (하위호환) ===
 function togglePermUserAll(checked) {
-    // 개인별 모드에서만 사용
     if (window._permMode !== 'individual') return;
     refreshPermPage();
 }
@@ -3624,14 +3567,14 @@ function togglePermUser(userId, checked) {
     } else {
         window._permSelectedUsers = window._permSelectedUsers.filter(id => id !== userId);
     }
-    // 매트릭스만 업데이트
     const matrixContainer = document.getElementById('perm-matrix-section');
     if (matrixContainer) matrixContainer.innerHTML = renderPermMatrix();
 }
 
 function selectPermRoleGroup(groupId) {
-    window._permSelectedRoleGroup = groupId;
-    refreshPermPage();
+    if (typeof openPermEditModal === 'function') {
+        openPermEditModal('roleGroup', groupId);
+    }
 }
 
 function searchPermUser(keyword) {
@@ -3648,17 +3591,15 @@ function refreshPermPage() {
 // === 메뉴 권한 매트릭스 ===
 function renderPermMatrix() {
     const allMenus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
-    const currentTab = 'admin'; // 관리자 메뉴만 표시
+    const currentTab = 'admin';
     const targetLabel = getPermTargetLabel();
 
-    // 관리자 메뉴만 필터링
     const menus = allMenus.filter(m => !m.screen || m.screen.includes(currentTab));
     const menuTree = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
 
     // 현재 권한 로드
     const permMap = {};
     if (window._permMode === 'hierarchy') {
-        // 소속/신분/상태별: mockHierarchyPermissions에서 로드
         const editingId = window._permEditingHierarchyId;
         if (editingId) {
             const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
@@ -3684,7 +3625,7 @@ function renderPermMatrix() {
     if (!targetLabel) {
         return `
             <div class="border rounded-lg p-8 text-center">
-                <p class="text-gray-400 text-sm">위에서 권한을 부여할 대상을 선택하세요.</p>
+                <p class="text-gray-400 text-sm">권한을 부여할 대상을 선택하세요.</p>
             </div>
         `;
     }
@@ -3693,11 +3634,13 @@ function renderPermMatrix() {
         <div class="border rounded-lg">
             <div class="p-4 border-b bg-gray-50 flex justify-between items-center">
                 <div>
-                    <p class="text-sm font-bold text-gray-800">선택된 대상: <span class="text-[#6A0028]">${targetLabel}</span></p>
-                    <p class="text-xs text-gray-500 mt-1">관리자 시스템 메뉴 접근 권한을 설정하고 [권한 저장]을 클릭하세요.</p>
+                    <p class="text-sm font-bold text-gray-800">메뉴 접근 권한 설정</p>
                 </div>
-                <div class="flex space-x-2">
-                    <button onclick="resetMenuPermission()" class="px-3 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-100">초기화</button>
+                <div class="flex items-center space-x-3">
+                    <button onclick="permMatrixSelectAll(true)" class="text-xs text-[#6A0028] hover:underline">전체 선택</button>
+                    <span class="text-gray-300">|</span>
+                    <button onclick="permMatrixSelectAll(false)" class="text-xs text-gray-500 hover:underline">전체 해제</button>
+                    <button onclick="resetMenuPermission()" class="px-3 py-1.5 text-xs border border-gray-300 rounded hover:bg-gray-100 ml-2">초기화</button>
                     <button onclick="saveMenuPermission()" class="px-4 py-2 text-sm bg-[#6A0028] text-white rounded hover:bg-[#8A0034]">권한 저장</button>
                 </div>
             </div>
@@ -3718,7 +3661,7 @@ function renderPermMatrix() {
                                 <td class="text-center py-2">
                                     <input type="checkbox" ${permMap[menu1.id] ? 'checked' : ''}
                                            class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]"
-                                           data-menu="${menu1.id}" data-crud="R"
+                                           data-menu="${menu1.id}" data-crud="R" data-parent="true"
                                            onchange="toggleParentMenuPerm('${menu1.id}', this.checked)">
                                 </td>
                             </tr>
@@ -3728,7 +3671,7 @@ function renderPermMatrix() {
                                 <td class="text-center py-2">
                                     <input type="checkbox" ${permMap[menu2.id] ? 'checked' : ''}
                                            class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]"
-                                           data-menu="${menu2.id}" data-crud="R">
+                                           data-menu="${menu2.id}" data-crud="R" data-child="${menu1.id}">
                                 </td>
                             </tr>
                             `).join('')}
@@ -3741,7 +3684,7 @@ function renderPermMatrix() {
     `;
 }
 
-// 화면별 메뉴 탭 전환 (관리자 메뉴만 사용하므로 탭 제거됨 - 하위호환용)
+// 화면별 메뉴 탭 전환 (하위호환용)
 function switchPermMenuTab(tab) { /* 탭 제거됨 */ }
 
 // 선택 대상 라벨 생성
@@ -3754,7 +3697,6 @@ function getPermTargetLabel() {
         const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
         const statusList = (typeof mockUserStatus !== 'undefined') ? mockUserStatus : [];
 
-        // 편집 중인 조합 또는 새 조합의 필터값 사용
         const deptId = window._permFilterDept || '';
         const posId = window._permFilterPos || '';
         const statCode = window._permFilterStat || '';
@@ -3785,7 +3727,7 @@ function getPermTargetLabel() {
         if (!groupId) return '';
         const roleGroups = (typeof mockRoleGroups !== 'undefined') ? mockRoleGroups : [];
         const group = roleGroups.find(g => g.id === groupId);
-        return group ? `역할그룹: ${group.name} (${group.memberCount}명)` : '';
+        return group ? `역할그룹: ${group.name} (${group.memberIds ? group.memberIds.length : group.memberCount}명)` : '';
 
     } else if (window._permMode === 'individual') {
         const selectedUsers = window._permSelectedUsers || [];
@@ -3795,7 +3737,7 @@ function getPermTargetLabel() {
             const u = users.find(u => u.username === id);
             return u ? u.name : id;
         });
-        return `개인: ${names.join(', ')} (${selectedUsers.length}명)`;
+        return `개인: ${names.join(', ')}`;
     }
     return '';
 }
@@ -3808,6 +3750,12 @@ function toggleParentMenuPerm(menuId, checked) {
         const cb = document.querySelector(`input[data-menu="${child.id}"]`);
         if (cb) cb.checked = checked;
     });
+}
+
+// 매트릭스 전체 선택/해제
+function permMatrixSelectAll(checked) {
+    const allCb = document.querySelectorAll('input[type="checkbox"][data-menu][data-crud="R"]');
+    allCb.forEach(cb => cb.checked = checked);
 }
 
 // 메뉴 권한 저장
@@ -3823,7 +3771,6 @@ function saveMenuPermission() {
     });
 
     if (window._permMode === 'hierarchy') {
-        // 소속/신분/상태별: mockHierarchyPermissions에 저장
         const editingId = window._permEditingHierarchyId;
         if (!editingId) { alert('편집할 조합을 선택해주세요.'); return; }
 
@@ -3833,12 +3780,9 @@ function saveMenuPermission() {
         const statusCode = window._permFilterStat || '';
 
         if (editingId === '__new__') {
-            // 새 조합 추가
             const newId = 'HP_' + Date.now();
             hPerms.push({ id: newId, deptId, positionId, statusCode, permissions: newPermissions });
-            window._permEditingHierarchyId = null;
         } else {
-            // 기존 조합 수정
             const item = hPerms.find(h => h.id === editingId);
             if (item) {
                 item.deptId = deptId;
@@ -3846,11 +3790,13 @@ function saveMenuPermission() {
                 item.statusCode = statusCode;
                 item.permissions = newPermissions;
             }
-            window._permEditingHierarchyId = null;
         }
+        window._permEditingHierarchyId = null;
         window._permSelectedUsers = [];
+        if (typeof closeModal === 'function') closeModal();
         refreshPermPage();
-        showToast('권한 조합이 저장되었습니다.', 'success');
+        if (typeof showToast === 'function') showToast('권한 조합이 저장되었습니다.', 'success');
+        else alert('권한 조합이 저장되었습니다.');
 
     } else if (window._permMode === 'individual') {
         const selectedUsers = window._permSelectedUsers || [];
@@ -3865,7 +3811,10 @@ function saveMenuPermission() {
             if (!item) { item = { userId: userId, permissions: [] }; list.push(item); }
             item.permissions = [...fullPerms];
         });
-        showToast('권한 설정이 저장되었습니다.', 'success');
+        if (typeof closeModal === 'function') closeModal();
+        refreshPermPage();
+        if (typeof showToast === 'function') showToast('권한 설정이 저장되었습니다.', 'success');
+        else alert('권한 설정이 저장되었습니다.');
 
     } else if (window._permMode === 'roleGroup') {
         const groupId = window._permSelectedRoleGroup || '';
@@ -3878,7 +3827,10 @@ function saveMenuPermission() {
         let item = list.find(r => r.roleGroupId === groupId);
         if (!item) { item = { roleGroupId: groupId, permissions: [] }; list.push(item); }
         item.permissions = fullPerms;
-        showToast('권한 설정이 저장되었습니다.', 'success');
+        if (typeof closeModal === 'function') closeModal();
+        refreshPermPage();
+        if (typeof showToast === 'function') showToast('권한 설정이 저장되었습니다.', 'success');
+        else alert('권한 설정이 저장되었습니다.');
     }
 }
 
@@ -3895,6 +3847,7 @@ function switchPermissionTab() { /* 탭 제거됨 - 무시 */ }
 function selectPermissionTarget() { /* 탭 제거됨 - 무시 */ }
 function savePermissionMatrix() { saveMenuPermission(); }
 function renderPermTabContent() { return renderPermissionPage(); }
+function renderPermTargetSection() { return renderPermListSection(); }
 
 // ========== 메뉴 관리 ==========
 
@@ -4325,13 +4278,23 @@ function addNewMenu() { addNewTopMenu(); }
 function deleteMenu(menuId) { deleteTopMenu(menuId); }
 function renderMenuTable() { renderAllMenuTables(); }
 
-// Export - 권한관리 (단일 화면 통합형)
+// Export - 권한관리 (모달 통일형)
 window.renderPermissionPage = renderPermissionPage;
+window.renderPermListView = renderPermListView;
+window.renderPermListSection = renderPermListSection;
 window.switchPermMode = switchPermMode;
-window.renderPermTargetSection = renderPermTargetSection;
+// 하위호환 (제거된 함수)
+window.renderPermDetailView = function() { return renderPermListView(); };
+window.goBackToPermList = function() { refreshPermPage(); };
 window.renderHierarchyMode = renderHierarchyMode;
 window.renderRoleGroupMode = renderRoleGroupMode;
 window.renderIndividualMode = renderIndividualMode;
+window.editHierarchyPerm = editHierarchyPerm;
+window.addHierarchyPerm = addHierarchyPerm;
+window.cancelHierarchyEdit = cancelHierarchyEdit;
+window.deleteHierarchyPerm = deleteHierarchyPerm;
+window.editRoleGroupPerm = editRoleGroupPerm;
+window.editIndividualPerm = editIndividualPerm;
 window.confirmPermTarget = confirmPermTarget;
 window.onPermFilterChange = onPermFilterChange;
 window.onPermAllToggle = onPermAllToggle;
@@ -4346,15 +4309,17 @@ window.renderPermMatrix = renderPermMatrix;
 window.switchPermMenuTab = switchPermMenuTab;
 window.getPermTargetLabel = getPermTargetLabel;
 window.toggleParentMenuPerm = toggleParentMenuPerm;
+window.permMatrixSelectAll = permMatrixSelectAll;
 window.saveMenuPermission = saveMenuPermission;
 window.resetMenuPermission = resetMenuPermission;
+window.renderPermTargetSection = renderPermListSection;
 // 하위호환 (기존 호출 에러 방지)
 window.switchPermMainTab = function() {};
 window.switchPermissionTab = function() {};
 window.selectPermissionTarget = function() {};
 window.savePermissionMatrix = saveMenuPermission;
 window.resetPermissionMatrix = resetMenuPermission;
-window.initPermissionManagement = function() { console.log('권한관리 초기화 (계층형)'); };
+window.initPermissionManagement = function() { console.log('권한관리 초기화 (목록/상세 분리형)'); };
 
 // Export - 메뉴관리
 window.initMenuManagement = initMenuManagement;

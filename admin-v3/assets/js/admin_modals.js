@@ -6915,142 +6915,10 @@ window.editRole = editRole;
 window.deleteRole = deleteRole;
 
 // =============================================================================
-// ERP 연동 기반 권한 관리 함수
+// ERP 연동 기반 권한 관리 함수 → admin_main.js로 이동 완료
 // =============================================================================
-
-/**
- * 권한 관리 탭 전환
- * @param {string} tabName - department, position, roleGroup, individual
- */
-function switchPermissionTab(tabName) {
-    window.currentPermissionTab = tabName;
-
-    // 탭에 따라 첫 번째 대상 자동 선택
-    let firstTargetId = null;
-    if (tabName === 'department') {
-        firstTargetId = mockDepartments[0]?.id;
-    } else if (tabName === 'position') {
-        firstTargetId = mockPositions[0]?.id;
-    } else if (tabName === 'roleGroup') {
-        firstTargetId = mockRoleGroups[0]?.id;
-    } else if (tabName === 'individual') {
-        firstTargetId = mockUsers[0]?.id;
-    }
-
-    window.currentPermissionTargetId = firstTargetId;
-    switchView('permissionManagement');
-}
-
-/**
- * 권한 대상 선택
- * @param {string} tabName - 탭 이름
- * @param {string} targetId - 대상 ID
- */
-function selectPermissionTarget(tabName, targetId) {
-    window.currentPermissionTab = tabName;
-    window.currentPermissionTargetId = targetId;
-    switchView('permissionManagement');
-}
-
-/**
- * 권한 매트릭스 초기화
- */
-function resetPermissionMatrix() {
-    if (confirm('권한 설정을 초기화하시겠습니까?')) {
-        // 모든 체크박스 해제
-        const checkboxes = document.querySelectorAll('[data-menu][data-crud]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-        showAlert('권한 설정이 초기화되었습니다.');
-    }
-}
-
-/**
- * 권한 매트릭스 저장
- */
-function savePermissionMatrix() {
-    const currentTab = window.currentPermissionTab || 'department';
-    const currentTargetId = window.currentPermissionTargetId;
-
-    if (!currentTargetId) {
-        showAlert('대상을 선택해주세요.');
-        return;
-    }
-
-    // 체크박스에서 권한 수집
-    const checkboxes = document.querySelectorAll('[data-menu][data-crud]');
-    const permissionsMap = {};
-
-    checkboxes.forEach(checkbox => {
-        const menuId = checkbox.getAttribute('data-menu');
-        const crudType = checkbox.getAttribute('data-crud');
-        const isChecked = checkbox.checked;
-
-        if (!permissionsMap[menuId]) {
-            permissionsMap[menuId] = {
-                menuId: menuId,
-                canRead: false,
-                canCreate: false,
-                canUpdate: false,
-                canDelete: false
-            };
-        }
-
-        if (crudType === 'R') permissionsMap[menuId].canRead = isChecked;
-        else if (crudType === 'C') permissionsMap[menuId].canCreate = isChecked;
-        else if (crudType === 'U') permissionsMap[menuId].canUpdate = isChecked;
-        else if (crudType === 'D') permissionsMap[menuId].canDelete = isChecked;
-    });
-
-    const permissions = Object.values(permissionsMap);
-
-    // 데이터 저장 (mock data 업데이트)
-    if (currentTab === 'department') {
-        const index = mockDepartmentPermissions.findIndex(dp => dp.departmentId === currentTargetId);
-        if (index >= 0) {
-            mockDepartmentPermissions[index].permissions = permissions;
-        } else {
-            mockDepartmentPermissions.push({
-                departmentId: currentTargetId,
-                permissions: permissions
-            });
-        }
-    } else if (currentTab === 'position') {
-        const index = mockPositionPermissions.findIndex(pp => pp.positionId === currentTargetId);
-        if (index >= 0) {
-            mockPositionPermissions[index].permissions = permissions;
-        } else {
-            mockPositionPermissions.push({
-                positionId: currentTargetId,
-                permissions: permissions
-            });
-        }
-    } else if (currentTab === 'roleGroup') {
-        const index = mockRoleGroupPermissions.findIndex(rp => rp.roleGroupId === currentTargetId);
-        if (index >= 0) {
-            mockRoleGroupPermissions[index].permissions = permissions;
-        } else {
-            mockRoleGroupPermissions.push({
-                roleGroupId: currentTargetId,
-                permissions: permissions
-            });
-        }
-    } else if (currentTab === 'individual') {
-        const index = mockIndividualPermissions.findIndex(ip => ip.userId === currentTargetId);
-        if (index >= 0) {
-            mockIndividualPermissions[index].permissions = permissions;
-        } else {
-            mockIndividualPermissions.push({
-                userId: currentTargetId,
-                permissions: permissions
-            });
-        }
-    }
-
-    showAlert('권한 설정이 저장되었습니다.');
-    console.log('권한 저장 완료:', { currentTab, currentTargetId, permissions });
-}
+// switchPermissionTab, selectPermissionTarget, resetPermissionMatrix, savePermissionMatrix
+// 위 함수들은 admin_main.js에서 새 계층형 권한관리 함수로 대체됨
 
 /**
  * 사용자 권한 시뮬레이터 모달 열기
@@ -7334,11 +7202,662 @@ function calculateUnionPermissions(userId) {
     return Object.values(permissionsMap);
 }
 
-// 전역으로 노출
-window.switchPermissionTab = switchPermissionTab;
-window.selectPermissionTarget = selectPermissionTarget;
-window.resetPermissionMatrix = resetPermissionMatrix;
-window.savePermissionMatrix = savePermissionMatrix;
+// ====================================================================
+// 역할그룹 CRUD 모달 (권한관리 > 역할그룹별 모드)
+// ====================================================================
+
+/**
+ * 역할그룹 추가/수정 모달 열기
+ * @param {string|null} groupId - 수정 시 그룹 ID, 신규는 null
+ */
+function openRoleGroupModal(groupId = null) {
+    const isEdit = groupId !== null;
+    const group = isEdit ? mockRoleGroups.find(g => g.id === groupId) : null;
+
+    // 선택된 멤버 초기화
+    window._roleGroupSelectedMembers = [];
+    if (isEdit && group && group.memberIds) {
+        window._roleGroupSelectedMembers = [...group.memberIds];
+    }
+
+    // 소속 드롭다운 옵션
+    const deptOptions = mockDepartments.map(d =>
+        `<option value="${d.id}">${d.name}</option>`
+    ).join('');
+
+    // 신분 드롭다운 옵션
+    const posOptions = mockPositions.map(p =>
+        `<option value="${p.id}">${p.name}</option>`
+    ).join('');
+
+    // 선택된 멤버 태그 HTML
+    const selectedMemberTags = _buildSelectedMemberTags();
+
+    const content = `
+        <div class="space-y-5">
+            <!-- 그룹 기본 정보 -->
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">그룹명 <span class="text-red-500">*</span></label>
+                <input type="text"
+                       id="rg-modal-name"
+                       value="${group ? group.name : ''}"
+                       placeholder="예: 논문심사위원"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8] text-sm">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">설명</label>
+                <input type="text"
+                       id="rg-modal-desc"
+                       value="${group ? group.description : ''}"
+                       placeholder="그룹에 대한 설명"
+                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#009DE8] text-sm">
+            </div>
+
+            <!-- 멤버 검색 섹션 -->
+            <div class="border-t pt-4">
+                <h4 class="text-sm font-semibold text-gray-800 mb-3">멤버 검색</h4>
+                <div class="grid grid-cols-3 gap-2 mb-2">
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">소속</label>
+                        <select id="rg-search-dept" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                            <option value="">전체</option>
+                            ${deptOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">신분</label>
+                        <select id="rg-search-pos" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                            <option value="">전체</option>
+                            ${posOptions}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-gray-500 mb-1">상태</label>
+                        <select id="rg-search-status" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
+                            <option value="">전체</option>
+                            <option value="ACTIVE">재직/재학</option>
+                            <option value="LEAVE">휴직/휴학</option>
+                            <option value="RETIRED">퇴직/졸업</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex gap-2 mb-3">
+                    <input type="text"
+                           id="rg-search-name"
+                           placeholder="이름 또는 교번/학번/사번 검색"
+                           class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm"
+                           onkeydown="if(event.key==='Enter') searchRoleGroupMembers()">
+                    <button onclick="searchRoleGroupMembers()"
+                            class="px-4 py-1.5 bg-[#009DE8] text-white text-sm rounded hover:bg-[#0080C0]">
+                        검색
+                    </button>
+                </div>
+
+                <!-- 검색 결과 -->
+                <div id="rg-search-results"
+                     class="border border-gray-200 rounded max-h-48 overflow-y-auto bg-gray-50">
+                    <div class="p-4 text-center text-sm text-gray-400">
+                        검색 조건을 설정하고 [검색]을 클릭하세요
+                    </div>
+                </div>
+            </div>
+
+            <!-- 선택된 멤버 -->
+            <div class="border-t pt-4">
+                <h4 class="text-sm font-semibold text-gray-800 mb-2">
+                    선택된 멤버 (<span id="rg-selected-count">${window._roleGroupSelectedMembers.length}</span>명)
+                </h4>
+                <div id="rg-selected-members" class="flex flex-wrap gap-2 min-h-[36px]">
+                    ${selectedMemberTags}
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal(
+        isEdit ? '역할그룹 수정' : '역할그룹 추가',
+        content,
+        '저장',
+        () => {
+            return saveRoleGroup(groupId);
+        }
+    );
+
+    // 수정 모드일 때 자동으로 멤버 검색 실행
+    if (isEdit && group && group.memberIds && group.memberIds.length > 0) {
+        setTimeout(() => searchRoleGroupMembers(), 100);
+    }
+}
+
+/**
+ * 역할그룹 모달 - 멤버 검색 실행
+ */
+function searchRoleGroupMembers() {
+    const deptFilter = document.getElementById('rg-search-dept')?.value || '';
+    const posFilter = document.getElementById('rg-search-pos')?.value || '';
+    const statusFilter = document.getElementById('rg-search-status')?.value || '';
+    const nameKeyword = (document.getElementById('rg-search-name')?.value || '').trim().toLowerCase();
+
+    // mockUsers × mockUserMapping × mockUserStatus 조인
+    const results = [];
+    const seenUserIds = new Set();
+
+    mockUsers.forEach(user => {
+        if (seenUserIds.has(user.username)) return;
+
+        const mapping = mockUserMapping.find(m => m.userId === user.username);
+        if (!mapping) return;
+
+        const userStatus = mockUserStatus.find(s => s.userId === user.username);
+
+        // 소속 필터
+        if (deptFilter && mapping.departmentId !== deptFilter) return;
+
+        // 신분 필터
+        if (posFilter && mapping.positionId !== posFilter) return;
+
+        // 상태 필터
+        if (statusFilter && userStatus && userStatus.statusCode !== statusFilter) return;
+
+        // 이름/번호 검색
+        if (nameKeyword) {
+            const nameMatch = user.name.toLowerCase().includes(nameKeyword);
+            const numMatch = (user.employeeNumber || '').toLowerCase().includes(nameKeyword)
+                || (user.studentNumber || '').toLowerCase().includes(nameKeyword)
+                || user.username.toLowerCase().includes(nameKeyword);
+            if (!nameMatch && !numMatch) return;
+        }
+
+        // 중복 방지
+        seenUserIds.add(user.username);
+
+        // 표시 정보 조합
+        const dept = mockDepartments.find(d => d.id === mapping.departmentId);
+        const pos = mockPositions.find(p => p.id === mapping.positionId);
+        const displayNum = user.employeeNumber || user.studentNumber || user.username;
+
+        results.push({
+            userId: user.username,
+            displayNum,
+            name: user.name,
+            deptName: dept ? dept.name : '-',
+            posName: pos ? pos.name : '-',
+            statusName: userStatus ? userStatus.statusName : '-'
+        });
+    });
+
+    // 검색 결과 렌더링
+    const container = document.getElementById('rg-search-results');
+    if (!container) return;
+
+    if (results.length === 0) {
+        container.innerHTML = `
+            <div class="p-4 text-center text-sm text-gray-400">
+                검색 결과가 없습니다
+            </div>
+        `;
+        return;
+    }
+
+    container.innerHTML = results.map(r => {
+        const isSelected = window._roleGroupSelectedMembers.includes(r.userId);
+        return `
+            <label class="flex items-center px-3 py-2 hover:bg-blue-50 cursor-pointer border-b border-gray-100 last:border-b-0">
+                <input type="checkbox"
+                       ${isSelected ? 'checked' : ''}
+                       onchange="toggleRoleGroupMember('${r.userId}', this.checked)"
+                       class="mr-3 rounded border-gray-300 text-[#009DE8] focus:ring-[#009DE8]">
+                <span class="text-sm">
+                    <span class="font-medium text-gray-800">${r.displayNum}</span>
+                    <span class="text-gray-700 ml-1">${r.name}</span>
+                    <span class="text-gray-400 ml-2">(${r.deptName} / ${r.posName} / ${r.statusName})</span>
+                </span>
+            </label>
+        `;
+    }).join('');
+}
+
+/**
+ * 역할그룹 모달 - 멤버 체크박스 토글
+ */
+function toggleRoleGroupMember(userId, checked) {
+    if (checked) {
+        if (!window._roleGroupSelectedMembers.includes(userId)) {
+            window._roleGroupSelectedMembers.push(userId);
+        }
+    } else {
+        window._roleGroupSelectedMembers = window._roleGroupSelectedMembers.filter(id => id !== userId);
+    }
+    _updateSelectedMemberUI();
+}
+
+/**
+ * 역할그룹 모달 - 선택된 멤버 태그 제거
+ */
+function removeRoleGroupMember(userId) {
+    window._roleGroupSelectedMembers = window._roleGroupSelectedMembers.filter(id => id !== userId);
+    _updateSelectedMemberUI();
+
+    // 검색 결과 체크박스도 동기화
+    const checkboxes = document.querySelectorAll('#rg-search-results input[type="checkbox"]');
+    checkboxes.forEach(cb => {
+        const onchangeAttr = cb.getAttribute('onchange') || '';
+        if (onchangeAttr.includes(`'${userId}'`)) {
+            cb.checked = false;
+        }
+    });
+}
+
+/**
+ * 선택된 멤버 UI 갱신 (태그 + 카운트)
+ */
+function _updateSelectedMemberUI() {
+    const tagsContainer = document.getElementById('rg-selected-members');
+    const countEl = document.getElementById('rg-selected-count');
+    if (tagsContainer) {
+        tagsContainer.innerHTML = _buildSelectedMemberTags();
+    }
+    if (countEl) {
+        countEl.textContent = window._roleGroupSelectedMembers.length;
+    }
+}
+
+/**
+ * 선택된 멤버 태그 HTML 생성
+ */
+function _buildSelectedMemberTags() {
+    if (!window._roleGroupSelectedMembers || window._roleGroupSelectedMembers.length === 0) {
+        return '<span class="text-sm text-gray-400">선택된 멤버가 없습니다</span>';
+    }
+    return window._roleGroupSelectedMembers.map(userId => {
+        const user = mockUsers.find(u => u.username === userId);
+        const displayNum = user ? (user.employeeNumber || user.studentNumber || user.username) : userId;
+        const displayName = user ? user.name : userId;
+        return `
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                ${displayNum} ${displayName}
+                <button onclick="removeRoleGroupMember('${userId}')"
+                        class="ml-1.5 text-blue-600 hover:text-blue-900 font-bold">&times;</button>
+            </span>
+        `;
+    }).join('');
+}
+
+/**
+ * 역할그룹 저장 (추가 또는 수정)
+ */
+function saveRoleGroup(groupId = null) {
+    const name = (document.getElementById('rg-modal-name')?.value || '').trim();
+    const description = (document.getElementById('rg-modal-desc')?.value || '').trim();
+    const memberIds = window._roleGroupSelectedMembers || [];
+
+    if (!name) {
+        alert('그룹명을 입력해주세요.');
+        return false;
+    }
+
+    if (groupId) {
+        // 수정
+        const idx = mockRoleGroups.findIndex(g => g.id === groupId);
+        if (idx >= 0) {
+            const oldMemberIds = mockRoleGroups[idx].memberIds || [];
+
+            mockRoleGroups[idx].name = name;
+            mockRoleGroups[idx].description = description;
+            mockRoleGroups[idx].memberIds = memberIds;
+            mockRoleGroups[idx].memberCount = memberIds.length;
+
+            // mockUserMapping 동기화: 이전 멤버에서 제거, 새 멤버에 추가
+            oldMemberIds.forEach(uid => {
+                const um = mockUserMapping.find(m => m.userId === uid);
+                if (um) {
+                    um.roleGroupIds = um.roleGroupIds.filter(id => id !== groupId);
+                }
+            });
+            memberIds.forEach(uid => {
+                const um = mockUserMapping.find(m => m.userId === uid);
+                if (um && !um.roleGroupIds.includes(groupId)) {
+                    um.roleGroupIds.push(groupId);
+                }
+            });
+
+            if (typeof showToast === 'function') showToast('역할그룹이 수정되었습니다.', 'success');
+            else alert('역할그룹이 수정되었습니다.');
+        }
+    } else {
+        // 신규 추가
+        const newId = 'ROLEGROUP_' + Date.now();
+        mockRoleGroups.push({
+            id: newId,
+            name,
+            description,
+            memberIds,
+            query: '',
+            memberCount: memberIds.length,
+            createdBy: 'admin',
+            createdDate: new Date().toISOString().split('T')[0]
+        });
+
+        // mockUserMapping 동기화
+        memberIds.forEach(uid => {
+            const um = mockUserMapping.find(m => m.userId === uid);
+            if (um && !um.roleGroupIds.includes(newId)) {
+                um.roleGroupIds.push(newId);
+            }
+        });
+
+        if (typeof showToast === 'function') showToast('역할그룹이 추가되었습니다.', 'success');
+        else alert('역할그룹이 추가되었습니다.');
+
+        // 새 그룹 → 모달 닫고 → 권한 설정 모달 열기
+        closeModal();
+        if (typeof refreshPermPage === 'function') refreshPermPage();
+        // 약간의 딜레이 후 권한 설정 모달 열기 (DOM 갱신 대기)
+        setTimeout(function() {
+            if (typeof openPermEditModal === 'function') {
+                openPermEditModal('roleGroup', newId);
+            }
+        }, 300);
+        return true;
+    }
+
+    // 모달 닫기
+    closeModal();
+
+    // 화면 재렌더링
+    if (typeof refreshPermPage === 'function') {
+        refreshPermPage();
+    }
+    return true;
+}
+
+// ========================================
+// 새 권한 조합 추가 모달 (hierarchy 모드)
+// ========================================
+function openHierarchyPermModal() {
+    const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
+    const positions = (typeof mockPositions !== 'undefined') ? mockPositions : [];
+    const userStatuses = (typeof mockUserStatus !== 'undefined') ? mockUserStatus : [];
+    const allMenus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+
+    // 상태 옵션 (중복 제거)
+    const statusOptions = [...new Set(userStatuses.map(s => s.statusCode))].map(code => {
+        const s = userStatuses.find(st => st.statusCode === code);
+        return { code, name: s ? s.statusName : code };
+    });
+
+    // 관리자 메뉴 트리
+    const menus = allMenus.filter(m => !m.screen || m.screen.includes('admin'));
+    const menuTree = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
+
+    const menuTableRows = menuTree.map(menu1 => {
+        const children = menus.filter(m => m.parentId === menu1.id).sort((a, b) => a.order - b.order);
+        return `
+            <tr class="bg-red-50 border-b">
+                <td class="py-3 px-4 font-semibold text-sm">${menu1.name}</td>
+                <td class="text-center py-2">
+                    <input type="checkbox" data-hier-menu="${menu1.id}" data-hier-parent="true"
+                           onchange="toggleHierModalParent('${menu1.id}', this.checked)"
+                           class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
+                </td>
+            </tr>
+            ${children.map(menu2 => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="py-3 px-4 text-sm pl-8">└ ${menu2.name}</td>
+                <td class="text-center py-2">
+                    <input type="checkbox" data-hier-menu="${menu2.id}" data-hier-child="${menu1.id}"
+                           class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
+                </td>
+            </tr>
+            `).join('')}
+        `;
+    }).join('');
+
+    const content = `
+        <div style="max-height: 70vh; overflow-y: auto;">
+            <!-- 조합 조건 -->
+            <div class="mb-4">
+                <p class="text-sm font-bold text-gray-700 mb-3">조합 조건</p>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">소속</label>
+                        <select id="hier-modal-dept" class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">전체</option>
+                            ${departments.map(d => `<option value="${d.id}">${d.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">신분</label>
+                        <select id="hier-modal-pos" class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">전체</option>
+                            ${positions.map(p => `<option value="${p.id}">${p.name}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-1">상태</label>
+                        <select id="hier-modal-stat" class="w-full px-3 py-2 text-sm border border-gray-300 rounded focus:ring-[#6A0028] focus:border-[#6A0028]">
+                            <option value="">전체</option>
+                            ${statusOptions.map(s => `<option value="${s.code}">${s.name}</option>`).join('')}
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 구분선 -->
+            <hr class="my-4 border-gray-200">
+
+            <!-- 메뉴 이용 권한 -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-sm font-bold text-gray-700">메뉴 이용 권한</p>
+                    <div class="flex gap-2">
+                        <button onclick="hierModalSelectAll(true)" class="text-xs text-[#6A0028] hover:underline">전체 선택</button>
+                        <span class="text-gray-300">|</span>
+                        <button onclick="hierModalSelectAll(false)" class="text-xs text-gray-500 hover:underline">전체 해제</button>
+                    </div>
+                </div>
+                <div class="border rounded" style="max-height: 300px; overflow-y: auto;">
+                    <table style="width: 100%; min-width: 0; table-layout: fixed;">
+                        <colgroup><col><col style="width: 60px;"></colgroup>
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700">메뉴명</th>
+                                <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700">접근</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${menuTableRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+
+    openModal('새 권한 조합 추가', content, '저장', function() {
+        saveHierarchyPermFromModal();
+    });
+}
+
+// 모달 내 부모 메뉴 체크 → 자식 연동
+function toggleHierModalParent(menuId, checked) {
+    const children = document.querySelectorAll(`input[data-hier-child="${menuId}"]`);
+    children.forEach(cb => cb.checked = checked);
+}
+
+// 모달 내 전체 선택/해제
+function hierModalSelectAll(checked) {
+    const allCb = document.querySelectorAll('input[data-hier-menu]');
+    allCb.forEach(cb => cb.checked = checked);
+}
+
+// 모달에서 저장
+function saveHierarchyPermFromModal() {
+    const deptId = document.getElementById('hier-modal-dept')?.value || '';
+    const positionId = document.getElementById('hier-modal-pos')?.value || '';
+    const statusCode = document.getElementById('hier-modal-stat')?.value || '';
+
+    // 체크된 메뉴 수집
+    const checkedMenus = document.querySelectorAll('input[data-hier-menu]:checked');
+    const permissions = [];
+    checkedMenus.forEach(cb => {
+        permissions.push({ menuId: cb.dataset.hierMenu, canRead: true });
+    });
+
+    // mockHierarchyPermissions에 추가
+    const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+    const newId = 'HP_' + Date.now();
+    hPerms.push({ id: newId, deptId, positionId, statusCode, permissions });
+
+    closeModal();
+
+    if (typeof refreshPermPage === 'function') {
+        refreshPermPage();
+    }
+
+    if (typeof showToast === 'function') showToast('새 권한 조합이 추가되었습니다.', 'success');
+    else alert('새 권한 조합이 추가되었습니다.');
+}
+
+// ========================================
+// 범용 권한 편집 모달 (hierarchy/roleGroup/individual 공통)
+// ========================================
+function openPermEditModal(mode, targetId) {
+    // 1. 전역 상태 설정 (saveMenuPermission이 참조)
+    window._permMode = mode;
+    if (mode === 'hierarchy') {
+        window._permEditingHierarchyId = targetId;
+        const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+        const hp = hPerms.find(h => h.id === targetId);
+        if (hp) {
+            window._permFilterDept = hp.deptId || '';
+            window._permFilterPos = hp.positionId || '';
+            window._permFilterStat = hp.statusCode || '';
+        }
+        window._permSelectedUsers = ['__hierarchy_target__'];
+    } else if (mode === 'roleGroup') {
+        window._permSelectedRoleGroup = targetId;
+    } else if (mode === 'individual') {
+        window._permSelectedUsers = [targetId];
+    }
+
+    // 2. 대상 라벨 생성
+    const targetLabel = (typeof getPermTargetLabel === 'function') ? getPermTargetLabel() : targetId;
+
+    // 3. 기존 권한 로드
+    const permMap = {};
+    if (mode === 'hierarchy') {
+        const hPerms = (typeof mockHierarchyPermissions !== 'undefined') ? mockHierarchyPermissions : [];
+        const hp = hPerms.find(h => h.id === targetId);
+        if (hp && hp.permissions) hp.permissions.forEach(p => { permMap[p.menuId] = p.canRead; });
+    } else if (mode === 'roleGroup') {
+        const rgPerms = (typeof mockRoleGroupPermissions !== 'undefined') ? mockRoleGroupPermissions : [];
+        const gPerm = rgPerms.find(rp => rp.roleGroupId === targetId);
+        if (gPerm && gPerm.permissions) gPerm.permissions.forEach(p => { permMap[p.menuId] = p.canRead; });
+    } else if (mode === 'individual') {
+        const indPerms = (typeof mockIndividualPermissions !== 'undefined') ? mockIndividualPermissions : [];
+        const userPerm = indPerms.find(ip => ip.userId === targetId);
+        if (userPerm && userPerm.permissions) userPerm.permissions.forEach(p => { permMap[p.menuId] = p.canRead; });
+    }
+
+    // 4. 메뉴 트리 + 체크박스 테이블 생성
+    const allMenus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menus = allMenus.filter(m => !m.screen || m.screen.includes('admin'));
+    const menuTree = menus.filter(m => m.depth === 1).sort((a, b) => a.order - b.order);
+
+    const menuTableRows = menuTree.map(menu1 => {
+        const children = menus.filter(m => m.parentId === menu1.id).sort((a, b) => a.order - b.order);
+        return `
+            <tr class="bg-red-50 border-b">
+                <td class="py-3 px-4 font-semibold text-sm">${menu1.name}</td>
+                <td class="text-center py-2">
+                    <input type="checkbox" ${permMap[menu1.id] ? 'checked' : ''}
+                           data-menu="${menu1.id}" data-crud="R" data-parent="true"
+                           onchange="toggleParentMenuPerm('${menu1.id}', this.checked)"
+                           class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
+                </td>
+            </tr>
+            ${children.map(menu2 => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="py-3 px-4 text-sm pl-8">└ ${menu2.name}</td>
+                <td class="text-center py-2">
+                    <input type="checkbox" ${permMap[menu2.id] ? 'checked' : ''}
+                           data-menu="${menu2.id}" data-crud="R" data-child="${menu1.id}"
+                           class="w-4 h-4 text-[#6A0028] border-gray-300 rounded focus:ring-[#6A0028]">
+                </td>
+            </tr>
+            `).join('')}
+        `;
+    }).join('');
+
+    // 5. 모달 컨텐츠 구성
+    const content = `
+        <div style="max-height: 70vh; overflow-y: auto;">
+            <!-- 대상 정보 -->
+            <div class="bg-gray-50 border rounded-lg p-3 mb-4">
+                <p class="text-sm font-bold text-gray-800">대상: <span class="text-[#6A0028]">${targetLabel}</span></p>
+            </div>
+
+            <!-- 메뉴 이용 권한 -->
+            <div>
+                <div class="flex justify-between items-center mb-3">
+                    <p class="text-sm font-bold text-gray-700">메뉴 이용 권한</p>
+                    <div class="flex gap-2">
+                        <button onclick="permEditModalSelectAll(true)" class="text-xs text-[#6A0028] hover:underline">전체 선택</button>
+                        <span class="text-gray-300">|</span>
+                        <button onclick="permEditModalSelectAll(false)" class="text-xs text-gray-500 hover:underline">전체 해제</button>
+                    </div>
+                </div>
+                <div class="border rounded" style="max-height: 350px; overflow-y: auto;">
+                    <table style="width: 100%; min-width: 0; table-layout: fixed;">
+                        <colgroup><col><col style="width: 60px;"></colgroup>
+                        <thead class="bg-gray-100 sticky top-0">
+                            <tr>
+                                <th class="text-left py-3 px-4 text-xs font-semibold text-gray-700">메뉴명</th>
+                                <th class="text-center py-3 px-2 text-xs font-semibold text-gray-700">접근</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${menuTableRows}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // 6. 모달 열기
+    openModal('메뉴 접근 권한 설정', content, '저장', function() {
+        if (typeof saveMenuPermission === 'function') {
+            saveMenuPermission();
+        }
+    });
+}
+
+// 모달 내 전체 선택/해제
+function permEditModalSelectAll(checked) {
+    const allCb = document.querySelectorAll('input[type="checkbox"][data-menu][data-crud="R"]');
+    allCb.forEach(cb => cb.checked = checked);
+}
+
+// 전역으로 노출 - 역할그룹 CRUD 모달
+window.openRoleGroupModal = openRoleGroupModal;
+window.searchRoleGroupMembers = searchRoleGroupMembers;
+window.toggleRoleGroupMember = toggleRoleGroupMember;
+window.removeRoleGroupMember = removeRoleGroupMember;
+window.saveRoleGroup = saveRoleGroup;
+
+// 전역으로 노출 - 조합 추가 모달
+window.openHierarchyPermModal = openHierarchyPermModal;
+window.toggleHierModalParent = toggleHierModalParent;
+window.hierModalSelectAll = hierModalSelectAll;
+window.saveHierarchyPermFromModal = saveHierarchyPermFromModal;
+
+// 전역으로 노출 - 범용 권한 편집 모달
+window.openPermEditModal = openPermEditModal;
+window.permEditModalSelectAll = permEditModalSelectAll;
+
+// 전역으로 노출 (권한관리 함수는 admin_main.js로 이동됨)
 window.openUserSimulatorModal = openUserSimulatorModal;
 window.calculateUnionPermissions = calculateUnionPermissions;
 
