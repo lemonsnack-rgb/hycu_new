@@ -7282,15 +7282,28 @@ function openRoleGroupModal(groupId = null) {
                     </div>
                 </div>
                 <div class="flex gap-2 mb-3">
-                    <input type="text"
-                           id="rg-search-name"
-                           placeholder="이름 또는 교번/학번/사번 검색"
-                           class="flex-1 px-3 py-1.5 border border-gray-300 rounded text-sm"
-                           onkeydown="if(event.key==='Enter') searchRoleGroupMembers()">
-                    <button onclick="searchRoleGroupMembers()"
-                            class="px-4 py-1.5 bg-[#009DE8] text-white text-sm rounded hover:bg-[#0080C0]">
-                        검색
-                    </button>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-500 mb-1">교번/학번/사번</label>
+                        <input type="text"
+                               id="rg-search-num"
+                               placeholder="교번/학번/사번"
+                               class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm"
+                               onkeydown="if(event.key==='Enter') searchRoleGroupMembers()">
+                    </div>
+                    <div class="flex-1">
+                        <label class="block text-xs text-gray-500 mb-1">이름</label>
+                        <input type="text"
+                               id="rg-search-name"
+                               placeholder="이름"
+                               class="w-full px-3 py-1.5 border border-gray-300 rounded text-sm"
+                               onkeydown="if(event.key==='Enter') searchRoleGroupMembers()">
+                    </div>
+                    <div class="flex items-end">
+                        <button onclick="searchRoleGroupMembers()"
+                                class="px-4 py-1.5 bg-[#009DE8] text-white text-sm rounded hover:bg-[#0080C0]">
+                            검색
+                        </button>
+                    </div>
                 </div>
 
                 <!-- 검색 결과 -->
@@ -7336,6 +7349,7 @@ function searchRoleGroupMembers() {
     const deptFilter = document.getElementById('rg-search-dept')?.value || '';
     const posFilter = document.getElementById('rg-search-pos')?.value || '';
     const statusFilter = document.getElementById('rg-search-status')?.value || '';
+    const numKeyword = (document.getElementById('rg-search-num')?.value || '').trim().toLowerCase();
     const nameKeyword = (document.getElementById('rg-search-name')?.value || '').trim().toLowerCase();
 
     // mockUsers × mockUserMapping × mockUserStatus 조인
@@ -7359,13 +7373,17 @@ function searchRoleGroupMembers() {
         // 상태 필터
         if (statusFilter && userStatus && userStatus.statusCode !== statusFilter) return;
 
-        // 이름/번호 검색
+        // 교번/학번/사번 검색
+        if (numKeyword) {
+            const numMatch = (user.employeeNumber || '').toLowerCase().includes(numKeyword)
+                || (user.studentNumber || '').toLowerCase().includes(numKeyword)
+                || user.username.toLowerCase().includes(numKeyword);
+            if (!numMatch) return;
+        }
+
+        // 이름 검색
         if (nameKeyword) {
-            const nameMatch = user.name.toLowerCase().includes(nameKeyword);
-            const numMatch = (user.employeeNumber || '').toLowerCase().includes(nameKeyword)
-                || (user.studentNumber || '').toLowerCase().includes(nameKeyword)
-                || user.username.toLowerCase().includes(nameKeyword);
-            if (!nameMatch && !numMatch) return;
+            if (!user.name.toLowerCase().includes(nameKeyword)) return;
         }
 
         // 중복 방지
