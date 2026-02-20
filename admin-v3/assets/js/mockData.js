@@ -438,6 +438,302 @@ const mockThesisStages = [
                 scheduleTypes: ['submission', 'review'],
                 schedules: []
             }
+        ],
+        hierarchicalStages: [
+            {
+                id: 'HS_P001',
+                basicStageName: '논문작성계획서',
+                order: 1,
+                subStages: [
+                    {
+                        id: 'SS_P001',
+                        name: '계획서 초안 작성',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-03-01T09:00', endDate: '2025-03-15T18:00' },
+                        reviewSchedule: { startDate: '2025-03-16T09:00', endDate: '2025-03-25T18:00' }
+                    },
+                    {
+                        id: 'SS_P002',
+                        name: '지도교수 승인',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-03-26T09:00', endDate: '2025-03-31T18:00' },
+                        reviewSchedule: { startDate: '2025-04-01T09:00', endDate: '2025-04-05T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_P002',
+                basicStageName: '프로포절',
+                order: 2,
+                subStages: [
+                    {
+                        id: 'SS_P003',
+                        name: '연구제안서 심사',
+                        order: 1,
+                        evaluationType: 'EVAL003',
+                        submissionSchedule: { startDate: '2025-05-01T09:00', endDate: '2025-05-15T18:00' },
+                        reviewSchedule: { startDate: '2025-05-20T09:00', endDate: '2025-06-05T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_P003',
+                basicStageName: '예비심사',
+                order: 3,
+                subStages: [
+                    {
+                        id: 'SS_P004',
+                        name: '예비심사 준비',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-10-01T09:00', endDate: '2025-10-15T18:00' },
+                        reviewSchedule: { startDate: '2025-10-20T09:00', endDate: '2025-11-05T18:00' }
+                    },
+                    {
+                        id: 'SS_P005',
+                        name: '예비심사 진행',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-11-06T09:00', endDate: '2025-11-15T18:00' },
+                        reviewSchedule: { startDate: '2025-11-16T09:00', endDate: '2025-11-30T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_P004',
+                basicStageName: '본심사',
+                order: 4,
+                subStages: [
+                    {
+                        id: 'SS_P006',
+                        name: '최종 논문 제출',
+                        order: 1,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2025-12-25T09:00', endDate: '2026-01-10T18:00' },
+                        reviewSchedule: { startDate: '2026-01-15T09:00', endDate: '2026-01-30T18:00' }
+                    },
+                    {
+                        id: 'SS_P007',
+                        name: '본심사 진행',
+                        order: 2,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2026-01-31T09:00', endDate: '2026-02-10T18:00' },
+                        reviewSchedule: { startDate: '2026-02-11T09:00', endDate: '2026-02-28T18:00' }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'TS003',
+        name: '석사 표준 과정 (경영학과)',
+        departmentName: '경영학과',
+        degreeType: 'master',
+        thesisType: 'degree',
+        isValidStage: 'Y',
+        stageCount: 4,
+        createdDate: '2025-01-01',
+        stages: [],
+        hierarchicalStages: [
+            {
+                id: 'HS_M001',
+                basicStageName: '논문작성계획서',
+                order: 1,
+                subStages: [
+                    {
+                        id: 'SS_M001',
+                        name: '계획서 작성',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-02-20T09:00', endDate: '2025-02-28T18:00' },
+                        reviewSchedule: { startDate: '2025-03-01T09:00', endDate: '2025-03-05T18:00' }
+                    },
+                    {
+                        id: 'SS_M002',
+                        name: '계획서 제출',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-03-01T09:00', endDate: '2025-03-15T18:00' },
+                        reviewSchedule: { startDate: '2025-03-16T09:00', endDate: '2025-03-20T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_M002',
+                basicStageName: '프로포절',
+                order: 2,
+                subStages: [
+                    {
+                        id: 'SS_M003',
+                        name: '초안 작성',
+                        order: 1,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2025-04-01T09:00', endDate: '2025-04-15T18:00' },
+                        reviewSchedule: { startDate: '2025-04-16T09:00', endDate: '2025-04-25T18:00' }
+                    },
+                    {
+                        id: 'SS_M004',
+                        name: '최종 제출',
+                        order: 2,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2025-04-26T09:00', endDate: '2025-05-05T18:00' },
+                        reviewSchedule: { startDate: '2025-05-06T09:00', endDate: '2025-05-15T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_M003',
+                basicStageName: '예비심사',
+                order: 3,
+                subStages: [
+                    {
+                        id: 'SS_M005',
+                        name: '예비심사 준비',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-06-01T09:00', endDate: '2025-06-15T18:00' },
+                        reviewSchedule: { startDate: '2025-06-16T09:00', endDate: '2025-06-20T18:00' }
+                    },
+                    {
+                        id: 'SS_M006',
+                        name: '예비심사 진행',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-06-21T09:00', endDate: '2025-06-25T18:00' },
+                        reviewSchedule: { startDate: '2025-06-26T09:00', endDate: '2025-07-10T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_M004',
+                basicStageName: '본심사',
+                order: 4,
+                subStages: [
+                    {
+                        id: 'SS_M007',
+                        name: '최종 논문 제출',
+                        order: 1,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2025-09-01T09:00', endDate: '2025-09-15T18:00' },
+                        reviewSchedule: { startDate: '2025-09-16T09:00', endDate: '2025-09-20T18:00' }
+                    },
+                    {
+                        id: 'SS_M008',
+                        name: '본심사 진행',
+                        order: 2,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2025-09-21T09:00', endDate: '2025-09-25T18:00' },
+                        reviewSchedule: { startDate: '2025-09-26T09:00', endDate: '2025-10-10T18:00' }
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        id: 'TS004',
+        name: '박사 표준 과정 (컴퓨터공학과)',
+        departmentName: '컴퓨터공학과',
+        degreeType: 'phd',
+        thesisType: 'degree',
+        isValidStage: 'Y',
+        stageCount: 4,
+        createdDate: '2025-01-01',
+        stages: [],
+        hierarchicalStages: [
+            {
+                id: 'HS_CP001',
+                basicStageName: '논문작성계획서',
+                order: 1,
+                subStages: [
+                    {
+                        id: 'SS_CP001',
+                        name: '계획서 초안 작성',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-03-01T09:00', endDate: '2025-03-20T18:00' },
+                        reviewSchedule: { startDate: '2025-03-21T09:00', endDate: '2025-03-31T18:00' }
+                    },
+                    {
+                        id: 'SS_CP002',
+                        name: '지도교수 승인',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-04-01T09:00', endDate: '2025-04-10T18:00' },
+                        reviewSchedule: { startDate: '2025-04-11T09:00', endDate: '2025-04-20T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_CP002',
+                basicStageName: '프로포절',
+                order: 2,
+                subStages: [
+                    {
+                        id: 'SS_CP003',
+                        name: '연구제안서 작성',
+                        order: 1,
+                        evaluationType: 'EVAL003',
+                        submissionSchedule: { startDate: '2025-05-01T09:00', endDate: '2025-05-20T18:00' },
+                        reviewSchedule: { startDate: '2025-05-21T09:00', endDate: '2025-06-10T18:00' }
+                    },
+                    {
+                        id: 'SS_CP004',
+                        name: '프로포절 발표',
+                        order: 2,
+                        evaluationType: 'EVAL003',
+                        submissionSchedule: { startDate: '2025-06-11T09:00', endDate: '2025-06-20T18:00' },
+                        reviewSchedule: { startDate: '2025-06-21T09:00', endDate: '2025-07-05T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_CP003',
+                basicStageName: '예비심사',
+                order: 3,
+                subStages: [
+                    {
+                        id: 'SS_CP005',
+                        name: '예비심사 준비',
+                        order: 1,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-10-01T09:00', endDate: '2025-10-20T18:00' },
+                        reviewSchedule: { startDate: '2025-10-21T09:00', endDate: '2025-11-10T18:00' }
+                    },
+                    {
+                        id: 'SS_CP006',
+                        name: '예비심사 진행',
+                        order: 2,
+                        evaluationType: 'EVAL001',
+                        submissionSchedule: { startDate: '2025-11-11T09:00', endDate: '2025-11-20T18:00' },
+                        reviewSchedule: { startDate: '2025-11-21T09:00', endDate: '2025-12-10T18:00' }
+                    }
+                ]
+            },
+            {
+                id: 'HS_CP004',
+                basicStageName: '본심사',
+                order: 4,
+                subStages: [
+                    {
+                        id: 'SS_CP007',
+                        name: '최종 논문 제출',
+                        order: 1,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2026-01-01T09:00', endDate: '2026-01-15T18:00' },
+                        reviewSchedule: { startDate: '2026-01-16T09:00', endDate: '2026-01-31T18:00' }
+                    },
+                    {
+                        id: 'SS_CP008',
+                        name: '본심사 진행',
+                        order: 2,
+                        evaluationType: 'EVAL002',
+                        submissionSchedule: { startDate: '2026-02-01T09:00', endDate: '2026-02-15T18:00' },
+                        reviewSchedule: { startDate: '2026-02-16T09:00', endDate: '2026-03-05T18:00' }
+                    }
+                ]
+            }
         ]
     }
 ];

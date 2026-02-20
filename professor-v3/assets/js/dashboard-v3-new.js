@@ -9,9 +9,13 @@ const DASHBOARD_USER = {
     email: 'kim@hycu.ac.kr'
 };
 
-// 필터 상태
+// 필터 상태 (내 지도학생 현황)
 window.currentDegreeFilter = '전체';
 window.currentDeptFilter = '전체';
+
+// 필터 상태 (논문지도단계)
+window.currentStageDegreeFilter = null;
+window.currentStageDeptFilter = null;
 
 /* ==================== [1] 행정 공지사항 ==================== */
 function renderProfessorAdminNoticeCard() {
@@ -151,95 +155,241 @@ function setDeptFilter(dept) {
     renderStudentSummaryCards();
 }
 
-/* ==================== [4] 우리 학과 논문지도단계 ==================== */
-function renderDepartmentGuidanceStages() {
-    const container = document.getElementById('dept-guidance-stages-list');
-    if (!container) return;
+/* ==================== [4] 논문지도단계 (지도학생 학과 기반) ==================== */
 
-    // Mock 데이터 (hierarchicalStages가 없으면 임시 데이터 사용)
-    let stages = [];
-    if (typeof hierarchicalStages !== 'undefined') {
-        stages = hierarchicalStages.filter(stage => stage.department === DASHBOARD_USER.department);
-    } else {
-        // 임시 Mock 데이터
-        stages = [
-            {
-                basicStageName: '논문작성계획서',
-                subStages: [
-                    { name: '계획서 초안 작성', submitStartDate: '2024-11-01', submitEndDate: '2024-11-15', reviewStartDate: '2024-11-16', reviewEndDate: '2024-11-30' },
-                    { name: '지도교수 승인', submitStartDate: '2024-12-01', submitEndDate: '2024-12-15', reviewStartDate: '2024-12-16', reviewEndDate: '2024-12-31' }
-                ]
-            },
-            {
-                basicStageName: '프로포절',
-                subStages: [
-                    { name: '프로포절 제출', submitStartDate: '2025-01-01', submitEndDate: '2025-01-15', reviewStartDate: '2025-01-16', reviewEndDate: '2025-01-31' },
-                    { name: '프로포절 발표', submitStartDate: '2025-02-01', submitEndDate: '2025-02-15', reviewStartDate: '2025-02-16', reviewEndDate: '2025-02-28' }
-                ]
-            }
-        ];
+// 학위과정 값 매핑 (professor mock-data: 'master'/'doctor', admin mockThesisStages: 'master'/'phd')
+function mapDegreeToThesisStageType(degree) {
+    const map = { '석사': 'master', 'master': 'master', '박사': 'phd', 'doctor': 'phd', '통합과정': 'integrated' };
+    return map[degree] || degree;
+}
+
+function mapDegreeToLabel(degree) {
+    const map = { 'master': '석사', 'doctor': '박사', '석사': '석사', '박사': '박사', '통합과정': '통합과정' };
+    return map[degree] || degree;
+}
+
+function renderStageFilters() {
+    const degreeContainer = document.getElementById('stage-degree-filter');
+    const deptContainer = document.getElementById('stage-dept-filter');
+    if (!degreeContainer || !deptContainer) return;
+
+    const students = (typeof MOCK_DATA !== 'undefined' && MOCK_DATA.students) ? MOCK_DATA.students : [];
+
+    // 지도학생에서 학위과정/학과 동적 추출 (전체 없음)
+    const degrees = [...new Set(students.map(s => mapDegreeToLabel(s.degree)).filter(Boolean))];
+    const departments = [...new Set(students.map(s => s.department).filter(Boolean))];
+
+    // 기본값 설정 (첫 번째 항목)
+    if (!window.currentStageDegreeFilter && degrees.length > 0) {
+        window.currentStageDegreeFilter = degrees[0];
+    }
+    if (!window.currentStageDeptFilter && departments.length > 0) {
+        window.currentStageDeptFilter = departments[0];
     }
 
-    if (stages.length === 0) {
-        container.innerHTML = '<div style="text-align: center; padding: 20px; color: #9CA3AF; font-size: 13px;">등록된 논문지도단계가 없습니다.</div>';
+    degreeContainer.innerHTML = degrees.map(degree =>
+        `<button class="filter-chip ${degree === window.currentStageDegreeFilter ? 'active' : ''}" onclick="setStageDegreeFilter('${degree}')">${degree}</button>`
+    ).join('');
+
+    deptContainer.innerHTML = departments.map(dept =>
+        `<button class="filter-chip ${dept === window.currentStageDeptFilter ? 'active' : ''}" onclick="setStageDeptFilter('${dept}')">${dept}</button>`
+    ).join('');
+}
+
+function setStageDegreeFilter(degree) {
+    window.currentStageDegreeFilter = degree;
+    document.querySelectorAll('#stage-degree-filter .filter-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === degree);
+    });
+    renderDepartmentGuidanceStages();
+}
+
+function setStageDeptFilter(dept) {
+    window.currentStageDeptFilter = dept;
+    document.querySelectorAll('#stage-dept-filter .filter-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === dept);
+    });
+    renderDepartmentGuidanceStages();
+}
+
+function renderDepartmentGuidanceStages() {
+    const container = document.getElementById('prof-dept-stages');
+    if (!container) return;
+
+    const selectedDept = window.currentStageDeptFilter;
+    const selectedDegree = window.currentStageDegreeFilter;
+    const degreeType = mapDegreeToThesisStageType(selectedDegree);
+
+    // mockThesisStages에서 학과+학위과정 매칭
+    let hierarchicalStages = [];
+    if (typeof mockThesisStages !== 'undefined') {
+        const matched = mockThesisStages.find(ts =>
+            ts.departmentName === selectedDept && ts.degreeType === degreeType
+        );
+        if (matched && matched.hierarchicalStages && matched.hierarchicalStages.length > 0) {
+            hierarchicalStages = matched.hierarchicalStages;
+        }
+    }
+
+    // 매칭 없으면 안내 메시지
+    if (hierarchicalStages.length === 0) {
+        container.innerHTML = '<div style="text-align: center; padding: 32px 16px; color: #9CA3AF; font-size: 13px;">등록된 논문지도단계가 없습니다.</div>';
         return;
     }
 
-    // 세로형 여정 렌더링 (학생용과 동일)
-    let html = '<div class="vertical-journey" style="position: relative; padding-left: 24px;">';
+    // hierarchicalStages → profDeptStageProgress 형식으로 변환
+    const stageProgress = hierarchicalStages.map(hs => {
+        const subStages = (hs.subStages || []).map(sub => {
+            const status = calcSubStageStatus(sub);
+            const submitStart = (sub.submissionSchedule && sub.submissionSchedule.startDate) || sub.submitStartDate || '';
+            const submitEnd = (sub.submissionSchedule && sub.submissionSchedule.endDate) || sub.submitEndDate || '';
+            const reviewStart = (sub.reviewSchedule && sub.reviewSchedule.startDate) || sub.reviewStartDate || '';
+            const reviewEnd = (sub.reviewSchedule && sub.reviewSchedule.endDate) || sub.reviewEndDate || '';
+            return {
+                name: sub.name,
+                status: status,
+                submissionPeriod: submitStart && submitEnd ? `${fmtDate(submitStart)} ~ ${fmtDate(submitEnd)}` : '',
+                reviewPeriod: reviewStart && reviewEnd ? `${fmtDate(reviewStart)} ~ ${fmtDate(reviewEnd)}` : ''
+            };
+        });
+        // 기본단계 상태 결정
+        const allCompleted = subStages.length > 0 && subStages.every(s => s.status === 'completed');
+        const anyCurrent = subStages.some(s => s.status === 'current');
+        const basicStatus = allCompleted ? 'completed' : anyCurrent ? 'in-progress' : 'upcoming';
+        // 기본단계 신청/철회 기간 (첫 번째 세부단계 기준)
+        const firstSub = hs.subStages && hs.subStages[0];
+        const appStart = firstSub && ((firstSub.submissionSchedule && firstSub.submissionSchedule.startDate) || firstSub.submitStartDate || '');
+        const appEnd = firstSub && ((firstSub.submissionSchedule && firstSub.submissionSchedule.endDate) || firstSub.submitEndDate || '');
+        return {
+            basicStageName: hs.basicStageName,
+            status: basicStatus,
+            applicationPeriod: appStart && appEnd ? `${fmtDate(appStart)} ~ ${fmtDate(appEnd)}` : '',
+            withdrawalPeriod: '',
+            subStages: subStages
+        };
+    });
 
-    // 수직선
-    html += '<div style="position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: #E5E7EB;"></div>';
+    // 아코디언 스타일 렌더링 (professor-dashboard.js renderVerticalJourney 동일)
+    let html = '';
+    const lastIdx = stageProgress.length - 1;
 
-    stages.forEach((basicStage, idx) => {
-        html += `<div class="journey-stage ${idx === 0 ? 'active' : ''}" style="position: relative; margin-bottom: 24px;">`;
-        html += `<div class="stage-header" style="font-size: 14px; font-weight: ${idx === 0 ? '700' : '600'}; color: ${idx === 0 ? '#6A0028' : '#1F2937'}; margin-bottom: 8px;">${basicStage.basicStageName}</div>`;
-        html += '<div class="substages" style="padding-left: 16px;">';
+    stageProgress.forEach((stage, stageIdx) => {
+        const isCompleted = stage.status === 'completed';
+        const isCurrent = stage.status === 'in-progress';
+        const isUpcoming = stage.status === 'upcoming';
+        const isLast = stageIdx === lastIdx;
+        const defaultCollapsed = isCompleted;
 
-        basicStage.subStages.forEach(subStage => {
-            const status = getStageStatus(subStage);
-            const badge = getBadgeHtml(status);
-            const dateHtml = status === '완료' ? '' : getDateRangeHtml(subStage);
+        const basicIcon = isCompleted
+            ? '<div style="width: 28px; height: 28px; border-radius: 6px; background: #2E7D32; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
+            : isCurrent
+                ? '<div style="width: 28px; height: 28px; border-radius: 6px; background: #0288D1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: white;"></div></div>'
+                : '<div style="width: 28px; height: 28px; border-radius: 6px; background: #F5F5F5; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: #BDBDBD;"></div></div>';
+
+        const basicBadge = isCompleted
+            ? '<span style="padding: 3px 12px; background: #E8F5E9; color: #2E7D32; border-radius: 4px; font-size: 12px; font-weight: 600;">완료</span>'
+            : isCurrent
+                ? '<span style="padding: 3px 12px; background: #E3F2FD; color: #0288D1; border-radius: 4px; font-size: 12px; font-weight: 600;">진행 중</span>'
+                : '<span style="padding: 3px 12px; background: #F5F5F5; color: #9E9E9E; border-radius: 4px; font-size: 12px; font-weight: 600;">예정</span>';
+
+        let basicPeriodHtml = '';
+        if (!isCompleted && stage.applicationPeriod) {
+            basicPeriodHtml = `<span class="journey-date-area"><span class="jd-label" style="color: #4B5563; font-weight: 500;">신청</span>${stage.applicationPeriod}</span>`;
+        }
+
+        const toggleRotate = defaultCollapsed ? '' : 'transform: rotate(180deg);';
+        const toggleTitle = defaultCollapsed ? '펼치기' : '접기';
+        const toggleIcon = `<span class="journey-toggle" data-stage="f${stageIdx}" style="cursor: pointer; margin-left: 6px; display: inline-flex; align-items: center; color: #9ca3af; transition: transform 0.2s; ${toggleRotate}" title="${toggleTitle}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"></polyline></svg></span>`;
+
+        html += `
+            <div style="margin-bottom: ${!isLast ? '4px' : '0'};">
+                <div onclick="toggleFilteredJourneyStage(${stageIdx})" style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; background: ${isCurrent ? '#F0F7FF' : '#F8F8F8'}; border-radius: 8px; ${isCurrent ? 'border: 2px solid #90CAF9;' : 'border: 1px solid #EEEEEE;'} cursor: pointer;">
+                    ${basicIcon}
+                    <span style="font-size: 15px; font-weight: 700; color: ${isUpcoming ? '#9E9E9E' : '#1a1a1a'};">${stage.basicStageName}</span>
+                    ${basicBadge}
+                    ${toggleIcon}
+                    ${basicPeriodHtml}
+                </div>
+                <div id="filtered-journey-sub-${stageIdx}" style="margin-left: 30px; ${!isLast ? 'border-left: 2px solid ' + (isCompleted ? '#A5D6A7' : isCurrent ? '#90CAF9' : '#E0E0E0') + ';' : ''} padding-left: 28px; padding-top: 4px; padding-bottom: 4px; ${defaultCollapsed ? 'display: none;' : ''}">
+        `;
+
+        stage.subStages.forEach((sub, subIdx) => {
+            const subCompleted = sub.status === 'completed';
+            const subCurrent = sub.status === 'current';
+            const subUpcoming = sub.status === 'upcoming';
+
+            const subIcon = subCompleted
+                ? '<div style="width: 16px; height: 16px; border-radius: 50%; background: #2E7D32; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: -38px; margin-right: 22px;"><svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg></div>'
+                : subCurrent
+                    ? '<div style="width: 16px; height: 16px; border-radius: 50%; background: #0288D1; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-left: -38px; margin-right: 22px;"><div style="width: 6px; height: 6px; border-radius: 50%; background: white;"></div></div>'
+                    : '<div style="width: 16px; height: 16px; border-radius: 50%; background: white; border: 2px solid #E0E0E0; flex-shrink: 0; margin-left: -38px; margin-right: 22px;"></div>';
+
+            const subBadge = subCompleted
+                ? '<span style="padding: 2px 10px; background: #E8F5E9; color: #2E7D32; border-radius: 4px; font-size: 11px; font-weight: 600;">완료</span>'
+                : subCurrent
+                    ? '<span style="padding: 2px 10px; background: #E3F2FD; color: #0288D1; border-radius: 4px; font-size: 11px; font-weight: 600;">진행 중</span>'
+                    : '<span style="padding: 2px 10px; background: #F5F5F5; color: #9E9E9E; border-radius: 4px; font-size: 11px; font-weight: 600;">예정</span>';
+
+            let subPeriodHtml = '';
+            if (!subCompleted) {
+                const subPeriods = [];
+                if (sub.submissionPeriod) subPeriods.push(`<span class="jd-label" style="color: #6A0028; font-weight: 500;">제출</span>${sub.submissionPeriod}`);
+                if (sub.reviewPeriod) subPeriods.push(`<span class="jd-label" style="color: #1565C0; font-weight: 500;">심사</span>${sub.reviewPeriod}`);
+                if (subPeriods.length > 0) {
+                    subPeriodHtml = `<span class="journey-date-area">${subPeriods.join('<span class="jd-sep">|</span>')}</span>`;
+                }
+            }
 
             html += `
-                <div class="substage" style="display: flex; align-items: center; gap: 8px; padding: 6px 0; font-size: 13px;">
-                    <span style="color: #6B7280;">${subStage.name}</span>
-                    ${dateHtml}
-                    ${badge}
-                </div>
+                    <div style="padding: 8px 0; ${subIdx < stage.subStages.length - 1 ? 'border-bottom: 1px solid #F3F4F6;' : ''}">
+                        <div style="display: flex; align-items: center;">
+                            ${subIcon}
+                            <span style="font-size: 14px; color: ${subUpcoming ? '#9E9E9E' : '#374151'}; ${subCurrent ? 'font-weight: 600;' : ''}">${sub.name}</span>
+                            <span style="margin-left: 8px;">${subBadge}</span>
+                            ${subPeriodHtml}
+                        </div>
+                    </div>
             `;
         });
 
-        html += '</div></div>';
+        html += `
+                </div>
+            </div>
+        `;
     });
 
-    html += '</div>';
     container.innerHTML = html;
 }
 
-function getStageStatus(subStage) {
+// 필터된 여정 토글 (renderDepartmentGuidanceStages 전용)
+function toggleFilteredJourneyStage(stageIdx) {
+    const subDiv = document.getElementById(`filtered-journey-sub-${stageIdx}`);
+    const toggle = document.querySelector(`.journey-toggle[data-stage="f${stageIdx}"]`);
+    if (!subDiv) return;
+    const isHidden = subDiv.style.display === 'none';
+    subDiv.style.display = isHidden ? '' : 'none';
+    if (toggle) {
+        toggle.style.transform = isHidden ? 'rotate(180deg)' : '';
+        toggle.title = isHidden ? '접기' : '펼치기';
+    }
+}
+
+// 세부단계 상태 계산 (날짜 기반)
+function calcSubStageStatus(subStage) {
     const now = new Date();
-    const submitEnd = new Date(subStage.submitEndDate || subStage.reviewEndDate);
-    const reviewEnd = new Date(subStage.reviewEndDate);
-
-    if (now > reviewEnd) return '완료';
-    if (now >= new Date(subStage.submitStartDate) && now <= reviewEnd) return '진행 중';
-    return '예정';
+    const submitStart = (subStage.submissionSchedule && subStage.submissionSchedule.startDate) || subStage.submitStartDate || '';
+    const submitEnd = (subStage.submissionSchedule && subStage.submissionSchedule.endDate) || subStage.submitEndDate || '';
+    const reviewEnd = (subStage.reviewSchedule && subStage.reviewSchedule.endDate) || subStage.reviewEndDate || '';
+    if (!reviewEnd && !submitEnd) return 'upcoming';
+    const endDate = new Date(reviewEnd || submitEnd);
+    if (now > endDate) return 'completed';
+    if (submitStart && now >= new Date(submitStart) && now <= endDate) return 'current';
+    return 'upcoming';
 }
 
-function getBadgeHtml(status) {
-    const badges = {
-        '완료': '<span class="badge badge-completed" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #D1FAE5; color: #065F46;">완료</span>',
-        '진행 중': '<span class="badge badge-ongoing" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #DBEAFE; color: #1E40AF;">진행 중</span>',
-        '예정': '<span class="badge badge-upcoming" style="padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; background: #F3F4F6; color: #6B7280;">예정</span>'
-    };
-    return badges[status] || '';
-}
-
-function getDateRangeHtml(subStage) {
-    if (!subStage.submitStartDate || !subStage.submitEndDate) return '';
-
-    return `<span style="font-size: 11px; color: #9CA3AF;">${subStage.submitStartDate} ~ ${subStage.submitEndDate}</span>`;
+// 날짜 포맷 (ISO → YYYY-MM-DD)
+function fmtDate(d) {
+    return d ? d.substring(0, 10) : '';
 }
 
 /* ==================== [5] 알림 ==================== */
@@ -350,7 +500,8 @@ function initProfessorDashboardV3() {
     renderProfessorBoardNoticeCard();       // [2] 논문지도공지 및 자료
     renderStudentFilters();                 // [3] 학생 현황 필터
     renderStudentSummaryCards();            // [3] 학생 현황 카드
-    renderDepartmentGuidanceStages();       // [4] 우리 학과 논문지도단계
+    renderStageFilters();                  // [4] 논문지도단계 필터
+    renderDepartmentGuidanceStages();       // [4] 논문지도단계
 
     // 우측 4개
     renderProfessorAlertCard();             // [5] 알림
@@ -363,7 +514,7 @@ function initProfessorDashboardV3() {
 
 // DOMContentLoaded 이벤트
 document.addEventListener('DOMContentLoaded', function() {
-    if (document.getElementById('prof-dashboard-v3')) {
+    if (document.getElementById('prof-dashboard-v3') || document.getElementById('dashboard-screen')) {
         initProfessorDashboardV3();
     }
 });
