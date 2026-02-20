@@ -3864,6 +3864,8 @@ function renderAllMenuTables() {
 
 // 메뉴관리 화면 초기화
 function initMenuManagement() {
+    // 이전에 남아있는 _pendingDelete 플래그 정리
+    mockMenus.forEach(m => { delete m._pendingDelete; });
     // 원본 데이터 스냅샷 (deep copy)
     menuOriginalData = JSON.parse(JSON.stringify(mockMenus));
     menuChanges = {};
@@ -3888,49 +3890,61 @@ function renderTopMenuTable() {
         return;
     }
 
-    tbody.innerHTML = depth1.map((m, idx) => `
-        <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="top">
-            <td class="px-4 py-3 text-center text-sm text-gray-600">${idx + 1}</td>
+    tbody.innerHTML = depth1.map((m, idx) => {
+        const isPending = m._pendingDelete;
+        const rowClass = isPending ? 'bg-red-50 opacity-60' : 'hover:bg-blue-50 transition-colors';
+        const textDeco = isPending ? 'line-through text-gray-400' : '';
+        const inputExtra = isPending ? 'opacity-50' : '';
+        const cbDisabled = isPending ? 'disabled' : '';
+
+        return `
+        <tr class="${rowClass}" data-menu-id="${m.id}" data-menu-section="top">
+            <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${idx + 1}</td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm font-medium text-gray-900 cursor-not-allowed">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm font-medium ${isPending ? 'text-gray-400 line-through' : 'text-gray-900'} cursor-not-allowed ${inputExtra}">
             </td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
             </td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
             </td>
-            <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+            <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${m.order}</td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
             </td>
             <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''}
+                <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''} ${cbDisabled}
                     onchange="onMenuCheckboxChange('${m.id}', 'isActiveAdmin', this.checked)"
-                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
             </td>
             <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''}
+                <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''} ${cbDisabled}
                     onchange="onMenuCheckboxChange('${m.id}', 'isActiveProf', this.checked)"
-                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
             </td>
             <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''}
+                <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''} ${cbDisabled}
                     onchange="onMenuCheckboxChange('${m.id}', 'isActiveStudent', this.checked)"
-                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
             </td>
             <td class="px-4 py-3 text-center">
+                ${isPending ? `
+                <div class="flex items-center justify-center gap-1">
+                    <span class="text-xs text-red-500 font-medium">삭제 예정</span>
+                    <button onclick="undoDeleteMenu('${m.id}')" class="px-3 py-1 text-xs bg-orange-500 text-white rounded hover:bg-orange-600">삭제 취소</button>
+                </div>` : `
                 <div class="flex items-center justify-center gap-1">
                     <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
                     <button onclick="deleteTopMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
-                </div>
+                </div>`}
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 }
 
 // ---- Section 2: 하위 메뉴 테이블 렌더링 (상위메뉴별 그룹핑) ----
@@ -3953,54 +3967,65 @@ function renderSubMenuTable() {
     // 하위 메뉴 행 렌더링 헬퍼
     function renderSubRow(m, idx) {
         const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
+        const isPending = m._pendingDelete;
+        const rowClass = isPending ? 'bg-red-50 opacity-60' : 'hover:bg-blue-50 transition-colors';
+        const inputExtra = isPending ? 'opacity-50' : '';
+        const cbDisabled = isPending ? 'disabled' : '';
+        const textClass = isPending ? 'text-gray-400 line-through' : 'text-gray-600';
+
         return `
-            <tr class="hover:bg-blue-50 transition-colors" data-menu-id="${m.id}" data-menu-section="sub">
-                <td class="px-4 py-3 text-center text-sm text-gray-600">${idx}</td>
+            <tr class="${rowClass}" data-menu-id="${m.id}" data-menu-section="sub">
+                <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${idx}</td>
                 <td class="px-4 py-3 text-center">
                     <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
-                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${textClass} cursor-not-allowed ${inputExtra}">
                 </td>
                 <td class="px-4 py-3 text-center">
                     <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
-                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${textClass} cursor-not-allowed ${inputExtra}">
                 </td>
                 <td class="px-4 py-3 text-center">
                     <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
-                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${textClass} cursor-not-allowed ${inputExtra}">
                 </td>
                 <td class="px-4 py-3 text-center">
                     <select data-field="parentId" data-id="${m.id}" disabled
-                        class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 text-gray-600 cursor-not-allowed"
+                        class="menu-input text-sm border border-gray-200 rounded px-2 py-1 bg-gray-50 ${textClass} cursor-not-allowed ${inputExtra}"
                         style="-webkit-appearance: none; -moz-appearance: none; appearance: none;">
                         <option value="">--선택--</option>
                         ${parentOpts}
                     </select>
                 </td>
-                <td class="px-4 py-3 text-center text-sm text-gray-600">${m.order}</td>
+                <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${m.order}</td>
                 <td class="px-4 py-3 text-center">
                     <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
-                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm text-gray-600 cursor-not-allowed">
+                        class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${textClass} cursor-not-allowed ${inputExtra}">
                 </td>
                 <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''}
+                    <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''} ${cbDisabled}
                         onchange="onMenuCheckboxChange('${m.id}', 'isActiveAdmin', this.checked)"
-                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
                 </td>
                 <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''}
+                    <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''} ${cbDisabled}
                         onchange="onMenuCheckboxChange('${m.id}', 'isActiveProf', this.checked)"
-                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
                 </td>
                 <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''}
+                    <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''} ${cbDisabled}
                         onchange="onMenuCheckboxChange('${m.id}', 'isActiveStudent', this.checked)"
-                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded cursor-pointer">
+                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
                 </td>
                 <td class="px-4 py-3 text-center">
+                    ${isPending ? `
+                    <div class="flex items-center justify-center gap-1">
+                        <span class="text-xs text-red-500 font-medium">삭제 예정</span>
+                        <button onclick="undoDeleteMenu('${m.id}')" class="px-3 py-1 text-xs bg-orange-500 text-white rounded hover:bg-orange-600">삭제 취소</button>
+                    </div>` : `
                     <div class="flex items-center justify-center gap-1">
                         <button onclick="toggleMenuEdit('${m.id}')" class="px-3 py-1 text-xs bg-gray-600 text-white rounded hover:bg-gray-700">수정</button>
                         <button onclick="deleteSubMenu('${m.id}')" class="px-3 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600">삭제</button>
-                    </div>
+                    </div>`}
                 </td>
             </tr>`;
     }
@@ -4133,11 +4158,19 @@ function saveAllMenuChanges() {
         alert('변경된 내용이 없습니다.');
         return;
     }
+    // 삭제 예정 항목을 실제로 제거
+    const pendingIds = mockMenus.filter(m => m._pendingDelete).map(m => m.id);
+    if (pendingIds.length > 0) {
+        for (let i = mockMenus.length - 1; i >= 0; i--) {
+            if (mockMenus[i]._pendingDelete) mockMenus.splice(i, 1);
+        }
+    }
     // mockMenus는 이미 임시 반영되어 있으므로, 원본 스냅샷만 갱신
     menuOriginalData = JSON.parse(JSON.stringify(mockMenus));
     menuChanges = {};
     isMenuDirty = false;
-    alert('메뉴 설정이 저장되었습니다.');
+    const deleteMsg = pendingIds.length > 0 ? `\n(${pendingIds.length}개 메뉴 삭제됨)` : '';
+    alert('메뉴 설정이 저장되었습니다.' + deleteMsg);
     renderAllMenuTables();
 }
 
@@ -4145,7 +4178,7 @@ function saveAllMenuChanges() {
 function checkMenuUnsavedChanges() {
     if (isMenuDirty) {
         if (confirm('저장하지 않은 변경사항이 있습니다.\n이동하시겠습니까?')) {
-            // mockMenus를 원본으로 복원
+            // mockMenus를 원본으로 복원 (_pendingDelete 플래그도 함께 제거됨)
             mockMenus.length = 0;
             menuOriginalData.forEach(m => mockMenus.push(JSON.parse(JSON.stringify(m))));
             menuChanges = {};
@@ -4238,7 +4271,7 @@ function addNewSubMenu() {
     setTimeout(() => toggleMenuEdit(newId), 50);
 }
 
-// ---- 최상위 메뉴 삭제 ----
+// ---- 최상위 메뉴 삭제 (삭제 표시만, 저장 시 실제 삭제) ----
 function deleteTopMenu(menuId) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
@@ -4246,27 +4279,47 @@ function deleteTopMenu(menuId) {
 
     const children = menus.filter(m => m.parentId === menuId);
     if (children.length > 0) {
-        if (!confirm(`'${menu.name}' 메뉴 아래에 ${children.length}개 하위 메뉴가 있습니다.\n하위 메뉴도 함께 삭제됩니다. 계속하시겠습니까?`)) return;
-        children.forEach(child => { const idx = menus.findIndex(m => m.id === child.id); if (idx !== -1) menus.splice(idx, 1); });
+        if (!confirm(`'${menu.name}' 메뉴 아래에 ${children.length}개 하위 메뉴가 있습니다.\n하위 메뉴도 함께 삭제 예정됩니다. 계속하시겠습니까?`)) return;
+        children.forEach(child => { child._pendingDelete = true; });
     } else {
         if (!confirm(`'${menu.name}' 최상위 메뉴를 삭제하시겠습니까?`)) return;
     }
-    const idx = menus.findIndex(m => m.id === menuId);
-    if (idx !== -1) menus.splice(idx, 1);
+    menu._pendingDelete = true;
     isMenuDirty = true;
     renderAllMenuTables();
 }
 
-// ---- 하위 메뉴 삭제 ----
+// ---- 하위 메뉴 삭제 (삭제 표시만, 저장 시 실제 삭제) ----
 function deleteSubMenu(menuId) {
     const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
     const menu = menus.find(m => m.id === menuId);
     if (!menu) return;
     if (!confirm(`'${menu.name}' 메뉴를 삭제하시겠습니까?`)) return;
-    const idx = menus.findIndex(m => m.id === menuId);
-    if (idx !== -1) menus.splice(idx, 1);
+    menu._pendingDelete = true;
     isMenuDirty = true;
     renderSubMenuTable();
+}
+
+// ---- 삭제 취소 ----
+function undoDeleteMenu(menuId) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+    delete menu._pendingDelete;
+    // 최상위 메뉴 삭제 취소 시, 하위 메뉴도 삭제 취소
+    if (menu.depth === 1) {
+        menus.filter(m => m.parentId === menuId).forEach(child => { delete child._pendingDelete; });
+    }
+    // 다른 삭제 예정 항목이 없으면 dirty 플래그 재확인
+    const hasPending = menus.some(m => m._pendingDelete);
+    const hasOtherChanges = Object.keys(menuChanges).length > 0;
+    if (!hasPending && !hasOtherChanges) {
+        // 원본과 현재 비교하여 dirty 여부 판단
+        const currentJson = JSON.stringify(menus.map(m => { const copy = {...m}; delete copy._pendingDelete; return copy; }));
+        const origJson = JSON.stringify(menuOriginalData);
+        isMenuDirty = currentJson !== origJson;
+    }
+    renderAllMenuTables();
 }
 
 // 하위호환
@@ -4330,6 +4383,7 @@ window.addNewTopMenu = addNewTopMenu;
 window.addNewSubMenu = addNewSubMenu;
 window.deleteTopMenu = deleteTopMenu;
 window.deleteSubMenu = deleteSubMenu;
+window.undoDeleteMenu = undoDeleteMenu;
 window.toggleMenuEdit = toggleMenuEdit;
 window.saveMenuRow = saveMenuRow;
 window.cancelMenuEdit = cancelMenuEdit;
