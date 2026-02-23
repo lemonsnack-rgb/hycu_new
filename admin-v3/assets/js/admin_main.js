@@ -4440,23 +4440,27 @@ function renderDeptManagementTable() {
         return;
     }
 
-    tbody.innerHTML = academic.map((dept, idx) => `
-        <tr class="hover:bg-blue-50 transition-colors" data-dept-id="${dept.id}">
-            <td class="px-4 py-3 text-center text-sm text-gray-600">${idx + 1}</td>
-            <td class="px-4 py-3 text-center text-sm text-gray-600">${dept.code}</td>
-            <td class="px-4 py-3 text-left text-sm font-medium text-gray-900">${dept.name}</td>
+    tbody.innerHTML = academic.map((dept, idx) => {
+        const disabled = !dept.isExposed;
+        return `
+        <tr class="${disabled ? 'bg-gray-50 opacity-60' : 'hover:bg-blue-50'} transition-colors" data-dept-id="${dept.id}">
+            <td class="px-4 py-3 text-center text-sm text-gray-${disabled ? '400' : '600'}">${idx + 1}</td>
+            <td class="px-4 py-3 text-center text-sm text-gray-${disabled ? '400' : '600'}">${dept.code}</td>
+            <td class="px-4 py-3 text-left text-sm font-medium text-gray-${disabled ? '400' : '900'}">${dept.name}</td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${dept.displayOrder}" onchange="updateDeptOrder('${dept.id}', this.value)"
-                       class="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#009DE8]">
+                       class="w-16 text-center border border-gray-300 rounded px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-[#009DE8] ${disabled ? 'bg-gray-100 text-gray-400' : ''}"
+                       ${disabled ? 'disabled' : ''}>
             </td>
             <td class="px-4 py-3 text-center">
-                <button onclick="toggleDeptExposed('${dept.id}')"
-                        class="px-3 py-1 rounded text-sm font-semibold ${dept.isExposed ? 'bg-green-100 text-green-700 hover:bg-green-200' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'}">
-                    ${dept.isExposed ? 'Y' : 'N'}
-                </button>
+                <select onchange="changeDeptExposed('${dept.id}', this.value)"
+                        class="px-2 py-1 rounded text-sm font-semibold border ${dept.isExposed ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-300 bg-gray-50 text-gray-500'} focus:outline-none focus:ring-1 focus:ring-[#009DE8]">
+                    <option value="Y" ${dept.isExposed ? 'selected' : ''}>Y</option>
+                    <option value="N" ${!dept.isExposed ? 'selected' : ''}>N</option>
+                </select>
             </td>
-        </tr>
-    `).join('');
+        </tr>`;
+    }).join('');
 }
 
 // 노출순서 업데이트 (input 변경 시)
@@ -4468,11 +4472,11 @@ function updateDeptOrder(deptId, value) {
     isDeptDirty = true;
 }
 
-// 노출여부 토글 (Y↔N)
-function toggleDeptExposed(deptId) {
+// 노출여부 변경 (드롭다운 select)
+function changeDeptExposed(deptId, value) {
     const dept = mockDepartments.find(d => d.id === deptId);
     if (!dept) return;
-    dept.isExposed = !dept.isExposed;
+    dept.isExposed = (value === 'Y');
     isDeptDirty = true;
     renderDeptManagementTable();
 }
@@ -4502,7 +4506,7 @@ function saveAllDeptChanges() {
 window.initDepartmentManagement = initDepartmentManagement;
 window.renderDeptManagementTable = renderDeptManagementTable;
 window.updateDeptOrder = updateDeptOrder;
-window.toggleDeptExposed = toggleDeptExposed;
+window.changeDeptExposed = changeDeptExposed;
 window.saveAllDeptChanges = saveAllDeptChanges;
 
 console.log('✅ 학과관리 기능 로드 완료');
