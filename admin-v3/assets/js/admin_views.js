@@ -5618,96 +5618,105 @@ views.menuManagement = () => {
     const depth2Count = menus.filter(m => m.depth === 2).length;
 
     return `
-        <!-- Section 1: 최상위 메뉴 관리 -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800">최상위 메뉴 관리</h2>
-                <p class="text-sm text-gray-600 mt-2">최상위 메뉴의 이름, 경로, 사용여부를 관리합니다.</p>
+        <!-- 탭 네비게이션 -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="flex -mb-px">
+                <button id="menu-tab-top" onclick="switchMenuTab('top')"
+                    class="px-6 py-3 text-sm font-semibold border-b-2 border-[#6A0028] text-[#6A0028]">
+                    최상위 메뉴관리
+                </button>
+                <button id="menu-tab-sub" onclick="switchMenuTab('sub')"
+                    class="px-6 py-3 text-sm font-semibold border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                    메뉴관리
+                </button>
+            </nav>
+        </div>
+
+        <!-- 탭 1: 최상위 메뉴관리 -->
+        <div id="menu-tab-content-top">
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">최상위 메뉴 목록</h3>
+                            <span class="table-count" id="top-menu-count">(${depth1Count}건)</span>
+                        </div>
+                        <div class="table-header-right">
+                            <button onclick="addNewTopMenu()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                최상위 메뉴 추가
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-scroll">
+                        <table class="min-w-full table-fixed">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(한글)</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(영어명)</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">메뉴명(중국어명)</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">경로</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 90px;">사용여부</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="topMenuTableBody" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
-            <div class="table-container">
-                <div class="table-header">
-                    <div class="table-header-left">
-                        <h3 class="table-title">최상위 메뉴 목록</h3>
-                        <span class="table-count" id="top-menu-count">(${depth1Count}건)</span>
-                    </div>
-                    <div class="table-header-right">
-                        <button onclick="addNewTopMenu()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            최상위 메뉴 추가
-                        </button>
-                    </div>
-                </div>
-                <div class="table-scroll">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(한글)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(영어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(중국어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순서</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">경로</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">관리자</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">교수</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">학생</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="topMenuTableBody" class="bg-white divide-y divide-gray-200">
-                        </tbody>
-                    </table>
-                </div>
+            <div class="flex justify-end mt-2 mb-4">
+                <button onclick="saveAllMenuChanges()" class="bg-[#6A0028] text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-opacity-90">
+                    저장
+                </button>
             </div>
         </div>
 
-        <!-- Section 2: 메뉴 관리 -->
-        <div class="bg-white rounded-lg shadow-md mb-6">
-            <div class="p-6 border-b">
-                <h2 class="text-2xl font-bold text-gray-800">메뉴 관리</h2>
-                <p class="text-sm text-gray-600 mt-2">하위 메뉴의 이름, 상위메뉴, 경로 등을 관리합니다.</p>
-            </div>
-            <div class="table-container">
-                <div class="table-header">
-                    <div class="table-header-left">
-                        <h3 class="table-title">메뉴 목록</h3>
-                        <span class="table-count" id="sub-menu-count">(${depth2Count}건)</span>
+        <!-- 탭 2: 메뉴관리 -->
+        <div id="menu-tab-content-sub" style="display: none;">
+            <div class="bg-white rounded-lg shadow-md mb-6">
+                <div class="table-container">
+                    <div class="table-header">
+                        <div class="table-header-left">
+                            <h3 class="table-title">메뉴 목록</h3>
+                            <span class="table-count" id="sub-menu-count">(${depth2Count}건)</span>
+                        </div>
+                        <div class="table-header-right">
+                            <button onclick="addNewSubMenu()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                                메뉴 추가
+                            </button>
+                        </div>
                     </div>
-                    <div class="table-header-right">
-                        <button onclick="addNewSubMenu()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                            메뉴 추가
-                        </button>
+                    <div class="table-scroll">
+                        <table class="min-w-full table-fixed">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(한글)</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(영어명)</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">메뉴명(중국어명)</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">상위메뉴</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">순서</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 140px;">경로</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 90px;">사용여부</th>
+                                    <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 110px;">관리</th>
+                                </tr>
+                            </thead>
+                            <tbody id="subMenuTableBody" class="bg-white divide-y divide-gray-200">
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-                <div class="table-scroll">
-                    <table class="min-w-full table-fixed">
-                        <thead class="bg-gray-50">
-                            <tr>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 50px;">순번</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">메뉴명(한글)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">메뉴명(영어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">메뉴명(중국어명)</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">상위메뉴</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">순서</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">경로</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">관리자</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">교수</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 55px;">학생</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 110px;">관리</th>
-                            </tr>
-                        </thead>
-                        <tbody id="subMenuTableBody" class="bg-white divide-y divide-gray-200">
-                        </tbody>
-                    </table>
-                </div>
             </div>
-        </div>
-
-        <!-- 하단 저장 버튼 -->
-        <div class="flex justify-end mt-2 mb-4">
-            <button onclick="saveAllMenuChanges()" class="bg-[#6A0028] text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-opacity-90">
-                저장
-            </button>
+            <div class="flex justify-end mt-2 mb-4">
+                <button onclick="saveAllMenuChanges()" class="bg-[#6A0028] text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-opacity-90">
+                    저장
+                </button>
+            </div>
         </div>
     `;
 };

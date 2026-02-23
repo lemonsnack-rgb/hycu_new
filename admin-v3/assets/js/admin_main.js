@@ -3886,51 +3886,43 @@ function renderTopMenuTable() {
     if (countEl) countEl.textContent = `(${depth1.length}건)`;
 
     if (depth1.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 최상위 메뉴가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="8" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 최상위 메뉴가 없습니다.</td></tr>';
         return;
     }
 
     tbody.innerHTML = depth1.map((m, idx) => {
         const isPending = m._pendingDelete;
-        const rowClass = isPending ? 'bg-red-50 opacity-60' : 'hover:bg-blue-50 transition-colors';
-        const textDeco = isPending ? 'line-through text-gray-400' : '';
+        const isActive = (m.isActiveAdmin !== false || m.isActiveProf !== false || m.isActiveStudent !== false);
+        const disabled = !isActive && !isPending;
+        const rowClass = isPending ? 'bg-red-50 opacity-60' : disabled ? 'bg-gray-50 opacity-60' : 'hover:bg-blue-50 transition-colors';
         const inputExtra = isPending ? 'opacity-50' : '';
-        const cbDisabled = isPending ? 'disabled' : '';
 
         return `
         <tr class="${rowClass}" data-menu-id="${m.id}" data-menu-section="top">
-            <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${idx + 1}</td>
+            <td class="px-4 py-3 text-center text-sm ${isPending || disabled ? 'text-gray-400' : 'text-gray-600'}">${idx + 1}</td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm font-medium ${isPending ? 'text-gray-400 line-through' : 'text-gray-900'} cursor-not-allowed ${inputExtra}">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm font-medium ${isPending ? 'text-gray-400 line-through' : disabled ? 'text-gray-400' : 'text-gray-900'} cursor-not-allowed ${inputExtra}">
             </td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.nameEn || ''}" data-field="nameEn" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : disabled ? 'text-gray-400' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
             </td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.nameCn || ''}" data-field="nameCn" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : disabled ? 'text-gray-400' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
             </td>
-            <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${m.order}</td>
+            <td class="px-4 py-3 text-center text-sm ${isPending || disabled ? 'text-gray-400' : 'text-gray-600'}">${m.order}</td>
             <td class="px-4 py-3 text-center">
                 <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
-                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
+                    class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${isPending ? 'text-gray-400 line-through' : disabled ? 'text-gray-400' : 'text-gray-600'} cursor-not-allowed ${inputExtra}">
             </td>
             <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''} ${cbDisabled}
-                    onchange="onMenuCheckboxChange('${m.id}', 'isActiveAdmin', this.checked)"
-                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
-            </td>
-            <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''} ${cbDisabled}
-                    onchange="onMenuCheckboxChange('${m.id}', 'isActiveProf', this.checked)"
-                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
-            </td>
-            <td class="px-4 py-3 text-center">
-                <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''} ${cbDisabled}
-                    onchange="onMenuCheckboxChange('${m.id}', 'isActiveStudent', this.checked)"
-                    class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
+                <select onchange="changeMenuActive('${m.id}', this.value)" ${isPending ? 'disabled' : ''}
+                    class="px-2 py-1 rounded text-sm font-semibold border ${isActive ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-300 bg-gray-50 text-gray-500'} focus:outline-none focus:ring-1 focus:ring-[#6A0028] cursor-pointer">
+                    <option value="Y" ${isActive ? 'selected' : ''}>Y</option>
+                    <option value="N" ${!isActive ? 'selected' : ''}>N</option>
+                </select>
             </td>
             <td class="px-4 py-3 text-center">
                 ${isPending ? `
@@ -3960,7 +3952,7 @@ function renderSubMenuTable() {
     if (countEl) countEl.textContent = `(${depth2.length}건)`;
 
     if (depth2.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="11" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 메뉴가 없습니다.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="9" class="px-4 py-8 text-center text-gray-400 text-sm">등록된 메뉴가 없습니다.</td></tr>';
         return;
     }
 
@@ -3968,14 +3960,15 @@ function renderSubMenuTable() {
     function renderSubRow(m, idx) {
         const parentOpts = depth1All.map(p => `<option value="${p.id}" ${m.parentId === p.id ? 'selected' : ''}>${p.name}</option>`).join('');
         const isPending = m._pendingDelete;
-        const rowClass = isPending ? 'bg-red-50 opacity-60' : 'hover:bg-blue-50 transition-colors';
+        const isActive = (m.isActiveAdmin !== false || m.isActiveProf !== false || m.isActiveStudent !== false);
+        const disabled = !isActive && !isPending;
+        const rowClass = isPending ? 'bg-red-50 opacity-60' : disabled ? 'bg-gray-50 opacity-60' : 'hover:bg-blue-50 transition-colors';
         const inputExtra = isPending ? 'opacity-50' : '';
-        const cbDisabled = isPending ? 'disabled' : '';
-        const textClass = isPending ? 'text-gray-400 line-through' : 'text-gray-600';
+        const textClass = isPending ? 'text-gray-400 line-through' : disabled ? 'text-gray-400' : 'text-gray-600';
 
         return `
             <tr class="${rowClass}" data-menu-id="${m.id}" data-menu-section="sub">
-                <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${idx}</td>
+                <td class="px-4 py-3 text-center text-sm ${isPending || disabled ? 'text-gray-400' : 'text-gray-600'}">${idx}</td>
                 <td class="px-4 py-3 text-center">
                     <input type="text" value="${m.name}" data-field="name" data-id="${m.id}" disabled
                         class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${textClass} cursor-not-allowed ${inputExtra}">
@@ -3996,25 +3989,17 @@ function renderSubMenuTable() {
                         ${parentOpts}
                     </select>
                 </td>
-                <td class="px-4 py-3 text-center text-sm ${isPending ? 'text-gray-400' : 'text-gray-600'}">${m.order}</td>
+                <td class="px-4 py-3 text-center text-sm ${isPending || disabled ? 'text-gray-400' : 'text-gray-600'}">${m.order}</td>
                 <td class="px-4 py-3 text-center">
                     <input type="text" value="${m.code || ''}" data-field="code" data-id="${m.id}" disabled
                         class="menu-input w-full border border-gray-200 rounded px-2 py-1 bg-gray-50 text-sm ${textClass} cursor-not-allowed ${inputExtra}">
                 </td>
                 <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActiveAdmin !== false ? 'checked' : ''} ${cbDisabled}
-                        onchange="onMenuCheckboxChange('${m.id}', 'isActiveAdmin', this.checked)"
-                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
-                </td>
-                <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActiveProf !== false ? 'checked' : ''} ${cbDisabled}
-                        onchange="onMenuCheckboxChange('${m.id}', 'isActiveProf', this.checked)"
-                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
-                </td>
-                <td class="px-4 py-3 text-center">
-                    <input type="checkbox" ${m.isActiveStudent !== false ? 'checked' : ''} ${cbDisabled}
-                        onchange="onMenuCheckboxChange('${m.id}', 'isActiveStudent', this.checked)"
-                        class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded ${isPending ? '' : 'cursor-pointer'}">
+                    <select onchange="changeMenuActive('${m.id}', this.value)" ${isPending ? 'disabled' : ''}
+                        class="px-2 py-1 rounded text-sm font-semibold border ${isActive ? 'border-green-300 bg-green-50 text-green-700' : 'border-gray-300 bg-gray-50 text-gray-500'} focus:outline-none focus:ring-1 focus:ring-[#6A0028] cursor-pointer">
+                        <option value="Y" ${isActive ? 'selected' : ''}>Y</option>
+                        <option value="N" ${!isActive ? 'selected' : ''}>N</option>
+                    </select>
                 </td>
                 <td class="px-4 py-3 text-center">
                     ${isPending ? `
@@ -4038,7 +4023,7 @@ function renderSubMenuTable() {
         if (children.length === 0) return;
 
         // 그룹 구분 행
-        html += `<tr class="bg-gray-100"><td colspan="11" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴: ${parent.name} (${children.length}건)</td></tr>`;
+        html += `<tr class="bg-gray-100"><td colspan="9" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴: ${parent.name} (${children.length}건)</td></tr>`;
 
         children.forEach(m => {
             globalIdx++;
@@ -4049,7 +4034,7 @@ function renderSubMenuTable() {
     // 고아 메뉴 (상위메뉴가 삭제된 경우)
     const orphans = depth2.filter(m => !depth1All.find(p => p.id === m.parentId));
     if (orphans.length > 0) {
-        html += `<tr class="bg-gray-100"><td colspan="11" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴 미지정 (${orphans.length}건)</td></tr>`;
+        html += `<tr class="bg-gray-100"><td colspan="9" class="px-4 py-2 text-sm font-semibold text-gray-700">상위메뉴 미지정 (${orphans.length}건)</td></tr>`;
         orphans.forEach(m => {
             globalIdx++;
             html += renderSubRow(m, globalIdx);
@@ -4150,6 +4135,43 @@ function onMenuCheckboxChange(menuId, field, checked) {
     const menu = menus.find(m => m.id === menuId);
     if (menu) menu[field] = checked;
     isMenuDirty = true;
+}
+
+// ---- 사용여부 Y/N 변경 ----
+function changeMenuActive(menuId, value) {
+    const menus = (typeof mockMenus !== 'undefined') ? mockMenus : [];
+    const menu = menus.find(m => m.id === menuId);
+    if (!menu) return;
+    const active = (value === 'Y');
+    menu.isActiveAdmin = active;
+    menu.isActiveProf = active;
+    menu.isActiveStudent = active;
+    isMenuDirty = true;
+    renderAllMenuTables();
+}
+
+// ---- 탭 전환 ----
+function switchMenuTab(tab) {
+    const topContent = document.getElementById('menu-tab-content-top');
+    const subContent = document.getElementById('menu-tab-content-sub');
+    const topTab = document.getElementById('menu-tab-top');
+    const subTab = document.getElementById('menu-tab-sub');
+    if (!topContent || !subContent) return;
+
+    const activeClass = 'border-[#6A0028] text-[#6A0028]';
+    const inactiveClass = 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300';
+
+    if (tab === 'top') {
+        topContent.style.display = '';
+        subContent.style.display = 'none';
+        topTab.className = `px-6 py-3 text-sm font-semibold border-b-2 ${activeClass}`;
+        subTab.className = `px-6 py-3 text-sm font-semibold border-b-2 ${inactiveClass}`;
+    } else {
+        topContent.style.display = 'none';
+        subContent.style.display = '';
+        topTab.className = `px-6 py-3 text-sm font-semibold border-b-2 ${inactiveClass}`;
+        subTab.className = `px-6 py-3 text-sm font-semibold border-b-2 ${activeClass}`;
+    }
 }
 
 // ---- 전체 저장 ----
@@ -4390,6 +4412,8 @@ window.cancelMenuEdit = cancelMenuEdit;
 window.moveMenuOrder = moveMenuOrder;
 window.saveAllMenuChanges = saveAllMenuChanges;
 window.onMenuCheckboxChange = onMenuCheckboxChange;
+window.changeMenuActive = changeMenuActive;
+window.switchMenuTab = switchMenuTab;
 window.checkMenuUnsavedChanges = checkMenuUnsavedChanges;
 // 하위호환 별칭
 window.renderMenuTable = function() { renderTopMenuTable(); renderSubMenuTable(); };
