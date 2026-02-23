@@ -374,6 +374,10 @@
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>권한관리</span>
                         </a>
+                        <a href="#" onclick="showScreen('departmentManagement'); return false;" data-screen="departmentManagement"
+                           class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
+                            <span>학과관리</span>
+                        </a>
                         <a href="#" onclick="showScreen('menuManagement'); return false;" data-screen="menuManagement"
                            class="sidebar-sublink flex items-center rounded-lg transition-colors duration-200">
                             <span>메뉴관리</span>
@@ -836,6 +840,10 @@
                 <div id="user-management-content"></div>
             </section>
 
+            <section id="departmentManagement-screen" class="content-screen">
+                <div id="department-management-content"></div>
+            </section>
+
             <section id="proxyLogin-screen" class="content-screen">
                 <div id="proxy-login-content"></div>
             </section>
@@ -1008,6 +1016,7 @@
                 'workScheduleManagement': 'work-schedule-management-content',
                 'permissionManagement': 'permission-management-content',
                 'menuManagement': 'menu-management-content',
+                'departmentManagement': 'department-management-content',
                 'userManagement': 'user-management-content',
                 'proxyLogin': 'proxy-login-content',
                 'notice': 'notice-content',
@@ -1133,6 +1142,15 @@
                     }, 100);
                 }
 
+                // 학과관리 화면 후처리
+                if (viewName === 'departmentManagement') {
+                    setTimeout(() => {
+                        if (typeof initDepartmentManagement === 'function') {
+                            initDepartmentManagement();
+                        }
+                    }, 100);
+                }
+
                 // 논문신청 화면 후처리
                 if (viewName === 'thesisApplication' && typeof renderAdminThesisApplicationList === 'function') {
                     setTimeout(() => {
@@ -1228,6 +1246,8 @@
                 'journalReview': { menu: '논문 심사', submenu: '학술지논문심사' },
                 'workScheduleManagement': { menu: '시스템 설정', submenu: '업무일정등록' },
                 'permissionManagement': { menu: '시스템 설정', submenu: '권한관리' },
+                'departmentManagement': { menu: '시스템 설정', submenu: '학과관리' },
+                'menuManagement': { menu: '시스템 설정', submenu: '메뉴관리' },
                 'userManagement': { menu: '시스템 설정', submenu: '사용자관리' },
                 'proxyLogin': { menu: '시스템 설정', submenu: '대리로그인' },
                 'noticeManagement': { menu: '논문 안내', submenu: '행정공지사항' },

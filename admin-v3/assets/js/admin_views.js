@@ -5712,6 +5712,58 @@ views.menuManagement = () => {
     `;
 };
 
+// ========== 학과 관리 ==========
+views.departmentManagement = () => {
+    const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
+    const exposedDepts = departments.filter(d => d.type === 'academic' && d.isExposed);
+
+    return `
+        <!-- 노출 학과 관리 -->
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="p-6 border-b">
+                <h2 class="text-2xl font-bold text-gray-800">노출 학과 관리</h2>
+                <p class="text-sm text-gray-600 mt-2">논문지도시스템에 노출할 학과를 관리하고 노출 순서를 설정합니다.</p>
+            </div>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">노출 학과 목록</h3>
+                        <span class="table-count" id="dept-exposed-count">(${exposedDepts.length}건)</span>
+                    </div>
+                    <div class="table-header-right">
+                        <button onclick="openAddDeptModal()" class="bg-[#009DE8] text-white px-4 py-2 rounded-md hover:bg-opacity-90 text-sm flex items-center gap-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                            학과 추가
+                        </button>
+                    </div>
+                </div>
+                <div class="table-scroll">
+                    <table class="min-w-full table-fixed">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 60px;">순번</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 120px;">학과코드</th>
+                                <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600" style="width: 200px;">학과명</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">노출순서</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">관리</th>
+                            </tr>
+                        </thead>
+                        <tbody id="deptManagementTableBody" class="bg-white divide-y divide-gray-200">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 하단 저장 버튼 -->
+        <div class="flex justify-end mt-2 mb-4">
+            <button onclick="saveAllDeptChanges()" class="bg-[#6A0028] text-white px-8 py-3 rounded-md text-base font-semibold hover:bg-opacity-90">
+                저장
+            </button>
+        </div>
+    `;
+};
+
 // ========== 사용자 관리 ==========
 views.userManagement = () => {
     const users = appData.users || [];

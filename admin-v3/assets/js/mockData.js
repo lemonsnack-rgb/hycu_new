@@ -1411,52 +1411,30 @@ const mockUsers = [
 
 // ERP 부서 정보 (ERP View에서 동기화)
 const mockDepartments = [
-    {
-        id: 'DEPT_001',
-        code: 'DEPT_001',
-        name: '교무학사팀',
-        type: 'admin',
-        parentId: null,
-        memberCount: 12,
-        erpSyncDate: '2025-01-15 09:00:00'
-    },
-    {
-        id: 'DEPT_002',
-        code: 'DEPT_002',
-        name: '학생지원팀',
-        type: 'admin',
-        parentId: null,
-        memberCount: 8,
-        erpSyncDate: '2025-01-15 09:00:00'
-    },
-    {
-        id: 'DEPT_003',
-        code: 'DEPT_003',
-        name: '경영학과',
-        type: 'academic',
-        parentId: null,
-        memberCount: 45,
-        erpSyncDate: '2025-01-15 09:00:00'
-    },
-    {
-        id: 'DEPT_004',
-        code: 'DEPT_004',
-        name: '컴퓨터공학과',
-        type: 'academic',
-        parentId: null,
-        memberCount: 52,
-        erpSyncDate: '2025-01-15 09:00:00'
-    },
-    {
-        id: 'DEPT_005',
-        code: 'DEPT_005',
-        name: '입학관리팀',
-        type: 'admin',
-        parentId: null,
-        memberCount: 6,
-        erpSyncDate: '2025-01-15 09:00:00'
-    }
+    // 행정부서 (논문지도시스템 노출 불가)
+    { id: 'DEPT_001', code: '10001', name: '교무학사팀', type: 'admin', parentId: null, memberCount: 12, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_002', code: '10002', name: '학생지원팀', type: 'admin', parentId: null, memberCount: 8, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_005', code: '10005', name: '입학관리팀', type: 'admin', parentId: null, memberCount: 6, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
+    // 대학원 학과 (노출 대상)
+    { id: 'DEPT_003', code: '41003', name: '경영학과', type: 'academic', parentId: null, memberCount: 45, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 1 },
+    { id: 'DEPT_004', code: '41004', name: '컴퓨터공학과', type: 'academic', parentId: null, memberCount: 52, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 2 },
+    { id: 'DEPT_006', code: '41006', name: '교육학과', type: 'academic', parentId: null, memberCount: 38, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 3 },
+    { id: 'DEPT_007', code: '41007', name: '심리학과', type: 'academic', parentId: null, memberCount: 30, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 4 },
+    { id: 'DEPT_008', code: '41008', name: '사회복지학과', type: 'academic', parentId: null, memberCount: 42, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 5 },
+    // 미노출 학과 (ERP에 존재하나 아직 노출 안 함)
+    { id: 'DEPT_009', code: '41009', name: '상담심리학과', type: 'academic', parentId: null, memberCount: 25, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_010', code: '41010', name: '부동산학과', type: 'academic', parentId: null, memberCount: 18, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_011', code: '41011', name: '미디어콘텐츠학과', type: 'academic', parentId: null, memberCount: 22, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 }
 ];
+
+// ERP 동기화 시뮬레이션용 미등록 학과 풀
+const mockErpPendingDepartments = [
+    { id: 'DEPT_ERP_001', code: '41012', name: '글로벌경영학과', type: 'academic', parentId: null, memberCount: 20, erpSyncDate: null, isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_ERP_002', code: '41013', name: '데이터사이언스학과', type: 'academic', parentId: null, memberCount: 15, erpSyncDate: null, isExposed: false, displayOrder: 0 }
+];
+
+// ERP 마지막 동기화 일시
+let mockErpLastSyncDate = '2025-01-15 09:00:00';
 
 // 신분 정보 (ERP 기준)
 const mockPositions = [
@@ -2840,6 +2818,8 @@ if (typeof window !== 'undefined') {
 
     // ERP 연동 기반 권한 관리 데이터
     window.mockDepartments = mockDepartments;
+    window.mockErpPendingDepartments = mockErpPendingDepartments;
+    window.mockErpLastSyncDate = mockErpLastSyncDate;
     window.mockPositions = mockPositions;
     window.mockRoleGroups = mockRoleGroups;
     window.mockUserStatus = mockUserStatus;

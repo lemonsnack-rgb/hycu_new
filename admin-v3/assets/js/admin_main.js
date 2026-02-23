@@ -4402,6 +4402,212 @@ window.submitAdminNotification = submitAdminNotification;
 
 console.log('✅ 권한관리/메뉴관리 기능 로드 완료');
 
+// ========== 학과관리 ==========
+
+let deptOriginalData = [];
+let isDeptDirty = false;
+
+// 초기화
+function initDepartmentManagement() {
+    deptOriginalData = JSON.parse(JSON.stringify(mockDepartments));
+    isDeptDirty = false;
+    renderDeptManagementTable();
+    console.log('✅ 학과관리 화면 초기화 완료');
+}
+
+// 노출 학과 테이블 렌더링 (노출 학과만 표시)
+function renderDeptManagementTable() {
+    const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
+    const tbody = document.getElementById('deptManagementTableBody');
+    if (!tbody) return;
+
+    const exposed = departments
+        .filter(d => d.type === 'academic' && d.isExposed)
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+
+    // 카운트 업데이트
+    const countEl = document.getElementById('dept-exposed-count');
+    if (countEl) countEl.textContent = `(${exposed.length}건)`;
+
+    if (exposed.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" class="px-4 py-8 text-center text-gray-400 text-sm">노출 중인 학과가 없습니다. [학과 추가] 버튼으로 학과를 추가하세요.</td></tr>';
+        return;
+    }
+
+    tbody.innerHTML = exposed.map((dept, idx) => `
+        <tr class="hover:bg-blue-50 transition-colors" data-dept-id="${dept.id}">
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${idx + 1}</td>
+            <td class="px-4 py-3 text-center text-sm text-gray-600">${dept.code}</td>
+            <td class="px-4 py-3 text-left text-sm font-medium text-gray-900">${dept.name}</td>
+            <td class="px-4 py-3 text-center">
+                <div class="flex items-center justify-center gap-1">
+                    <button onclick="moveDeptOrder('${dept.id}', -1)" class="text-gray-400 hover:text-gray-700 text-sm px-1" title="위로">▲</button>
+                    <span class="text-sm text-gray-600 w-6 text-center">${dept.displayOrder}</span>
+                    <button onclick="moveDeptOrder('${dept.id}', 1)" class="text-gray-400 hover:text-gray-700 text-sm px-1" title="아래로">▼</button>
+                </div>
+            </td>
+            <td class="px-4 py-3 text-center">
+                <button onclick="removeDeptFromExposed('${dept.id}')" class="text-red-500 hover:text-red-700 text-sm font-medium px-2 py-1 rounded hover:bg-red-50">제외</button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+// 순서 이동 (인접 교환)
+function moveDeptOrder(deptId, direction) {
+    const dept = mockDepartments.find(d => d.id === deptId);
+    if (!dept || !dept.isExposed) return;
+
+    const exposed = mockDepartments
+        .filter(d => d.type === 'academic' && d.isExposed)
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+
+    const currentIdx = exposed.findIndex(d => d.id === deptId);
+    const targetIdx = currentIdx + direction;
+    if (targetIdx < 0 || targetIdx >= exposed.length) return;
+
+    const temp = exposed[currentIdx].displayOrder;
+    exposed[currentIdx].displayOrder = exposed[targetIdx].displayOrder;
+    exposed[targetIdx].displayOrder = temp;
+
+    isDeptDirty = true;
+    renderDeptManagementTable();
+}
+
+// 노출 해제 (DB 삭제가 아닌 비노출 전환)
+function removeDeptFromExposed(deptId) {
+    const dept = mockDepartments.find(d => d.id === deptId);
+    if (!dept) return;
+
+    if (!confirm(`"${dept.code} ${dept.name}"을(를) 노출 대상에서 제외하시겠습니까?`)) return;
+
+    dept.isExposed = false;
+    dept.displayOrder = 0;
+    reorderExposedDepts();
+    isDeptDirty = true;
+    renderDeptManagementTable();
+}
+
+// 노출 학과 순서 재정렬 (1부터 연번)
+function reorderExposedDepts() {
+    const exposed = mockDepartments
+        .filter(d => d.type === 'academic' && d.isExposed)
+        .sort((a, b) => a.displayOrder - b.displayOrder);
+    exposed.forEach((d, idx) => { d.displayOrder = idx + 1; });
+}
+
+// 학과 추가 모달 열기
+function openAddDeptModal() {
+    const departments = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
+    const unexposed = departments.filter(d => d.type === 'academic' && !d.isExposed);
+
+    if (unexposed.length === 0) {
+        alert('추가할 수 있는 학과가 없습니다.\nERP 동기화를 실행하여 학과를 가져오세요.');
+        return;
+    }
+
+    const content = `
+        <div class="mb-4 flex gap-2">
+            <input type="text" id="add-dept-search-code" placeholder="학과코드"
+                   oninput="filterAddDeptModal()"
+                   class="w-1/3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+            <input type="text" id="add-dept-search-name" placeholder="학과명"
+                   oninput="filterAddDeptModal()"
+                   class="w-2/3 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-[#009DE8]">
+        </div>
+        <div id="add-dept-list" class="max-h-64 overflow-y-auto space-y-1">
+            ${unexposed.map(d => `
+                <label class="add-dept-item flex items-center gap-3 p-2 rounded hover:bg-gray-50 cursor-pointer" data-code="${d.code}" data-name="${d.name}">
+                    <input type="checkbox" value="${d.id}" class="w-4 h-4 text-[#6A0028] focus:ring-[#6A0028] border-gray-300 rounded">
+                    <span class="text-sm text-gray-500">${d.code}</span>
+                    <span class="text-sm font-medium text-gray-900">${d.name}</span>
+                </label>
+            `).join('')}
+        </div>
+        <div class="mt-3 text-xs text-gray-400">이미 노출 중인 학과는 목록에 표시되지 않습니다.</div>
+    `;
+
+    openModal('학과 추가', content, '추가', () => {
+        confirmAddDepts();
+    });
+}
+
+// 모달 내 검색 필터
+function filterAddDeptModal() {
+    const codeKeyword = (document.getElementById('add-dept-search-code')?.value || '').toLowerCase();
+    const nameKeyword = (document.getElementById('add-dept-search-name')?.value || '').toLowerCase();
+    const items = document.querySelectorAll('.add-dept-item');
+    items.forEach(item => {
+        const code = (item.dataset.code || '').toLowerCase();
+        const name = (item.dataset.name || '').toLowerCase();
+        const matchCode = !codeKeyword || code.includes(codeKeyword);
+        const matchName = !nameKeyword || name.includes(nameKeyword);
+        item.style.display = (matchCode && matchName) ? '' : 'none';
+    });
+}
+
+// 모달에서 선택된 학과 노출 추가
+function confirmAddDepts() {
+    const checkboxes = document.querySelectorAll('#add-dept-list input[type="checkbox"]:checked');
+    if (checkboxes.length === 0) {
+        alert('추가할 학과를 선택하세요.');
+        return;
+    }
+
+    const maxOrder = mockDepartments
+        .filter(d => d.type === 'academic' && d.isExposed)
+        .reduce((max, d) => Math.max(max, d.displayOrder || 0), 0);
+
+    let addedCount = 0;
+    checkboxes.forEach((cb, idx) => {
+        const dept = mockDepartments.find(d => d.id === cb.value);
+        if (dept) {
+            dept.isExposed = true;
+            dept.displayOrder = maxOrder + idx + 1;
+            addedCount++;
+        }
+    });
+
+    closeModal();
+    isDeptDirty = true;
+    renderDeptManagementTable();
+    console.log(`✅ ${addedCount}개 학과 노출 추가`);
+}
+
+// 전체 저장
+function saveAllDeptChanges() {
+    if (!isDeptDirty) {
+        alert('변경된 내용이 없습니다.');
+        return;
+    }
+
+    reorderExposedDepts();
+    deptOriginalData = JSON.parse(JSON.stringify(mockDepartments));
+    isDeptDirty = false;
+
+    // DepartmentUtils localStorage 동기화
+    const exposedNames = mockDepartments
+        .filter(d => d.type === 'academic' && d.isExposed)
+        .sort((a, b) => a.displayOrder - b.displayOrder)
+        .map(d => d.name);
+    localStorage.setItem('department_list', JSON.stringify(exposedNames));
+
+    alert('학과 설정이 저장되었습니다.');
+    renderDeptManagementTable();
+}
+
+// Export - 학과관리
+window.initDepartmentManagement = initDepartmentManagement;
+window.renderDeptManagementTable = renderDeptManagementTable;
+window.moveDeptOrder = moveDeptOrder;
+window.removeDeptFromExposed = removeDeptFromExposed;
+window.openAddDeptModal = openAddDeptModal;
+window.filterAddDeptModal = filterAddDeptModal;
+window.confirmAddDepts = confirmAddDepts;
+window.saveAllDeptChanges = saveAllDeptChanges;
+
+console.log('✅ 학과관리 기능 로드 완료');
+
 // ========== 대리로그인 ==========
 
 // 대리로그인 사용자 필터링

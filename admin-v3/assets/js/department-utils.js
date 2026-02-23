@@ -26,14 +26,22 @@ const DepartmentUtils = {
     },
 
     /**
-     * 전체 학과 목록 조회
+     * 전체 학과 목록 조회 (mockDepartments 연동)
      */
     getAllDepartments() {
+        // mockDepartments가 있으면 노출 학과를 우선 사용
+        if (typeof mockDepartments !== 'undefined') {
+            const exposed = mockDepartments
+                .filter(d => d.type === 'academic' && d.isExposed)
+                .sort((a, b) => a.displayOrder - b.displayOrder)
+                .map(d => d.name);
+            if (exposed.length > 0) return exposed;
+        }
+        // fallback: localStorage 또는 기본값
         const stored = localStorage.getItem(this.STORAGE_KEY);
         if (stored) {
             return JSON.parse(stored);
         } else {
-            // 초기 데이터 저장
             const defaultDepts = this.getDefaultDepartments();
             localStorage.setItem(this.STORAGE_KEY, JSON.stringify(defaultDepts));
             return defaultDepts;
