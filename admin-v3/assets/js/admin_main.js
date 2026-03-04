@@ -4494,6 +4494,7 @@ function updateDeptOrder(deptId, value) {
     const num = parseInt(value, 10);
     dept.displayOrder = isNaN(num) ? 0 : num;
     isDeptDirty = true;
+    renderDeptManagementTable();
 }
 
 // 노출여부 변경 (드롭다운 select)
@@ -4501,6 +4502,15 @@ function changeDeptExposed(deptId, value) {
     const dept = mockDepartments.find(d => d.id === deptId);
     if (!dept) return;
     dept.isExposed = (value === 'Y');
+    if (value === 'Y') {
+        // 노출 학과 중 최대 순서 +1 자동 부여
+        const maxOrder = mockDepartments
+            .filter(d => d.type === 'academic' && d.isExposed && d.id !== deptId)
+            .reduce((max, d) => Math.max(max, d.displayOrder || 0), 0);
+        dept.displayOrder = maxOrder + 1;
+    } else {
+        dept.displayOrder = 0;
+    }
     isDeptDirty = true;
     renderDeptManagementTable();
 }

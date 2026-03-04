@@ -25,26 +25,26 @@ const mockProfessors = [
 
 // 학생 데이터 (20명) - academicYear(학년도), semesterCount(학기차) 추가
 const mockStudents = [
-    { id: 'STU001', studentNumber: '2024001', name: '김학생', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu001@hycu.ac.kr', phone: '010-2222-0001', admissionDate: '2024-03-01' },
-    { id: 'STU002', studentNumber: '2024002', name: '이학생', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu002@hycu.ac.kr', phone: '010-2222-0002', admissionDate: '2024-03-01' },
-    { id: 'STU003', studentNumber: '2024003', name: '박학생', department: '경영학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu003@hycu.ac.kr', phone: '010-2222-0003', admissionDate: '2024-03-01' },
-    { id: 'STU004', studentNumber: '2024004', name: '최학생', department: '경영학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu004@hycu.ac.kr', phone: '010-2222-0004', admissionDate: '2023-09-01' },
-    { id: 'STU005', studentNumber: '2024005', name: '정학생', department: '교육학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu005@hycu.ac.kr', phone: '010-2222-0005', admissionDate: '2024-03-01' },
-    { id: 'STU006', studentNumber: '2024006', name: '강학생', department: '교육학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu006@hycu.ac.kr', phone: '010-2222-0006', admissionDate: '2023-09-01' },
-    { id: 'STU007', studentNumber: '2024007', name: '조학생', department: '심리학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu007@hycu.ac.kr', phone: '010-2222-0007', admissionDate: '2024-03-01' },
-    { id: 'STU008', studentNumber: '2024008', name: '윤학생', department: '심리학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu008@hycu.ac.kr', phone: '010-2222-0008', admissionDate: '2023-09-01' },
-    { id: 'STU009', studentNumber: '2024009', name: '장학생', department: '사회복지학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: 'active', email: 'stu009@hycu.ac.kr', phone: '010-2222-0009', admissionDate: '2024-03-01' },
-    { id: 'STU010', studentNumber: '2024010', name: '임학생', department: '사회복지학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: 'active', email: 'stu010@hycu.ac.kr', phone: '010-2222-0010', admissionDate: '2023-09-01' },
-    { id: 'STU011', studentNumber: '2023001', name: '한학생', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu011@hycu.ac.kr', phone: '010-2222-0011', admissionDate: '2023-03-01' },
-    { id: 'STU012', studentNumber: '2023002', name: '서학생', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu012@hycu.ac.kr', phone: '010-2222-0012', admissionDate: '2023-03-01' },
-    { id: 'STU013', studentNumber: '2023003', name: '오학생', department: '경영학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu013@hycu.ac.kr', phone: '010-2222-0013', admissionDate: '2023-03-01' },
-    { id: 'STU014', studentNumber: '2023004', name: '양학생', department: '경영학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu014@hycu.ac.kr', phone: '010-2222-0014', admissionDate: '2022-09-01' },
-    { id: 'STU015', studentNumber: '2023005', name: '권학생', department: '교육학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu015@hycu.ac.kr', phone: '010-2222-0015', admissionDate: '2023-03-01' },
-    { id: 'STU016', studentNumber: '2023006', name: '송학생', department: '교육학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu016@hycu.ac.kr', phone: '010-2222-0016', admissionDate: '2022-09-01' },
-    { id: 'STU017', studentNumber: '2023007', name: '백학생', department: '심리학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu017@hycu.ac.kr', phone: '010-2222-0017', admissionDate: '2023-03-01' },
-    { id: 'STU018', studentNumber: '2023008', name: '남학생', department: '심리학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu018@hycu.ac.kr', phone: '010-2222-0018', admissionDate: '2022-09-01' },
-    { id: 'STU019', studentNumber: '2023009', name: '문학생', department: '사회복지학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: 'active', email: 'stu019@hycu.ac.kr', phone: '010-2222-0019', admissionDate: '2023-03-01' },
-    { id: 'STU020', studentNumber: '2023010', name: '유학생', department: '사회복지학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: 'active', email: 'stu020@hycu.ac.kr', phone: '010-2222-0020', admissionDate: '2022-09-01' }
+    { id: 'STU001', studentNumber: '2024001', name: '김학생', collegeType: '일반대학원', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: '재학', email: 'stu001@hycu.ac.kr', phone: '010-2222-0001', admissionDate: '2024-03-01' },
+    { id: 'STU002', studentNumber: '2024002', name: '이학생', collegeType: '일반대학원', department: '컴퓨터공학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: '재학', email: 'stu002@hycu.ac.kr', phone: '010-2222-0002', admissionDate: '2024-03-01' },
+    { id: 'STU003', studentNumber: '2024003', name: '박학생', collegeType: '경영전문대학원', department: '경영학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: '재학', email: 'stu003@hycu.ac.kr', phone: '010-2222-0003', admissionDate: '2024-03-01' },
+    { id: 'STU004', studentNumber: '2024004', name: '최학생', collegeType: '경영전문대학원', department: '경영학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: '재학', email: 'stu004@hycu.ac.kr', phone: '010-2222-0004', admissionDate: '2023-09-01' },
+    { id: 'STU005', studentNumber: '2024005', name: '정학생', collegeType: '일반대학원', department: '교육학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: '재학', email: 'stu005@hycu.ac.kr', phone: '010-2222-0005', admissionDate: '2024-03-01' },
+    { id: 'STU006', studentNumber: '2024006', name: '강학생', collegeType: '일반대학원', department: '교육학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: '휴학', email: 'stu006@hycu.ac.kr', phone: '010-2222-0006', admissionDate: '2023-09-01' },
+    { id: 'STU007', studentNumber: '2024007', name: '조학생', collegeType: '일반대학원', department: '심리학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: '재학', email: 'stu007@hycu.ac.kr', phone: '010-2222-0007', admissionDate: '2024-03-01' },
+    { id: 'STU008', studentNumber: '2024008', name: '윤학생', collegeType: '일반대학원', department: '심리학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: '재학', email: 'stu008@hycu.ac.kr', phone: '010-2222-0008', admissionDate: '2023-09-01' },
+    { id: 'STU009', studentNumber: '2024009', name: '장학생', collegeType: '일반대학원', department: '사회복지학과', degreeType: '석사', grade: '석사1차', academicYear: '2025', semesterCount: 4, status: '재학', email: 'stu009@hycu.ac.kr', phone: '010-2222-0009', admissionDate: '2024-03-01' },
+    { id: 'STU010', studentNumber: '2024010', name: '임학생', collegeType: '일반대학원', department: '사회복지학과', degreeType: '석사', grade: '석사2차', academicYear: '2024', semesterCount: 5, status: '수료', email: 'stu010@hycu.ac.kr', phone: '010-2222-0010', admissionDate: '2023-09-01' },
+    { id: 'STU011', studentNumber: '2023001', name: '한학생', collegeType: '일반대학원', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: '재학', email: 'stu011@hycu.ac.kr', phone: '010-2222-0011', admissionDate: '2023-03-01' },
+    { id: 'STU012', studentNumber: '2023002', name: '서학생', collegeType: '일반대학원', department: '컴퓨터공학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: '재학', email: 'stu012@hycu.ac.kr', phone: '010-2222-0012', admissionDate: '2023-03-01' },
+    { id: 'STU013', studentNumber: '2023003', name: '오학생', collegeType: '경영전문대학원', department: '경영학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: '재학', email: 'stu013@hycu.ac.kr', phone: '010-2222-0013', admissionDate: '2023-03-01' },
+    { id: 'STU014', studentNumber: '2023004', name: '양학생', collegeType: '경영전문대학원', department: '경영학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: '재학', email: 'stu014@hycu.ac.kr', phone: '010-2222-0014', admissionDate: '2022-09-01' },
+    { id: 'STU015', studentNumber: '2023005', name: '권학생', collegeType: '일반대학원', department: '교육학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: '재학', email: 'stu015@hycu.ac.kr', phone: '010-2222-0015', admissionDate: '2023-03-01' },
+    { id: 'STU016', studentNumber: '2023006', name: '송학생', collegeType: '일반대학원', department: '교육학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: '수료', email: 'stu016@hycu.ac.kr', phone: '010-2222-0016', admissionDate: '2022-09-01' },
+    { id: 'STU017', studentNumber: '2023007', name: '백학생', collegeType: '일반대학원', department: '심리학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: '재학', email: 'stu017@hycu.ac.kr', phone: '010-2222-0017', admissionDate: '2023-03-01' },
+    { id: 'STU018', studentNumber: '2023008', name: '남학생', collegeType: '일반대학원', department: '심리학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: '재학', email: 'stu018@hycu.ac.kr', phone: '010-2222-0018', admissionDate: '2022-09-01' },
+    { id: 'STU019', studentNumber: '2023009', name: '문학생', collegeType: '일반대학원', department: '사회복지학과', degreeType: '박사', grade: '박사1차', academicYear: '2025', semesterCount: 6, status: '재학', email: 'stu019@hycu.ac.kr', phone: '010-2222-0019', admissionDate: '2023-03-01' },
+    { id: 'STU020', studentNumber: '2023010', name: '유학생', collegeType: '일반대학원', department: '사회복지학과', degreeType: '박사', grade: '박사2차', academicYear: '2023', semesterCount: 7, status: '재학', email: 'stu020@hycu.ac.kr', phone: '010-2222-0020', admissionDate: '2022-09-01' }
 ];
 
 // 연구계획서 데이터 (19명) - degreeType, necessity, desiredAdvisor 추가
@@ -130,6 +130,7 @@ const mockThesisStages = [
     {
         id: 'TS001',
         name: '석사 표준 과정',
+        collegeType: '일반대학원',
         departmentName: '컴퓨터공학과',
         degreeType: 'master',
         thesisType: 'degree',
@@ -298,6 +299,7 @@ const mockThesisStages = [
     {
         id: 'TS002',
         name: '박사 표준 과정',
+        collegeType: '경영전문대학원',
         departmentName: '경영학과',
         degreeType: 'phd',
         thesisType: 'degree',
@@ -529,6 +531,7 @@ const mockThesisStages = [
     {
         id: 'TS003',
         name: '석사 표준 과정 (경영학과)',
+        collegeType: '경영전문대학원',
         departmentName: '경영학과',
         degreeType: 'master',
         thesisType: 'degree',
@@ -634,6 +637,7 @@ const mockThesisStages = [
     {
         id: 'TS004',
         name: '박사 표준 과정 (컴퓨터공학과)',
+        collegeType: '일반대학원',
         departmentName: '컴퓨터공학과',
         degreeType: 'phd',
         thesisType: 'degree',
@@ -745,6 +749,33 @@ const mockStudentStageAssignments = mockStudents.map((student, index) => {
     const currentStageOrder = (index % stageTemplate.stageCount) + 1;
     const currentStage = stageTemplate.stages.find(s => s.order === currentStageOrder);
 
+    // 기본단계/세부단계 계산: hierarchicalStages에서 순서 기반 매핑
+    let basicStageName = null;
+    let subStageName = null;
+    if (stageTemplate.hierarchicalStages && stageTemplate.hierarchicalStages.length > 0) {
+        // 전체 세부단계를 순서대로 펼쳐서 currentStageOrder 번째 세부단계 찾기
+        let subStageIndex = 1;
+        for (const hs of stageTemplate.hierarchicalStages) {
+            for (const ss of (hs.subStages || [])) {
+                if (subStageIndex === currentStageOrder) {
+                    basicStageName = hs.basicStageName;
+                    subStageName = ss.name;
+                    break;
+                }
+                subStageIndex++;
+            }
+            if (basicStageName) break;
+        }
+        // hierarchicalStages 수보다 currentStageOrder가 크면 마지막 기본단계로
+        if (!basicStageName) {
+            const lastHs = stageTemplate.hierarchicalStages[stageTemplate.hierarchicalStages.length - 1];
+            basicStageName = lastHs.basicStageName;
+            subStageName = currentStage.name;
+        }
+    } else {
+        basicStageName = currentStage.name;
+    }
+
     return {
         studentId: student.id,
         studentNumber: student.studentNumber,
@@ -757,11 +788,13 @@ const mockStudentStageAssignments = mockStudents.map((student, index) => {
         currentStageOrder: currentStageOrder,
         currentStageName: currentStage.name,
         currentStageType: currentStage.type,
+        basicStageName: basicStageName,
+        subStageName: subStageName,
         canProceed: index % 2 === 0,
         lastUpdated: '2025-03-01',
-        workflowAssignedDate: '2025-03-01',  // 워크플로우 최초 배정일
-        workflowLastChangedDate: null,       // 마지막 변경일 (변경 없으면 null)
-        isWorkflowChanged: false             // 워크플로우 변경 여부
+        workflowAssignedDate: '2025-03-01',
+        workflowLastChangedDate: null,
+        isWorkflowChanged: false
     };
 });
 
@@ -1412,29 +1445,26 @@ const mockUsers = [
 // ERP 부서 정보 (ERP View에서 동기화)
 const mockDepartments = [
     // 행정부서 (논문지도시스템 노출 불가)
-    { id: 'DEPT_001', code: '10001', name: '교무학사팀', type: 'admin', parentId: null, memberCount: 12, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
-    { id: 'DEPT_002', code: '10002', name: '학생지원팀', type: 'admin', parentId: null, memberCount: 8, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
-    { id: 'DEPT_005', code: '10005', name: '입학관리팀', type: 'admin', parentId: null, memberCount: 6, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_001', code: '10001', name: '교무학사팀', type: 'admin', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_002', code: '10002', name: '학생지원팀', type: 'admin', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_005', code: '10005', name: '입학관리팀', type: 'admin', isExposed: false, displayOrder: 0 },
     // 대학원 학과 (노출 대상)
-    { id: 'DEPT_003', code: '41003', name: '경영학과', type: 'academic', parentId: null, memberCount: 45, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 1 },
-    { id: 'DEPT_004', code: '41004', name: '컴퓨터공학과', type: 'academic', parentId: null, memberCount: 52, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 2 },
-    { id: 'DEPT_006', code: '41006', name: '교육학과', type: 'academic', parentId: null, memberCount: 38, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 3 },
-    { id: 'DEPT_007', code: '41007', name: '심리학과', type: 'academic', parentId: null, memberCount: 30, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 4 },
-    { id: 'DEPT_008', code: '41008', name: '사회복지학과', type: 'academic', parentId: null, memberCount: 42, erpSyncDate: '2025-01-15 09:00:00', isExposed: true, displayOrder: 5 },
+    { id: 'DEPT_003', code: '41003', name: '경영학과', type: 'academic', isExposed: true, displayOrder: 1 },
+    { id: 'DEPT_004', code: '41004', name: '컴퓨터공학과', type: 'academic', isExposed: true, displayOrder: 2 },
+    { id: 'DEPT_006', code: '41006', name: '교육학과', type: 'academic', isExposed: true, displayOrder: 3 },
+    { id: 'DEPT_007', code: '41007', name: '심리학과', type: 'academic', isExposed: true, displayOrder: 4 },
+    { id: 'DEPT_008', code: '41008', name: '사회복지학과', type: 'academic', isExposed: true, displayOrder: 5 },
     // 미노출 학과 (ERP에 존재하나 아직 노출 안 함)
-    { id: 'DEPT_009', code: '41009', name: '상담심리학과', type: 'academic', parentId: null, memberCount: 25, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
-    { id: 'DEPT_010', code: '41010', name: '부동산학과', type: 'academic', parentId: null, memberCount: 18, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 },
-    { id: 'DEPT_011', code: '41011', name: '미디어콘텐츠학과', type: 'academic', parentId: null, memberCount: 22, erpSyncDate: '2025-01-15 09:00:00', isExposed: false, displayOrder: 0 }
+    { id: 'DEPT_009', code: '41009', name: '상담심리학과', type: 'academic', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_010', code: '41010', name: '부동산학과', type: 'academic', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_011', code: '41011', name: '미디어콘텐츠학과', type: 'academic', isExposed: false, displayOrder: 0 }
 ];
 
 // ERP 동기화 시뮬레이션용 미등록 학과 풀
 const mockErpPendingDepartments = [
-    { id: 'DEPT_ERP_001', code: '41012', name: '글로벌경영학과', type: 'academic', parentId: null, memberCount: 20, erpSyncDate: null, isExposed: false, displayOrder: 0 },
-    { id: 'DEPT_ERP_002', code: '41013', name: '데이터사이언스학과', type: 'academic', parentId: null, memberCount: 15, erpSyncDate: null, isExposed: false, displayOrder: 0 }
+    { id: 'DEPT_ERP_001', code: '41012', name: '글로벌경영학과', type: 'academic', isExposed: false, displayOrder: 0 },
+    { id: 'DEPT_ERP_002', code: '41013', name: '데이터사이언스학과', type: 'academic', isExposed: false, displayOrder: 0 }
 ];
-
-// ERP 마지막 동기화 일시
-let mockErpLastSyncDate = '2025-01-15 09:00:00';
 
 // 신분 정보 (ERP 기준)
 const mockPositions = [
@@ -2819,7 +2849,6 @@ if (typeof window !== 'undefined') {
     // ERP 연동 기반 권한 관리 데이터
     window.mockDepartments = mockDepartments;
     window.mockErpPendingDepartments = mockErpPendingDepartments;
-    window.mockErpLastSyncDate = mockErpLastSyncDate;
     window.mockPositions = mockPositions;
     window.mockRoleGroups = mockRoleGroups;
     window.mockUserStatus = mockUserStatus;
