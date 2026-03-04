@@ -4487,12 +4487,30 @@ function renderDeptManagementTable() {
     }).join('');
 }
 
-// 노출순서 업데이트 (input 변경 시)
+// 노출순서 업데이트 (input 변경 시) - 중복 순서 자동 밀어내기
 function updateDeptOrder(deptId, value) {
     const dept = mockDepartments.find(d => d.id === deptId);
     if (!dept) return;
-    const num = parseInt(value, 10);
-    dept.displayOrder = isNaN(num) ? 0 : num;
+    const newOrder = parseInt(value, 10);
+    if (isNaN(newOrder) || newOrder <= 0) {
+        dept.displayOrder = 0;
+        isDeptDirty = true;
+        renderDeptManagementTable();
+        return;
+    }
+    // 같은 순서를 가진 다른 노출 학과들을 +1씩 밀어내기
+    const exposed = mockDepartments.filter(d => d.type === 'academic' && d.isExposed && d.id !== deptId && d.displayOrder >= newOrder);
+    exposed.sort((a, b) => a.displayOrder - b.displayOrder);
+    let nextOrder = newOrder;
+    for (const d of exposed) {
+        if (d.displayOrder <= nextOrder) {
+            d.displayOrder = nextOrder + 1;
+            nextOrder = d.displayOrder;
+        } else {
+            break;
+        }
+    }
+    dept.displayOrder = newOrder;
     isDeptDirty = true;
     renderDeptManagementTable();
 }
