@@ -7220,11 +7220,6 @@ function openRoleGroupModal(groupId = null) {
         window._roleGroupSelectedMembers = [...group.memberIds];
     }
 
-    // 소속 드롭다운 옵션
-    const deptOptions = mockDepartments.map(d =>
-        `<option value="${d.id}">${d.name}</option>`
-    ).join('');
-
     // 신분 드롭다운 옵션
     const posOptions = mockPositions.map(p =>
         `<option value="${p.id}">${p.name}</option>`
@@ -7257,12 +7252,19 @@ function openRoleGroupModal(groupId = null) {
             <div class="border-t pt-4">
                 <h4 class="text-sm font-semibold text-gray-800 mb-3">멤버 검색</h4>
                 <div class="grid grid-cols-3 gap-2 mb-2">
-                    <div>
+                    <div class="relative">
                         <label class="block text-xs text-gray-500 mb-1">소속</label>
-                        <select id="rg-search-dept" class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm">
-                            <option value="">전체</option>
-                            ${deptOptions}
-                        </select>
+                        <input type="text" id="rg-search-dept-input"
+                               placeholder="전체 (부서명 입력)"
+                               autocomplete="off"
+                               class="w-full px-2 py-1.5 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-[#009DE8]"
+                               oninput="filterDeptDropdown(this.value)"
+                               onfocus="showDeptDropdown()"
+                               >
+                        <input type="hidden" id="rg-search-dept" value="">
+                        <div id="rg-dept-dropdown"
+                             class="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg max-h-48 overflow-y-auto hidden">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-xs text-gray-500 mb-1">신분</label>
@@ -7857,6 +7859,61 @@ function permEditModalSelectAll(checked) {
     const allCb = document.querySelectorAll('input[type="checkbox"][data-menu][data-crud="R"]');
     allCb.forEach(cb => cb.checked = checked);
 }
+
+// ========== 소속 검색 드롭다운 ==========
+function showDeptDropdown() {
+    const input = document.getElementById('rg-search-dept-input');
+    filterDeptDropdown(input ? input.value : '');
+}
+
+function filterDeptDropdown(keyword) {
+    const dropdown = document.getElementById('rg-dept-dropdown');
+    if (!dropdown) return;
+
+    const kw = keyword.trim().toLowerCase();
+    const depts = (typeof mockDepartments !== 'undefined') ? mockDepartments : [];
+
+    // "전체" 옵션 + 키워드 필터링된 부서 목록
+    let items = [{ id: '', name: '전체' }];
+    const filtered = kw
+        ? depts.filter(d => d.name.toLowerCase().includes(kw) || d.code.includes(kw))
+        : depts;
+    items = items.concat(filtered.map(d => ({ id: d.id, name: d.name })));
+
+    if (items.length === 1 && kw) {
+        dropdown.innerHTML = '<div class="px-3 py-2 text-sm text-gray-400">검색 결과 없음</div>';
+    } else {
+        dropdown.innerHTML = items.map(item =>
+            `<div class="px-3 py-1.5 text-sm cursor-pointer hover:bg-[#E6F4FD] ${item.id === '' ? 'text-gray-500 font-medium' : 'text-gray-800'}"
+                  onmousedown="selectDeptOption('${item.id}', '${item.name}')">${item.name}</div>`
+        ).join('');
+    }
+    dropdown.classList.remove('hidden');
+}
+
+function selectDeptOption(deptId, deptName) {
+    const input = document.getElementById('rg-search-dept-input');
+    const hidden = document.getElementById('rg-search-dept');
+    const dropdown = document.getElementById('rg-dept-dropdown');
+    if (input) input.value = deptId ? deptName : '';
+    if (input && !deptId) input.placeholder = '전체 (부서명 입력)';
+    if (hidden) hidden.value = deptId;
+    if (dropdown) dropdown.classList.add('hidden');
+}
+
+// 드롭다운 외부 클릭 시 닫기
+document.addEventListener('click', function(e) {
+    const dropdown = document.getElementById('rg-dept-dropdown');
+    const input = document.getElementById('rg-search-dept-input');
+    if (dropdown && input && !input.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.classList.add('hidden');
+    }
+});
+
+// 전역으로 노출 - 소속 검색 드롭다운
+window.showDeptDropdown = showDeptDropdown;
+window.filterDeptDropdown = filterDeptDropdown;
+window.selectDeptOption = selectDeptOption;
 
 // 전역으로 노출 - 역할그룹 CRUD 모달
 window.openRoleGroupModal = openRoleGroupModal;
