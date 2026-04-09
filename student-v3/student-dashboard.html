@@ -295,6 +295,10 @@
                            class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>논문지도절차</span>
                         </a>
+                        <a href="#" onclick="showScreen('notificationList'); return false;" data-screen="notificationList"
+                           class="sidebar-link flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>알림</span>
+                        </a>
                     </div>
                 </div>
 
@@ -668,6 +672,12 @@
                 </div>
             </section>
 
+            <section id="notificationList-screen" class="content-screen">
+                <div id="notificationList-content">
+                    <!-- JavaScript로 동적 렌더링 -->
+                </div>
+            </section>
+
             <!-- 논문 제출 메뉴 화면들 -->
             <section id="thesis-application-screen" class="content-screen">
                 <div id="thesis-application-content">
@@ -831,6 +841,8 @@
                 StudentMeetingList.init();
             } else if (screenId === 'resources' && typeof initBoard === 'function') {
                 initBoard('student');
+            } else if (screenId === 'notificationList' && typeof renderStudentNotificationList === 'function') {
+                renderStudentNotificationList();
             }
 
             // 모바일에서 화면 전환 시 사이드바 닫기
@@ -849,6 +861,7 @@
                 'research-ethics': { depth1: '논문 안내', depth2: '연구윤리' },
                 'thesis-schedule': { depth1: '논문 안내', depth2: '논문일정' },
                 'guidance-procedure': { depth1: '논문 안내', depth2: '논문지도절차' },
+                'notificationList': { depth1: '논문 안내', depth2: '알림' },
                 // 논문 제출
                 'thesis-submission': { depth1: '논문 제출', depth2: '학위 논문 제출' },
                 'journal-submission': { depth1: '논문 제출', depth2: '학술지 논문 제출' },
@@ -975,6 +988,61 @@
     <script src="assets/js/department-utils.js"></script>
     <script src="assets/js/student-notice.js"></script>
     <script src="assets/js/student-content.js"></script>
+
+    <!-- 알림 목록 렌더링 -->
+    <script>
+    function renderStudentNotificationList() {
+        const container = document.getElementById('notificationList-content');
+        if (!container) return;
+
+        const notifications = [
+            { id: 1, title: '학위 논문 심사 불합격', message: '심사 결과, 불합격 되었습니다.', timestamp: '2026-03-12 14:42' },
+            { id: 2, title: '학기별 지도 계획 승인', message: '담당 교수님이 2025년도 1학기 지도 계획을 승인했습니다.', timestamp: '2026-03-09 11:21' },
+            { id: 3, title: '학위 논문 심사 조건부 합격', message: '심사 결과, 조건부 합격되었습니다.', timestamp: '2026-02-26 18:48' },
+            { id: 4, title: '학위 논문 심사 조건부 합격', message: '심사 결과, 조건부 합격되었습니다.', timestamp: '2026-02-26 18:47' },
+            { id: 5, title: '학위 논문 심사 합격', message: '심사 결과, 합격 되었습니다.', timestamp: '2026-02-26 18:47' }
+        ];
+
+        container.innerHTML = `
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h3 style="font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 0;">알림 목록</h3>
+                        <span style="font-size: 13px; color: #6b7280;">(총 ${notifications.length}건)</span>
+                    </div>
+                </div>
+                <div>
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 0;">
+                        <colgroup>
+                            <col style="width: 50px;">
+                            <col style="width: 160px;">
+                            <col>
+                            <col style="width: 140px;">
+                        </colgroup>
+                        <thead>
+                            <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #374151;">순번</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151;">알림 제목</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151;">알림 내용</th>
+                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #374151;">알림 일자</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${notifications.map((notif, idx) => `
+                            <tr style="border-bottom: 1px solid #f3f4f6; ${idx % 2 === 1 ? 'background: #f9fafb;' : ''}">
+                                <td style="padding: 12px 16px; text-align: center; font-size: 13px; color: #6b7280;">${idx + 1}</td>
+                                <td style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 500; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notif.title}</td>
+                                <td style="padding: 12px 16px; text-align: left; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notif.message}</td>
+                                <td style="padding: 12px 16px; text-align: center; font-size: 13px; color: #6b7280; white-space: nowrap;">${notif.timestamp}</td>
+                            </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
+    </script>
 
     <script src="assets/js/app.js?v=20260107007"></script>
     <script src="assets/js/board.js?v=20260130001"></script>

@@ -17,58 +17,87 @@ const MOCK_DATA = {
     notifications: [
         {
             id: 1,
-            type: 'plan_submitted',
-            priority: 'high',
-            icon: '📋',
-            message: '김철수 학생이 주차별 계획을 제출했습니다',
-            timestamp: '2025-11-03 14:30',
-            isRead: false,
-            actionUrl: 'guidance',
-            daysElapsed: 0
+            title: '심사위원 배정',
+            message: '뮨후도님의 논문 심사위원으로 배정되었습니다.',
+            timestamp: '2026-04-01 11:14',
+            isRead: false
         },
         {
             id: 2,
-            type: 'meeting_request',
-            priority: 'high',
-            icon: '📅',
-            message: '이영희 학생이 11월 5일 14:00 미팅을 신청했습니다',
-            timestamp: '2025-11-03 10:15',
-            isRead: false,
-            actionUrl: 'meeting',
-            daysElapsed: 0
+            title: '논문 지도 요청 등록',
+            message: '뮨후도님이 논문 지도를 요청했습니다.',
+            timestamp: '2026-04-01 11:07',
+            isRead: false
         },
         {
             id: 3,
-            type: 'document_submitted',
-            priority: 'urgent',
-            icon: '📄',
-            message: '박민수 학생이 중간논문을 제출했습니다 (표절 검사 통과)',
-            timestamp: '2025-11-01 16:20',
-            isRead: false,
-            actionUrl: 'feedback',
-            daysElapsed: 2
+            title: '논문 지도 요청 등록',
+            message: '뮨후도님이 논문 지도를 요청했습니다.',
+            timestamp: '2026-04-01 09:05',
+            isRead: false
         },
         {
             id: 4,
-            type: 'review_assigned',
-            priority: 'urgent',
-            icon: '📝',
-            message: '정수진 학생의 최종논문 심사가 배정되었습니다',
-            timestamp: '2025-10-31 09:00',
-            isRead: false,
-            actionUrl: 'review',
-            daysElapsed: 3
+            title: '심사위원 배정',
+            message: '뮨후도님의 논문 심사위원으로 배정되었습니다.',
+            timestamp: '2026-04-01 09:00',
+            isRead: false
         },
         {
             id: 5,
-            type: 'review_deadline',
-            priority: 'urgent',
-            icon: '⏰',
-            message: '최민지 학생 논문 심사 마감이 3일 남았습니다',
-            timestamp: '2025-10-30 08:00',
-            isRead: true,
-            actionUrl: 'review',
-            daysElapsed: 4
+            title: '학생 학기별 지도 계획 등록',
+            message: '효상도님이 2025년도 2학기 지도 계획을 등록했습니다.',
+            timestamp: '2026-03-10 23:09',
+            isRead: false
+        },
+        {
+            id: 6,
+            title: '심사위원 배정',
+            message: '효상도님의 논문 심사위원으로 배정되었습니다.',
+            timestamp: '2026-03-10 10:34',
+            isRead: true
+        },
+        {
+            id: 7,
+            title: '실시간 지도 예약 등록',
+            message: '효상도님이 실시간 지도를 예약했습니다.',
+            timestamp: '2026-03-09 14:38',
+            isRead: true
+        },
+        {
+            id: 8,
+            title: '논문 지도 요청 등록',
+            message: '효상도님이 논문 지도를 요청했습니다.',
+            timestamp: '2026-03-09 10:45',
+            isRead: true
+        },
+        {
+            id: 9,
+            title: '논문 지도 요청 등록',
+            message: '효상도님이 논문 지도를 요청했습니다.',
+            timestamp: '2026-03-09 10:09',
+            isRead: true
+        },
+        {
+            id: 10,
+            title: '심사위원 배정',
+            message: '효상도님의 논문 심사위원으로 배정되었습니다.',
+            timestamp: '2026-02-26 18:47',
+            isRead: true
+        },
+        {
+            id: 11,
+            title: '논문 지도 요청 등록',
+            message: '효상도님이 논문 지도를 요청했습니다.',
+            timestamp: '2026-02-26 18:45',
+            isRead: true
+        },
+        {
+            id: 12,
+            title: '학생 학기별 지도 계획 등록',
+            message: '효상도님이 2025년도 1학기 지도 계획을 등록했습니다.',
+            timestamp: '2026-02-26 18:44',
+            isRead: true
         }
     ],
 

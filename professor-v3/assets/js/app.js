@@ -16,6 +16,7 @@ const breadcrumbMap = {
     'ethics': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '연구윤리' }],
     'schedule': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '논문일정' }],
     'process': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '논문지도절차' }],
+    'notificationList': [{ label: '홈', url: '#' }, { label: '논문 안내' }, { label: '알림' }],
     // 논문지도
     'advisor-assignment': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '지도교수 배정' }],
     'guidance': [{ label: '홈', url: '#' }, { label: '논문지도' }, { label: '주차별 논문지도 현황' }],
@@ -132,6 +133,11 @@ function showScreen(screenId) {
                 initProfessorNotice();
             } else {
                 // initProfessorNotice not found
+            }
+        } else if (screenId === 'notificationList') {
+            // 알림 목록 화면 렌더링
+            if (typeof renderNotificationListScreen === 'function') {
+                renderNotificationListScreen();
             }
         } else {
             const initFunction = window[`init${capitalize(screenId)}`];

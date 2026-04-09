@@ -561,6 +561,10 @@
                            class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
                             <span>논문지도절차</span>
                         </a>
+                        <a href="#" onclick="showScreen('notificationList'); return false;" data-screen="notificationList"
+                           class="sidebar-sublink flex items-center p-2 rounded-lg text-sm transition-colors duration-200">
+                            <span>알림</span>
+                        </a>
                     </div>
                 </div>
 
@@ -1464,6 +1468,15 @@
                 <!-- JavaScript로 동적 렌더링 -->
             </section>
 
+            <!-- ===================================
+                 논문 안내 - 알림
+                 =================================== -->
+            <section id="notificationList-screen" class="content-screen">
+                <div id="notificationList-content">
+                    <!-- JavaScript로 동적 렌더링 -->
+                </div>
+            </section>
+
             <!-- 심사 상세 화면은 review-list.js에서 동적으로 생성됨 (페이지 전환 방식) -->
 
         </main>
@@ -1531,7 +1544,8 @@
                 'meeting': '실시간 지도 예약',
                 'exam-schedule': '심사일정현황',
                 'review': '학위논문심사',
-                'journal-review': '학술지논문심사'
+                'journal-review': '학술지논문심사',
+                'notificationList': '알림'
             };
 
             const title = titleMap[screenId] || '대시보드';
@@ -1558,6 +1572,65 @@
                 updatePageTitle(screenId);
             }
         });
+    </script>
+
+    <!-- 알림 목록 렌더링 -->
+    <script>
+    function renderNotificationListScreen() {
+        const container = document.getElementById('notificationList-content');
+        if (!container) return;
+
+        const notifications = (typeof DataService !== 'undefined' && DataService.getNotifications)
+            ? DataService.getNotifications()
+            : (typeof localData !== 'undefined' ? localData.notifications : []);
+
+        container.innerHTML = `
+            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #e5e7eb;">
+                    <div style="display: flex; align-items: center; gap: 8px;">
+                        <h3 style="font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 0;">알림 목록</h3>
+                        <span style="font-size: 13px; color: #6b7280;">(총 ${notifications.length}건)</span>
+                    </div>
+                </div>
+                <div>
+                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 0;">
+                        <colgroup>
+                            <col style="width: 50px;">
+                            <col style="width: 160px;">
+                            <col>
+                            <col style="width: 140px;">
+                        </colgroup>
+                        <thead>
+                            <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
+                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #374151;">순번</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151;">알림 제목</th>
+                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151;">알림 내용</th>
+                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #374151;">알림 일자</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${notifications.length > 0 ? notifications.map((notif, idx) => `
+                            <tr style="border-bottom: 1px solid #f3f4f6; ${idx % 2 === 1 ? 'background: #f9fafb;' : ''}">
+                                <td style="padding: 12px 16px; text-align: center; font-size: 13px; color: #6b7280;">${idx + 1}</td>
+                                <td style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 500; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notif.title || '-'}</td>
+                                <td style="padding: 12px 16px; text-align: left; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notif.message}</td>
+                                <td style="padding: 12px 16px; text-align: center; font-size: 13px; color: #6b7280; white-space: nowrap;">${notif.timestamp}</td>
+                            </tr>
+                            `).join('') : `
+                            <tr>
+                                <td colspan="4" style="text-align: center; padding: 48px 16px;">
+                                    <div style="font-size: 48px; margin-bottom: 16px;">🔔</div>
+                                    <h3 style="font-size: 16px; font-weight: 600; color: #6b7280; margin-bottom: 8px;">등록된 알림이 없습니다</h3>
+                                    <p style="font-size: 13px; color: #9ca3af;">알림이 발생하면 이곳에 표시됩니다.</p>
+                                </td>
+                            </tr>
+                            `}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        `;
+    }
     </script>
 
     <!-- JavaScript 파일들 -->
