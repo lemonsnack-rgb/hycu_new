@@ -1004,36 +1004,30 @@
         ];
 
         container.innerHTML = `
-            <div style="background: #fff; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid #e5e7eb;">
-                    <div style="display: flex; align-items: center; gap: 8px;">
-                        <h3 style="font-size: 15px; font-weight: 600; color: #1a1a1a; margin: 0;">알림 목록</h3>
-                        <span style="font-size: 13px; color: #6b7280;">(총 ${notifications.length}건)</span>
+            <div class="table-container">
+                <div class="table-header">
+                    <div class="table-header-left">
+                        <h3 class="table-title">알림 목록</h3>
+                        <span class="table-count">(총 ${notifications.length}건)</span>
                     </div>
                 </div>
-                <div>
-                    <table style="width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 0;">
-                        <colgroup>
-                            <col style="width: 50px;">
-                            <col style="width: 160px;">
-                            <col>
-                            <col style="width: 140px;">
-                        </colgroup>
+                <div class="table-scroll">
+                    <table class="min-w-full">
                         <thead>
-                            <tr style="background: #f9fafb; border-bottom: 2px solid #e5e7eb;">
-                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #374151;">순번</th>
-                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151;">알림 제목</th>
-                                <th style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 600; color: #374151;">알림 내용</th>
-                                <th style="padding: 12px 16px; text-align: center; font-size: 13px; font-weight: 600; color: #374151;">알림 일자</th>
+                            <tr>
+                                <th style="width: 60px;">순번</th>
+                                <th style="width: 180px;">알림 제목</th>
+                                <th>알림 내용</th>
+                                <th style="width: 150px;">알림 일자</th>
                             </tr>
                         </thead>
                         <tbody>
                             ${notifications.map((notif, idx) => `
-                            <tr style="border-bottom: 1px solid #f3f4f6; ${idx % 2 === 1 ? 'background: #f9fafb;' : ''}">
-                                <td style="padding: 12px 16px; text-align: center; font-size: 13px; color: #6b7280;">${idx + 1}</td>
-                                <td style="padding: 12px 16px; text-align: left; font-size: 13px; font-weight: 500; color: #1a1a1a; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notif.title}</td>
-                                <td style="padding: 12px 16px; text-align: left; font-size: 13px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${notif.message}</td>
-                                <td style="padding: 12px 16px; text-align: center; font-size: 13px; color: #6b7280; white-space: nowrap;">${notif.timestamp}</td>
+                            <tr>
+                                <td class="text-center">${idx + 1}</td>
+                                <td>${notif.title}</td>
+                                <td>${notif.message}</td>
+                                <td class="text-center">${notif.timestamp}</td>
                             </tr>
                             `).join('')}
                         </tbody>
