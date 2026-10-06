@@ -37,29 +37,14 @@ function renderApplicationListScreen() {
     const container = document.getElementById('thesis-application-content');
     if (!container) return;
 
-    // processPhase가 'application'인 단계 유형 필터링
-    const applicationStages = window.mockStepTypes.filter(
-        stage => stage.processPhase === 'application'
-    );
-
-    // 현재 학생의 신청 내역
-    const studentApplications = window.mockThesisApplications.filter(
-        app => app.studentId === currentStudent.id
-    );
-
-    // 각 단계별로 신청 정보와 일정 정보를 매핑
-    const stageData = applicationStages.map(stage => {
-        const application = studentApplications.find(app => app.stageTypeId === stage.id);
-        const schedule = window.mockApplicationSchedules.find(sch => sch.stageTypeId === stage.id);
-
-        return {
-            stage,
-            application,
-            schedule
-        };
-    });
+    // 기본단계별 신청 상태 (재심사·제출취소 목업 시나리오 기준)
+    const stageData = ReviewScenario.getStages().map(stage => ({
+        stage,
+        status: ReviewScenario.getStageStatus(stage.id)
+    }));
 
     let html = `
+        ${ReviewScenario.renderBar('renderApplicationListScreen')}
         <div class="bg-white rounded-lg shadow-md">
             <!-- 헤더 -->
             <div class="table-container">
@@ -77,10 +62,11 @@ function renderApplicationListScreen() {
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">순번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문지도단계</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 110px;">차수</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 200px;">신청기간</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 200px;">철회기간</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">신청상태</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 100px;">관리</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">신청상태</th>
+                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 150px;">관리</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-200">
@@ -99,43 +85,60 @@ function renderApplicationListScreen() {
  * 목록의 각 행 렌더링
  */
 function renderApplicationRow(data, index) {
-    const { stage, application, schedule } = data;
+    const { stage, status } = data;
 
-    // 신청 기간
-    let periodText = '-';
-    if (schedule) {
-        periodText = `${schedule.startDate} ~ ${schedule.endDate}`;
+    // 신청 / 철회 기간
+    const periodText = `${stage.applicationPeriod.start} ~ ${stage.applicationPeriod.end}`;
+    const withdrawalPeriodText = `${stage.withdrawalPeriod.start} ~ ${stage.withdrawalPeriod.end}`;
+
+    // 차수
+    let attemptText = '-';
+    if (status.code === 'retry') {
+        attemptText = `${status.attempt}차<div class="text-xs text-red-600">(${status.failedAttempt}차 불합격)</div>`;
+    } else if (status.attempt && status.code !== 'none') {
+        attemptText = `${status.attempt}차`;
     }
 
-    // 철회 기간 (신청 기간과 동일하게 표시)
-    let withdrawalPeriodText = '-';
-    if (schedule) {
-        withdrawalPeriodText = `${schedule.startDate} ~ ${schedule.endDate}`;
-    }
+    // 신청 상태 배지
+    const badgeClass = {
+        passed: 'bg-green-100 text-green-800',
+        conditional: 'bg-yellow-100 text-yellow-800',
+        reviewing: 'bg-blue-100 text-blue-800',
+        applied: 'bg-blue-50 text-blue-700',
+        retry: 'bg-red-100 text-red-800',
+        locked: 'bg-gray-100 text-gray-500',
+        none: 'bg-gray-100 text-gray-700'
+    }[status.code];
+    const statusHtml = `<span class="px-2 py-0.5 rounded-full text-xs font-semibold ${badgeClass}">${status.label}</span>`;
 
-    // 신청 상태 및 관리 버튼
-    let statusText = '미신청';
-    let actionButton = `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
-                           class="text-[#6A0028] hover:underline text-xs font-medium">
-                            [관리]
-                        </a>`;
-
-    if (application && application.status === 'submitted') {
-        statusText = '신청완료';
-        actionButton = `<a href="#" onclick="confirmWithdrawal('${application.id}'); return false;"
-                           class="text-red-600 hover:underline text-xs font-medium">
-                            [철회]
-                        </a>`;
+    // 관리 버튼
+    let actionHtml = '<span class="text-xs text-gray-400">-</span>';
+    if (status.code === 'none') {
+        actionHtml = stage.applicationOpen
+            ? `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
+                  class="text-[#6A0028] hover:underline text-xs font-medium">[신청]</a>`
+            : '<span class="text-xs text-gray-400">신청기간 아님</span>';
+    } else if (status.code === 'retry') {
+        actionHtml = stage.applicationOpen
+            ? `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
+                  class="text-[#6A0028] hover:underline text-xs font-semibold">[${status.attempt}차 신청]</a>`
+            : `<span class="text-xs text-gray-500">다음 학기(${stage.semester}) 신청</span>`;
+    } else if (status.code === 'applied' || status.code === 'reviewing') {
+        actionHtml = `<a href="#" onclick="confirmWithdrawal('${stage.id}'); return false;"
+                         class="text-red-600 hover:underline text-xs font-medium">[철회]</a>`;
+    } else if (status.code === 'conditional') {
+        actionHtml = '<span class="text-xs text-gray-500">재심 자료는 심사자료제출에서 제출</span>';
     }
 
     return `
         <tr class="hover:bg-blue-50">
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
             <td class="py-3 px-4 text-sm font-medium text-gray-800">${stage.name}</td>
+            <td class="py-3 px-4 text-sm text-gray-600 text-center">${attemptText}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${periodText}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${withdrawalPeriodText}</td>
-            <td class="py-3 px-4 text-sm text-gray-600 text-center">${statusText}</td>
-            <td class="py-3 px-4 text-center">${actionButton}</td>
+            <td class="py-3 px-4 text-sm text-center">${statusHtml}</td>
+            <td class="py-3 px-4 text-center">${actionHtml}</td>
         </tr>
     `;
 }
@@ -144,8 +147,11 @@ function renderApplicationRow(data, index) {
  * 신청 모달 열기
  */
 function openApplicationModal(stageTypeId) {
-    const stage = window.mockStepTypes.find(s => s.id === stageTypeId);
+    const stage = ReviewScenario.getStage(stageTypeId);
     if (!stage) return;
+    const status = ReviewScenario.getStageStatus(stageTypeId);
+    const isRetry = status.code === 'retry';
+    const stageLabel = `${stage.name} (${status.attempt || 1}차)`;
 
     const modalHtml = `
         <!-- 모달 오버레이 -->
@@ -165,10 +171,15 @@ function openApplicationModal(stageTypeId) {
                 <!-- 모달 바디 -->
                 <div class="overflow-y-auto p-6 space-y-6" style="max-height: calc(90vh - 180px);">
                     <form id="application-form" onsubmit="submitApplication(event, '${stageTypeId}')">
+                        ${isRetry ? `
+                        <div class="p-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-800">
+                            ${status.failedAttempt}차 심사 불합격으로 ${status.attempt}차 재심사를 신청합니다.
+                            이전 차수의 제출 자료와 심사 결과는 이력으로 보존됩니다.
+                        </div>` : ''}
                         <!-- 신청 단계 -->
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">신청 단계</label>
-                            <input type="text" value="${stage.name}" readonly
+                            <input type="text" value="${stageLabel}" readonly
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-700">
                         </div>
 
@@ -242,27 +253,11 @@ function submitApplication(event, stageTypeId) {
     }
 
     if (confirm('논문을 신청하시겠습니까?')) {
-        // 새로운 신청 ID 생성
-        const newId = 'APP' + String(window.mockThesisApplications.length + 1).padStart(3, '0');
+        // 시나리오 상태에 신청 추가 (해당 차수의 제출 기록도 함께 생성)
+        const attemptNumber = ReviewScenario.apply(stageTypeId, title);
 
-        const newApplication = {
-            id: newId,
-            studentId: currentStudent.id,
-            studentName: currentStudent.name,
-            stageTypeId: stageTypeId,
-            thesisTitle: title,
-            thesisTitleEn: titleEn,
-            applicationDate: new Date().toISOString().split('T')[0],
-            status: 'submitted',
-            reviewComment: null,
-            approvedDate: null,
-            createdDate: new Date().toISOString().split('T')[0]
-        };
-
-        window.mockThesisApplications.push(newApplication);
-
-        console.log('논문 신청 완료:', newApplication);
-        alert('논문 신청이 완료되었습니다.');
+        console.log('논문 신청 완료:', stageTypeId, attemptNumber + '차');
+        alert(`논문 신청이 완료되었습니다. (${attemptNumber}차)`);
 
         closeApplicationModal();
         renderApplicationListScreen();
@@ -347,18 +342,20 @@ function viewApplicationDetail(applicationId) {
 /**
  * 목록에서 바로 철회 확인
  */
-function confirmWithdrawal(applicationId) {
-    if (confirm('논문 신청을 철회하시겠습니까?')) {
-        // mockThesisApplications에서 해당 항목 삭제
-        const index = window.mockThesisApplications.findIndex(app => app.id === applicationId);
-        if (index > -1) {
-            window.mockThesisApplications.splice(index, 1);
-        }
+function confirmWithdrawal(stageId) {
+    // 심사가 진행 중(평가한 심사위원 1명 이상)이거나 결과가 확정되면 철회 불가
+    const check = ReviewScenario.checkWithdraw(stageId);
+    if (!check.ok) {
+        alert(check.reason);
+        return;
+    }
 
-        // 성공 메시지
+    if (confirm('해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?')) {
+        // 신청은 '철회'로 기록, 결과 미확정 제출 자료 삭제 (확정된 이전 차수 기록은 보존)
+        ReviewScenario.withdraw(stageId);
+
         alert('논문 신청이 철회되었습니다.');
 
-        // 목록 재렌더링 (미신청 상태로 표시)
         renderApplicationListScreen();
     }
 }
