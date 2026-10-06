@@ -92,6 +92,9 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
     // 논문 정보
     html += renderThesisInfo(detail.assignment);
 
+    // 이전 차수 이력 (불합격 후 재심사 건)
+    html += renderPreviousAttemptHistory(detail.assignment);
+
     // 역할에 따라 화면 분리
     if (isChairView) {
         // 위원장 화면: 평가 요약 + 승인/보류/반려
@@ -121,6 +124,43 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
     console.log('🎯 Binding events...');
     bindEvaluationEvents(detail, isSubmitted, isChairView, allSubmitted);
     console.log('✅ renderReviewDetail COMPLETED');
+}
+
+// ==================== 이전 차수 이력 (재심사 목업, 2026-10-06) ====================
+// 같은 학생 · 같은 기본단계의 이전 차수 결과와 위원장 총평을 읽기 전용으로 표시
+function renderPreviousAttemptHistory(assignment) {
+    if (typeof ReviewAttempt === 'undefined') return '';
+    const previous = ReviewAttempt.getPreviousAttempts(assignment);
+    if (previous.length === 0) return '';
+
+    const items = previous.map(({ assignment: prev, result }) => {
+        const decision = (result && result.finalDecision) || '-';
+        const color = { '합격': 'text-green-700', '조건부합격': 'text-yellow-700', '불합격': 'text-red-700' }[decision] || 'text-gray-700';
+        return `
+            <div class="border border-gray-200 rounded-md p-3 bg-white">
+                <div class="flex items-center gap-3 text-sm mb-2">
+                    <span class="px-2 py-0.5 rounded text-xs font-semibold bg-[#6A0028] text-white">${ReviewAttempt.label(prev)}</span>
+                    <span class="text-gray-600">${prev.year || ''}-${prev.semester || ''}학기</span>
+                    <span class="text-gray-600">제출일 ${prev.submissionDate || '-'}</span>
+                    <span class="font-semibold ${color}">${decision}</span>
+                    ${result && result.chairDecidedAt ? `<span class="text-xs text-gray-500">판정 ${result.chairDecidedAt.slice(0, 10)}</span>` : ''}
+                </div>
+                ${result && result.chairComment ? `
+                <div class="text-sm text-gray-800 bg-gray-50 border border-gray-200 rounded p-2">
+                    <span class="text-xs font-semibold text-gray-600 mr-1">위원장 총평</span>${result.chairComment}
+                </div>` : ''}
+            </div>
+        `;
+    }).join('');
+
+    return `
+        <div class="bg-white rounded-lg shadow-md mb-6">
+            <div class="px-6 py-4 border-b bg-red-50 flex items-center justify-between">
+                <h4 class="text-sm font-semibold text-gray-800">이전 차수 이력 <span class="ml-1 text-xs font-normal text-gray-600">현재 ${ReviewAttempt.label(assignment)} 재심사</span></h4>
+            </div>
+            <div class="px-6 py-4 space-y-2">${items}</div>
+        </div>
+    `;
 }
 
 // ==================== 논문 정보 (관리자 페이지 스타일) ====================
@@ -2354,6 +2394,18 @@ function renderFinalDecisionSection(chairDecision, chairComment, isDisabled, dis
             </div>
     `;
 
+    // 불합격 안내 (제출 전 && 불합격 선택 시에만 표시) — 다음 학기 심사신청부터 재진행
+    if (!chairSubmitted) {
+        html += `
+            <div id="fail-notice-section" class="mb-4" style="display: none;">
+                <div class="bg-red-50 border border-red-300 rounded-lg p-4 text-sm text-red-800">
+                    <p class="font-semibold mb-1">불합격 확정 시 재심사 안내</p>
+                    <p>불합격 확정 시 학생은 다음 학기에 심사 신청부터 다시 진행합니다. 기존 심사 내역은 ${(REVIEW_ASSIGNMENTS.find(a => a.id === currentAssignmentId) || {}).attemptNo || 1}차 이력으로 보존됩니다.</p>
+                </div>
+            </div>
+        `;
+    }
+
     // 재심 정보 입력 영역 (제출 전 && 조건부합격 선택 시에만 표시)
     if (!chairSubmitted) {
         html += `
@@ -3187,6 +3239,18 @@ function renderChairApprovalScreen(detail, allSubmitted, isAdminMode = false) {
             </div>
     `;
 
+    // 불합격 안내 (제출 전 && 불합격 선택 시에만 표시) — 다음 학기 심사신청부터 재진행
+    if (!chairSubmitted) {
+        html += `
+            <div id="fail-notice-section" class="mb-4" style="display: none;">
+                <div class="bg-red-50 border border-red-300 rounded-lg p-4 text-sm text-red-800">
+                    <p class="font-semibold mb-1">불합격 확정 시 재심사 안내</p>
+                    <p>불합격 확정 시 학생은 다음 학기에 심사 신청부터 다시 진행합니다. 기존 심사 내역은 ${(REVIEW_ASSIGNMENTS.find(a => a.id === currentAssignmentId) || {}).attemptNo || 1}차 이력으로 보존됩니다.</p>
+                </div>
+            </div>
+        `;
+    }
+
     // 재심 정보 입력 영역 (제출 전 && 조건부합격 선택 시에만 표시)
     if (!chairSubmitted) {
         html += `
@@ -3956,6 +4020,12 @@ function selectDecision(decision) {
         }
     }
 
+    // 불합격 안내 영역 표시/숨김
+    const failNotice = document.getElementById('fail-notice-section');
+    if (failNotice) {
+        failNotice.style.display = decision === '불합격' ? 'block' : 'none';
+    }
+
     // 재심 정보 영역 표시/숨김
     const resubmissionSection = document.getElementById('resubmission-info-section');
     if (resubmissionSection) {
@@ -3988,13 +4058,14 @@ function populateResubmissionOptions() {
         });
     }
 
-    // 평가표 셀렉트 박스 채우기 (해당 학과의 모든 평가표)
+    // 평가표 셀렉트 박스 채우기
+    // 평가표에 학과(department) 정보가 없어 학과 필터 시 목록이 비는 문제 → 학과 정보가 없으면 전체 평가표 표시
     const templateSelect = document.getElementById('resubmission-template-id');
     if (templateSelect && detail.assignment) {
-        const department = detail.assignment.department;
+        const department = detail.assignment.department || detail.assignment.major;
         const allTemplates = Object.values(EVALUATION_TEMPLATES);
         const departmentTemplates = allTemplates.filter(t =>
-            t.department === department || t.department === 'all'
+            !t.department || t.department === department || t.department === 'all'
         );
 
         templateSelect.innerHTML = '<option value="">평가표 선택</option>';
@@ -4076,6 +4147,11 @@ function submitChairDecision() {
         // 재심 제출 마감일은 학교 정한 공식 제출 기간 사용
         // deadline 필드 제거됨
 
+        // 조건부합격 재심 회차: 같은 차수 안에서 반복 가능 (재심1, 재심2 …)
+        const prevResult = REVIEW_RESULTS.find(r => r.assignmentId === currentAssignmentId);
+        const prevRetryNo = (prevResult && prevResult.resubmission && prevResult.resubmission.retryNo) || 0;
+        const currentAssignment = REVIEW_ASSIGNMENTS.find(a => a.id === currentAssignmentId);
+
         // 재심 데이터 구성
         resubmissionData = {
             required: true,
@@ -4084,7 +4160,8 @@ function submitChairDecision() {
             reviewerName: reviewerName,
             evaluationTemplateId: templateId.value,
             // deadline 필드 제거: 시스템 설정된 제출 기간 사용
-            attemptNumber: 1,
+            attemptNumber: (currentAssignment && currentAssignment.attemptNo) || 1,
+            retryNo: prevRetryNo + 1,
             status: 'pending',
             createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
         };
@@ -4095,6 +4172,14 @@ function submitChairDecision() {
     if (!assignment) {
         showToast('심사 정보를 찾을 수 없습니다.', 'error');
         return;
+    }
+
+    // 불합격: 다음 학기 심사신청부터 재진행됨을 확인
+    if (selectedChairDecision === '불합격') {
+        const attemptNo = assignment.attemptNo || 1;
+        if (!confirm(`불합격으로 확정하시겠습니까?\n\n학생은 다음 학기에 심사 신청부터 다시 진행하며(${attemptNo + 1}차), 기존 심사 내역은 ${attemptNo}차 이력으로 보존됩니다.`)) {
+            return;
+        }
     }
 
     // Mock 데이터에 저장
@@ -4162,8 +4247,14 @@ function submitChairDecision() {
         console.log('✅ REVIEW_RESULTS 신규 추가:', newResult);
     }
 
+    // 심사 상태 반영 (목록의 심사결과·차수 표시에 사용)
+    assignment.status = selectedChairDecision === '불합격' ? '불합격'
+        : selectedChairDecision === '조건부합격' ? '조건부합격' : '합격';
+
     console.log('✅ submitChairDecision: 저장 완료, 재렌더링 시작');
-    showToast('최종 결정이 제출되었습니다.', 'success');
+    showToast(selectedChairDecision === '불합격'
+        ? '불합격이 확정되었습니다. 학생은 다음 학기에 심사 신청부터 다시 진행합니다.'
+        : '최종 결정이 제출되었습니다.', 'success');
 
     // 화면 재렌더링
     setTimeout(() => {

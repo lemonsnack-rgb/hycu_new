@@ -91,6 +91,7 @@ function renderReviewList() {
                             <th style="width: 100px;">지도교수명</th>
                             <th style="width: 100px;">기본단계</th>
                             <th style="width: 120px;">세부단계</th>
+                            <th style="width: 60px;">차수</th>
                             <th style="width: 100px;">심사결과</th>
                             <th style="width: 100px;">관리</th>
                         </tr>
@@ -118,8 +119,9 @@ function renderReviewList() {
                                 <td>${assignment.advisorName || '-'}</td>
                                 <td>${assignment.basicStageName || assignment.reviewType || '-'}</td>
                                 <td>${assignment.subStageName || '-'}</td>
+                                <td>${ReviewAttempt.label(assignment)}</td>
                                 <td>
-                                    ${getProgressStatusText(assignment.evaluationProgress)}
+                                    ${ReviewAttempt.resultHtml(assignment)}
                                 </td>
                                 <td onclick="event.stopPropagation()">
                                     <div class="flex gap-2 justify-center">

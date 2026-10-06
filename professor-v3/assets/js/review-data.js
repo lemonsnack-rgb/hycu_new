@@ -1080,6 +1080,81 @@ const REVIEW_ASSIGNMENTS = [
         status: '진행중',
 
         createdAt: '2025-11-21 10:00:00'
+    },
+
+    // ===== 재심사 목업 (2026-10-06): 같은 학생의 예비심사 1차 불합격 → 다음 학기 2차 재심사 =====
+    {
+        id: 'RA_RETRY_001',
+        studentId: 'S_RETRY',
+        studentName: '홍길동',
+        studentNumber: '2024123',
+        major: '컴퓨터공학과',
+        degree: '석사',
+        year: '2026',
+        semester: '1',
+
+        submissionId: 'SUB_RETRY_1',
+        submissionType: '예비심사',
+        basicStageName: '예비심사',
+        subStageName: '예비심사 논문 제출',
+        attemptNo: 1,                    // 차수 (불합격 시 다음 학기 신청부터 +1)
+        submissionDate: '2026-04-20',
+
+        advisorId: 'P001',
+        advisorName: '박교수',
+
+        thesisTitle: 'AI 기반 추천 시스템의 개인화 성능 개선 연구',
+        thesisFile: 'prelim_v1.pdf',
+        otherFile: 'prelim_v1_appendix.pdf',
+
+        committee: [
+            { id: 'C_RETRY1_001', professorId: 'P002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과', assignedDate: '2026-04-25' },
+            { id: 'C_RETRY1_002', professorId: 'P003', professorName: '김교수', role: 'member', department: '인공지능학과', assignedDate: '2026-04-25' },
+            { id: 'C_RETRY1_003', professorId: 'P004', professorName: '정교수', role: 'member', department: '소프트웨어학과', assignedDate: '2026-04-25' }
+        ],
+
+        templateId: 'TMPL_MIDTERM',
+        dueDate: '2026-06-05',
+        status: '불합격',
+
+        createdAt: '2026-04-25 10:00:00'
+    },
+    {
+        id: 'RA_RETRY_002',
+        studentId: 'S_RETRY',
+        studentName: '홍길동',
+        studentNumber: '2024123',
+        major: '컴퓨터공학과',
+        degree: '석사',
+        year: '2026',
+        semester: '2',
+
+        submissionId: 'SUB_RETRY_2',
+        submissionType: '예비심사',
+        basicStageName: '예비심사',
+        subStageName: '예비심사 논문 제출',
+        attemptNo: 2,
+        previousAssignmentId: 'RA_RETRY_001',
+        submissionDate: '2026-09-28',
+
+        advisorId: 'P001',
+        advisorName: '박교수',
+
+        thesisTitle: 'AI 기반 추천 시스템의 개인화 성능 개선 연구',
+        thesisFile: 'prelim_v2.pdf',
+        otherFile: 'prelim_v2_appendix.pdf',
+
+        committee: [
+            { id: 'C_RETRY2_001', professorId: 'P002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과', assignedDate: '2026-10-02' },
+            { id: 'C_RETRY2_002', professorId: 'P003', professorName: '김교수', role: 'member', department: '인공지능학과', assignedDate: '2026-10-02' },
+            { id: 'C_RETRY2_003', professorId: 'P004', professorName: '정교수', role: 'member', department: '소프트웨어학과', assignedDate: '2026-10-02' }
+        ],
+
+        templateId: 'TMPL_MIDTERM',
+        dueDate: '2026-11-13',
+        status: '진행중',
+
+        createdAt: '2026-10-02 10:00:00'
     }
 ];
 
@@ -2112,8 +2187,72 @@ const REVIEW_RESULTS = [
         notifiedAt: null,
 
         createdAt: '2025-11-21 16:00:00'
+    },
+
+    // ===== 재심사 목업 (2026-10-06): 예비심사 1차 불합격 결과 =====
+    {
+        id: 'RESULT_RETRY_001',
+        assignmentId: 'RA_RETRY_001',
+        evaluations: [],
+        averageScore: 61.0,
+        systemDecision: '불합격',
+        systemDecisionReason: '평균 점수 61.0점으로 합격 기준 미달',
+        chairDecision: '불합격',
+        chairComment: '연구 방법론이 연구 문제를 검증하기에 부족하고, 실험 데이터의 신뢰성 근거가 제시되지 않음. 데이터 수집 설계를 전면 보완한 후 다음 학기에 재심사를 받기 바람.',
+        chairDecidedAt: '2026-06-12 15:00:00',
+        chairDecidedBy: 'P002',
+        chairDecisionFiles: [],
+        resubmission: null,
+        finalDecision: '불합격',
+        notifiedAt: '2026-06-12 15:05:00',
+        createdAt: '2026-06-12 14:00:00'
     }
 ];
+
+// ==================== 재심사 차수 헬퍼 (목업, 2026-10-06) ====================
+// 차수(attemptNo): 불합격 시 다음 학기 심사신청부터 +1 / 재심(retryNo): 조건부합격 시 같은 차수 안에서 +1
+// 교수 심사목록 · 관리자 학위논문 심사 조회에서 공통 사용
+const ReviewAttempt = {
+    getResult(assignment) {
+        return REVIEW_RESULTS.find(r => r.assignmentId === assignment.id) || null;
+    },
+
+    label(assignment) {
+        return `${assignment.attemptNo || 1}차`;
+    },
+
+    // 심사결과: 위원장 최종결과가 있으면 결과, 없으면 평가 진행상태
+    resultHtml(assignment) {
+        const result = this.getResult(assignment);
+        const decision = result && result.finalDecision;
+        if (decision) {
+            const color = { '합격': 'text-green-700', '조건부합격': 'text-yellow-700', '불합격': 'text-red-700' }[decision] || 'text-gray-700';
+            let html = `<span class="font-semibold ${color}">${decision}</span>`;
+            if (decision === '조건부합격' && result.resubmission) {
+                html += `<div class="text-xs text-gray-500">재심${result.resubmission.retryNo || 1} 진행</div>`;
+            }
+            if (decision === '불합격') {
+                html += `<div class="text-xs text-gray-500">다음 학기 재신청</div>`;
+            }
+            return html;
+        }
+        return typeof getProgressStatusText === 'function'
+            ? getProgressStatusText(assignment.evaluationProgress)
+            : (assignment.evaluationProgress || '-');
+    },
+
+    // 같은 학생 · 같은 기본단계의 이전 차수 기록
+    getPreviousAttempts(assignment) {
+        const stageName = assignment.basicStageName || assignment.submissionType;
+        const currentNo = assignment.attemptNo || 1;
+        return REVIEW_ASSIGNMENTS
+            .filter(a => a.studentId === assignment.studentId
+                && (a.basicStageName || a.submissionType) === stageName
+                && (a.attemptNo || 1) < currentNo)
+            .sort((a, b) => (a.attemptNo || 1) - (b.attemptNo || 1))
+            .map(a => ({ assignment: a, result: this.getResult(a) }));
+    }
+};
 
 // ==================== Service ====================
 class ReviewService {
@@ -2304,6 +2443,7 @@ class ReviewService {
 
 // Export
 window.ReviewService = ReviewService;
+window.ReviewAttempt = ReviewAttempt;
 window.EVALUATION_TEMPLATES = EVALUATION_TEMPLATES;
 window.REVIEW_ASSIGNMENTS = REVIEW_ASSIGNMENTS;
 window.REVIEW_EVALUATIONS = REVIEW_EVALUATIONS;
