@@ -25,6 +25,9 @@
         const container = document.getElementById('thesis-application-list');
         if (!container) return;
 
+        // 신청상태 필터에 철회 / 재심사 대상 옵션 보강 (재심사 목업)
+        ensureApplicationStatusFilterOptions();
+
         // 검색 필터 적용
         const filteredData = getFilteredApplicationData();
 
@@ -48,6 +51,7 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">성명</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">지도교수명</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">지도단계</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">차수</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">신청상태</th>
                             </tr>
                         </thead>
@@ -67,9 +71,9 @@
                                     <td class="px-4 py-3 text-sm text-gray-900">${item.studentName}</td>
                                     <td class="px-4 py-3 text-sm text-gray-900">${item.advisorName}</td>
                                     <td class="px-4 py-3 text-sm text-gray-900">${item.stepName}</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">${item.attemptNo}차</td>
                                     <td class="px-4 py-3 text-sm">
-                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full
-                                            ${item.applicationStatus === '신청완료' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                                        <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getApplicationStatusBadgeClass(item.applicationStatus)}">
                                             ${item.applicationStatus}
                                         </span>
                                     </td>
@@ -84,6 +88,38 @@
         container.innerHTML = tableHtml;
     };
 
+    // ========== 신청상태 (재심사 목업, 2026-10-06) ==========
+    // submitted: 신청완료 / pending: 미신청 / withdrawn: 철회 / retry: 재심사 대상(불합격 확정 → 다음 학기 재신청)
+    const APPLICATION_STATUS_LABELS = {
+        submitted: '신청완료',
+        pending: '미신청',
+        withdrawn: '철회',
+        retry: '재심사 대상'
+    };
+
+    function getApplicationStatusLabel(status) {
+        return APPLICATION_STATUS_LABELS[status] || '미신청';
+    }
+
+    function getApplicationStatusBadgeClass(label) {
+        return {
+            '신청완료': 'bg-green-100 text-green-800',
+            '철회': 'bg-gray-200 text-gray-600',
+            '재심사 대상': 'bg-red-100 text-red-800'
+        }[label] || 'bg-gray-100 text-gray-800';
+    }
+
+    // 신청상태 필터(admin_views.js)에 철회 / 재심사 대상 옵션이 없으면 추가
+    function ensureApplicationStatusFilterOptions() {
+        const select = document.getElementById('filter-application-status');
+        if (!select) return;
+        ['철회', '재심사 대상'].forEach(label => {
+            if (!Array.from(select.options).some(o => o.value === label)) {
+                select.add(new Option(label, label));
+            }
+        });
+    }
+
     // ========== 필터링된 데이터 가져오기 ==========
     function getFilteredApplicationData() {
         // 학생 데이터와 신청 데이터 조인
@@ -97,8 +133,9 @@
                 id: app.id,
                 studentNumber: student.studentNumber,
                 studentName: student.studentName,
-                year: student.year,
-                semester: student.semester,
+                year: app.year || student.year,
+                semester: app.semester || student.semester,
+                attemptNo: app.attemptNo || 1,
                 graduate: student.graduate,
                 collegeType: student.graduate.includes('일반') ? '대학원' : '특수대학원',
                 college: student.college,
@@ -108,7 +145,7 @@
                 academicStatus: student.academicStatus,
                 advisorName: student.advisorName,
                 stepName: stepType.name,
-                applicationStatus: app.status === 'submitted' ? '신청완료' : '미신청',
+                applicationStatus: getApplicationStatusLabel(app.status),
                 applicationPeriodStart: app.applicationPeriodStart,
                 applicationPeriodEnd: app.applicationPeriodEnd,
                 withdrawalPeriodStart: app.withdrawalPeriodStart,
@@ -307,7 +344,12 @@
                     <div class="grid grid-cols-3 gap-4 mt-4">
                         <div>
                             <label class="block text-xs text-gray-600 mb-1">신청상태</label>
-                            <input type="text" value="${application.status === 'submitted' ? '신청완료' : '미신청'}" disabled
+                            <input type="text" value="${getApplicationStatusLabel(application.status)}" disabled
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-gray-600 mb-1">차수</label>
+                            <input type="text" value="${application.attemptNo || 1}차${application.resultNote ? ' · ' + application.resultNote : ''}${application.withdrawnDate ? ' · 철회일 ' + application.withdrawnDate : ''}" disabled
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 cursor-not-allowed">
                         </div>
                         ${application.submittedDate ? `

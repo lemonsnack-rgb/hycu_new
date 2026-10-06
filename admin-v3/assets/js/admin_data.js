@@ -1827,6 +1827,54 @@ const appData = {
             withdrawalPeriodEnd: '2025-11-10',
             status: 'submitted',
             submittedDate: '2025-11-03'
+        },
+
+        // ===== 재심사 목업 (2026-10-06) =====
+        // status: submitted(신청완료) | pending(미신청) | withdrawn(철회) | retry(재심사 대상: 불합격 확정 → 다음 학기 재신청)
+        // attemptNo: 차수 (불합격 시 다음 학기 심사신청부터 +1)
+        {
+            id: 6,
+            studentId: 1,
+            stepTypeId: 4,
+            attemptNo: 1,
+            year: '2026',
+            semester: '1',
+            applicationPeriodStart: '2026-03-02',
+            applicationPeriodEnd: '2026-03-31',
+            withdrawalPeriodStart: '2026-03-02',
+            withdrawalPeriodEnd: '2026-03-20',
+            status: 'retry',
+            submittedDate: '2026-03-05',
+            resultNote: '1차 불합격 (2026-06-12) → 다음 학기 재신청 대상'
+        },
+        {
+            id: 7,
+            studentId: 1,
+            stepTypeId: 4,
+            attemptNo: 2,
+            year: '2026',
+            semester: '2',
+            applicationPeriodStart: '2026-09-01',
+            applicationPeriodEnd: '2026-10-31',
+            withdrawalPeriodStart: '2026-09-01',
+            withdrawalPeriodEnd: '2026-10-20',
+            status: 'submitted',
+            submittedDate: '2026-09-03'
+        },
+        {
+            id: 8,
+            studentId: 2,
+            stepTypeId: 4,
+            attemptNo: 1,
+            year: '2026',
+            semester: '2',
+            applicationPeriodStart: '2026-09-01',
+            applicationPeriodEnd: '2026-10-31',
+            withdrawalPeriodStart: '2026-09-01',
+            withdrawalPeriodEnd: '2026-10-20',
+            status: 'withdrawn',
+            submittedDate: '2026-09-04',
+            withdrawnDate: '2026-09-18'
         }
     ]
 };
