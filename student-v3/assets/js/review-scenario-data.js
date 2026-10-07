@@ -11,7 +11,7 @@
  * - 롤백: 이 파일 삭제 + student-dashboard.html의 script 태그 제거
  */
 (function () {
-    const ADVISOR = '김교수';
+    const ADVISOR = '박교수';
     const TITLE = 'AI 기반 추천 시스템의 개인화 성능 개선 연구';
 
     // 기본단계 정의
@@ -215,6 +215,10 @@
 
         load(key) {
             state = buildScenario(key);
+            // 대시보드 단계 진행 배지가 선택한 시나리오를 따르도록 다시 그림
+            if (typeof window.renderVerticalJourney === 'function' && document.getElementById('vertical-journey')) {
+                window.renderVerticalJourney();
+            }
             return state;
         },
 

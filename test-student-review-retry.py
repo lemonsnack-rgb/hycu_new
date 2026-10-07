@@ -67,8 +67,16 @@ def stage_row(d, container_id, stage_name):
 
 
 def test_01_retry_open_reapply(driver):
-    """① 불합격 단계: [재신청] → 신청완료, 자료제출에 2차 제출 행"""
+    """① 불합격 단계: [재신청] → 신청완료, 자료제출에 2차 제출 행
+    (자료제출 제출 폼을 먼저 열어 두어도 신청 모달 입력값이 섞이지 않는지 함께 확인)"""
+    choose_scenario(driver, "thesis-submission", "conditional")
+    stage_row(driver, "thesis-submission-content", "본심사").find_element(By.XPATH, ".//button[normalize-space()='제출']").click()
+    time.sleep(0.3)
     choose_scenario(driver, "thesis-application", "retry-open")
+    # 경로 표시: '홈 > 대시보드'가 아니라 '논문 심사 > 논문신청'
+    breadcrumb = driver.execute_script(
+        "const el = document.querySelector('.breadcrumb, #breadcrumb, [class*=breadcrumb]'); return el ? el.innerText : ''")
+    assert "논문신청" in breadcrumb, breadcrumb
     content = driver.find_element(By.ID, "thesis-application-content")
     headers = [th.text for th in content.find_elements(By.CSS_SELECTOR, "thead th")]
     assert "차수" not in headers, "심사신청 화면은 번호를 표시하지 않음"
@@ -80,8 +88,8 @@ def test_01_retry_open_reapply(driver):
     time.sleep(0.3)
     modal = driver.find_element(By.ID, "application-modal")
     assert "재신청합니다" in modal.text
-    driver.find_element(By.ID, "thesis-title").send_keys("AI 기반 추천 시스템 연구(보완)")
-    driver.find_element(By.ID, "thesis-title-en").send_keys("Improved Recommender")
+    driver.find_element(By.ID, "app-thesis-title").send_keys("AI 기반 추천 시스템 연구(보완)")
+    driver.find_element(By.ID, "app-thesis-title-en").send_keys("Improved Recommender")
     modal.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
     accept_dialog(driver)
     accept_dialog(driver)
@@ -90,12 +98,17 @@ def test_01_retry_open_reapply(driver):
     open_screen(driver, "thesis-submission")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
     assert "2차 제출" in row.text and "미제출" in row.text
+    # 신청 시 입력한 제목이 제출 폼 기본값으로 들어감
+    row.find_element(By.XPATH, ".//button[normalize-space()='제출']").click()
+    time.sleep(0.3)
+    assert driver.find_element(By.CSS_SELECTOR, "#thesis-submission-content #thesis-title").get_attribute("value") == "AI 기반 추천 시스템 연구(보완)"
 
 
 def test_02_submission_history(driver):
     """단계명 클릭 → 제출 기록 (1차 제출 불합격 총평 포함)"""
     choose_scenario(driver, "thesis-submission", "retry-open")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
+    assert "논문신청에서 재신청" in row.text
     row.find_element(By.CSS_SELECTOR, "[data-action=show-history]").click()
     time.sleep(0.3)
     modal = driver.find_element(By.ID, "stage-history-modal")
@@ -164,10 +177,12 @@ def test_07_conditional_followup_submit(driver):
     content = driver.find_element(By.ID, "thesis-submission-content").text
     assert "기존 제출 내역" in content and "조건부합격" in content and "2차 제출" in content
     assert "재심" not in content
+    # 보완 제출 폼: 직전 제출 제목이 기본값
+    assert driver.find_element(By.CSS_SELECTOR, "#thesis-submission-content #thesis-title").get_attribute("value")
 
 
 def test_08_exam_schedule_attempt_column(driver):
-    """심사일정: 차수 컬럼, 헤더와 셀 개수 일치"""
+    """심사일정: 차수 컬럼, 헤더와 셀 개수 일치, 로그인 학생(홍길동) 1차·2차 일정"""
     open_screen(driver, "exam-schedule")
     time.sleep(0.3)
     table = driver.find_element(By.ID, "student-exam-schedule-content")
@@ -177,10 +192,18 @@ def test_08_exam_schedule_attempt_column(driver):
         cells = row.find_elements(By.TAG_NAME, "td")
         if len(cells) > 1:
             assert len(cells) == len(headers)
+    rows = [r.text for r in table.find_elements(By.CSS_SELECTOR, "tbody tr")]
+    assert rows and all("홍길동" in r for r in rows), rows
+    assert any("1차" in r for r in rows) and any("2차" in r for r in rows), rows
 
 
 def test_09_dashboard_rereview_badge(driver):
-    """대시보드: 단계 진행에 '재심사 진행' 배지"""
+    """대시보드: 시나리오에 따라 '재심사 대상'(①) / '재심사 진행'(③) 배지, 경로 표시"""
+    choose_scenario(driver, "thesis-application", "retry-open")
+    open_screen(driver, "dashboard")
+    journey = driver.find_element(By.ID, "vertical-journey").text
+    assert "재심사 대상" in journey and "1차 예비심사" not in journey
+    choose_scenario(driver, "thesis-application", "not-started")
     open_screen(driver, "dashboard")
     assert "재심사 진행" in driver.find_element(By.ID, "vertical-journey").text
 

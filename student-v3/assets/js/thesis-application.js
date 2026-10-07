@@ -178,7 +178,7 @@ function openApplicationModal(stageTypeId) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 논문 제목 (한글) <span class="text-red-600">*</span>
                             </label>
-                            <input type="text" id="thesis-title" required
+                            <input type="text" id="app-thesis-title" required
                                    placeholder="논문 제목을 입력하세요"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
@@ -188,7 +188,7 @@ function openApplicationModal(stageTypeId) {
                             <label class="block text-sm font-medium text-gray-700 mb-2">
                                 논문 제목 (외국어) <span class="text-red-600">*</span>
                             </label>
-                            <input type="text" id="thesis-title-en" required
+                            <input type="text" id="app-thesis-title-en" required
                                    placeholder="논문 제목을 외국어로 입력하세요"
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
                         </div>
@@ -234,8 +234,8 @@ function closeApplicationModal(event) {
 function submitApplication(event, stageTypeId) {
     event.preventDefault();
 
-    const title = document.getElementById('thesis-title').value.trim();
-    const titleEn = document.getElementById('thesis-title-en').value.trim();
+    const title = document.getElementById('app-thesis-title').value.trim();
+    const titleEn = document.getElementById('app-thesis-title-en').value.trim();
 
     if (!title || !titleEn) {
         alert('모든 필수 항목을 입력해주세요.');

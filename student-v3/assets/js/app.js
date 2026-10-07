@@ -10,7 +10,7 @@ const currentStudent = {
     email: 'hong@example.com',
     major: '컴퓨터공학과',
     degree: '석사',
-    advisorName: '김교수',
+    advisorName: '박교수',
     year: 2024,
     semester: 1
 };

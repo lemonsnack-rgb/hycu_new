@@ -243,6 +243,9 @@ function renderThesisListRow(submission, index) {
     let resultText = '-';
     if (submission.reviewResult) {
         resultText = `<span class="font-medium ${ReviewScenario.resultColor(submission.reviewResult)}">${ReviewScenario.resultText(submission.reviewResult)}</span>`;
+        if (submission.reviewResult === 'fail') {
+            resultText += '<div class="text-xs text-gray-500">논문신청에서 재신청</div>';
+        }
     } else if (submission.status === 'submitted') {
         resultText = submission.evaluatedCount > 0 ? '심사중' : '심사 대기';
     }
@@ -265,7 +268,8 @@ function renderThesisListRow(submission, index) {
 
     // 기본단계명 클릭 → 제출 기록 팝업 (기간과 무관하게 조회)
     const stageLink = `<button type="button" data-action="show-history" data-stage="${submission.stage}"
-                               class="text-[#6A0028] hover:underline font-medium">${submission.basicStageName || stageDisplay || '-'}</button>`;
+                               title="제출 기록 보기"
+                               class="text-[#6A0028] underline underline-offset-2 font-medium">${submission.basicStageName || stageDisplay || '-'}</button>`;
 
     return `
         <tr class="hover:bg-gray-50">
@@ -315,7 +319,8 @@ function renderThesisSubmissionForm() {
     const isResubmit = submission.status !== 'submitted' && !!submission.originalSubmission;
     const isEdit = submission.status === 'submitted';
     // 신규 제출 시 심사신청에서 입력한 논문 제목을 기본값으로 사용
-    const data = isEdit ? submission.submittedData : { title: submission.pendingTitle || '' };
+    const data = isEdit ? submission.submittedData
+        : { title: submission.pendingTitle || (submission.originalSubmission && submission.originalSubmission.title) || '' };
 
     // 제출 번호 표기 (횟수 제한 없음)
     const stageDisplay = `${submission.stageName} (${ReviewScenario.attemptLabel(submission)})`;
