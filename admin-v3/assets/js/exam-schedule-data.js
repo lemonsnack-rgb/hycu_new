@@ -94,7 +94,7 @@ const mockExamSchedules = [
         scheduleId: "SCH003",
         assignmentId: "CA004",
 
-        studentId: "S2024001",
+        studentId: "S2024002",
         studentName: "김철수",
         studentNumber: "2024001",
         department: "컴퓨터공학과",
@@ -133,7 +133,7 @@ const mockExamSchedules = [
     {
         scheduleId: "SCH004",
         assignmentId: "CA005",
-        studentId: "S_RETRY",
+        studentId: "S2024001",
         studentName: "홍길동",
         studentNumber: "2024123",
         department: "컴퓨터공학과",

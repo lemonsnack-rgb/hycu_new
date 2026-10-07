@@ -912,7 +912,7 @@ const mockReviewTargets = [
     { id: 'RT010', studentId: 'STU016', studentNumber: '2023006', studentName: '송학생', department: '교육학과', degreeType: '박사', academicYear: '2023', semesterCount: 7, reviewType: 'final', title: '인공지능 기반 개인화 학습 시스템 설계', submittedDate: '2025-02-21', advisorId: 'PROF006', advisorName: '강교수', status: 'pending' },
 
     // 학생용(student-v3) 테스트 데이터 - S2024001 (김철수 학생) - 박사 예비심사
-    { id: 'RT011', studentId: 'S2024001', studentNumber: '2024001', studentName: '김철수', department: '컴퓨터공학과', degreeType: '박사', academicYear: '2025', semesterCount: 6, reviewType: 'preliminary', title: 'AI 기반 실시간 데이터 처리 최적화 연구', submittedDate: '2025-02-23', advisorId: 'PROF001', advisorName: '김교수', status: 'assigned' }
+    { id: 'RT011', studentId: 'S2024002', studentNumber: '2024001', studentName: '김철수', department: '컴퓨터공학과', degreeType: '박사', academicYear: '2025', semesterCount: 6, reviewType: 'preliminary', title: 'AI 기반 실시간 데이터 처리 최적화 연구', submittedDate: '2025-02-23', advisorId: 'PROF001', advisorName: '김교수', status: 'assigned' }
 ];
 
 // 심사위원 배정 데이터
@@ -998,11 +998,11 @@ const mockCommitteeAssignments = [
         assignedDate: '2025-02-22',
         status: 'completed'
     },
-    // 학생용(student-v3) 테스트 데이터 추가 - S2024001 (김철수 학생)
+    // 김철수 학생 예비심사 (2026-10-07: 학생 화면 로그인 학생이 홍길동이므로 studentId 분리)
     {
         id: 'CA004',
         reviewTargetId: 'RT011',
-        studentId: 'S2024001',
+        studentId: 'S2024002',
         studentNumber: '2024001',
         studentName: '김철수',
         department: '컴퓨터공학과',
@@ -1039,7 +1039,7 @@ const mockCommitteeAssignments = [
     {
         id: 'CA005',
         reviewTargetId: null,
-        studentId: 'S_RETRY',
+        studentId: 'S2024001',   // 학생 화면 로그인 학생(홍길동)
         studentNumber: '2024123',
         studentName: '홍길동',
         department: '컴퓨터공학과',
@@ -1061,8 +1061,8 @@ const mockCommitteeAssignments = [
         chairName: '이교수',
         members: [
             { professorId: 'PROF002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과' },
-            { professorId: 'PROF003', professorName: '박교수', role: 'member', department: '경영학과' },
-            { professorId: 'PROF004', professorName: '최교수', role: 'member', department: '컴퓨터공학과' }
+            { professorId: 'PROF003', professorName: '박교수', role: 'member', department: '컴퓨터공학과' },
+            { professorId: 'PROF005', professorName: '정교수', role: 'member', department: '소프트웨어학과' }
         ],
         assignedDate: '2026-04-25',
         status: 'completed'
@@ -1070,7 +1070,7 @@ const mockCommitteeAssignments = [
     {
         id: 'CA006',
         reviewTargetId: null,
-        studentId: 'S_RETRY',
+        studentId: 'S2024001',   // 학생 화면 로그인 학생(홍길동)
         studentNumber: '2024123',
         studentName: '홍길동',
         department: '컴퓨터공학과',
@@ -1093,8 +1093,8 @@ const mockCommitteeAssignments = [
         chairName: '이교수',
         members: [
             { professorId: 'PROF002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과' },
-            { professorId: 'PROF003', professorName: '박교수', role: 'member', department: '경영학과' },
-            { professorId: 'PROF004', professorName: '최교수', role: 'member', department: '컴퓨터공학과' }
+            { professorId: 'PROF003', professorName: '박교수', role: 'member', department: '컴퓨터공학과' },
+            { professorId: 'PROF005', professorName: '정교수', role: 'member', department: '소프트웨어학과' }
         ],
         assignedDate: '2026-10-02',
         status: 'completed'
