@@ -137,8 +137,7 @@ function renderProfStudentSummary() {
     const stages = [
         { name: '논문작성계획서', count: 5, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
         { name: '프로포절', count: 3, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
-        // reReview: 불합격 후 재신청하여 다시 심사 중인 학생 수 (재심사 목업 2026-10-07, 고정값)
-        { name: '예비심사', count: 2, reReview: 1, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
+        { name: '예비심사', count: 2, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
         { name: '본심사', count: 1, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' }
     ];
 
@@ -159,10 +158,6 @@ function renderProfStudentSummary() {
                 <div style="font-size: 20px; font-weight: 700; color: ${stage.textColor};">
                     ${stage.count}<span style="font-size: 13px; font-weight: 600;">명</span>
                 </div>
-                ${stage.reReview ? `
-                <div class="prof-rereview-count" style="margin-top: 4px; font-size: 11px; font-weight: 600; color: #C62828;">
-                    재심사 ${stage.reReview}명
-                </div>` : ''}
             </div>
             ${idx < stages.length - 1 ? `
                 <div style="display: flex; align-items: center; gap: 2px; flex-shrink: 0;">

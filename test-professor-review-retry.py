@@ -1,7 +1,8 @@
 """
-교수 화면 - 재심사 목업 테스트 (2026-10-06 작성, 10-07 번호 체계 변경 반영)
-기준: docs/재심사_제출취소_영향도분석_20261006.md 0장 · 0-5
-- 조건부합격 제출 시 다음 번호의 새 심사 행 생성, '재심' 표기 없음
+교수 화면 - 재심사 목업 테스트 (2026-10-07 재정비 기준)
+기준: docs/재심사_목업_재정비_계획_20261007.md
+- 학위논문심사 목록 '차수' 컬럼(D2), 심사결과는 기존 진행상태
+- 조건부합격 시 다음 번호 심사 행 생성, 이전 차수 이력·불합격 안내/확인창 없음
 
 실행: python -m pytest test-professor-review-retry.py -v -s
 """
@@ -13,7 +14,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import Select, WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 
 ROOT = os.path.dirname(os.path.abspath(__file__))
 URL = "file:///" + os.path.join(ROOT, "professor-v3", "professor-dashboard-proposal.html").replace(os.sep, "/")
@@ -31,15 +31,6 @@ def driver():
     d.quit()
 
 
-def accept_dialog(d, timeout=5):
-    WebDriverWait(d, timeout).until(EC.alert_is_present())
-    alert = d.switch_to.alert
-    text = alert.text
-    alert.accept()
-    time.sleep(0.2)
-    return text
-
-
 def open_review_list(d):
     d.execute_script("showScreen('review')")
     time.sleep(0.6)
@@ -50,113 +41,92 @@ def open_chair(d, assignment_id):
     time.sleep(0.8)
 
 
+def detail_text(d):
+    # 페이지에 같은 id가 두 개 있어 상세 화면(review-detail-screen) 안으로 한정
+    return d.find_element(By.CSS_SELECTOR, "#review-detail-screen #review-detail-content").text
+
+
 def review_rows(d, name):
-    table = d.find_element(By.ID, "review-list")
-    return [r.text for r in table.find_elements(By.CSS_SELECTOR, "tbody tr") if name in r.text]
+    return [r.text for r in d.find_elements(By.CSS_SELECTOR, "#review-list tbody tr") if name in r.text]
 
 
-def test_01_list_shows_attempts_and_results(driver):
-    """같은 학생의 1차(불합격) · 2차(진행) 행, 차수 컬럼"""
+def test_01_list_attempt_column_and_existing_result(driver):
+    """차수 컬럼 유지, 심사결과는 기존 진행상태"""
     open_review_list(driver)
     headers = [th.text for th in driver.find_elements(By.CSS_SELECTOR, "#review-list thead th")]
     assert "차수" in headers
     rows = review_rows(driver, "홍길동")
-    assert len(rows) == 2, rows
-    assert any("1차" in r and "불합격" in r for r in rows)
-    assert any("2차" in r and "진행 중" in r for r in rows), rows
-    # 영문 결과 코드(pass 등)가 그대로 노출되지 않음
-    all_text = driver.find_element(By.ID, "review-list").text
-    assert " pass" not in all_text and " fail" not in all_text
-    # 1차 불합격 건의 위원 평가 이력 보존
-    assert driver.execute_script("return REVIEW_EVALUATIONS.filter(e => e.assignmentId === 'RA_RETRY_001').length") == 2
+    assert len(rows) == 2 and any("1차" in r for r in rows) and any("2차" in r for r in rows), rows
+    assert all("다음 학기 재신청" not in r for r in rows)
 
 
-def test_02_previous_attempt_history(driver):
-    """2차 상세에 이전 차수 이력(1차 불합격 · 위원장 총평), '재심' 표기 없음"""
+def test_02_detail_without_previous_history(driver):
+    """상세에 '이전 차수 이력' 없음 (명시 요구 아님)"""
     open_review_list(driver)
     open_chair(driver, "RA_RETRY_002")
-    # 페이지에 같은 id가 두 개 있어 상세 화면(review-detail-screen) 안으로 한정
-    text = driver.find_element(By.CSS_SELECTOR, "#review-detail-screen #review-detail-content").text
-    assert "이전 차수 이력" in text and "현재 2차 심사" in text and "위원장 총평" in text
+    text = detail_text(driver)
+    assert "홍길동" in text and "이전 차수 이력" not in text
 
 
-def test_03_fail_decision_notice_and_confirm(driver):
-    """불합격 선택 시 안내 표시 → 확인 후 결과 불합격"""
+def test_03_fail_decision_existing_flow(driver):
+    """불합격: 안내 박스·확인창 없이 기존 흐름으로 저장"""
     open_review_list(driver)
     open_chair(driver, "RA_TEST_CHAIR")
     driver.execute_script("selectDecision('불합격')")
-    notice = driver.find_element(By.ID, "fail-notice-section")
-    assert notice.is_displayed() and "다음 학기에 심사 신청부터" in notice.text
-
+    assert not driver.find_elements(By.ID, "fail-notice-section")
     driver.find_element(By.ID, "chair-final-comment").send_keys("연구 방법론 전면 보완 필요")
     driver.execute_script("submitChairDecision()")
-    confirm_text = accept_dialog(driver)
-    assert "2차" in confirm_text and "1차 이력으로 보존" in confirm_text
     time.sleep(0.5)
     decision = driver.execute_script(
         "return REVIEW_RESULTS.find(r => r.assignmentId === 'RA_TEST_CHAIR').finalDecision")
     assert decision == "불합격"
-    # 불합격은 새 행을 만들지 않음 (학생 재신청 후 배정)
     assert not driver.execute_script("return REVIEW_ASSIGNMENTS.some(a => a.previousAssignmentId === 'RA_TEST_CHAIR')")
 
 
-def test_04_conditional_creates_new_review_row(driver):
-    """조건부합격: 평가표 선택 가능 → 제출 시 다음 번호의 새 심사 행 생성"""
+def test_04_conditional_creates_next_review(driver):
+    """조건부합격: 평가표 선택 가능 → 다음 번호 심사 행 생성(파일 없음)"""
     open_review_list(driver)
     open_chair(driver, "RA_TEST_CHAIR")
     driver.execute_script("selectDecision('조건부합격')")
     template_select = Select(driver.find_element(By.ID, "resubmission-template-id"))
-    assert len(template_select.options) > 1, "평가표 목록이 비어 있음"
+    assert len(template_select.options) > 1
     template_select.select_by_index(1)
     driver.find_element(By.CSS_SELECTOR, "input[name='resubmission-reviewer-type'][value='committee']").click()
     driver.find_element(By.ID, "chair-final-comment").send_keys("5장 분석 보완 후 다시 제출")
     driver.execute_script("submitChairDecision()")
     time.sleep(1.5)
-
     new_row = driver.execute_script(
         "const a = REVIEW_ASSIGNMENTS.find(x => x.previousAssignmentId === 'RA_TEST_CHAIR');"
-        "return a ? {id: a.id, no: a.attemptNo, status: a.status, n: a.committee.length, file: a.thesisFile} : null")
-    assert new_row and new_row["no"] == 2 and new_row["status"] == "대기" and new_row["n"] == 3, new_row
-    assert new_row["file"] is None, "학생 제출 전이므로 파일 없음"
-
+        "return a ? {no: a.attemptNo, n: a.committee.length, file: a.thesisFile} : null")
+    assert new_row and new_row["no"] == 2 and new_row["n"] == 3 and new_row["file"] is None, new_row
     driver.execute_script("closeReviewDetailScreen && closeReviewDetailScreen()")
     open_review_list(driver)
     rows = review_rows(driver, "판정테스트")
-    assert len(rows) == 2, rows
-    assert any("1차" in r and "조건부합격" in r for r in rows)
-    assert any("2차" in r for r in rows)
-    assert all("재심1" not in r and "재심 " not in r for r in rows)
+    assert len(rows) == 2 and any("2차" in r for r in rows), rows
 
 
-def test_05_exam_schedule_columns_aligned(driver):
-    """심사일정: 차수 컬럼, 헤더·셀 개수 일치, 학위과정 정상, 홍길동 1차·2차"""
+def test_05_exam_schedule_no_attempt_column(driver):
+    """심사일정: 차수 컬럼 없음, 헤더·셀 개수 일치, 학위 표시·필터 정상(기존 결함 수정 유지)"""
     driver.execute_script("showScreen('exam-schedule')")
     time.sleep(0.8)
-    # 학년도·학기 기본값이 2025·1학기라 2026학년도 시연 데이터를 보려면 '전체' 선택
     driver.execute_script("document.getElementById('exam-filter-year').value=''; document.getElementById('exam-filter-semester').value=''; filterExamScheduleList();")
     time.sleep(0.4)
     content = driver.find_element(By.ID, "exam-schedule-content")
     headers = [th.text for th in content.find_elements(By.CSS_SELECTOR, "thead th")]
-    assert "차수" in headers and "세부단계" in headers
-    rows = content.find_elements(By.CSS_SELECTOR, "tbody tr")
-    texts = []
-    for row in rows:
-        cells = row.find_elements(By.TAG_NAME, "td")
-        assert len(cells) == len(headers), (len(cells), len(headers))
-        texts.append(row.text)
-    hong = [t for t in texts if "홍길동" in t]
-    assert any("1차" in t for t in hong) and any("2차" in t for t in hong), hong
-    assert all("석박통합" not in t for t in hong)
-    # 대학구분·학적상태 필터가 동작 (데이터 출처 변경 후 0건 되던 문제)
+    assert "차수" not in headers and "세부단계" in headers
+    for row in content.find_elements(By.CSS_SELECTOR, "tbody tr"):
+        assert len(row.find_elements(By.TAG_NAME, "td")) == len(headers)
+    hong = [r.text for r in content.find_elements(By.CSS_SELECTOR, "tbody tr") if "홍길동" in r.text]
+    assert hong and all("석박통합" not in t for t in hong)
     driver.execute_script("document.getElementById('exam-filter-college-type').value='일반대학원'; filterExamScheduleList();")
     time.sleep(0.3)
     assert any("홍길동" in r.text for r in content.find_elements(By.CSS_SELECTOR, "tbody tr"))
 
 
-def test_06_dashboard_rereview_count(driver):
+def test_06_dashboard_without_rereview(driver):
     driver.execute_script("showScreen('dashboard')")
     time.sleep(0.5)
-    assert "재심사 1명" in driver.find_element(By.ID, "student-summary-cards").text
+    assert "재심사" not in driver.find_element(By.ID, "student-summary-cards").text
 
 
 def test_07_no_console_errors(driver):
@@ -164,18 +134,15 @@ def test_07_no_console_errors(driver):
     open_chair(driver, "RA_RETRY_002")
     logs = driver.get_log("browser")
     targets = ("review-data.js", "review-list.js", "review-detail.js",
-               "exam-schedule-professor-readonly.js", "professor-dashboard.js", "exam-schedule-data.js")
+               "exam-schedule-professor-readonly.js", "professor-dashboard.js", "exam-schedule-data.js", "mockup-deeplink.js")
     errors = [l["message"] for l in logs if l["level"] == "SEVERE" and any(t in l["message"] for t in targets)]
     assert not errors, errors
 
 
 def test_08_deeplink(driver):
-    """목업 딥링크: 학위논문심사 상세(위원장) · 심사일정 '전체' 바로 열기"""
-    driver.get(URL + "?screen=review&detail=RA_RETRY_002&view=chair")
+    driver.get(URL + "?screen=review&detail=RA_TEST_CHAIR&view=chair")
     time.sleep(2)
-    text = driver.find_element(By.CSS_SELECTOR, "#review-detail-screen #review-detail-content").text
-    assert "이전 차수 이력" in text
+    assert "판정테스트" in detail_text(driver)
     driver.get(URL + "?screen=exam-schedule&year=all")
     time.sleep(2)
-    rows = driver.find_element(By.ID, "exam-schedule-content").text
-    assert "홍길동" in rows
+    assert "홍길동" in driver.find_element(By.ID, "exam-schedule-content").text

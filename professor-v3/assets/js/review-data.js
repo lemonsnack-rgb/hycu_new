@@ -2282,33 +2282,10 @@ const REVIEW_RESULTS = [
 // ==================== 재심사 차수 헬퍼 (목업, 2026-10-06) ====================
 // 차수(attemptNo): 같은 학생 · 같은 기본단계 안에서 심사할 때마다 +1 (조건부합격 후 보완 심사, 불합격 후 재신청 심사 모두)
 // 재심도 일반 심사 1건으로 다루며 '재심' 표기는 쓰지 않음
-// 교수 심사목록 · 관리자 학위논문 심사 조회에서 공통 사용
+// 교수 학위논문심사 목록 차수 표기, 조건부합격 후 보완 심사 번호에 사용
 const ReviewAttempt = {
-    getResult(assignment) {
-        return REVIEW_RESULTS.find(r => r.assignmentId === assignment.id) || null;
-    },
-
     label(assignment) {
         return `${assignment.attemptNo || 1}차`;
-    },
-
-    // 심사결과: 위원장 최종결과가 있으면 결과, 없으면 평가 진행상태
-    resultHtml(assignment) {
-        const result = this.getResult(assignment);
-        // 일부 Mock은 영문 코드(pass/conditional/fail)로 저장되어 있어 한글로 변환
-        const codeMap = { pass: '합격', conditional: '조건부합격', fail: '불합격' };
-        const decision = result && result.finalDecision && (codeMap[result.finalDecision] || result.finalDecision);
-        if (decision) {
-            const color = { '합격': 'text-green-700', '조건부합격': 'text-yellow-700', '불합격': 'text-red-700' }[decision] || 'text-gray-700';
-            let html = `<span class="font-semibold ${color}">${decision}</span>`;
-            if (decision === '불합격') {
-                html += `<div class="text-xs text-gray-500">다음 학기 재신청</div>`;
-            }
-            return html;
-        }
-        return typeof getProgressStatusText === 'function'
-            ? getProgressStatusText(assignment.evaluationProgress)
-            : (assignment.evaluationProgress || '-');
     },
 
     // 같은 학생 · 같은 기본단계의 다음 심사 번호
@@ -2318,18 +2295,6 @@ const ReviewAttempt = {
             .filter(a => a.studentId === assignment.studentId && (a.basicStageName || a.submissionType) === stageName)
             .map(a => a.attemptNo || 1);
         return Math.max(...numbers) + 1;
-    },
-
-    // 같은 학생 · 같은 기본단계의 이전 차수 기록
-    getPreviousAttempts(assignment) {
-        const stageName = assignment.basicStageName || assignment.submissionType;
-        const currentNo = assignment.attemptNo || 1;
-        return REVIEW_ASSIGNMENTS
-            .filter(a => a.studentId === assignment.studentId
-                && (a.basicStageName || a.submissionType) === stageName
-                && (a.attemptNo || 1) < currentNo)
-            .sort((a, b) => (a.attemptNo || 1) - (b.attemptNo || 1))
-            .map(a => ({ assignment: a, result: this.getResult(a) }));
     }
 };
 

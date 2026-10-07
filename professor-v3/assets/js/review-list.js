@@ -121,7 +121,7 @@ function renderReviewList() {
                                 <td>${assignment.subStageName || '-'}</td>
                                 <td>${ReviewAttempt.label(assignment)}</td>
                                 <td>
-                                    ${ReviewAttempt.resultHtml(assignment)}
+                                    ${getProgressStatusText(assignment.evaluationProgress)}
                                 </td>
                                 <td onclick="event.stopPropagation()">
                                     <div class="flex gap-2 justify-center">
