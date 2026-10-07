@@ -63,7 +63,12 @@ def test_01_list_shows_attempts_and_results(driver):
     rows = review_rows(driver, "홍길동")
     assert len(rows) == 2, rows
     assert any("1차" in r and "불합격" in r for r in rows)
-    assert any("2차" in r and "불합격" not in r for r in rows)
+    assert any("2차" in r and "진행 중" in r for r in rows), rows
+    # 영문 결과 코드(pass 등)가 그대로 노출되지 않음
+    all_text = driver.find_element(By.ID, "review-list").text
+    assert " pass" not in all_text and " fail" not in all_text
+    # 1차 불합격 건의 위원 평가 이력 보존
+    assert driver.execute_script("return REVIEW_EVALUATIONS.filter(e => e.assignmentId === 'RA_RETRY_001').length") == 2
 
 
 def test_02_previous_attempt_history(driver):
@@ -110,12 +115,13 @@ def test_04_conditional_creates_new_review_row(driver):
 
     new_row = driver.execute_script(
         "const a = REVIEW_ASSIGNMENTS.find(x => x.previousAssignmentId === 'RA_TEST_CHAIR');"
-        "return a ? {id: a.id, no: a.attemptNo, status: a.status, n: a.committee.length} : null")
+        "return a ? {id: a.id, no: a.attemptNo, status: a.status, n: a.committee.length, file: a.thesisFile} : null")
     assert new_row and new_row["no"] == 2 and new_row["status"] == "대기" and new_row["n"] == 3, new_row
+    assert new_row["file"] is None, "학생 제출 전이므로 파일 없음"
 
     driver.execute_script("closeReviewDetailScreen && closeReviewDetailScreen()")
     open_review_list(driver)
-    rows = review_rows(driver, "재심테스트")
+    rows = review_rows(driver, "판정테스트")
     assert len(rows) == 2, rows
     assert any("1차" in r and "조건부합격" in r for r in rows)
     assert any("2차" in r for r in rows)
@@ -141,6 +147,10 @@ def test_05_exam_schedule_columns_aligned(driver):
     hong = [t for t in texts if "홍길동" in t]
     assert any("1차" in t for t in hong) and any("2차" in t for t in hong), hong
     assert all("석박통합" not in t for t in hong)
+    # 대학구분·학적상태 필터가 동작 (데이터 출처 변경 후 0건 되던 문제)
+    driver.execute_script("document.getElementById('exam-filter-college-type').value='일반대학원'; filterExamScheduleList();")
+    time.sleep(0.3)
+    assert any("홍길동" in r.text for r in content.find_elements(By.CSS_SELECTOR, "tbody tr"))
 
 
 def test_06_dashboard_rereview_count(driver):

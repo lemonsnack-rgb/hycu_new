@@ -137,7 +137,7 @@ function renderProfStudentSummary() {
     const stages = [
         { name: '논문작성계획서', count: 5, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
         { name: '프로포절', count: 3, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
-        // reReview: 불합격 후 재신청·조건부합격 후 보완 등으로 다시 심사 중인 학생 수 (재심사 목업 2026-10-07, 고정값)
+        // reReview: 불합격 후 재신청하여 다시 심사 중인 학생 수 (재심사 목업 2026-10-07, 고정값)
         { name: '예비심사', count: 2, reReview: 1, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' },
         { name: '본심사', count: 1, color: '#F9FAFB', textColor: '#1F2937', borderColor: '#E5E7EB' }
     ];

@@ -281,7 +281,7 @@ function filterExamScheduleList() {
     }
 
     if (currentExamFilters.collegeType) {
-        data = data.filter(item => item.collegeType === currentExamFilters.collegeType);
+        data = data.filter(item => (item.collegeType || item.graduate) === currentExamFilters.collegeType);
     }
 
     if (currentExamFilters.graduate) {
@@ -309,7 +309,7 @@ function filterExamScheduleList() {
     }
 
     if (currentExamFilters.status) {
-        data = data.filter(item => item.status === currentExamFilters.status);
+        data = data.filter(item => (item.status || item.academicStatus) === currentExamFilters.status);
     }
 
     if (currentExamFilters.studentNumber) {
@@ -380,12 +380,12 @@ function renderExamScheduleTable(data) {
                 <td>${index + 1}</td>
                 <td>${item.year || '2025'}</td>
                 <td>${item.semester || '1'}</td>
-                <td>${item.collegeType || '일반대학원'}</td>
+                <td>${item.collegeType || item.graduate || '일반대학원'}</td>
                 <td>${item.graduate || '일반대학원'}</td>
                 <td>${item.undergraduate || '-'}</td>
                 <td>${item.department}</td>
                 <td>${(item.degreeType === 'master' || item.degreeType === '석사') ? '석사' : (item.degreeType === 'doctor' || item.degreeType === '박사') ? '박사' : '석박통합'}</td>
-                <td>${item.status || '재학'}</td>
+                <td>${item.status || item.academicStatus || '재학'}</td>
                 <td>${item.studentNumber}</td>
                 <td>${item.studentName}</td>
                 <td>${item.advisorName || '-'}</td>
@@ -473,7 +473,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                         </div>
                         <div class="flex gap-2">
                             <span class="text-gray-600 min-w-[80px]">학위과정:</span>
-                            <span class="text-gray-900 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
+                            <span class="text-gray-900 font-medium">${(assignment.degreeType === 'master' || assignment.degreeType === '석사') ? '석사' : '박사'}</span>
                         </div>
                         <div class="flex gap-2">
                             <span class="text-gray-600 min-w-[80px]">학적상태:</span>
@@ -561,7 +561,7 @@ function renderExamScheduleDetailReadonly(assignmentId) {
                     </div>
                     <div class="flex gap-2">
                         <span class="text-gray-600 min-w-[80px]">학위과정:</span>
-                        <span class="text-gray-900 font-medium">${assignment.degreeType === 'master' ? '석사' : '박사'}</span>
+                        <span class="text-gray-900 font-medium">${(assignment.degreeType === 'master' || assignment.degreeType === '석사') ? '석사' : '박사'}</span>
                     </div>
                     <div class="flex gap-2">
                         <span class="text-gray-600 min-w-[80px]">학적상태:</span>

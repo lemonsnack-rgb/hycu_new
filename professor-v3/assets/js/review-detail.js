@@ -222,10 +222,11 @@ function renderThesisInfo(assignment) {
                         <span class="text-gray-600 min-w-[80px]">논문 제목:</span>
                         <span class="text-gray-900 font-medium flex-1">${assignment.thesisTitle}</span>
                         <div class="flex gap-2">
+                            ${assignment.thesisFile ? `
                             <button onclick="downloadThesisFile('${assignment.thesisFile}')"
                                     class="bg-[#6A0028] text-white px-3 py-1 rounded text-sm hover:bg-[#8A0034] whitespace-nowrap">
                                 논문파일 다운로드
-                            </button>
+                            </button>` : '<span class="text-sm text-gray-500 whitespace-nowrap">학생 제출 전</span>'}
                             ${assignment.otherFile ? `
                                 <button onclick="downloadOtherFile('${assignment.otherFile}')"
                                         class="bg-gray-600 text-white px-3 py-1 rounded text-sm hover:bg-gray-700 whitespace-nowrap">
@@ -4126,6 +4127,8 @@ function createFollowUpAssignment(assignment, resubmissionData) {
         previousAssignmentId: assignment.id,
         submissionId: null,
         submissionDate: null,
+        thesisFile: null,      // 학생이 보완 자료를 제출하기 전
+        otherFile: null,
         templateId: resubmissionData.evaluationTemplateId || assignment.templateId,
         committee: [chair, ...members].filter(Boolean).map(m => ({ ...m, id: `${m.id}_N${attemptNo}`, assignedDate: today })),
         status: '대기',
@@ -4180,7 +4183,7 @@ function submitChairDecision() {
 
         // 조건부합격 후 보완 심사: 다음 제출 번호의 새 심사 1건으로 생성 (재심도 일반 심사와 동일)
         const currentAssignment = REVIEW_ASSIGNMENTS.find(a => a.id === currentAssignmentId);
-        const nextAttemptNo = ReviewAttempt.nextAttemptNo(currentAssignment);
+        const nextAttemptNo = currentAssignment ? ReviewAttempt.nextAttemptNo(currentAssignment) : 2;
 
         // 재심 데이터 구성
         resubmissionData = {

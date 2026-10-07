@@ -1027,7 +1027,7 @@ const REVIEW_ASSIGNMENTS = [
     {
         id: 'RA_TEST_CHAIR',
         studentId: 'S_TEST',
-        studentName: '재심테스트',
+        studentName: '판정테스트',
         studentNumber: '2024999',
         major: '컴퓨터공학과',
         degree: '석사',
@@ -1041,9 +1041,9 @@ const REVIEW_ASSIGNMENTS = [
         advisorId: 'P001',
         advisorName: '박교수',
 
-        thesisTitle: '빅데이터 분석을 통한 소비자 행동 예측 모델 개발 (테스트:위원장재심결정대기)',
+        thesisTitle: '빅데이터 분석을 통한 소비자 행동 예측 모델 개발 (테스트:위원장 판정 대기)',
         thesisFile: {
-            name: '재심테스트_본심사_v1.pdf',
+            name: '판정테스트_본심사_v1.pdf',
             size: 3850000,
             uploadedAt: '2025-11-20 15:30:00'
         },
@@ -1109,7 +1109,7 @@ const REVIEW_ASSIGNMENTS = [
 
         committee: [
             { id: 'C_RETRY1_001', professorId: 'P002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과', assignedDate: '2026-04-25' },
-            { id: 'C_RETRY1_002', professorId: 'P003', professorName: '김교수', role: 'member', department: '인공지능학과', assignedDate: '2026-04-25' },
+            { id: 'C_RETRY1_002', professorId: 'P001', professorName: '박교수', role: 'member', department: '컴퓨터공학과', assignedDate: '2026-04-25' },
             { id: 'C_RETRY1_003', professorId: 'P004', professorName: '정교수', role: 'member', department: '소프트웨어학과', assignedDate: '2026-04-25' }
         ],
 
@@ -1146,7 +1146,7 @@ const REVIEW_ASSIGNMENTS = [
 
         committee: [
             { id: 'C_RETRY2_001', professorId: 'P002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과', assignedDate: '2026-10-02' },
-            { id: 'C_RETRY2_002', professorId: 'P003', professorName: '김교수', role: 'member', department: '인공지능학과', assignedDate: '2026-10-02' },
+            { id: 'C_RETRY2_002', professorId: 'P001', professorName: '박교수', role: 'member', department: '컴퓨터공학과', assignedDate: '2026-10-02' },
             { id: 'C_RETRY2_003', professorId: 'P004', professorName: '정교수', role: 'member', department: '소프트웨어학과', assignedDate: '2026-10-02' }
         ],
 
@@ -1813,7 +1813,7 @@ const REVIEW_EVALUATIONS = [
         status: '제출완료',
         submittedAt: '2025-11-03 09:15:00'
     },
-    // RA_TEST_CHAIR (재심테스트 - 본심사) - 위원 평가 완료, 위원장 대기
+    // RA_TEST_CHAIR (판정테스트 - 본심사) - 위원 평가 완료, 위원장 대기
     {
         id: 'EVAL_TEST_001',
         assignmentId: 'RA_TEST_CHAIR',
@@ -1911,6 +1911,76 @@ const REVIEW_EVALUATIONS = [
 
         status: '제출완료',
         submittedAt: '2025-11-26 10:15:00'
+    },
+    // ===== 재심사 목업 (2026-10-07): 홍길동 예비심사 1차(불합격) 평가 2건 · 2차(진행 중) 평가 1건 =====
+    {
+        id: 'EVAL_RETRY_001',
+        assignmentId: 'RA_RETRY_001',
+        committeeId: 'C_RETRY1_002',
+        professorId: 'P001',
+        professorName: '박교수',
+        role: 'member',
+        scores: [
+            { categoryId: 'CAT101', categoryName: '연구 진행의 충실성', score: 6, maxScore: 10, weight: 30, comment: '계획 대비 진행이 미흡함' },
+            { categoryId: 'CAT102', categoryName: '연구 방법의 적절성', score: 5, maxScore: 10, weight: 25, comment: '연구 문제를 검증하기에 방법론이 부족함' },
+            { categoryId: 'CAT103', categoryName: '결과 분석의 타당성', score: 6, maxScore: 10, weight: 25, comment: '데이터 신뢰성 근거가 부족함' },
+            { categoryId: 'CAT104', categoryName: '논문 작성의 완성도', score: 7, maxScore: 10, weight: 20, comment: '서술 구성은 무난함' }
+        ],
+        totalScore: 60,
+        overallComment: {
+            strengths: '연구 주제의 필요성은 분명함',
+            improvements: '실험 데이터 수집 설계를 전면 보완해야 함',
+            conclusion: '불합격 의견 — 데이터 수집 설계 보완 후 재심사 필요'
+        },
+        files: [],
+        status: '제출완료',
+        submittedAt: '2026-05-28 15:20:00'
+    },
+    {
+        id: 'EVAL_RETRY_002',
+        assignmentId: 'RA_RETRY_001',
+        committeeId: 'C_RETRY1_003',
+        professorId: 'P004',
+        professorName: '정교수',
+        role: 'member',
+        scores: [
+            { categoryId: 'CAT101', categoryName: '연구 진행의 충실성', score: 6, maxScore: 10, weight: 30, comment: '진행 내용이 계획서와 일부 불일치' },
+            { categoryId: 'CAT102', categoryName: '연구 방법의 적절성', score: 6, maxScore: 10, weight: 25, comment: '비교 실험 설계가 부족함' },
+            { categoryId: 'CAT103', categoryName: '결과 분석의 타당성', score: 6, maxScore: 10, weight: 25, comment: '통계적 검증이 없음' },
+            { categoryId: 'CAT104', categoryName: '논문 작성의 완성도', score: 7, maxScore: 10, weight: 20, comment: '형식은 갖춤' }
+        ],
+        totalScore: 62,
+        overallComment: {
+            strengths: '선행연구 정리가 충실함',
+            improvements: '비교 실험과 통계 검증 추가 필요',
+            conclusion: '불합격 의견 — 방법론 보완 필요'
+        },
+        files: [],
+        status: '제출완료',
+        submittedAt: '2026-05-30 11:05:00'
+    },
+    {
+        id: 'EVAL_RETRY_003',
+        assignmentId: 'RA_RETRY_002',
+        committeeId: 'C_RETRY2_002',
+        professorId: 'P001',
+        professorName: '박교수',
+        role: 'member',
+        scores: [
+            { categoryId: 'CAT101', categoryName: '연구 진행의 충실성', score: 8, maxScore: 10, weight: 30, comment: '1차 지적 사항을 반영함' },
+            { categoryId: 'CAT102', categoryName: '연구 방법의 적절성', score: 8, maxScore: 10, weight: 25, comment: '데이터 수집 설계가 보완됨' },
+            { categoryId: 'CAT103', categoryName: '결과 분석의 타당성', score: 7, maxScore: 10, weight: 25, comment: '통계 검증이 추가됨' },
+            { categoryId: 'CAT104', categoryName: '논문 작성의 완성도', score: 8, maxScore: 10, weight: 20, comment: '구성이 개선됨' }
+        ],
+        totalScore: 78,
+        overallComment: {
+            strengths: '1차 지적 사항을 충실히 반영함',
+            improvements: '결과 해석을 일부 보완하면 좋겠음',
+            conclusion: '합격 의견'
+        },
+        files: [],
+        status: '제출완료',
+        submittedAt: '2026-10-05 16:40:00'
     }
 ];
 
@@ -2134,7 +2204,7 @@ const REVIEW_RESULTS = [
         systemDecisionReason: '평균 점수 75.5점으로 합격 기준 75점 이상',
 
         chairDecision: '조건부합격',
-        chairComment: '연구 방법론 보완 필요. 지적 사항 수정 후 재심사 요청',
+        chairComment: '연구 방법론 보완 필요. 지적 사항 수정 후 보완 제출 요청',
         chairDecidedAt: '2025-11-18 14:00:00',
         chairDecidedBy: 'P003',
 
@@ -2193,7 +2263,7 @@ const REVIEW_RESULTS = [
     {
         id: 'RESULT_RETRY_001',
         assignmentId: 'RA_RETRY_001',
-        evaluations: [],
+        evaluations: ['EVAL_RETRY_001', 'EVAL_RETRY_002'],
         averageScore: 61.0,
         systemDecision: '불합격',
         systemDecisionReason: '평균 점수 61.0점으로 합격 기준 미달',
@@ -2225,7 +2295,9 @@ const ReviewAttempt = {
     // 심사결과: 위원장 최종결과가 있으면 결과, 없으면 평가 진행상태
     resultHtml(assignment) {
         const result = this.getResult(assignment);
-        const decision = result && result.finalDecision;
+        // 일부 Mock은 영문 코드(pass/conditional/fail)로 저장되어 있어 한글로 변환
+        const codeMap = { pass: '합격', conditional: '조건부합격', fail: '불합격' };
+        const decision = result && result.finalDecision && (codeMap[result.finalDecision] || result.finalDecision);
         if (decision) {
             const color = { '합격': 'text-green-700', '조건부합격': 'text-yellow-700', '불합격': 'text-red-700' }[decision] || 'text-gray-700';
             let html = `<span class="font-semibold ${color}">${decision}</span>`;
