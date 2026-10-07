@@ -167,3 +167,15 @@ def test_07_no_console_errors(driver):
                "exam-schedule-professor-readonly.js", "professor-dashboard.js", "exam-schedule-data.js")
     errors = [l["message"] for l in logs if l["level"] == "SEVERE" and any(t in l["message"] for t in targets)]
     assert not errors, errors
+
+
+def test_08_deeplink(driver):
+    """목업 딥링크: 학위논문심사 상세(위원장) · 심사일정 '전체' 바로 열기"""
+    driver.get(URL + "?screen=review&detail=RA_RETRY_002&view=chair")
+    time.sleep(2)
+    text = driver.find_element(By.CSS_SELECTOR, "#review-detail-screen #review-detail-content").text
+    assert "이전 차수 이력" in text
+    driver.get(URL + "?screen=exam-schedule&year=all")
+    time.sleep(2)
+    rows = driver.find_element(By.ID, "exam-schedule-content").text
+    assert "홍길동" in rows

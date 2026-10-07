@@ -120,3 +120,13 @@ def test_06_no_console_errors(driver):
                "admin_main.js", "exam-schedule.js", "exam-schedule-data.js", "mockData.js")
     errors = [l["message"] for l in logs if l["level"] == "SEVERE" and any(t in l["message"] for t in targets)]
     assert not errors, errors
+
+
+def test_07_deeplink(driver):
+    """목업 딥링크: 심사위원등록 · 심사일정(전체) 화면 바로 열기"""
+    driver.get(URL + "?screen=committeeAssignment")
+    time.sleep(2.5)
+    assert "배정 불가" in driver.find_element(By.ID, "committee-assignment-content").text
+    driver.get(URL + "?screen=scheduleManagement&year=all")
+    time.sleep(2.5)
+    assert "홍길동" in driver.find_element(By.ID, "schedule-management-content").text

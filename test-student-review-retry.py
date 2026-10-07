@@ -214,3 +214,14 @@ def test_10_no_console_errors(driver):
                "student-exam-schedule.js", "dashboard.js")
     errors = [l["message"] for l in logs if l["level"] == "SEVERE" and any(t in l["message"] for t in targets)]
     assert not errors, errors
+
+
+def test_11_deeplink(driver):
+    """목업 딥링크: ?screen=…&scenario=…&history=… 로 화면·시나리오·제출 기록 팝업이 바로 열림"""
+    driver.get(URL + "?screen=thesis-submission&scenario=in-progress&history=prelim")
+    time.sleep(1.5)
+    assert driver.find_element(By.ID, "thesis-submission-screen").is_displayed()
+    assert "예비심사 제출 기록" in driver.find_element(By.ID, "stage-history-modal").text
+    driver.get(URL + "?screen=thesis-application&scenario=retry-wait")
+    time.sleep(1.5)
+    assert "다음 학기(2027-1학기) 신청" in stage_row(driver, "thesis-application-content", "예비심사").text
