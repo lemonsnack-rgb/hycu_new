@@ -1,6 +1,7 @@
 /**
  * 재심사 · 제출취소 목업 시나리오 (학생 화면 전용)
- * 2026-10-06 작성 / 2026-10-07 번호 체계 변경 — docs/재심사_제출취소_영향도분석_20261006.md 0-5 기준
+ * 2026-10-06 작성 / 2026-10-07 재정비 — docs/재심사_목업_재정비_계획_20261007.md 기준
+ *   (기존 목업의 신청상태 '미신청/신청완료' + 요구서 '재심사 진행'만 사용, 버튼은 기존 [관리]/[철회])
  *
  * - 단계별 심사신청(thesis-application.js)과 단계별 심사자료제출(thesis-submission.js)이
  *   같은 시나리오 상태를 공유함 (페이지 내 메모리, 새로고침 시 초기화)
@@ -27,18 +28,13 @@
         application: { start: '2026-09-01', end: '2026-10-31' },
         withdrawal: { start: '2026-09-01', end: '2026-10-20' }
     };
-    const PERIOD_NEXT = {
-        semester: '2027-1학기',
-        application: { start: '2027-03-02', end: '2027-03-31' },
-        withdrawal: { start: '2027-03-02', end: '2027-03-20' }
-    };
 
+    // key는 딥링크 호환을 위해 유지
     const SCENARIOS = [
-        { key: 'retry-open', label: '① 재신청 가능', desc: '예비심사 불합격 → 신청기간이 열려 재신청 가능' },
-        { key: 'retry-wait', label: '② 다음 학기 대기', desc: '예비심사 불합격 → 신청기간이 아니어서 다음 학기 신청 대기' },
-        { key: 'not-started', label: '③ 심사 미진행', desc: '예비심사 재신청·제출 완료, 평가한 심사위원 없음 → 철회·제출취소 가능' },
-        { key: 'in-progress', label: '④ 심사 진행 중', desc: '예비심사 재신청·제출 완료, 심사위원 1명 평가 완료 → 철회·제출취소 불가' },
-        { key: 'conditional', label: '⑤ 조건부합격 후 보완 제출', desc: '본심사 조건부합격 → 신청 없이 같은 학기에 보완 자료 제출' }
+        { key: 'retry-open', label: '① 재심사 진행', desc: '예비심사 불합격 → 재심사 진행, [관리]에서 다시 신청' },
+        { key: 'not-started', label: '② 심사 미진행', desc: '예비심사 다시 신청·2차 제출 완료, 평가한 심사위원 없음 → 철회·제출취소 가능' },
+        { key: 'in-progress', label: '③ 심사 진행 중', desc: '예비심사 다시 신청·2차 제출 완료, 심사위원 1명 평가 완료 → 철회·제출취소 불가' },
+        { key: 'conditional', label: '④ 조건부합격 후 보완 제출', desc: '본심사 조건부합격 → 신청 없이 보완 자료 제출' }
     ];
 
     let seq = 1;
@@ -135,16 +131,9 @@
         stage('plan').applications.push(application('plan', 1, '2025-09-05', '2025-2학기'));
         submissions.push(planPassed());
 
-        if (key === 'retry-open' || key === 'retry-wait') {
+        if (key === 'retry-open') {
             stage('prelim').applications.push(application('prelim', 1, '2026-03-05', '2026-1학기'));
             submissions.push(prelimFailed());
-            if (key === 'retry-wait') {
-                const s = stage('prelim');
-                s.semester = PERIOD_NEXT.semester;
-                s.applicationPeriod = { ...PERIOD_NEXT.application };
-                s.withdrawalPeriod = { ...PERIOD_NEXT.withdrawal };
-                s.applicationOpen = false;
-            }
         } else if (key === 'not-started' || key === 'in-progress') {
             stage('prelim').applications.push(application('prelim', 1, '2026-03-05', '2026-1학기'));
             stage('prelim').applications.push(application('prelim', 2, '2026-09-03', '2026-2학기'));
@@ -215,10 +204,6 @@
 
         load(key) {
             state = buildScenario(key);
-            // 대시보드 단계 진행 배지가 선택한 시나리오를 따르도록 다시 그림
-            if (typeof window.renderVerticalJourney === 'function' && document.getElementById('vertical-journey')) {
-                window.renderVerticalJourney();
-            }
             return state;
         },
 
@@ -251,18 +236,6 @@
             return this.getState().submissions.find(r => r.id === id) || null;
         },
 
-        attemptLabel(rec) {
-            return rec ? `${rec.attemptNumber}차 제출` : '-';
-        },
-
-        resultText(result) {
-            return { pass: '합격', fail: '불합격', conditional: '조건부합격' }[result] || '-';
-        },
-
-        resultColor(result) {
-            return { pass: 'text-green-700', fail: 'text-red-700', conditional: 'text-yellow-700' }[result] || 'text-gray-600';
-        },
-
         // 현재 유효한 신청 (철회되지 않은 마지막 신청)
         getCurrentApplication(stageId) {
             const apps = this.getStage(stageId).applications.filter(a => a.status === 'submitted');
@@ -273,45 +246,18 @@
             return app ? this.getState().submissions.filter(r => r.applicationId === app.id) : [];
         },
 
-        isStagePassed(stageId) {
-            const latest = this.getLatest(stageId);
-            return !!(latest && latest.reviewResult === 'pass');
-        },
-
         /**
-         * 심사신청 화면용 단계 상태
-         * code: passed | conditional | reviewing | applied | retry | locked | none
+         * 논문신청 화면용 신청상태 (기존 '미신청/신청완료' + 요구서 JXLB-1 '재심사 진행')
+         * code: retry(재심사 진행 — 불합격 확정 후 다시 신청 전) | applied(신청완료) | none(미신청)
          */
         getStageStatus(stageId) {
-            const stage = this.getStage(stageId);
             const latest = this.getLatest(stageId);
-            const app = this.getCurrentApplication(stageId);
-
-            if (latest && latest.reviewResult === 'pass') {
-                return { code: 'passed', label: '합격' };
-            }
-
-            // 불합격 확정 → 재신청 대상 (이전 신청은 종료)
             if (latest && latest.reviewResult === 'fail') {
-                return { code: 'retry', label: '재심사 대상' };
+                return { code: 'retry', label: '재심사 진행' };
             }
-
-            if (app) {
-                const appRecords = this.getApplicationRecords(app);
-                if (appRecords.some(r => r.reviewResult === 'conditional')) {
-                    return { code: 'conditional', label: '조건부합격' };
-                }
-                return appRecords.some(r => r.evaluatedCount > 0)
-                    ? { code: 'reviewing', label: '심사중' }
-                    : { code: 'applied', label: '신청완료' };
-            }
-
-            const prev = this.getStages().find(s => s.order === stage.order - 1);
-            if (prev && !this.isStagePassed(prev.id)) {
-                return { code: 'locked', label: '선행단계 미완료' };
-            }
-
-            return { code: 'none', label: '미신청' };
+            return this.getCurrentApplication(stageId)
+                ? { code: 'applied', label: '신청완료' }
+                : { code: 'none', label: '미신청' };
         },
 
         // 심사신청 (최초 또는 재신청) → 다음 번호의 제출 기록 생성
@@ -327,33 +273,28 @@
                 semester: stage.semester,
                 submissionPeriod: { start: '2026-09-15', end: '2026-10-31' }
             });
-            if (title) rec.pendingTitle = title;
             this.getState().submissions.push(rec);
             return rec.attemptNumber;
         },
 
-        // 철회 가능 여부: 결과 확정 전 + 평가한 심사위원 0명
+        // 철회 가능 여부 (JXLB-2): 결과 확정(100% 완료) 또는 심사 진행 중(1명 이상 평가)이면 불가 — 요구서 문구 사용
         checkWithdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
             const appRecords = this.getApplicationRecords(app);
-            if (!app) return { ok: false, reason: '철회할 신청 내역이 없습니다.' };
-            if (appRecords.some(r => r.reviewResult)) {
-                return { ok: false, reason: '심사 결과가 확정된 단계는 철회할 수 없습니다.' };
-            }
-            if (appRecords.some(r => r.evaluatedCount > 0)) {
+            if (appRecords.some(r => r.reviewResult || r.evaluatedCount > 0)) {
                 return { ok: false, reason: '심사가 진행중이므로 철회할 수 없습니다.' };
             }
             return { ok: true };
         },
 
-        // 철회: 신청을 '철회'로 기록, 결과 미확정 제출 기록 삭제 (결과 확정 기록은 보존)
+        // 철회: 신청과 해당 신청의 제출 자료 삭제 (기존 목업처럼 신청 내역 삭제 → 미신청 또는 재심사 진행)
         withdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
             if (!app) return;
-            app.status = 'withdrawn';
-            app.withdrawnAt = nowText();
+            const stage = this.getStage(stageId);
+            stage.applications = stage.applications.filter(a => a !== app);
             const s = this.getState();
-            s.submissions = s.submissions.filter(r => !(r.applicationId === app.id && !r.reviewResult));
+            s.submissions = s.submissions.filter(r => r.applicationId !== app.id);
         },
 
         // 제출취소 가능 여부: 제출완료 + 결과 미확정 + 평가한 심사위원 0명 (기간 조건은 정책 미정으로 제외)

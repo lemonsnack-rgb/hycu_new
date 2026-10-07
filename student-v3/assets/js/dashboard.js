@@ -651,9 +651,9 @@ const studentStageProgress = [
         withdrawalPeriod: '2025-05-10 ~ 2025-05-20',
         status: 'in-progress',
         subStages: [
-            { id: 'SS005', name: '예비심사 논문 제출', status: 'completed',
+            { id: 'SS005', name: '1차 예비심사', status: 'completed',
               submissionPeriod: '2025-05-10 ~ 2025-05-25', reviewPeriod: '2025-05-26 ~ 2025-05-31' },
-            { id: 'SS006', name: '예비심사 발표 심사', status: 'current',
+            { id: 'SS006', name: '2차 예비심사', status: 'current',
               submissionPeriod: '2025-06-01 ~ 2025-06-15', reviewPeriod: '2025-06-16 ~ 2025-06-25' }
         ]
     },
@@ -664,9 +664,9 @@ const studentStageProgress = [
         withdrawalPeriod: '2025-08-20 ~ 2025-08-30',
         status: 'upcoming',
         subStages: [
-            { id: 'SS007', name: '본심사 논문 제출', status: 'upcoming',
+            { id: 'SS007', name: '1차 본심사', status: 'upcoming',
               submissionPeriod: '2025-09-01 ~ 2025-09-15', reviewPeriod: '2025-09-20 ~ 2025-10-05' },
-            { id: 'SS008', name: '본심사 발표 심사', status: 'upcoming',
+            { id: 'SS008', name: '2차 본심사', status: 'upcoming',
               submissionPeriod: '2025-10-10 ~ 2025-10-20', reviewPeriod: '2025-10-25 ~ 2025-11-05' }
         ]
     }
@@ -786,19 +786,6 @@ function renderRequirementsChips() {
  * - 날짜 위치 통일 (right: 0 고정)
  * - 세부단계 폰트 14px
  */
-// 재심사 목업 (2026-10-07): 심사신청·자료제출 화면의 시연 시나리오(ReviewScenario)에 맞춘 배지 문구
-// - 불합격 확정 후 재신청 전: '재심사 대상' / 불합격 후 재신청하여 진행 중: '재심사 진행'
-function getScenarioReReviewLabel(basicStageName) {
-    if (!window.ReviewScenario) return null;
-    const stage = ReviewScenario.getStages().find(s => s.name === basicStageName);
-    if (!stage) return null;
-    const status = ReviewScenario.getStageStatus(stage.id);
-    if (status.code === 'retry') return '재심사 대상';
-    const hadFail = ReviewScenario.getRecords(stage.id).some(r => r.reviewResult === 'fail');
-    if (hadFail && (status.code === 'applied' || status.code === 'reviewing')) return '재심사 진행';
-    return null;
-}
-
 function renderVerticalJourney() {
     const container = document.getElementById('vertical-journey');
     if (!container) return;
@@ -820,11 +807,8 @@ function renderVerticalJourney() {
                 ? '<div style="width: 28px; height: 28px; border-radius: 6px; background: #0288D1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: white;"></div></div>'
                 : '<div style="width: 28px; height: 28px; border-radius: 6px; background: #F5F5F5; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: #BDBDBD;"></div></div>';
 
-        // 기본단계 상태 배지 (재심사 목업: 시연 시나리오 기준 '재심사 대상' / '재심사 진행')
-        const reReviewLabel = getScenarioReReviewLabel(stage.basicStageName);
-        const basicBadge = reReviewLabel
-            ? `<span style="padding: 3px 12px; background: #FDECEA; color: #C62828; border-radius: 4px; font-size: 12px; font-weight: 600;">${reReviewLabel}</span>`
-            : isCompleted
+        // 기본단계 상태 배지
+        const basicBadge = isCompleted
             ? '<span style="padding: 3px 12px; background: #E8F5E9; color: #2E7D32; border-radius: 4px; font-size: 12px; font-weight: 600;">완료</span>'
             : isCurrent
                 ? '<span style="padding: 3px 12px; background: #E3F2FD; color: #0288D1; border-radius: 4px; font-size: 12px; font-weight: 600;">진행 중</span>'

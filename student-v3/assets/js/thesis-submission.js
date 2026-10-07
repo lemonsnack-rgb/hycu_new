@@ -8,7 +8,7 @@ let thesisCurrentView = 'list'; // list | submit | detail
 let thesisCurrentSubmissionId = null;
 
 // 제출 데이터: 재심사·제출취소 목업 시나리오(review-scenario-data.js)의 제출 기록
-// (제출 번호 = 기본단계 안에서 제출할 때마다 1씩 증가 — 조건부합격 보완 제출, 불합격 후 재신청 제출 모두 포함)
+// (제출 번호 'N차 제출' = 기본단계 안에서 제출할 때마다 1씩 증가)
 function getThesisSubmissions() {
     return ReviewScenario.getState().submissions;
 }
@@ -109,10 +109,6 @@ function setupThesisEventDelegation() {
                 e.preventDefault();
                 e.stopPropagation();
                 cancelThesisSubmission(parseInt(id));
-            } else if (action === 'show-history') {
-                e.preventDefault();
-                e.stopPropagation();
-                showStageHistoryModal(target.getAttribute('data-stage'));
             } else {
                 console.log('알 수 없는 버튼 클릭, action:', action, 'target:', target);
             }
@@ -180,7 +176,12 @@ function getLatestSubmissionPerStage(allSubmissions) {
 
 // 목록 화면
 function renderThesisListScreen() {
-    const submissions = getLatestSubmissionPerStage(getThesisSubmissions());
+    // 구 이력 상시 조회(JXLB-2): 지난 제출도 목록에 그대로 표시하고 기존 [보기]·[총평 보기]로 조회
+    const stageOrder = { plan: 1, prelim: 2, final: 3 };
+    const submissions = getThesisSubmissions()
+        .filter(sub => sub.evaluationFormRegistered)
+        .slice()
+        .sort((a, b) => (stageOrder[a.stage] || 9) - (stageOrder[b.stage] || 9) || a.attemptNumber - b.attemptNumber);
 
     return `
         ${ReviewScenario.renderBar('renderThesisScreen')}
@@ -230,51 +231,41 @@ function renderThesisListRow(submission, index) {
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
 
-    // 제출구분: 제출 번호 (예: 1차 제출 / 2차 제출)
-    const submissionType = ReviewScenario.attemptLabel(submission);
+    // 제출구분 (신규 추가)
+    const submissionType = `${submission.attemptNumber}차 제출`;
 
-    // 제출 상태
+    // 상태 텍스트 (재심도 미제출로 표시)
     let statusText = '미제출';
     if (submission.status === 'submitted') {
         statusText = '제출완료';
     }
 
-    // 심사 결과 텍스트 (결과 전이면 평가 진행 여부 표시)
+    // 심사 결과 텍스트
     let resultText = '-';
-    if (submission.reviewResult) {
-        resultText = `<span class="font-medium ${ReviewScenario.resultColor(submission.reviewResult)}">${ReviewScenario.resultText(submission.reviewResult)}</span>`;
-        if (submission.reviewResult === 'fail') {
-            resultText += '<div class="text-xs text-gray-500">논문신청에서 재신청</div>';
-        }
-    } else if (submission.status === 'submitted') {
-        resultText = submission.evaluatedCount > 0 ? '심사중' : '심사 대기';
+    if (submission.reviewResult === 'pass') {
+        resultText = '합격';
+    } else if (submission.reviewResult === 'fail') {
+        resultText = '불합격';
+    } else if (submission.reviewResult === 'conditional') {
+        resultText = '조건부합격';
     }
 
-    // 액션 버튼
-    const btnClass = 'text-sm text-[#6A0028] hover:text-[#8A0034] font-medium';
+    // 액션 버튼 (재심 구분 제거)
     let actionButton;
     if (submission.status === 'submitted') {
-        actionButton = `<button data-action="view" data-id="${submission.id}" class="${btnClass}">보기</button>`;
-        // 제출취소: 결과 확정 전 + 평가한 심사위원 0명일 때만 가능
+        actionButton = `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`;
+        // 제출취소: 결과 확정 전 제출 건에 표시, 심사가 진행 중이면 누를 때 안내 (철회와 같은 방식)
         if (!submission.reviewResult) {
-            const cancelCheck = ReviewScenario.checkCancelSubmission(submission);
-            actionButton += cancelCheck.ok
-                ? `<button data-action="cancel-submission" data-id="${submission.id}" class="ml-3 text-sm text-red-600 hover:text-red-800 font-medium">제출취소</button>`
-                : `<button type="button" disabled title="${cancelCheck.reason}" class="ml-3 text-sm text-gray-300 font-medium cursor-not-allowed">제출취소</button>`;
+            actionButton += `<button data-action="cancel-submission" data-id="${submission.id}" class="ml-3 text-sm text-red-600 hover:text-red-800 font-medium">제출취소</button>`;
         }
-    } else {  // not_submitted
-        actionButton = `<button data-action="submit" data-id="${submission.id}" class="${btnClass}">제출</button>`;
+    } else {  // not_submitted 또는 resubmit
+        actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
     }
-
-    // 기본단계명 클릭 → 제출 기록 팝업 (기간과 무관하게 조회)
-    const stageLink = `<button type="button" data-action="show-history" data-stage="${submission.stage}"
-                               title="제출 기록 보기"
-                               class="text-[#6A0028] underline underline-offset-2 font-medium">${submission.basicStageName || stageDisplay || '-'}</button>`;
 
     return `
         <tr class="hover:bg-gray-50">
             <td class="px-6 py-3 text-center text-sm text-gray-900">${index + 1}</td>
-            <td class="px-6 py-3 text-center text-sm text-gray-900">${stageLink}</td>
+            <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.basicStageName || stageDisplay || '-'}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${submission.subStageName || '-'}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900" style="white-space: nowrap;">${periodDisplay}</td>
             <td class="px-6 py-3 text-center text-sm text-gray-900">${submissionType}</td>
@@ -318,12 +309,11 @@ function renderThesisSubmissionForm() {
     // 조건부합격 후 보완 제출: 직전 제출 내역을 함께 표시
     const isResubmit = submission.status !== 'submitted' && !!submission.originalSubmission;
     const isEdit = submission.status === 'submitted';
-    // 신규 제출 시 심사신청에서 입력한 논문 제목을 기본값으로 사용
-    const data = isEdit ? submission.submittedData
-        : { title: submission.pendingTitle || (submission.originalSubmission && submission.originalSubmission.title) || '' };
+    const data = isEdit ? submission.submittedData : {};
 
-    // 제출 번호 표기 (횟수 제한 없음)
-    const stageDisplay = `${submission.stageName} (${ReviewScenario.attemptLabel(submission)})`;
+    const stageDisplay = submission.attemptNumber > 1
+        ? `${submission.stageName} (${submission.attemptNumber}차)`
+        : submission.stageName;
 
     let html = `
         <div class="mb-4">
@@ -360,7 +350,7 @@ function renderThesisSubmissionForm() {
                     <!-- 세부단계 -->
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">세부단계</label>
-                        <input type="text" value="${submission.subStageName || '-'} (${orig.attemptNumber || submission.attemptNumber - 1}차 제출)" readonly
+                        <input type="text" value="${submission.subStageName || '-'} (${orig.attemptNumber || submission.attemptNumber - 1}차)" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
                     <!-- 논문 제목 -->
@@ -398,7 +388,7 @@ function renderThesisSubmissionForm() {
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">평가 결과</label>
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-medium ${ReviewScenario.resultColor(orig.reviewResult || 'conditional')}">${ReviewScenario.resultText(orig.reviewResult || 'conditional')}</span>
+                            <span class="text-sm font-medium text-yellow-700">조건부합격</span>
                             <button type="button" data-action="show-review-comments" data-comments="${(orig.reviewComments || '').replace(/"/g, '&quot;')}"
                                     class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
                                 총평 보기
@@ -413,7 +403,7 @@ function renderThesisSubmissionForm() {
     // 제출 폼
     html += `
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">논문 제출 정보 <span class="ml-2 text-sm font-medium text-[#6A0028]">${ReviewScenario.attemptLabel(submission)}</span></h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">논문 제출 정보</h3>
             <div class="space-y-4">
                 <!-- 지도교수명 출력 (읽기 전용) -->
                 <div class="flex items-center gap-4">
@@ -497,17 +487,19 @@ function renderThesisDetailView() {
     if (!submission || submission.status !== 'submitted') return '';
 
     const data = submission.submittedData;
-    const stageDisplay = `${submission.stageName} (${ReviewScenario.attemptLabel(submission)})`;
+    const stageDisplay = submission.attemptNumber > 1
+        ? `${submission.stageName} (${submission.attemptNumber}차)`
+        : submission.stageName;
 
     // 평가 결과 텍스트 계산
-    let reviewResultText = ReviewScenario.resultText(submission.reviewResult);
-    if (!submission.reviewResult) {
-        reviewResultText = submission.evaluatedCount > 0 ? '심사중' : '심사 대기';
+    let reviewResultText = '-';
+    if (submission.reviewResult === 'pass') {
+        reviewResultText = '합격';
+    } else if (submission.reviewResult === 'fail') {
+        reviewResultText = '불합격';
+    } else if (submission.reviewResult === 'conditional') {
+        reviewResultText = '조건부합격';
     }
-    const reviewResultColor = ReviewScenario.resultColor(submission.reviewResult);
-
-    // 수정: 결과 확정 전 + 평가한 심사위원 0명일 때만 가능
-    const canEdit = ReviewScenario.checkCancelSubmission(submission).ok;
 
     return `
         <div class="mb-4">
@@ -521,12 +513,11 @@ function renderThesisDetailView() {
 
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">논문 제출 정보 <span class="ml-2 text-sm font-medium text-[#6A0028]">${ReviewScenario.attemptLabel(submission)}</span></h3>
-                ${canEdit ? `
+                <h3 class="text-lg font-semibold text-gray-800">논문 제출 정보</h3>
                 <button data-action="edit-thesis" data-id="${submission.id}"
                         class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
                     수정
-                </button>` : ''}
+                </button>
             </div>
 
             <div class="space-y-4">
@@ -590,13 +581,12 @@ function renderThesisDetailView() {
                 <div class="flex items-center gap-4">
                     <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">평가 결과</label>
                     <div class="flex items-center gap-2">
-                        <span class="text-sm font-medium ${reviewResultColor}">${reviewResultText}</span>
-                        ${submission.reviewComments ? `
+                        <span class="text-sm font-medium text-green-700">${reviewResultText}</span>
                         <button type="button" data-action="show-review-comments"
                                 data-comments="${(submission.reviewComments || '').replace(/"/g, '&quot;')}"
                                 class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
                             총평 보기
-                        </button>` : ''}
+                        </button>
                     </div>
                 </div>
             </div>
@@ -702,78 +692,6 @@ function cancelThesisSubmission(id) {
     backToThesisList();
 }
 
-// ==================== 제출 기록 팝업 ====================
-// 기본단계명 클릭 시 1차 제출 / 2차 제출 … 기록을 시간순으로 표시 (기간과 무관하게 조회)
-function showStageHistoryModal(stageId) {
-    const records = ReviewScenario.getRecords(stageId);
-    if (records.length === 0) return;
-
-    const stageName = records[0].basicStageName || records[0].stageName;
-    const fileText = (name, size) => name ? `${name} (${(size / 1024 / 1024).toFixed(2)} MB)` : '-';
-
-    const cards = records.map(rec => {
-        const d = rec.submittedData;
-        let statusText = '미제출';
-        if (rec.status === 'submitted') statusText = '제출완료';
-
-        let resultHtml = '<span class="text-gray-500">-</span>';
-        if (rec.reviewResult) {
-            resultHtml = `<span class="font-semibold ${ReviewScenario.resultColor(rec.reviewResult)}">${ReviewScenario.resultText(rec.reviewResult)}</span>`
-                + (rec.decidedAt ? `<span class="ml-2 text-xs text-gray-500">${rec.decidedAt}</span>` : '');
-        } else if (rec.status === 'submitted') {
-            resultHtml = `<span class="text-gray-600">${rec.evaluatedCount > 0 ? '심사중' : '심사 대기'}</span>`;
-        }
-
-        return `
-            <div class="border border-gray-200 rounded-lg p-4 ${rec.reviewResult === 'fail' ? 'bg-red-50' : 'bg-white'}">
-                <div class="flex items-center justify-between mb-3">
-                    <div class="flex items-center gap-2">
-                        <span class="px-2 py-0.5 rounded text-xs font-semibold bg-[#6A0028] text-white">${ReviewScenario.attemptLabel(rec)}</span>
-                        <span class="text-sm text-gray-600">${rec.semester || ''}</span>
-                    </div>
-                    <span class="text-xs text-gray-500">${statusText}</span>
-                </div>
-                <dl class="grid grid-cols-[90px_1fr] gap-y-1.5 text-sm">
-                    <dt class="text-gray-500">제출일시</dt><dd class="text-gray-900">${d ? d.submittedAt : '-'}</dd>
-                    <dt class="text-gray-500">논문파일</dt><dd class="text-gray-900">${d ? fileText(d.thesisFile, d.thesisFileSize) : '-'}</dd>
-                    <dt class="text-gray-500">기타파일</dt><dd class="text-gray-900">${d ? fileText(d.otherFile, d.otherFileSize) : '-'}</dd>
-                    <dt class="text-gray-500">심사결과</dt><dd>${resultHtml}</dd>
-                </dl>
-                ${rec.reviewComments ? `
-                <div class="mt-3 p-3 rounded-md bg-gray-50 border border-gray-200">
-                    <div class="text-xs font-semibold text-gray-600 mb-1">심사위원장 총평</div>
-                    <p class="text-sm text-gray-900 whitespace-pre-wrap">${rec.reviewComments}</p>
-                </div>` : ''}
-            </div>
-        `;
-    }).join('');
-
-    const modal = document.createElement('div');
-    modal.id = 'stage-history-modal';
-    modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
-    modal.innerHTML = `
-        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col">
-            <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-lg font-semibold text-gray-800">${stageName} 제출 기록</h3>
-                <button data-action="close-history" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
-            </div>
-            <div class="p-5 space-y-3 overflow-y-auto">
-                <p class="text-xs text-gray-500">조건부합격은 같은 학기에 심사신청 없이 보완 자료를 다시 제출하고, 불합격은 다음 학기에 심사신청부터 다시 진행합니다. 모든 제출은 순서대로 번호가 붙으며 이전 기록은 삭제되지 않고 보존됩니다.</p>
-                ${cards}
-            </div>
-            <div class="p-4 border-t flex justify-end">
-                <button data-action="close-history" class="px-4 py-2 bg-[#6A0028] text-white rounded-md hover:bg-[#8A0034]">닫기</button>
-            </div>
-        </div>
-    `;
-    modal.addEventListener('click', function (e) {
-        if (e.target === modal || e.target.getAttribute('data-action') === 'close-history') {
-            modal.remove();
-        }
-    });
-    document.body.appendChild(modal);
-}
-
 // 스타일 추가 (즉시 실행)
 (function() {
     const style = document.createElement('style');
@@ -865,4 +783,3 @@ window.saveThesisSubmission = saveThesisSubmission;
 window.showReviewCommentsModal = showReviewCommentsModal;
 window.renderThesisScreen = renderThesisScreen;
 window.cancelThesisSubmission = cancelThesisSubmission;
-window.showStageHistoryModal = showStageHistoryModal;
