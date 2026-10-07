@@ -650,6 +650,7 @@ const studentStageProgress = [
         applicationPeriod: '2025-05-10 ~ 2025-06-10',
         withdrawalPeriod: '2025-05-10 ~ 2025-05-20',
         status: 'in-progress',
+        reReview: true,   // 재심사 목업(2026-10-07): 이전 제출 불합격 후 재신청하여 진행 중
         subStages: [
             { id: 'SS005', name: '1차 예비심사', status: 'completed',
               submissionPeriod: '2025-05-10 ~ 2025-05-25', reviewPeriod: '2025-05-26 ~ 2025-05-31' },
@@ -807,8 +808,10 @@ function renderVerticalJourney() {
                 ? '<div style="width: 28px; height: 28px; border-radius: 6px; background: #0288D1; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: white;"></div></div>'
                 : '<div style="width: 28px; height: 28px; border-radius: 6px; background: #F5F5F5; border: 1px solid #E0E0E0; display: flex; align-items: center; justify-content: center; flex-shrink: 0;"><div style="width: 10px; height: 10px; border-radius: 50%; background: #BDBDBD;"></div></div>';
 
-        // 기본단계 상태 배지
-        const basicBadge = isCompleted
+        // 기본단계 상태 배지 (불합격 후 재신청하여 진행 중이면 '재심사 진행')
+        const basicBadge = stage.reReview && isCurrent
+            ? '<span style="padding: 3px 12px; background: #FDECEA; color: #C62828; border-radius: 4px; font-size: 12px; font-weight: 600;">재심사 진행</span>'
+            : isCompleted
             ? '<span style="padding: 3px 12px; background: #E8F5E9; color: #2E7D32; border-radius: 4px; font-size: 12px; font-weight: 600;">완료</span>'
             : isCurrent
                 ? '<span style="padding: 3px 12px; background: #E3F2FD; color: #0288D1; border-radius: 4px; font-size: 12px; font-weight: 600;">진행 중</span>'

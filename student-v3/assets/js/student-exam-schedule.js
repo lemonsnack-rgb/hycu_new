@@ -46,6 +46,7 @@ function renderStudentExamScheduleScreen() {
                                     <th>지도교수명</th>
                                     <th>기본단계</th>
                                     <th>세부단계</th>
+                                    <th>차수</th>
                                     <th>등록상태</th>
                                     <th>심사일정</th>
                                     <th>진행방식</th>
@@ -107,7 +108,7 @@ function renderStudentExamScheduleTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="16" class="px-6 py-8 text-center text-gray-500">
+                <td colspan="18" class="px-6 py-8 text-center text-gray-500">
                     등록된 심사 일정이 없습니다.
                 </td>
             </tr>
@@ -148,6 +149,7 @@ function renderStudentExamScheduleTable(data) {
                 <td class="px-4 py-3 text-sm text-gray-600 text-center">${item.advisorName || '-'}</td>
                 <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.basicStageName || item.stageName || '-'}</td>
                 <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.subStageName || '-'}</td>
+                <td class="px-4 py-3 text-sm text-gray-900 text-center">${item.attemptNo || 1}차</td>
                 <td class="px-4 py-3 text-sm text-gray-800 text-center">${statusText}</td>
                 <td class="px-4 py-3 text-sm text-gray-900 text-center">${scheduleText}</td>
                 <td class="px-4 py-3 text-sm text-center">${methodText}</td>

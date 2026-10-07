@@ -7,8 +7,8 @@
 let thesisCurrentView = 'list'; // list | submit | detail
 let thesisCurrentSubmissionId = null;
 
-// 제출 데이터: 재심사·제출취소 목업 시나리오(review-scenario-data.js)의 차수별 기록
-// (차수 = 불합격 시 증가, 재심N = 조건부합격 시 같은 차수 안에서 증가)
+// 제출 데이터: 재심사·제출취소 목업 시나리오(review-scenario-data.js)의 제출 기록
+// (제출 번호 = 기본단계 안에서 제출할 때마다 1씩 증가 — 조건부합격 보완 제출, 불합격 후 재신청 제출 모두 포함)
 function getThesisSubmissions() {
     return ReviewScenario.getState().submissions;
 }
@@ -157,7 +157,7 @@ function renderThesisScreen() {
 
 /**
  * 각 단계(stage)별로 가장 최신 제출(attemptNumber가 가장 큰 것)만 반환
- * 재심이 있어도 한 단계당 하나의 행만 표시하기 위함
+ * 여러 번 제출해도 한 단계당 하나의 행만 표시하기 위함
  */
 function getLatestSubmissionPerStage(allSubmissions) {
     const stageMap = new Map();
@@ -169,12 +169,8 @@ function getLatestSubmissionPerStage(allSubmissions) {
         const existing = stageMap.get(submission.stage);
 
         // 해당 stage의 submission이 없거나,
-        // 현재 submission의 차수(attemptNumber) → 재심 회차(retryNo)가 더 크면 업데이트
-        const isNewer = existing && (
-            submission.attemptNumber > existing.attemptNumber ||
-            (submission.attemptNumber === existing.attemptNumber && (submission.retryNo || 0) > (existing.retryNo || 0))
-        );
-        if (!existing || isNewer) {
+        // 현재 submission의 제출 번호(attemptNumber)가 더 크면 업데이트
+        if (!existing || submission.attemptNumber > existing.attemptNumber) {
             stageMap.set(submission.stage, submission);
         }
     });
@@ -234,15 +230,13 @@ function renderThesisListRow(submission, index) {
 
     const periodDisplay = `${submission.submissionPeriod.start} ~ ${submission.submissionPeriod.end}`;
 
-    // 제출구분: 차수 + 조건부합격 재심 회차 (예: 1차 / 1차 재심1 / 2차)
+    // 제출구분: 제출 번호 (예: 1차 제출 / 2차 제출)
     const submissionType = ReviewScenario.attemptLabel(submission);
 
     // 제출 상태
     let statusText = '미제출';
     if (submission.status === 'submitted') {
         statusText = '제출완료';
-    } else if (submission.status === 'resubmit') {
-        statusText = '재심 제출 대기';
     }
 
     // 심사 결과 텍스트 (결과 전이면 평가 진행 여부 표시)
@@ -265,13 +259,11 @@ function renderThesisListRow(submission, index) {
                 ? `<button data-action="cancel-submission" data-id="${submission.id}" class="ml-3 text-sm text-red-600 hover:text-red-800 font-medium">제출취소</button>`
                 : `<button type="button" disabled title="${cancelCheck.reason}" class="ml-3 text-sm text-gray-300 font-medium cursor-not-allowed">제출취소</button>`;
         }
-    } else if (submission.status === 'resubmit') {
-        actionButton = `<button data-action="submit" data-id="${submission.id}" class="${btnClass}">재심 제출</button>`;
     } else {  // not_submitted
         actionButton = `<button data-action="submit" data-id="${submission.id}" class="${btnClass}">제출</button>`;
     }
 
-    // 기본단계명 클릭 → 차수별 기록 팝업 (기간과 무관하게 조회)
+    // 기본단계명 클릭 → 제출 기록 팝업 (기간과 무관하게 조회)
     const stageLink = `<button type="button" data-action="show-history" data-stage="${submission.stage}"
                                class="text-[#6A0028] hover:underline font-medium">${submission.basicStageName || stageDisplay || '-'}</button>`;
 
@@ -319,12 +311,13 @@ function renderThesisSubmissionForm() {
     const submission = getThesisSubmissions().find(s => s.id === thesisCurrentSubmissionId);
     if (!submission) return '';
 
-    const isResubmit = submission.status === 'resubmit' && submission.originalSubmission;
+    // 조건부합격 후 보완 제출: 직전 제출 내역을 함께 표시
+    const isResubmit = submission.status !== 'submitted' && !!submission.originalSubmission;
     const isEdit = submission.status === 'submitted';
     // 신규 제출 시 심사신청에서 입력한 논문 제목을 기본값으로 사용
     const data = isEdit ? submission.submittedData : { title: submission.pendingTitle || '' };
 
-    // 차수·재심 회차 표기 (재심 횟수 제한 없음)
+    // 제출 번호 표기 (횟수 제한 없음)
     const stageDisplay = `${submission.stageName} (${ReviewScenario.attemptLabel(submission)})`;
 
     let html = `
@@ -338,7 +331,7 @@ function renderThesisSubmissionForm() {
         </div>
     `;
 
-    // 재심 제출인 경우: 기존 제출 내역 표시 (읽기 전용)
+    // 보완 제출인 경우: 직전 제출 내역 표시 (읽기 전용)
     if (isResubmit) {
         const orig = submission.originalSubmission;
         const hasComments = orig.reviewComments && orig.reviewComments.trim() !== '';
@@ -362,7 +355,7 @@ function renderThesisSubmissionForm() {
                     <!-- 세부단계 -->
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">세부단계</label>
-                        <input type="text" value="${submission.subStageName || '-'} (${submission.attemptNumber}차)" readonly
+                        <input type="text" value="${submission.subStageName || '-'} (${orig.attemptNumber || submission.attemptNumber - 1}차 제출)" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
                     <!-- 논문 제목 -->
@@ -412,12 +405,10 @@ function renderThesisSubmissionForm() {
         `;
     }
 
-    // 재심 제출 또는 신규 제출 폼
+    // 제출 폼
     html += `
         <div class="bg-white rounded-lg shadow-md p-6">
             <h3 class="text-lg font-semibold text-gray-800 mb-6">논문 제출 정보 <span class="ml-2 text-sm font-medium text-[#6A0028]">${ReviewScenario.attemptLabel(submission)}</span></h3>
-            ${isResubmit && submission.resubmission && submission.resubmission.reviewerName ? `
-            <p class="-mt-4 mb-4 text-xs text-gray-500">조건부합격 재심 · 재심 위원: ${submission.resubmission.reviewerName} · 심사신청 없이 자료만 제출합니다.</p>` : ''}
             <div class="space-y-4">
                 <!-- 지도교수명 출력 (읽기 전용) -->
                 <div class="flex items-center gap-4">
@@ -646,7 +637,6 @@ function saveThesisSubmission() {
 
     const submission = getThesisSubmissions().find(s => s.id === thesisCurrentSubmissionId);
     const isEdit = submission.status === 'submitted';
-    const isResubmit = submission.status === 'resubmit';
 
     if (!title) {
         alert('논문 제목을 입력해주세요.');
@@ -658,34 +648,10 @@ function saveThesisSubmission() {
         return;
     }
 
-    const confirmMessage = isResubmit ? '재심 논문을 제출하시겠습니까?' : isEdit ? '논문을 수정하시겠습니까?' : '논문을 제출하시겠습니까?';
+    const confirmMessage = isEdit ? '논문을 수정하시겠습니까?' : '논문을 제출하시겠습니까?';
     if (confirm(confirmMessage)) {
-        if (isResubmit) {
-            // 재심 제출 처리
-            submission.status = 'submitted';
-            submission.submittedData = {
-                title: title,
-                thesisFile: thesisFile ? thesisFile.name : 'resubmission.pdf',
-                thesisFileSize: thesisFile ? thesisFile.size : 0,
-                otherFile: otherFile ? otherFile.name : null,
-                otherFileSize: otherFile ? otherFile.size : 0,
-                submittedAt: new Date().toLocaleString('ko-KR', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    hour12: false
-                }).replace(/\. /g, '-').replace('.', '')
-            };
-            submission.resubmission.status = 'submitted';
-            submission.reviewResult = null;  // 재심 결과 대기
-            submission.evaluatedCount = 0;
-
-            console.log('재심 논문 제출:', submission);
-            alert('재심 논문이 제출되었습니다.');
-        } else {
-            // 일반 제출 또는 수정 처리
+        {
+            // 제출 또는 수정 처리 (조건부합격 후 보완 제출도 동일)
             submission.status = 'submitted';
             submission.submittedData = {
                 title: title,
@@ -712,7 +678,7 @@ function saveThesisSubmission() {
 }
 
 // ==================== 제출취소 ====================
-// 제출한 심사자료를 삭제하고 미제출(재심이면 재심 제출 대기)로 되돌림
+// 제출한 심사자료를 삭제하고 미제출로 되돌림
 // 조건: 결과 확정 전 + 평가한 심사위원 0명 (제출취소 기간 조건은 정책 미정으로 제외)
 function cancelThesisSubmission(id) {
     const submission = ReviewScenario.getRecordById(id);
@@ -731,8 +697,8 @@ function cancelThesisSubmission(id) {
     backToThesisList();
 }
 
-// ==================== 차수별 기록 팝업 ====================
-// 기본단계명 클릭 시 1차 / 1차 재심N / 2차 … 기록을 시간순으로 표시 (기간과 무관하게 조회)
+// ==================== 제출 기록 팝업 ====================
+// 기본단계명 클릭 시 1차 제출 / 2차 제출 … 기록을 시간순으로 표시 (기간과 무관하게 조회)
 function showStageHistoryModal(stageId) {
     const records = ReviewScenario.getRecords(stageId);
     if (records.length === 0) return;
@@ -744,7 +710,6 @@ function showStageHistoryModal(stageId) {
         const d = rec.submittedData;
         let statusText = '미제출';
         if (rec.status === 'submitted') statusText = '제출완료';
-        if (rec.status === 'resubmit') statusText = '재심 제출 대기';
 
         let resultHtml = '<span class="text-gray-500">-</span>';
         if (rec.reviewResult) {
@@ -784,11 +749,11 @@ function showStageHistoryModal(stageId) {
     modal.innerHTML = `
         <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[85vh] flex flex-col">
             <div class="flex justify-between items-center p-5 border-b">
-                <h3 class="text-lg font-semibold text-gray-800">${stageName} 차수별 기록</h3>
+                <h3 class="text-lg font-semibold text-gray-800">${stageName} 제출 기록</h3>
                 <button data-action="close-history" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">&times;</button>
             </div>
             <div class="p-5 space-y-3 overflow-y-auto">
-                <p class="text-xs text-gray-500">불합격 시 다음 학기에 심사신청부터 새 차수로 진행되며, 조건부합격은 같은 차수 안에서 재심으로 진행됩니다. 이전 기록은 삭제되지 않고 보존됩니다.</p>
+                <p class="text-xs text-gray-500">조건부합격은 같은 학기에 심사신청 없이 보완 자료를 다시 제출하고, 불합격은 다음 학기에 심사신청부터 다시 진행합니다. 모든 제출은 순서대로 번호가 붙으며 이전 기록은 삭제되지 않고 보존됩니다.</p>
                 ${cards}
             </div>
             <div class="p-4 border-t flex justify-end">

@@ -1,6 +1,8 @@
 """
-학생 화면 - 재심사 · 제출취소 목업 테스트 (2026-10-06)
-기준: docs/재심사_제출취소_영향도분석_20261006.md 0장 (시연 시나리오 ①~⑤)
+학생 화면 - 재심사 · 제출취소 목업 테스트 (2026-10-06 작성, 10-07 번호 체계 변경 반영)
+기준: docs/재심사_제출취소_영향도분석_20261006.md 0장 · 0-5
+- 제출 번호 하나로 표기 ('N차 제출'), '재심' 표기 없음
+- 심사신청 화면: 번호 없이 [재신청]
 
 실행: python -m pytest test-student-review-retry.py -v -s
 """
@@ -58,58 +60,56 @@ def choose_scenario(d, screen, key):
 
 
 def stage_row(d, container_id, stage_name):
-    rows = d.find_elements(By.CSS_SELECTOR, f"#{container_id} tbody tr")
-    for row in rows:
+    for row in d.find_elements(By.CSS_SELECTOR, f"#{container_id} tbody tr"):
         if stage_name in row.text:
             return row
     raise AssertionError(f"{stage_name} 행을 찾을 수 없음")
 
 
-def test_01_retry_open_apply_second_attempt(driver):
-    """① 불합격 단계: [2차 신청] → 신청완료(2차)"""
+def test_01_retry_open_reapply(driver):
+    """① 불합격 단계: [재신청] → 신청완료, 자료제출에 2차 제출 행"""
     choose_scenario(driver, "thesis-application", "retry-open")
-    rows = driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content tbody tr")
-    assert len(rows) == 3, "논문작성계획서/예비심사/본심사 3행"
+    content = driver.find_element(By.ID, "thesis-application-content")
+    headers = [th.text for th in content.find_elements(By.CSS_SELECTOR, "thead th")]
+    assert "차수" not in headers, "심사신청 화면은 번호를 표시하지 않음"
+    assert len(content.find_elements(By.CSS_SELECTOR, "tbody tr")) == 3
 
     row = stage_row(driver, "thesis-application-content", "예비심사")
-    assert "재심사 대상" in row.text and "1차 불합격" in row.text
-    row.find_element(By.PARTIAL_LINK_TEXT, "2차 신청").click()
+    assert "재심사 대상" in row.text
+    row.find_element(By.PARTIAL_LINK_TEXT, "재신청").click()
     time.sleep(0.3)
     modal = driver.find_element(By.ID, "application-modal")
-    assert "2차 재심사를 신청합니다" in modal.text
+    assert "재신청합니다" in modal.text
     driver.find_element(By.ID, "thesis-title").send_keys("AI 기반 추천 시스템 연구(보완)")
     driver.find_element(By.ID, "thesis-title-en").send_keys("Improved Recommender")
     modal.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
-    accept_dialog(driver)                      # 신청 확인
-    assert "2차" in accept_dialog(driver)      # 완료 알림
+    accept_dialog(driver)
+    accept_dialog(driver)
+    assert "신청완료" in stage_row(driver, "thesis-application-content", "예비심사").text
 
-    row = stage_row(driver, "thesis-application-content", "예비심사")
-    assert "신청완료" in row.text and "2차" in row.text
-
-    # 자료제출 화면: 2차 미제출 행 + [제출]
     open_screen(driver, "thesis-submission")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
-    assert "2차" in row.text and "미제출" in row.text and "제출" in row.text
+    assert "2차 제출" in row.text and "미제출" in row.text
 
 
-def test_02_history_modal(driver):
-    """단계명 클릭 → 차수별 기록 (1차 불합격 총평 포함)"""
+def test_02_submission_history(driver):
+    """단계명 클릭 → 제출 기록 (1차 제출 불합격 총평 포함)"""
     choose_scenario(driver, "thesis-submission", "retry-open")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
     row.find_element(By.CSS_SELECTOR, "[data-action=show-history]").click()
     time.sleep(0.3)
     modal = driver.find_element(By.ID, "stage-history-modal")
-    assert "예비심사 차수별 기록" in modal.text
-    assert "1차" in modal.text and "불합격" in modal.text and "심사위원장 총평" in modal.text
+    assert "예비심사 제출 기록" in modal.text
+    assert "1차 제출" in modal.text and "불합격" in modal.text and "심사위원장 총평" in modal.text
     modal.find_element(By.CSS_SELECTOR, "[data-action=close-history]").click()
 
 
 def test_03_retry_wait_next_semester(driver):
-    """② 신청기간 아님 → 다음 학기 신청 안내, 신청 버튼 없음"""
+    """② 신청기간 아님 → 다음 학기 신청 안내, 재신청 버튼 없음"""
     choose_scenario(driver, "thesis-application", "retry-wait")
     row = stage_row(driver, "thesis-application-content", "예비심사")
     assert "재심사 대상" in row.text and "다음 학기(2027-1학기) 신청" in row.text
-    assert not row.find_elements(By.PARTIAL_LINK_TEXT, "차 신청")
+    assert not row.find_elements(By.PARTIAL_LINK_TEXT, "재신청")
 
 
 def test_04_not_started_withdraw(driver):
@@ -120,20 +120,18 @@ def test_04_not_started_withdraw(driver):
     row.find_element(By.PARTIAL_LINK_TEXT, "철회").click()
     assert accept_dialog(driver) == WITHDRAW_CONFIRM
     accept_dialog(driver)
-    row = stage_row(driver, "thesis-application-content", "예비심사")
-    assert "재심사 대상" in row.text
+    assert "재심사 대상" in stage_row(driver, "thesis-application-content", "예비심사").text
 
 
 def test_05_not_started_cancel_submission(driver):
     """③ 심사 미진행: [제출취소] → 미제출"""
     choose_scenario(driver, "thesis-submission", "not-started")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
-    assert "2차" in row.text and "제출완료" in row.text
+    assert "2차 제출" in row.text and "제출완료" in row.text
     row.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
     assert "취소하시겠습니까" in accept_dialog(driver)
     accept_dialog(driver)
-    row = stage_row(driver, "thesis-submission-content", "예비심사")
-    assert "미제출" in row.text
+    assert "미제출" in stage_row(driver, "thesis-submission-content", "예비심사").text
 
 
 def test_06_in_progress_blocked(driver):
@@ -143,7 +141,6 @@ def test_06_in_progress_blocked(driver):
     assert "심사중" in row.text
     row.find_element(By.PARTIAL_LINK_TEXT, "철회").click()
     assert accept_dialog(driver) == WITHDRAW_BLOCKED
-    assert "심사중" in stage_row(driver, "thesis-application-content", "예비심사").text
 
     open_screen(driver, "thesis-submission")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
@@ -152,25 +149,45 @@ def test_06_in_progress_blocked(driver):
     assert disabled.get_attribute("disabled") is not None
 
 
-def test_07_conditional_retry_submit(driver):
-    """⑤ 조건부합격: 신청 없이 [재심 제출], 표기 1차 재심1"""
+def test_07_conditional_followup_submit(driver):
+    """⑤ 조건부합격: 신청 없이 2차 제출, '재심' 표기 없음"""
     choose_scenario(driver, "thesis-application", "conditional")
     row = stage_row(driver, "thesis-application-content", "본심사")
-    assert "조건부합격(재심)" in row.text
+    assert "조건부합격" in row.text and "재심" not in row.text
     assert not row.find_elements(By.PARTIAL_LINK_TEXT, "신청")
 
     open_screen(driver, "thesis-submission")
     row = stage_row(driver, "thesis-submission-content", "본심사")
-    assert "1차 재심1" in row.text and "재심 제출 대기" in row.text
-    row.find_element(By.XPATH, ".//button[normalize-space()='재심 제출']").click()
+    assert "2차 제출" in row.text and "미제출" in row.text and "재심" not in row.text
+    row.find_element(By.XPATH, ".//button[normalize-space()='제출']").click()
     time.sleep(0.3)
     content = driver.find_element(By.ID, "thesis-submission-content").text
-    assert "기존 제출 내역" in content and "조건부합격" in content and "1차 재심1" in content
+    assert "기존 제출 내역" in content and "조건부합격" in content and "2차 제출" in content
+    assert "재심" not in content
 
 
-def test_08_no_console_errors(driver):
-    """콘솔 오류(SEVERE) 중 이번 수정 파일 관련 오류 없음"""
+def test_08_exam_schedule_attempt_column(driver):
+    """심사일정: 차수 컬럼, 헤더와 셀 개수 일치"""
+    open_screen(driver, "exam-schedule")
+    time.sleep(0.3)
+    table = driver.find_element(By.ID, "student-exam-schedule-content")
+    headers = [th.text for th in table.find_elements(By.CSS_SELECTOR, "thead th")]
+    assert "차수" in headers
+    for row in table.find_elements(By.CSS_SELECTOR, "tbody tr"):
+        cells = row.find_elements(By.TAG_NAME, "td")
+        if len(cells) > 1:
+            assert len(cells) == len(headers)
+
+
+def test_09_dashboard_rereview_badge(driver):
+    """대시보드: 단계 진행에 '재심사 진행' 배지"""
+    open_screen(driver, "dashboard")
+    assert "재심사 진행" in driver.find_element(By.ID, "vertical-journey").text
+
+
+def test_10_no_console_errors(driver):
     logs = driver.get_log("browser")
-    targets = ("review-scenario-data.js", "thesis-application.js", "thesis-submission.js")
+    targets = ("review-scenario-data.js", "thesis-application.js", "thesis-submission.js",
+               "student-exam-schedule.js", "dashboard.js")
     errors = [l["message"] for l in logs if l["level"] == "SEVERE" and any(t in l["message"] for t in targets)]
     assert not errors, errors

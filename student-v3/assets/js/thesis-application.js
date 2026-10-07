@@ -62,7 +62,6 @@ function renderApplicationListScreen() {
                             <tr>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 80px;">순번</th>
                                 <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">논문지도단계</th>
-                                <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 110px;">차수</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 200px;">신청기간</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 200px;">철회기간</th>
                                 <th class="py-3 px-4 text-center text-xs font-semibold text-gray-600" style="width: 130px;">신청상태</th>
@@ -91,14 +90,6 @@ function renderApplicationRow(data, index) {
     const periodText = `${stage.applicationPeriod.start} ~ ${stage.applicationPeriod.end}`;
     const withdrawalPeriodText = `${stage.withdrawalPeriod.start} ~ ${stage.withdrawalPeriod.end}`;
 
-    // 차수
-    let attemptText = '-';
-    if (status.code === 'retry') {
-        attemptText = `${status.attempt}차<div class="text-xs text-red-600">(${status.failedAttempt}차 불합격)</div>`;
-    } else if (status.attempt && status.code !== 'none') {
-        attemptText = `${status.attempt}차`;
-    }
-
     // 신청 상태 배지
     const badgeClass = {
         passed: 'bg-green-100 text-green-800',
@@ -121,20 +112,19 @@ function renderApplicationRow(data, index) {
     } else if (status.code === 'retry') {
         actionHtml = stage.applicationOpen
             ? `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
-                  class="text-[#6A0028] hover:underline text-xs font-semibold">[${status.attempt}차 신청]</a>`
+                  class="text-[#6A0028] hover:underline text-xs font-semibold">[재신청]</a>`
             : `<span class="text-xs text-gray-500">다음 학기(${stage.semester}) 신청</span>`;
     } else if (status.code === 'applied' || status.code === 'reviewing') {
         actionHtml = `<a href="#" onclick="confirmWithdrawal('${stage.id}'); return false;"
                          class="text-red-600 hover:underline text-xs font-medium">[철회]</a>`;
     } else if (status.code === 'conditional') {
-        actionHtml = '<span class="text-xs text-gray-500">재심 자료는 심사자료제출에서 제출</span>';
+        actionHtml = '<span class="text-xs text-gray-500">보완 자료는 심사자료제출에서 제출</span>';
     }
 
     return `
         <tr class="hover:bg-blue-50">
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${index + 1}</td>
             <td class="py-3 px-4 text-sm font-medium text-gray-800">${stage.name}</td>
-            <td class="py-3 px-4 text-sm text-gray-600 text-center">${attemptText}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${periodText}</td>
             <td class="py-3 px-4 text-sm text-gray-600 text-center">${withdrawalPeriodText}</td>
             <td class="py-3 px-4 text-sm text-center">${statusHtml}</td>
@@ -151,7 +141,7 @@ function openApplicationModal(stageTypeId) {
     if (!stage) return;
     const status = ReviewScenario.getStageStatus(stageTypeId);
     const isRetry = status.code === 'retry';
-    const stageLabel = `${stage.name} (${status.attempt || 1}차)`;
+    const stageLabel = isRetry ? `${stage.name} (재신청)` : stage.name;
 
     const modalHtml = `
         <!-- 모달 오버레이 -->
@@ -173,8 +163,8 @@ function openApplicationModal(stageTypeId) {
                     <form id="application-form" onsubmit="submitApplication(event, '${stageTypeId}')">
                         ${isRetry ? `
                         <div class="p-3 rounded-md bg-red-50 border border-red-200 text-sm text-red-800">
-                            ${status.failedAttempt}차 심사 불합격으로 ${status.attempt}차 재심사를 신청합니다.
-                            이전 차수의 제출 자료와 심사 결과는 이력으로 보존됩니다.
+                            불합격 판정에 따라 재신청합니다.
+                            이전 제출 자료와 심사 결과는 이력으로 보존됩니다.
                         </div>` : ''}
                         <!-- 신청 단계 -->
                         <div>
@@ -253,11 +243,11 @@ function submitApplication(event, stageTypeId) {
     }
 
     if (confirm('논문을 신청하시겠습니까?')) {
-        // 시나리오 상태에 신청 추가 (해당 차수의 제출 기록도 함께 생성)
+        // 시나리오 상태에 신청 추가 (다음 번호의 제출 기록도 함께 생성)
         const attemptNumber = ReviewScenario.apply(stageTypeId, title);
 
-        console.log('논문 신청 완료:', stageTypeId, attemptNumber + '차');
-        alert(`논문 신청이 완료되었습니다. (${attemptNumber}차)`);
+        console.log('논문 신청 완료:', stageTypeId, attemptNumber + '차 제출');
+        alert('논문 신청이 완료되었습니다.');
 
         closeApplicationModal();
         renderApplicationListScreen();
@@ -351,7 +341,7 @@ function confirmWithdrawal(stageId) {
     }
 
     if (confirm('해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?')) {
-        // 신청은 '철회'로 기록, 결과 미확정 제출 자료 삭제 (확정된 이전 차수 기록은 보존)
+        // 신청은 '철회'로 기록, 결과 미확정 제출 자료 삭제 (결과가 확정된 이전 제출 기록은 보존)
         ReviewScenario.withdraw(stageId);
 
         alert('논문 신청이 철회되었습니다.');

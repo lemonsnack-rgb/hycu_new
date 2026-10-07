@@ -1,11 +1,13 @@
 /**
  * 재심사 · 제출취소 목업 시나리오 (학생 화면 전용)
- * 2026-10-06 — docs/재심사_제출취소_영향도분석_20261006.md 0장 기준
+ * 2026-10-06 작성 / 2026-10-07 번호 체계 변경 — docs/재심사_제출취소_영향도분석_20261006.md 0-5 기준
  *
  * - 단계별 심사신청(thesis-application.js)과 단계별 심사자료제출(thesis-submission.js)이
  *   같은 시나리오 상태를 공유함 (페이지 내 메모리, 새로고침 시 초기화)
- * - 차수(attemptNumber): 불합격 시에만 증가 (다음 학기 심사신청부터 재진행)
- * - 재심(retryNo): 조건부합격 시 같은 차수 안에서 증가 (당해 학기, 심사신청 불필요)
+ * - 제출 번호(attemptNumber): 기본단계 안에서 제출(심사)할 때마다 1씩 증가 — 'N차 제출'
+ *   · 조건부합격: 같은 신청 안에서 보완 자료를 다음 번호로 제출 (심사신청 불필요)
+ *   · 불합격: 다음 학기에 재신청 → 새 신청의 제출이 다음 번호
+ * - 재심도 일반 심사 1건으로 다루며 '재심' 표기는 쓰지 않음
  * - 롤백: 이 파일 삭제 + student-dashboard.html의 script 태그 제거
  */
 (function () {
@@ -32,11 +34,11 @@
     };
 
     const SCENARIOS = [
-        { key: 'retry-open', label: '① 재신청 가능', desc: '예비심사 1차 불합격 → 신청기간이 열려 2차 신청 가능' },
-        { key: 'retry-wait', label: '② 다음 학기 대기', desc: '예비심사 1차 불합격 → 신청기간이 아니어서 다음 학기 신청 대기' },
-        { key: 'not-started', label: '③ 심사 미진행', desc: '예비심사 2차 신청·제출 완료, 평가한 심사위원 없음 → 철회·제출취소 가능' },
-        { key: 'in-progress', label: '④ 심사 진행 중', desc: '예비심사 2차 신청·제출 완료, 심사위원 1명 평가 완료 → 철회·제출취소 불가' },
-        { key: 'conditional', label: '⑤ 조건부 재심', desc: '본심사 1차 조건부합격 → 신청 없이 같은 학기에 재심 자료 제출' }
+        { key: 'retry-open', label: '① 재신청 가능', desc: '예비심사 불합격 → 신청기간이 열려 재신청 가능' },
+        { key: 'retry-wait', label: '② 다음 학기 대기', desc: '예비심사 불합격 → 신청기간이 아니어서 다음 학기 신청 대기' },
+        { key: 'not-started', label: '③ 심사 미진행', desc: '예비심사 재신청·제출 완료, 평가한 심사위원 없음 → 철회·제출취소 가능' },
+        { key: 'in-progress', label: '④ 심사 진행 중', desc: '예비심사 재신청·제출 완료, 심사위원 1명 평가 완료 → 철회·제출취소 불가' },
+        { key: 'conditional', label: '⑤ 조건부합격 후 보완 제출', desc: '본심사 조건부합격 → 신청 없이 같은 학기에 보완 자료 제출' }
     ];
 
     let seq = 1;
@@ -67,12 +69,12 @@
             stageName: def.name,
             basicStageName: def.name,
             subStageName: def.subStageName,
-            attemptNumber: 1,
-            retryNo: 0,
+            attemptNumber: 1,             // 제출 번호 (N차 제출)
+            applicationId: null,          // 어느 심사신청에 속한 제출인지
             semester: '2026-1학기',
             advisorName: ADVISOR,
             submissionPeriod: { start: '2026-04-01', end: '2026-04-30' },
-            status: 'not_submitted',      // not_submitted | submitted | resubmit(조건부 재심 제출 대기)
+            status: 'not_submitted',      // not_submitted | submitted
             reviewResult: null,           // pass | fail | conditional | null
             submittedData: null,
             reviewComments: '',
@@ -83,13 +85,14 @@
         }, opts);
     }
 
-    function application(stageId, attemptNumber, appliedAt, semester) {
-        return { id: 'APP-' + stageId + '-' + attemptNumber, stageId, attemptNumber, status: 'submitted', appliedAt, semester };
+    function application(stageId, no, appliedAt, semester) {
+        return { id: 'APP-' + stageId + '-' + no, stageId, no, status: 'submitted', appliedAt, semester };
     }
 
-    // 논문작성계획서 1차 합격 (모든 시나리오 공통)
+    // 논문작성계획서 합격 (모든 시나리오 공통)
     function planPassed() {
         return record('plan', {
+            applicationId: 'APP-plan-1',
             semester: '2025-2학기',
             submissionPeriod: { start: '2025-10-01', end: '2025-10-31' },
             status: 'submitted',
@@ -101,9 +104,10 @@
         });
     }
 
-    // 예비심사 1차 불합격 (2026-1학기)
+    // 예비심사 1차 제출 불합격 (2026-1학기)
     function prelimFailed() {
         return record('prelim', {
+            applicationId: 'APP-prelim-1',
             semester: '2026-1학기',
             status: 'submitted',
             reviewResult: 'fail',
@@ -127,7 +131,7 @@
         const stage = id => stages.find(s => s.id === id);
         const submissions = [];
 
-        // 공통: 계획서 1차 합격
+        // 공통: 계획서 합격
         stage('plan').applications.push(application('plan', 1, '2025-09-05', '2025-2학기'));
         submissions.push(planPassed());
 
@@ -146,6 +150,7 @@
             stage('prelim').applications.push(application('prelim', 2, '2026-09-03', '2026-2학기'));
             submissions.push(prelimFailed());
             submissions.push(record('prelim', {
+                applicationId: 'APP-prelim-2',
                 attemptNumber: 2,
                 semester: '2026-2학기',
                 submissionPeriod: { start: '2026-09-15', end: '2026-10-15' },
@@ -156,6 +161,7 @@
         } else if (key === 'conditional') {
             stage('prelim').applications.push(application('prelim', 1, '2026-03-05', '2026-1학기'));
             submissions.push(record('prelim', {
+                applicationId: 'APP-prelim-1',
                 semester: '2026-1학기',
                 status: 'submitted',
                 reviewResult: 'pass',
@@ -166,24 +172,30 @@
             }));
             stage('final').applications.push(application('final', 1, '2026-09-03', '2026-2학기'));
             const first = record('final', {
+                applicationId: 'APP-final-1',
                 semester: '2026-2학기',
                 submissionPeriod: { start: '2026-09-15', end: '2026-10-15' },
                 status: 'submitted',
                 reviewResult: 'conditional',
                 submittedData: submitted('final_v1.pdf', '2026-09-20 11:05', 'final_v1_data.pdf'),
-                reviewComments: '결론의 일반화 근거가 부족함. 5장 분석 결과를 보완하여 재심 자료를 제출할 것. (재심 위원: 정교수)',
+                reviewComments: '결론의 일반화 근거가 부족함. 5장 분석 결과를 보완하여 다시 제출할 것.',
                 decidedAt: '2026-10-01',
                 evaluatedCount: 3
             });
             submissions.push(first);
+            // 조건부합격 → 같은 신청 안에서 다음 번호 제출 (심사신청 불필요)
             submissions.push(record('final', {
+                applicationId: 'APP-final-1',
+                attemptNumber: 2,
                 semester: '2026-2학기',
-                retryNo: 1,
                 submissionPeriod: { start: '2026-10-02', end: '2026-10-31' },
-                status: 'resubmit',
-                originalSubmission: { ...first.submittedData, reviewResult: 'conditional', reviewComments: first.reviewComments },
-                resubmission: { required: true, retryNo: 1, status: 'pending', reviewerType: 'single', reviewerName: '정교수' },
-                totalReviewers: 1
+                originalSubmission: {
+                    ...first.submittedData,
+                    attemptNumber: first.attemptNumber,
+                    reviewResult: first.reviewResult,
+                    reviewComments: first.reviewComments
+                },
+                totalReviewers: 2
             }));
         }
 
@@ -219,11 +231,11 @@
             return this.getStages().find(s => s.id === stageId);
         },
 
-        // 단계의 전체 기록 (차수 → 재심 순)
+        // 단계의 전체 제출 기록 (제출 번호 순)
         getRecords(stageId) {
             return this.getState().submissions
                 .filter(r => r.stage === stageId)
-                .sort((a, b) => a.attemptNumber - b.attemptNumber || a.retryNo - b.retryNo);
+                .sort((a, b) => a.attemptNumber - b.attemptNumber);
         },
 
         getLatest(stageId) {
@@ -236,8 +248,7 @@
         },
 
         attemptLabel(rec) {
-            if (!rec) return '-';
-            return `${rec.attemptNumber}차` + (rec.retryNo ? ` 재심${rec.retryNo}` : '');
+            return rec ? `${rec.attemptNumber}차 제출` : '-';
         },
 
         resultText(result) {
@@ -248,10 +259,14 @@
             return { pass: 'text-green-700', fail: 'text-red-700', conditional: 'text-yellow-700' }[result] || 'text-gray-600';
         },
 
-        // 현재 차수의 신청 (철회되지 않은 마지막 신청)
+        // 현재 유효한 신청 (철회되지 않은 마지막 신청)
         getCurrentApplication(stageId) {
             const apps = this.getStage(stageId).applications.filter(a => a.status === 'submitted');
             return apps[apps.length - 1] || null;
+        },
+
+        getApplicationRecords(app) {
+            return app ? this.getState().submissions.filter(r => r.applicationId === app.id) : [];
         },
 
         isStagePassed(stageId) {
@@ -269,73 +284,72 @@
             const app = this.getCurrentApplication(stageId);
 
             if (latest && latest.reviewResult === 'pass') {
-                return { code: 'passed', label: '합격', attempt: latest.attemptNumber };
+                return { code: 'passed', label: '합격' };
             }
 
-            if (app && !(latest && latest.attemptNumber === app.attemptNumber && latest.reviewResult === 'fail')) {
-                const attemptRecords = this.getRecords(stageId).filter(r => r.attemptNumber === app.attemptNumber);
-                if (attemptRecords.some(r => r.reviewResult === 'conditional')) {
-                    return { code: 'conditional', label: '조건부합격(재심)', attempt: app.attemptNumber };
-                }
-                const evaluated = attemptRecords.some(r => r.evaluatedCount > 0);
-                return evaluated
-                    ? { code: 'reviewing', label: '심사중', attempt: app.attemptNumber }
-                    : { code: 'applied', label: '신청완료', attempt: app.attemptNumber };
-            }
-
+            // 불합격 확정 → 재신청 대상 (이전 신청은 종료)
             if (latest && latest.reviewResult === 'fail') {
-                return { code: 'retry', label: '재심사 대상', attempt: latest.attemptNumber + 1, failedAttempt: latest.attemptNumber };
+                return { code: 'retry', label: '재심사 대상' };
+            }
+
+            if (app) {
+                const appRecords = this.getApplicationRecords(app);
+                if (appRecords.some(r => r.reviewResult === 'conditional')) {
+                    return { code: 'conditional', label: '조건부합격' };
+                }
+                return appRecords.some(r => r.evaluatedCount > 0)
+                    ? { code: 'reviewing', label: '심사중' }
+                    : { code: 'applied', label: '신청완료' };
             }
 
             const prev = this.getStages().find(s => s.order === stage.order - 1);
             if (prev && !this.isStagePassed(prev.id)) {
-                return { code: 'locked', label: '선행단계 미완료', attempt: null };
+                return { code: 'locked', label: '선행단계 미완료' };
             }
 
-            return { code: 'none', label: '미신청', attempt: 1 };
+            return { code: 'none', label: '미신청' };
         },
 
-        // 심사신청 (신규 또는 N차 재신청) → 해당 차수 제출 기록 생성
+        // 심사신청 (최초 또는 재신청) → 다음 번호의 제출 기록 생성
         apply(stageId, title) {
             const stage = this.getStage(stageId);
-            const status = this.getStageStatus(stageId);
-            const attemptNumber = status.attempt || 1;
-            stage.applications.push(application(stageId, attemptNumber, nowText().slice(0, 10), stage.semester));
+            const records = this.getRecords(stageId);
+            const app = application(stageId, stage.applications.length + 1, nowText().slice(0, 10), stage.semester);
+            stage.applications.push(app);
             const rec = record(stageId, {
                 id: Math.max(0, ...this.getState().submissions.map(r => r.id)) + 1,
-                attemptNumber,
+                applicationId: app.id,
+                attemptNumber: records.length ? records[records.length - 1].attemptNumber + 1 : 1,
                 semester: stage.semester,
                 submissionPeriod: { start: '2026-09-15', end: '2026-10-31' }
             });
             if (title) rec.pendingTitle = title;
             this.getState().submissions.push(rec);
-            return attemptNumber;
+            return rec.attemptNumber;
         },
 
         // 철회 가능 여부: 결과 확정 전 + 평가한 심사위원 0명
         checkWithdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
+            const appRecords = this.getApplicationRecords(app);
             if (!app) return { ok: false, reason: '철회할 신청 내역이 없습니다.' };
-            const attemptRecords = this.getRecords(stageId).filter(r => r.attemptNumber === app.attemptNumber);
-            if (attemptRecords.some(r => r.reviewResult)) {
+            if (appRecords.some(r => r.reviewResult)) {
                 return { ok: false, reason: '심사 결과가 확정된 단계는 철회할 수 없습니다.' };
             }
-            if (attemptRecords.some(r => r.evaluatedCount > 0)) {
+            if (appRecords.some(r => r.evaluatedCount > 0)) {
                 return { ok: false, reason: '심사가 진행중이므로 철회할 수 없습니다.' };
             }
             return { ok: true };
         },
 
-        // 철회: 신청을 '철회' 상태로 기록, 결과 미확정 제출 기록 삭제 (결과 확정 기록은 보존)
+        // 철회: 신청을 '철회'로 기록, 결과 미확정 제출 기록 삭제 (결과 확정 기록은 보존)
         withdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
             if (!app) return;
             app.status = 'withdrawn';
             app.withdrawnAt = nowText();
             const s = this.getState();
-            s.submissions = s.submissions.filter(r =>
-                !(r.stage === stageId && r.attemptNumber === app.attemptNumber && !r.reviewResult)
-            );
+            s.submissions = s.submissions.filter(r => !(r.applicationId === app.id && !r.reviewResult));
         },
 
         // 제출취소 가능 여부: 제출완료 + 결과 미확정 + 평가한 심사위원 0명 (기간 조건은 정책 미정으로 제외)
@@ -349,8 +363,7 @@
         cancelSubmission(id) {
             const rec = this.getRecordById(id);
             if (!this.checkCancelSubmission(rec).ok) return false;
-            rec.status = rec.retryNo > 0 ? 'resubmit' : 'not_submitted';
-            if (rec.resubmission) rec.resubmission.status = 'pending';
+            rec.status = 'not_submitted';
             rec.submittedData = null;
             return true;
         },
