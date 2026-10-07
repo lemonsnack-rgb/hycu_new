@@ -2,6 +2,13 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- Vercel(cleanUrls)에서 /admin-v3 (끝 '/' 없음)로 열리면 상대 경로가 사이트 루트 기준이 되어
+         assets/·../professor-v3/ 파일을 못 불러옴 → 이 경우에만 기준 경로를 /admin-v3/ 로 지정 (2026-10-07) -->
+    <script>
+        if (/\/admin-v3$/.test(location.pathname)) {
+            document.write('<base href="/admin-v3/">');
+        }
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>논문 지도 시스템 - 관리자용 (Design System v3)</title>
 
