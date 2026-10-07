@@ -236,7 +236,6 @@ function getExamScheduleListData() {
             stageOrder: assignment.stageOrder,
             basicStageName: assignment.basicStageName || assignment.stageName,
             subStageName: assignment.subStageName || null,
-            attemptNo: assignment.attemptNo || 1,   // 심사 번호 (재심사 목업)
 
             // 논문 정보
             thesisTitle: thesisTitle,

@@ -1499,8 +1499,6 @@ const appData = {
         },
 
         // ===== 재심사 목업 (2026-10-07) =====
-        // attemptNo: 같은 학생 · 같은 기본단계 안의 심사 번호
-        // assignmentStatus '배정 불가': 신청 철회 또는 제출취소된 건 (배정 버튼 비활성)
         {
             id: 'CA009',
             studentId: 'S_RETRY',
@@ -1517,7 +1515,6 @@ const appData = {
             reviewStage: '예비심사',
             basicStageName: '예비심사',
             subStageName: '예비심사 논문 제출',
-            attemptNo: 1,
             assignmentStatus: '배정 완료',
             advisorName: '박교수',
             thesisTitle: 'AI 기반 추천 시스템의 개인화 성능 개선 연구',
@@ -1539,34 +1536,10 @@ const appData = {
             reviewStage: '예비심사',
             basicStageName: '예비심사',
             subStageName: '예비심사 논문 제출',
-            attemptNo: 2,
             assignmentStatus: '배정 완료',
             advisorName: '박교수',
             thesisTitle: 'AI 기반 추천 시스템의 개인화 성능 개선 연구',
             submitDate: '2026-09-28'
-        },
-        {
-            id: 'CA011',
-            studentId: 'S002',
-            studentNumber: '2024001235',
-            studentName: '이영희',
-            academicYear: '2026',
-            semester: '2',
-            collegeType: '대학원',
-            graduate: '일반대학원',
-            undergraduateMajor: '-',
-            major: '경영학',
-            degreeType: '박사',
-            academicStatus: '재학',
-            reviewStage: '예비심사',
-            basicStageName: '예비심사',
-            subStageName: '예비심사 논문 제출',
-            attemptNo: 1,
-            assignmentStatus: '배정 불가',
-            unavailableReason: '신청 철회',
-            advisorName: '김교수',
-            thesisTitle: '모바일 학습 환경에서의 자기조절학습 지원 전략',
-            submitDate: '2026-09-10'
         }
     ],
 
@@ -1916,52 +1889,17 @@ const appData = {
             submittedDate: '2025-11-03'
         },
 
-        // ===== 재심사 목업 (2026-10-06, 10-07 홍길동으로 통일) =====
-        // status: submitted(신청완료) | pending(미신청) | withdrawn(철회) | retry(재심사 대상: 불합격 확정 → 다음 학기 재신청)
-        // applicationType: initial(최초) | reapply(재신청)
+        // ===== 재심사 목업 (2026-10-07 재정비): 홍길동 예비심사 — 2026-1학기 신청(불합격 후 리셋), 2026-2학기 다시 신청 =====
         {
             id: 6,
             studentId: 6,
             stepTypeId: 4,
-            applicationType: 'initial',
-            year: '2026',
-            semester: '1',
-            applicationPeriodStart: '2026-03-02',
-            applicationPeriodEnd: '2026-03-31',
-            withdrawalPeriodStart: '2026-03-02',
-            withdrawalPeriodEnd: '2026-03-20',
-            status: 'retry',
-            submittedDate: '2026-03-05',
-            resultNote: '불합격 (2026-06-12) → 다음 학기 재신청 대상'
-        },
-        {
-            id: 7,
-            studentId: 6,
-            stepTypeId: 4,
-            applicationType: 'reapply',
-            year: '2026',
-            semester: '2',
             applicationPeriodStart: '2026-09-01',
             applicationPeriodEnd: '2026-10-31',
             withdrawalPeriodStart: '2026-09-01',
             withdrawalPeriodEnd: '2026-10-20',
             status: 'submitted',
             submittedDate: '2026-09-03'
-        },
-        {
-            id: 8,
-            studentId: 2,
-            stepTypeId: 4,
-            applicationType: 'initial',
-            year: '2026',
-            semester: '2',
-            applicationPeriodStart: '2026-09-01',
-            applicationPeriodEnd: '2026-10-31',
-            withdrawalPeriodStart: '2026-09-01',
-            withdrawalPeriodEnd: '2026-10-20',
-            status: 'withdrawn',
-            submittedDate: '2026-09-04',
-            withdrawnDate: '2026-09-18'
         }
     ]
 };

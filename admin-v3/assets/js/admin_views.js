@@ -1629,7 +1629,6 @@ const views = {
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수명</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">기본단계</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">세부단계</th>
-                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">차수</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록상태</th>
                                 </tr>
                             </thead>

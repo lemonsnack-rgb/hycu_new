@@ -170,7 +170,7 @@ function renderExamScheduleTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="16" style="text-align: center; padding: 2rem; color: #9CA3AF;">
+                <td colspan="14" style="text-align: center; padding: 2rem; color: #9CA3AF;">
                     조회 결과가 없습니다.
                 </td>
             </tr>
@@ -201,7 +201,6 @@ function renderExamScheduleTable(data) {
                 <td class="px-4 py-3 text-sm text-gray-600">${item.advisorName || '-'}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">${item.basicStageName || item.stageName || '-'}</td>
                 <td class="px-4 py-3 text-sm text-gray-900">${item.subStageName || '-'}</td>
-                <td class="px-4 py-3 text-sm text-gray-900">${item.attemptNo || 1}차</td>
                 <td class="px-4 py-3 text-sm text-gray-800">${statusText}</td>
             </tr>
         `;

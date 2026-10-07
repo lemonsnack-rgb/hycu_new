@@ -1035,7 +1035,6 @@ const mockCommitteeAssignments = [
         status: 'completed'
     },
     // ===== 재심사 목업 (2026-10-07): 홍길동 예비심사 1차(불합격) → 2차(재신청) =====
-    // attemptNo: 같은 학생 · 같은 기본단계 안의 심사 번호 (조건부합격 보완 심사, 불합격 후 재신청 심사 모두 +1)
     {
         id: 'CA005',
         reviewTargetId: null,
@@ -1056,7 +1055,6 @@ const mockCommitteeAssignments = [
         basicStageName: '예비심사',
         subStageName: '예비심사 논문 제출',
         stageOrder: 2,
-        attemptNo: 1,
         chairId: 'PROF002',
         chairName: '이교수',
         members: [
@@ -1087,8 +1085,6 @@ const mockCommitteeAssignments = [
         basicStageName: '예비심사',
         subStageName: '예비심사 논문 제출',
         stageOrder: 2,
-        attemptNo: 2,
-        previousAssignmentId: 'CA005',
         chairId: 'PROF002',
         chairName: '이교수',
         members: [
