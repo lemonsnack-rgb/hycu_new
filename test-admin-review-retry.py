@@ -52,6 +52,8 @@ def test_01_application_list(driver):
     assert any("최초" in t and "재심사 대상" in t for t in hong), hong
     assert any("재신청" in t and "신청완료" in t for t in hong), hong
     assert "철회" in table.text
+    # 김철수의 지도교수가 '홍길동'으로 나와 학생 홍길동과 혼동되지 않음
+    assert all("홍길동" not in r.text for r in rows_of(table, "김철수"))
 
     options = [o.text for o in driver.find_elements(By.CSS_SELECTOR, "#filter-application-status option")]
     assert "철회" in options and "재심사 대상" in options
@@ -75,6 +77,8 @@ def test_03_committee_assignment(driver):
     hong = [r.text for r in rows_of(content, "홍길동")]
     assert any("1차" in t for t in hong) and any("2차" in t for t in hong), hong
 
+    lee = [r.text for r in rows_of(content, "이영희") if "배정 불가" in r.text]
+    assert lee and "박사" in lee[0], lee
     blocked = [r for r in rows_of(content, "배정 불가")]
     assert blocked, "배정 불가 행 없음"
     btn = blocked[0].find_element(By.XPATH, ".//button[normalize-space()='배정']")

@@ -5881,6 +5881,7 @@ views.thesisApplication = () => {
                                         class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary"
                                         style="height: 34px;">
                                     <option value="">전체</option>
+                                    <option value="2026">2026</option>
                                     <option value="2025" selected>2025</option>
                                     <option value="2024">2024</option>
                                     <option value="2023">2023</option>

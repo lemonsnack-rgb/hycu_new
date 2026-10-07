@@ -931,7 +931,7 @@ const appData = {
             collegeType: '대학원',
             faculty: '-',
             status: '재학',
-            advisorName: '홍길동',
+            advisorName: '김교수',
             professor: '홍길동',
             submitDate: '2025-11-05',
             requestStatus: '피드백 대기',
@@ -1360,7 +1360,7 @@ const appData = {
             academicStatus: '재학',
             reviewStage: '연구계획서',
             assignmentStatus: '배정 대기',
-            advisorName: '홍길동',
+            advisorName: '김교수',
             thesisTitle: 'AI 기반 학습자 맞춤형 교육 시스템 개발',
             submitDate: '2025-11-20'
         },
@@ -1555,8 +1555,8 @@ const appData = {
             collegeType: '대학원',
             graduate: '일반대학원',
             undergraduateMajor: '-',
-            major: '컴퓨터공학',
-            degreeType: '석사',
+            major: '경영학',
+            degreeType: '박사',
             academicStatus: '재학',
             reviewStage: '예비심사',
             basicStageName: '예비심사',
@@ -1564,7 +1564,7 @@ const appData = {
             attemptNo: 1,
             assignmentStatus: '배정 불가',
             unavailableReason: '신청 철회',
-            advisorName: '박교수',
+            advisorName: '김교수',
             thesisTitle: '모바일 학습 환경에서의 자기조절학습 지원 전략',
             submitDate: '2026-09-10'
         }
@@ -1769,7 +1769,7 @@ const appData = {
             degreeType: '석사',
             academicStatus: '재학',
             advisorId: 'PROF001',
-            advisorName: '홍길동'
+            advisorName: '김교수'
         },
         {
             id: 2,
