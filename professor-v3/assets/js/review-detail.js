@@ -156,7 +156,7 @@ function renderPreviousAttemptHistory(assignment) {
     return `
         <div class="bg-white rounded-lg shadow-md mb-6">
             <div class="px-6 py-4 border-b bg-red-50 flex items-center justify-between">
-                <h4 class="text-sm font-semibold text-gray-800">이전 차수 이력 <span class="ml-1 text-xs font-normal text-gray-600">현재 ${ReviewAttempt.label(assignment)} 재심사</span></h4>
+                <h4 class="text-sm font-semibold text-gray-800">이전 차수 이력 <span class="ml-1 text-xs font-normal text-gray-600">현재 ${ReviewAttempt.label(assignment)} 심사</span></h4>
             </div>
             <div class="px-6 py-4 space-y-2">${items}</div>
         </div>
@@ -2311,6 +2311,7 @@ function getDueDateBadge(dueDate) {
 }
 
 function formatDateFull(dateStr) {
+    if (!dateStr) return '-';  // 제출 전 심사(조건부합격 후 보완 심사 대기)
     const date = new Date(dateStr);
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -4103,6 +4104,36 @@ function getTemplateName(templateId) {
 }
 
 /**
+ * 조건부합격 후 보완 자료를 심사할 새 심사 1건 생성 (재심사 목업, 2026-10-07)
+ * - 번호: 같은 학생 · 같은 기본단계의 다음 제출 번호
+ * - 위원: 위원장 + 지정 위원 (위원회 전체 지정 시 기존 위원 그대로)
+ * - 학생이 보완 자료를 제출하기 전이므로 제출일 없음, 평가 진행 '대기'
+ */
+function createFollowUpAssignment(assignment, resubmissionData) {
+    const chair = assignment.committee.find(m => m.role === 'chair');
+    const members = resubmissionData.reviewerType === 'single'
+        ? assignment.committee.filter(m => m.professorId === resubmissionData.reviewerId)
+        : assignment.committee.filter(m => m.role !== 'chair');
+    const attemptNo = resubmissionData.attemptNumber;
+    const newId = `${assignment.id}_N${attemptNo}`;
+    if (REVIEW_ASSIGNMENTS.some(a => a.id === newId)) return;
+
+    const today = new Date().toISOString().slice(0, 10);
+    REVIEW_ASSIGNMENTS.push({
+        ...assignment,
+        id: newId,
+        attemptNo: attemptNo,
+        previousAssignmentId: assignment.id,
+        submissionId: null,
+        submissionDate: null,
+        templateId: resubmissionData.evaluationTemplateId || assignment.templateId,
+        committee: [chair, ...members].filter(Boolean).map(m => ({ ...m, id: `${m.id}_N${attemptNo}`, assignedDate: today })),
+        status: '대기',
+        createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
+    });
+}
+
+/**
  * 위원장 최종 결정 제출
  */
 function submitChairDecision() {
@@ -4147,10 +4178,9 @@ function submitChairDecision() {
         // 재심 제출 마감일은 학교 정한 공식 제출 기간 사용
         // deadline 필드 제거됨
 
-        // 조건부합격 재심 회차: 같은 차수 안에서 반복 가능 (재심1, 재심2 …)
-        const prevResult = REVIEW_RESULTS.find(r => r.assignmentId === currentAssignmentId);
-        const prevRetryNo = (prevResult && prevResult.resubmission && prevResult.resubmission.retryNo) || 0;
+        // 조건부합격 후 보완 심사: 다음 제출 번호의 새 심사 1건으로 생성 (재심도 일반 심사와 동일)
         const currentAssignment = REVIEW_ASSIGNMENTS.find(a => a.id === currentAssignmentId);
+        const nextAttemptNo = ReviewAttempt.nextAttemptNo(currentAssignment);
 
         // 재심 데이터 구성
         resubmissionData = {
@@ -4160,8 +4190,7 @@ function submitChairDecision() {
             reviewerName: reviewerName,
             evaluationTemplateId: templateId.value,
             // deadline 필드 제거: 시스템 설정된 제출 기간 사용
-            attemptNumber: (currentAssignment && currentAssignment.attemptNo) || 1,
-            retryNo: prevRetryNo + 1,
+            attemptNumber: nextAttemptNo,
             status: 'pending',
             createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
         };
@@ -4177,7 +4206,7 @@ function submitChairDecision() {
     // 불합격: 다음 학기 심사신청부터 재진행됨을 확인
     if (selectedChairDecision === '불합격') {
         const attemptNo = assignment.attemptNo || 1;
-        if (!confirm(`불합격으로 확정하시겠습니까?\n\n학생은 다음 학기에 심사 신청부터 다시 진행하며(${attemptNo + 1}차), 기존 심사 내역은 ${attemptNo}차 이력으로 보존됩니다.`)) {
+        if (!confirm(`불합격으로 확정하시겠습니까?\n\n학생은 다음 학기에 심사 신청부터 다시 진행하며(${ReviewAttempt.nextAttemptNo(assignment)}차), 기존 심사 내역은 ${attemptNo}차 이력으로 보존됩니다.`)) {
             return;
         }
     }
@@ -4250,6 +4279,11 @@ function submitChairDecision() {
     // 심사 상태 반영 (목록의 심사결과·차수 표시에 사용)
     assignment.status = selectedChairDecision === '불합격' ? '불합격'
         : selectedChairDecision === '조건부합격' ? '조건부합격' : '합격';
+
+    // 조건부합격: 보완 자료를 심사할 새 심사 행 생성 (다음 번호, 지정 위원 + 위원장)
+    if (selectedChairDecision === '조건부합격' && resubmissionData) {
+        createFollowUpAssignment(assignment, resubmissionData);
+    }
 
     console.log('✅ submitChairDecision: 저장 완료, 재렌더링 시작');
     showToast(selectedChairDecision === '불합격'

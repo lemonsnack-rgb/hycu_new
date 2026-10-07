@@ -2210,7 +2210,8 @@ const REVIEW_RESULTS = [
 ];
 
 // ==================== 재심사 차수 헬퍼 (목업, 2026-10-06) ====================
-// 차수(attemptNo): 불합격 시 다음 학기 심사신청부터 +1 / 재심(retryNo): 조건부합격 시 같은 차수 안에서 +1
+// 차수(attemptNo): 같은 학생 · 같은 기본단계 안에서 심사할 때마다 +1 (조건부합격 후 보완 심사, 불합격 후 재신청 심사 모두)
+// 재심도 일반 심사 1건으로 다루며 '재심' 표기는 쓰지 않음
 // 교수 심사목록 · 관리자 학위논문 심사 조회에서 공통 사용
 const ReviewAttempt = {
     getResult(assignment) {
@@ -2228,9 +2229,6 @@ const ReviewAttempt = {
         if (decision) {
             const color = { '합격': 'text-green-700', '조건부합격': 'text-yellow-700', '불합격': 'text-red-700' }[decision] || 'text-gray-700';
             let html = `<span class="font-semibold ${color}">${decision}</span>`;
-            if (decision === '조건부합격' && result.resubmission) {
-                html += `<div class="text-xs text-gray-500">재심${result.resubmission.retryNo || 1} 진행</div>`;
-            }
             if (decision === '불합격') {
                 html += `<div class="text-xs text-gray-500">다음 학기 재신청</div>`;
             }
@@ -2239,6 +2237,15 @@ const ReviewAttempt = {
         return typeof getProgressStatusText === 'function'
             ? getProgressStatusText(assignment.evaluationProgress)
             : (assignment.evaluationProgress || '-');
+    },
+
+    // 같은 학생 · 같은 기본단계의 다음 심사 번호
+    nextAttemptNo(assignment) {
+        const stageName = assignment.basicStageName || assignment.submissionType;
+        const numbers = REVIEW_ASSIGNMENTS
+            .filter(a => a.studentId === assignment.studentId && (a.basicStageName || a.submissionType) === stageName)
+            .map(a => a.attemptNo || 1);
+        return Math.max(...numbers) + 1;
     },
 
     // 같은 학생 · 같은 기본단계의 이전 차수 기록

@@ -42,6 +42,7 @@ function renderExamScheduleScreen() {
                             <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도/학기</label>
                             <select id="exam-filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;">
                                 <option value="">전체</option>
+                                <option value="2026">2026</option>
                                 <option value="2025" selected>2025</option>
                                 <option value="2024">2024</option>
                             </select>
@@ -179,6 +180,7 @@ function renderExamScheduleScreen() {
                                     <th>지도교수명</th>
                                     <th>기본단계</th>
                                     <th>세부단계</th>
+                                    <th>차수</th>
                                     <th>등록상태</th>
                                     <th>심사일정</th>
                                     <th>진행방식</th>
@@ -352,7 +354,7 @@ function renderExamScheduleTable(data) {
     if (data.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="16" style="text-align: center; padding: 24px 12px;">
+                <td colspan="18" style="text-align: center; padding: 24px 12px;">
                     배정된 심사 일정이 없습니다.
                 </td>
             </tr>
@@ -382,12 +384,14 @@ function renderExamScheduleTable(data) {
                 <td>${item.graduate || '일반대학원'}</td>
                 <td>${item.undergraduate || '-'}</td>
                 <td>${item.department}</td>
-                <td>${item.degreeType === 'master' ? '석사' : item.degreeType === 'doctor' ? '박사' : '석박통합'}</td>
+                <td>${(item.degreeType === 'master' || item.degreeType === '석사') ? '석사' : (item.degreeType === 'doctor' || item.degreeType === '박사') ? '박사' : '석박통합'}</td>
                 <td>${item.status || '재학'}</td>
                 <td>${item.studentNumber}</td>
                 <td>${item.studentName}</td>
                 <td>${item.advisorName || '-'}</td>
-                <td>${item.stageName}</td>
+                <td>${item.basicStageName || item.stageName}</td>
+                <td>${item.subStageName || '-'}</td>
+                <td>${item.attemptNo || 1}차</td>
                 <td>${statusText}</td>
                 <td>${scheduleText}</td>
                 <td>${methodText}</td>
