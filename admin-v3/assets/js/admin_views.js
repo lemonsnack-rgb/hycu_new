@@ -1461,6 +1461,7 @@ const views = {
                                 <label class="text-xs font-medium text-gray-700 whitespace-nowrap" style="width: 85px;">학년도</label>
                                 <select id="filter-year" class="flex-1 px-2 border border-gray-300 rounded text-xs focus:ring-primary focus:border-primary" style="height: 34px;" onchange="filterExamSchedule()">
                                     <option value="">전체</option>
+                                    <option value="2026">2026</option>
                                     <option value="2025" selected>2025</option>
                                     <option value="2024">2024</option>
                                     <option value="2023">2023</option>
@@ -1628,6 +1629,7 @@ const views = {
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">지도교수명</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">기본단계</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">세부단계</th>
+                                    <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">차수</th>
                                     <th class="py-3 px-4 text-left text-xs font-semibold text-gray-600">등록상태</th>
                                 </tr>
                             </thead>

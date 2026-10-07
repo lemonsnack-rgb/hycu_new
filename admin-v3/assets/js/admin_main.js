@@ -7540,6 +7540,7 @@ function showCommitteeAssignment() {
                             <option value="">전체</option>
                             <option value="배정 대기">배정 대기</option>
                             <option value="배정 완료">배정 완료</option>
+                            <option value="배정 불가">배정 불가</option>
                         </select>
                     </div>
 
@@ -7583,6 +7584,7 @@ function showCommitteeAssignment() {
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">지도교수명</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">기본단계</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">세부단계</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">차수</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">배정상태</th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">관리</th>
                         </tr>
@@ -7590,7 +7592,7 @@ function showCommitteeAssignment() {
                     <tbody class="bg-white divide-y divide-gray-200">
                         ${data.length === 0 ? `
                             <tr>
-                                <td colspan="16" class="px-6 py-8 text-center text-gray-500">
+                                <td colspan="17" class="px-6 py-8 text-center text-gray-500">
                                     심사위원 배정 대기 중인 학생이 없습니다.
                                 </td>
                             </tr>
@@ -7610,12 +7612,20 @@ function showCommitteeAssignment() {
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.advisorName}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.basicStageName || item.reviewStage || '-'}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.subStageName || '-'}</td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.assignmentStatus}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.attemptNo || 1}차</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm ${item.assignmentStatus === '배정 불가' ? 'text-red-700 font-medium' : 'text-gray-900'}">
+                                    ${item.assignmentStatus}${item.unavailableReason ? `<div class="text-xs text-gray-500">(${item.unavailableReason})</div>` : ''}
+                                </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                    ${item.assignmentStatus === '배정 불가' ? `
+                                    <button type="button" disabled title="신청 철회 또는 제출취소된 건은 심사위원을 배정할 수 없습니다."
+                                            class="text-xs px-3 py-1 border border-gray-300 text-gray-400 rounded cursor-not-allowed">
+                                        배정
+                                    </button>` : `
                                     <button onclick="openCommitteeAssignmentModal('${item.id}')"
                                             class="text-xs px-3 py-1 border border-[#6A0028] text-[#6A0028] rounded hover:bg-[#6A0028] hover:text-white">
                                         배정
-                                    </button>
+                                    </button>`}
                                 </td>
                             </tr>
                         `).join('')}
@@ -8318,6 +8328,7 @@ function _getDashCommitteePending() {
             degreeType: r.degreeType,
             basicStageName: typeMap[r.reviewType] || r.reviewType || '-',
             subStageName: '-',
+            attemptNo: r.attemptNo || 1,
             studentName: r.studentName,
             advisorName: r.advisorName || '-'
         };
@@ -8338,7 +8349,8 @@ function renderDashCommitteePending() {
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학번</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 8%;">과정</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">기본단계</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 6%;">차수</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">성명</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">지도교수</th>';
     html += '</tr></thead><tbody>';
@@ -8349,6 +8361,7 @@ function renderDashCommitteePending() {
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151;">' + r.basicStageName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151;">' + r.attemptNo + '차</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.advisorName + '</td>';
         html += '</tr>';
@@ -8376,10 +8389,11 @@ function _getDashSchedulePending() {
             department: ca.department,
             studentNumber: ca.studentNumber,
             degreeType: ca.degreeType,
-            basicStageName: ca.stageName || '-',
-            subStageName: '-',
+            basicStageName: ca.basicStageName || ca.stageName || '-',
+            subStageName: ca.subStageName || '-',
+            attemptNo: ca.attemptNo || 1,
             studentName: ca.studentName,
-            advisorName: advisorName
+            advisorName: advisorName !== '-' ? advisorName : (ca.advisorName || '-')
         };
     });
 }
@@ -8398,7 +8412,8 @@ function renderDashSchedulePending() {
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">학번</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 8%;">과정</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">기본단계</th>';
-    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 20%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 14%;">세부단계</th>';
+    html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 6%;">차수</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">성명</th>';
     html += '<th style="padding: 10px 4px; text-align: center; font-size: 13px; font-weight: 700; color: #1a1a1a; white-space: nowrap; width: 11%;">지도교수</th>';
     html += '</tr></thead><tbody>';
@@ -8409,6 +8424,7 @@ function renderDashSchedulePending() {
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.degreeType + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151;">' + r.basicStageName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.subStageName + '</td>';
+        html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #374151;">' + r.attemptNo + '차</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #1a1a1a; font-weight: 500;">' + r.studentName + '</td>';
         html += '<td style="padding: 8px 4px; text-align: center; font-size: 13px; color: #6B7280;">' + r.advisorName + '</td>';
         html += '</tr>';

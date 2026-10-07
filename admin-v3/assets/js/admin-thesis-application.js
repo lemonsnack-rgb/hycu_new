@@ -51,7 +51,7 @@
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">성명</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">지도교수명</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">지도단계</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">차수</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">신청구분</th>
                                 <th class="px-4 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">신청상태</th>
                             </tr>
                         </thead>
@@ -71,7 +71,7 @@
                                     <td class="px-4 py-3 text-sm text-gray-900">${item.studentName}</td>
                                     <td class="px-4 py-3 text-sm text-gray-900">${item.advisorName}</td>
                                     <td class="px-4 py-3 text-sm text-gray-900">${item.stepName}</td>
-                                    <td class="px-4 py-3 text-sm text-gray-900">${item.attemptNo}차</td>
+                                    <td class="px-4 py-3 text-sm text-gray-900">${item.applicationTypeLabel}</td>
                                     <td class="px-4 py-3 text-sm">
                                         <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getApplicationStatusBadgeClass(item.applicationStatus)}">
                                             ${item.applicationStatus}
@@ -135,7 +135,7 @@
                 studentName: student.studentName,
                 year: app.year || student.year,
                 semester: app.semester || student.semester,
-                attemptNo: app.attemptNo || 1,
+                applicationTypeLabel: app.applicationType === 'reapply' ? '재신청' : '최초',
                 graduate: student.graduate,
                 collegeType: student.graduate.includes('일반') ? '대학원' : '특수대학원',
                 college: student.college,
@@ -348,8 +348,8 @@
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 cursor-not-allowed">
                         </div>
                         <div>
-                            <label class="block text-xs text-gray-600 mb-1">차수</label>
-                            <input type="text" value="${application.attemptNo || 1}차${application.resultNote ? ' · ' + application.resultNote : ''}${application.withdrawnDate ? ' · 철회일 ' + application.withdrawnDate : ''}" disabled
+                            <label class="block text-xs text-gray-600 mb-1">신청구분</label>
+                            <input type="text" value="${application.applicationType === 'reapply' ? '재신청' : '최초'}${application.resultNote ? ' · ' + application.resultNote : ''}${application.withdrawnDate ? ' · 철회일 ' + application.withdrawnDate : ''}" disabled
                                    class="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-gray-50 cursor-not-allowed">
                         </div>
                         ${application.submittedDate ? `
