@@ -176,12 +176,7 @@ function getLatestSubmissionPerStage(allSubmissions) {
 
 // 목록 화면
 function renderThesisListScreen() {
-    // 구 이력 상시 조회(JXLB-2): 지난 제출도 목록에 그대로 표시하고 기존 [보기]·[총평 보기]로 조회
-    const stageOrder = { plan: 1, prelim: 2, final: 3 };
-    const submissions = getThesisSubmissions()
-        .filter(sub => sub.evaluationFormRegistered)
-        .slice()
-        .sort((a, b) => (stageOrder[a.stage] || 9) - (stageOrder[b.stage] || 9) || a.attemptNumber - b.attemptNumber);
+    const submissions = getLatestSubmissionPerStage(getThesisSubmissions());
 
     return `
         ${ReviewScenario.renderBar('renderThesisScreen')}
@@ -297,39 +292,21 @@ function backToThesisList() {
     renderThesisScreen();
 }
 
-// 제출 폼 화면
-function renderThesisSubmissionForm() {
-    const submission = getThesisSubmissions().find(s => s.id === thesisCurrentSubmissionId);
-    if (!submission) return '';
-
-    // 조건부합격 후 보완 제출: 직전 제출 내역을 함께 표시
-    const isResubmit = submission.status !== 'submitted' && !!submission.originalSubmission;
-    const isEdit = submission.status === 'submitted';
-    const data = isEdit ? submission.submittedData : {};
-
-    const stageDisplay = submission.attemptNumber > 1
-        ? `${submission.stageName} (${submission.attemptNumber}차)`
-        : submission.stageName;
-
-    let html = `
-        <div class="mb-4">
-            <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                목록으로
-            </button>
-        </div>
-    `;
-
-    // 보완 제출인 경우: 직전 제출 내역 표시 (읽기 전용)
-    if (isResubmit) {
-        const orig = submission.originalSubmission;
-        const hasComments = orig.reviewComments && orig.reviewComments.trim() !== '';
-
-        html += `
+/**
+ * 같은 심사 건(기본단계)의 이전 차수 제출 내역 — 기존 '기존 제출 내역' 블록을 차수마다 그대로 사용 (2026-10-08)
+ * 1·2차 제출은 목록에 따로 표시하지 않고 하나의 관리(상세·제출) 화면에서 모두 표시
+ */
+function renderPreviousSubmissionBlocks(submission) {
+    return getThesisSubmissions()
+        .filter(prev => prev.stage === submission.stage && prev.attemptNumber < submission.attemptNumber && prev.submittedData)
+        .sort((a, b) => a.attemptNumber - b.attemptNumber)
+        .map(prev => {
+            const orig = { ...prev.submittedData, reviewResult: prev.reviewResult, reviewComments: prev.reviewComments };
+            const resultText = { pass: '합격', fail: '불합격', conditional: '조건부합격' }[prev.reviewResult] || '-';
+            const resultColor = { pass: 'text-green-700', fail: 'text-red-700', conditional: 'text-yellow-700' }[prev.reviewResult] || 'text-gray-700';
+            return `
             <div class="bg-gray-50 border border-gray-300 rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역</h3>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역 (${prev.attemptNumber}차 제출)</h3>
                 <div class="space-y-3">
                     <!-- 지도교수 -->
                     <div class="flex items-center gap-4">
@@ -346,7 +323,7 @@ function renderThesisSubmissionForm() {
                     <!-- 세부단계 -->
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">세부단계</label>
-                        <input type="text" value="${submission.subStageName || '-'} (${orig.attemptNumber || submission.attemptNumber - 1}차)" readonly
+                        <input type="text" value="${submission.subStageName || '-'} (${prev.attemptNumber}차)" readonly
                                class="flex-1 px-3 py-1.5 text-sm border border-gray-300 rounded-md bg-gray-50">
                     </div>
                     <!-- 논문 제목 -->
@@ -384,7 +361,7 @@ function renderThesisSubmissionForm() {
                     <div class="flex items-center gap-4">
                         <label class="text-sm font-medium text-gray-700 w-24 flex-shrink-0">평가 결과</label>
                         <div class="flex items-center gap-2">
-                            <span class="text-sm font-medium text-yellow-700">조건부합격</span>
+                            <span class="text-sm font-medium ${resultColor}">${resultText}</span>
                             <button type="button" data-action="show-review-comments" data-comments="${(orig.reviewComments || '').replace(/"/g, '&quot;')}"
                                     class="text-sm text-[#6A0028] hover:text-[#8A0034] underline">
                                 총평 보기
@@ -394,7 +371,34 @@ function renderThesisSubmissionForm() {
                 </div>
             </div>
         `;
-    }
+        }).join('');
+}
+
+// 제출 폼 화면
+function renderThesisSubmissionForm() {
+    const submission = getThesisSubmissions().find(s => s.id === thesisCurrentSubmissionId);
+    if (!submission) return '';
+
+    const isEdit = submission.status === 'submitted';
+    const data = isEdit ? submission.submittedData : {};
+
+    const stageDisplay = submission.attemptNumber > 1
+        ? `${submission.stageName} (${submission.attemptNumber}차)`
+        : submission.stageName;
+
+    let html = `
+        <div class="mb-4">
+            <button data-action="back-to-list" class="inline-flex items-center text-sm text-gray-600 hover:text-gray-900">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                목록으로
+            </button>
+        </div>
+    `;
+
+    // 같은 심사 건의 이전 차수 제출 내역 (기존 블록 그대로, 읽기 전용)
+    html += renderPreviousSubmissionBlocks(submission);
 
     // 제출 폼
     html += `
@@ -510,6 +514,7 @@ function renderThesisDetailView() {
             </button>
         </div>
 
+        ${renderPreviousSubmissionBlocks(submission)}
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">논문 제출 정보</h3>
@@ -679,22 +684,23 @@ function saveThesisSubmission() {
 }
 
 // ==================== 제출취소 ====================
-// 제출한 심사자료를 삭제하고 미제출로 되돌림
-// 조건: 결과 확정 전 + 평가한 심사위원 0명 (제출취소 기간 조건은 정책 미정으로 제외)
+// 제출취소 = 신청 철회와 같은 처리 (어느 메뉴에서 해도 신청과 제출이 함께 철회됨)
+// 조건(요구서): 결과 확정 전 + 평가한 심사위원 0명 / 표시: 상세 화면에서 제출기간일 때만
 function cancelThesisSubmission(id) {
     const submission = ReviewScenario.getRecordById(id);
-    const check = ReviewScenario.checkCancelSubmission(submission);
+    if (!submission) return;
+    const check = ReviewScenario.checkWithdraw(submission.stage);
     if (!check.ok) {
         alert(check.reason);
         return;
     }
 
-    if (!confirm('제출한 심사자료를 취소하시겠습니까?\n제출한 파일이 삭제되며, 제출기간 내에 다시 제출할 수 있습니다.')) {
+    if (!confirm('해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?')) {
         return;
     }
 
-    ReviewScenario.cancelSubmission(id);
-    alert('제출이 취소되었습니다.');
+    ReviewScenario.withdraw(submission.stage);
+    alert('논문 신청 내역이 초기화되었습니다.');
     backToThesisList();
 }
 

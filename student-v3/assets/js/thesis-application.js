@@ -90,7 +90,7 @@ function renderApplicationRow(data, index) {
     const periodText = `${stage.applicationPeriod.start} ~ ${stage.applicationPeriod.end}`;
     const withdrawalPeriodText = `${stage.withdrawalPeriod.start} ~ ${stage.withdrawalPeriod.end}`;
 
-    // 신청 상태 및 관리 버튼 — 관리 컬럼은 [관리] 하나 (미신청·재심사 진행: 신청 모달 / 신청완료: 신청 상세, 철회는 상세에서)
+    // 신청 상태 및 관리 버튼 — 관리 컬럼은 [관리] 하나 (미신청: 신청 모달 / 신청완료: 신청 상세, 철회는 상세에서)
     const statusText = status.label;
     const openFn = status.code === 'applied' ? 'viewApplicationDetail' : 'openApplicationModal';
     const actionButton = `<a href="#" onclick="${openFn}('${stage.id}'); return false;"

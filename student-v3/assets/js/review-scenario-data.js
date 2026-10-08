@@ -1,7 +1,7 @@
 /**
  * 재심사 · 제출취소 목업 시나리오 (학생 화면 전용)
  * 2026-10-06 작성 / 2026-10-07 재정비 — docs/재심사_목업_재정비_계획_20261007.md 기준
- *   (기존 목업의 신청상태 '미신청/신청완료' + 요구서 '재심사 진행'만 사용, 버튼은 기존 [관리]/[철회])
+ *   (신청상태는 기존 '미신청/신청완료'만 — 재심사도 일반 심사와 동일하게 취급)
  *
  * - 단계별 심사신청(thesis-application.js)과 단계별 심사자료제출(thesis-submission.js)이
  *   같은 시나리오 상태를 공유함 (페이지 내 메모리, 새로고침 시 초기화)
@@ -31,7 +31,7 @@
 
     // key는 딥링크 호환을 위해 유지
     const SCENARIOS = [
-        { key: 'retry-open', label: '① 재심사 진행', desc: '예비심사 불합격 → 재심사 진행, [관리]에서 다시 신청' },
+        { key: 'retry-open', label: '① 불합격 후 다시 신청', desc: '예비심사 1차 불합격 → 미신청, [관리]에서 다시 신청' },
         { key: 'not-started', label: '② 심사 미진행', desc: '예비심사 다시 신청·2차 제출 완료, 평가한 심사위원 없음 → 철회·제출취소 가능' },
         { key: 'in-progress', label: '③ 심사 진행 중', desc: '예비심사 다시 신청·2차 제출 완료, 심사위원 1명 평가 완료 → 철회·제출취소 불가' },
         { key: 'conditional', label: '④ 조건부합격 후 보완 제출', desc: '본심사 조건부합격 → 신청 없이 보완 자료 제출' }
@@ -179,12 +179,6 @@
                 attemptNumber: 2,
                 semester: '2026-2학기',
                 submissionPeriod: { start: '2026-10-02', end: '2026-12-31' },
-                originalSubmission: {
-                    ...first.submittedData,
-                    attemptNumber: first.attemptNumber,
-                    reviewResult: first.reviewResult,
-                    reviewComments: first.reviewComments
-                },
                 totalReviewers: 2
             }));
         }
@@ -248,13 +242,13 @@
         },
 
         /**
-         * 논문신청 화면용 신청상태 (기존 '미신청/신청완료' + 요구서 JXLB-1 '재심사 진행')
-         * code: retry(재심사 진행 — 불합격 확정 후 다시 신청 전) | applied(신청완료) | none(미신청)
+         * 논문신청 화면용 신청상태 (기존 '미신청/신청완료'만 — 재심사도 일반 심사와 동일)
+         * 불합격 확정 시 해당 단계 신청은 리셋되어 '미신청'
          */
         getStageStatus(stageId) {
             const latest = this.getLatest(stageId);
             if (latest && latest.reviewResult === 'fail') {
-                return { code: 'retry', label: '재심사 진행' };
+                return { code: 'none', label: '미신청' };
             }
             return this.getCurrentApplication(stageId)
                 ? { code: 'applied', label: '신청완료' }
@@ -296,7 +290,7 @@
             return { ok: true };
         },
 
-        // 철회: 신청과 해당 신청의 제출 자료 삭제 (기존 목업처럼 신청 내역 삭제 → 미신청 또는 재심사 진행)
+        // 철회: 신청과 해당 신청의 제출 자료 삭제 → 미신청 (논문신청의 신청 철회, 학위논문제출의 제출취소 공용)
         withdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
             if (!app) return;
@@ -304,22 +298,6 @@
             stage.applications = stage.applications.filter(a => a !== app);
             const s = this.getState();
             s.submissions = s.submissions.filter(r => r.applicationId !== app.id);
-        },
-
-        // 제출취소 가능 여부: 제출완료 + 결과 미확정 + 평가한 심사위원 0명 (기간 조건은 정책 미정으로 제외)
-        checkCancelSubmission(rec) {
-            if (!rec || rec.status !== 'submitted') return { ok: false, reason: '제출한 자료가 없습니다.' };
-            if (rec.reviewResult) return { ok: false, reason: '심사 결과가 확정되어 제출을 취소할 수 없습니다.' };
-            if (rec.evaluatedCount > 0) return { ok: false, reason: '심사가 진행 중이어서 제출을 취소할 수 없습니다.' };
-            return { ok: true };
-        },
-
-        cancelSubmission(id) {
-            const rec = this.getRecordById(id);
-            if (!this.checkCancelSubmission(rec).ok) return false;
-            rec.status = 'not_submitted';
-            rec.submittedData = null;
-            return true;
         },
 
         /**
