@@ -89,6 +89,9 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
 
     let html = '';
 
+    // 같은 심사 건의 이전 차수 심사 내역 (기존 화면 그대로, 읽기 전용)
+    html += renderPreviousAttemptsAsIs(detail.assignment, isChairView, isAdminMode);
+
     // 논문 정보
     html += renderThesisInfo(detail.assignment);
 
@@ -121,6 +124,35 @@ function renderReviewDetail(assignmentId, viewType, isAdminMode = false) {
     console.log('🎯 Binding events...');
     bindEvaluationEvents(detail, isSubmitted, isChairView, allSubmitted);
     console.log('✅ renderReviewDetail COMPLETED');
+}
+
+// ==================== 이전 차수 심사 내역 (2026-10-08) ====================
+// 같은 심사 건(학생 · 기본단계)의 1·2차는 한 관리 화면에 표시 — 이전 차수는 기존 화면을 그대로 읽기 전용으로 렌더링
+function renderPreviousAttemptsAsIs(assignment, isChairView, isAdminMode) {
+    if (typeof ReviewAttempt === 'undefined') return '';
+    return ReviewAttempt.previousAttempts(assignment).map(prev => {
+        const prevDetail = (isChairView || isAdminMode)
+            ? ReviewService.getReviewDetailForAdmin(prev.id)
+            : ReviewService.getReviewDetail(prev.id);
+        if (!prevDetail) return '';
+        let body = renderThesisInfo(prev);
+        if (isChairView || isAdminMode) {
+            body += renderChairApprovalScreen(prevDetail, true, true);
+        } else if (prevDetail.myEvaluation) {
+            body += renderSubmittedEvaluation(prevDetail.template, prevDetail.myEvaluation, false);
+        }
+        // 현재 차수 화면과 id·이벤트가 겹치지 않도록 읽기 전용 처리
+        const prefix = `prev${prev.attemptNo || 1}-`;
+        body = body
+            .replace(/\sid="/g, ` id="${prefix}`)
+            .replace(/\sname="/g, ` name="${prefix}`)
+            .replace(/\s(onclick|onchange)="[^"]*"/g, '');
+        return `
+            <div class="mb-2 text-sm font-semibold text-gray-700">${prev.attemptNo || 1}차 심사</div>
+            <div style="pointer-events: none; opacity: 0.85;">${body}</div>
+            <div class="mb-2 text-sm font-semibold text-gray-700">${assignment.attemptNo || 1}차 심사</div>
+        `;
+    }).join('');
 }
 
 // ==================== 논문 정보 (관리자 페이지 스타일) ====================
@@ -4035,38 +4067,6 @@ function getTemplateName(templateId) {
 }
 
 /**
- * 조건부합격 후 보완 자료를 심사할 새 심사 1건 생성 (재심사 목업, 2026-10-07)
- * - 번호: 같은 학생 · 같은 기본단계의 다음 제출 번호
- * - 위원: 위원장 + 지정 위원 (위원회 전체 지정 시 기존 위원 그대로)
- * - 학생이 보완 자료를 제출하기 전이므로 제출일 없음, 평가 진행 '대기'
- */
-function createFollowUpAssignment(assignment, resubmissionData) {
-    const chair = assignment.committee.find(m => m.role === 'chair');
-    const members = resubmissionData.reviewerType === 'single'
-        ? assignment.committee.filter(m => m.professorId === resubmissionData.reviewerId)
-        : assignment.committee.filter(m => m.role !== 'chair');
-    const attemptNo = resubmissionData.attemptNumber;
-    const newId = `${assignment.id}_N${attemptNo}`;
-    if (REVIEW_ASSIGNMENTS.some(a => a.id === newId)) return;
-
-    const today = new Date().toISOString().slice(0, 10);
-    REVIEW_ASSIGNMENTS.push({
-        ...assignment,
-        id: newId,
-        attemptNo: attemptNo,
-        previousAssignmentId: assignment.id,
-        submissionId: null,
-        submissionDate: null,
-        thesisFile: null,      // 학생이 보완 자료를 제출하기 전
-        otherFile: null,
-        templateId: resubmissionData.evaluationTemplateId || assignment.templateId,
-        committee: [chair, ...members].filter(Boolean).map(m => ({ ...m, id: `${m.id}_N${attemptNo}`, assignedDate: today })),
-        status: '대기',
-        createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
-    });
-}
-
-/**
  * 위원장 최종 결정 제출
  */
 function submitChairDecision() {
@@ -4111,9 +4111,6 @@ function submitChairDecision() {
         // 재심 제출 마감일은 학교 정한 공식 제출 기간 사용
         // deadline 필드 제거됨
 
-        // 조건부합격 후 보완 심사: 다음 제출 번호의 새 심사 1건으로 생성 (재심도 일반 심사와 동일)
-        const currentAssignment = REVIEW_ASSIGNMENTS.find(a => a.id === currentAssignmentId);
-        const nextAttemptNo = currentAssignment ? ReviewAttempt.nextAttemptNo(currentAssignment) : 2;
 
         // 재심 데이터 구성
         resubmissionData = {
@@ -4123,7 +4120,7 @@ function submitChairDecision() {
             reviewerName: reviewerName,
             evaluationTemplateId: templateId.value,
             // deadline 필드 제거: 시스템 설정된 제출 기간 사용
-            attemptNumber: nextAttemptNo,
+            attemptNumber: 1,
             status: 'pending',
             createdAt: new Date().toISOString().replace('T', ' ').substring(0, 19)
         };
@@ -4199,11 +4196,6 @@ function submitChairDecision() {
 
         REVIEW_RESULTS.push(newResult);
         console.log('✅ REVIEW_RESULTS 신규 추가:', newResult);
-    }
-
-    // 조건부합격: 보완 자료를 심사할 새 심사 행 생성 (다음 번호, 지정 위원 + 위원장)
-    if (selectedChairDecision === '조건부합격' && resubmissionData) {
-        createFollowUpAssignment(assignment, resubmissionData);
     }
 
     console.log('✅ submitChairDecision: 저장 완료, 재렌더링 시작');

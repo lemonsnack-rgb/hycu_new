@@ -2282,19 +2282,30 @@ const REVIEW_RESULTS = [
 // ==================== 재심사 차수 헬퍼 (목업, 2026-10-06) ====================
 // 차수(attemptNo): 같은 학생 · 같은 기본단계 안에서 심사할 때마다 +1 (조건부합격 후 보완 심사, 불합격 후 재신청 심사 모두)
 // 재심도 일반 심사 1건으로 다루며 '재심' 표기는 쓰지 않음
-// 교수 학위논문심사 목록 차수 표기, 조건부합격 후 보완 심사 번호에 사용
+// 같은 심사 건의 1·2차는 목록 1행(최신 차수), 이전 차수 심사 내역은 상세 화면에 기존 화면 그대로 표시
 const ReviewAttempt = {
-    label(assignment) {
-        return `${assignment.attemptNo || 1}차`;
+    caseKey(assignment) {
+        return `${assignment.studentId}|${assignment.basicStageName || assignment.submissionType}`;
     },
 
-    // 같은 학생 · 같은 기본단계의 다음 심사 번호
-    nextAttemptNo(assignment) {
-        const stageName = assignment.basicStageName || assignment.submissionType;
-        const numbers = REVIEW_ASSIGNMENTS
-            .filter(a => a.studentId === assignment.studentId && (a.basicStageName || a.submissionType) === stageName)
-            .map(a => a.attemptNo || 1);
-        return Math.max(...numbers) + 1;
+    // 목록: 같은 심사 건(학생 · 기본단계)은 최신 차수 1행만
+    latestPerCase(assignments) {
+        const map = new Map();
+        assignments.forEach(a => {
+            const key = this.caseKey(a);
+            const prev = map.get(key);
+            if (!prev || (a.attemptNo || 1) > (prev.attemptNo || 1)) map.set(key, a);
+        });
+        return assignments.filter(a => map.get(this.caseKey(a)) === a);
+    },
+
+    // 상세: 같은 심사 건의 이전 차수 (차수 순)
+    previousAttempts(assignment) {
+        const key = this.caseKey(assignment);
+        const current = assignment.attemptNo || 1;
+        return REVIEW_ASSIGNMENTS
+            .filter(a => this.caseKey(a) === key && (a.attemptNo || 1) < current)
+            .sort((a, b) => (a.attemptNo || 1) - (b.attemptNo || 1));
     }
 };
 

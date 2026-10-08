@@ -1,8 +1,8 @@
 """
 교수 화면 - 재심사 목업 테스트 (2026-10-07 재정비 기준)
 기준: docs/재심사_목업_재정비_계획_20261007.md
-- 학위논문심사 목록 '차수' 컬럼(D2), 심사결과는 기존 진행상태
-- 조건부합격 시 다음 번호 심사 행 생성, 이전 차수 이력·불합격 안내/확인창 없음
+- 같은 심사 건의 1·2차는 목록 1행(최신 차수), 상세에 이전 차수 심사 화면을 그대로(읽기 전용) 표시 (2026-10-08)
+- 조건부합격은 기존처럼 같은 심사 건 안에서 '재심 정보'로 처리 (새 행 없음), 불합격 안내/확인창 없음
 
 실행: python -m pytest test-professor-review-retry.py -v -s
 """
@@ -50,22 +50,24 @@ def review_rows(d, name):
     return [r.text for r in d.find_elements(By.CSS_SELECTOR, "#review-list tbody tr") if name in r.text]
 
 
-def test_01_list_attempt_column_and_existing_result(driver):
-    """차수 컬럼 유지, 심사결과는 기존 진행상태"""
+def test_01_list_one_row_per_case(driver):
+    """심사 건 1행 (차수 컬럼 없음)"""
     open_review_list(driver)
     headers = [th.text for th in driver.find_elements(By.CSS_SELECTOR, "#review-list thead th")]
-    assert "차수" in headers
-    rows = review_rows(driver, "홍길동")
-    assert len(rows) == 2 and any("1차" in r for r in rows) and any("2차" in r for r in rows), rows
-    assert all("다음 학기 재신청" not in r for r in rows)
+    assert "차수" not in headers
+    assert len(review_rows(driver, "홍길동")) == 1
 
 
-def test_02_detail_without_previous_history(driver):
-    """상세에 '이전 차수 이력' 없음 (명시 요구 아님)"""
+def test_02_detail_shows_previous_attempt_as_is(driver):
+    """한 관리 화면: 1차 심사 내역(기존 화면 그대로) + 2차 심사"""
     open_review_list(driver)
     open_chair(driver, "RA_RETRY_002")
     text = detail_text(driver)
-    assert "홍길동" in text and "이전 차수 이력" not in text
+    assert "1차 심사" in text and "2차 심사" in text
+    assert "데이터 수집 설계를 전면 보완" in text, "1차 위원장 최종 의견"
+    # 현재 차수의 판정 영역은 그대로 동작 (이전 차수와 id 충돌 없음)
+    ids = driver.execute_script("return [!!document.querySelector('#review-detail-screen #chair-final-comment'), !!document.querySelector('#review-detail-screen #prev1-chair-final-comment')]")
+    assert ids == [True, True], ids
 
 
 def test_03_fail_decision_existing_flow(driver):
@@ -83,8 +85,8 @@ def test_03_fail_decision_existing_flow(driver):
     assert not driver.execute_script("return REVIEW_ASSIGNMENTS.some(a => a.previousAssignmentId === 'RA_TEST_CHAIR')")
 
 
-def test_04_conditional_creates_next_review(driver):
-    """조건부합격: 평가표 선택 가능 → 다음 번호 심사 행 생성(파일 없음)"""
+def test_04_conditional_stays_in_same_case(driver):
+    """조건부합격: 평가표 선택 가능 → 같은 심사 건 안에 '재심 정보' 저장 (새 행 없음)"""
     open_review_list(driver)
     open_chair(driver, "RA_TEST_CHAIR")
     driver.execute_script("selectDecision('조건부합격')")
@@ -95,14 +97,13 @@ def test_04_conditional_creates_next_review(driver):
     driver.find_element(By.ID, "chair-final-comment").send_keys("5장 분석 보완 후 다시 제출")
     driver.execute_script("submitChairDecision()")
     time.sleep(1.5)
-    new_row = driver.execute_script(
-        "const a = REVIEW_ASSIGNMENTS.find(x => x.previousAssignmentId === 'RA_TEST_CHAIR');"
-        "return a ? {no: a.attemptNo, n: a.committee.length, file: a.thesisFile} : null")
-    assert new_row and new_row["no"] == 2 and new_row["n"] == 3 and new_row["file"] is None, new_row
+    resub = driver.execute_script(
+        "const r = REVIEW_RESULTS.find(x => x.assignmentId === 'RA_TEST_CHAIR'); return r && r.resubmission ? r.resubmission.reviewerType : null")
+    assert resub == "committee"
+    assert not driver.execute_script("return REVIEW_ASSIGNMENTS.some(a => a.previousAssignmentId === 'RA_TEST_CHAIR')")
     driver.execute_script("closeReviewDetailScreen && closeReviewDetailScreen()")
     open_review_list(driver)
-    rows = review_rows(driver, "판정테스트")
-    assert len(rows) == 2 and any("2차" in r for r in rows), rows
+    assert len(review_rows(driver, "판정테스트")) == 1
 
 
 def test_05_exam_schedule_no_attempt_column(driver):

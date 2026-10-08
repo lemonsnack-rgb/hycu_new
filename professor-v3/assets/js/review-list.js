@@ -2,7 +2,8 @@
 
 // ==================== 심사 목록 렌더링 ====================
 function renderReviewList() {
-    const assignments = ReviewService.getMyReviewAssignments();
+    // 같은 심사 건(학생 · 기본단계)의 1·2차는 최신 차수 1행만 표시 (이전 차수는 상세에서)
+    const assignments = ReviewAttempt.latestPerCase(ReviewService.getMyReviewAssignments());
     
     const listContainer = document.getElementById('review-list');
     const countEl = document.getElementById('review-count');
@@ -91,7 +92,6 @@ function renderReviewList() {
                             <th style="width: 100px;">지도교수명</th>
                             <th style="width: 100px;">기본단계</th>
                             <th style="width: 120px;">세부단계</th>
-                            <th style="width: 60px;">차수</th>
                             <th style="width: 100px;">심사결과</th>
                             <th style="width: 100px;">관리</th>
                         </tr>
@@ -119,7 +119,6 @@ function renderReviewList() {
                                 <td>${assignment.advisorName || '-'}</td>
                                 <td>${assignment.basicStageName || assignment.reviewType || '-'}</td>
                                 <td>${assignment.subStageName || '-'}</td>
-                                <td>${ReviewAttempt.label(assignment)}</td>
                                 <td>
                                     ${getProgressStatusText(assignment.evaluationProgress)}
                                 </td>
