@@ -25,8 +25,8 @@
     // 신청/철회 기간 (Mock)
     const PERIOD_OPEN = {
         semester: '2026-2학기',
-        application: { start: '2026-09-01', end: '2026-10-31' },
-        withdrawal: { start: '2026-09-01', end: '2026-10-20' }
+        application: { start: '2026-09-01', end: '2026-12-31' },
+        withdrawal: { start: '2026-09-01', end: '2026-12-31' }
     };
 
     // key는 딥링크 호환을 위해 유지
@@ -81,8 +81,9 @@
         }, opts);
     }
 
-    function application(stageId, no, appliedAt, semester) {
-        return { id: 'APP-' + stageId + '-' + no, stageId, no, status: 'submitted', appliedAt, semester };
+    function application(stageId, no, appliedAt, semester, titleEn) {
+        return { id: 'APP-' + stageId + '-' + no, stageId, no, status: 'submitted', appliedAt, semester,
+                 thesisTitle: TITLE, thesisTitleEn: titleEn || 'Improving Personalization Performance of AI-based Recommender Systems' };
     }
 
     // 논문작성계획서 합격 (모든 시나리오 공통)
@@ -142,7 +143,7 @@
                 applicationId: 'APP-prelim-2',
                 attemptNumber: 2,
                 semester: '2026-2학기',
-                submissionPeriod: { start: '2026-09-15', end: '2026-10-15' },
+                submissionPeriod: { start: '2026-09-15', end: '2026-12-31' },
                 status: 'submitted',
                 submittedData: submitted('prelim_v2.pdf', '2026-09-28 16:40', 'prelim_v2_appendix.pdf'),
                 evaluatedCount: key === 'in-progress' ? 1 : 0
@@ -163,7 +164,7 @@
             const first = record('final', {
                 applicationId: 'APP-final-1',
                 semester: '2026-2학기',
-                submissionPeriod: { start: '2026-09-15', end: '2026-10-15' },
+                submissionPeriod: { start: '2026-09-15', end: '2026-12-31' },
                 status: 'submitted',
                 reviewResult: 'conditional',
                 submittedData: submitted('final_v1.pdf', '2026-09-20 11:05', 'final_v1_data.pdf'),
@@ -177,7 +178,7 @@
                 applicationId: 'APP-final-1',
                 attemptNumber: 2,
                 semester: '2026-2학기',
-                submissionPeriod: { start: '2026-10-02', end: '2026-10-31' },
+                submissionPeriod: { start: '2026-10-02', end: '2026-12-31' },
                 originalSubmission: {
                     ...first.submittedData,
                     attemptNumber: first.attemptNumber,
@@ -260,18 +261,26 @@
                 : { code: 'none', label: '미신청' };
         },
 
+        // 오늘이 기간 안인지 (철회기간·제출기간 판단)
+        isWithinPeriod(period) {
+            if (!period) return false;
+            const today = nowText().slice(0, 10);
+            return period.start <= today && today <= period.end;
+        },
+
         // 심사신청 (최초 또는 재신청) → 다음 번호의 제출 기록 생성
-        apply(stageId, title) {
+        apply(stageId, title, titleEn) {
             const stage = this.getStage(stageId);
             const records = this.getRecords(stageId);
-            const app = application(stageId, stage.applications.length + 1, nowText().slice(0, 10), stage.semester);
+            const app = application(stageId, stage.applications.length + 1, nowText().slice(0, 10), stage.semester, titleEn);
+            if (title) app.thesisTitle = title;
             stage.applications.push(app);
             const rec = record(stageId, {
                 id: Math.max(0, ...this.getState().submissions.map(r => r.id)) + 1,
                 applicationId: app.id,
                 attemptNumber: records.length ? records[records.length - 1].attemptNumber + 1 : 1,
                 semester: stage.semester,
-                submissionPeriod: { start: '2026-09-15', end: '2026-10-31' }
+                submissionPeriod: { start: '2026-09-15', end: '2026-12-31' }
             });
             this.getState().submissions.push(rec);
             return rec.attemptNumber;

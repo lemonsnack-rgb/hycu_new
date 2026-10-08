@@ -254,10 +254,6 @@ function renderThesisListRow(submission, index) {
     let actionButton;
     if (submission.status === 'submitted') {
         actionButton = `<button data-action="view" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">보기</button>`;
-        // 제출취소: 결과 확정 전 제출 건에 표시, 심사가 진행 중이면 누를 때 안내 (철회와 같은 방식)
-        if (!submission.reviewResult) {
-            actionButton += `<button data-action="cancel-submission" data-id="${submission.id}" class="ml-3 text-sm text-red-600 hover:text-red-800 font-medium">제출취소</button>`;
-        }
     } else {  // not_submitted 또는 resubmit
         actionButton = `<button data-action="submit" data-id="${submission.id}" class="text-sm text-[#6A0028] hover:text-[#8A0034] font-medium">제출</button>`;
     }
@@ -491,6 +487,9 @@ function renderThesisDetailView() {
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
 
+    // 제출취소: 상세 화면에서, 결과 확정 전이고 제출기간일 때만 (심사 진행 중이면 누를 때 안내)
+    const canShowCancel = !submission.reviewResult && ReviewScenario.isWithinPeriod(submission.submissionPeriod);
+
     // 평가 결과 텍스트 계산
     let reviewResultText = '-';
     if (submission.reviewResult === 'pass') {
@@ -514,10 +513,17 @@ function renderThesisDetailView() {
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">논문 제출 정보</h3>
-                <button data-action="edit-thesis" data-id="${submission.id}"
-                        class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
-                    수정
-                </button>
+                <div class="flex gap-2">
+                    ${canShowCancel ? `
+                    <button data-action="cancel-submission" data-id="${submission.id}"
+                            class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-600 hover:text-white transition-colors">
+                        제출취소
+                    </button>` : ''}
+                    <button data-action="edit-thesis" data-id="${submission.id}"
+                            class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
+                        수정
+                    </button>
+                </div>
             </div>
 
             <div class="space-y-4">

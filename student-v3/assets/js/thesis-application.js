@@ -90,19 +90,13 @@ function renderApplicationRow(data, index) {
     const periodText = `${stage.applicationPeriod.start} ~ ${stage.applicationPeriod.end}`;
     const withdrawalPeriodText = `${stage.withdrawalPeriod.start} ~ ${stage.withdrawalPeriod.end}`;
 
-    // 신청 상태 및 관리 버튼 (기존 목업과 동일: 미신청·재심사 진행 → [관리], 신청완료 → [철회])
+    // 신청 상태 및 관리 버튼 — 관리 컬럼은 [관리] 하나 (미신청·재심사 진행: 신청 모달 / 신청완료: 신청 상세, 철회는 상세에서)
     const statusText = status.label;
-    let actionButton = `<a href="#" onclick="openApplicationModal('${stage.id}'); return false;"
+    const openFn = status.code === 'applied' ? 'viewApplicationDetail' : 'openApplicationModal';
+    const actionButton = `<a href="#" onclick="${openFn}('${stage.id}'); return false;"
                            class="text-[#6A0028] hover:underline text-xs font-medium">
                             [관리]
                         </a>`;
-
-    if (status.code === 'applied') {
-        actionButton = `<a href="#" onclick="confirmWithdrawal('${stage.id}'); return false;"
-                           class="text-red-600 hover:underline text-xs font-medium">
-                            [철회]
-                        </a>`;
-    }
 
     return `
         <tr class="hover:bg-blue-50">
@@ -219,7 +213,7 @@ function submitApplication(event, stageTypeId) {
 
     if (confirm('논문을 신청하시겠습니까?')) {
         // 시나리오 상태에 신청 추가 (학위논문제출에 다음 번호의 제출 행 생성)
-        const attemptNumber = ReviewScenario.apply(stageTypeId, title);
+        const attemptNumber = ReviewScenario.apply(stageTypeId, title, titleEn);
 
         console.log('논문 신청 완료:', stageTypeId, attemptNumber + '차 제출');
         alert('논문 신청이 완료되었습니다.');
@@ -232,16 +226,14 @@ function submitApplication(event, stageTypeId) {
 /**
  * 신청 상세 보기
  */
-function viewApplicationDetail(applicationId) {
-    const application = window.mockThesisApplications.find(app => app.id === applicationId);
-    if (!application) return;
+function viewApplicationDetail(stageId) {
+    const stage = ReviewScenario.getStage(stageId);
+    const application = ReviewScenario.getCurrentApplication(stageId);
+    if (!stage || !application) return;
 
-    const stage = window.mockStepTypes.find(s => s.id === application.stageTypeId);
-
-    let statusText = '미신청';
-    if (application.status === 'submitted') {
-        statusText = '신청완료';
-    }
+    const statusText = ReviewScenario.getStageStatus(stageId).label;
+    // 철회는 학생이 상세 화면에서, 철회기간일 때만
+    const canShowWithdraw = ReviewScenario.isWithinPeriod(stage.withdrawalPeriod);
 
     const modalHtml = `
         <!-- 모달 오버레이 -->
@@ -277,7 +269,7 @@ function viewApplicationDetail(applicationId) {
 
                     <div class="border-b pb-4">
                         <label class="block text-sm font-medium text-gray-500 mb-1">신청일</label>
-                        <p class="text-base text-gray-900">${application.applicationDate}</p>
+                        <p class="text-base text-gray-900">${application.appliedAt}</p>
                     </div>
 
                     <div class="border-b pb-4">
@@ -288,10 +280,11 @@ function viewApplicationDetail(applicationId) {
 
                 <!-- 모달 푸터 -->
                 <div class="flex justify-between items-center gap-3 p-6 border-t bg-gray-50">
-                    <button type="button" onclick="cancelApplication('${applicationId}')"
+                    ${canShowWithdraw ? `
+                    <button type="button" onclick="cancelApplication('${stageId}')"
                             class="px-6 py-2.5 bg-red-600 text-white rounded-md hover:bg-red-700 font-semibold text-sm">
                         논문 신청 철회
-                    </button>
+                    </button>` : '<span></span>'}
                     <button type="button" onclick="closeDetailModal()"
                             class="px-6 py-2.5 bg-gray-600 text-white rounded-md hover:bg-gray-700 font-semibold text-sm">
                         닫기
@@ -305,10 +298,10 @@ function viewApplicationDetail(applicationId) {
 }
 
 /**
- * 목록에서 바로 철회 확인
+ * 신청 철회 (상세 모달에서) — 요구서 JXLB-2 조건·문구
  */
-function confirmWithdrawal(stageId) {
-    // 심사가 진행 중(평가한 심사위원 1명 이상)이거나 결과가 확정되면 철회 불가 (JXLB-2)
+function cancelApplication(stageId) {
+    // 심사가 진행 중(평가한 심사위원 1명 이상)이거나 결과가 확정되면 철회 불가
     const check = ReviewScenario.checkWithdraw(stageId);
     if (!check.ok) {
         alert(check.reason);
@@ -319,30 +312,9 @@ function confirmWithdrawal(stageId) {
         // 신청과 해당 신청의 제출 자료 삭제
         ReviewScenario.withdraw(stageId);
 
-        alert('논문 신청이 철회되었습니다.');
-
-        renderApplicationListScreen();
-    }
-}
-
-/**
- * 신청 철회 (상세 모달에서)
- */
-function cancelApplication(applicationId) {
-    if (confirm('논문 신청을 철회하시겠습니까?')) {
-        // mockThesisApplications에서 해당 항목 삭제
-        const index = window.mockThesisApplications.findIndex(app => app.id === applicationId);
-        if (index > -1) {
-            window.mockThesisApplications.splice(index, 1);
-        }
-
-        // 성공 메시지
         alert('논문 신청 내역이 초기화되었습니다.');
 
-        // 모달 닫기
         closeDetailModal();
-
-        // 목록 재렌더링 (미신청 상태로 표시)
         renderApplicationListScreen();
     }
 }
@@ -368,7 +340,6 @@ window.openApplicationModal = openApplicationModal;
 window.closeApplicationModal = closeApplicationModal;
 window.submitApplication = submitApplication;
 window.viewApplicationDetail = viewApplicationDetail;
-window.confirmWithdrawal = confirmWithdrawal;
 window.cancelApplication = cancelApplication;
 window.closeDetailModal = closeDetailModal;
 

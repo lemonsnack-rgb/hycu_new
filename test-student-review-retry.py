@@ -4,6 +4,7 @@
 - 신청상태: 기존 '미신청 / 신청완료' + 요구서 '재심사 진행', 버튼은 기존 [관리] / [철회]
 - 구 이력 조회: 학위논문제출 목록의 지난 제출 행 + 기존 [보기] / [총평 보기]
 - 철회 불가 문구는 요구서 문구 하나
+- 관리 컬럼은 상세(페이지) 이동 1개만, 철회·제출취소는 상세 화면에서 해당 기간에만 (2026-10-08)
 
 실행: python -m pytest test-student-review-retry.py -v -s
 """
@@ -64,6 +65,18 @@ def rows(d, container_id, text):
     return [r for r in d.find_elements(By.CSS_SELECTOR, f"#{container_id} tbody tr") if text in r.text]
 
 
+def action_cell_count(row):
+    """관리 컬럼(마지막 칸)의 버튼·링크 개수"""
+    return len(row.find_elements(By.CSS_SELECTOR, "td:last-child a, td:last-child button"))
+
+
+def open_application_detail(d, stage_name):
+    """논문신청 목록의 [관리] → 신청 상세 모달"""
+    stage_row(d, "thesis-application-content", stage_name).find_element(By.PARTIAL_LINK_TEXT, "관리").click()
+    time.sleep(0.3)
+    return d.find_element(By.ID, "detail-modal")
+
+
 def stage_row(d, container_id, stage_name):
     found = rows(d, container_id, stage_name)
     assert found, f"{stage_name} 행을 찾을 수 없음"
@@ -89,12 +102,16 @@ def test_01_retry_status_and_reapply(driver):
     accept_dialog(driver)
     assert accept_dialog(driver) == "논문 신청이 완료되었습니다."
     row = stage_row(driver, "thesis-application-content", "예비심사")
-    assert "신청완료" in row.text and "[철회]" in row.text
+    assert "신청완료" in row.text and "[관리]" in row.text and "철회" not in row.text
+    for r_ in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content tbody tr"):
+        assert action_cell_count(r_) == 1, "관리 컬럼은 1개 동작"
 
     open_screen(driver, "thesis-submission")
     prelim = [r.text for r in rows(driver, "thesis-submission-content", "예비심사")]
     assert any("1차 제출" in t and "불합격" in t for t in prelim), prelim
     assert any("2차 제출" in t and "미제출" in t for t in prelim), prelim
+    for r_ in driver.find_elements(By.CSS_SELECTOR, "#thesis-submission-content tbody tr"):
+        assert action_cell_count(r_) == 1 and "제출취소" not in r_.text, "관리 컬럼은 1개 동작, 제출취소는 상세에서"
 
 
 def test_02_old_history_via_existing_view(driver):
@@ -106,6 +123,7 @@ def test_02_old_history_via_existing_view(driver):
     time.sleep(0.3)
     detail = driver.find_element(By.ID, "thesis-submission-content")
     assert "불합격" in detail.text
+    assert "제출취소" not in detail.text, "결과 확정·제출기간 지난 건은 제출취소 없음"
     detail.find_element(By.CSS_SELECTOR, "[data-action=show-review-comments]").click()
     time.sleep(0.3)
     assert "데이터 수집 설계를 전면 보완" in driver.find_element(By.TAG_NAME, "body").text
@@ -116,20 +134,23 @@ def test_02_old_history_via_existing_view(driver):
 
 
 def test_03_withdraw_not_started(driver):
-    """② 심사 미진행: [철회] → 요구서 확인 문구 → 재심사 진행으로 복귀"""
+    """② 심사 미진행: [관리] → 신청 상세 → '논문 신청 철회'(철회기간) → 요구서 확인 문구 → 재심사 진행으로 복귀"""
     choose_scenario(driver, "thesis-application", "not-started")
-    stage_row(driver, "thesis-application-content", "예비심사").find_element(By.PARTIAL_LINK_TEXT, "철회").click()
+    modal = open_application_detail(driver, "예비심사")
+    modal.find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']").click()
     assert accept_dialog(driver) == WITHDRAW_CONFIRM
     accept_dialog(driver)
     assert "재심사 진행" in stage_row(driver, "thesis-application-content", "예비심사").text
 
 
 def test_04_cancel_submission_not_started(driver):
-    """② 심사 미진행: [제출취소] → 미제출, 결과 전 심사결과는 '-'"""
+    """② 심사 미진행: [보기] 상세 → [제출취소](제출기간) → 미제출, 결과 전 심사결과는 '-'"""
     choose_scenario(driver, "thesis-submission", "not-started")
     row = [r for r in rows(driver, "thesis-submission-content", "예비심사") if "2차 제출" in r.text][0]
     assert row.find_elements(By.TAG_NAME, "td")[6].text == "-"
-    row.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
+    row.find_element(By.XPATH, ".//button[normalize-space()='보기']").click()
+    time.sleep(0.3)
+    driver.find_element(By.CSS_SELECTOR, "#thesis-submission-content [data-action=cancel-submission]").click()
     assert "취소하시겠습니까" in accept_dialog(driver)
     accept_dialog(driver)
     row = [r for r in rows(driver, "thesis-submission-content", "예비심사") if "2차 제출" in r.text][0]
@@ -139,21 +160,24 @@ def test_04_cancel_submission_not_started(driver):
 def test_05_in_progress_blocked(driver):
     """③ 심사 진행 중: 철회·제출취소 모두 안내 팝업으로 불가 (비활성 버튼 없음)"""
     choose_scenario(driver, "thesis-application", "in-progress")
-    stage_row(driver, "thesis-application-content", "예비심사").find_element(By.PARTIAL_LINK_TEXT, "철회").click()
+    open_application_detail(driver, "예비심사").find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']").click()
     assert accept_dialog(driver) == WITHDRAW_BLOCKED
+    driver.execute_script("closeDetailModal()")
 
     open_screen(driver, "thesis-submission")
     row = [r for r in rows(driver, "thesis-submission-content", "예비심사") if "2차 제출" in r.text][0]
-    assert not row.find_elements(By.CSS_SELECTOR, "button[disabled]")
-    row.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
+    row.find_element(By.XPATH, ".//button[normalize-space()='보기']").click()
+    time.sleep(0.3)
+    driver.find_element(By.CSS_SELECTOR, "#thesis-submission-content [data-action=cancel-submission]").click()
     assert "제출을 취소할 수 없습니다" in accept_dialog(driver)
 
 
 def test_06_passed_stage_withdraw_uses_requirement_text(driver):
     """결과 확정 단계(논문작성계획서 합격)도 요구서 문구로 철회 불가 (D4)"""
     choose_scenario(driver, "thesis-application", "retry-open")
-    stage_row(driver, "thesis-application-content", "논문작성계획서").find_element(By.PARTIAL_LINK_TEXT, "철회").click()
+    open_application_detail(driver, "논문작성계획서").find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']").click()
     assert accept_dialog(driver) == WITHDRAW_BLOCKED
+    driver.execute_script("closeDetailModal()")
 
 
 def test_07_conditional_followup_submit(driver):
