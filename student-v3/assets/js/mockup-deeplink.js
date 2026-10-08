@@ -9,6 +9,8 @@
  * - screen   : showScreen 화면 키 (dashboard, thesis-application, thesis-submission, exam-schedule …)
  * - scenario : 시연 시나리오 키 (retry-open, not-started, in-progress, conditional)
  * - form     : 학위논문제출에서 해당 기본단계의 최신 제출 폼 열기 (plan, prelim, final)
+ * - view     : 학위논문제출에서 해당 기본단계의 최신 제출 상세([보기]) 열기 (plan, prelim, final)
+ * - detail   : 논문신청에서 해당 기본단계의 신청 상세 모달 열기 (plan, prelim, final)
  * 롤백: 이 파일 삭제 + student-dashboard.html의 script 태그 제거
  */
 (function () {
@@ -17,6 +19,8 @@
         const screen = params.get('screen');
         const scenario = params.get('scenario');
         const form = params.get('form');
+        const view = params.get('view');
+        const detail = params.get('detail');
 
         if (scenario && window.ReviewScenario && ReviewScenario.SCENARIOS.some(s => s.key === scenario)) {
             ReviewScenario.load(scenario);
@@ -25,6 +29,13 @@
             window.showScreen(screen);
         }
         setTimeout(function () {
+            if (view && window.ReviewScenario && typeof window.viewThesisSubmission === 'function') {
+                const latest = ReviewScenario.getLatest(view);
+                if (latest) window.viewThesisSubmission(latest.id);
+            }
+            if (detail && typeof window.viewApplicationDetail === 'function') {
+                window.viewApplicationDetail(detail);
+            }
             if (form && window.ReviewScenario && typeof window.submitThesis === 'function') {
                 const latest = ReviewScenario.getLatest(form);
                 if (latest) window.submitThesis(latest.id);
