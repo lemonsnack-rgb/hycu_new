@@ -116,6 +116,11 @@ function renderApplicationRow(data, index) {
 function openApplicationModal(stageTypeId) {
     const stage = ReviewScenario.getStage(stageTypeId);
     if (!stage) return;
+    const check = ReviewScenario.checkApply(stageTypeId);
+    if (!check.ok) {
+        alert(check.reason);
+        return;
+    }
 
     const modalHtml = `
         <!-- 모달 오버레이 -->

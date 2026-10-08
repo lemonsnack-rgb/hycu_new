@@ -262,6 +262,16 @@
             return period.start <= today && today <= period.end;
         },
 
+        // 신청 가능 여부: 불합격 처리된 학기에는 같은 단계를 다시 신청할 수 없음 (다음 학기에 다시 신청)
+        checkApply(stageId) {
+            const stage = this.getStage(stageId);
+            const latest = this.getLatest(stageId);
+            if (stage && latest && latest.reviewResult === 'fail' && latest.semester === stage.semester) {
+                return { ok: false, reason: '불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다.' };
+            }
+            return { ok: true };
+        },
+
         // 심사신청 (최초 또는 재신청) → 다음 번호의 제출 기록 생성
         apply(stageId, title, titleEn) {
             const stage = this.getStage(stageId);

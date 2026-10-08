@@ -181,6 +181,22 @@ def test_07_conditional_followup_in_same_screen(driver):
     assert "기존 제출 내역 (1차 제출)" in page.text and "조건부합격" in page.text
 
 
+def test_07b_same_semester_reapply_blocked(driver):
+    """불합격 처리된 학기에는 같은 단계 다시 신청 불가 (다음 학기에 신청) — ① 시나리오의 불합격 학기를 현재 학기로 바꿔 확인"""
+    choose_scenario(driver, "thesis-application", "retry-open")
+    driver.execute_script(
+        "const s = ReviewScenario.getStage('prelim'); ReviewScenario.getLatest('prelim').semester = s.semester;")
+    stage_row(driver, "thesis-application-content", "예비심사").find_element(By.PARTIAL_LINK_TEXT, "관리").click()
+    assert accept_dialog(driver) == "불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다."
+    assert not driver.find_elements(By.ID, "application-modal")
+    # 다른 학기(기본 ① 시나리오)는 신청 모달이 열림
+    choose_scenario(driver, "thesis-application", "retry-open")
+    stage_row(driver, "thesis-application-content", "예비심사").find_element(By.PARTIAL_LINK_TEXT, "관리").click()
+    time.sleep(0.3)
+    assert driver.find_elements(By.ID, "application-modal")
+    driver.execute_script("closeApplicationModal()")
+
+
 def test_08_removed_items(driver):
     open_screen(driver, "thesis-application")
     options = [o.text for o in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content .review-scenario-select option")]
