@@ -37,7 +37,7 @@ function renderApplicationListScreen() {
     const container = document.getElementById('thesis-application-content');
     if (!container) return;
 
-    // 기본단계별 신청 상태 (재심사·제출취소 목업 시나리오 기준)
+    // 기본단계별 신청 상태 (재심사·신청철회 목업 시나리오 기준)
     const stageData = ReviewScenario.getStages().map(stage => ({
         stage,
         status: ReviewScenario.getStageStatus(stage.id)
@@ -303,17 +303,20 @@ function viewApplicationDetail(stageId) {
 }
 
 /**
- * 신청 철회 (상세 모달에서) — 요구서 JXLB-2 조건·문구
+ * 신청 철회 (상세 모달에서) — 제출 자료 삭제도 신청 철회로만 함 (별도 제출취소 없음)
+ * 심사 내역(평가 저장 1건 이상, 임시저장 포함) 또는 결과가 있으면 불가 / 제출 내역이 있으면 안내 문구로 확인
  */
 function cancelApplication(stageId) {
-    // 심사가 진행 중(평가한 심사위원 1명 이상)이거나 결과가 확정되면 철회 불가
     const check = ReviewScenario.checkWithdraw(stageId);
     if (!check.ok) {
         alert(check.reason);
         return;
     }
 
-    if (confirm('해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?')) {
+    const confirmMessage = ReviewScenario.hasSubmission(stageId)
+        ? '제출한 심사자료가 있습니다. 신청을 철회하면 제출 내역도 함께 삭제됩니다. 그래도 철회하시겠습니까?'
+        : '해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?';
+    if (confirm(confirmMessage)) {
         // 신청과 해당 신청의 제출 자료 삭제
         ReviewScenario.withdraw(stageId);
 

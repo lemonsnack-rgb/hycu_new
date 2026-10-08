@@ -1,9 +1,9 @@
 """
-학생 화면 - 재심사 · 신청철회 · 제출취소 목업 테스트 (2026-10-08 기준)
-- 신청상태는 기존 '미신청 / 신청완료'만 (재심사도 일반 심사와 동일)
-- 목록은 심사 건(기본단계) 1행, 1·2차 제출은 하나의 관리(상세·제출) 화면에 'N차 제출' 블록으로 표시 (목록 제출구분과 같은 표기)
-- 관리 컬럼은 상세(페이지) 이동 1개, 철회·제출취소는 상세 화면에서 해당 기간에만
-- 신청 철회 = 제출취소 (어느 메뉴에서 해도 신청과 제출이 함께 철회), 불가 문구는 요구서 문구
+학생 화면 - 재심사 · 신청철회 목업 테스트 (2026-10-08 기준)
+- 시나리오는 예비심사 심사 건의 상태 1개씩 (MECE): ① 신청 후 미제출 ② 제출 완료·심사 전 ③ 심사 내역 저장됨
+  ④ 불합격·같은 학기 ⑤ 불합격·다음 학기 ⑥ 조건부합격 후 보완 / 재심사 안: 1안(신청 유지) · 2안(신청 다시)
+- 제출 자료 삭제는 신청 철회로만 (별도 제출취소 없음). 제출 내역이 있으면 안내 문구, 심사 내역(임시저장 포함)이 있으면 불가
+- 신청상태는 기존 '미신청 / 신청완료'만, 목록은 심사 건 1행, 상세·제출 화면은 '1차 제출', '2차 제출' 순서
 
 실행: python -m pytest test-student-review-retry.py -v -s
 """
@@ -21,8 +21,11 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 URL = "file:///" + os.path.join(ROOT, "student-v3", "student-dashboard.html").replace(os.sep, "/")
 
 WITHDRAW_CONFIRM = "해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?"
+WITHDRAW_CONFIRM_SUBMITTED = "제출한 심사자료가 있습니다. 신청을 철회하면 제출 내역도 함께 삭제됩니다. 그래도 철회하시겠습니까?"
 WITHDRAW_BLOCKED = "심사가 진행중이므로 철회할 수 없습니다."
 WITHDRAW_DONE = "논문 신청 내역이 초기화되었습니다."
+APPLY_BLOCKED = "불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다."
+SUBMIT_BLOCKED = "불합격 처리된 단계는 다음 학기 제출기간에 제출할 수 있습니다."
 
 
 @pytest.fixture(scope="module")
@@ -51,10 +54,12 @@ def open_screen(d, screen):
     time.sleep(0.4)
 
 
-def choose_scenario(d, screen, key):
-    """시나리오 선택 후 [초기화]로 이전 테스트의 상태 변경을 되돌림 (현재 화면의 선택 바 사용)"""
+def choose(d, screen, key, plan="1"):
+    """현재 화면의 시연 바에서 재심사 안·시나리오 선택 후 [초기화]"""
     open_screen(d, screen)
     bar = f"#{screen}-content"
+    Select(d.find_element(By.CSS_SELECTOR, f"{bar} .review-plan-select")).select_by_value(plan)
+    time.sleep(0.3)
     Select(d.find_element(By.CSS_SELECTOR, f"{bar} .review-scenario-select")).select_by_value(key)
     time.sleep(0.3)
     d.find_element(By.CSS_SELECTOR, f"{bar} .review-scenario-reset").click()
@@ -75,10 +80,14 @@ def action_cell_count(row):
     return len(row.find_elements(By.CSS_SELECTOR, "td:last-child a, td:last-child button"))
 
 
-def open_application_detail(d, stage_name):
+def click_manage(d, stage_name):
     stage_row(d, "thesis-application-content", stage_name).find_element(By.PARTIAL_LINK_TEXT, "관리").click()
     time.sleep(0.3)
-    return d.find_element(By.ID, "detail-modal")
+
+
+def withdraw_button(d, stage_name):
+    click_manage(d, stage_name)
+    return d.find_element(By.ID, "detail-modal").find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']")
 
 
 def headings(page):
@@ -91,43 +100,102 @@ def open_submission_row(d, stage_name, button):
     return d.find_element(By.ID, "thesis-submission-content")
 
 
-def test_01_fail_then_reapply(driver):
-    """① 불합격 단계: 신청상태 '미신청'(재심사 구분 없음) → [관리]로 다시 신청 → 학위논문제출 같은 행이 2차 제출로"""
-    choose_scenario(driver, "thesis-application", "retry-open")
-    content = driver.find_element(By.ID, "thesis-application-content")
-    statuses = [r.find_elements(By.TAG_NAME, "td")[4].text for r in content.find_elements(By.CSS_SELECTOR, "tbody tr")]
-    assert set(statuses) <= {"미신청", "신청완료"}, statuses
-    assert "재심사" not in content.find_element(By.TAG_NAME, "table").text
+def status_of(d, stage_name):
+    return stage_row(d, "thesis-application-content", stage_name).find_elements(By.TAG_NAME, "td")[4].text
 
-    row = stage_row(driver, "thesis-application-content", "예비심사")
-    assert "미신청" in row.text
-    row.find_element(By.PARTIAL_LINK_TEXT, "관리").click()
-    time.sleep(0.3)
-    modal = driver.find_element(By.ID, "application-modal")
-    driver.find_element(By.ID, "app-thesis-title").send_keys("AI 기반 추천 시스템 연구(보완)")
-    driver.find_element(By.ID, "app-thesis-title-en").send_keys("Improved Recommender")
-    modal.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
-    accept_dialog(driver)
-    assert accept_dialog(driver) == "논문 신청이 완료되었습니다."
-    assert "신청완료" in stage_row(driver, "thesis-application-content", "예비심사").text
-    for r_ in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content tbody tr"):
-        assert action_cell_count(r_) == 1
 
+def test_01_bar_and_list_rules(driver):
+    """시연 바: 시나리오 6개(상태별 1개) + 재심사 안 2개 / 신청상태 2종 / 관리 컬럼 1개"""
+    open_screen(driver, "thesis-application")
+    options = [o.text for o in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content .review-scenario-select option")]
+    assert options == ["① 신청 후 미제출", "② 제출 완료·심사 전", "③ 심사 내역 저장됨",
+                       "④ 불합격·같은 학기", "⑤ 불합격·다음 학기", "⑥ 조건부합격 후 보완"], options
+    plans = [o.text for o in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content .review-plan-select option")]
+    assert len(plans) == 2 and plans[0].startswith("1안") and plans[1].startswith("2안")
+    for key in ("applied", "submitted", "reviewing", "fail-same", "fail-next", "conditional"):
+        for plan in ("1", "2"):
+            choose(driver, "thesis-application", key, plan)
+            for r in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content tbody tr"):
+                assert r.find_elements(By.TAG_NAME, "td")[4].text in ("미신청", "신청완료")
+                assert action_cell_count(r) == 1
+    open_screen(driver, "thesis-submission")
+    for r in driver.find_elements(By.CSS_SELECTOR, "#thesis-submission-content tbody tr"):
+        assert action_cell_count(r) == 1
+
+
+def test_02_applied_withdraw_default_message(driver):
+    """① 신청 후 미제출: 철회 → 요구서 문구 → 미신청, 학위논문제출 행 삭제"""
+    choose(driver, "thesis-application", "applied")
+    withdraw_button(driver, "예비심사").click()
+    assert accept_dialog(driver) == WITHDRAW_CONFIRM
+    assert accept_dialog(driver) == WITHDRAW_DONE
+    assert status_of(driver, "예비심사") == "미신청"
+    open_screen(driver, "thesis-submission")
+    assert not rows(driver, "thesis-submission-content", "예비심사")
+
+
+def test_03_submitted_no_cancel_button_and_withdraw_message(driver):
+    """② 제출 완료·심사 전: 상세에 [제출취소] 없음 / 철회 → 제출 내역 삭제 안내 → 제출도 삭제"""
+    choose(driver, "thesis-submission", "submitted")
+    page = open_submission_row(driver, "예비심사", "보기")
+    assert headings(page) == ["1차 제출"]
+    assert "제출취소" not in page.text and not page.find_elements(By.CSS_SELECTOR, "[data-action=cancel-submission]")
+    open_screen(driver, "thesis-application")
+    withdraw_button(driver, "예비심사").click()
+    assert accept_dialog(driver) == WITHDRAW_CONFIRM_SUBMITTED
+    assert accept_dialog(driver) == WITHDRAW_DONE
+    assert status_of(driver, "예비심사") == "미신청"
+    open_screen(driver, "thesis-submission")
+    assert not rows(driver, "thesis-submission-content", "예비심사")
+
+
+def test_04_reviewing_withdraw_blocked(driver):
+    """③ 심사 내역 저장됨(임시저장 포함): 철회 불가"""
+    choose(driver, "thesis-application", "reviewing")
+    withdraw_button(driver, "예비심사").click()
+    assert accept_dialog(driver) == WITHDRAW_BLOCKED
+    driver.execute_script("closeDetailModal()")
+
+
+def test_05_passed_stage_withdraw_blocked(driver):
+    """합격 단계(논문작성계획서): 철회 불가"""
+    choose(driver, "thesis-application", "applied")
+    withdraw_button(driver, "논문작성계획서").click()
+    assert accept_dialog(driver) == WITHDRAW_BLOCKED
+    driver.execute_script("closeDetailModal()")
+
+
+def test_06_fail_same_semester_plan1(driver):
+    """④ 1안: 신청완료 유지, 2차 제출 행 [제출] → 같은 학기 차단, 철회 불가"""
+    choose(driver, "thesis-application", "fail-same", "1")
+    assert status_of(driver, "예비심사") == "신청완료"
+    withdraw_button(driver, "예비심사").click()
+    assert accept_dialog(driver) == WITHDRAW_BLOCKED
+    driver.execute_script("closeDetailModal()")
+    open_screen(driver, "thesis-submission")
+    row = stage_row(driver, "thesis-submission-content", "예비심사")
+    assert "2차 제출" in row.text and "미제출" in row.text
+    row.find_element(By.XPATH, ".//button[normalize-space()='제출']").click()
+    assert accept_dialog(driver) == SUBMIT_BLOCKED
+
+
+def test_07_fail_same_semester_plan2(driver):
+    """④ 2안: 미신청, [관리] → 같은 학기 신청 차단"""
+    choose(driver, "thesis-application", "fail-same", "2")
+    assert status_of(driver, "예비심사") == "미신청"
+    click_manage(driver, "예비심사")
+    assert accept_dialog(driver) == APPLY_BLOCKED
+    assert not driver.find_elements(By.ID, "application-modal")
+
+
+def test_08_fail_next_semester_plan1(driver):
+    """⑤ 1안: 신청완료, 같은 행 2차 [제출] → 1차 제출(불합격·총평) + 2차 제출 폼"""
+    choose(driver, "thesis-application", "fail-next", "1")
+    assert status_of(driver, "예비심사") == "신청완료"
     open_screen(driver, "thesis-submission")
     row = stage_row(driver, "thesis-submission-content", "예비심사")
     assert "2차 제출" in row.text and "미제출" in row.text
     page = open_submission_row(driver, "예비심사", "제출")
-    assert headings(page) == ["1차 제출", "2차 제출"] and "불합격" in page.text
-
-
-def test_02_one_management_screen(driver):
-    """② 2차 제출 상세: 같은 화면에 1차 제출 내역(불합격·총평 보기)과 2차 제출 정보"""
-    choose_scenario(driver, "thesis-submission", "not-started")
-    for r_ in driver.find_elements(By.CSS_SELECTOR, "#thesis-submission-content tbody tr"):
-        assert action_cell_count(r_) == 1 and "제출취소" not in r_.text
-    # 목록 제출구분('2차 제출')과 상세 제목이 같은 표기
-    assert "2차 제출" in stage_row(driver, "thesis-submission-content", "예비심사").text
-    page = open_submission_row(driver, "예비심사", "보기")
     assert headings(page) == ["1차 제출", "2차 제출"] and "불합격" in page.text
     page.find_element(By.CSS_SELECTOR, "[data-action=show-review-comments]").click()
     time.sleep(0.3)
@@ -136,77 +204,39 @@ def test_02_one_management_screen(driver):
     time.sleep(0.3)
 
 
-def test_03_withdraw_in_application_detail_also_withdraws_submission(driver):
-    """② 논문신청 상세 [논문 신청 철회] → 신청·제출 함께 철회"""
-    choose_scenario(driver, "thesis-application", "not-started")
-    open_application_detail(driver, "예비심사").find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']").click()
-    assert accept_dialog(driver) == WITHDRAW_CONFIRM
-    assert accept_dialog(driver) == WITHDRAW_DONE
-    assert "미신청" in stage_row(driver, "thesis-application-content", "예비심사").text
+def test_09_fail_next_semester_plan2(driver):
+    """⑤ 2안: 미신청 → [관리]로 다시 신청 → 같은 행이 2차 제출"""
+    choose(driver, "thesis-application", "fail-next", "2")
+    assert status_of(driver, "예비심사") == "미신청"
+    click_manage(driver, "예비심사")
+    modal = driver.find_element(By.ID, "application-modal")
+    driver.find_element(By.ID, "app-thesis-title").send_keys("AI 기반 추천 시스템 연구(보완)")
+    driver.find_element(By.ID, "app-thesis-title-en").send_keys("Improved Recommender")
+    modal.find_element(By.CSS_SELECTOR, "button[type=submit]").click()
+    accept_dialog(driver)
+    assert accept_dialog(driver) == "논문 신청이 완료되었습니다."
+    assert status_of(driver, "예비심사") == "신청완료"
     open_screen(driver, "thesis-submission")
-    assert "1차 제출" in stage_row(driver, "thesis-submission-content", "예비심사").text, "2차 제출도 철회됨"
+    row = stage_row(driver, "thesis-submission-content", "예비심사")
+    assert "2차 제출" in row.text and "미제출" in row.text
+    page = open_submission_row(driver, "예비심사", "제출")
+    assert headings(page) == ["1차 제출", "2차 제출"] and "불합격" in page.text
 
 
-def test_04_cancel_submission_also_withdraws_application(driver):
-    """② 학위논문제출 상세 [제출취소] → 신청도 함께 철회 (한 번에)"""
-    choose_scenario(driver, "thesis-submission", "not-started")
-    page = open_submission_row(driver, "예비심사", "보기")
-    page.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
-    assert accept_dialog(driver) == WITHDRAW_CONFIRM
-    assert accept_dialog(driver) == WITHDRAW_DONE
-    assert "1차 제출" in stage_row(driver, "thesis-submission-content", "예비심사").text
-    open_screen(driver, "thesis-application")
-    assert "미신청" in stage_row(driver, "thesis-application-content", "예비심사").text, "신청도 철회됨"
-
-
-def test_05_in_progress_blocked_in_both_menus(driver):
-    """③ 심사 진행 중: 논문신청·학위논문제출 어느 쪽에서도 요구서 문구로 불가"""
-    choose_scenario(driver, "thesis-application", "in-progress")
-    open_application_detail(driver, "예비심사").find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']").click()
-    assert accept_dialog(driver) == WITHDRAW_BLOCKED
-    driver.execute_script("closeDetailModal()")
-    open_screen(driver, "thesis-submission")
-    page = open_submission_row(driver, "예비심사", "보기")
-    page.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
-    assert accept_dialog(driver) == WITHDRAW_BLOCKED
-
-
-def test_06_passed_stage_withdraw_blocked(driver):
-    choose_scenario(driver, "thesis-application", "retry-open")
-    open_application_detail(driver, "논문작성계획서").find_element(By.XPATH, ".//button[normalize-space()='논문 신청 철회']").click()
-    assert accept_dialog(driver) == WITHDRAW_BLOCKED
-    driver.execute_script("closeDetailModal()")
-
-
-def test_07_conditional_followup_in_same_screen(driver):
-    """④ 조건부합격: 본심사 1행이 2차 제출, 제출 화면에 1차 제출 내역(조건부합격)"""
-    choose_scenario(driver, "thesis-submission", "conditional")
+def test_10_conditional(driver):
+    """⑥ 조건부합격: 신청 없이 2차 제출 폼, 철회 불가"""
+    choose(driver, "thesis-submission", "conditional")
     row = stage_row(driver, "thesis-submission-content", "본심사")
     assert "2차 제출" in row.text and "미제출" in row.text
     page = open_submission_row(driver, "본심사", "제출")
     assert headings(page) == ["1차 제출", "2차 제출"] and "조건부합격" in page.text
-
-
-def test_07b_same_semester_reapply_blocked(driver):
-    """불합격 처리된 학기에는 같은 단계 다시 신청 불가 (다음 학기에 신청) — ① 시나리오의 불합격 학기를 현재 학기로 바꿔 확인"""
-    choose_scenario(driver, "thesis-application", "retry-open")
-    driver.execute_script(
-        "const s = ReviewScenario.getStage('prelim'); ReviewScenario.getLatest('prelim').semester = s.semester;")
-    stage_row(driver, "thesis-application-content", "예비심사").find_element(By.PARTIAL_LINK_TEXT, "관리").click()
-    assert accept_dialog(driver) == "불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다."
-    assert not driver.find_elements(By.ID, "application-modal")
-    # 다른 학기(기본 ① 시나리오)는 신청 모달이 열림
-    choose_scenario(driver, "thesis-application", "retry-open")
-    stage_row(driver, "thesis-application-content", "예비심사").find_element(By.PARTIAL_LINK_TEXT, "관리").click()
-    time.sleep(0.3)
-    assert driver.find_elements(By.ID, "application-modal")
-    driver.execute_script("closeApplicationModal()")
-
-
-def test_08_removed_items(driver):
     open_screen(driver, "thesis-application")
-    options = [o.text for o in driver.find_elements(By.CSS_SELECTOR, "#thesis-application-content .review-scenario-select option")]
-    assert len(options) == 4, options
+    withdraw_button(driver, "본심사").click()
+    assert accept_dialog(driver) == WITHDRAW_BLOCKED
+    driver.execute_script("closeDetailModal()")
+
+
+def test_11_removed_items(driver):
     open_screen(driver, "exam-schedule")
     time.sleep(0.3)
     assert "차수" not in [th.text for th in driver.find_elements(By.CSS_SELECTOR, "#student-exam-schedule-content thead th")]
@@ -214,7 +244,7 @@ def test_08_removed_items(driver):
     assert "재심사" not in driver.find_element(By.ID, "vertical-journey").text
 
 
-def test_09_no_console_errors(driver):
+def test_12_no_console_errors(driver):
     logs = driver.get_log("browser")
     targets = ("review-scenario-data.js", "thesis-application.js", "thesis-submission.js",
                "student-exam-schedule.js", "dashboard.js", "mockup-deeplink.js")
@@ -222,11 +252,18 @@ def test_09_no_console_errors(driver):
     assert not errors, errors
 
 
-def test_10_deeplink(driver):
-    driver.get(URL + "?screen=thesis-submission&scenario=not-started&view=prelim")
+def test_13_deeplink(driver):
+    driver.get(URL + "?screen=thesis-application&scenario=fail-next&plan=2")
+    time.sleep(1.5)
+    assert status_of(driver, "예비심사") == "미신청"
+    driver.get(URL + "?screen=thesis-submission&scenario=submitted&view=prelim")
     time.sleep(1.5)
     text = driver.find_element(By.ID, "thesis-submission-content").text
-    assert "1차 제출" in text and "2차 제출" in text and "기존 제출 내역" not in text and "제출취소" in text
-    driver.get(URL + "?screen=thesis-application&scenario=not-started&detail=prelim")
+    assert "1차 제출" in text and "[제출취소]" not in text and "수정" in text
+    driver.get(URL + "?screen=thesis-application&scenario=submitted&detail=prelim")
     time.sleep(1.5)
     assert "논문 신청 철회" in driver.find_element(By.ID, "detail-modal").text
+    # 이전 키 호환
+    driver.get(URL + "?screen=thesis-application&scenario=retry-open")
+    time.sleep(1.5)
+    assert driver.execute_script("return ReviewScenario.getState().key") == "fail-next"

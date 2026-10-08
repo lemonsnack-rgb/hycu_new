@@ -7,7 +7,9 @@
  *   student-dashboard.html?screen=thesis-submission&scenario=conditional&form=final
  *
  * - screen   : showScreen 화면 키 (dashboard, thesis-application, thesis-submission, exam-schedule …)
- * - scenario : 시연 시나리오 키 (retry-open, not-started, in-progress, conditional)
+ * - scenario : 시연 시나리오 키 (applied, submitted, reviewing, fail-same, fail-next, conditional)
+ *              이전 키 retry-open · not-started · in-progress 도 호환
+ * - plan     : 재심사 안 (1: 신청 유지 / 2: 신청 다시), 생략 시 1안
  * - form     : 학위논문제출에서 해당 기본단계의 최신 제출 폼 열기 (plan, prelim, final)
  * - view     : 학위논문제출에서 해당 기본단계의 최신 제출 상세([보기]) 열기 (plan, prelim, final)
  * - detail   : 논문신청에서 해당 기본단계의 신청 상세 모달 열기 (plan, prelim, final)
@@ -21,9 +23,16 @@
         const form = params.get('form');
         const view = params.get('view');
         const detail = params.get('detail');
+        const plan = params.get('plan');
 
-        if (scenario && window.ReviewScenario && ReviewScenario.SCENARIOS.some(s => s.key === scenario)) {
-            ReviewScenario.load(scenario);
+        if (window.ReviewScenario) {
+            const key = scenario ? ReviewScenario.resolveKey(scenario) : null;
+            const validPlan = ReviewScenario.PLANS.some(p => p.key === plan) ? plan : undefined;
+            if (key && ReviewScenario.SCENARIOS.some(s => s.key === key)) {
+                ReviewScenario.load(key, validPlan);
+            } else if (validPlan) {
+                ReviewScenario.load(ReviewScenario.getState().key, validPlan);
+            }
         }
         if (screen && typeof window.showScreen === 'function') {
             window.showScreen(screen);

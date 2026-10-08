@@ -7,7 +7,7 @@
 let thesisCurrentView = 'list'; // list | submit | detail
 let thesisCurrentSubmissionId = null;
 
-// 제출 데이터: 재심사·제출취소 목업 시나리오(review-scenario-data.js)의 제출 기록
+// 제출 데이터: 재심사·신청철회 목업 시나리오(review-scenario-data.js)의 제출 기록
 // (제출 번호 'N차 제출' = 기본단계 안에서 제출할 때마다 1씩 증가)
 function getThesisSubmissions() {
     return ReviewScenario.getState().submissions;
@@ -105,10 +105,6 @@ function setupThesisEventDelegation() {
                 e.stopPropagation();
                 const comments = target.getAttribute('data-comments');
                 showReviewCommentsModal(comments);
-            } else if (action === 'cancel-submission' && id) {
-                e.preventDefault();
-                e.stopPropagation();
-                cancelThesisSubmission(parseInt(id));
             } else {
                 console.log('알 수 없는 버튼 클릭, action:', action, 'target:', target);
             }
@@ -270,6 +266,12 @@ function renderThesisListRow(submission, index) {
 // 제출 화면으로 이동
 function submitThesis(id) {
     console.log('submitThesis 호출됨, id:', id);
+    // 재심사 1안: 불합격 처리된 학기에는 다음 차수 제출 불가 (다음 학기 제출기간에 제출)
+    const check = ReviewScenario.checkSubmit(id);
+    if (!check.ok) {
+        alert(check.reason);
+        return;
+    }
     thesisCurrentSubmissionId = id;
     thesisCurrentView = 'submit';
     console.log('thesisCurrentView 변경:', thesisCurrentView);
@@ -491,9 +493,6 @@ function renderThesisDetailView() {
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
 
-    // 제출취소: 상세 화면에서, 결과 확정 전이고 제출기간일 때만 (심사 진행 중이면 누를 때 안내)
-    const canShowCancel = !submission.reviewResult && ReviewScenario.isWithinPeriod(submission.submissionPeriod);
-
     // 평가 결과 텍스트 계산
     let reviewResultText = '-';
     if (submission.reviewResult === 'pass') {
@@ -519,11 +518,6 @@ function renderThesisDetailView() {
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">${submission.attemptNumber}차 제출</h3>
                 <div class="flex gap-2">
-                    ${canShowCancel ? `
-                    <button data-action="cancel-submission" data-id="${submission.id}"
-                            class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-600 hover:text-white transition-colors">
-                        제출취소
-                    </button>` : ''}
                     <button data-action="edit-thesis" data-id="${submission.id}"
                             class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
                         수정
@@ -683,27 +677,6 @@ function saveThesisSubmission() {
     }
 }
 
-// ==================== 제출취소 ====================
-// 제출취소 = 신청 철회와 같은 처리 (어느 메뉴에서 해도 신청과 제출이 함께 철회됨)
-// 조건(요구서): 결과 확정 전 + 평가한 심사위원 0명 / 표시: 상세 화면에서 제출기간일 때만
-function cancelThesisSubmission(id) {
-    const submission = ReviewScenario.getRecordById(id);
-    if (!submission) return;
-    const check = ReviewScenario.checkWithdraw(submission.stage);
-    if (!check.ok) {
-        alert(check.reason);
-        return;
-    }
-
-    if (!confirm('해당 단계에서 제출한 자료와 내역은 모두 초기화됩니다(합격여부가 결정된 단계 제외) 그래도 철회하시겠습니까?')) {
-        return;
-    }
-
-    ReviewScenario.withdraw(submission.stage);
-    alert('논문 신청 내역이 초기화되었습니다.');
-    backToThesisList();
-}
-
 // 스타일 추가 (즉시 실행)
 (function() {
     const style = document.createElement('style');
@@ -794,4 +767,3 @@ window.editThesisSubmission = editThesisSubmission;
 window.saveThesisSubmission = saveThesisSubmission;
 window.showReviewCommentsModal = showReviewCommentsModal;
 window.renderThesisScreen = renderThesisScreen;
-window.cancelThesisSubmission = cancelThesisSubmission;

@@ -1,14 +1,15 @@
 /**
- * 재심사 · 제출취소 목업 시나리오 (학생 화면 전용)
- * 2026-10-06 작성 / 2026-10-07 재정비 — docs/재심사_목업_재정비_계획_20261007.md 기준
+ * 재심사 · 신청철회 목업 시나리오 (학생 화면 전용)
+ * 2026-10-06 작성 / 2026-10-07 재정비 / 2026-10-08 시나리오 MECE 정리 · 제출취소 삭제 · 재심사 1안/2안
  *   (신청상태는 기존 '미신청/신청완료'만 — 재심사도 일반 심사와 동일하게 취급)
  *
  * - 단계별 심사신청(thesis-application.js)과 단계별 심사자료제출(thesis-submission.js)이
  *   같은 시나리오 상태를 공유함 (페이지 내 메모리, 새로고침 시 초기화)
  * - 제출 번호(attemptNumber): 기본단계 안에서 제출(심사)할 때마다 1씩 증가 — 'N차 제출'
  *   · 조건부합격: 같은 신청 안에서 보완 자료를 다음 번호로 제출 (심사신청 불필요)
- *   · 불합격: 다음 학기에 재신청 → 새 신청의 제출이 다음 번호
- * - 재심도 일반 심사 1건으로 다루며 '재심' 표기는 쓰지 않음
+ *   · 불합격 1안: 신청 유지, 다음 학기 제출기간에 다음 번호로 제출
+ *   · 불합격 2안: 신청만 리셋(미신청), 다음 학기에 다시 신청 → 다음 번호로 제출 (심사 내역 보존)
+ * - 제출 자료 삭제는 신청 철회로만 함 (별도 제출취소 없음)
  * - 롤백: 이 파일 삭제 + student-dashboard.html의 script 태그 제거
  */
 (function () {
@@ -22,20 +23,32 @@
         { id: 'final', name: '본심사', subStageName: '본심사 논문 제출', order: 3 }
     ];
 
-    // 신청/철회 기간 (Mock)
+    // 신청/철회 기간 (Mock) — 현재 학기
     const PERIOD_OPEN = {
         semester: '2026-2학기',
         application: { start: '2026-09-01', end: '2026-12-31' },
         withdrawal: { start: '2026-09-01', end: '2026-12-31' }
     };
+    const CURRENT_SUBMISSION_PERIOD = { start: '2026-09-15', end: '2026-12-31' };
 
-    // key는 딥링크 호환을 위해 유지
-    const SCENARIOS = [
-        { key: 'retry-open', label: '① 불합격 후 다시 신청', desc: '예비심사 1차 불합격 → 미신청, [관리]에서 다시 신청' },
-        { key: 'not-started', label: '② 심사 미진행', desc: '예비심사 다시 신청·2차 제출 완료, 평가한 심사위원 없음 → 철회·제출취소 가능' },
-        { key: 'in-progress', label: '③ 심사 진행 중', desc: '예비심사 다시 신청·2차 제출 완료, 심사위원 1명 평가 완료 → 철회·제출취소 불가' },
-        { key: 'conditional', label: '④ 조건부합격 후 보완 제출', desc: '본심사 조건부합격 → 신청 없이 보완 자료 제출' }
+    // 재심사(불합격 후) 처리 안 — 고객사 선택용
+    const PLANS = [
+        { key: '1', label: '1안 — 신청 유지', desc: '불합격 후 신청은 그대로, 다음 학기 제출기간에 다음 차수 제출' },
+        { key: '2', label: '2안 — 신청 다시', desc: '불합격 후 신청만 리셋(미신청), 다음 학기에 다시 신청 후 제출 (심사 내역 보존)' }
     ];
+
+    // 시나리오: 예비심사 심사 건의 상태 1개씩 (상태 S1·S2·S3·S6·S7·S5)
+    // 공통 배경: 논문작성계획서 합격(S4), 본심사 미신청(S0)
+    const SCENARIOS = [
+        { key: 'applied', label: '① 신청 후 미제출', desc: '예비심사 신청, 아직 제출 안 함 → 신청 철회 가능' },
+        { key: 'submitted', label: '② 제출 완료·심사 전', desc: '예비심사 제출 완료, 심사 내역 없음 → 신청 철회 시 제출 내역 삭제 안내' },
+        { key: 'reviewing', label: '③ 심사 내역 저장됨', desc: '예비심사 제출 완료, 심사위원 1명 평가 저장(임시저장 포함) → 신청 철회 불가' },
+        { key: 'fail-same', label: '④ 불합격·같은 학기', desc: '이번 학기 예비심사 불합격 → 1안: 다음 학기에 제출 / 2안: 다음 학기에 신청', byPlan: true },
+        { key: 'fail-next', label: '⑤ 불합격·다음 학기', desc: '지난 학기 예비심사 불합격 → 1안: 2차 제출 / 2안: 다시 신청 후 2차 제출', byPlan: true },
+        { key: 'conditional', label: '⑥ 조건부합격 후 보완', desc: '본심사 1차 조건부합격 → 신청 없이 2차 보완 제출, 신청 철회 불가' }
+    ];
+    // 이전 딥링크 키 호환
+    const KEY_ALIAS = { 'retry-open': 'fail-next', 'not-started': 'submitted', 'in-progress': 'reviewing' };
 
     let seq = 1;
 
@@ -75,7 +88,7 @@
             submittedData: null,
             reviewComments: '',
             decidedAt: null,
-            evaluatedCount: 0,            // 평가를 저장한 심사위원 수 (0이면 심사 미진행)
+            evaluatedCount: 0,            // 평가를 저장한 심사위원 수 (임시저장 포함, 0이면 심사 내역 없음)
             totalReviewers: 3,
             evaluationFormRegistered: true
         }, opts);
@@ -101,21 +114,23 @@
         });
     }
 
-    // 예비심사 1차 제출 불합격 (2026-1학기)
-    function prelimFailed() {
+    // 예비심사 1차 제출 불합격 (semester 학기)
+    function prelimFailed(semester) {
+        const thisSemester = semester === PERIOD_OPEN.semester;
         return record('prelim', {
             applicationId: 'APP-prelim-1',
-            semester: '2026-1학기',
+            semester: semester,
+            submissionPeriod: thisSemester ? { ...CURRENT_SUBMISSION_PERIOD } : { start: '2026-04-01', end: '2026-04-30' },
             status: 'submitted',
             reviewResult: 'fail',
-            submittedData: submitted('prelim_v1.pdf', '2026-04-20 10:12', 'prelim_v1_appendix.pdf'),
+            submittedData: submitted('prelim_v1.pdf', thisSemester ? '2026-09-20 10:12' : '2026-04-20 10:12', 'prelim_v1_appendix.pdf'),
             reviewComments: '연구 방법론이 연구 문제를 검증하기에 부족하고, 실험 데이터의 신뢰성 근거가 제시되지 않음. 데이터 수집 설계를 전면 보완한 후 다음 학기에 재심사를 받기 바람.',
-            decidedAt: '2026-06-12',
+            decidedAt: thisSemester ? '2026-10-01' : '2026-06-12',
             evaluatedCount: 3
         });
     }
 
-    function buildScenario(key) {
+    function buildScenario(key, plan) {
         seq = 1;
         const stages = STAGE_DEFS.map(def => ({
             ...def,
@@ -132,22 +147,35 @@
         stage('plan').applications.push(application('plan', 1, '2025-09-05', '2025-2학기'));
         submissions.push(planPassed());
 
-        if (key === 'retry-open') {
-            stage('prelim').applications.push(application('prelim', 1, '2026-03-05', '2026-1학기'));
-            submissions.push(prelimFailed());
-        } else if (key === 'not-started' || key === 'in-progress') {
-            stage('prelim').applications.push(application('prelim', 1, '2026-03-05', '2026-1학기'));
-            stage('prelim').applications.push(application('prelim', 2, '2026-09-03', '2026-2학기'));
-            submissions.push(prelimFailed());
-            submissions.push(record('prelim', {
-                applicationId: 'APP-prelim-2',
-                attemptNumber: 2,
-                semester: '2026-2학기',
-                submissionPeriod: { start: '2026-09-15', end: '2026-12-31' },
-                status: 'submitted',
-                submittedData: submitted('prelim_v2.pdf', '2026-09-28 16:40', 'prelim_v2_appendix.pdf'),
-                evaluatedCount: key === 'in-progress' ? 1 : 0
-            }));
+        if (key === 'applied' || key === 'submitted' || key === 'reviewing') {
+            // 예비심사 1차 신청 (이번 학기)
+            stage('prelim').applications.push(application('prelim', 1, '2026-09-03', PERIOD_OPEN.semester));
+            const opts = {
+                applicationId: 'APP-prelim-1',
+                semester: PERIOD_OPEN.semester,
+                submissionPeriod: { ...CURRENT_SUBMISSION_PERIOD }
+            };
+            if (key !== 'applied') {
+                Object.assign(opts, {
+                    status: 'submitted',
+                    submittedData: submitted('prelim_v1.pdf', '2026-09-28 16:40', 'prelim_v1_appendix.pdf'),
+                    evaluatedCount: key === 'reviewing' ? 1 : 0
+                });
+            }
+            submissions.push(record('prelim', opts));
+        } else if (key === 'fail-same' || key === 'fail-next') {
+            const failSemester = key === 'fail-same' ? PERIOD_OPEN.semester : '2026-1학기';
+            stage('prelim').applications.push(application('prelim', 1, key === 'fail-same' ? '2026-09-03' : '2026-03-05', failSemester));
+            submissions.push(prelimFailed(failSemester));
+            if (plan === '1') {
+                // 1안: 신청 유지, 같은 신청 안에 다음 차수 제출 생성 (다음 학기 제출기간에 제출)
+                submissions.push(record('prelim', {
+                    applicationId: 'APP-prelim-1',
+                    attemptNumber: 2,
+                    semester: PERIOD_OPEN.semester,
+                    submissionPeriod: { ...CURRENT_SUBMISSION_PERIOD }
+                }));
+            }
         } else if (key === 'conditional') {
             stage('prelim').applications.push(application('prelim', 1, '2026-03-05', '2026-1학기'));
             submissions.push(record('prelim', {
@@ -160,30 +188,29 @@
                 decidedAt: '2026-06-12',
                 evaluatedCount: 3
             }));
-            stage('final').applications.push(application('final', 1, '2026-09-03', '2026-2학기'));
-            const first = record('final', {
+            stage('final').applications.push(application('final', 1, '2026-09-03', PERIOD_OPEN.semester));
+            submissions.push(record('final', {
                 applicationId: 'APP-final-1',
-                semester: '2026-2학기',
-                submissionPeriod: { start: '2026-09-15', end: '2026-12-31' },
+                semester: PERIOD_OPEN.semester,
+                submissionPeriod: { ...CURRENT_SUBMISSION_PERIOD },
                 status: 'submitted',
                 reviewResult: 'conditional',
                 submittedData: submitted('final_v1.pdf', '2026-09-20 11:05', 'final_v1_data.pdf'),
                 reviewComments: '결론의 일반화 근거가 부족함. 5장 분석 결과를 보완하여 다시 제출할 것.',
                 decidedAt: '2026-10-01',
                 evaluatedCount: 3
-            });
-            submissions.push(first);
+            }));
             // 조건부합격 → 같은 신청 안에서 다음 번호 제출 (심사신청 불필요)
             submissions.push(record('final', {
                 applicationId: 'APP-final-1',
                 attemptNumber: 2,
-                semester: '2026-2학기',
+                semester: PERIOD_OPEN.semester,
                 submissionPeriod: { start: '2026-10-02', end: '2026-12-31' },
                 totalReviewers: 2
             }));
         }
 
-        return { key, stages, submissions };
+        return { key, plan, stages, submissions };
     }
 
     let state = null;
@@ -196,15 +223,26 @@
 
     const ReviewScenario = {
         SCENARIOS,
+        PLANS,
 
-        load(key) {
-            state = buildScenario(key);
+        resolveKey(key) {
+            return KEY_ALIAS[key] || key;
+        },
+
+        // key: 시나리오, plan: 재심사 안('1' | '2', 생략 시 현재 안 유지)
+        load(key, plan) {
+            const nextPlan = plan || (state && state.plan) || '1';
+            state = buildScenario(this.resolveKey(key), nextPlan);
             return state;
         },
 
         getState() {
             if (!state) this.load(SCENARIOS[0].key);
             return state;
+        },
+
+        getPlan() {
+            return this.getState().plan;
         },
 
         getStages() {
@@ -243,11 +281,11 @@
 
         /**
          * 논문신청 화면용 신청상태 (기존 '미신청/신청완료'만 — 재심사도 일반 심사와 동일)
-         * 불합격 확정 시 해당 단계 신청은 리셋되어 '미신청'
+         * 불합격 확정 시: 1안은 신청 유지(신청완료), 2안은 신청만 리셋(미신청)
          */
         getStageStatus(stageId) {
             const latest = this.getLatest(stageId);
-            if (latest && latest.reviewResult === 'fail') {
+            if (latest && latest.reviewResult === 'fail' && this.getPlan() === '2') {
                 return { code: 'none', label: '미신청' };
             }
             return this.getCurrentApplication(stageId)
@@ -262,12 +300,25 @@
             return period.start <= today && today <= period.end;
         },
 
-        // 신청 가능 여부: 불합격 처리된 학기에는 같은 단계를 다시 신청할 수 없음 (다음 학기에 다시 신청)
-        checkApply(stageId) {
+        // 같은 단계에서 불합격 처리된 학기가 현재 학기인지
+        failedThisSemester(stageId) {
             const stage = this.getStage(stageId);
-            const latest = this.getLatest(stageId);
-            if (stage && latest && latest.reviewResult === 'fail' && latest.semester === stage.semester) {
+            return this.getRecords(stageId).some(r => r.reviewResult === 'fail' && stage && r.semester === stage.semester);
+        },
+
+        // 신청 가능 여부 (2안): 불합격 처리된 학기에는 같은 단계를 다시 신청할 수 없음 (다음 학기에 다시 신청)
+        checkApply(stageId) {
+            if (this.failedThisSemester(stageId)) {
                 return { ok: false, reason: '불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다.' };
+            }
+            return { ok: true };
+        },
+
+        // 제출 가능 여부 (1안): 불합격 처리된 학기에는 다음 차수를 제출할 수 없음 (다음 학기 제출기간에 제출)
+        checkSubmit(recordId) {
+            const rec = this.getRecordById(recordId);
+            if (rec && rec.status !== 'submitted' && this.failedThisSemester(rec.stage)) {
+                return { ok: false, reason: '불합격 처리된 단계는 다음 학기 제출기간에 제출할 수 있습니다.' };
             }
             return { ok: true };
         },
@@ -284,13 +335,13 @@
                 applicationId: app.id,
                 attemptNumber: records.length ? records[records.length - 1].attemptNumber + 1 : 1,
                 semester: stage.semester,
-                submissionPeriod: { start: '2026-09-15', end: '2026-12-31' }
+                submissionPeriod: { ...CURRENT_SUBMISSION_PERIOD }
             });
             this.getState().submissions.push(rec);
             return rec.attemptNumber;
         },
 
-        // 철회 가능 여부 (JXLB-2): 결과 확정(100% 완료) 또는 심사 진행 중(1명 이상 평가)이면 불가 — 요구서 문구 사용
+        // 신청 철회 가능 여부: 같은 신청 안에 심사 내역(평가 저장 1건 이상, 임시저장 포함) 또는 결과가 있으면 불가 — 요구서 문구
         checkWithdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
             const appRecords = this.getApplicationRecords(app);
@@ -300,7 +351,13 @@
             return { ok: true };
         },
 
-        // 철회: 신청과 해당 신청의 제출 자료 삭제 → 미신청 (논문신청의 신청 철회, 학위논문제출의 제출취소 공용)
+        // 신청 철회 시 함께 삭제될 제출 내역이 있는지
+        hasSubmission(stageId) {
+            const app = this.getCurrentApplication(stageId);
+            return this.getApplicationRecords(app).some(r => r.status === 'submitted');
+        },
+
+        // 신청 철회: 신청과 해당 신청의 제출 자료 삭제 → 미신청 (이전 신청의 심사 기록은 보존)
         withdraw(stageId) {
             const app = this.getCurrentApplication(stageId);
             if (!app) return;
@@ -311,12 +368,14 @@
         },
 
         /**
-         * 목업 전용 시나리오 선택 바
+         * 목업 전용 시연 바 (시나리오 + 재심사 안)
          * @param {string} rerenderFn - 선택 변경 후 호출할 전역 함수명
          */
         renderBar(rerenderFn) {
             const current = this.getState().key;
+            const plan = this.getPlan();
             const info = SCENARIOS.find(s => s.key === current);
+            const planInfo = PLANS.find(p => p.key === plan);
             return `
                 <div class="mb-4 flex flex-wrap items-center gap-3 px-4 py-3 rounded-lg border border-dashed border-amber-400 bg-amber-50">
                     <span class="px-2 py-0.5 text-xs font-semibold rounded bg-amber-500 text-white">목업 시연</span>
@@ -326,10 +385,16 @@
                             style="height: 32px;">
                         ${SCENARIOS.map(s => `<option value="${s.key}" ${s.key === current ? 'selected' : ''}>${s.label}</option>`).join('')}
                     </select>
+                    <label class="text-sm font-medium text-gray-700">재심사 안</label>
+                    <select class="review-plan-select px-2 border border-gray-300 rounded text-sm bg-white"
+                            onchange="ReviewScenario.load('${current}', this.value); ${rerenderFn}();"
+                            style="height: 32px;">
+                        ${PLANS.map(p => `<option value="${p.key}" ${p.key === plan ? 'selected' : ''}>${p.label}</option>`).join('')}
+                    </select>
                     <button type="button"
                             onclick="ReviewScenario.load('${current}'); ${rerenderFn}();"
                             class="review-scenario-reset px-2 text-xs border border-gray-300 rounded bg-white hover:bg-gray-50" style="height: 32px;">초기화</button>
-                    <span class="text-xs text-gray-600">${info ? info.desc : ''}</span>
+                    <span class="text-xs text-gray-600">${info ? info.desc : ''}${info && info.byPlan && planInfo ? ` (${planInfo.desc})` : ''}</span>
                 </div>
             `;
         }
