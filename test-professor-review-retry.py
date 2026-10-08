@@ -140,6 +140,28 @@ def test_07_no_console_errors(driver):
     assert not errors, errors
 
 
+def test_09_mouse_path_to_previous_attempt(driver):
+    """경로: 학위논문심사 목록 → [승인](위원장) / [심사](위원) 실제 마우스 클릭 → 상세 위쪽 1차 심사 내역
+    (모바일 메뉴 오버레이가 데스크톱 화면을 가려 클릭이 안 되던 기존 결함 수정 확인)"""
+    from selenium.webdriver.common.action_chains import ActionChains
+    for button, expect in (("승인", "데이터 수집 설계를 전면 보완"), ("심사", "1차 심사")):
+        open_review_list(driver)
+        row = [r for r in driver.find_elements(By.CSS_SELECTOR, "#review-list tbody tr") if "홍길동" in r.text][0]
+        btn = row.find_element(By.XPATH, f".//button[normalize-space()='{button}']")
+        driver.execute_script("arguments[0].scrollIntoView({block:'center'})", btn)
+        time.sleep(0.3)
+        ActionChains(driver).move_to_element(btn).click().perform()
+        time.sleep(0.8)
+        text = detail_text(driver)
+        assert expect in text and "2차 심사" in text, button
+        assert text.find("1차 심사") < text.find("2차 심사")
+    # 모바일 메뉴는 그대로 열리고 닫힘
+    driver.execute_script("toggleMobileMenu()")
+    assert driver.execute_script("return getComputedStyle(document.getElementById('mobile-menu-overlay')).display") == "block"
+    driver.execute_script("toggleMobileMenu()")
+    assert driver.execute_script("return getComputedStyle(document.getElementById('mobile-menu-overlay')).display") == "none"
+
+
 def test_08_deeplink(driver):
     driver.get(URL + "?screen=review&detail=RA_TEST_CHAIR&view=chair")
     time.sleep(2)

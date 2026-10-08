@@ -1485,7 +1485,7 @@
     </div> <!-- /layout-v3-container -->
 
     <!-- 사이드바 오버레이 (모바일용) -->
-    <div id="mobile-menu-overlay" class="layout-v3-sidebar-overlay" onclick="toggleMobileMenu()"></div>
+    <div id="mobile-menu-overlay" class="layout-v3-sidebar-overlay hidden" onclick="toggleMobileMenu()"></div>
     
     <!-- 모달 컨테이너 -->
     <div id="modal-container"></div>
@@ -1524,6 +1524,8 @@
             const overlay = document.getElementById('mobile-menu-overlay');
             sidebar.classList.toggle('mobile-open');
             overlay.classList.toggle('active');
+            // style.css는 .hidden이 없으면 오버레이를 표시하므로 메뉴가 닫혀 있을 때는 숨김 (화면 클릭 가림 방지)
+            overlay.classList.toggle('hidden', !sidebar.classList.contains('mobile-open'));
         };
 
         // 페이지 타이틀 업데이트 함수
