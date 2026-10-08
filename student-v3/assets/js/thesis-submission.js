@@ -105,6 +105,10 @@ function setupThesisEventDelegation() {
                 e.stopPropagation();
                 const comments = target.getAttribute('data-comments');
                 showReviewCommentsModal(comments);
+            } else if (action === 'cancel-submission' && id) {
+                e.preventDefault();
+                e.stopPropagation();
+                cancelThesisSubmission(parseInt(id));
             } else {
                 console.log('알 수 없는 버튼 클릭, action:', action, 'target:', target);
             }
@@ -493,6 +497,9 @@ function renderThesisDetailView() {
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
 
+    // 제출취소: 상세 화면에서, 결과 확정 전이고 제출기간일 때만 (심사 내역이 있으면 누를 때 안내)
+    const canShowCancel = !submission.reviewResult && ReviewScenario.isWithinPeriod(submission.submissionPeriod);
+
     // 평가 결과 텍스트 계산
     let reviewResultText = '-';
     if (submission.reviewResult === 'pass') {
@@ -518,6 +525,11 @@ function renderThesisDetailView() {
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-lg font-semibold text-gray-800">${submission.attemptNumber}차 제출</h3>
                 <div class="flex gap-2">
+                    ${canShowCancel ? `
+                    <button data-action="cancel-submission" data-id="${submission.id}"
+                            class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-600 hover:text-white transition-colors">
+                        제출취소
+                    </button>` : ''}
                     <button data-action="edit-thesis" data-id="${submission.id}"
                             class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
                         수정
@@ -677,6 +689,25 @@ function saveThesisSubmission() {
     }
 }
 
+// ==================== 제출취소 ====================
+// 해당 차수(세부단계) 제출 내역만 삭제 → 미제출. 신청과 이전 차수(통과·판정) 기록은 유지 — 신청 철회와 별개
+// 조건: 결과 확정 전 + 심사 내역(평가 저장, 임시저장 포함) 없음 / 표시: 상세 화면에서 제출기간일 때만
+function cancelThesisSubmission(id) {
+    const check = ReviewScenario.checkCancelSubmission(id);
+    if (!check.ok) {
+        alert(check.reason);
+        return;
+    }
+
+    if (!confirm('제출한 심사자료를 취소하시겠습니까?\n제출한 파일이 삭제되며, 제출기간 내에 다시 제출할 수 있습니다.')) {
+        return;
+    }
+
+    ReviewScenario.cancelSubmission(id);
+    alert('제출이 취소되었습니다.');
+    backToThesisList();
+}
+
 // 스타일 추가 (즉시 실행)
 (function() {
     const style = document.createElement('style');
@@ -760,6 +791,7 @@ function showReviewCommentsModal(comments) {
 }
 
 // 전역 함수 등록
+window.cancelThesisSubmission = cancelThesisSubmission;
 window.submitThesis = submitThesis;
 window.viewThesisSubmission = viewThesisSubmission;
 window.backToThesisList = backToThesisList;

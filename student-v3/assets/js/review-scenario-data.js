@@ -1,6 +1,6 @@
 /**
  * 재심사 · 신청철회 목업 시나리오 (학생 화면 전용)
- * 2026-10-06 작성 / 2026-10-07 재정비 / 2026-10-08 시나리오 MECE 정리 · 제출취소 삭제 · 재심사 1안/2안
+ * 2026-10-06 작성 / 2026-10-07 재정비 / 2026-10-08 시나리오 MECE 정리 · 재심사 1안/2안 · 신청 철회와 제출취소 분리
  *   (신청상태는 기존 '미신청/신청완료'만 — 재심사도 일반 심사와 동일하게 취급)
  *
  * - 단계별 심사신청(thesis-application.js)과 단계별 심사자료제출(thesis-submission.js)이
@@ -9,7 +9,8 @@
  *   · 조건부합격: 같은 신청 안에서 보완 자료를 다음 번호로 제출 (심사신청 불필요)
  *   · 불합격 1안: 신청 유지, 다음 학기 제출기간에 다음 번호로 제출
  *   · 불합격 2안: 신청만 리셋(미신청), 다음 학기에 다시 신청 → 다음 번호로 제출 (심사 내역 보존)
- * - 제출 자료 삭제는 신청 철회로만 함 (별도 제출취소 없음)
+ * - 신청 철회(신청 + 그 신청의 제출 삭제)와 제출취소(해당 차수 제출만 삭제, 신청 유지)는 별개
+ *   → 통과·판정된 이전 차수 기록은 남기고, 진행 중인 차수만 되돌림
  * - 롤백: 이 파일 삭제 + student-dashboard.html의 script 태그 제거
  */
 (function () {
@@ -41,8 +42,8 @@
     // 공통 배경: 논문작성계획서 합격(S4), 본심사 미신청(S0)
     const SCENARIOS = [
         { key: 'applied', label: '① 신청 후 미제출', desc: '예비심사 신청, 아직 제출 안 함 → 신청 철회 가능' },
-        { key: 'submitted', label: '② 제출 완료·심사 전', desc: '예비심사 제출 완료, 심사 내역 없음 → 신청 철회 시 제출 내역 삭제 안내' },
-        { key: 'reviewing', label: '③ 심사 내역 저장됨', desc: '예비심사 제출 완료, 심사위원 1명 평가 저장(임시저장 포함) → 신청 철회 불가' },
+        { key: 'submitted', label: '② 제출 완료·심사 전', desc: '예비심사 제출 완료, 심사 내역 없음 → 제출취소 가능(신청 유지), 신청 철회 시 제출 내역 삭제 안내' },
+        { key: 'reviewing', label: '③ 심사 내역 저장됨', desc: '예비심사 제출 완료, 심사위원 1명 평가 저장(임시저장 포함) → 심사중: 제출취소·신청 철회 불가' },
         { key: 'fail-same', label: '④ 불합격·같은 학기', desc: '이번 학기 예비심사 불합격 → 1안: 다음 학기에 제출 / 2안: 다음 학기에 신청', byPlan: true },
         { key: 'fail-next', label: '⑤ 불합격·다음 학기', desc: '지난 학기 예비심사 불합격 → 1안: 2차 제출 / 2안: 다시 신청 후 2차 제출', byPlan: true },
         { key: 'conditional', label: '⑥ 조건부합격 후 보완', desc: '본심사 1차 조건부합격 → 신청 없이 2차 보완 제출, 신청 철회 불가' }
@@ -355,6 +356,23 @@
         hasSubmission(stageId) {
             const app = this.getCurrentApplication(stageId);
             return this.getApplicationRecords(app).some(r => r.status === 'submitted');
+        },
+
+        // 제출취소 가능 여부: 해당 차수(세부단계) 제출에 심사 내역(평가 저장 1건 이상, 임시저장 포함)이 있으면 심사중으로 보고 불가
+        checkCancelSubmission(recordId) {
+            const rec = this.getRecordById(recordId);
+            if (!rec || rec.status !== 'submitted' || rec.reviewResult || rec.evaluatedCount > 0) {
+                return { ok: false, reason: '심사가 진행 중이어서 제출을 취소할 수 없습니다.' };
+            }
+            return { ok: true };
+        },
+
+        // 제출취소: 해당 차수 제출 내역만 삭제 → 미제출 (신청과 이전 차수 기록은 유지)
+        cancelSubmission(recordId) {
+            const rec = this.getRecordById(recordId);
+            if (!rec) return;
+            rec.status = 'not_submitted';
+            rec.submittedData = null;
         },
 
         // 신청 철회: 신청과 해당 신청의 제출 자료 삭제 → 미신청 (이전 신청의 심사 기록은 보존)

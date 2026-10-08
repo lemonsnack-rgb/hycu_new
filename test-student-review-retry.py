@@ -2,7 +2,8 @@
 학생 화면 - 재심사 · 신청철회 목업 테스트 (2026-10-08 기준)
 - 시나리오는 예비심사 심사 건의 상태 1개씩 (MECE): ① 신청 후 미제출 ② 제출 완료·심사 전 ③ 심사 내역 저장됨
   ④ 불합격·같은 학기 ⑤ 불합격·다음 학기 ⑥ 조건부합격 후 보완 / 재심사 안: 1안(신청 유지) · 2안(신청 다시)
-- 제출 자료 삭제는 신청 철회로만 (별도 제출취소 없음). 제출 내역이 있으면 안내 문구, 심사 내역(임시저장 포함)이 있으면 불가
+- 신청 철회(신청 + 제출 삭제)와 제출취소(해당 차수 제출만 삭제, 신청 유지)는 별개
+  심사 내역(평가 저장, 임시저장 포함)이 있으면 심사중으로 보고 둘 다 불가
 - 신청상태는 기존 '미신청 / 신청완료'만, 목록은 심사 건 1행, 상세·제출 화면은 '1차 제출', '2차 제출' 순서
 
 실행: python -m pytest test-student-review-retry.py -v -s
@@ -24,6 +25,9 @@ WITHDRAW_CONFIRM = "해당 단계에서 제출한 자료와 내역은 모두 초
 WITHDRAW_CONFIRM_SUBMITTED = "제출한 심사자료가 있습니다. 신청을 철회하면 제출 내역도 함께 삭제됩니다. 그래도 철회하시겠습니까?"
 WITHDRAW_BLOCKED = "심사가 진행중이므로 철회할 수 없습니다."
 WITHDRAW_DONE = "논문 신청 내역이 초기화되었습니다."
+CANCEL_CONFIRM = "제출한 심사자료를 취소하시겠습니까?\n제출한 파일이 삭제되며, 제출기간 내에 다시 제출할 수 있습니다."
+CANCEL_BLOCKED = "심사가 진행 중이어서 제출을 취소할 수 없습니다."
+CANCEL_DONE = "제출이 취소되었습니다."
 APPLY_BLOCKED = "불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다."
 SUBMIT_BLOCKED = "불합격 처리된 단계는 다음 학기 제출기간에 제출할 수 있습니다."
 
@@ -134,13 +138,23 @@ def test_02_applied_withdraw_default_message(driver):
     assert not rows(driver, "thesis-submission-content", "예비심사")
 
 
-def test_03_submitted_no_cancel_button_and_withdraw_message(driver):
-    """② 제출 완료·심사 전: 상세에 [제출취소] 없음 / 철회 → 제출 내역 삭제 안내 → 제출도 삭제"""
+def test_03a_submitted_cancel_submission_keeps_application(driver):
+    """② 제출 완료·심사 전: 상세 [제출취소] → 해당 차수 제출만 삭제(미제출), 신청은 신청완료 유지"""
     choose(driver, "thesis-submission", "submitted")
     page = open_submission_row(driver, "예비심사", "보기")
     assert headings(page) == ["1차 제출"]
-    assert "제출취소" not in page.text and not page.find_elements(By.CSS_SELECTOR, "[data-action=cancel-submission]")
+    page.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
+    assert accept_dialog(driver).replace(chr(13), "") == CANCEL_CONFIRM
+    assert accept_dialog(driver) == CANCEL_DONE
+    row = stage_row(driver, "thesis-submission-content", "예비심사")
+    assert "1차 제출" in row.text and "미제출" in row.text
     open_screen(driver, "thesis-application")
+    assert status_of(driver, "예비심사") == "신청완료"
+
+
+def test_03b_submitted_withdraw_message(driver):
+    """② 제출 완료·심사 전: 신청 철회 → 제출 내역 삭제 안내 → 신청·제출 함께 삭제"""
+    choose(driver, "thesis-application", "submitted")
     withdraw_button(driver, "예비심사").click()
     assert accept_dialog(driver) == WITHDRAW_CONFIRM_SUBMITTED
     assert accept_dialog(driver) == WITHDRAW_DONE
@@ -149,12 +163,16 @@ def test_03_submitted_no_cancel_button_and_withdraw_message(driver):
     assert not rows(driver, "thesis-submission-content", "예비심사")
 
 
-def test_04_reviewing_withdraw_blocked(driver):
-    """③ 심사 내역 저장됨(임시저장 포함): 철회 불가"""
+def test_04_reviewing_withdraw_and_cancel_blocked(driver):
+    """③ 심사 내역 저장됨(임시저장 포함): 심사중 — 신청 철회·제출취소 모두 불가"""
     choose(driver, "thesis-application", "reviewing")
     withdraw_button(driver, "예비심사").click()
     assert accept_dialog(driver) == WITHDRAW_BLOCKED
     driver.execute_script("closeDetailModal()")
+    open_screen(driver, "thesis-submission")
+    page = open_submission_row(driver, "예비심사", "보기")
+    page.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
+    assert accept_dialog(driver) == CANCEL_BLOCKED
 
 
 def test_05_passed_stage_withdraw_blocked(driver):
@@ -202,6 +220,26 @@ def test_08_fail_next_semester_plan1(driver):
     assert "데이터 수집 설계를 전면 보완" in driver.find_element(By.TAG_NAME, "body").text
     driver.find_elements(By.CSS_SELECTOR, "[data-action=close-modal]")[-1].click()
     time.sleep(0.3)
+
+
+def test_08b_plan1_second_attempt_cancel_keeps_first(driver):
+    """⑤ 1안: 2차 제출 후 제출취소 → 2차만 미제출, 1차 불합격 기록·신청 유지 (특정 차수만 되돌림)"""
+    choose(driver, "thesis-submission", "fail-next", "1")
+    driver.execute_script(
+        "const r = ReviewScenario.getLatest('prelim'); r.status = 'submitted';"
+        "r.submittedData = {title: 't', thesisFile: 'prelim_v2.pdf', thesisFileSize: 1000, otherFile: null, otherFileSize: 0, submittedAt: '2026-10-08 10:00'};"
+        "renderThesisScreen();")
+    time.sleep(0.3)
+    page = open_submission_row(driver, "예비심사", "보기")
+    assert headings(page) == ["1차 제출", "2차 제출"]
+    page.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
+    accept_dialog(driver)
+    assert accept_dialog(driver) == CANCEL_DONE
+    row = stage_row(driver, "thesis-submission-content", "예비심사")
+    assert "2차 제출" in row.text and "미제출" in row.text
+    assert driver.execute_script("return ReviewScenario.getRecords('prelim')[0].reviewResult") == "fail"
+    open_screen(driver, "thesis-application")
+    assert status_of(driver, "예비심사") == "신청완료"
 
 
 def test_09_fail_next_semester_plan2(driver):
@@ -259,7 +297,7 @@ def test_13_deeplink(driver):
     driver.get(URL + "?screen=thesis-submission&scenario=submitted&view=prelim")
     time.sleep(1.5)
     text = driver.find_element(By.ID, "thesis-submission-content").text
-    assert "1차 제출" in text and "[제출취소]" not in text and "수정" in text
+    assert "1차 제출" in text and "제출취소" in text and "수정" in text
     driver.get(URL + "?screen=thesis-application&scenario=submitted&detail=prelim")
     time.sleep(1.5)
     assert "논문 신청 철회" in driver.find_element(By.ID, "detail-modal").text
