@@ -1498,28 +1498,7 @@ const appData = {
             submitDate: '2024-11-05'
         },
 
-        // ===== 재심사 목업 (2026-10-07) =====
-        {
-            id: 'CA009',
-            studentId: 'S_RETRY',
-            studentNumber: '2024123',
-            studentName: '홍길동',
-            academicYear: '2026',
-            semester: '1',
-            collegeType: '대학원',
-            graduate: '일반대학원',
-            undergraduateMajor: '-',
-            major: '컴퓨터공학',
-            degreeType: '석사',
-            academicStatus: '재학',
-            reviewStage: '예비심사',
-            basicStageName: '예비심사',
-            subStageName: '예비심사 논문 제출',
-            assignmentStatus: '배정 완료',
-            advisorName: '박교수',
-            thesisTitle: 'AI 기반 추천 시스템의 개인화 성능 개선 연구',
-            submitDate: '2026-04-20'
-        },
+        // ===== 재심사 목업 (2026-10-08): 홍길동 예비심사 — 심사 건 1행(현재 차수) =====
         {
             id: 'CA010',
             studentId: 'S_RETRY',

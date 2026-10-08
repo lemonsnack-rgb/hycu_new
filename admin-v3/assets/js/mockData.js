@@ -1034,37 +1034,7 @@ const mockCommitteeAssignments = [
         assignedDate: '2025-02-23',
         status: 'completed'
     },
-    // ===== 재심사 목업 (2026-10-07): 홍길동 예비심사 1차(불합격) → 2차(재신청) =====
-    {
-        id: 'CA005',
-        reviewTargetId: null,
-        studentId: 'S2024001',   // 학생 화면 로그인 학생(홍길동)
-        studentNumber: '2024123',
-        studentName: '홍길동',
-        department: '컴퓨터공학과',
-        degreeType: '석사',
-        reviewType: 'preliminary',
-        year: '2026',
-        semester: '1',
-        graduate: '일반대학원',
-        college: '공학계열',
-        undergraduate: '컴퓨터공학과',
-        academicStatus: '재학',
-        advisorName: '박교수',
-        stageName: '예비심사',
-        basicStageName: '예비심사',
-        subStageName: '예비심사 논문 제출',
-        stageOrder: 2,
-        chairId: 'PROF002',
-        chairName: '이교수',
-        members: [
-            { professorId: 'PROF002', professorName: '이교수', role: 'chair', department: '컴퓨터공학과' },
-            { professorId: 'PROF003', professorName: '박교수', role: 'member', department: '컴퓨터공학과' },
-            { professorId: 'PROF005', professorName: '정교수', role: 'member', department: '소프트웨어학과' }
-        ],
-        assignedDate: '2026-04-25',
-        status: 'completed'
-    },
+    // ===== 재심사 목업 (2026-10-08): 홍길동 예비심사 — 심사 건 1행(현재 차수) =====
     {
         id: 'CA006',
         reviewTargetId: null,

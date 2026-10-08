@@ -2,6 +2,7 @@
 관리자 화면 - 재심사 목업 테스트 (2026-10-07 재정비 기준)
 기준: docs/재심사_목업_재정비_계획_20261007.md
 - 관리 화면은 재신청·재심사 건을 따로 구분하지 않음 (신청구분·철회/재심사 대상·배정 불가·차수 없음)
+- 같은 심사 건의 1·2차는 목록 1행, 학위논문심사 상세에 이전 차수 심사 내역 표시 (2026-10-08)
 - 철회 건은 목록에 없음(요구서: 철회 시 배정 내역 삭제)
 
 실행: python -m pytest test-admin-review-retry.py -v -s
@@ -56,7 +57,12 @@ def test_02_review_list_existing(driver):
     open_screen(driver, "thesisReview")
     table = driver.find_element(By.ID, "admin-thesis-review-list")
     assert "차수" not in headers_of(table)
-    assert "홍길동" in table.text
+    assert len([r for r in table.find_elements(By.CSS_SELECTOR, "tbody tr") if "홍길동" in r.text]) == 1
+    driver.execute_script("openAdminReviewDetail('RA_RETRY_002')")
+    time.sleep(1.0)
+    assert "1차 심사" in driver.find_element(By.TAG_NAME, "body").text
+    driver.execute_script("closeAdminReviewDetailScreen()")
+    time.sleep(0.3)
 
 
 def test_03_committee_assignment_existing(driver):
@@ -65,7 +71,8 @@ def test_03_committee_assignment_existing(driver):
     content = driver.find_element(By.ID, "committee-assignment-content")
     headers = headers_of(content)
     assert "차수" not in headers
-    assert "배정 불가" not in content.text and "홍길동" in content.text
+    assert "배정 불가" not in content.text
+    assert len([r for r in content.find_elements(By.CSS_SELECTOR, "tbody tr") if "홍길동" in r.text]) == 1
     options = [o.text for o in driver.find_elements(By.CSS_SELECTOR, "#assignmentStatusFilter option")]
     assert "배정 불가" not in options
     for row in content.find_elements(By.CSS_SELECTOR, "tbody tr"):
@@ -78,7 +85,7 @@ def test_04_exam_schedule_existing(driver):
     time.sleep(0.4)
     content = driver.find_element(By.ID, "schedule-management-content")
     assert "차수" not in headers_of(content)
-    assert "홍길동" in content.text
+    assert len([r for r in content.find_elements(By.CSS_SELECTOR, "tbody tr") if "홍길동" in r.text]) == 1
 
 
 def test_05_dashboard_existing(driver):

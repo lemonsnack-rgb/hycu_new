@@ -129,31 +129,6 @@ const mockExamSchedules = [
         updatedBy: "ADM001",
         updatedAt: "2025-02-27T14:00:00"
     },
-    // 재심사 목업 (2026-10-07): 홍길동 예비심사 1차 일정 (2차 CA006은 일정 미등록)
-    {
-        scheduleId: "SCH004",
-        assignmentId: "CA005",
-        studentId: "S2024001",
-        studentName: "홍길동",
-        studentNumber: "2024123",
-        department: "컴퓨터공학과",
-        degreeType: "석사",
-        stageId: null,
-        stageName: "예비심사",
-        thesisTitle: "AI 기반 추천 시스템의 개인화 성능 개선 연구",
-        examDate: "2026-05-20",
-        examTime: "14:00",
-        duration: 60,
-        method: "offline",
-        onlineInfo: null,
-        offlineInfo: { location: "공학관 501호", address: "" },
-        status: "scheduled",
-        cancelReason: null,
-        createdBy: "ADM001",
-        createdAt: "2026-05-02T10:00:00",
-        updatedBy: "ADM001",
-        updatedAt: "2026-05-02T10:00:00"
-    }
     // CA003 (윤학생 - 예비심사)은 일정 미등록 상태
 ];
 

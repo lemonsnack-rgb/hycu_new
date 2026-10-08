@@ -4,7 +4,8 @@
 // ==================== 심사 목록 렌더링 (관리자용) ====================
 function renderAdminThesisReviewList() {
     // 모든 심사 배정 가져오기 (관리자는 모든 심사 조회 가능)
-    const assignments = ReviewService.getAllReviewAssignments();
+    // 같은 심사 건(학생 · 기본단계)의 1·2차는 최신 차수 1행만 표시 (이전 차수는 상세에서)
+    const assignments = ReviewAttempt.latestPerCase(ReviewService.getAllReviewAssignments());
 
     const listContainer = document.getElementById('admin-thesis-review-list');
     const countEl = document.getElementById('admin-thesis-review-count');
