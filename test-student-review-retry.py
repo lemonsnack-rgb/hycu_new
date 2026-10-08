@@ -1,7 +1,7 @@
 """
 학생 화면 - 재심사 · 신청철회 · 제출취소 목업 테스트 (2026-10-08 기준)
 - 신청상태는 기존 '미신청 / 신청완료'만 (재심사도 일반 심사와 동일)
-- 목록은 심사 건(기본단계) 1행, 1·2차 제출은 하나의 관리(상세·제출) 화면에 '기존 제출 내역' 블록으로 표시
+- 목록은 심사 건(기본단계) 1행, 1·2차 제출은 하나의 관리(상세·제출) 화면에 'N차 제출' 블록으로 표시 (목록 제출구분과 같은 표기)
 - 관리 컬럼은 상세(페이지) 이동 1개, 철회·제출취소는 상세 화면에서 해당 기간에만
 - 신청 철회 = 제출취소 (어느 메뉴에서 해도 신청과 제출이 함께 철회), 불가 문구는 요구서 문구
 
@@ -81,6 +81,10 @@ def open_application_detail(d, stage_name):
     return d.find_element(By.ID, "detail-modal")
 
 
+def headings(page):
+    return [h.text for h in page.find_elements(By.TAG_NAME, "h3") if h.text.endswith("차 제출")]
+
+
 def open_submission_row(d, stage_name, button):
     stage_row(d, "thesis-submission-content", stage_name).find_element(By.XPATH, f".//button[normalize-space()='{button}']").click()
     time.sleep(0.3)
@@ -113,7 +117,7 @@ def test_01_fail_then_reapply(driver):
     row = stage_row(driver, "thesis-submission-content", "예비심사")
     assert "2차 제출" in row.text and "미제출" in row.text
     page = open_submission_row(driver, "예비심사", "제출")
-    assert "기존 제출 내역 (1차 제출)" in page.text and "불합격" in page.text
+    assert headings(page) == ["1차 제출", "2차 제출"] and "불합격" in page.text
 
 
 def test_02_one_management_screen(driver):
@@ -121,8 +125,10 @@ def test_02_one_management_screen(driver):
     choose_scenario(driver, "thesis-submission", "not-started")
     for r_ in driver.find_elements(By.CSS_SELECTOR, "#thesis-submission-content tbody tr"):
         assert action_cell_count(r_) == 1 and "제출취소" not in r_.text
+    # 목록 제출구분('2차 제출')과 상세 제목이 같은 표기
+    assert "2차 제출" in stage_row(driver, "thesis-submission-content", "예비심사").text
     page = open_submission_row(driver, "예비심사", "보기")
-    assert "기존 제출 내역 (1차 제출)" in page.text and "불합격" in page.text and "논문 제출 정보" in page.text
+    assert headings(page) == ["1차 제출", "2차 제출"] and "불합격" in page.text
     page.find_element(By.CSS_SELECTOR, "[data-action=show-review-comments]").click()
     time.sleep(0.3)
     assert "데이터 수집 설계를 전면 보완" in driver.find_element(By.TAG_NAME, "body").text
@@ -178,7 +184,7 @@ def test_07_conditional_followup_in_same_screen(driver):
     row = stage_row(driver, "thesis-submission-content", "본심사")
     assert "2차 제출" in row.text and "미제출" in row.text
     page = open_submission_row(driver, "본심사", "제출")
-    assert "기존 제출 내역 (1차 제출)" in page.text and "조건부합격" in page.text
+    assert headings(page) == ["1차 제출", "2차 제출"] and "조건부합격" in page.text
 
 
 def test_07b_same_semester_reapply_blocked(driver):
@@ -220,7 +226,7 @@ def test_10_deeplink(driver):
     driver.get(URL + "?screen=thesis-submission&scenario=not-started&view=prelim")
     time.sleep(1.5)
     text = driver.find_element(By.ID, "thesis-submission-content").text
-    assert "기존 제출 내역 (1차 제출)" in text and "제출취소" in text
+    assert "1차 제출" in text and "2차 제출" in text and "기존 제출 내역" not in text and "제출취소" in text
     driver.get(URL + "?screen=thesis-application&scenario=not-started&detail=prelim")
     time.sleep(1.5)
     assert "논문 신청 철회" in driver.find_element(By.ID, "detail-modal").text

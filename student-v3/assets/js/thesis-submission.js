@@ -293,7 +293,7 @@ function backToThesisList() {
 }
 
 /**
- * 같은 심사 건(기본단계)의 이전 차수 제출 내역 — 기존 '기존 제출 내역' 블록을 차수마다 그대로 사용 (2026-10-08)
+ * 같은 심사 건(기본단계)의 이전 차수 제출 내역 — 기존 '기존 제출 내역' 블록을 차수마다 그대로 사용, 제목은 목록 제출구분과 같은 'N차 제출' (2026-10-08)
  * 1·2차 제출은 목록에 따로 표시하지 않고 하나의 관리(상세·제출) 화면에서 모두 표시
  */
 function renderPreviousSubmissionBlocks(submission) {
@@ -306,7 +306,7 @@ function renderPreviousSubmissionBlocks(submission) {
             const resultColor = { pass: 'text-green-700', fail: 'text-red-700', conditional: 'text-yellow-700' }[prev.reviewResult] || 'text-gray-700';
             return `
             <div class="bg-gray-50 border border-gray-300 rounded-lg p-6 mb-6">
-                <h3 class="text-lg font-semibold text-gray-800 mb-4">기존 제출 내역 (${prev.attemptNumber}차 제출)</h3>
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">${prev.attemptNumber}차 제출</h3>
                 <div class="space-y-3">
                     <!-- 지도교수 -->
                     <div class="flex items-center gap-4">
@@ -403,7 +403,7 @@ function renderThesisSubmissionForm() {
     // 제출 폼
     html += `
         <div class="bg-white rounded-lg shadow-md p-6">
-            <h3 class="text-lg font-semibold text-gray-800 mb-6">논문 제출 정보</h3>
+            <h3 class="text-lg font-semibold text-gray-800 mb-6">${submission.attemptNumber}차 제출</h3>
             <div class="space-y-4">
                 <!-- 지도교수명 출력 (읽기 전용) -->
                 <div class="flex items-center gap-4">
@@ -517,7 +517,7 @@ function renderThesisDetailView() {
         ${renderPreviousSubmissionBlocks(submission)}
         <div class="bg-white rounded-lg shadow-md p-6">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-lg font-semibold text-gray-800">논문 제출 정보</h3>
+                <h3 class="text-lg font-semibold text-gray-800">${submission.attemptNumber}차 제출</h3>
                 <div class="flex gap-2">
                     ${canShowCancel ? `
                     <button data-action="cancel-submission" data-id="${submission.id}"
