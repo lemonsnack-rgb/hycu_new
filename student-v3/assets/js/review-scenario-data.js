@@ -358,11 +358,24 @@
             return this.getApplicationRecords(app).some(r => r.status === 'submitted');
         },
 
-        // 제출취소 가능 여부: 해당 차수(세부단계) 제출에 심사 내역(평가 저장 1건 이상, 임시저장 포함)이 있으면 심사중으로 보고 불가
-        checkCancelSubmission(recordId) {
+        // 해당 차수(세부단계) 제출이 심사중 또는 결과 확정인지 — 심사 내역(평가 저장 1건 이상, 임시저장 포함)이 있으면 심사중
+        isLocked(recordId) {
             const rec = this.getRecordById(recordId);
-            if (!rec || rec.status !== 'submitted' || rec.reviewResult || rec.evaluatedCount > 0) {
+            return !rec || rec.status !== 'submitted' || !!rec.reviewResult || rec.evaluatedCount > 0;
+        },
+
+        // 제출취소 가능 여부: 심사중·결과 확정이면 불가
+        checkCancelSubmission(recordId) {
+            if (this.isLocked(recordId)) {
                 return { ok: false, reason: '심사가 진행 중이어서 제출을 취소할 수 없습니다.' };
+            }
+            return { ok: true };
+        },
+
+        // 제출 수정 가능 여부: 심사중·결과 확정이면 논문 파일을 바꿀 수 없음
+        checkEditSubmission(recordId) {
+            if (this.isLocked(recordId)) {
+                return { ok: false, reason: '심사가 진행 중이어서 제출 내용을 수정할 수 없습니다.' };
             }
             return { ok: true };
         },

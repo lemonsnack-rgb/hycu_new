@@ -28,6 +28,7 @@ WITHDRAW_DONE = "논문 신청 내역이 초기화되었습니다."
 CANCEL_CONFIRM = "제출한 심사자료를 취소하시겠습니까?\n제출한 파일이 삭제되며, 제출기간 내에 다시 제출할 수 있습니다."
 CANCEL_BLOCKED = "심사가 진행 중이어서 제출을 취소할 수 없습니다."
 CANCEL_DONE = "제출이 취소되었습니다."
+EDIT_BLOCKED = "심사가 진행 중이어서 제출 내용을 수정할 수 없습니다."
 APPLY_BLOCKED = "불합격 처리된 단계는 다음 학기에 다시 신청할 수 있습니다."
 SUBMIT_BLOCKED = "불합격 처리된 단계는 다음 학기 제출기간에 제출할 수 있습니다."
 
@@ -173,6 +174,24 @@ def test_04_reviewing_withdraw_and_cancel_blocked(driver):
     page = open_submission_row(driver, "예비심사", "보기")
     page.find_element(By.CSS_SELECTOR, "[data-action=cancel-submission]").click()
     assert accept_dialog(driver) == CANCEL_BLOCKED
+    # 심사중에는 논문 파일 수정 불가
+    page.find_element(By.CSS_SELECTOR, "[data-action=edit-thesis]").click()
+    assert accept_dialog(driver) == EDIT_BLOCKED
+    assert not driver.find_elements(By.ID, "thesis-main-file")
+
+
+def test_04b_edit_allowed_before_review_hidden_after_result(driver):
+    """[수정]: 심사 전(②)에는 수정 화면 열림 / 결과 확정(합격) 후에는 [수정]·[제출취소] 없음"""
+    choose(driver, "thesis-submission", "submitted")
+    page = open_submission_row(driver, "예비심사", "보기")
+    page.find_element(By.CSS_SELECTOR, "[data-action=edit-thesis]").click()
+    time.sleep(0.3)
+    assert driver.find_elements(By.ID, "thesis-main-file")
+    driver.execute_script("backToThesisList()")
+    time.sleep(0.3)
+    page = open_submission_row(driver, "논문작성계획서", "보기")
+    assert not page.find_elements(By.CSS_SELECTOR, "[data-action=edit-thesis]")
+    assert not page.find_elements(By.CSS_SELECTOR, "[data-action=cancel-submission]")
 
 
 def test_05_passed_stage_withdraw_blocked(driver):
@@ -298,6 +317,10 @@ def test_13_deeplink(driver):
     time.sleep(1.5)
     text = driver.find_element(By.ID, "thesis-submission-content").text
     assert "1차 제출" in text and "제출취소" in text and "수정" in text
+    # 결과 확정·심사중 차수는 딥링크로도 수정 화면이 열리지 않음
+    driver.get(URL + "?screen=thesis-submission&scenario=reviewing&form=prelim")
+    time.sleep(1.5)
+    assert accept_dialog(driver) == EDIT_BLOCKED
     driver.get(URL + "?screen=thesis-application&scenario=submitted&detail=prelim")
     time.sleep(1.5)
     assert "논문 신청 철회" in driver.find_element(By.ID, "detail-modal").text

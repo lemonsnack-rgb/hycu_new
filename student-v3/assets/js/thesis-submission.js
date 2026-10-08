@@ -271,7 +271,11 @@ function renderThesisListRow(submission, index) {
 function submitThesis(id) {
     console.log('submitThesis 호출됨, id:', id);
     // 재심사 1안: 불합격 처리된 학기에는 다음 차수 제출 불가 (다음 학기 제출기간에 제출)
-    const check = ReviewScenario.checkSubmit(id);
+    // 이미 제출된 차수를 여는 경우(수정)는 수정 기준 적용: 심사중·결과 확정이면 불가
+    const rec = ReviewScenario.getRecordById(id);
+    const check = rec && rec.status === 'submitted'
+        ? ReviewScenario.checkEditSubmission(id)
+        : ReviewScenario.checkSubmit(id);
     if (!check.ok) {
         alert(check.reason);
         return;
@@ -497,8 +501,9 @@ function renderThesisDetailView() {
         ? `${submission.stageName} (${submission.attemptNumber}차)`
         : submission.stageName;
 
-    // 제출취소: 상세 화면에서, 결과 확정 전이고 제출기간일 때만 (심사 내역이 있으면 누를 때 안내)
+    // 제출취소: 결과 확정 전이고 제출기간일 때만 / 수정: 결과 확정 전일 때만 (둘 다 심사중이면 누를 때 안내)
     const canShowCancel = !submission.reviewResult && ReviewScenario.isWithinPeriod(submission.submissionPeriod);
+    const canShowEdit = !submission.reviewResult;
 
     // 평가 결과 텍스트 계산
     let reviewResultText = '-';
@@ -530,10 +535,11 @@ function renderThesisDetailView() {
                             class="px-4 py-2 border border-red-600 text-red-600 rounded-md hover:bg-red-600 hover:text-white transition-colors">
                         제출취소
                     </button>` : ''}
+                    ${canShowEdit ? `
                     <button data-action="edit-thesis" data-id="${submission.id}"
                             class="px-4 py-2 border border-[#6A0028] text-[#6A0028] rounded-md hover:bg-[#6A0028] hover:text-white transition-colors">
                         수정
-                    </button>
+                    </button>` : ''}
                 </div>
             </div>
 
@@ -613,6 +619,12 @@ function renderThesisDetailView() {
 
 // 수정 모드로 전환
 function editThesisSubmission(id) {
+    // 심사중(평가 저장 1건 이상, 임시저장 포함)이거나 결과 확정이면 논문 파일을 바꿀 수 없음
+    const check = ReviewScenario.checkEditSubmission(id);
+    if (!check.ok) {
+        alert(check.reason);
+        return;
+    }
     thesisCurrentSubmissionId = id;
     thesisCurrentView = 'submit';
     renderThesisScreen();
